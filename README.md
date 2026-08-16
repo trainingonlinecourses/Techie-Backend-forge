@@ -136,3 +136,12 @@ claims, JSON 401/403 via `AuthenticationEntryPoint`/`AccessDeniedHandler`.
 ```
 
 The old single-file `index.html` is kept in the repo root as an archive of the original design.
+
+## Deployed URLs
+
+- **Frontend (Vercel):** https://techie-backend-forge.vercel.app — the React SPA.
+  Pushes to `main` auto-deploy it (Vercel builds `frontend/`).
+- **Backend:** run locally (`cd backend && mvn spring-boot:run`, port 8080) or host it on a
+  Java-capable platform (Render, Railway, Fly.io, a VPS). Vercel cannot run the Spring Boot API.
+  To point the deployed SPA at a hosted backend, set `VITE_API_URL` (e.g. `https://api.example.com/api`)
+  in the Vercel project's environment variables and redeploy.
