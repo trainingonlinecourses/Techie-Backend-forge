@@ -52,6 +52,16 @@ code.inline {
 
 .app { position: relative; z-index: 1; min-height: 100vh; display: flex; flex-direction: column; }
 
+/* ---------------- api banner ---------------- */
+.apibanner {
+  position: sticky; top: 0; z-index: 70;
+  background: linear-gradient(90deg, #3a2410, #2a1a0c);
+  color: #f0b86e; border-bottom: 1px solid #5a3d1a;
+  padding: 8px 20px; font-size: 13px; line-height: 1.5;
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+}
+.apibanner code { font-family: var(--mono); font-size: 12px; color: #ffd9a0; background: rgba(0,0,0,.3); padding: 1px 5px; border-radius: 4px; }
+
 /* ---------------- header ---------------- */
 header {
   position: sticky; top: 0; z-index: 60; height: var(--hh);
