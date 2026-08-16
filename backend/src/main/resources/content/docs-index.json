@@ -1,0 +1,93 @@
+[
+  {
+    "title": "Spring Framework Reference",
+    "links": [
+      {"title": "Core Technologies (IoC, beans, AOP, events)", "url": "https://docs.spring.io/spring-framework/reference/core.html", "description": "The official reference for the IoC container, dependency injection, bean scopes, AOP, events and resources."},
+      {"title": "The IoC Container", "url": "https://docs.spring.io/spring-framework/reference/core/beans.html", "description": "BeanFactory vs ApplicationContext, instantiation, dependencies, scopes, lifecycle and configuration."},
+      {"title": "Aspect-Oriented Programming", "url": "https://docs.spring.io/spring-framework/reference/core/aop.html", "description": "AOP concepts, @Aspect, pointcuts, advice types and how Spring AOP proxies work."},
+      {"title": "Data Access & Transactions", "url": "https://docs.spring.io/spring-framework/reference/data-access.html", "description": "JDBC, transactions, DAO support and the transaction abstraction."},
+      {"title": "Transaction Management", "url": "https://docs.spring.io/spring-framework/reference/data-access/transaction.html", "description": "The PlatformTransactionManager abstraction, @Transactional, propagation and isolation."},
+      {"title": "Spring MVC (Web MVC)", "url": "https://docs.spring.io/spring-framework/reference/web/webmvc.html", "description": "DispatcherServlet, controllers, argument resolution, message converters and exception handling."},
+      {"title": "Testing Support", "url": "https://docs.spring.io/spring-framework/reference/testing.html", "description": "Unit and integration testing support in the framework."}
+    ]
+  },
+  {
+    "title": "Spring Boot Reference",
+    "links": [
+      {"title": "Reference Documentation (home)", "url": "https://docs.spring.io/spring-boot/reference/", "description": "The complete Spring Boot reference: using, features, web, data, testing, deployment."},
+      {"title": "Using Spring Boot (build systems, structure, starters)", "url": "https://docs.spring.io/spring-boot/reference/using/index.html", "description": "Maven/Gradle setup, code structure, starters, configuration classes and auto-configuration."},
+      {"title": "Auto-configuration", "url": "https://docs.spring.io/spring-boot/reference/using/auto-configuration.html", "description": "How auto-configuration works and how to customize or disable it."},
+      {"title": "Externalized Configuration", "url": "https://docs.spring.io/spring-boot/reference/features/external-config.html", "description": "application.yml, profiles, environment variables, @ConfigurationProperties and configuration precedence."},
+      {"title": "Spring MVC / Web features", "url": "https://docs.spring.io/spring-boot/reference/web/index.html", "description": "JSON, error handling, CORS, HTTP clients and servlet containers."},
+      {"title": "Data (Spring Data JPA)", "url": "https://docs.spring.io/spring-boot/reference/data/sql.html", "description": "Working with SQL databases, JPA repositories and Hibernate."},
+      {"title": "Testing Spring Boot applications", "url": "https://docs.spring.io/spring-boot/reference/testing/index.html", "description": "@SpringBootTest, @WebMvcTest, @DataJpaTest, MockMvc and test slices."},
+      {"title": "Actuator", "url": "https://docs.spring.io/spring-boot/reference/actuator/index.html", "description": "Production-ready features: health, metrics, audit, HTTP endpoints."},
+      {"title": "Deploying Spring Boot applications", "url": "https://docs.spring.io/spring-boot/reference/deployment/index.html", "description": "Cloud deployment, Docker containers, systemd and Kubernetes."}
+    ]
+  },
+  {
+    "title": "Spring Security Reference",
+    "links": [
+      {"title": "Reference Documentation (home)", "url": "https://docs.spring.io/spring-security/reference/", "description": "The complete Spring Security reference documentation."},
+      {"title": "Architecture (filter chain, authentication)", "url": "https://docs.spring.io/spring-security/reference/servlet/architecture.html", "description": "SecurityFilterChain, SecurityContextHolder, AuthenticationManager and how requests flow."},
+      {"title": "Authentication", "url": "https://docs.spring.io/spring-security/reference/servlet/authentication/index.html", "description": "Password storage, UserDetailsService, DaoAuthenticationProvider, sessions and JWT-style stateless auth."},
+      {"title": "Authorization", "url": "https://docs.spring.io/spring-security/reference/servlet/authorization/index.html", "description": "AuthorizeHttpRequests, method security (@PreAuthorize) and authorities."},
+      {"title": "OAuth2 / OIDC", "url": "https://docs.spring.io/spring-security/reference/servlet/oauth2/index.html", "description": "Login with OAuth2 providers, resource servers and JWT decoding."},
+      {"title": "CORS, CSRF and headers", "url": "https://docs.spring.io/spring-security/reference/servlet/exploits/index.html", "description": "Cross-site request forgery, CORS and security headers."},
+      {"title": "Testing Spring Security", "url": "https://docs.spring.io/spring-security/reference/servlet/test/index.html", "description": "MockMvc support, @WithMockUser and security test annotations."}
+    ]
+  },
+  {
+    "title": "Spring AI Reference",
+    "links": [
+      {"title": "Reference Documentation (home)", "url": "https://docs.spring.io/spring-ai/reference/", "description": "The complete Spring AI reference: models, prompts, structured output, RAG."},
+      {"title": "ChatClient", "url": "https://docs.spring.io/spring-ai/reference/api/chatclient.html", "description": "Fluent API for prompting, messages, streaming and tools."},
+      {"title": "Structured Output", "url": "https://docs.spring.io/spring-ai/reference/api/structured-output-converter.html", "description": "Converting model output into typed Java objects (BeanOutputConverter, MapOutputConverter)."},
+      {"title": "Function Calling", "url": "https://docs.spring.io/spring-ai/reference/api/functions.html", "description": "Registering Java methods as tools the model can call."},
+      {"title": "Embeddings", "url": "https://docs.spring.io/spring-ai/reference/api/embeddings.html", "description": "Embedding models, embeddings and similarity."},
+      {"title": "Vector Databases", "url": "https://docs.spring.io/spring-ai/reference/api/vectordbs.html", "description": "SimpleVectorStore, Redis, PGVector, Chroma, Milvus and more."},
+      {"title": "RAG", "url": "https://docs.spring.io/spring-ai/reference/api/rag.html", "description": "Retrieval-augmented generation: ingestion, retrieval and the RAG pipeline."},
+      {"title": "Advisors", "url": "https://docs.spring.io/spring-ai/reference/api/advisors.html", "description": "Cross-cutting concerns for prompts: memory, logging, RAG, safety."}
+    ]
+  },
+  {
+    "title": "Spring Cloud Reference",
+    "links": [
+      {"title": "Reference Documentation (home)", "url": "https://docs.spring.io/spring-cloud/reference/", "description": "The complete Spring Cloud reference: discovery, config, gateway, resilience and tracing."},
+      {"title": "Service Discovery (Eureka)", "url": "https://docs.spring.io/spring-cloud-netflix/reference/spring-cloud-netflix.html", "description": "Service registration and discovery with Eureka, client and server."},
+      {"title": "Spring Cloud Config", "url": "https://docs.spring.io/spring-cloud-config/reference/", "description": "Centralized external configuration: config server, clients, refresh and encryption."},
+      {"title": "Spring Cloud Gateway", "url": "https://docs.spring.io/spring-cloud-gateway/reference/spring-cloud-gateway-server-mvc.html", "description": "API gateway: routing, predicates, filters, circuit breakers and fallbacks."},
+      {"title": "Resilience4j", "url": "https://resilience4j.readme.io/docs/getting-started-3", "description": "Circuit breakers, retries, rate limiters, bulkheads and time limiters for microservices."},
+      {"title": "Distributed Tracing (Micrometer Tracing)", "url": "https://docs.spring.io/spring-boot/reference/actuator/tracing.html", "description": "Trace IDs, spans, Brave/OpenTelemetry and Zipkin integration."},
+      {"title": "Spring Cloud OpenFeign", "url": "https://docs.spring.io/spring-cloud-openfeign/reference/", "description": "Declarative REST clients that plug into discovery and load balancing."},
+      {"title": "Spring Cloud LoadBalancer", "url": "https://docs.spring.io/spring-cloud-commons/reference/spring-cloud-commons.html", "description": "Client-side load balancing across discovered service instances."}
+    ]
+  },
+  {
+    "title": "Spring Data & Ecosystem",
+    "links": [
+      {"title": "Spring Data JPA", "url": "https://docs.spring.io/spring-data/jpa/reference/", "description": "Repositories, derived queries, auditing, transactions with JPA/Hibernate."},
+      {"title": "Spring Data Relational (JDBC)", "url": "https://docs.spring.io/spring-data/relational/reference/", "description": "JDBC and JPA without the ORM when you prefer SQL-first."},
+      {"title": "Spring Cloud", "url": "https://docs.spring.io/spring-cloud/reference/", "description": "Microservices: service discovery, config server, gateway, resilience."},
+      {"title": "Spring Boot 3 Migration Guide", "url": "https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-3.0-Migration-Guide", "description": "Migrating from Spring Boot 2 to 3 (jakarta.* namespace and more)."}
+    ]
+  },
+  {
+    "title": "Java & Tooling",
+    "links": [
+      {"title": "Java 21 Documentation (docs.oracle.com)", "url": "https://docs.oracle.com/en/java/javase/21/", "description": "Official Java SE 21 API docs, language spec and virtual threads."},
+      {"title": "The Java Tutorials", "url": "https://docs.oracle.com/javase/tutorial/", "description": "Oracle's tutorial path from language basics to advanced topics."},
+      {"title": "The Java Language Specification", "url": "https://docs.oracle.com/javase/specs/jls/se21/html/index.html", "description": "The authoritative language specification."},
+      {"title": "Maven — Getting Started", "url": "https://maven.apache.org/guides/getting-started/", "description": "Project structure, lifecycle and the standard directory layout."},
+      {"title": "Gradle — Getting Started", "url": "https://docs.gradle.org/current/userguide/getting_started.html", "description": "The alternative build tool used by many Spring projects."}
+    ]
+  },
+  {
+    "title": "Community & Release Info",
+    "links": [
+      {"title": "Spring Releases (versions & support)", "url": "https://spring.io/projects/spring-boot#support", "description": "OSSRH versions, support timelines and release notes."},
+      {"title": "Spring Initializr", "url": "https://start.spring.io", "description": "Bootstrap a new Spring Boot project with the starters you need."},
+      {"title": "Baeldung Spring Tutorials", "url": "https://www.baeldung.com/spring-tutorial", "description": "Hands-on tutorials across the whole Spring ecosystem."}
+    ]
+  }
+]

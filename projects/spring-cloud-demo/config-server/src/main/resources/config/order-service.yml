@@ -1,0 +1,53 @@
+# Served centrally by the config server — the service itself only knows
+# where the config server lives.
+
+server:
+  port: 9001
+
+spring:
+  application:
+    name: order-service
+  cloud:
+    openfeign:
+      circuitbreaker:
+        enabled: true        # wrap Feign clients in a circuit breaker
+
+app:
+  order-limit: 100
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka
+  instance:
+    prefer-ip-address: true
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      inventory-service:                 # name = Feign client name
+        slidingWindowSize: 10
+        failureRateThreshold: 40
+        waitDurationInOpenState: 10s
+        permittedNumberOfCallsInHalfOpenState: 3
+  timelimiter:
+    instances:
+      inventory-service:
+        timeoutDuration: 2s
+  retry:
+    instances:
+      inventory-service:
+        maxAttempts: 3
+        waitDuration: 500ms
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+  zipkin:
+    tracing:
+      endpoint: http://localhost:9411/api/v2/spans
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,refresh

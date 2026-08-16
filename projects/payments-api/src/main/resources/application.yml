@@ -1,0 +1,32 @@
+server:
+  port: 8081
+  error:
+    include-message: never
+    include-stacktrace: never
+
+spring:
+  application:
+    name: payments-api
+  datasource:
+    url: jdbc:h2:file:./data/payments;AUTO_SERVER=TRUE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+  h2:
+    console:
+      enabled: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+
+app:
+  jwt:
+    secret: ${APP_JWT_SECRET:payments-api-dev-secret-change-me-0123456789}
+    expiration-seconds: 86400

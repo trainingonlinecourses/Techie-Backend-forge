@@ -1,0 +1,77 @@
+server:
+  port: 8080
+  error:
+    include-message: never
+    include-stacktrace: never
+
+spring:
+  application:
+    name: backendforge-academy
+  datasource:
+    url: jdbc:h2:file:./data/academy;AUTO_SERVER=TRUE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  jackson:
+    default-property-inclusion: non_null
+  ai:
+    # We wire OpenAI manually in AiChatService (conditional on an API key),
+    # so turn OFF Spring AI's model auto-configuration entirely.
+    model:
+      chat: none
+      embedding: none
+      image: none
+      audio:
+        speech: none
+        transcription: none
+      moderation: none
+  autoconfigure:
+    exclude:
+      - org.springframework.ai.model.openai.autoconfigure.OpenAiChatAutoConfiguration
+      - org.springframework.ai.model.openai.autoconfigure.OpenAiEmbeddingAutoConfiguration
+      - org.springframework.ai.model.openai.autoconfigure.OpenAiImageAutoConfiguration
+      - org.springframework.ai.model.openai.autoconfigure.OpenAiAudioSpeechAutoConfiguration
+      - org.springframework.ai.model.openai.autoconfigure.OpenAiAudioTranscriptionAutoConfiguration
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when_authorized
+
+app:
+  jwt:
+    # Dev-only secret. Override with APP_JWT_SECRET in production (>= 32 chars).
+    secret: ${APP_JWT_SECRET:backendforge-academy-dev-secret-change-me-0123456789}
+    expiration-seconds: 86400
+  cors:
+    allowed-origins: ${APP_CORS_ORIGINS:http://localhost:5173,http://127.0.0.1:5173}
+  openai:
+    # Optional. Set OPENAI_API_KEY to enable the live AI assistant.
+    # No key needed for a keyless endpoint — set APP_OPENAI_BASE_URL and it just works.
+    #
+    # Free Hugging Face example (base URL WITHOUT the /v1 suffix — Spring AI appends it):
+    #   APP_OPENAI_BASE_URL=https://g9hnto0u7lvbu837.us-east-2.aws.endpoints.huggingface.cloud
+    #   APP_OPENAI_MODEL=Qwen/Qwen3.8-27B
+    #
+    # Any OpenAI-compatible endpoint works (OpenAI, HF Spaces, Ollama, LM Studio...).
+    api-key: ${OPENAI_API_KEY:}
+    model: ${OPENAI_MODEL:gpt-4o-mini}
+    base-url: ${APP_OPENAI_BASE_URL:}
+    # Zero-config fallback: when no key and no base URL are set, the tutor uses a free
+    # Hugging Face endpoint automatically (no key needed). Set false to disable.
+    use-free-endpoint: ${APP_USE_FREE_ENDPOINT:true}

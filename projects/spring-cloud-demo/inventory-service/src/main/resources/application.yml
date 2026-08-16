@@ -1,0 +1,6 @@
+# Port, eureka and tracing are served centrally by the config server.
+spring:
+  application:
+    name: inventory-service
+  config:
+    import: optional:configserver:http://localhost:8888
