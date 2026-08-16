@@ -79,6 +79,19 @@
     ]
   },
   {
+    "title": "Spring WebFlux & Reactive",
+    "links": [
+      {"title": "WebFlux Reference", "url": "https://docs.spring.io/spring-framework/reference/web/webflux.html", "description": "The reactive web stack: thread model, annotated controllers, functional endpoints and streaming."},
+      {"title": "Project Reactor Core", "url": "https://projectreactor.io/docs/core/release/reference/", "description": "Mono and Flux, operators, schedulers and backpressure — the foundation of reactive Spring."},
+      {"title": "WebClient", "url": "https://docs.spring.io/spring-framework/reference/web/webflux-webclient.html", "description": "The non-blocking HTTP client: retrieve vs exchange, filters, timeouts."},
+      {"title": "Spring Data R2DBC", "url": "https://docs.spring.io/spring-data/r2dbc/reference/", "description": "Reactive relational data access: ReactiveCrudRepository and transactional operators."},
+      {"title": "Spring Data MongoDB (Reactive)", "url": "https://docs.spring.io/spring-data/mongodb/reference/", "description": "ReactiveMongoRepository and reactive document data access."},
+      {"title": "WebTestClient", "url": "https://docs.spring.io/spring-framework/reference/testing/webtestclient.html", "description": "Reactive client for testing WebFlux endpoints."},
+      {"title": "Reactor Test (StepVerifier)", "url": "https://projectreactor.io/docs/test/release/reference/", "description": "StepVerifier and virtual time for verifying Mono/Flux streams."},
+      {"title": "R2DBC", "url": "https://r2dbc.io", "description": "The reactive relational database connectivity specification."}
+    ]
+  },
+  {
     "title": "Spring Data & Ecosystem",
     "links": [
       {"title": "Spring Data JPA", "url": "https://docs.spring.io/spring-data/jpa/reference/", "description": "Repositories, derived queries, auditing, transactions with JPA/Hibernate."},

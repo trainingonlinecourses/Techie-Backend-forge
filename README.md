@@ -25,10 +25,11 @@ It is **not** a static site. It is a real application:
 | 06 Capstone: Payments API | 5 | Walkthrough of the real runnable project in `projects/payments-api` |
 | 07 Spring Cloud & Microservices | 7 | Discovery (Eureka), config server, API gateway, Resilience4j, distributed tracing, production patterns — runnable demo in `projects/spring-cloud-demo` |
 | 08 Spring Kafka & Messaging | 7 | Event-driven architecture, producers/listeners, consumer groups, transactional outbox, retries & DLQs, testing, production — runnable demo in `projects/kafka-demo` |
+| 09 Spring WebFlux & Reactive | 7 | Reactive programming, Mono/Flux, WebFlux controllers & functional routes, WebClient, R2DBC, reactive testing, production — runnable demo in `projects/webflux-demo` |
 
 Every lesson includes: explanation, runnable code, an *"Why it matters (organizational view)"* callout,
 and links to the authoritative reference on docs.spring.io. The **Docs index** page organizes
-61 official links (Spring Framework, Boot, Security, AI, Cloud, Kafka, Data, Java, OWASP, Maven/Gradle).
+69 official links (Framework, Boot, Security, AI, Cloud, Kafka, WebFlux, Data, Java, OWASP, Maven/Gradle).
 
 ## Run it
 
@@ -96,6 +97,16 @@ docker build -t payments-api .
 
 See `projects/payments-api/README.md` for the full API walkthrough (register → login → create
 accounts → transfer with idempotency keys).
+
+## The WebFlux demo (runnable)
+
+```bash
+cd projects/webflux-demo
+mvn spring-boot:run        # port 9096, H2 in-memory — nothing else to start
+# POST/GET /api/customers (annotation controller), /api/fn/customers (RouterFunction),
+# /api/summary (WebClient aggregation), curl -N /api/quotes/stream (SSE)
+mvn test                   # 6 reactive tests (WebTestClient + StepVerifier)
+```
 
 ## The Kafka demo (runnable)
 

@@ -1,0 +1,19 @@
+server:
+  port: 9096
+
+spring:
+  application:
+    name: webflux-demo
+  r2dbc:
+    url: r2dbc:h2:mem:///customers;DB_CLOSE_DELAY=-1
+    username: sa
+    password: ""
+  sql:
+    init:
+      mode: always            # run schema.sql against the R2DBC connection factory
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics

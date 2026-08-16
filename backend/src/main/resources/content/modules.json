@@ -70,5 +70,14 @@
     "color": "#f7768e",
     "tech": ["Kafka", "Outbox", "Consumer Groups", "DLQ", "Retry"],
     "docsUrl": "https://docs.spring.io/spring-kafka/reference/"
+  },
+  {
+    "id": "spring-webflux",
+    "title": "Spring WebFlux & Reactive",
+    "subtitle": "Reactive programming with Mono and Flux, non-blocking WebClient, R2DBC data access and when reactive beats servlet — with a runnable demo.",
+    "order": 9,
+    "color": "#9ece6a",
+    "tech": ["Mono", "Flux", "WebClient", "R2DBC", "Netty"],
+    "docsUrl": "https://docs.spring.io/spring-framework/reference/web/webflux.html"
   }
 ]

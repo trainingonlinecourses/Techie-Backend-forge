@@ -15,6 +15,7 @@ const FALLBACK_CURRICULUM = [
   { module: { id: 'capstone', title: 'Capstone: Full Backend Project', subtitle: 'A complete, runnable payments API built with everything above — layered architecture, JWT security, tests.', order: 6, color: '#2ac3de', tech: ['Spring Boot', 'JPA', 'Security', 'JUnit'], lessonCount: 5, minutes: 84 }, lessons: [] },
   { module: { id: 'spring-cloud', title: 'Spring Cloud & Microservices', subtitle: 'Service discovery, centralized config, API gateway, Resilience4j and distributed tracing — with a runnable 5-service demo.', order: 7, color: '#7aa2f7', tech: ['Eureka', 'Config Server', 'Gateway', 'Resilience4j', 'Tracing'], lessonCount: 7, minutes: 138 }, lessons: [] },
   { module: { id: 'spring-kafka', title: 'Spring Kafka & Event-Driven Messaging', subtitle: 'Kafka producers and listeners, consumer groups, the transactional outbox, retries and DLQs — with a runnable outbox demo.', order: 8, color: '#f7768e', tech: ['Kafka', 'Outbox', 'Consumer Groups', 'DLQ', 'Retry'], lessonCount: 7, minutes: 140 }, lessons: [] },
+  { module: { id: 'spring-webflux', title: 'Spring WebFlux & Reactive', subtitle: 'Reactive programming with Mono and Flux, non-blocking WebClient, R2DBC data access and when reactive beats servlet — with a runnable demo.', order: 9, color: '#9ece6a', tech: ['Mono', 'Flux', 'WebClient', 'R2DBC', 'Netty'], lessonCount: 7, minutes: 130 }, lessons: [] },
 ];
 
 const TECH = [
@@ -60,7 +61,7 @@ export default function Home() {
             {!user && <Link to="/register" className="btn ghost">Create account · track progress</Link>}
           </div>
           <div className="stats">
-            <div className="stat"><div className="v">{stats?.lessons ?? '66'}</div><div className="l">LESSONS</div></div>
+            <div className="stat"><div className="v">{stats?.lessons ?? '73'}</div><div className="l">LESSONS</div></div>
             <div className="stat"><div className="v">{stats?.modules ?? 6}</div><div className="l">MODULES</div></div>
             <div className="stat"><div className="v">{(stats?.minutes ?? 830) / 60 | 0}<b>h</b></div><div className="l">CURRICULUM</div></div>
             <div className="stat"><div className="v">{stats?.docsLinks ?? 40}+</div><div className="l">DOC LINKS</div></div>
@@ -78,7 +79,7 @@ export default function Home() {
 
       <h2 className="sec">The curriculum</h2>
       <p className="lede">
-        Eight modules, ordered the way an organization rolls out Java and Spring: foundation first,
+        Nine modules, ordered the way an organization rolls out Java and Spring: foundation first,
         then the framework, then production practice — finishing with a complete runnable project.
       </p>
       <div className="modgrid">
@@ -109,7 +110,7 @@ export default function Home() {
         <div className="bcol ok">
           <h4>LEARN</h4>
           <ul>
-            <li>66 lessons with explanations + runnable code</li>
+            <li>73 lessons with explanations + runnable code</li>
             <li>Every topic linked to its official docs</li>
             <li>Marked from the sidebar; progress is saved</li>
           </ul>
@@ -134,7 +135,7 @@ export default function Home() {
 
       <h2 className="sec">What's inside the docs index</h2>
       <div className="depthgrid">
-        {['Spring Framework Reference', 'Spring Boot Reference', 'Spring Security Reference', 'Spring AI Reference', 'Spring Cloud Reference', 'Spring Kafka Reference', 'Spring Data JPA', 'Java 21 / Oracle docs', 'Maven & Gradle', 'OWASP Top 10'].map((d) => (
+        {['Spring Framework Reference', 'Spring Boot Reference', 'Spring Security Reference', 'Spring AI Reference', 'Spring Cloud Reference', 'Spring Kafka Reference', 'Spring WebFlux Reference', 'Spring Data JPA', 'Java 21 / Oracle docs', 'Maven & Gradle', 'OWASP Top 10'].map((d) => (
           <div key={d}><i>⚑</i>{d}</div>
         ))}
       </div>
