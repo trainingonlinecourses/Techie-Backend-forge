@@ -12,7 +12,8 @@ frontend/dist/
 npm-debug.log*
 
 # ---- Runtime data (H2 file DB, logs) ----
-backend/data/
+data/
+*.mv.db
 *.log
 
 # ---- Editors / OS ----

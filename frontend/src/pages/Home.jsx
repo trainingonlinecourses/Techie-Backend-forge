@@ -4,6 +4,18 @@ import { api } from '../api/client';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useProgress } from '../hooks/useProgress.js';
 
+// Shown when the API is unreachable (e.g. a static-only deployment) so the
+// curriculum still renders. The live backend always replaces this.
+const FALLBACK_CURRICULUM = [
+  { module: { id: 'java', title: 'Java Foundations', subtitle: 'The language, JVM and tooling every backend engineer needs — from bytecode to virtual threads.', order: 1, color: '#f5a623', tech: ['JDK 21', 'JVM', 'Maven', 'Concurrency'], lessonCount: 12, minutes: 196 }, lessons: [] },
+  { module: { id: 'spring-core', title: 'Spring Core & Framework', subtitle: 'IoC, dependency injection, AOP, events and transactions — the engine under every Spring app.', order: 2, color: '#6fce6f', tech: ['IoC', 'DI', 'AOP', 'Events', 'Transactions'], lessonCount: 9, minutes: 156 }, lessons: [] },
+  { module: { id: 'spring-boot', title: 'Spring Boot', subtitle: 'Auto-configuration, REST APIs, Spring Data JPA, testing, Actuator and production readiness.', order: 3, color: '#4cc2ff', tech: ['Auto-configuration', 'REST', 'JPA', 'Testing', 'Actuator'], lessonCount: 9, minutes: 156 }, lessons: [] },
+  { module: { id: 'spring-security', title: 'Spring Security', subtitle: 'Authentication, JWT, authorization, OAuth2 and hardening APIs the way production teams do.', order: 4, color: '#ff6b6b', tech: ['Filter Chain', 'JWT', 'OAuth2', 'Method Security'], lessonCount: 9, minutes: 150 }, lessons: [] },
+  { module: { id: 'spring-ai', title: 'Spring AI', subtitle: 'ChatClient, embeddings, RAG and function calling — production patterns for AI-powered backends.', order: 5, color: '#bb9af7', tech: ['ChatClient', 'Embeddings', 'RAG', 'Function Calling'], lessonCount: 8, minutes: 132 }, lessons: [] },
+  { module: { id: 'capstone', title: 'Capstone: Full Backend Project', subtitle: 'A complete, runnable payments API built with everything above — layered architecture, JWT security, tests.', order: 6, color: '#2ac3de', tech: ['Spring Boot', 'JPA', 'Security', 'JUnit'], lessonCount: 5, minutes: 84 }, lessons: [] },
+  { module: { id: 'spring-cloud', title: 'Spring Cloud & Microservices', subtitle: 'Service discovery, centralized config, API gateway, Resilience4j and distributed tracing — with a runnable 5-service demo.', order: 7, color: '#7aa2f7', tech: ['Eureka', 'Config Server', 'Gateway', 'Resilience4j', 'Tracing'], lessonCount: 7, minutes: 138 }, lessons: [] },
+];
+
 const TECH = [
   ['JAVA', 'JDK 21'], ['SPRING FRAMEWORK', 'IoC · DI · AOP'], ['SPRING BOOT', '3.4'],
   ['SPRING SECURITY', 'JWT · OAuth2'], ['SPRING AI', 'RAG · ChatClient'], ['JPA', 'Hibernate'],
@@ -19,7 +31,9 @@ export default function Home() {
 
   useEffect(() => {
     api.get('/content/stats').then((res) => setStats(res.data)).catch(() => {});
-    api.get('/content/curriculum').then((res) => setCurriculum(res.data)).catch(() => {});
+    api.get('/content/curriculum')
+      .then((res) => setCurriculum(res.data))
+      .catch(() => setCurriculum(FALLBACK_CURRICULUM));
   }, [user]);
 
   return (
@@ -68,6 +82,7 @@ export default function Home() {
       </p>
       <div className="modgrid">
         {curriculum?.map((m, i) => {
+          const total = m.module.lessonCount ?? m.lessons.length;
           const done = m.lessons.filter((l) => progress[l.id]).length;
           return (
             <Link key={m.module.id} to={`/modules/${m.module.id}`} className="modcard" data-num={m.module.order}>
@@ -78,9 +93,9 @@ export default function Home() {
                 {m.module.tech.map((t) => <span key={t}>{t}</span>)}
               </div>
               <div className="foot">
-                <span>{m.lessons.length} lessons · {Math.round(m.module.minutes / 60 * 10) / 10}h</span>
-                <span className={`state ${done === m.lessons.length && m.lessons.length > 0 ? 'done' : 'todo'}`}>
-                  {done === m.lessons.length && m.lessons.length > 0 ? '✓ complete' : `${done}/${m.lessons.length} done`}
+                <span>{total} lessons · {Math.round(m.module.minutes / 60 * 10) / 10}h</span>
+                <span className={`state ${done === total && total > 0 ? 'done' : 'todo'}`}>
+                  {done === total && total > 0 ? '✓ complete' : `${done}/${total} done`}
                 </span>
               </div>
             </Link>
