@@ -61,5 +61,14 @@
     "color": "#7aa2f7",
     "tech": ["Eureka", "Config Server", "Gateway", "Resilience4j", "Tracing"],
     "docsUrl": "https://docs.spring.io/spring-cloud/reference/"
+  },
+  {
+    "id": "spring-kafka",
+    "title": "Spring Kafka & Event-Driven Messaging",
+    "subtitle": "Kafka producers and listeners, consumer groups, the transactional outbox, retries and DLQs — with a runnable outbox demo.",
+    "order": 8,
+    "color": "#f7768e",
+    "tech": ["Kafka", "Outbox", "Consumer Groups", "DLQ", "Retry"],
+    "docsUrl": "https://docs.spring.io/spring-kafka/reference/"
   }
 ]

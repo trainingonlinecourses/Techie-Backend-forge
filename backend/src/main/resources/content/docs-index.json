@@ -64,6 +64,21 @@
     ]
   },
   {
+    "title": "Spring Kafka & Messaging",
+    "links": [
+      {"title": "Spring Kafka Reference", "url": "https://docs.spring.io/spring-kafka/reference/", "description": "The complete Spring Kafka reference: producers, consumers, containers, transactions and error handling."},
+      {"title": "Quick Tour", "url": "https://docs.spring.io/spring-kafka/reference/quick-tour.html", "description": "KafkaTemplate, @KafkaListener and the minimal setup in one page."},
+      {"title": "Receiving Messages (@KafkaListener)", "url": "https://docs.spring.io/spring-kafka/reference/kafka/receiving-messages/receiving-messages.html", "description": "Listener containers, concurrency, batch listeners and acknowledging."},
+      {"title": "RetryTopic & Dead Letter Topics", "url": "https://docs.spring.io/spring-kafka/reference/retrytopic/index.html", "description": "@RetryableTopic, backoff, DLT handlers and failed-deserialization routing."},
+      {"title": "Error Handling", "url": "https://docs.spring.io/spring-kafka/reference/kafka/error-handling.html", "description": "ErrorHandlingDeserializer, listener error handlers and seek-to-current behavior."},
+      {"title": "Transactions", "url": "https://docs.spring.io/spring-kafka/reference/kafka/transactions.html", "description": "Kafka transactions and the ChainedKafkaTransactionManager."},
+      {"title": "Testing Support", "url": "https://docs.spring.io/spring-kafka/reference/testing.html", "description": "@EmbeddedKafka and Testcontainers for Kafka integration tests."},
+      {"title": "Apache Kafka Documentation", "url": "https://kafka.apache.org/documentation/", "description": "The authoritative Kafka docs: topics, partitions, consumer groups, operations and security."},
+      {"title": "Transactional Outbox (microservices.io)", "url": "https://microservices.io/patterns/data/transactional-outbox.html", "description": "The outbox pattern: atomic writes to business state and an event table."},
+      {"title": "Confluent Schema Registry", "url": "https://docs.confluent.io/platform/current/schema-registry/index.html", "description": "Versioned, governed event schemas for production Kafka."}
+    ]
+  },
+  {
     "title": "Spring Data & Ecosystem",
     "links": [
       {"title": "Spring Data JPA", "url": "https://docs.spring.io/spring-data/jpa/reference/", "description": "Repositories, derived queries, auditing, transactions with JPA/Hibernate."},

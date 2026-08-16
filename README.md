@@ -24,10 +24,11 @@ It is **not** a static site. It is a real application:
 | 05 Spring AI | 8 | ChatClient, structured output, function calling, embeddings, RAG, advisors, eval |
 | 06 Capstone: Payments API | 5 | Walkthrough of the real runnable project in `projects/payments-api` |
 | 07 Spring Cloud & Microservices | 7 | Discovery (Eureka), config server, API gateway, Resilience4j, distributed tracing, production patterns — runnable demo in `projects/spring-cloud-demo` |
+| 08 Spring Kafka & Messaging | 7 | Event-driven architecture, producers/listeners, consumer groups, transactional outbox, retries & DLQs, testing, production — runnable demo in `projects/kafka-demo` |
 
 Every lesson includes: explanation, runnable code, an *"Why it matters (organizational view)"* callout,
 and links to the authoritative reference on docs.spring.io. The **Docs index** page organizes
-~43 official links (Spring Framework, Boot, Security, AI, Data, Java, OWASP, Maven/Gradle).
+61 official links (Spring Framework, Boot, Security, AI, Cloud, Kafka, Data, Java, OWASP, Maven/Gradle).
 
 ## Run it
 
@@ -95,6 +96,17 @@ docker build -t payments-api .
 
 See `projects/payments-api/README.md` for the full API walkthrough (register → login → create
 accounts → transfer with idempotency keys).
+
+## The Kafka demo (runnable)
+
+```bash
+cd projects/kafka-demo
+docker compose up -d          # Kafka on :9092, Kafka UI on :8085
+mvn spring-boot:run           # app on :9095
+# POST /api/orders → outbox row → relay publishes OrderCreated → consumer processes it
+# POST /api/notifications with "fail" in the message → retries → DLT
+mvn test                      # 3 embedded-broker tests (outbox flow + retry/DLT)
+```
 
 ## The Spring Cloud demo (runnable)
 
