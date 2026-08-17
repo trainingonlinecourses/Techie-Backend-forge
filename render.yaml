@@ -1,0 +1,32 @@
+# Render Blueprint — one-click deployment of the Spring Boot API on the free tier.
+#
+# How to use: push this repo to GitHub, then in the Render dashboard choose
+#   New + → Blueprint → connect your repo.
+# Render reads this file (it lives at the repo root) and provisions the service.
+# It sets APP_JWT_SECRET to a random value automatically; APP_CORS_ORIGINS is
+# pre-filled with the production Vercel frontend.
+services:
+  - type: web
+    name: backendforge-academy-api
+    runtime: docker
+    plan: free
+    region: oregon
+    # Build the backend/ directory with backend/Dockerfile.
+    dockerContext: backend
+    dockerfilePath: backend/Dockerfile
+    # Free-tier instances idle after 15 min and wake on request; this checks liveness.
+    healthCheckPath: /actuator/health
+    envVars:
+      # Comma-separated allowlist of origins that may call the API. Add your
+      # Vercel preview origin (https://<project>-<hash>-<team>.vercel.app) too.
+      - key: APP_CORS_ORIGINS
+        value: https://techie-backend-forge.vercel.app
+      # >= 32 chars. Render generates a random value once (don't change after
+      # users sign up, or existing JWTs stop validating).
+      - key: APP_JWT_SECRET
+        generateValue: true
+      # Optional: real AI answers instead of the keyless free endpoint.
+      # - key: OPENAI_API_KEY
+      #   sync: false
+      # - key: APP_USE_FREE_ENDPOINT
+      #   value: "true"

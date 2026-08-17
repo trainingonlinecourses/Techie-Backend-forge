@@ -160,11 +160,70 @@ claims, JSON 401/403 via `AuthenticationEntryPoint`/`AccessDeniedHandler`.
 
 The old single-file `index.html` is kept in the repo root as an archive of the original design.
 
-## Deployed URLs
+## Deployment
+
+The SPA deploys to Vercel (static, auto-deploys on push to `main`). Vercel cannot run the Spring
+Boot API, so the backend is hosted separately. The repo ships with `render.yaml` (Render Blueprint)
+and `railway.toml` so the backend is one-click deployable on the free tier.
+
+### 1. Deploy the backend — Render (free, recommended)
+
+1. Push this repo to GitHub.
+2. In the Render dashboard: **New + → Blueprint** → connect the repo.
+3. Render reads `render.yaml` at the repo root and provisions `backendforge-academy-api` on the
+   free plan — it builds `backend/Dockerfile` (Java 21), generates a random `APP_JWT_SECRET`, and
+   sets `APP_CORS_ORIGINS` to `https://techie-backend-forge.vercel.app`.
+4. When the deploy finishes, the API is at `https://backendforge-academy-api.onrender.com`.
+   Verify it:
+
+   ```bash
+   curl https://backendforge-academy-api.onrender.com/actuator/health   # → {"status":"UP"}
+   ```
+
+Free-tier notes: the instance sleeps after ~15 min idle (the first request takes ~1 min to wake),
+and its disk is **ephemeral** — registrations, progress and chat history reset on each redeploy.
+Demo accounts (`admin`/`admin123`, `learner`/`learner123`) are re-seeded at every startup.
+For persistence, attach a Render Postgres or persistent disk later.
+
+### Alternative: Railway
+
+1. Create a project on railway.com and connect this repo. It reads `railway.toml`, which sets the
+   root directory to `backend/` (its Dockerfile) — `PORT` is injected automatically.
+2. In the project's **Variables** tab add:
+   - `APP_CORS_ORIGINS=https://techie-backend-forge.vercel.app`
+   - `APP_JWT_SECRET=<random string ≥ 32 chars>`
+
+### 2. Point the Vercel frontend at the hosted API
+
+The SPA's axios client uses `import.meta.env.VITE_API_URL || '/api'`. Vite inlines the value at
+**build time**, so changing it requires a redeploy of the frontend.
+
+1. Vercel dashboard → **techie-backend-forge** → **Settings → Environment Variables**.
+2. Add:
+   - **Key:** `VITE_API_URL`
+   - **Value:** `https://backendforge-academy-api.onrender.com/api` — keep the `/api` suffix; the
+     client joins it onto every request (`/content/curriculum`, `/auth/login`, …).
+   - **Scope:** Production (or All).
+3. **Redeploy**: Deployments → latest → ⋯ → **Redeploy** (or just push to `main`).
+
+If `VITE_API_URL` is left unset, the SPA calls `/api/*` on its own origin — Vercel rewrites those
+paths to `index.html`, so the app shows the "Static preview — the Spring Boot API isn't connected"
+banner instead of crashing (the API client rejects non-JSON responses).
+
+### Backend environment variables
+
+| Variable | Default | Purpose |
+|---|---|---|
+| `PORT` | `8080` | Injected by Render/Railway; don't set manually. |
+| `APP_CORS_ORIGINS` | `http://localhost:5173,http://127.0.0.1:5173` | Comma-separated origins allowed to call the API. Add your Vercel **preview** origin too if you test there. |
+| `APP_JWT_SECRET` | dev-only value | ≥ 32 chars. Keep it stable or existing JWTs stop validating. |
+| `OPENAI_API_KEY` | *(unset)* | Enables real OpenAI answers from the AI tutor. |
+| `APP_OPENAI_BASE_URL` | *(unset)* | Any OpenAI-compatible endpoint (base URL without `/v1`). |
+| `APP_USE_FREE_ENDPOINT` | `true` | Zero-key fallback: a free Hugging Face endpoint answers the tutor by default. |
+
+### Deployed URLs
 
 - **Frontend (Vercel):** https://techie-backend-forge.vercel.app — the React SPA.
-  Pushes to `main` auto-deploy it (Vercel builds `frontend/`).
-- **Backend:** run locally (`cd backend && mvn spring-boot:run`, port 8080) or host it on a
-  Java-capable platform (Render, Railway, Fly.io, a VPS). Vercel cannot run the Spring Boot API.
-  To point the deployed SPA at a hosted backend, set `VITE_API_URL` (e.g. `https://api.example.com/api`)
-  in the Vercel project's environment variables and redeploy.
+- **Backend (Render, after step 1):** https://backendforge-academy-api.onrender.com —
+  health check at `/actuator/health`.
+- **Local:** backend on `:8080`, frontend dev server on `:5173` (proxies `/api`).

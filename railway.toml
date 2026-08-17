@@ -1,0 +1,7 @@
+# Railway (railway.com) config — connect this repo to a new project and Railway
+# reads this file: it builds backend/Dockerfile and injects PORT automatically.
+# Then set these variables in the project:
+#   APP_CORS_ORIGINS  = https://techie-backend-forge.vercel.app
+#   APP_JWT_SECRET    = <random string >= 32 chars>
+[deploy]
+rootDir = "backend"

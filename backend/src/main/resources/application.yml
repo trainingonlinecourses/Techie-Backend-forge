@@ -1,5 +1,7 @@
 server:
-  port: 8080
+  # ${PORT} is injected by hosting platforms (Render, Railway, Fly.io...);
+  # falls back to 8080 for local dev.
+  port: ${PORT:8080}
   error:
     include-message: never
     include-stacktrace: never
