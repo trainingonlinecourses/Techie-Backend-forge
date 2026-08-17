@@ -17,7 +17,12 @@ export default function LessonPage() {
     setLesson(null);
     setError(null);
     api.get(`/content/lessons/${lessonId}`).then((res) => setLesson(res.data)).catch((e) => {
-      setError(e.response?.data?.message || 'Lesson not found');
+      const staticMode = !e.response?.data?.message;
+      setError(
+        staticMode
+          ? 'Lesson content is only available when the Spring Boot backend is connected. Host it via the render.yaml blueprint or run it locally (see the README Deployment section), then refresh.'
+          : (e.response?.data?.message || 'Lesson not found')
+      );
     });
     api.get('/content/curriculum').then((res) => setCurriculum(res.data)).catch(() => {});
     window.scrollTo(0, 0);
@@ -43,7 +48,7 @@ export default function LessonPage() {
     return { prev: idx > 0 ? all[idx - 1] : null, next: idx >= 0 && idx < all.length - 1 ? all[idx + 1] : null };
   }, [curriculum, lesson]);
 
-  if (error) return <div className="call warn"><div className="ct">⚠ Not found</div><p>{error}</p></div>;
+  if (error) return <div className="call warn"><div className="ct">⚠ Lesson unavailable</div><p>{error}</p></div>;
   if (!lesson) return <div className="page-loading">Loading lesson…</div>;
 
   const l = lesson.lesson;

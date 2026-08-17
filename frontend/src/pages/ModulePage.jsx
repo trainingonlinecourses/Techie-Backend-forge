@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { api } from '../api/client';
 import { useProgress } from '../hooks/useProgress.js';
+import { FALLBACK_CURRICULUM } from '../fallbackCurriculum.js';
 
 export default function ModulePage() {
   const { moduleId } = useParams();
@@ -15,7 +16,16 @@ export default function ModulePage() {
     api
       .get(`/content/modules/${moduleId}`)
       .then((res) => setDetail(res.data))
-      .catch((e) => setError(e.response?.data?.message || 'Module not found'));
+      .catch(() => {
+        // Static-only mode: the API is unreachable, so render the module
+        // metadata from the shared fallback instead of a dead-end error page.
+        const fallback = FALLBACK_CURRICULUM.find((m) => m.module.id === moduleId);
+        if (fallback) {
+          setDetail({ module: fallback.module, lessons: fallback.lessons });
+        } else {
+          setError('Module not found');
+        }
+      });
   }, [moduleId]);
 
   if (error) return <div className="call warn"><div className="ct">⚠ Not found</div><p>{error}</p></div>;
@@ -40,8 +50,12 @@ export default function ModulePage() {
         <div className="statusbar">
           <b>{done}/{lessons.length}</b> lessons completed
           <span>·</span> ≈ {Math.round((m.minutes / 60) * 10) / 10}h
-          <span>·</span>
-          <a href={m.docsUrl} target="_blank" rel="noreferrer">official docs ↗</a>
+          {m.docsUrl && (
+            <>
+              <span>·</span>
+              <a href={m.docsUrl} target="_blank" rel="noreferrer">official docs ↗</a>
+            </>
+          )}
         </div>
       </div>
 
@@ -60,6 +74,17 @@ export default function ModulePage() {
           </Link>
         ))}
       </div>
+
+      {lessons.length === 0 && (
+        <div className="call info">
+          <div className="ct">ℹ Lessons load when the backend is connected</div>
+          <p>
+            The module overview renders from the static fallback, but lesson content comes from the
+            Spring Boot API. Host the backend via the <code>render.yaml</code> blueprint or run it
+            locally (see the README Deployment section), then refresh.
+          </p>
+        </div>
+      )}
     </div>
   );
 }
