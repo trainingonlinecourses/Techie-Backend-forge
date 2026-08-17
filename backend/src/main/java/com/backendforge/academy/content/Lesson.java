@@ -32,9 +32,11 @@ public class Lesson {
     private String body;
 
     @ElementCollection(fetch = FetchType.EAGER)   // tiny metadata lists — safe to load eagerly
+    @org.hibernate.annotations.BatchSize(size = 50) // one query per 50 lessons, not one per lesson
     private List<String> topics = new ArrayList<>();
 
     @ElementCollection(fetch = FetchType.EAGER)
+    @org.hibernate.annotations.BatchSize(size = 50)
     private List<String> docs = new ArrayList<>();
 
     @Column(nullable = false)
