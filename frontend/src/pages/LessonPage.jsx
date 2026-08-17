@@ -37,7 +37,7 @@ export default function LessonPage() {
   }, [lesson]);
 
   const nav = useMemo(() => {
-    if (!curriculum || !lesson) return { prev: null, next: null };
+    if (!Array.isArray(curriculum) || !lesson) return { prev: null, next: null };
     const all = curriculum.flatMap((m) => m.lessons);
     const idx = all.findIndex((l) => l.id === lesson.lesson.id);
     return { prev: idx > 0 ? all[idx - 1] : null, next: idx >= 0 && idx < all.length - 1 ? all[idx + 1] : null };

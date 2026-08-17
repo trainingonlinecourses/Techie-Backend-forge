@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { api } from '../api/client';
+import { FALLBACK_CURRICULUM } from '../fallbackCurriculum.js';
 
 export default function Sidebar({ progress }) {
   const [curriculum, setCurriculum] = useState(null);
@@ -9,8 +10,8 @@ export default function Sidebar({ progress }) {
   useEffect(() => {
     api
       .get('/content/curriculum')
-      .then((res) => setCurriculum(res.data))
-      .catch(() => {});
+      .then((res) => setCurriculum(Array.isArray(res.data) ? res.data : FALLBACK_CURRICULUM))
+      .catch(() => setCurriculum(FALLBACK_CURRICULUM));
   }, []);
 
   if (!curriculum) return <aside className="sidebar">Loading curriculum…</aside>;

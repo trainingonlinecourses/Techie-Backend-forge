@@ -13,7 +13,19 @@ api.interceptors.request.use((config) => {
 });
 
 api.interceptors.response.use(
-  (res) => res,
+  (res) => {
+    // Static-only deployments (e.g. Vercel rewrites any unmatched path —
+    // including /api/* — to index.html) resolve a "successful" request with
+    // HTML instead of JSON. Reject so callers' .catch fallbacks kick in
+    // instead of crashing on .map() over a non-array body.
+    if (res.data === null || typeof res.data !== 'object') {
+      const err = new Error(`API returned a non-JSON response (${typeof res.data})`);
+      err.response = res;
+      err.config = res.config;
+      return Promise.reject(err);
+    }
+    return res;
+  },
   (error) => {
     if (error.response?.status === 401 && !error.config?.url?.includes('/api/auth/')) {
       localStorage.removeItem(TOKEN_KEY);

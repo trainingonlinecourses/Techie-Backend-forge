@@ -21,7 +21,8 @@ export default function ModulePage() {
   if (error) return <div className="call warn"><div className="ct">⚠ Not found</div><p>{error}</p></div>;
   if (!detail) return <div className="page-loading">Loading module…</div>;
 
-  const { module: m, lessons } = detail;
+  const { module: m } = detail;
+  const lessons = Array.isArray(detail.lessons) ? detail.lessons : [];
   const done = lessons.filter((l) => progress[l.id]).length;
 
   return (

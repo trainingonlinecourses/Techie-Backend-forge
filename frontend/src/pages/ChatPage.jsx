@@ -13,7 +13,7 @@ export default function ChatPage() {
   useEffect(() => {
     api
       .get('/chat/history')
-      .then((res) => setMessages(res.data))
+      .then((res) => setMessages(Array.isArray(res.data) ? res.data : []))
       .catch(() => {});
   }, []);
 

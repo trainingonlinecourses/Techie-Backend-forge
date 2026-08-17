@@ -5,7 +5,9 @@ export default function DocsPage() {
   const [sections, setSections] = useState(null);
 
   useEffect(() => {
-    api.get('/content/docs').then((res) => setSections(res.data)).catch(() => {});
+    api.get('/content/docs')
+      .then((res) => setSections(Array.isArray(res.data) ? res.data : []))
+      .catch(() => setSections([]));
   }, []);
 
   return (

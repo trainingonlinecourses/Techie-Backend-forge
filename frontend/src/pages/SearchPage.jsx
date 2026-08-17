@@ -17,7 +17,7 @@ export default function SearchPage() {
     setLoading(true);
     api
       .get('/content/search', { params: { q } })
-      .then((res) => setResults(res.data))
+      .then((res) => setResults(Array.isArray(res.data) ? res.data : []))
       .catch(() => setResults([]))
       .finally(() => setLoading(false));
   }, [q]);
