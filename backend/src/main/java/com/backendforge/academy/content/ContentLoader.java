@@ -62,13 +62,18 @@ public class ContentLoader implements CommandLineRunner {
             if (in == null) throw new IllegalStateException("content/modules.json missing on classpath");
             List<Map<String, Object>> raw = mapper.readValue(in, new TypeReference<>() {});
             for (Map<String, Object> m : raw) {
-                Module module = new Module();
-                module.setId((String) m.get("id"));
+                // Reuse existing rows (like loadLessons) — on Postgres a plain
+                // save() with a set id always INSERTs, so a redeploy against a
+                // populated database would die with a duplicate-key error.
+                String id = (String) m.get("id");
+                Module module = modules.findById(id).orElseGet(Module::new);
+                module.setId(id);
                 module.setTitle((String) m.get("title"));
                 module.setSubtitle((String) m.get("subtitle"));
                 module.setOrderIndex((Integer) m.get("order"));
                 module.setColor((String) m.get("color"));
                 module.setDocsUrl((String) m.get("docsUrl"));
+                module.getTech().clear();
                 module.getTech().addAll(castStringList(m.get("tech")));
                 modules.save(module);
             }
