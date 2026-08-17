@@ -25,12 +25,37 @@ public class ContentService {
                 .collect(Collectors.toMap(Module::getId, Module::getTitle));
     }
 
+    /**
+     * All modules with lesson counts/minutes in two queries (grouping in memory)
+     * — the previous per-module count+fetch was N+1 and got slow as lessons grew.
+     */
     public List<ModuleDto> modules() {
-        return modules.findAllByOrderByOrderIndexAsc().stream()
-                .map(m -> ModuleDto.from(m, lessons.countByModuleId(m.getId()),
-                        lessons.findByModuleIdOrderByOrderIndexAsc(m.getId()).stream()
-                                .mapToInt(Lesson::getMinutes).sum()))
+        List<Module> mods = modules.findAllByOrderByOrderIndexAsc();
+        Map<String, List<Lesson>> byModule = lessons.findAll().stream()
+                .collect(Collectors.groupingBy(Lesson::getModuleId));
+        return mods.stream()
+                .map(m -> {
+                    List<Lesson> ls = byModule.getOrDefault(m.getId(), List.of());
+                    return ModuleDto.from(m, ls.size(), ls.stream().mapToInt(Lesson::getMinutes).sum());
+                })
                 .toList();
+    }
+
+    /** The whole curriculum tree (modules + ordered lessons) in two queries. */
+    public List<CurriculumModule> curriculum() {
+        List<Module> mods = modules.findAllByOrderByOrderIndexAsc();
+        Map<String, String> titles = mods.stream()
+                .collect(Collectors.toMap(Module::getId, Module::getTitle));
+        Map<String, List<Lesson>> byModule = lessons.findAll().stream()
+                .collect(Collectors.groupingBy(Lesson::getModuleId));
+        return mods.stream().map(m -> {
+            List<Lesson> ls = byModule.getOrDefault(m.getId(), List.of());
+            List<LessonSummaryDto> summaries = ls.stream()
+                    .map(l -> LessonSummaryDto.from(l, titles.get(l.getModuleId())))
+                    .toList();
+            return new CurriculumModule(ModuleDto.from(m, ls.size(),
+                    ls.stream().mapToInt(Lesson::getMinutes).sum()), summaries);
+        }).toList();
     }
 
     public ModuleDto module(String id) {
@@ -84,9 +109,7 @@ public class ContentService {
     }
 
     public StatsDto stats(long completedLessons, long totalLessons, long docsLinks) {
-        List<Lesson> all = lessons.findAll();
-        return new StatsDto(modules.count(), all.size(),
-                all.stream().mapToInt(Lesson::getMinutes).sum(),
+        return new StatsDto(modules.count(), lessons.count(), lessons.totalMinutes(),
                 docsLinks,
                 completedLessons, totalLessons);
     }

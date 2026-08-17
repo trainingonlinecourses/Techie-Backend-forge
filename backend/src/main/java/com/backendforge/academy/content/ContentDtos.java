@@ -33,6 +33,9 @@ public final class ContentDtos {
     public record SearchResultDto(String lessonId, String moduleId, String moduleTitle, String title,
                                   String snippet, double score) {}
 
+    /** A module plus its ordered lessons (for the curriculum tree). */
+    public record CurriculumModule(ModuleDto module, List<LessonSummaryDto> lessons) {}
+
     public record StatsDto(long modules, long lessons, long minutes, long docsLinks,
                            long completedLessons, long totalLessons) {}
 

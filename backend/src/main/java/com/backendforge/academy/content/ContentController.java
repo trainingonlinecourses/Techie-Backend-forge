@@ -50,9 +50,7 @@ public class ContentController {
     /** The whole curriculum in one call — modules + lessons (used by the SPA sidebar/home). */
     @GetMapping("/curriculum")
     public List<CurriculumModule> curriculum() {
-        return content.modules().stream()
-                .map(m -> new CurriculumModule(m, content.lessons(m.id())))
-                .toList();
+        return content.curriculum();
     }
 
     @GetMapping("/docs")
@@ -69,7 +67,4 @@ public class ContentController {
 
     /** A module plus its ordered lessons (for the module landing page). */
     public record ModuleDetail(ModuleDto module, List<LessonSummaryDto> lessons) {}
-
-    /** A module plus its ordered lessons (for the curriculum tree). */
-    public record CurriculumModule(ModuleDto module, List<LessonSummaryDto> lessons) {}
 }
