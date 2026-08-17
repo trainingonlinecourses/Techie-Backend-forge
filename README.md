@@ -17,19 +17,24 @@ It is **not** a static site. It is a real application:
 
 | Module | Lessons | Covers |
 |---|---|---|
-| 01 Java Foundations | 12 | JVM/bytecode, OOP, modern Java, collections, streams, concurrency, virtual threads |
-| 02 Spring Core & Framework | 9 | IoC, DI, bean lifecycle, configuration, AOP/proxies, events, transactions, MVC |
-| 03 Spring Boot | 9 | Auto-configuration, REST APIs, JPA, testing, Actuator, production readiness, async |
+| 01 Java Foundations | 19 | JVM/bytecode, OOP, modern Java, collections, streams, concurrency, virtual threads, date/time, NIO files, networking, JDBC, JPMS modules, JCA security, reflection |
+| 02 Spring Core & Framework | 13 | IoC, DI, bean lifecycle, configuration, AOP/proxies, events, transactions, MVC, SpEL, Bean Validation, i18n/MessageSource, Resources |
+| 03 Spring Boot | 11 | Auto-configuration, REST APIs, JPA, testing, Actuator, production readiness, async, logging, Testcontainers |
 | 04 Spring Security | 9 | Authn vs Authz, filter chain, JWT, method security, OAuth2, CORS/CSRF, OWASP |
 | 05 Spring AI | 8 | ChatClient, structured output, function calling, embeddings, RAG, advisors, eval |
 | 06 Capstone: Payments API | 5 | Walkthrough of the real runnable project in `projects/payments-api` |
-| 07 Spring Cloud & Microservices | 7 | Discovery (Eureka), config server, API gateway, Resilience4j, distributed tracing, production patterns — runnable demo in `projects/spring-cloud-demo` |
+| 07 Spring Cloud & Microservices | 8 | Discovery (Eureka), config server, API gateway, Resilience4j, distributed tracing, Spring Cloud Stream, production patterns — runnable demo in `projects/spring-cloud-demo` |
 | 08 Spring Kafka & Messaging | 7 | Event-driven architecture, producers/listeners, consumer groups, transactional outbox, retries & DLQs, testing, production — runnable demo in `projects/kafka-demo` |
 | 09 Spring WebFlux & Reactive | 7 | Reactive programming, Mono/Flux, WebFlux controllers & functional routes, WebClient, R2DBC, reactive testing, production — runnable demo in `projects/webflux-demo` |
+| 10 Spring Batch & Integration | 6 | Jobs/Steps, chunk-oriented processing, readers & writers, skip/retry fault tolerance, scheduling, Spring Integration/EIP |
+| 11 Spring Data Beyond JPA | 6 | Repositories & query methods, projections, MongoDB, Redis, Spring Data JDBC aggregates, cache abstraction |
+| 12 APIs Beyond REST | 6 | GraphQL (schema, queries, mutations, errors), OpenAPI/springdoc, REST Docs, HTTP clients, WebSocket/STOMP |
+| 13 Security: OAuth2 & Hardening | 5 | Authorization server, JWT resource server, SSO/OAuth2 client, session management, OWASP Top 10 |
 
 Every lesson includes: explanation, runnable code, an *"Why it matters (organizational view)"* callout,
 and links to the authoritative reference on docs.spring.io. The **Docs index** page organizes
-69 official links (Framework, Boot, Security, AI, Cloud, Kafka, WebFlux, Data, Java, OWASP, Maven/Gradle).
+90 official links (Framework, Boot, Security, AI, Cloud, Kafka, WebFlux, Data, Batch, GraphQL,
+REST Docs, Java, OWASP, Maven/Gradle).
 
 ## Run it
 
@@ -153,7 +158,7 @@ claims, JSON 401/403 via `AuthenticationEntryPoint`/`AccessDeniedHandler`.
 │   └── src/main/resources/content/
 │       ├── modules.json      curriculum metadata
 │       ├── docs-index.json   curated docs.spring.io index
-│       └── lessons/<module>/ 52 markdown lessons (loaded + searched at runtime)
+│       └── lessons/<module>/ 110 markdown lessons (loaded + searched at runtime)
 ├── frontend/                 React SPA
 └── projects/payments-api/    Capstone: complete runnable payments API
 ```

@@ -33,6 +33,11 @@
       {"title": "Authentication", "url": "https://docs.spring.io/spring-security/reference/servlet/authentication/index.html", "description": "Password storage, UserDetailsService, DaoAuthenticationProvider, sessions and JWT-style stateless auth."},
       {"title": "Authorization", "url": "https://docs.spring.io/spring-security/reference/servlet/authorization/index.html", "description": "AuthorizeHttpRequests, method security (@PreAuthorize) and authorities."},
       {"title": "OAuth2 / OIDC", "url": "https://docs.spring.io/spring-security/reference/servlet/oauth2/index.html", "description": "Login with OAuth2 providers, resource servers and JWT decoding."},
+      {"title": "OAuth2 Resource Server", "url": "https://docs.spring.io/spring-security/reference/servlet/oauth2/resource-server/index.html", "description": "Securing APIs with Bearer tokens — JWT validation against JWKS, opaque-token introspection and scopes."},
+      {"title": "OAuth2 Client (login with Google/GitHub/SSO)", "url": "https://docs.spring.io/spring-security/reference/servlet/oauth2/login/index.html", "description": "Adding Sign in with … — client registrations, the authorization code flow and user info mapping."},
+      {"title": "Session Management", "url": "https://docs.spring.io/spring-security/reference/servlet/authentication/session-management.html", "description": "Session fixation, concurrency control, the session registry and timeouts."},
+      {"title": "Spring Authorization Server", "url": "https://docs.spring.io/spring-authorization-server/reference/", "description": "Running your own OAuth2/OIDC authorization server: clients, the authorize and token endpoints, PKCE."},
+      {"title": "Spring Session", "url": "https://docs.spring.io/spring-session/reference/", "description": "Externalizing sessions to Redis or JDBC for multi-instance deployments."},
       {"title": "CORS, CSRF and headers", "url": "https://docs.spring.io/spring-security/reference/servlet/exploits/index.html", "description": "Cross-site request forgery, CORS and security headers."},
       {"title": "Testing Spring Security", "url": "https://docs.spring.io/spring-security/reference/servlet/test/index.html", "description": "MockMvc support, @WithMockUser and security test annotations."}
     ]
@@ -92,12 +97,38 @@
     ]
   },
   {
+    "title": "Spring Batch & Integration",
+    "links": [
+      {"title": "Spring Batch Reference", "url": "https://docs.spring.io/spring-batch/reference/", "description": "Jobs, Steps, chunk-oriented processing, readers/writers, fault tolerance and the JobRepository."},
+      {"title": "Chunk-Oriented Processing", "url": "https://docs.spring.io/spring-batch/reference/step/chunk-oriented-processing.html", "description": "The read-process-write loop, commit intervals and restart checkpoints."},
+      {"title": "Readers & Writers", "url": "https://docs.spring.io/spring-batch/reference/readers-and-writers.html", "description": "Flat files, CSV, JSON, JDBC/JPA, messaging and multi-resource readers."},
+      {"title": "Fault Tolerance (skip/retry/rollback)", "url": "https://docs.spring.io/spring-batch/reference/step/fault-tolerant.html", "description": "Skip policies for poison records, retry with backoff, rollback rules."},
+      {"title": "Spring Integration Reference", "url": "https://docs.spring.io/spring-integration/reference/", "description": "Enterprise Integration Patterns: channels, gateways, routers, transformers and adapters."},
+      {"title": "Enterprise Integration Patterns", "url": "https://www.enterpriseintegrationpatterns.com/", "description": "The canonical EIP catalog by Gregor Hohpe and Bobby Woolf."}
+    ]
+  },
+  {
     "title": "Spring Data & Ecosystem",
     "links": [
       {"title": "Spring Data JPA", "url": "https://docs.spring.io/spring-data/jpa/reference/", "description": "Repositories, derived queries, auditing, transactions with JPA/Hibernate."},
       {"title": "Spring Data Relational (JDBC)", "url": "https://docs.spring.io/spring-data/relational/reference/", "description": "JDBC and JPA without the ORM when you prefer SQL-first."},
+      {"title": "Spring Data MongoDB", "url": "https://docs.spring.io/spring-data/mongodb/reference/", "description": "@Document mapping, repositories, aggregations and geo queries."},
+      {"title": "Spring Data Redis", "url": "https://docs.spring.io/spring-data/redis/reference/", "description": "RedisTemplate, @RedisHash entities, TTLs and pub/sub."},
+      {"title": "Spring Cache Abstraction", "url": "https://docs.spring.io/spring-framework/reference/integration/cache.html", "description": "@Cacheable/@CacheEvict, cache managers and cache-aside design."},
       {"title": "Spring Cloud", "url": "https://docs.spring.io/spring-cloud/reference/", "description": "Microservices: service discovery, config server, gateway, resilience."},
       {"title": "Spring Boot 3 Migration Guide", "url": "https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-3.0-Migration-Guide", "description": "Migrating from Spring Boot 2 to 3 (jakarta.* namespace and more)."}
+    ]
+  },
+  {
+    "title": "APIs Beyond REST",
+    "links": [
+      {"title": "Spring for GraphQL", "url": "https://docs.spring.io/spring-graphql/reference/", "description": "Schema-first GraphQL: @QueryMapping/@MutationMapping, DataLoader batching and error handling."},
+      {"title": "GraphQL Learn", "url": "https://graphql.org/learn/", "description": "The GraphQL spec, queries, mutations, and the schema language."},
+      {"title": "Spring REST Docs", "url": "https://docs.spring.io/spring-restdocs/reference/", "description": "Test-driven API documentation — snippets captured from executing tests."},
+      {"title": "springdoc-openapi", "url": "https://springdoc.org/", "description": "OpenAPI 3 descriptors and Swagger UI generated from your controllers."},
+      {"title": "OpenAPI Specification", "url": "https://swagger.io/specification/", "description": "The machine-readable contract format for HTTP APIs."},
+      {"title": "REST Clients (RestClient, WebClient, HTTP interfaces)", "url": "https://docs.spring.io/spring-framework/reference/integration/rest-clients.html", "description": "Synchronous and reactive HTTP clients plus the Spring 6 typed interface clients."},
+      {"title": "WebSocket & STOMP", "url": "https://docs.spring.io/spring-framework/reference/web/websocket.html", "description": "Full-duplex messaging: STOMP endpoints, @MessageMapping and broker relays."}
     ]
   },
   {

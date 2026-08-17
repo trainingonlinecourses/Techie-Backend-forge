@@ -79,5 +79,41 @@
     "color": "#9ece6a",
     "tech": ["Mono", "Flux", "WebClient", "R2DBC", "Netty"],
     "docsUrl": "https://docs.spring.io/spring-framework/reference/web/webflux.html"
+  },
+  {
+    "id": "spring-batch",
+    "title": "Spring Batch & Integration",
+    "subtitle": "Reliable offline processing — Jobs, Steps, chunk-oriented ETL, skip/retry fault tolerance, and Spring Integration's message flows.",
+    "order": 10,
+    "color": "#e0af68",
+    "tech": ["Batch", "Chunks", "ETL", "Skip/Retry", "EIP"],
+    "docsUrl": "https://docs.spring.io/spring-batch/reference/"
+  },
+  {
+    "id": "spring-data",
+    "title": "Spring Data Beyond JPA",
+    "subtitle": "Repositories, query methods and projections across stores — MongoDB documents, Redis hashes, Spring Data JDBC aggregates and the cache abstraction.",
+    "order": 11,
+    "color": "#73daca",
+    "tech": ["MongoDB", "Redis", "JDBC", "Caching", "Repositories"],
+    "docsUrl": "https://docs.spring.io/spring-data/reference/"
+  },
+  {
+    "id": "spring-web-apis",
+    "title": "APIs Beyond REST",
+    "subtitle": "GraphQL schemas and resolvers, OpenAPI/springdoc, test-driven docs with REST Docs, HTTP clients and WebSocket/STOMP realtime.",
+    "order": 12,
+    "color": "#ff9e64",
+    "tech": ["GraphQL", "OpenAPI", "REST Docs", "Clients", "WebSocket"],
+    "docsUrl": "https://docs.spring.io/spring-graphql/reference/"
+  },
+  {
+    "id": "spring-security-advanced",
+    "title": "Security: OAuth2 & Hardening",
+    "subtitle": "Building an authorization server, JWT resource servers, SSO login with OAuth2 clients, session management and the OWASP Top 10 for Spring backends.",
+    "order": 13,
+    "color": "#bb9af7",
+    "tech": ["OAuth2", "OIDC", "Sessions", "PKCE", "OWASP"],
+    "docsUrl": "https://docs.spring.io/spring-security/reference/"
   }
 ]

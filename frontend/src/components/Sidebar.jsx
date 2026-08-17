@@ -66,7 +66,7 @@ export default function Sidebar({ progress }) {
         <span className="modttl">AI Tutor</span>
       </Link>
       <div className="sidefoot">
-        <p>73 lessons · 9 modules · full backend projects</p>
+        <p>110 lessons · 13 modules · full backend projects</p>
         <p className="dim">Java 21 · Spring Boot 3.4 · Spring AI 1.0</p>
       </div>
     </aside>
