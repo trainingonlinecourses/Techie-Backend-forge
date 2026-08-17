@@ -2,340 +2,1461 @@
   {
     "title": "Spring Framework Reference",
     "links": [
-      {"title": "Core Technologies (IoC, beans, AOP, events)", "url": "https://docs.spring.io/spring-framework/reference/core.html", "description": "The official reference for the IoC container, dependency injection, bean scopes, AOP, events and resources."},
-      {"title": "The IoC Container", "url": "https://docs.spring.io/spring-framework/reference/core/beans.html", "description": "BeanFactory vs ApplicationContext, instantiation, dependencies, scopes, lifecycle and configuration."},
-      {"title": "Aspect-Oriented Programming", "url": "https://docs.spring.io/spring-framework/reference/core/aop.html", "description": "AOP concepts, @Aspect, pointcuts, advice types and how Spring AOP proxies work."},
-      {"title": "Data Access & Transactions", "url": "https://docs.spring.io/spring-framework/reference/data-access.html", "description": "JDBC, transactions, DAO support and the transaction abstraction."},
-      {"title": "Transaction Management", "url": "https://docs.spring.io/spring-framework/reference/data-access/transaction.html", "description": "The PlatformTransactionManager abstraction, @Transactional, propagation and isolation."},
-      {"title": "Spring MVC (Web MVC)", "url": "https://docs.spring.io/spring-framework/reference/web/webmvc.html", "description": "DispatcherServlet, controllers, argument resolution, message converters and exception handling."},
-      {"title": "Testing Support", "url": "https://docs.spring.io/spring-framework/reference/testing.html", "description": "Unit and integration testing support in the framework."}
+      {
+        "title": "Core Technologies (IoC, beans, AOP, events)",
+        "url": "https://docs.spring.io/spring-framework/reference/core.html",
+        "description": "The official reference for the IoC container, dependency injection, bean scopes, AOP, events and resources."
+      },
+      {
+        "title": "The IoC Container",
+        "url": "https://docs.spring.io/spring-framework/reference/core/beans.html",
+        "description": "BeanFactory vs ApplicationContext, instantiation, dependencies, scopes, lifecycle and configuration."
+      },
+      {
+        "title": "Aspect-Oriented Programming",
+        "url": "https://docs.spring.io/spring-framework/reference/core/aop.html",
+        "description": "AOP concepts, @Aspect, pointcuts, advice types and how Spring AOP proxies work."
+      },
+      {
+        "title": "Data Access & Transactions",
+        "url": "https://docs.spring.io/spring-framework/reference/data-access.html",
+        "description": "JDBC, transactions, DAO support and the transaction abstraction."
+      },
+      {
+        "title": "Transaction Management",
+        "url": "https://docs.spring.io/spring-framework/reference/data-access/transaction.html",
+        "description": "The PlatformTransactionManager abstraction, @Transactional, propagation and isolation."
+      },
+      {
+        "title": "Spring MVC (Web MVC)",
+        "url": "https://docs.spring.io/spring-framework/reference/web/webmvc.html",
+        "description": "DispatcherServlet, controllers, argument resolution, message converters and exception handling."
+      },
+      {
+        "title": "Testing Support",
+        "url": "https://docs.spring.io/spring-framework/reference/testing.html",
+        "description": "Unit and integration testing support in the framework."
+      }
     ]
   },
   {
     "title": "Spring Boot Reference",
     "links": [
-      {"title": "Reference Documentation (home)", "url": "https://docs.spring.io/spring-boot/reference/", "description": "The complete Spring Boot reference: using, features, web, data, testing, deployment."},
-      {"title": "Using Spring Boot (build systems, structure, starters)", "url": "https://docs.spring.io/spring-boot/reference/using/index.html", "description": "Maven/Gradle setup, code structure, starters, configuration classes and auto-configuration."},
-      {"title": "Auto-configuration", "url": "https://docs.spring.io/spring-boot/reference/using/auto-configuration.html", "description": "How auto-configuration works and how to customize or disable it."},
-      {"title": "Externalized Configuration", "url": "https://docs.spring.io/spring-boot/reference/features/external-config.html", "description": "application.yml, profiles, environment variables, @ConfigurationProperties and configuration precedence."},
-      {"title": "Spring MVC / Web features", "url": "https://docs.spring.io/spring-boot/reference/web/index.html", "description": "JSON, error handling, CORS, HTTP clients and servlet containers."},
-      {"title": "Data (Spring Data JPA)", "url": "https://docs.spring.io/spring-boot/reference/data/sql.html", "description": "Working with SQL databases, JPA repositories and Hibernate."},
-      {"title": "Testing Spring Boot applications", "url": "https://docs.spring.io/spring-boot/reference/testing/index.html", "description": "@SpringBootTest, @WebMvcTest, @DataJpaTest, MockMvc and test slices."},
-      {"title": "Actuator", "url": "https://docs.spring.io/spring-boot/reference/actuator/index.html", "description": "Production-ready features: health, metrics, audit, HTTP endpoints."},
-      {"title": "Deploying Spring Boot applications", "url": "https://docs.spring.io/spring-boot/reference/deployment/index.html", "description": "Cloud deployment, Docker containers, systemd and Kubernetes."}
+      {
+        "title": "Reference Documentation (home)",
+        "url": "https://docs.spring.io/spring-boot/reference/",
+        "description": "The complete Spring Boot reference: using, features, web, data, testing, deployment."
+      },
+      {
+        "title": "Using Spring Boot (build systems, structure, starters)",
+        "url": "https://docs.spring.io/spring-boot/reference/using/index.html",
+        "description": "Maven/Gradle setup, code structure, starters, configuration classes and auto-configuration."
+      },
+      {
+        "title": "Auto-configuration",
+        "url": "https://docs.spring.io/spring-boot/reference/using/auto-configuration.html",
+        "description": "How auto-configuration works and how to customize or disable it."
+      },
+      {
+        "title": "Externalized Configuration",
+        "url": "https://docs.spring.io/spring-boot/reference/features/external-config.html",
+        "description": "application.yml, profiles, environment variables, @ConfigurationProperties and configuration precedence."
+      },
+      {
+        "title": "Spring MVC / Web features",
+        "url": "https://docs.spring.io/spring-boot/reference/web/index.html",
+        "description": "JSON, error handling, CORS, HTTP clients and servlet containers."
+      },
+      {
+        "title": "Data (Spring Data JPA)",
+        "url": "https://docs.spring.io/spring-boot/reference/data/sql.html",
+        "description": "Working with SQL databases, JPA repositories and Hibernate."
+      },
+      {
+        "title": "Testing Spring Boot applications",
+        "url": "https://docs.spring.io/spring-boot/reference/testing/index.html",
+        "description": "@SpringBootTest, @WebMvcTest, @DataJpaTest, MockMvc and test slices."
+      },
+      {
+        "title": "Actuator",
+        "url": "https://docs.spring.io/spring-boot/reference/actuator/index.html",
+        "description": "Production-ready features: health, metrics, audit, HTTP endpoints."
+      },
+      {
+        "title": "Deploying Spring Boot applications",
+        "url": "https://docs.spring.io/spring-boot/reference/deployment/index.html",
+        "description": "Cloud deployment, Docker containers, systemd and Kubernetes."
+      }
     ]
   },
   {
     "title": "Spring Security Reference",
     "links": [
-      {"title": "Reference Documentation (home)", "url": "https://docs.spring.io/spring-security/reference/", "description": "The complete Spring Security reference documentation."},
-      {"title": "Architecture (filter chain, authentication)", "url": "https://docs.spring.io/spring-security/reference/servlet/architecture.html", "description": "SecurityFilterChain, SecurityContextHolder, AuthenticationManager and how requests flow."},
-      {"title": "Authentication", "url": "https://docs.spring.io/spring-security/reference/servlet/authentication/index.html", "description": "Password storage, UserDetailsService, DaoAuthenticationProvider, sessions and JWT-style stateless auth."},
-      {"title": "Authorization", "url": "https://docs.spring.io/spring-security/reference/servlet/authorization/index.html", "description": "AuthorizeHttpRequests, method security (@PreAuthorize) and authorities."},
-      {"title": "OAuth2 / OIDC", "url": "https://docs.spring.io/spring-security/reference/servlet/oauth2/index.html", "description": "Login with OAuth2 providers, resource servers and JWT decoding."},
-      {"title": "OAuth2 Resource Server", "url": "https://docs.spring.io/spring-security/reference/servlet/oauth2/resource-server/index.html", "description": "Securing APIs with Bearer tokens — JWT validation against JWKS, opaque-token introspection and scopes."},
-      {"title": "OAuth2 Client (login with Google/GitHub/SSO)", "url": "https://docs.spring.io/spring-security/reference/servlet/oauth2/login/index.html", "description": "Adding Sign in with … — client registrations, the authorization code flow and user info mapping."},
-      {"title": "Session Management", "url": "https://docs.spring.io/spring-security/reference/servlet/authentication/session-management.html", "description": "Session fixation, concurrency control, the session registry and timeouts."},
-      {"title": "Spring Authorization Server", "url": "https://docs.spring.io/spring-authorization-server/reference/", "description": "Running your own OAuth2/OIDC authorization server: clients, the authorize and token endpoints, PKCE."},
-      {"title": "Spring Session", "url": "https://docs.spring.io/spring-session/reference/", "description": "Externalizing sessions to Redis or JDBC for multi-instance deployments."},
-      {"title": "CORS, CSRF and headers", "url": "https://docs.spring.io/spring-security/reference/servlet/exploits/index.html", "description": "Cross-site request forgery, CORS and security headers."},
-      {"title": "Testing Spring Security", "url": "https://docs.spring.io/spring-security/reference/servlet/test/index.html", "description": "MockMvc support, @WithMockUser and security test annotations."}
+      {
+        "title": "Reference Documentation (home)",
+        "url": "https://docs.spring.io/spring-security/reference/",
+        "description": "The complete Spring Security reference documentation."
+      },
+      {
+        "title": "Architecture (filter chain, authentication)",
+        "url": "https://docs.spring.io/spring-security/reference/servlet/architecture.html",
+        "description": "SecurityFilterChain, SecurityContextHolder, AuthenticationManager and how requests flow."
+      },
+      {
+        "title": "Authentication",
+        "url": "https://docs.spring.io/spring-security/reference/servlet/authentication/index.html",
+        "description": "Password storage, UserDetailsService, DaoAuthenticationProvider, sessions and JWT-style stateless auth."
+      },
+      {
+        "title": "Authorization",
+        "url": "https://docs.spring.io/spring-security/reference/servlet/authorization/index.html",
+        "description": "AuthorizeHttpRequests, method security (@PreAuthorize) and authorities."
+      },
+      {
+        "title": "OAuth2 / OIDC",
+        "url": "https://docs.spring.io/spring-security/reference/servlet/oauth2/index.html",
+        "description": "Login with OAuth2 providers, resource servers and JWT decoding."
+      },
+      {
+        "title": "OAuth2 Resource Server",
+        "url": "https://docs.spring.io/spring-security/reference/servlet/oauth2/resource-server/index.html",
+        "description": "Securing APIs with Bearer tokens — JWT validation against JWKS, opaque-token introspection and scopes."
+      },
+      {
+        "title": "OAuth2 Client (login with Google/GitHub/SSO)",
+        "url": "https://docs.spring.io/spring-security/reference/servlet/oauth2/login/index.html",
+        "description": "Adding Sign in with … — client registrations, the authorization code flow and user info mapping."
+      },
+      {
+        "title": "Session Management",
+        "url": "https://docs.spring.io/spring-security/reference/servlet/authentication/session-management.html",
+        "description": "Session fixation, concurrency control, the session registry and timeouts."
+      },
+      {
+        "title": "Spring Authorization Server",
+        "url": "https://docs.spring.io/spring-authorization-server/reference/",
+        "description": "Running your own OAuth2/OIDC authorization server: clients, the authorize and token endpoints, PKCE."
+      },
+      {
+        "title": "Spring Session",
+        "url": "https://docs.spring.io/spring-session/reference/",
+        "description": "Externalizing sessions to Redis or JDBC for multi-instance deployments."
+      },
+      {
+        "title": "CORS, CSRF and headers",
+        "url": "https://docs.spring.io/spring-security/reference/servlet/exploits/index.html",
+        "description": "Cross-site request forgery, CORS and security headers."
+      },
+      {
+        "title": "Testing Spring Security",
+        "url": "https://docs.spring.io/spring-security/reference/servlet/test/index.html",
+        "description": "MockMvc support, @WithMockUser and security test annotations."
+      }
     ]
   },
   {
     "title": "Spring AI Reference",
     "links": [
-      {"title": "Reference Documentation (home)", "url": "https://docs.spring.io/spring-ai/reference/", "description": "The complete Spring AI reference: models, prompts, structured output, RAG."},
-      {"title": "ChatClient", "url": "https://docs.spring.io/spring-ai/reference/api/chatclient.html", "description": "Fluent API for prompting, messages, streaming and tools."},
-      {"title": "Structured Output", "url": "https://docs.spring.io/spring-ai/reference/api/structured-output-converter.html", "description": "Converting model output into typed Java objects (BeanOutputConverter, MapOutputConverter)."},
-      {"title": "Function Calling", "url": "https://docs.spring.io/spring-ai/reference/api/functions.html", "description": "Registering Java methods as tools the model can call."},
-      {"title": "Embeddings", "url": "https://docs.spring.io/spring-ai/reference/api/embeddings.html", "description": "Embedding models, embeddings and similarity."},
-      {"title": "Vector Databases", "url": "https://docs.spring.io/spring-ai/reference/api/vectordbs.html", "description": "SimpleVectorStore, Redis, PGVector, Chroma, Milvus and more."},
-      {"title": "RAG", "url": "https://docs.spring.io/spring-ai/reference/api/rag.html", "description": "Retrieval-augmented generation: ingestion, retrieval and the RAG pipeline."},
-      {"title": "Advisors", "url": "https://docs.spring.io/spring-ai/reference/api/advisors.html", "description": "Cross-cutting concerns for prompts: memory, logging, RAG, safety."}
+      {
+        "title": "Reference Documentation (home)",
+        "url": "https://docs.spring.io/spring-ai/reference/",
+        "description": "The complete Spring AI reference: models, prompts, structured output, RAG."
+      },
+      {
+        "title": "ChatClient",
+        "url": "https://docs.spring.io/spring-ai/reference/api/chatclient.html",
+        "description": "Fluent API for prompting, messages, streaming and tools."
+      },
+      {
+        "title": "Structured Output",
+        "url": "https://docs.spring.io/spring-ai/reference/api/structured-output-converter.html",
+        "description": "Converting model output into typed Java objects (BeanOutputConverter, MapOutputConverter)."
+      },
+      {
+        "title": "Function Calling",
+        "url": "https://docs.spring.io/spring-ai/reference/api/functions.html",
+        "description": "Registering Java methods as tools the model can call."
+      },
+      {
+        "title": "Embeddings",
+        "url": "https://docs.spring.io/spring-ai/reference/api/embeddings.html",
+        "description": "Embedding models, embeddings and similarity."
+      },
+      {
+        "title": "Vector Databases",
+        "url": "https://docs.spring.io/spring-ai/reference/api/vectordbs.html",
+        "description": "SimpleVectorStore, Redis, PGVector, Chroma, Milvus and more."
+      },
+      {
+        "title": "RAG",
+        "url": "https://docs.spring.io/spring-ai/reference/api/rag.html",
+        "description": "Retrieval-augmented generation: ingestion, retrieval and the RAG pipeline."
+      },
+      {
+        "title": "Advisors",
+        "url": "https://docs.spring.io/spring-ai/reference/api/advisors.html",
+        "description": "Cross-cutting concerns for prompts: memory, logging, RAG, safety."
+      }
     ]
   },
   {
     "title": "Spring Cloud Reference",
     "links": [
-      {"title": "Reference Documentation (home)", "url": "https://docs.spring.io/spring-cloud/reference/", "description": "The complete Spring Cloud reference: discovery, config, gateway, resilience and tracing."},
-      {"title": "Service Discovery (Eureka)", "url": "https://docs.spring.io/spring-cloud-netflix/reference/spring-cloud-netflix.html", "description": "Service registration and discovery with Eureka, client and server."},
-      {"title": "Spring Cloud Config", "url": "https://docs.spring.io/spring-cloud-config/reference/", "description": "Centralized external configuration: config server, clients, refresh and encryption."},
-      {"title": "Spring Cloud Gateway", "url": "https://docs.spring.io/spring-cloud-gateway/reference/spring-cloud-gateway-server-mvc.html", "description": "API gateway: routing, predicates, filters, circuit breakers and fallbacks."},
-      {"title": "Resilience4j", "url": "https://resilience4j.readme.io/docs/getting-started-3", "description": "Circuit breakers, retries, rate limiters, bulkheads and time limiters for microservices."},
-      {"title": "Distributed Tracing (Micrometer Tracing)", "url": "https://docs.spring.io/spring-boot/reference/actuator/tracing.html", "description": "Trace IDs, spans, Brave/OpenTelemetry and Zipkin integration."},
-      {"title": "Spring Cloud OpenFeign", "url": "https://docs.spring.io/spring-cloud-openfeign/reference/", "description": "Declarative REST clients that plug into discovery and load balancing."},
-      {"title": "Spring Cloud LoadBalancer", "url": "https://docs.spring.io/spring-cloud-commons/reference/spring-cloud-commons.html", "description": "Client-side load balancing across discovered service instances."}
+      {
+        "title": "Reference Documentation (home)",
+        "url": "https://docs.spring.io/spring-cloud/reference/",
+        "description": "The complete Spring Cloud reference: discovery, config, gateway, resilience and tracing."
+      },
+      {
+        "title": "Service Discovery (Eureka)",
+        "url": "https://docs.spring.io/spring-cloud-netflix/reference/spring-cloud-netflix.html",
+        "description": "Service registration and discovery with Eureka, client and server."
+      },
+      {
+        "title": "Spring Cloud Config",
+        "url": "https://docs.spring.io/spring-cloud-config/reference/",
+        "description": "Centralized external configuration: config server, clients, refresh and encryption."
+      },
+      {
+        "title": "Spring Cloud Gateway",
+        "url": "https://docs.spring.io/spring-cloud-gateway/reference/spring-cloud-gateway-server-mvc.html",
+        "description": "API gateway: routing, predicates, filters, circuit breakers and fallbacks."
+      },
+      {
+        "title": "Resilience4j",
+        "url": "https://resilience4j.readme.io/docs/getting-started-3",
+        "description": "Circuit breakers, retries, rate limiters, bulkheads and time limiters for microservices."
+      },
+      {
+        "title": "Distributed Tracing (Micrometer Tracing)",
+        "url": "https://docs.spring.io/spring-boot/reference/actuator/tracing.html",
+        "description": "Trace IDs, spans, Brave/OpenTelemetry and Zipkin integration."
+      },
+      {
+        "title": "Spring Cloud OpenFeign",
+        "url": "https://docs.spring.io/spring-cloud-openfeign/reference/",
+        "description": "Declarative REST clients that plug into discovery and load balancing."
+      },
+      {
+        "title": "Spring Cloud LoadBalancer",
+        "url": "https://docs.spring.io/spring-cloud-commons/reference/spring-cloud-commons.html",
+        "description": "Client-side load balancing across discovered service instances."
+      }
     ]
   },
   {
     "title": "Spring Kafka & Messaging",
     "links": [
-      {"title": "Spring Kafka Reference", "url": "https://docs.spring.io/spring-kafka/reference/", "description": "The complete Spring Kafka reference: producers, consumers, containers, transactions and error handling."},
-      {"title": "Quick Tour", "url": "https://docs.spring.io/spring-kafka/reference/quick-tour.html", "description": "KafkaTemplate, @KafkaListener and the minimal setup in one page."},
-      {"title": "Receiving Messages (@KafkaListener)", "url": "https://docs.spring.io/spring-kafka/reference/kafka/receiving-messages/receiving-messages.html", "description": "Listener containers, concurrency, batch listeners and acknowledging."},
-      {"title": "RetryTopic & Dead Letter Topics", "url": "https://docs.spring.io/spring-kafka/reference/retrytopic/index.html", "description": "@RetryableTopic, backoff, DLT handlers and failed-deserialization routing."},
-      {"title": "Error Handling", "url": "https://docs.spring.io/spring-kafka/reference/kafka/error-handling.html", "description": "ErrorHandlingDeserializer, listener error handlers and seek-to-current behavior."},
-      {"title": "Transactions", "url": "https://docs.spring.io/spring-kafka/reference/kafka/transactions.html", "description": "Kafka transactions and the ChainedKafkaTransactionManager."},
-      {"title": "Testing Support", "url": "https://docs.spring.io/spring-kafka/reference/testing.html", "description": "@EmbeddedKafka and Testcontainers for Kafka integration tests."},
-      {"title": "Apache Kafka Documentation", "url": "https://kafka.apache.org/documentation/", "description": "The authoritative Kafka docs: topics, partitions, consumer groups, operations and security."},
-      {"title": "Transactional Outbox (microservices.io)", "url": "https://microservices.io/patterns/data/transactional-outbox.html", "description": "The outbox pattern: atomic writes to business state and an event table."},
-      {"title": "Confluent Schema Registry", "url": "https://docs.confluent.io/platform/current/schema-registry/index.html", "description": "Versioned, governed event schemas for production Kafka."}
+      {
+        "title": "Spring Kafka Reference",
+        "url": "https://docs.spring.io/spring-kafka/reference/",
+        "description": "The complete Spring Kafka reference: producers, consumers, containers, transactions and error handling."
+      },
+      {
+        "title": "Quick Tour",
+        "url": "https://docs.spring.io/spring-kafka/reference/quick-tour.html",
+        "description": "KafkaTemplate, @KafkaListener and the minimal setup in one page."
+      },
+      {
+        "title": "Receiving Messages (@KafkaListener)",
+        "url": "https://docs.spring.io/spring-kafka/reference/kafka/receiving-messages/receiving-messages.html",
+        "description": "Listener containers, concurrency, batch listeners and acknowledging."
+      },
+      {
+        "title": "RetryTopic & Dead Letter Topics",
+        "url": "https://docs.spring.io/spring-kafka/reference/retrytopic/index.html",
+        "description": "@RetryableTopic, backoff, DLT handlers and failed-deserialization routing."
+      },
+      {
+        "title": "Error Handling",
+        "url": "https://docs.spring.io/spring-kafka/reference/kafka/error-handling.html",
+        "description": "ErrorHandlingDeserializer, listener error handlers and seek-to-current behavior."
+      },
+      {
+        "title": "Transactions",
+        "url": "https://docs.spring.io/spring-kafka/reference/kafka/transactions.html",
+        "description": "Kafka transactions and the ChainedKafkaTransactionManager."
+      },
+      {
+        "title": "Testing Support",
+        "url": "https://docs.spring.io/spring-kafka/reference/testing.html",
+        "description": "@EmbeddedKafka and Testcontainers for Kafka integration tests."
+      },
+      {
+        "title": "Apache Kafka Documentation",
+        "url": "https://kafka.apache.org/documentation/",
+        "description": "The authoritative Kafka docs: topics, partitions, consumer groups, operations and security."
+      },
+      {
+        "title": "Transactional Outbox (microservices.io)",
+        "url": "https://microservices.io/patterns/data/transactional-outbox.html",
+        "description": "The outbox pattern: atomic writes to business state and an event table."
+      },
+      {
+        "title": "Confluent Schema Registry",
+        "url": "https://docs.confluent.io/platform/current/schema-registry/index.html",
+        "description": "Versioned, governed event schemas for production Kafka."
+      }
     ]
   },
   {
     "title": "Spring WebFlux & Reactive",
     "links": [
-      {"title": "WebFlux Reference", "url": "https://docs.spring.io/spring-framework/reference/web/webflux.html", "description": "The reactive web stack: thread model, annotated controllers, functional endpoints and streaming."},
-      {"title": "Project Reactor Core", "url": "https://projectreactor.io/docs/core/release/reference/", "description": "Mono and Flux, operators, schedulers and backpressure — the foundation of reactive Spring."},
-      {"title": "WebClient", "url": "https://docs.spring.io/spring-framework/reference/web/webflux-webclient.html", "description": "The non-blocking HTTP client: retrieve vs exchange, filters, timeouts."},
-      {"title": "Spring Data R2DBC", "url": "https://docs.spring.io/spring-data/r2dbc/reference/", "description": "Reactive relational data access: ReactiveCrudRepository and transactional operators."},
-      {"title": "Spring Data MongoDB (Reactive)", "url": "https://docs.spring.io/spring-data/mongodb/reference/", "description": "ReactiveMongoRepository and reactive document data access."},
-      {"title": "WebTestClient", "url": "https://docs.spring.io/spring-framework/reference/testing/webtestclient.html", "description": "Reactive client for testing WebFlux endpoints."},
-      {"title": "Reactor Test (StepVerifier)", "url": "https://projectreactor.io/docs/test/release/reference/", "description": "StepVerifier and virtual time for verifying Mono/Flux streams."},
-      {"title": "R2DBC", "url": "https://r2dbc.io", "description": "The reactive relational database connectivity specification."}
+      {
+        "title": "WebFlux Reference",
+        "url": "https://docs.spring.io/spring-framework/reference/web/webflux.html",
+        "description": "The reactive web stack: thread model, annotated controllers, functional endpoints and streaming."
+      },
+      {
+        "title": "Project Reactor Core",
+        "url": "https://projectreactor.io/docs/core/release/reference/",
+        "description": "Mono and Flux, operators, schedulers and backpressure — the foundation of reactive Spring."
+      },
+      {
+        "title": "WebClient",
+        "url": "https://docs.spring.io/spring-framework/reference/web/webflux-webclient.html",
+        "description": "The non-blocking HTTP client: retrieve vs exchange, filters, timeouts."
+      },
+      {
+        "title": "Spring Data R2DBC",
+        "url": "https://docs.spring.io/spring-data/r2dbc/reference/",
+        "description": "Reactive relational data access: ReactiveCrudRepository and transactional operators."
+      },
+      {
+        "title": "Spring Data MongoDB (Reactive)",
+        "url": "https://docs.spring.io/spring-data/mongodb/reference/",
+        "description": "ReactiveMongoRepository and reactive document data access."
+      },
+      {
+        "title": "WebTestClient",
+        "url": "https://docs.spring.io/spring-framework/reference/testing/webtestclient.html",
+        "description": "Reactive client for testing WebFlux endpoints."
+      },
+      {
+        "title": "Reactor Test (StepVerifier)",
+        "url": "https://projectreactor.io/docs/test/release/reference/",
+        "description": "StepVerifier and virtual time for verifying Mono/Flux streams."
+      },
+      {
+        "title": "R2DBC",
+        "url": "https://r2dbc.io",
+        "description": "The reactive relational database connectivity specification."
+      }
     ]
   },
   {
     "title": "Spring Batch & Integration",
     "links": [
-      {"title": "Spring Batch Reference", "url": "https://docs.spring.io/spring-batch/reference/", "description": "Jobs, Steps, chunk-oriented processing, readers/writers, fault tolerance and the JobRepository."},
-      {"title": "Chunk-Oriented Processing", "url": "https://docs.spring.io/spring-batch/reference/step/chunk-oriented-processing.html", "description": "The read-process-write loop, commit intervals and restart checkpoints."},
-      {"title": "Readers & Writers", "url": "https://docs.spring.io/spring-batch/reference/readers-and-writers.html", "description": "Flat files, CSV, JSON, JDBC/JPA, messaging and multi-resource readers."},
-      {"title": "Fault Tolerance (skip/retry/rollback)", "url": "https://docs.spring.io/spring-batch/reference/step/fault-tolerant.html", "description": "Skip policies for poison records, retry with backoff, rollback rules."},
-      {"title": "Spring Integration Reference", "url": "https://docs.spring.io/spring-integration/reference/", "description": "Enterprise Integration Patterns: channels, gateways, routers, transformers and adapters."},
-      {"title": "Enterprise Integration Patterns", "url": "https://www.enterpriseintegrationpatterns.com/", "description": "The canonical EIP catalog by Gregor Hohpe and Bobby Woolf."}
+      {
+        "title": "Spring Batch Reference",
+        "url": "https://docs.spring.io/spring-batch/reference/",
+        "description": "Jobs, Steps, chunk-oriented processing, readers/writers, fault tolerance and the JobRepository."
+      },
+      {
+        "title": "Chunk-Oriented Processing",
+        "url": "https://docs.spring.io/spring-batch/reference/step/chunk-oriented-processing.html",
+        "description": "The read-process-write loop, commit intervals and restart checkpoints."
+      },
+      {
+        "title": "Readers & Writers",
+        "url": "https://docs.spring.io/spring-batch/reference/readers-and-writers.html",
+        "description": "Flat files, CSV, JSON, JDBC/JPA, messaging and multi-resource readers."
+      },
+      {
+        "title": "Fault Tolerance (skip/retry/rollback)",
+        "url": "https://docs.spring.io/spring-batch/reference/step/fault-tolerant.html",
+        "description": "Skip policies for poison records, retry with backoff, rollback rules."
+      },
+      {
+        "title": "Spring Integration Reference",
+        "url": "https://docs.spring.io/spring-integration/reference/",
+        "description": "Enterprise Integration Patterns: channels, gateways, routers, transformers and adapters."
+      },
+      {
+        "title": "Enterprise Integration Patterns",
+        "url": "https://www.enterpriseintegrationpatterns.com/",
+        "description": "The canonical EIP catalog by Gregor Hohpe and Bobby Woolf."
+      }
     ]
   },
   {
     "title": "Spring Data & Ecosystem",
     "links": [
-      {"title": "Spring Data JPA", "url": "https://docs.spring.io/spring-data/jpa/reference/", "description": "Repositories, derived queries, auditing, transactions with JPA/Hibernate."},
-      {"title": "Spring Data Relational (JDBC)", "url": "https://docs.spring.io/spring-data/relational/reference/", "description": "JDBC and JPA without the ORM when you prefer SQL-first."},
-      {"title": "Spring Data MongoDB", "url": "https://docs.spring.io/spring-data/mongodb/reference/", "description": "@Document mapping, repositories, aggregations and geo queries."},
-      {"title": "Spring Data Redis", "url": "https://docs.spring.io/spring-data/redis/reference/", "description": "RedisTemplate, @RedisHash entities, TTLs and pub/sub."},
-      {"title": "Spring Cache Abstraction", "url": "https://docs.spring.io/spring-framework/reference/integration/cache.html", "description": "@Cacheable/@CacheEvict, cache managers and cache-aside design."},
-      {"title": "Spring Cloud", "url": "https://docs.spring.io/spring-cloud/reference/", "description": "Microservices: service discovery, config server, gateway, resilience."},
-      {"title": "Spring Boot 3 Migration Guide", "url": "https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-3.0-Migration-Guide", "description": "Migrating from Spring Boot 2 to 3 (jakarta.* namespace and more)."}
+      {
+        "title": "Spring Data JPA",
+        "url": "https://docs.spring.io/spring-data/jpa/reference/",
+        "description": "Repositories, derived queries, auditing, transactions with JPA/Hibernate."
+      },
+      {
+        "title": "Spring Data Relational (JDBC)",
+        "url": "https://docs.spring.io/spring-data/relational/reference/",
+        "description": "JDBC and JPA without the ORM when you prefer SQL-first."
+      },
+      {
+        "title": "Spring Data MongoDB",
+        "url": "https://docs.spring.io/spring-data/mongodb/reference/",
+        "description": "@Document mapping, repositories, aggregations and geo queries."
+      },
+      {
+        "title": "Spring Data Redis",
+        "url": "https://docs.spring.io/spring-data/redis/reference/",
+        "description": "RedisTemplate, @RedisHash entities, TTLs and pub/sub."
+      },
+      {
+        "title": "Spring Cache Abstraction",
+        "url": "https://docs.spring.io/spring-framework/reference/integration/cache.html",
+        "description": "@Cacheable/@CacheEvict, cache managers and cache-aside design."
+      },
+      {
+        "title": "Spring Cloud",
+        "url": "https://docs.spring.io/spring-cloud/reference/",
+        "description": "Microservices: service discovery, config server, gateway, resilience."
+      },
+      {
+        "title": "Spring Boot 3 Migration Guide",
+        "url": "https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-3.0-Migration-Guide",
+        "description": "Migrating from Spring Boot 2 to 3 (jakarta.* namespace and more)."
+      }
     ]
   },
   {
     "title": "APIs Beyond REST",
     "links": [
-      {"title": "Spring for GraphQL", "url": "https://docs.spring.io/spring-graphql/reference/", "description": "Schema-first GraphQL: @QueryMapping/@MutationMapping, DataLoader batching and error handling."},
-      {"title": "GraphQL Learn", "url": "https://graphql.org/learn/", "description": "The GraphQL spec, queries, mutations, and the schema language."},
-      {"title": "Spring REST Docs", "url": "https://docs.spring.io/spring-restdocs/reference/", "description": "Test-driven API documentation — snippets captured from executing tests."},
-      {"title": "springdoc-openapi", "url": "https://springdoc.org/", "description": "OpenAPI 3 descriptors and Swagger UI generated from your controllers."},
-      {"title": "OpenAPI Specification", "url": "https://swagger.io/specification/", "description": "The machine-readable contract format for HTTP APIs."},
-      {"title": "REST Clients (RestClient, WebClient, HTTP interfaces)", "url": "https://docs.spring.io/spring-framework/reference/integration/rest-clients.html", "description": "Synchronous and reactive HTTP clients plus the Spring 6 typed interface clients."},
-      {"title": "WebSocket & STOMP", "url": "https://docs.spring.io/spring-framework/reference/web/websocket.html", "description": "Full-duplex messaging: STOMP endpoints, @MessageMapping and broker relays."},
-      {"title": "Spring HATEOAS", "url": "https://docs.spring.io/spring-hateoas/reference/", "description": "Hypermedia APIs — EntityModel, link builders and self-describing resources."},
-      {"title": "Spring Data REST", "url": "https://docs.spring.io/spring-data/rest/reference/", "description": "Exposing repositories as HAL hypermedia APIs without controllers."}
+      {
+        "title": "Spring for GraphQL",
+        "url": "https://docs.spring.io/spring-graphql/reference/",
+        "description": "Schema-first GraphQL: @QueryMapping/@MutationMapping, DataLoader batching and error handling."
+      },
+      {
+        "title": "GraphQL Learn",
+        "url": "https://graphql.org/learn/",
+        "description": "The GraphQL spec, queries, mutations, and the schema language."
+      },
+      {
+        "title": "Spring REST Docs",
+        "url": "https://docs.spring.io/spring-restdocs/reference/",
+        "description": "Test-driven API documentation — snippets captured from executing tests."
+      },
+      {
+        "title": "springdoc-openapi",
+        "url": "https://springdoc.org/",
+        "description": "OpenAPI 3 descriptors and Swagger UI generated from your controllers."
+      },
+      {
+        "title": "OpenAPI Specification",
+        "url": "https://swagger.io/specification/",
+        "description": "The machine-readable contract format for HTTP APIs."
+      },
+      {
+        "title": "REST Clients (RestClient, WebClient, HTTP interfaces)",
+        "url": "https://docs.spring.io/spring-framework/reference/integration/rest-clients.html",
+        "description": "Synchronous and reactive HTTP clients plus the Spring 6 typed interface clients."
+      },
+      {
+        "title": "WebSocket & STOMP",
+        "url": "https://docs.spring.io/spring-framework/reference/web/websocket.html",
+        "description": "Full-duplex messaging: STOMP endpoints, @MessageMapping and broker relays."
+      },
+      {
+        "title": "Spring HATEOAS",
+        "url": "https://docs.spring.io/spring-hateoas/reference/",
+        "description": "Hypermedia APIs — EntityModel, link builders and self-describing resources."
+      },
+      {
+        "title": "Spring Data REST",
+        "url": "https://docs.spring.io/spring-data/rest/reference/",
+        "description": "Exposing repositories as HAL hypermedia APIs without controllers."
+      }
     ]
   },
   {
     "title": "Java Testing",
     "links": [
-      {"title": "JUnit 5 User Guide", "url": "https://junit.org/junit5/docs/current/user-guide/", "description": "Lifecycle, assertions, parameterized and repeated tests, extensions."},
-      {"title": "AssertJ", "url": "https://assertj.github.io/doc/", "description": "Fluent assertions for values, collections, exceptions and soft assertions."},
-      {"title": "Mockito", "url": "https://site.mockito.org/", "description": "Mocks, stubs, spies and verification for unit tests."},
-      {"title": "TestDouble (Martin Fowler)", "url": "https://martinfowler.com/bliki/TestDouble.html", "description": "The five kinds of test double and when to use each."},
-      {"title": "Test-Driven Development (Fowler)", "url": "https://martinfowler.com/bliki/TestDrivenDevelopment.html", "description": "The red-green-refactor loop and the design value of tests."},
-      {"title": "xUnit Test Patterns", "url": "https://xunitpatterns.com/Test%20Double.html", "description": "The classic test-double taxonomy in depth."}
+      {
+        "title": "JUnit 5 User Guide",
+        "url": "https://junit.org/junit5/docs/current/user-guide/",
+        "description": "Lifecycle, assertions, parameterized and repeated tests, extensions."
+      },
+      {
+        "title": "AssertJ",
+        "url": "https://assertj.github.io/doc/",
+        "description": "Fluent assertions for values, collections, exceptions and soft assertions."
+      },
+      {
+        "title": "Mockito",
+        "url": "https://site.mockito.org/",
+        "description": "Mocks, stubs, spies and verification for unit tests."
+      },
+      {
+        "title": "TestDouble (Martin Fowler)",
+        "url": "https://martinfowler.com/bliki/TestDouble.html",
+        "description": "The five kinds of test double and when to use each."
+      },
+      {
+        "title": "Test-Driven Development (Fowler)",
+        "url": "https://martinfowler.com/bliki/TestDrivenDevelopment.html",
+        "description": "The red-green-refactor loop and the design value of tests."
+      },
+      {
+        "title": "xUnit Test Patterns",
+        "url": "https://xunitpatterns.com/Test%20Double.html",
+        "description": "The classic test-double taxonomy in depth."
+      }
     ]
   },
   {
     "title": "JVM Performance & Tuning",
     "links": [
-      {"title": "Garbage Collection Tuning Guide", "url": "https://docs.oracle.com/en/java/javase/21/gctuning/", "description": "Generational collection, G1, ZGC, GC logs and tuning."},
-      {"title": "java tool reference", "url": "https://docs.oracle.com/en/java/javase/21/docs/specs/man/java.html", "description": "JVM flags, sizing and runtime options."},
-      {"title": "jcmd / jfr tools", "url": "https://docs.oracle.com/en/java/javase/21/docs/specs/man/jfr.html", "description": "Java Flight Recorder — production-safe profiling built into the JDK."},
-      {"title": "async-profiler", "url": "https://github.com/async-profiler/async-profiler", "description": "Safepoint-bias-free CPU, allocation, wall and lock flame graphs."},
-      {"title": "jmap tool", "url": "https://docs.oracle.com/en/java/javase/21/docs/specs/man/jmap.html", "description": "Heap dumps and JVM memory inspection."},
-      {"title": "Eclipse MAT", "url": "https://www.eclipse.org/mat/", "description": "Heap analysis: leak suspects, dominator tree, path to GC roots."}
+      {
+        "title": "Garbage Collection Tuning Guide",
+        "url": "https://docs.oracle.com/en/java/javase/21/gctuning/",
+        "description": "Generational collection, G1, ZGC, GC logs and tuning."
+      },
+      {
+        "title": "java tool reference",
+        "url": "https://docs.oracle.com/en/java/javase/21/docs/specs/man/java.html",
+        "description": "JVM flags, sizing and runtime options."
+      },
+      {
+        "title": "jcmd / jfr tools",
+        "url": "https://docs.oracle.com/en/java/javase/21/docs/specs/man/jfr.html",
+        "description": "Java Flight Recorder — production-safe profiling built into the JDK."
+      },
+      {
+        "title": "async-profiler",
+        "url": "https://github.com/async-profiler/async-profiler",
+        "description": "Safepoint-bias-free CPU, allocation, wall and lock flame graphs."
+      },
+      {
+        "title": "jmap tool",
+        "url": "https://docs.oracle.com/en/java/javase/21/docs/specs/man/jmap.html",
+        "description": "Heap dumps and JVM memory inspection."
+      },
+      {
+        "title": "Eclipse MAT",
+        "url": "https://www.eclipse.org/mat/",
+        "description": "Heap analysis: leak suspects, dominator tree, path to GC roots."
+      }
     ]
   },
   {
     "title": "Database Migrations",
     "links": [
-      {"title": "Flyway (Redgate)", "url": "https://documentation.red-gate.com/fd/", "description": "Versioned SQL migrations, checksums and the schema history table."},
-      {"title": "Liquibase", "url": "https://docs.liquibase.com/", "description": "Declarative changeSets, rollbacks and changelogs."},
-      {"title": "Parallel Change (Fowler)", "url": "https://martinfowler.com/bliki/ParallelChange.html", "description": "Expand-contract: safe schema evolution without downtime."},
-      {"title": "Spring Boot Data Initialization", "url": "https://docs.spring.io/spring-boot/reference/how-to/data-initialization.html", "description": "JPA import, script init, Flyway/Liquibase wiring and ordering."}
+      {
+        "title": "Flyway (Redgate)",
+        "url": "https://documentation.red-gate.com/fd/",
+        "description": "Versioned SQL migrations, checksums and the schema history table."
+      },
+      {
+        "title": "Liquibase",
+        "url": "https://docs.liquibase.com/",
+        "description": "Declarative changeSets, rollbacks and changelogs."
+      },
+      {
+        "title": "Parallel Change (Fowler)",
+        "url": "https://martinfowler.com/bliki/ParallelChange.html",
+        "description": "Expand-contract: safe schema evolution without downtime."
+      },
+      {
+        "title": "Spring Boot Data Initialization",
+        "url": "https://docs.spring.io/spring-boot/reference/how-to/data-initialization.html",
+        "description": "JPA import, script init, Flyway/Liquibase wiring and ordering."
+      }
     ]
   },
   {
     "title": "Spring Modulith & Architecture",
     "links": [
-      {"title": "Spring Modulith Reference", "url": "https://docs.spring.io/spring-modulith/reference/", "description": "Application modules, events with publication tracking, testing and docs."},
-      {"title": "Application Modules", "url": "https://docs.spring.io/spring-modulith/reference/application-modules.html", "description": "@ApplicationModule, named interfaces and the dependency rule."},
-      {"title": "Modulith Events", "url": "https://docs.spring.io/spring-modulith/reference/events.html", "description": "Reliable in-process events: publication registry, completion handlers."},
-      {"title": "Modulith Testing", "url": "https://docs.spring.io/spring-modulith/reference/testing.html", "description": "@ApplicationModuleTest and the Scenario DSL for event flows."},
-      {"title": "MonolithFirst (Fowler)", "url": "https://martinfowler.com/bliki/MonolithFirst.html", "description": "Why most teams should build a modular monolith before splitting."}
+      {
+        "title": "Spring Modulith Reference",
+        "url": "https://docs.spring.io/spring-modulith/reference/",
+        "description": "Application modules, events with publication tracking, testing and docs."
+      },
+      {
+        "title": "Application Modules",
+        "url": "https://docs.spring.io/spring-modulith/reference/application-modules.html",
+        "description": "@ApplicationModule, named interfaces and the dependency rule."
+      },
+      {
+        "title": "Modulith Events",
+        "url": "https://docs.spring.io/spring-modulith/reference/events.html",
+        "description": "Reliable in-process events: publication registry, completion handlers."
+      },
+      {
+        "title": "Modulith Testing",
+        "url": "https://docs.spring.io/spring-modulith/reference/testing.html",
+        "description": "@ApplicationModuleTest and the Scenario DSL for event flows."
+      },
+      {
+        "title": "MonolithFirst (Fowler)",
+        "url": "https://martinfowler.com/bliki/MonolithFirst.html",
+        "description": "Why most teams should build a modular monolith before splitting."
+      }
     ]
   },
   {
     "title": "Microservices Patterns",
     "links": [
-      {"title": "Saga (microservices.io)", "url": "https://microservices.io/patterns/data/saga.html", "description": "Local transactions + compensation for distributed flows."},
-      {"title": "CQRS (microservices.io)", "url": "https://microservices.io/patterns/data/cqrs.html", "description": "Separating write and read models, projections."},
-      {"title": "CQRS (Fowler)", "url": "https://martinfowler.com/bliki/CQRS.html", "description": "The pattern and its trade-offs."},
-      {"title": "Event Sourcing (Fowler)", "url": "https://martinfowler.com/eaaDev/EventSourcing.html", "description": "The event log as the source of truth."},
-      {"title": "Strangler Fig (Fowler)", "url": "https://martinfowler.com/bliki/StranglerFigApplication.html", "description": "Incremental legacy replacement through a facade."},
-      {"title": "Data patterns index (microservices.io)", "url": "https://microservices.io/patterns/data/index.html", "description": "The full catalog of distributed data patterns."}
+      {
+        "title": "Saga (microservices.io)",
+        "url": "https://microservices.io/patterns/data/saga.html",
+        "description": "Local transactions + compensation for distributed flows."
+      },
+      {
+        "title": "CQRS (microservices.io)",
+        "url": "https://microservices.io/patterns/data/cqrs.html",
+        "description": "Separating write and read models, projections."
+      },
+      {
+        "title": "CQRS (Fowler)",
+        "url": "https://martinfowler.com/bliki/CQRS.html",
+        "description": "The pattern and its trade-offs."
+      },
+      {
+        "title": "Event Sourcing (Fowler)",
+        "url": "https://martinfowler.com/eaaDev/EventSourcing.html",
+        "description": "The event log as the source of truth."
+      },
+      {
+        "title": "Strangler Fig (Fowler)",
+        "url": "https://martinfowler.com/bliki/StranglerFigApplication.html",
+        "description": "Incremental legacy replacement through a facade."
+      },
+      {
+        "title": "Data patterns index (microservices.io)",
+        "url": "https://microservices.io/patterns/data/index.html",
+        "description": "The full catalog of distributed data patterns."
+      }
     ]
   },
   {
     "title": "Cloud Native — Docker & Kubernetes",
     "links": [
-      {"title": "Docker Get Started", "url": "https://docs.docker.com/get-started/", "description": "Images, layers, containers and the basic workflow."},
-      {"title": "Dockerfile best practices", "url": "https://docs.docker.com/build/building/best-practices/", "description": "Multi-stage builds, layer caching, .dockerignore."},
-      {"title": "Kubernetes Concepts", "url": "https://kubernetes.io/docs/concepts/", "description": "Pods, deployments, services, control plane and reconciliation."},
-      {"title": "Kubernetes Basics tutorial", "url": "https://kubernetes.io/docs/tutorials/kubernetes-basics/", "description": "Hands-on intro to deployments, services and scaling."},
-      {"title": "Resource management (requests/limits)", "url": "https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/", "description": "Requests, limits and quality-of-service for containers."},
-      {"title": "ConfigMaps & Secrets", "url": "https://kubernetes.io/docs/concepts/configuration/configmap/", "description": "Configuration as first-class cluster objects."},
-      {"title": "Spring Boot on Kubernetes", "url": "https://docs.spring.io/spring-boot/reference/deployment/kubernetes.html", "description": "Probes, health endpoints and deployment notes for Boot apps."},
-      {"title": "12-factor app", "url": "https://12factor.net/", "description": "The twelve factors of deployable applications."}
+      {
+        "title": "Docker Get Started",
+        "url": "https://docs.docker.com/get-started/",
+        "description": "Images, layers, containers and the basic workflow."
+      },
+      {
+        "title": "Dockerfile best practices",
+        "url": "https://docs.docker.com/build/building/best-practices/",
+        "description": "Multi-stage builds, layer caching, .dockerignore."
+      },
+      {
+        "title": "Kubernetes Concepts",
+        "url": "https://kubernetes.io/docs/concepts/",
+        "description": "Pods, deployments, services, control plane and reconciliation."
+      },
+      {
+        "title": "Kubernetes Basics tutorial",
+        "url": "https://kubernetes.io/docs/tutorials/kubernetes-basics/",
+        "description": "Hands-on intro to deployments, services and scaling."
+      },
+      {
+        "title": "Resource management (requests/limits)",
+        "url": "https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/",
+        "description": "Requests, limits and quality-of-service for containers."
+      },
+      {
+        "title": "ConfigMaps & Secrets",
+        "url": "https://kubernetes.io/docs/concepts/configuration/configmap/",
+        "description": "Configuration as first-class cluster objects."
+      },
+      {
+        "title": "Spring Boot on Kubernetes",
+        "url": "https://docs.spring.io/spring-boot/reference/deployment/kubernetes.html",
+        "description": "Probes, health endpoints and deployment notes for Boot apps."
+      },
+      {
+        "title": "12-factor app",
+        "url": "https://12factor.net/",
+        "description": "The twelve factors of deployable applications."
+      }
     ]
   },
   {
     "title": "Java & Tooling",
     "links": [
-      {"title": "Java 21 Documentation (docs.oracle.com)", "url": "https://docs.oracle.com/en/java/javase/21/", "description": "Official Java SE 21 API docs, language spec and virtual threads."},
-      {"title": "The Java Tutorials", "url": "https://docs.oracle.com/javase/tutorial/", "description": "Oracle's tutorial path from language basics to advanced topics."},
-      {"title": "The Java Language Specification", "url": "https://docs.oracle.com/javase/specs/jls/se21/html/index.html", "description": "The authoritative language specification."},
-      {"title": "Maven — Getting Started", "url": "https://maven.apache.org/guides/getting-started/", "description": "Project structure, lifecycle and the standard directory layout."},
-      {"title": "Gradle — Getting Started", "url": "https://docs.gradle.org/current/userguide/getting_started.html", "description": "The alternative build tool used by many Spring projects."}
+      {
+        "title": "Java 21 Documentation (docs.oracle.com)",
+        "url": "https://docs.oracle.com/en/java/javase/21/",
+        "description": "Official Java SE 21 API docs, language spec and virtual threads."
+      },
+      {
+        "title": "The Java Tutorials",
+        "url": "https://docs.oracle.com/javase/tutorial/",
+        "description": "Oracle's tutorial path from language basics to advanced topics."
+      },
+      {
+        "title": "The Java Language Specification",
+        "url": "https://docs.oracle.com/javase/specs/jls/se21/html/index.html",
+        "description": "The authoritative language specification."
+      },
+      {
+        "title": "Maven — Getting Started",
+        "url": "https://maven.apache.org/guides/getting-started/",
+        "description": "Project structure, lifecycle and the standard directory layout."
+      },
+      {
+        "title": "Gradle — Getting Started",
+        "url": "https://docs.gradle.org/current/userguide/getting_started.html",
+        "description": "The alternative build tool used by many Spring projects."
+      }
     ]
   },
   {
     "title": "Scheduling & Async",
     "links": [
-      {"title": "Task Execution and Scheduling", "url": "https://docs.spring.io/spring-framework/reference/integration/scheduling.html", "description": "@Scheduled, @Async, TaskScheduler, cron expressions and the executor abstraction."},
-      {"title": "ShedLock", "url": "https://github.com/lukas-krecan/ShedLock", "description": "Distributed locks for scheduled tasks across cluster nodes."},
-      {"title": "Cron expressions", "url": "https://docs.spring.io/spring-framework/reference/integration/scheduling.html#scheduling-cron-expression", "description": "The six-field cron syntax used by Spring @Scheduled."}
+      {
+        "title": "Task Execution and Scheduling",
+        "url": "https://docs.spring.io/spring-framework/reference/integration/scheduling.html",
+        "description": "@Scheduled, @Async, TaskScheduler, cron expressions and the executor abstraction."
+      },
+      {
+        "title": "ShedLock",
+        "url": "https://github.com/lukas-krecan/ShedLock",
+        "description": "Distributed locks for scheduled tasks across cluster nodes."
+      },
+      {
+        "title": "Cron expressions",
+        "url": "https://docs.spring.io/spring-framework/reference/integration/scheduling.html#scheduling-cron-expression",
+        "description": "The six-field cron syntax used by Spring @Scheduled."
+      }
     ]
   },
   {
     "title": "Caching",
     "links": [
-      {"title": "Cache Abstraction", "url": "https://docs.spring.io/spring-framework/reference/integration/cache.html", "description": "@Cacheable, @CachePut, @CacheEvict and CacheManager configuration."},
-      {"title": "Spring Data Redis caching", "url": "https://docs.spring.io/spring-data/redis/reference/redis/redis-cache.html", "description": "Redis as the shared cache store with TTLs and serialization."},
-      {"title": "Caffeine", "url": "https://github.com/ben-manes/caffeine", "description": "The high-performance in-memory cache for single-node apps."}
+      {
+        "title": "Cache Abstraction",
+        "url": "https://docs.spring.io/spring-framework/reference/integration/cache.html",
+        "description": "@Cacheable, @CachePut, @CacheEvict and CacheManager configuration."
+      },
+      {
+        "title": "Spring Data Redis caching",
+        "url": "https://docs.spring.io/spring-data/redis/reference/redis/redis-cache.html",
+        "description": "Redis as the shared cache store with TTLs and serialization."
+      },
+      {
+        "title": "Caffeine",
+        "url": "https://github.com/ben-manes/caffeine",
+        "description": "The high-performance in-memory cache for single-node apps."
+      }
     ]
   },
   {
     "title": "REST API Design",
     "links": [
-      {"title": "Spring MVC REST support", "url": "https://docs.spring.io/spring-framework/reference/web/webmvc.html", "description": "Controllers, @ResponseBody, message converters and content negotiation."},
-      {"title": "Problem Details (RFC 7807)", "url": "https://www.rfc-editor.org/rfc/rfc7807", "description": "The standard machine-readable error format."},
-      {"title": "Bucket4j", "url": "https://github.com/bucket4j/bucket4j", "description": "Token-bucket rate limiting for JVM applications."}
+      {
+        "title": "Spring MVC REST support",
+        "url": "https://docs.spring.io/spring-framework/reference/web/webmvc.html",
+        "description": "Controllers, @ResponseBody, message converters and content negotiation."
+      },
+      {
+        "title": "Problem Details (RFC 7807)",
+        "url": "https://www.rfc-editor.org/rfc/rfc7807",
+        "description": "The standard machine-readable error format."
+      },
+      {
+        "title": "Bucket4j",
+        "url": "https://github.com/bucket4j/bucket4j",
+        "description": "Token-bucket rate limiting for JVM applications."
+      }
     ]
   },
   {
     "title": "Observability",
     "links": [
-      {"title": "Spring Boot Metrics", "url": "https://docs.spring.io/spring-boot/reference/actuator/metrics.html", "description": "Micrometer metrics, tags, timers and the /actuator/metrics endpoints."},
-      {"title": "Spring Boot Health", "url": "https://docs.spring.io/spring-boot/reference/actuator/health.html", "description": "Health indicators, readiness/liveness groups and probes."},
-      {"title": "Micrometer Tracing", "url": "https://docs.spring.io/spring-boot/reference/actuator/tracing.html", "description": "Distributed tracing with Brave/OpenTelemetry and Zipkin."},
-      {"title": "Prometheus", "url": "https://prometheus.io/docs/prometheus/latest/querying/basics/", "description": "Query language and scraping for time-series metrics."},
-      {"title": "Grafana", "url": "https://grafana.com/docs/", "description": "Dashboards and alerting on top of Prometheus."}
+      {
+        "title": "Spring Boot Metrics",
+        "url": "https://docs.spring.io/spring-boot/reference/actuator/metrics.html",
+        "description": "Micrometer metrics, tags, timers and the /actuator/metrics endpoints."
+      },
+      {
+        "title": "Spring Boot Health",
+        "url": "https://docs.spring.io/spring-boot/reference/actuator/health.html",
+        "description": "Health indicators, readiness/liveness groups and probes."
+      },
+      {
+        "title": "Micrometer Tracing",
+        "url": "https://docs.spring.io/spring-boot/reference/actuator/tracing.html",
+        "description": "Distributed tracing with Brave/OpenTelemetry and Zipkin."
+      },
+      {
+        "title": "Prometheus",
+        "url": "https://prometheus.io/docs/prometheus/latest/querying/basics/",
+        "description": "Query language and scraping for time-series metrics."
+      },
+      {
+        "title": "Grafana",
+        "url": "https://grafana.com/docs/",
+        "description": "Dashboards and alerting on top of Prometheus."
+      }
     ]
   },
   {
     "title": "CI/CD & DevOps",
     "links": [
-      {"title": "GitHub Actions", "url": "https://docs.github.com/en/actions", "description": "Workflows, jobs, steps, secrets and caching."},
-      {"title": "Docker best practices", "url": "https://docs.docker.com/build/building/best-practices/", "description": "Multi-stage builds and layer caching."},
-      {"title": "Kubernetes Deployment", "url": "https://kubernetes.io/docs/concepts/workloads/controllers/deployment/", "description": "Rolling updates, strategies and probes."},
-      {"title": "SRE Book", "url": "https://sre.google/sre-book/table-of-contents/", "description": "Google's site reliability engineering handbook."}
+      {
+        "title": "GitHub Actions",
+        "url": "https://docs.github.com/en/actions",
+        "description": "Workflows, jobs, steps, secrets and caching."
+      },
+      {
+        "title": "Docker best practices",
+        "url": "https://docs.docker.com/build/building/best-practices/",
+        "description": "Multi-stage builds and layer caching."
+      },
+      {
+        "title": "Kubernetes Deployment",
+        "url": "https://kubernetes.io/docs/concepts/workloads/controllers/deployment/",
+        "description": "Rolling updates, strategies and probes."
+      },
+      {
+        "title": "SRE Book",
+        "url": "https://sre.google/sre-book/table-of-contents/",
+        "description": "Google's site reliability engineering handbook."
+      }
     ]
   },
   {
     "title": "Spring AMQP / RabbitMQ",
     "links": [
-      {"title": "Spring AMQP Reference", "url": "https://docs.spring.io/spring-amqp/reference/", "description": "RabbitTemplate, @RabbitListener, confirms and retry."},
-      {"title": "RabbitMQ Tutorials", "url": "https://www.rabbitmq.com/tutorials", "description": "Official tutorials: exchanges, queues, bindings and patterns."},
-      {"title": "RabbitMQ Reliability Guide", "url": "https://www.rabbitmq.com/confirms.html", "description": "Publisher confirms and consumer acknowledgements."}
+      {
+        "title": "Spring AMQP Reference",
+        "url": "https://docs.spring.io/spring-amqp/reference/",
+        "description": "RabbitTemplate, @RabbitListener, confirms and retry."
+      },
+      {
+        "title": "RabbitMQ Tutorials",
+        "url": "https://www.rabbitmq.com/tutorials",
+        "description": "Official tutorials: exchanges, queues, bindings and patterns."
+      },
+      {
+        "title": "RabbitMQ Reliability Guide",
+        "url": "https://www.rabbitmq.com/confirms.html",
+        "description": "Publisher confirms and consumer acknowledgements."
+      }
     ]
   },
   {
     "title": "Spring JDBC",
     "links": [
-      {"title": "JDBC with Spring", "url": "https://docs.spring.io/spring-framework/reference/data-access/jdbc.html", "description": "JdbcTemplate, NamedParameterJdbcTemplate, SimpleJdbcInsert and batches."},
-      {"title": "Transaction Management", "url": "https://docs.spring.io/spring-framework/reference/data-access/transaction.html", "description": "The transaction abstraction shared by JDBC and JPA."}
+      {
+        "title": "JDBC with Spring",
+        "url": "https://docs.spring.io/spring-framework/reference/data-access/jdbc.html",
+        "description": "JdbcTemplate, NamedParameterJdbcTemplate, SimpleJdbcInsert and batches."
+      },
+      {
+        "title": "Transaction Management",
+        "url": "https://docs.spring.io/spring-framework/reference/data-access/transaction.html",
+        "description": "The transaction abstraction shared by JDBC and JPA."
+      }
     ]
   },
   {
     "title": "Modern Java",
     "links": [
-      {"title": "Java 21 Language Changes", "url": "https://docs.oracle.com/en/java/javase/21/language/java-language-changes.html", "description": "Records, sealed classes, pattern matching, switch expressions and text blocks."},
-      {"title": "Text Blocks", "url": "https://docs.oracle.com/en/java/javase/21/text-blocks.html", "description": "Multiline strings with indentation handling and formatted()."},
-      {"title": "Concurrency", "url": "https://docs.oracle.com/en/java/javase/21/core/concurrency.html", "description": "Executors, locks, CompletableFuture and virtual threads."},
-      {"title": "Virtual Threads", "url": "https://docs.oracle.com/en/java/javase/21/core/virtual-threads.html", "description": "Project Loom: millions of lightweight threads."},
-      {"title": "Collections Framework", "url": "https://docs.oracle.com/en/java/javase/21/core/collections.html", "description": "The collection interfaces, implementations and concurrency."},
-      {"title": "Stream API", "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/stream/package-summary.html", "description": "Lazy pipelines, collectors and parallel streams."}
+      {
+        "title": "Java 21 Language Changes",
+        "url": "https://docs.oracle.com/en/java/javase/21/language/java-language-changes.html",
+        "description": "Records, sealed classes, pattern matching, switch expressions and text blocks."
+      },
+      {
+        "title": "Text Blocks",
+        "url": "https://docs.oracle.com/en/java/javase/21/text-blocks.html",
+        "description": "Multiline strings with indentation handling and formatted()."
+      },
+      {
+        "title": "Concurrency",
+        "url": "https://docs.oracle.com/en/java/javase/21/core/concurrency.html",
+        "description": "Executors, locks, CompletableFuture and virtual threads."
+      },
+      {
+        "title": "Virtual Threads",
+        "url": "https://docs.oracle.com/en/java/javase/21/core/virtual-threads.html",
+        "description": "Project Loom: millions of lightweight threads."
+      },
+      {
+        "title": "Collections Framework",
+        "url": "https://docs.oracle.com/en/java/javase/21/core/collections.html",
+        "description": "The collection interfaces, implementations and concurrency."
+      },
+      {
+        "title": "Stream API",
+        "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/stream/package-summary.html",
+        "description": "Lazy pipelines, collectors and parallel streams."
+      }
     ]
   },
   {
     "title": "Transactions in Depth",
     "links": [
-      {"title": "Declarative transaction management", "url": "https://docs.spring.io/spring-framework/reference/data-access/transaction/declarative/tx-annotation.html", "description": "@Transactional rollback rules and the transaction boundary."},
-      {"title": "Propagation", "url": "https://docs.spring.io/spring-framework/reference/data-access/transaction/declarative/tx-propagation.html", "description": "REQUIRED, REQUIRES_NEW, NESTED and the rest."},
-      {"title": "PostgreSQL MVCC", "url": "https://www.postgresql.org/docs/current/mvcc.html", "description": "Isolation levels and locking in Postgres."},
-      {"title": "Transactional Outbox", "url": "https://microservices.io/patterns/data/transactional-outbox.html", "description": "Atomic DB + broker writes via an outbox table."}
+      {
+        "title": "Declarative transaction management",
+        "url": "https://docs.spring.io/spring-framework/reference/data-access/transaction/declarative/tx-annotation.html",
+        "description": "@Transactional rollback rules and the transaction boundary."
+      },
+      {
+        "title": "Propagation",
+        "url": "https://docs.spring.io/spring-framework/reference/data-access/transaction/declarative/tx-propagation.html",
+        "description": "REQUIRED, REQUIRES_NEW, NESTED and the rest."
+      },
+      {
+        "title": "PostgreSQL MVCC",
+        "url": "https://www.postgresql.org/docs/current/mvcc.html",
+        "description": "Isolation levels and locking in Postgres."
+      },
+      {
+        "title": "Transactional Outbox",
+        "url": "https://microservices.io/patterns/data/transactional-outbox.html",
+        "description": "Atomic DB + broker writes via an outbox table."
+      }
     ]
   },
   {
     "title": "gRPC & Protobuf",
     "links": [
-      {"title": "gRPC Concepts", "url": "https://grpc.io/docs/what-is-grpc/concepts/", "description": "RPC types, deadlines, status codes and channels."},
-      {"title": "Protobuf Language Guide", "url": "https://protobuf.dev/programming-guides/proto3/", "description": "Messages, scalars, repeated, oneof and versioning."},
-      {"title": "gRPC-Web", "url": "https://grpc.io/docs/platforms/web/", "description": "gRPC from browsers via a proxy."}
+      {
+        "title": "gRPC Concepts",
+        "url": "https://grpc.io/docs/what-is-grpc/concepts/",
+        "description": "RPC types, deadlines, status codes and channels."
+      },
+      {
+        "title": "Protobuf Language Guide",
+        "url": "https://protobuf.dev/programming-guides/proto3/",
+        "description": "Messages, scalars, repeated, oneof and versioning."
+      },
+      {
+        "title": "gRPC-Web",
+        "url": "https://grpc.io/docs/platforms/web/",
+        "description": "gRPC from browsers via a proxy."
+      }
     ]
   },
   {
     "title": "DDD & Architecture",
     "links": [
-      {"title": "DDD Reference (Fowler)", "url": "https://martinfowler.com/tags/domain%20driven%20design.html", "description": "Entities, value objects, aggregates and repositories."},
-      {"title": "Hexagonal Architecture", "url": "https://alistair.cockburn.us/hexagonal-architecture/", "description": "Ports and adapters around the domain."},
-      {"title": "Clean Architecture", "url": "https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html", "description": "The dependency rule and concentric circles."},
-      {"title": "DDD Aggregate (Fowler)", "url": "https://martinfowler.com/bliki/DDD_Aggregate.html", "description": "Consistency boundaries and aggregate roots."}
+      {
+        "title": "DDD Reference (Fowler)",
+        "url": "https://martinfowler.com/tags/domain%20driven%20design.html",
+        "description": "Entities, value objects, aggregates and repositories."
+      },
+      {
+        "title": "Hexagonal Architecture",
+        "url": "https://alistair.cockburn.us/hexagonal-architecture/",
+        "description": "Ports and adapters around the domain."
+      },
+      {
+        "title": "Clean Architecture",
+        "url": "https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html",
+        "description": "The dependency rule and concentric circles."
+      },
+      {
+        "title": "DDD Aggregate (Fowler)",
+        "url": "https://martinfowler.com/bliki/DDD_Aggregate.html",
+        "description": "Consistency boundaries and aggregate roots."
+      }
     ]
   },
   {
     "title": "Maven & Gradle",
     "links": [
-      {"title": "Maven Dependency Mechanism", "url": "https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html", "description": "Scopes, transitivity and conflict resolution."},
-      {"title": "Maven Lifecycle", "url": "https://maven.apache.org/guides/introduction/introduction-to-the-lifecycle.html", "description": "Phases, goals and plugins."},
-      {"title": "Gradle User Guide", "url": "https://docs.gradle.org/current/userguide/userguide.html", "description": "Tasks, the DSL and incremental builds."}
+      {
+        "title": "Maven Dependency Mechanism",
+        "url": "https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html",
+        "description": "Scopes, transitivity and conflict resolution."
+      },
+      {
+        "title": "Maven Lifecycle",
+        "url": "https://maven.apache.org/guides/introduction/introduction-to-the-lifecycle.html",
+        "description": "Phases, goals and plugins."
+      },
+      {
+        "title": "Gradle User Guide",
+        "url": "https://docs.gradle.org/current/userguide/userguide.html",
+        "description": "Tasks, the DSL and incremental builds."
+      }
     ]
   },
   {
     "title": "PostgreSQL",
     "links": [
-      {"title": "PostgreSQL Documentation", "url": "https://www.postgresql.org/docs/current/", "description": "The authoritative reference."},
-      {"title": "Indexes", "url": "https://www.postgresql.org/docs/current/indexes.html", "description": "B-tree, composite, partial and covering indexes."},
-      {"title": "MVCC", "url": "https://www.postgresql.org/docs/current/mvcc.html", "description": "Isolation levels and concurrency control."},
-      {"title": "JSON Types", "url": "https://www.postgresql.org/docs/current/datatype-json.html", "description": "jsonb operators, GIN indexes and document queries."},
-      {"title": "Performance Tips", "url": "https://www.postgresql.org/docs/current/performance-tips.html", "description": "EXPLAIN and query tuning."}
+      {
+        "title": "PostgreSQL Documentation",
+        "url": "https://www.postgresql.org/docs/current/",
+        "description": "The authoritative reference."
+      },
+      {
+        "title": "Indexes",
+        "url": "https://www.postgresql.org/docs/current/indexes.html",
+        "description": "B-tree, composite, partial and covering indexes."
+      },
+      {
+        "title": "MVCC",
+        "url": "https://www.postgresql.org/docs/current/mvcc.html",
+        "description": "Isolation levels and concurrency control."
+      },
+      {
+        "title": "JSON Types",
+        "url": "https://www.postgresql.org/docs/current/datatype-json.html",
+        "description": "jsonb operators, GIN indexes and document queries."
+      },
+      {
+        "title": "Performance Tips",
+        "url": "https://www.postgresql.org/docs/current/performance-tips.html",
+        "description": "EXPLAIN and query tuning."
+      }
     ]
   },
   {
     "title": "Distributed Systems",
     "links": [
-      {"title": "CAP Theorem", "url": "https://en.wikipedia.org/wiki/CAP_theorem", "description": "Consistency, availability, partition tolerance."},
-      {"title": "Raft Consensus", "url": "https://raft.github.io/", "description": "Leader election and log replication."},
-      {"title": "Distributed Locks with Redis", "url": "https://redis.io/docs/latest/develop/use/patterns/distributed-locks/", "description": "SET NX EX, leases and fencing tokens."},
-      {"title": "Saga Pattern", "url": "https://microservices.io/patterns/data/saga.html", "description": "Choreography and orchestration with compensation."}
+      {
+        "title": "CAP Theorem",
+        "url": "https://en.wikipedia.org/wiki/CAP_theorem",
+        "description": "Consistency, availability, partition tolerance."
+      },
+      {
+        "title": "Raft Consensus",
+        "url": "https://raft.github.io/",
+        "description": "Leader election and log replication."
+      },
+      {
+        "title": "Distributed Locks with Redis",
+        "url": "https://redis.io/docs/latest/develop/use/patterns/distributed-locks/",
+        "description": "SET NX EX, leases and fencing tokens."
+      },
+      {
+        "title": "Saga Pattern",
+        "url": "https://microservices.io/patterns/data/saga.html",
+        "description": "Choreography and orchestration with compensation."
+      }
     ]
   },
   {
     "title": "Community & Release Info",
     "links": [
-      {"title": "Spring Releases (versions & support)", "url": "https://spring.io/projects/spring-boot#support", "description": "OSSRH versions, support timelines and release notes."},
-      {"title": "Spring Initializr", "url": "https://start.spring.io", "description": "Bootstrap a new Spring Boot project with the starters you need."},
-      {"title": "Baeldung Spring Tutorials", "url": "https://www.baeldung.com/spring-tutorial", "description": "Hands-on tutorials across the whole Spring ecosystem."}
+      {
+        "title": "Spring Releases (versions & support)",
+        "url": "https://spring.io/projects/spring-boot#support",
+        "description": "OSSRH versions, support timelines and release notes."
+      },
+      {
+        "title": "Spring Initializr",
+        "url": "https://start.spring.io",
+        "description": "Bootstrap a new Spring Boot project with the starters you need."
+      },
+      {
+        "title": "Baeldung Spring Tutorials",
+        "url": "https://www.baeldung.com/spring-tutorial",
+        "description": "Hands-on tutorials across the whole Spring ecosystem."
+      }
+    ]
+  },
+  {
+    "title": "Java Strings & I/O",
+    "links": [
+      {
+        "title": "String (Java SE API)",
+        "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html",
+        "description": "Immutability, the string pool, StringBuilder and formatting."
+      },
+      {
+        "title": "java.io package",
+        "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/io/package-summary.html",
+        "description": "Streams, readers/writers, charsets and serialization."
+      },
+      {
+        "title": "java.nio package",
+        "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/nio/package-summary.html",
+        "description": "Channels, buffers and the Files API."
+      },
+      {
+        "title": "Compact Strings (JEP 254)",
+        "url": "https://openjdk.org/jeps/254",
+        "description": "How modern Java stores strings in less memory."
+      }
+    ]
+  },
+  {
+    "title": "java.time — Dates & Time",
+    "links": [
+      {
+        "title": "java.time package",
+        "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/time/package-summary.html",
+        "description": "LocalDate, LocalTime, Instant, Duration and ZonedDateTime."
+      },
+      {
+        "title": "DateTimeFormatter",
+        "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/time/format/DateTimeFormatter.html",
+        "description": "Patterns, ISO formats, parsing and locales."
+      }
+    ]
+  },
+  {
+    "title": "Functional Java",
+    "links": [
+      {
+        "title": "Lambda expressions tutorial",
+        "url": "https://docs.oracle.com/javase/tutorial/java/javaOO/lambdaexpressions.html",
+        "description": "Syntax, effective finality and use cases."
+      },
+      {
+        "title": "Method references",
+        "url": "https://docs.oracle.com/javase/tutorial/java/javaOO/methodreferences.html",
+        "description": "The four forms of :: shorthand."
+      },
+      {
+        "title": "java.util.function package",
+        "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/function/package-summary.html",
+        "description": "Predicate, Function, Consumer, Supplier and friends."
+      },
+      {
+        "title": "Stream API",
+        "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/stream/package-summary.html",
+        "description": "Lazy pipelines, collectors and parallel streams."
+      }
+    ]
+  },
+  {
+    "title": "Design Patterns",
+    "links": [
+      {
+        "title": "Refactoring Guru — Design Patterns",
+        "url": "https://refactoring.guru/design-patterns",
+        "description": "Factory, Singleton, Builder, Strategy, Observer and more, with diagrams."
+      },
+      {
+        "title": "GoF catalog (Wikipedia)",
+        "url": "https://en.wikipedia.org/wiki/Design_Patterns",
+        "description": "The original Gang of Four pattern catalog."
+      }
+    ]
+  },
+  {
+    "title": "SOLID Principles",
+    "links": [
+      {
+        "title": "SOLID (Wikipedia)",
+        "url": "https://en.wikipedia.org/wiki/SOLID",
+        "description": "The five principles with examples."
+      },
+      {
+        "title": "The Dependency Inversion Principle (Fowler)",
+        "url": "https://martinfowler.com/articles/dipInTheWild.html",
+        "description": "DIP in depth, from the inventor's collaborator."
+      },
+      {
+        "title": "Liskov Substitution (Wikipedia)",
+        "url": "https://en.wikipedia.org/wiki/Liskov_substitution_principle",
+        "description": "Behavioral substitutability in inheritance."
+      }
+    ]
+  },
+  {
+    "title": "Spring Boot Internals",
+    "links": [
+      {
+        "title": "Auto-configuration",
+        "url": "https://docs.spring.io/spring-boot/reference/using/auto-configuration.html",
+        "description": "How Boot configures itself from the classpath."
+      },
+      {
+        "title": "Starters",
+        "url": "https://docs.spring.io/spring-boot/reference/using/build-systems.html#using.build-systems.starters",
+        "description": "The curated dependency bundles."
+      },
+      {
+        "title": "Embedded web servers",
+        "url": "https://docs.spring.io/spring-boot/reference/howto/webserver.html",
+        "description": "Tomcat/Jetty/Undertow inside the app."
+      },
+      {
+        "title": "Type-safe configuration properties",
+        "url": "https://docs.spring.io/spring-boot/reference/features/external-config.html#features.external-config.typesafe-configuration-properties",
+        "description": "@ConfigurationProperties, relaxed binding, validation."
+      },
+      {
+        "title": "Actuator",
+        "url": "https://docs.spring.io/spring-boot/reference/actuator/index.html",
+        "description": "Health, metrics, info and production endpoints."
+      }
+    ]
+  },
+  {
+    "title": "REST Clients",
+    "links": [
+      {
+        "title": "RestClient",
+        "url": "https://docs.spring.io/spring-framework/reference/integration/rest-clients.html#rest-restclient",
+        "description": "The modern synchronous HTTP client."
+      },
+      {
+        "title": "WebClient",
+        "url": "https://docs.spring.io/spring-framework/reference/web/webflux-webclient.html",
+        "description": "The reactive HTTP client."
+      },
+      {
+        "title": "HTTP Interface",
+        "url": "https://docs.spring.io/spring-framework/reference/integration/rest-clients.html#rest-http-interface",
+        "description": "Declarative typed clients with @HttpExchange."
+      }
+    ]
+  },
+  {
+    "title": "Configuration",
+    "links": [
+      {
+        "title": "Externalized Configuration",
+        "url": "https://docs.spring.io/spring-boot/reference/features/external-config.html",
+        "description": "The property source precedence ladder."
+      },
+      {
+        "title": "Profiles",
+        "url": "https://docs.spring.io/spring-boot/reference/features/profiles.html",
+        "description": "Environment-specific beans and properties."
+      },
+      {
+        "title": "The Twelve-Factor App — Config",
+        "url": "https://12factor.net/config",
+        "description": "Why configuration belongs in the environment."
+      }
+    ]
+  },
+  {
+    "title": "JWT Authentication",
+    "links": [
+      {
+        "title": "RFC 7519 — JSON Web Token",
+        "url": "https://datatracker.ietf.org/doc/html/rfc7519",
+        "description": "The token format and claims."
+      },
+      {
+        "title": "jjwt (Java JWT library)",
+        "url": "https://github.com/jwtk/jjwt",
+        "description": "The standard Java library for issuing and validating tokens."
+      },
+      {
+        "title": "OWASP — Testing JWT",
+        "url": "https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/06-Session_Management_Testing/10-Testing_for_JSON_Web_Tokens",
+        "description": "The attack catalog: alg none, confusion, weak secrets."
+      }
+    ]
+  },
+  {
+    "title": "Spring Data JDBC",
+    "links": [
+      {
+        "title": "Spring Data JDBC reference",
+        "url": "https://docs.spring.io/spring-data/jdbc/reference/",
+        "description": "Aggregates, repositories and mapping."
+      },
+      {
+        "title": "JDBC vs JPA (Spring blog)",
+        "url": "https://spring.io/blog/2018/09/24/spring-data-jdbc-references-and-aggregates",
+        "description": "The design philosophy behind Spring Data JDBC."
+      }
+    ]
+  },
+  {
+    "title": "Messaging & Spring Integration",
+    "links": [
+      {
+        "title": "Spring Integration overview",
+        "url": "https://docs.spring.io/spring-integration/reference/overview.html",
+        "description": "Channels, gateways, transformers and routers."
+      },
+      {
+        "title": "Enterprise Integration Patterns",
+        "url": "https://www.enterpriseintegrationpatterns.com/",
+        "description": "The canonical pattern catalog."
+      },
+      {
+        "title": "Spring Integration error handling",
+        "url": "https://docs.spring.io/spring-integration/reference/error-handling.html",
+        "description": "Error channels, retry advice and DLQs."
+      }
+    ]
+  },
+  {
+    "title": "OpenAPI & Docs",
+    "links": [
+      {
+        "title": "OpenAPI Specification",
+        "url": "https://spec.openapis.org/oas/v3.1.0",
+        "description": "The machine-readable API contract."
+      },
+      {
+        "title": "springdoc-openapi",
+        "url": "https://springdoc.org/",
+        "description": "OpenAPI + Swagger UI for Spring Boot."
+      },
+      {
+        "title": "Spring REST Docs",
+        "url": "https://docs.spring.io/spring-restdocs/reference/",
+        "description": "Test-driven documentation from snippets."
+      },
+      {
+        "title": "OpenAPI Generator",
+        "url": "https://openapi-generator.tech/",
+        "description": "Generate clients and servers from the spec."
+      }
+    ]
+  },
+  {
+    "title": "Database Design",
+    "links": [
+      {
+        "title": "Normalization (Wikipedia)",
+        "url": "https://en.wikipedia.org/wiki/Database_normalization",
+        "description": "The normal forms and their purpose."
+      },
+      {
+        "title": "PostgreSQL constraints",
+        "url": "https://www.postgresql.org/docs/current/ddl-constraints.html",
+        "description": "NOT NULL, UNIQUE, CHECK, FK and EXCLUDE."
+      },
+      {
+        "title": "ER model (Wikipedia)",
+        "url": "https://en.wikipedia.org/wiki/Entity%E2%80%93relationship_model",
+        "description": "Entities, relationships and cardinality."
+      },
+      {
+        "title": "Denormalization (Wikipedia)",
+        "url": "https://en.wikipedia.org/wiki/Denormalization",
+        "description": "The deliberate read-path trade-off."
+      }
+    ]
+  },
+  {
+    "title": "Docker",
+    "links": [
+      {
+        "title": "Dockerfile reference",
+        "url": "https://docs.docker.com/reference/dockerfile/",
+        "description": "Every instruction and its semantics."
+      },
+      {
+        "title": "Docker best practices",
+        "url": "https://docs.docker.com/build/building/best-practices/",
+        "description": "Multi-stage builds, caching, .dockerignore."
+      },
+      {
+        "title": "Docker Compose",
+        "url": "https://docs.docker.com/compose/",
+        "description": "Multi-container applications in YAML."
+      },
+      {
+        "title": "Docker security",
+        "url": "https://docs.docker.com/engine/security/",
+        "description": "Non-root, read-only, capabilities and scanning."
+      }
+    ]
+  },
+  {
+    "title": "WebSockets & Realtime",
+    "links": [
+      {
+        "title": "RFC 6455 — WebSocket",
+        "url": "https://datatracker.ietf.org/doc/html/rfc6455",
+        "description": "The full-duplex protocol."
+      },
+      {
+        "title": "STOMP over WebSocket (Spring)",
+        "url": "https://docs.spring.io/spring-framework/reference/web/websocket/stomp.html",
+        "description": "Destinations, subscriptions and broker relays."
+      },
+      {
+        "title": "WebSocket security (Spring Security)",
+        "url": "https://docs.spring.io/spring-security/reference/servlet/integrations/websocket.html",
+        "description": "Handshake auth and destination authorization."
+      },
+      {
+        "title": "SockJS client",
+        "url": "https://github.com/sockjs/sockjs-client",
+        "description": "HTTP fallbacks for WebSocket."
+      }
+    ]
+  },
+  {
+    "title": "GraphQL",
+    "links": [
+      {
+        "title": "GraphQL learn",
+        "url": "https://graphql.org/learn/",
+        "description": "Schema, queries, mutations, execution."
+      },
+      {
+        "title": "Spring for GraphQL",
+        "url": "https://docs.spring.io/spring-graphql/reference/",
+        "description": "@QueryMapping, DataLoader and federation support."
+      },
+      {
+        "title": "graphql-java DataLoader",
+        "url": "https://www.graphql-java.com/documentation/data-fetching/",
+        "description": "Batching field resolution to kill N+1."
+      },
+      {
+        "title": "Apollo Federation",
+        "url": "https://www.apollographql.com/docs/federation/",
+        "description": "One graph across many services."
+      }
+    ]
+  },
+  {
+    "title": "Resilience4j",
+    "links": [
+      {
+        "title": "Resilience4j docs",
+        "url": "https://resilience4j.readme.io/docs/circuitbreaker",
+        "description": "Circuit breaker, retry, rate limiter, bulkhead, time limiter."
+      },
+      {
+        "title": "Circuit breaker (Wikipedia)",
+        "url": "https://en.wikipedia.org/wiki/Circuit_breaker_design_pattern",
+        "description": "The pattern and its states."
+      }
+    ]
+  },
+  {
+    "title": "HTTP Fundamentals",
+    "links": [
+      {
+        "title": "RFC 9110 — HTTP Semantics",
+        "url": "https://datatracker.ietf.org/doc/html/rfc9110",
+        "description": "Methods, status codes, headers, content negotiation."
+      },
+      {
+        "title": "RFC 9111 — HTTP Caching",
+        "url": "https://datatracker.ietf.org/doc/html/rfc9111",
+        "description": "Expiration and revalidation."
+      },
+      {
+        "title": "RFC 6265 — Cookies",
+        "url": "https://datatracker.ietf.org/doc/html/rfc6265",
+        "description": "HTTP state management."
+      }
+    ]
+  },
+  {
+    "title": "Git & GitHub",
+    "links": [
+      {
+        "title": "Pro Git book",
+        "url": "https://git-scm.com/book/en/v2",
+        "description": "The definitive Git book, free."
+      },
+      {
+        "title": "GitHub Flow",
+        "url": "https://docs.github.com/en/get-started/using-github/github-flow",
+        "description": "The branching workflow most teams use."
+      },
+      {
+        "title": "Git docs",
+        "url": "https://git-scm.com/doc",
+        "description": "Reference and tutorials."
+      }
     ]
   }
 ]

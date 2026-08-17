@@ -5,7 +5,12 @@
     "subtitle": "The language, JVM and tooling every backend engineer needs — from bytecode to virtual threads.",
     "order": 1,
     "color": "#f5a623",
-    "tech": ["JDK 21", "JVM", "Maven", "Concurrency"],
+    "tech": [
+      "JDK 21",
+      "JVM",
+      "Maven",
+      "Concurrency"
+    ],
     "docsUrl": "https://docs.oracle.com/javase/tutorial/"
   },
   {
@@ -14,7 +19,13 @@
     "subtitle": "IoC, dependency injection, AOP, events and transactions — the engine under every Spring app.",
     "order": 2,
     "color": "#6fce6f",
-    "tech": ["IoC", "DI", "AOP", "Events", "Transactions"],
+    "tech": [
+      "IoC",
+      "DI",
+      "AOP",
+      "Events",
+      "Transactions"
+    ],
     "docsUrl": "https://docs.spring.io/spring-framework/reference/"
   },
   {
@@ -23,7 +34,13 @@
     "subtitle": "Auto-configuration, REST APIs, Spring Data JPA, testing, Actuator and production readiness.",
     "order": 3,
     "color": "#4cc2ff",
-    "tech": ["Auto-configuration", "REST", "JPA", "Testing", "Actuator"],
+    "tech": [
+      "Auto-configuration",
+      "REST",
+      "JPA",
+      "Testing",
+      "Actuator"
+    ],
     "docsUrl": "https://docs.spring.io/spring-boot/reference/"
   },
   {
@@ -32,7 +49,12 @@
     "subtitle": "Authentication, JWT, authorization, OAuth2 and hardening APIs the way production teams do.",
     "order": 4,
     "color": "#ff6b6b",
-    "tech": ["Filter Chain", "JWT", "OAuth2", "Method Security"],
+    "tech": [
+      "Filter Chain",
+      "JWT",
+      "OAuth2",
+      "Method Security"
+    ],
     "docsUrl": "https://docs.spring.io/spring-security/reference/"
   },
   {
@@ -41,7 +63,12 @@
     "subtitle": "ChatClient, embeddings, RAG and function calling — production patterns for AI-powered backends.",
     "order": 5,
     "color": "#bb9af7",
-    "tech": ["ChatClient", "Embeddings", "RAG", "Function Calling"],
+    "tech": [
+      "ChatClient",
+      "Embeddings",
+      "RAG",
+      "Function Calling"
+    ],
     "docsUrl": "https://docs.spring.io/spring-ai/reference/"
   },
   {
@@ -50,7 +77,12 @@
     "subtitle": "A complete, runnable payments API built with everything above — layered architecture, JWT security, tests.",
     "order": 6,
     "color": "#2ac3de",
-    "tech": ["Spring Boot", "JPA", "Security", "JUnit"],
+    "tech": [
+      "Spring Boot",
+      "JPA",
+      "Security",
+      "JUnit"
+    ],
     "docsUrl": "https://docs.spring.io/spring-boot/reference/"
   },
   {
@@ -59,7 +91,13 @@
     "subtitle": "Service discovery, centralized config, API gateway, Resilience4j and distributed tracing — with a runnable 5-service demo.",
     "order": 7,
     "color": "#7aa2f7",
-    "tech": ["Eureka", "Config Server", "Gateway", "Resilience4j", "Tracing"],
+    "tech": [
+      "Eureka",
+      "Config Server",
+      "Gateway",
+      "Resilience4j",
+      "Tracing"
+    ],
     "docsUrl": "https://docs.spring.io/spring-cloud/reference/"
   },
   {
@@ -68,7 +106,13 @@
     "subtitle": "Kafka producers and listeners, consumer groups, the transactional outbox, retries and DLQs — with a runnable outbox demo.",
     "order": 8,
     "color": "#f7768e",
-    "tech": ["Kafka", "Outbox", "Consumer Groups", "DLQ", "Retry"],
+    "tech": [
+      "Kafka",
+      "Outbox",
+      "Consumer Groups",
+      "DLQ",
+      "Retry"
+    ],
     "docsUrl": "https://docs.spring.io/spring-kafka/reference/"
   },
   {
@@ -77,7 +121,13 @@
     "subtitle": "Reactive programming with Mono and Flux, non-blocking WebClient, R2DBC data access and when reactive beats servlet — with a runnable demo.",
     "order": 9,
     "color": "#9ece6a",
-    "tech": ["Mono", "Flux", "WebClient", "R2DBC", "Netty"],
+    "tech": [
+      "Mono",
+      "Flux",
+      "WebClient",
+      "R2DBC",
+      "Netty"
+    ],
     "docsUrl": "https://docs.spring.io/spring-framework/reference/web/webflux.html"
   },
   {
@@ -86,7 +136,13 @@
     "subtitle": "Reliable offline processing — Jobs, Steps, chunk-oriented ETL, skip/retry fault tolerance, and Spring Integration's message flows.",
     "order": 10,
     "color": "#e0af68",
-    "tech": ["Batch", "Chunks", "ETL", "Skip/Retry", "EIP"],
+    "tech": [
+      "Batch",
+      "Chunks",
+      "ETL",
+      "Skip/Retry",
+      "EIP"
+    ],
     "docsUrl": "https://docs.spring.io/spring-batch/reference/"
   },
   {
@@ -95,7 +151,13 @@
     "subtitle": "Repositories, query methods and projections across stores — MongoDB documents, Redis hashes, Spring Data JDBC aggregates and the cache abstraction.",
     "order": 11,
     "color": "#73daca",
-    "tech": ["MongoDB", "Redis", "JDBC", "Caching", "Repositories"],
+    "tech": [
+      "MongoDB",
+      "Redis",
+      "JDBC",
+      "Caching",
+      "Repositories"
+    ],
     "docsUrl": "https://docs.spring.io/spring-data/reference/"
   },
   {
@@ -104,7 +166,13 @@
     "subtitle": "GraphQL schemas and resolvers, OpenAPI/springdoc, test-driven docs with REST Docs, HTTP clients and WebSocket/STOMP realtime.",
     "order": 12,
     "color": "#ff9e64",
-    "tech": ["GraphQL", "OpenAPI", "REST Docs", "Clients", "WebSocket"],
+    "tech": [
+      "GraphQL",
+      "OpenAPI",
+      "REST Docs",
+      "Clients",
+      "WebSocket"
+    ],
     "docsUrl": "https://docs.spring.io/spring-graphql/reference/"
   },
   {
@@ -113,7 +181,13 @@
     "subtitle": "Building an authorization server, JWT resource servers, SSO login with OAuth2 clients, session management and the OWASP Top 10 for Spring backends.",
     "order": 13,
     "color": "#bb9af7",
-    "tech": ["OAuth2", "OIDC", "Sessions", "PKCE", "OWASP"],
+    "tech": [
+      "OAuth2",
+      "OIDC",
+      "Sessions",
+      "PKCE",
+      "OWASP"
+    ],
     "docsUrl": "https://docs.spring.io/spring-security/reference/"
   },
   {
@@ -122,7 +196,13 @@
     "subtitle": "JUnit 5 lifecycle and assertions, AssertJ fluent matchers, Mockito, parameterized tests, the test-double taxonomy and TDD for legacy code.",
     "order": 14,
     "color": "#e0af68",
-    "tech": ["JUnit 5", "AssertJ", "Mockito", "TDD", "Test Doubles"],
+    "tech": [
+      "JUnit 5",
+      "AssertJ",
+      "Mockito",
+      "TDD",
+      "Test Doubles"
+    ],
     "docsUrl": "https://junit.org/junit5/docs/current/user-guide/"
   },
   {
@@ -131,7 +211,13 @@
     "subtitle": "Memory regions, garbage collectors, JFR and async-profiler, heap-dump analysis and the measurement-first tuning checklist.",
     "order": 15,
     "color": "#9ece6a",
-    "tech": ["JFR", "GC", "Heap Analysis", "Profiling", "Tuning"],
+    "tech": [
+      "JFR",
+      "GC",
+      "Heap Analysis",
+      "Profiling",
+      "Tuning"
+    ],
     "docsUrl": "https://docs.oracle.com/en/java/javase/21/gctuning/"
   },
   {
@@ -140,7 +226,13 @@
     "subtitle": "Flyway and Liquibase migrations-as-code, the expand-contract pattern for zero-downtime changes, backfills and environment seed data.",
     "order": 16,
     "color": "#7dcfff",
-    "tech": ["Flyway", "Liquibase", "Expand-Contract", "Backfills", "Seeding"],
+    "tech": [
+      "Flyway",
+      "Liquibase",
+      "Expand-Contract",
+      "Backfills",
+      "Seeding"
+    ],
     "docsUrl": "https://documentation.red-gate.com/fd/"
   },
   {
@@ -149,7 +241,12 @@
     "subtitle": "Modular monolith vs microservices, @ApplicationModule boundaries, reliable in-process events with publication tracking, and architecture-as-test.",
     "order": 17,
     "color": "#bb9af7",
-    "tech": ["Modular Monolith", "Application Modules", "Events", "Verification"],
+    "tech": [
+      "Modular Monolith",
+      "Application Modules",
+      "Events",
+      "Verification"
+    ],
     "docsUrl": "https://docs.spring.io/spring-modulith/reference/"
   },
   {
@@ -158,7 +255,13 @@
     "subtitle": "Saga choreography and orchestration, CQRS read models, event sourcing, the strangler fig migration and distributed data consistency.",
     "order": 18,
     "color": "#f7768e",
-    "tech": ["Saga", "CQRS", "Event Sourcing", "Strangler Fig", "Consistency"],
+    "tech": [
+      "Saga",
+      "CQRS",
+      "Event Sourcing",
+      "Strangler Fig",
+      "Consistency"
+    ],
     "docsUrl": "https://microservices.io/patterns/index.html"
   },
   {
@@ -167,7 +270,13 @@
     "subtitle": "Docker images and multi-stage builds, Kubernetes objects and reconciliation, deploying Spring Boot with probes and limits, ConfigMaps/Secrets and 12-factor production.",
     "order": 19,
     "color": "#2ac3de",
-    "tech": ["Docker", "Kubernetes", "Probes", "ConfigMaps", "12-Factor"],
+    "tech": [
+      "Docker",
+      "Kubernetes",
+      "Probes",
+      "ConfigMaps",
+      "12-Factor"
+    ],
     "docsUrl": "https://kubernetes.io/docs/concepts/"
   },
   {
@@ -176,7 +285,13 @@
     "subtitle": "Cross-cutting concerns done right — pointcut designators, all five advice types, aspect configuration and proxying, with full code walkthroughs.",
     "order": 20,
     "color": "#e0af68",
-    "tech": ["AOP", "Pointcuts", "Advice", "Proxies", "Aspects"],
+    "tech": [
+      "AOP",
+      "Pointcuts",
+      "Advice",
+      "Proxies",
+      "Aspects"
+    ],
     "docsUrl": "https://docs.spring.io/spring-framework/reference/core/aop.html"
   },
   {
@@ -185,7 +300,13 @@
     "subtitle": "@Scheduled timing models, @Async pools, the TaskScheduler abstraction, cron in depth, and distributed scheduling with ShedLock.",
     "order": 21,
     "color": "#9ece6a",
-    "tech": ["@Scheduled", "@Async", "Cron", "TaskScheduler", "ShedLock"],
+    "tech": [
+      "@Scheduled",
+      "@Async",
+      "Cron",
+      "TaskScheduler",
+      "ShedLock"
+    ],
     "docsUrl": "https://docs.spring.io/spring-framework/reference/integration/scheduling.html"
   },
   {
@@ -194,7 +315,13 @@
     "subtitle": "The cache abstraction, @CachePut/@CacheEvict consistency, Redis and Caffeine stores, CacheManagers compared, and cache design patterns.",
     "order": 22,
     "color": "#7dcfff",
-    "tech": ["@Cacheable", "Redis", "Caffeine", "CacheManager", "Patterns"],
+    "tech": [
+      "@Cacheable",
+      "Redis",
+      "Caffeine",
+      "CacheManager",
+      "Patterns"
+    ],
     "docsUrl": "https://docs.spring.io/spring-framework/reference/integration/cache.html"
   },
   {
@@ -203,7 +330,13 @@
     "subtitle": "Resource design and verbs, consistent RFC 7807 errors, pagination and filtering, versioning strategies, and idempotency with rate limiting.",
     "order": 23,
     "color": "#ff9e64",
-    "tech": ["REST", "Pagination", "Versioning", "Idempotency", "Rate Limiting"],
+    "tech": [
+      "REST",
+      "Pagination",
+      "Versioning",
+      "Idempotency",
+      "Rate Limiting"
+    ],
     "docsUrl": "https://docs.spring.io/spring-framework/reference/web/webmvc.html"
   },
   {
@@ -212,7 +345,13 @@
     "subtitle": "Micrometer metrics and timers, health indicators and readiness, custom business metrics, Grafana dashboards and alerting, and distributed tracing.",
     "order": 24,
     "color": "#bb9af7",
-    "tech": ["Micrometer", "Prometheus", "Grafana", "Tracing", "SLOs"],
+    "tech": [
+      "Micrometer",
+      "Prometheus",
+      "Grafana",
+      "Tracing",
+      "SLOs"
+    ],
     "docsUrl": "https://docs.spring.io/spring-boot/reference/actuator/metrics.html"
   },
   {
@@ -221,7 +360,13 @@
     "subtitle": "GitHub Actions workflows, multi-stage Docker pipelines, deploying Spring Boot to Kubernetes with probes, and blue-green and canary releases.",
     "order": 25,
     "color": "#2ac3de",
-    "tech": ["GitHub Actions", "Docker", "Kubernetes", "Canary", "Incidents"],
+    "tech": [
+      "GitHub Actions",
+      "Docker",
+      "Kubernetes",
+      "Canary",
+      "Incidents"
+    ],
     "docsUrl": "https://docs.github.com/en/actions"
   },
   {
@@ -230,7 +375,13 @@
     "subtitle": "The exception resolver chain, content negotiation and message converters, forms and Bean Validation, view resolvers, and filters/interceptors.",
     "order": 26,
     "color": "#4cc2ff",
-    "tech": ["Exception Handling", "Negotiation", "Forms", "ViewResolvers", "Interceptors"],
+    "tech": [
+      "Exception Handling",
+      "Negotiation",
+      "Forms",
+      "ViewResolvers",
+      "Interceptors"
+    ],
     "docsUrl": "https://docs.spring.io/spring-framework/reference/web/webmvc.html"
   },
   {
@@ -239,7 +390,13 @@
     "subtitle": "Test slices (@WebMvcTest/@DataJpaTest), the MockMvc DSL, client testing with MockRestServiceServer, Testcontainers for real dependencies, and test config.",
     "order": 27,
     "color": "#9ece6a",
-    "tech": ["Test Slices", "MockMvc", "Testcontainers", "MockWebServer", "Config"],
+    "tech": [
+      "Test Slices",
+      "MockMvc",
+      "Testcontainers",
+      "MockWebServer",
+      "Config"
+    ],
     "docsUrl": "https://docs.spring.io/spring-boot/reference/testing/spring-boot-applications.html"
   },
   {
@@ -248,7 +405,13 @@
     "subtitle": "Exchanges, queues and bindings, publisher confirms, retries and dead-letter queues, consumer concurrency, and request-reply RPC over AMQP.",
     "order": 28,
     "color": "#f7768e",
-    "tech": ["RabbitMQ", "AMQP", "DLQ", "Confirms", "RPC"],
+    "tech": [
+      "RabbitMQ",
+      "AMQP",
+      "DLQ",
+      "Confirms",
+      "RPC"
+    ],
     "docsUrl": "https://docs.spring.io/spring-amqp/reference/"
   },
   {
@@ -257,7 +420,12 @@
     "subtitle": "JdbcTemplate and RowMappers, named parameters, SimpleJdbcInsert, transactions with raw SQL, and batch operations at scale.",
     "order": 29,
     "color": "#73daca",
-    "tech": ["JdbcTemplate", "NamedParameters", "Transactions", "Batching"],
+    "tech": [
+      "JdbcTemplate",
+      "NamedParameters",
+      "Transactions",
+      "Batching"
+    ],
     "docsUrl": "https://docs.spring.io/spring-framework/reference/data-access/jdbc.html"
   },
   {
@@ -266,7 +434,13 @@
     "subtitle": "Records, sealed classes and pattern matching, switch expressions, text blocks, modern collections, and Optional error handling.",
     "order": 30,
     "color": "#f5a623",
-    "tech": ["Records", "Sealed", "Pattern Matching", "Text Blocks", "Optional"],
+    "tech": [
+      "Records",
+      "Sealed",
+      "Pattern Matching",
+      "Text Blocks",
+      "Optional"
+    ],
     "docsUrl": "https://docs.oracle.com/en/java/javase/21/language/java-language-changes.html"
   },
   {
@@ -275,7 +449,13 @@
     "subtitle": "HashMap internals, concurrent collections, sets/maps and the equals-hashCode contract, performance and memory, and queues and deques.",
     "order": 31,
     "color": "#f5a623",
-    "tech": ["HashMap", "Concurrent", "Sets", "Performance", "Queues"],
+    "tech": [
+      "HashMap",
+      "Concurrent",
+      "Sets",
+      "Performance",
+      "Queues"
+    ],
     "docsUrl": "https://docs.oracle.com/en/java/javase/21/core/collections.html"
   },
   {
@@ -284,7 +464,13 @@
     "subtitle": "Pipeline internals and laziness, collectors and grouping, parallel streams, stream idioms for real code, and when NOT to use streams.",
     "order": 32,
     "color": "#9ece6a",
-    "tech": ["Streams", "Collectors", "Parallel", "Idioms", "groupingBy"],
+    "tech": [
+      "Streams",
+      "Collectors",
+      "Parallel",
+      "Idioms",
+      "groupingBy"
+    ],
     "docsUrl": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/stream/package-summary.html"
   },
   {
@@ -293,7 +479,12 @@
     "subtitle": "Threads and executors, locks and atomicity, CompletableFuture composition, race/deadlock pathology, and virtual threads (Project Loom).",
     "order": 33,
     "color": "#ff6b6b",
-    "tech": ["Executors", "Locks", "CompletableFuture", "Virtual Threads"],
+    "tech": [
+      "Executors",
+      "Locks",
+      "CompletableFuture",
+      "Virtual Threads"
+    ],
     "docsUrl": "https://docs.oracle.com/en/java/javase/21/core/concurrency.html"
   },
   {
@@ -302,7 +493,13 @@
     "subtitle": "Propagation semantics, isolation and locking, TransactionTemplate, rollback rules, and distributed transactions with the outbox pattern.",
     "order": 34,
     "color": "#6fce6f",
-    "tech": ["Propagation", "Isolation", "Locking", "Outbox", "Saga"],
+    "tech": [
+      "Propagation",
+      "Isolation",
+      "Locking",
+      "Outbox",
+      "Saga"
+    ],
     "docsUrl": "https://docs.spring.io/spring-framework/reference/data-access/transaction.html"
   },
   {
@@ -311,7 +508,13 @@
     "subtitle": "Protobuf schema design, building gRPC servers and clients, streaming and deadlines, production hardening, and gRPC vs REST.",
     "order": 35,
     "color": "#7aa2f7",
-    "tech": ["gRPC", "Protobuf", "Streaming", "HTTP/2", "RPC"],
+    "tech": [
+      "gRPC",
+      "Protobuf",
+      "Streaming",
+      "HTTP/2",
+      "RPC"
+    ],
     "docsUrl": "https://grpc.io/docs/"
   },
   {
@@ -320,7 +523,13 @@
     "subtitle": "Entities, value objects and aggregates, hexagonal ports and adapters, the clean-architecture dependency rule, and domain events.",
     "order": 36,
     "color": "#e0af68",
-    "tech": ["DDD", "Aggregates", "Hexagonal", "Clean Architecture", "Events"],
+    "tech": [
+      "DDD",
+      "Aggregates",
+      "Hexagonal",
+      "Clean Architecture",
+      "Events"
+    ],
     "docsUrl": "https://martinfowler.com/tags/domain%20driven%20design.html"
   },
   {
@@ -329,7 +538,13 @@
     "subtitle": "The Maven lifecycle and plugins, dependency management and BOMs, Gradle as the modern alternative, and multi-module project builds.",
     "order": 37,
     "color": "#9ece6a",
-    "tech": ["Maven", "Gradle", "Dependencies", "Plugins", "Multi-Module"],
+    "tech": [
+      "Maven",
+      "Gradle",
+      "Dependencies",
+      "Plugins",
+      "Multi-Module"
+    ],
     "docsUrl": "https://maven.apache.org/guides/"
   },
   {
@@ -338,7 +553,13 @@
     "subtitle": "SQL fundamentals and window functions, indexing and EXPLAIN, transactions and MVCC, JSONB documents, and performance tuning.",
     "order": 38,
     "color": "#7dcfff",
-    "tech": ["PostgreSQL", "Indexes", "MVCC", "JSONB", "Tuning"],
+    "tech": [
+      "PostgreSQL",
+      "Indexes",
+      "MVCC",
+      "JSONB",
+      "Tuning"
+    ],
     "docsUrl": "https://www.postgresql.org/docs/current/"
   },
   {
@@ -347,7 +568,13 @@
     "subtitle": "CAP and consistency models, Raft consensus and quorums, idempotency, distributed locks with fencing tokens, and sagas.",
     "order": 39,
     "color": "#f7768e",
-    "tech": ["CAP", "Raft", "Idempotency", "Locks", "Saga"],
+    "tech": [
+      "CAP",
+      "Raft",
+      "Idempotency",
+      "Locks",
+      "Saga"
+    ],
     "docsUrl": "https://microservices.io/patterns/index.html"
   },
   {
@@ -356,7 +583,312 @@
     "subtitle": "Entity mapping and identifiers, derived queries and JPQL, killing the N+1 with fetch strategies, the persistence context, and Specifications.",
     "order": 40,
     "color": "#4cc2ff",
-    "tech": ["JPA", "JPQL", "EntityGraph", "N+1", "Specifications"],
+    "tech": [
+      "JPA",
+      "JPQL",
+      "EntityGraph",
+      "N+1",
+      "Specifications"
+    ],
     "docsUrl": "https://docs.spring.io/spring-data/jpa/reference/"
+  },
+  {
+    "id": "java-strings-deep",
+    "title": "Java Strings in Depth",
+    "subtitle": "String immutability and the pool, StringBuilder, formatting, and string performance — every concept explained from first principles with code walkthroughs.",
+    "order": 41,
+    "color": "#f5a623",
+    "tech": [
+      "Immutability",
+      "String Pool",
+      "StringBuilder",
+      "Formatting",
+      "Performance"
+    ],
+    "docsUrl": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html"
+  },
+  {
+    "id": "java-io-nio",
+    "title": "Java I/O & NIO",
+    "subtitle": "Byte and character streams, charsets and readers/writers, NIO channels and buffers, the modern Files API, and serialization — concept first, code second.",
+    "order": 42,
+    "color": "#73daca",
+    "tech": [
+      "Streams",
+      "Charsets",
+      "NIO",
+      "Files API",
+      "Serialization"
+    ],
+    "docsUrl": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/io/package-summary.html"
+  },
+  {
+    "id": "java-time-api",
+    "title": "java.time — Modern Date & Time",
+    "subtitle": "LocalDate, LocalTime, Instant and Duration, time zones and DST, and formatting/parsing — the type system that makes date bugs impossible.",
+    "order": 43,
+    "color": "#9ece6a",
+    "tech": [
+      "LocalDate",
+      "Instant",
+      "ZonedDateTime",
+      "DST",
+      "Formatting"
+    ],
+    "docsUrl": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/time/package-summary.html"
+  },
+  {
+    "id": "java-functional-programming",
+    "title": "Functional Programming in Java",
+    "subtitle": "Lambda expressions, functional interfaces, method references, composing functions, and the pitfalls — behavior as data, explained for beginners.",
+    "order": 44,
+    "color": "#e0af68",
+    "tech": [
+      "Lambdas",
+      "Functional Interfaces",
+      "Method References",
+      "Composition",
+      "Purity"
+    ],
+    "docsUrl": "https://docs.oracle.com/javase/tutorial/java/javaOO/lambdaexpressions.html"
+  },
+  {
+    "id": "design-patterns",
+    "title": "Design Patterns in Java",
+    "subtitle": "Factory, Singleton, Builder, Strategy and Observer — the five patterns you will actually use, each explained as a concept before the code.",
+    "order": 45,
+    "color": "#7aa2f7",
+    "tech": [
+      "Factory",
+      "Singleton",
+      "Builder",
+      "Strategy",
+      "Observer"
+    ],
+    "docsUrl": "https://refactoring.guru/design-patterns"
+  },
+  {
+    "id": "solid-clean-code",
+    "title": "SOLID & Clean Code",
+    "subtitle": "Single responsibility, open/closed, Liskov substitution, interface segregation and dependency inversion — the principles behind maintainable code, with before/after refactors.",
+    "order": 46,
+    "color": "#4cc2ff",
+    "tech": [
+      "SRP",
+      "OCP",
+      "LSP",
+      "ISP",
+      "DIP"
+    ],
+    "docsUrl": "https://en.wikipedia.org/wiki/SOLID"
+  },
+  {
+    "id": "spring-boot-internals",
+    "title": "Spring Boot Internals",
+    "subtitle": "How auto-configuration works, starters and version management, the embedded server, @ConfigurationProperties binding, and Actuator — the engine under the magic.",
+    "order": 47,
+    "color": "#4cc2ff",
+    "tech": [
+      "Auto-Configuration",
+      "Starters",
+      "Tomcat",
+      "Config Props",
+      "Actuator"
+    ],
+    "docsUrl": "https://docs.spring.io/spring-boot/reference/"
+  },
+  {
+    "id": "spring-rest-clients",
+    "title": "Calling REST APIs from Spring",
+    "subtitle": "RestClient, timeouts and interceptors, the reactive WebClient, HTTP interface clients, and client resilience — how your backend talks to other services.",
+    "order": 48,
+    "color": "#7dcfff",
+    "tech": [
+      "RestClient",
+      "WebClient",
+      "HTTP Interfaces",
+      "Timeouts",
+      "Resilience"
+    ],
+    "docsUrl": "https://docs.spring.io/spring-framework/reference/integration/rest-clients.html"
+  },
+  {
+    "id": "spring-configuration",
+    "title": "Spring Configuration Mastery",
+    "subtitle": "Externalized configuration and precedence, profiles, property sources, YAML, and config best practices — one jar, every environment.",
+    "order": 49,
+    "color": "#6fce6f",
+    "tech": [
+      "Externalized Config",
+      "Profiles",
+      "PropertySources",
+      "YAML",
+      "12-Factor"
+    ],
+    "docsUrl": "https://docs.spring.io/spring-boot/reference/features/external-config.html"
+  },
+  {
+    "id": "spring-security-jwt-deep",
+    "title": "JWT Auth in Depth",
+    "subtitle": "JWT structure and signing, issuing tokens, validation and the security filter, refresh tokens with rotation, and the attacks that break naive implementations.",
+    "order": 50,
+    "color": "#ff6b6b",
+    "tech": [
+      "JWT",
+      "HS256/RS256",
+      "Issuance",
+      "Refresh Tokens",
+      "Security"
+    ],
+    "docsUrl": "https://datatracker.ietf.org/doc/html/rfc7519"
+  },
+  {
+    "id": "spring-data-jdbc",
+    "title": "Spring Data JDBC",
+    "subtitle": "Repositories and aggregates, aggregate design, derived and @Query methods, JDBC vs JPA, and testing with Testcontainers — predictable SQL, no ORM magic.",
+    "order": 51,
+    "color": "#73daca",
+    "tech": [
+      "Spring Data JDBC",
+      "Aggregates",
+      "Derived Queries",
+      "Testcontainers"
+    ],
+    "docsUrl": "https://docs.spring.io/spring-data/jdbc/reference/"
+  },
+  {
+    "id": "spring-messaging",
+    "title": "Spring Messaging & Integration",
+    "subtitle": "Messaging architecture, channels, gateways and transformers, error handling with DLQs, and request-reply with correlation — the Enterprise Integration Patterns.",
+    "order": 52,
+    "color": "#f7768e",
+    "tech": [
+      "EIP",
+      "Channels",
+      "Gateways",
+      "DLQ",
+      "Request-Reply"
+    ],
+    "docsUrl": "https://docs.spring.io/spring-integration/reference/"
+  },
+  {
+    "id": "openapi-rest-docs",
+    "title": "OpenAPI & API Documentation",
+    "subtitle": "The OpenAPI spec, springdoc setup, Spring REST Docs test-driven docs, contract-first design, and the pitfalls that rot documentation.",
+    "order": 53,
+    "color": "#bb9af7",
+    "tech": [
+      "OpenAPI",
+      "Springdoc",
+      "REST Docs",
+      "Contract-First",
+      "Swagger UI"
+    ],
+    "docsUrl": "https://spec.openapis.org/oas/v3.1.0"
+  },
+  {
+    "id": "database-design",
+    "title": "Database Design",
+    "subtitle": "Normalization, keys and relationships, constraints, ER modeling, and deliberate denormalization — designing schemas that don't lie.",
+    "order": 54,
+    "color": "#7dcfff",
+    "tech": [
+      "Normalization",
+      "Keys",
+      "Constraints",
+      "ER Modeling",
+      "Denormalization"
+    ],
+    "docsUrl": "https://www.postgresql.org/docs/current/ddl.html"
+  },
+  {
+    "id": "docker-deep",
+    "title": "Docker Deep Dive",
+    "subtitle": "Dockerfiles and multi-stage builds, image layers, Docker Compose, volumes and networks, and container security — the container fundamentals behind cloud-native.",
+    "order": 55,
+    "color": "#2ac3de",
+    "tech": [
+      "Dockerfile",
+      "Layers",
+      "Compose",
+      "Volumes",
+      "Security"
+    ],
+    "docsUrl": "https://docs.docker.com/"
+  },
+  {
+    "id": "websockets-deep",
+    "title": "WebSockets & Realtime",
+    "subtitle": "The WebSocket protocol, STOMP messaging, client reconnection patterns, WebSocket security, and scaling sockets across instances.",
+    "order": 56,
+    "color": "#9ece6a",
+    "tech": [
+      "WebSocket",
+      "STOMP",
+      "Realtime",
+      "Security",
+      "Scaling"
+    ],
+    "docsUrl": "https://docs.spring.io/spring-framework/reference/web/websocket.html"
+  },
+  {
+    "id": "graphql-deep",
+    "title": "GraphQL Deep Dive",
+    "subtitle": "Schema design, resolvers, the N+1 problem and DataLoader, field-scoped errors, and federation — one graph across many services.",
+    "order": 57,
+    "color": "#bb9af7",
+    "tech": [
+      "GraphQL",
+      "Resolvers",
+      "DataLoader",
+      "Errors",
+      "Federation"
+    ],
+    "docsUrl": "https://graphql.org/learn/"
+  },
+  {
+    "id": "resilience-circuit-breaker",
+    "title": "Resilience4j & Fault Tolerance",
+    "subtitle": "Circuit breakers, bulkheads, retry with backoff, rate limiting, and composing the full resilience stack — keeping your app alive when dependencies die.",
+    "order": 58,
+    "color": "#ff9e64",
+    "tech": [
+      "Circuit Breaker",
+      "Bulkhead",
+      "Retry",
+      "Rate Limit",
+      "Fallback"
+    ],
+    "docsUrl": "https://resilience4j.readme.io/"
+  },
+  {
+    "id": "http-basics",
+    "title": "HTTP Fundamentals",
+    "subtitle": "Methods and their semantics, status codes, headers, cookies and sessions, and caching — the protocol every backend engineer must know cold.",
+    "order": 59,
+    "color": "#e0af68",
+    "tech": [
+      "Methods",
+      "Status Codes",
+      "Headers",
+      "Cookies",
+      "Caching"
+    ],
+    "docsUrl": "https://datatracker.ietf.org/doc/html/rfc9110"
+  },
+  {
+    "id": "git-github-basics",
+    "title": "Git & GitHub Workflows",
+    "subtitle": "Commits and branches, merging and conflicts, remotes and pull requests, rewriting history safely, and the workflows teams actually use.",
+    "order": 60,
+    "color": "#f5a623",
+    "tech": [
+      "Git",
+      "Branching",
+      "PRs",
+      "Rebase",
+      "GitHub Flow"
+    ],
+    "docsUrl": "https://git-scm.com/doc"
   }
 ]
