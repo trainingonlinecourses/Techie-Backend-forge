@@ -49,9 +49,9 @@ export default function Home() {
           </div>
           <div className="stats">
             <div className="stat"><div className="v">{stats?.lessons ?? '110'}</div><div className="l">LESSONS</div></div>
-            <div className="stat"><div className="v">{stats?.modules ?? 6}</div><div className="l">MODULES</div></div>
-            <div className="stat"><div className="v">{(stats?.minutes ?? 830) / 60 | 0}<b>h</b></div><div className="l">CURRICULUM</div></div>
-            <div className="stat"><div className="v">{stats?.docsLinks ?? 40}+</div><div className="l">DOC LINKS</div></div>
+            <div className="stat"><div className="v">{stats?.modules ?? 13}</div><div className="l">MODULES</div></div>
+            <div className="stat"><div className="v">{(stats?.minutes ?? 1825) / 60 | 0}<b>h</b></div><div className="l">CURRICULUM</div></div>
+            <div className="stat"><div className="v">{stats?.docsLinks ?? 90}+</div><div className="l">DOC LINKS</div></div>
           </div>
         </div>
       </section>
@@ -66,7 +66,7 @@ export default function Home() {
 
       <h2 className="sec">The curriculum</h2>
       <p className="lede">
-        Nine modules, ordered the way an organization rolls out Java and Spring: foundation first,
+        Thirteen modules, ordered the way an organization rolls out Java and Spring: foundation first,
         then the framework, then production practice — finishing with a complete runnable project.
       </p>
       <div className="modgrid">
@@ -122,7 +122,7 @@ export default function Home() {
 
       <h2 className="sec">What's inside the docs index</h2>
       <div className="depthgrid">
-        {['Spring Framework Reference', 'Spring Boot Reference', 'Spring Security Reference', 'Spring AI Reference', 'Spring Cloud Reference', 'Spring Kafka Reference', 'Spring WebFlux Reference', 'Spring Data JPA', 'Java 21 / Oracle docs', 'Maven & Gradle', 'OWASP Top 10'].map((d) => (
+        {['Spring Framework Reference', 'Spring Boot Reference', 'Spring Security Reference', 'Spring AI Reference', 'Spring Cloud Reference', 'Spring Kafka Reference', 'Spring WebFlux Reference', 'Spring Batch Reference', 'Spring Data JPA / Mongo / Redis', 'GraphQL / REST Docs / WebSocket', 'Spring Authorization Server', 'Java 21 / Oracle docs', 'Maven & Gradle', 'OWASP Top 10'].map((d) => (
           <div key={d}><i>⚑</i>{d}</div>
         ))}
       </div>
