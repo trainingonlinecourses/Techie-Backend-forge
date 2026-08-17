@@ -65,6 +65,14 @@
       <scope>runtime</scope>
     </dependency>
 
+    <!-- Postgres: used when DATABASE_URL is set (Render/Railway Postgres).
+         Local dev keeps using H2 (zero setup). -->
+    <dependency>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+
     <!-- Spring AI: OpenAI chat model -->
     <dependency>
       <groupId>org.springframework.ai</groupId>

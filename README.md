@@ -170,9 +170,12 @@ and `railway.toml` so the backend is one-click deployable on the free tier.
 
 1. Push this repo to GitHub.
 2. In the Render dashboard: **New + → Blueprint** → connect the repo.
-3. Render reads `render.yaml` at the repo root and provisions `backendforge-academy-api` on the
-   free plan — it builds `backend/Dockerfile` (Java 21), generates a random `APP_JWT_SECRET`, and
-   sets `APP_CORS_ORIGINS` to `https://techie-backend-forge.vercel.app`.
+3. Render reads `render.yaml` at the repo root and provisions **two** resources on the free plan:
+   - `backendforge-academy-api` — the web service (builds `backend/Dockerfile`, Java 21),
+   - `backendforge-academy-db` — a Postgres database whose connection string is injected as
+     `DATABASE_URL`.
+   It also generates a random `APP_JWT_SECRET` and sets `APP_CORS_ORIGINS` to
+   `https://techie-backend-forge.vercel.app`.
 4. When the deploy finishes, the API is at `https://backendforge-academy-api.onrender.com`.
    Verify it:
 
@@ -180,18 +183,28 @@ and `railway.toml` so the backend is one-click deployable on the free tier.
    curl https://backendforge-academy-api.onrender.com/actuator/health   # → {"status":"UP"}
    ```
 
-Free-tier notes: the instance sleeps after ~15 min idle (the first request takes ~1 min to wake),
-and its disk is **ephemeral** — registrations, progress and chat history reset on each redeploy.
-Demo accounts (`admin`/`admin123`, `learner`/`learner123`) are re-seeded at every startup.
-For persistence, attach a Render Postgres or persistent disk later.
+Free-tier notes: the web instance sleeps after ~15 min idle (the first request takes ~1 min to
+wake), and Render's free Postgres **expires after 30 days** — upgrade it to the Starter plan for a
+permanent database. Demo accounts (`admin`/`admin123`, `learner`/`learner123`) are seeded at
+startup only if they don't exist yet, so your own users are never touched.
 
 ### Alternative: Railway
 
 1. Create a project on railway.com and connect this repo. It reads `railway.toml`, which sets the
    root directory to `backend/` (its Dockerfile) — `PORT` is injected automatically.
-2. In the project's **Variables** tab add:
+2. Add a **PostgreSQL** plugin to the project — Railway injects `DATABASE_URL` automatically.
+3. In the project's **Variables** tab add:
    - `APP_CORS_ORIGINS=https://techie-backend-forge.vercel.app`
    - `APP_JWT_SECRET=<random string ≥ 32 chars>`
+
+### Database (H2 locally, Postgres in production)
+
+- **Local dev:** zero setup — the app uses an H2 file database (`backend/data/academy`).
+- **Production:** when `DATABASE_URL` is set (Render/Railway Postgres), the app builds its JDBC
+  DataSource from it automatically (`DatabaseConfig`), so user data survives redeploys.
+- Migrating: existing local H2 data does **not** carry over to Postgres — the fresh production
+  database is created empty (demo accounts are re-seeded; any previously registered users must
+  register again).
 
 ### 2. Point the Vercel frontend at the hosted API
 
@@ -215,6 +228,7 @@ banner instead of crashing (the API client rejects non-JSON responses).
 | Variable | Default | Purpose |
 |---|---|---|
 | `PORT` | `8080` | Injected by Render/Railway; don't set manually. |
+| `DATABASE_URL` | *(unset → H2 file DB)* | `postgres://…` connection string from Render/Railway Postgres. When present, the app uses Postgres instead of H2. |
 | `APP_CORS_ORIGINS` | `http://localhost:5173,http://127.0.0.1:5173` | Comma-separated origins allowed to call the API. Add your Vercel **preview** origin too if you test there. |
 | `APP_JWT_SECRET` | dev-only value | ≥ 32 chars. Keep it stable or existing JWTs stop validating. |
 | `OPENAI_API_KEY` | *(unset)* | Enables real OpenAI answers from the AI tutor. |

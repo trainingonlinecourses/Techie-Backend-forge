@@ -3,5 +3,9 @@
 # Then set these variables in the project:
 #   APP_CORS_ORIGINS  = https://techie-backend-forge.vercel.app
 #   APP_JWT_SECRET    = <random string >= 32 chars>
+#
+# Persistence: add a "PostgreSQL" plugin to the project. Railway injects
+# DATABASE_URL (postgres://...) automatically and the app switches to Postgres
+# whenever that variable is present.
 [deploy]
 rootDir = "backend"

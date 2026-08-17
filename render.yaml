@@ -2,9 +2,17 @@
 #
 # How to use: push this repo to GitHub, then in the Render dashboard choose
 #   New + → Blueprint → connect your repo.
-# Render reads this file (it lives at the repo root) and provisions the service.
-# It sets APP_JWT_SECRET to a random value automatically; APP_CORS_ORIGINS is
-# pre-filled with the production Vercel frontend.
+# Render reads this file (it lives at the repo root) and provisions the web
+# service AND a Postgres database. It sets APP_JWT_SECRET to a random value
+# automatically; APP_CORS_ORIGINS is pre-filled with the production Vercel
+# frontend.
+databases:
+  - name: backendforge-academy-db
+    databaseName: academy
+    user: academy
+    plan: free
+    region: oregon
+
 services:
   - type: web
     name: backendforge-academy-api
@@ -25,6 +33,14 @@ services:
       # users sign up, or existing JWTs stop validating).
       - key: APP_JWT_SECRET
         generateValue: true
+      # Postgres connection string. The app reads DATABASE_URL and builds its
+      # JDBC DataSource from it, so registrations/progress/chat survive
+      # web-service redeploys. (Note: Render's free Postgres expires after
+      # 30 days — upgrade to the Starter plan for a permanent database.)
+      - key: DATABASE_URL
+        fromDatabase:
+          name: backendforge-academy-db
+          property: connectionString
       # Optional: real AI answers instead of the keyless free endpoint.
       # - key: OPENAI_API_KEY
       #   sync: false
