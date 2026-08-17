@@ -231,6 +231,11 @@ If `VITE_API_URL` is left unset, the SPA calls `/api/*` on its own origin — Ve
 paths to `index.html`, so the app shows the "Static preview — the Spring Boot API isn't connected"
 banner instead of crashing (the API client rejects non-JSON responses).
 
+**Bring-your-own-key:** the chat page has a "Bring your own AI key" panel where any signed-in user
+can add an OpenAI-compatible key (plus optional base URL/model). The key is sent to the backend as an
+`X-OpenAI-Key` header, used only for that chat call, and never stored or logged. Without it, the tutor
+uses the server-configured provider (free Hugging Face endpoint by default).
+
 ### Backend environment variables
 
 | Variable | Default | Purpose |
@@ -240,6 +245,7 @@ banner instead of crashing (the API client rejects non-JSON responses).
 | `APP_CORS_ORIGINS` | `http://localhost:5173,http://127.0.0.1:5173` | Comma-separated origins allowed to call the API. Add your Vercel **preview** origin too if you test there. |
 | `APP_JWT_SECRET` | dev-only value | ≥ 32 chars. Keep it stable or existing JWTs stop validating. |
 | `OPENAI_API_KEY` | *(unset)* | Enables real OpenAI answers from the AI tutor. |
+| `OPENAI_MODEL` | `gpt-4o-mini` | Model used when `OPENAI_API_KEY`/`APP_OPENAI_BASE_URL` is set. |
 | `APP_OPENAI_BASE_URL` | *(unset)* | Any OpenAI-compatible endpoint (base URL without `/v1`). |
 | `APP_USE_FREE_ENDPOINT` | `true` | Zero-key fallback: a free Hugging Face endpoint answers the tutor by default. |
 

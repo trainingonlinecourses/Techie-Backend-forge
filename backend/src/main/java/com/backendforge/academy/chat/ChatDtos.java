@@ -13,7 +13,11 @@ public final class ChatDtos {
     public record ChatRequest(
             @NotBlank(message = "message is required")
             @Size(max = 4000, message = "message is too long")
-            String message) {}
+            String message,
+            // Optional per-request LLM overrides for "bring your own key":
+            // baseUrl (OpenAI-compatible, without /v1) and model name.
+            String baseUrl,
+            String model) {}
 
     public record Source(String lessonId, String title, String moduleTitle) {}
 

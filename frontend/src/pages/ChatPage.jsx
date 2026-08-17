@@ -3,12 +3,33 @@ import { Link } from 'react-router-dom';
 import { api, errorMessage } from '../api/client';
 import Markdown from '../components/Markdown.jsx';
 
+const BYOK_KEY = 'backendforge_byok';
+
+function loadByok() {
+  try {
+    return JSON.parse(localStorage.getItem(BYOK_KEY) || 'null') || {};
+  } catch {
+    return {};
+  }
+}
+
 export default function ChatPage() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(null);
+  const [byok, setByok] = useState(loadByok);
   const endRef = useRef(null);
+
+  function updateByok(field, value) {
+    const next = { ...byok, [field]: value };
+    if (!next.apiKey && !next.baseUrl && !next.model) {
+      localStorage.removeItem(BYOK_KEY);
+    } else {
+      localStorage.setItem(BYOK_KEY, JSON.stringify(next));
+    }
+    setByok(next);
+  }
 
   useEffect(() => {
     api
@@ -30,7 +51,12 @@ export default function ChatPage() {
     setError(null);
     setMessages((m) => [...m, { id: `local-${Date.now()}`, role: 'user', content: text, model: null }]);
     try {
-      const res = await api.post('/chat', { message: text });
+      const headers = {};
+      const body = { message: text };
+      if (byok.apiKey) headers['X-OpenAI-Key'] = byok.apiKey;
+      if (byok.baseUrl) body.baseUrl = byok.baseUrl;
+      if (byok.model) body.model = byok.model;
+      const res = await api.post('/chat', body, { headers });
       setMessages((m) => [
         ...m,
         {
@@ -65,13 +91,49 @@ export default function ChatPage() {
             <strong>OpenAI</strong> (if a key is set), a local <strong>Ollama</strong> (auto-detected),
             a free <strong>Hugging Face</strong> endpoint by default, or <strong>Spring AI's ChatClient</strong>
             with retrieval + a lesson tool — falling back to a local knowledge assistant only if everything
-            is unreachable.
+            is unreachable. Prefer your own provider? Add your key below and it's used just for your chats.
           </p>
         </div>
         <button className="btn ghost small" onClick={clear} disabled={messages.length === 0}>
           Clear history
         </button>
       </div>
+
+      <details className="byok">
+        <summary>🔑 Bring your own AI key <span className="dim">(optional — free default otherwise)</span></summary>
+        <div className="byok-grid">
+          <label>
+            API key
+            <input
+              type="password"
+              value={byok.apiKey || ''}
+              placeholder="sk-…"
+              onChange={(e) => updateByok('apiKey', e.target.value)}
+              autoComplete="off"
+            />
+          </label>
+          <label>
+            Base URL <span className="dim">(optional)</span>
+            <input
+              value={byok.baseUrl || ''}
+              placeholder="https://api.openai.com"
+              onChange={(e) => updateByok('baseUrl', e.target.value)}
+            />
+          </label>
+          <label>
+            Model <span className="dim">(optional)</span>
+            <input
+              value={byok.model || ''}
+              placeholder="gpt-4o-mini"
+              onChange={(e) => updateByok('model', e.target.value)}
+            />
+          </label>
+        </div>
+        <p className="dim">
+          Your key is sent only to the backend for each chat call and is never stored or logged.
+          Works with any OpenAI-compatible endpoint (OpenAI, Groq, OpenRouter, LM Studio…).
+        </p>
+      </details>
 
       {error && <div className="call warn"><div className="ct">⚠ Error</div><p>{error}</p></div>}
 
@@ -101,7 +163,7 @@ export default function ChatPage() {
               <div className="cm-meta">
                 {m.role === 'assistant' ? (
                   <span className="cm-model">
-                    {m.provider === 'openai' ? 'OpenAI · ' : m.provider === 'ollama' ? 'Ollama · ' : m.provider === 'free-endpoint' ? 'Free endpoint · ' : m.provider === 'openai-error' ? 'Fallback · ' : 'Local knowledge · '}
+                    {m.provider === 'openai' ? 'OpenAI · ' : m.provider === 'user-key' ? 'Your key · ' : m.provider === 'user-endpoint' ? 'Your endpoint · ' : m.provider === 'ollama' ? 'Ollama · ' : m.provider === 'free-endpoint' ? 'Free endpoint · ' : m.provider === 'openai-error' ? 'Fallback · ' : 'Local knowledge · '}
                     {m.model || 'assistant'}
                   </span>
                 ) : (

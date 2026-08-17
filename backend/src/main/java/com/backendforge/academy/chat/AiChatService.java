@@ -112,23 +112,31 @@ public class AiChatService {
         return answerLocally(message, user, "local");
     }
 
+    /**
+     * Per-request "bring your own key" path. When the caller supplies an API key or a
+     * base URL, we build a transient client for that endpoint only — the server's
+     * cached endpoint/client are untouched, and the key is never stored or logged.
+     * Falls back to the local assistant if the call fails.
+     */
+    public ChatAnswer answer(String message, User user, String apiKey, String baseUrl, String model) {
+        if (!StringUtils.hasText(apiKey) && !StringUtils.hasText(baseUrl)) {
+            return answer(message, user);
+        }
+        try {
+            return answerWithUserLlm(message, user, apiKey, baseUrl, model);
+        } catch (Exception e) {
+            log.warn("LLM call failed (user-provided key), falling back to local assistant: {}",
+                    e.getMessage());
+            return answerLocally(message, user, "openai-error");
+        }
+    }
+
     // ---- LLM mode ----------------------------------------------------------
 
     private ChatAnswer answerWithLlm(String message, User user) {
         AiEndpoint ep = resolveEndpoint();
-        ChatClient client = client();
-        List<SearchResultDto> hits = content.search(message).stream().limit(5).toList();
-        String context = contextBlock(hits);
-
-        String response = client.prompt()
-                .user(u -> u.text(
-                        "Relevant curriculum context:\n---\n{context}\n---\n\nQuestion: {question}")
-                        .param("context", context)
-                        .param("question", message))
-                .call()
-                .content();
-
-        List<Source> sources = hits.stream()
+        String response = runPrompt(client(), message);
+        List<Source> sources = content.search(message).stream().limit(5)
                 .map(h -> new Source(h.lessonId(), h.title(), h.moduleTitle()))
                 .toList();
         return new ChatAnswer(response, sources, ep.model(), ep.label());
@@ -140,31 +148,61 @@ public class AiChatService {
             synchronized (this) {
                 if (openAiClient == null) {
                     AiEndpoint ep = resolveEndpoint();
-                    String apiKey = props.openai().apiKey();
-                    OpenAiApi.Builder apiBuilder = OpenAiApi.builder()
-                            // Keyless endpoints (free HF Spaces, Ollama) ignore the header.
-                            .apiKey(StringUtils.hasText(apiKey) ? apiKey : "keyless-endpoint")
-                            .restClientBuilder(llmRestClient());
-                    if (ep.baseUrl() != null) {
-                        apiBuilder.baseUrl(ep.baseUrl());
-                    }
-                    OpenAiApi api = apiBuilder.build();
-                    OpenAiChatModel model = OpenAiChatModel.builder()
-                            .openAiApi(api)
-                            .defaultOptions(OpenAiChatOptions.builder()
-                                    .model(ep.model())
-                                    .temperature(0.3)
-                                    .build())
-                            .build();
-                    openAiClient = ChatClient.builder(model)
-                            .defaultSystem(SYSTEM_PROMPT)
-                            .defaultTools(new LessonTool(content))
-                            .build();
+                    openAiClient = buildClient(props.openai().apiKey(), ep.baseUrl(), ep.model());
                 }
                 local = openAiClient;
             }
         }
         return local;
+    }
+
+    private ChatAnswer answerWithUserLlm(String message, User user, String apiKey, String baseUrl, String model) {
+        ChatClient client = buildClient(
+                StringUtils.hasText(apiKey) ? apiKey : "keyless-endpoint",
+                StringUtils.hasText(baseUrl) ? baseUrl : null,
+                StringUtils.hasText(model) ? model : props.openai().model());
+        String response = runPrompt(client, message);
+        List<Source> sources = content.search(message).stream().limit(5)
+                .map(h -> new Source(h.lessonId(), h.title(), h.moduleTitle()))
+                .toList();
+        String label = StringUtils.hasText(baseUrl) ? "user-endpoint" : "user-key";
+        return new ChatAnswer(response, sources,
+                StringUtils.hasText(model) ? model : props.openai().model(), label);
+    }
+
+    private ChatClient buildClient(String apiKey, String baseUrl, String model) {
+        OpenAiApi.Builder apiBuilder = OpenAiApi.builder()
+                // Keyless endpoints (free HF Spaces, Ollama) ignore the header.
+                .apiKey(StringUtils.hasText(apiKey) ? apiKey : "keyless-endpoint")
+                .restClientBuilder(llmRestClient());
+        if (StringUtils.hasText(baseUrl)) {
+            apiBuilder.baseUrl(baseUrl);
+        }
+        OpenAiApi api = apiBuilder.build();
+        OpenAiChatModel chatModel = OpenAiChatModel.builder()
+                .openAiApi(api)
+                .defaultOptions(OpenAiChatOptions.builder()
+                        .model(model)
+                        .temperature(0.3)
+                        .build())
+                .build();
+        return ChatClient.builder(chatModel)
+                .defaultSystem(SYSTEM_PROMPT)
+                .defaultTools(new LessonTool(content))
+                .build();
+    }
+
+    /** Shared prompt runner: context-grounded question with the lesson tool wired in. */
+    private String runPrompt(ChatClient client, String message) {
+        List<SearchResultDto> hits = content.search(message).stream().limit(5).toList();
+        String context = contextBlock(hits);
+        return client.prompt()
+                .user(u -> u.text(
+                        "Relevant curriculum context:\n---\n{context}\n---\n\nQuestion: {question}")
+                        .param("context", context)
+                        .param("question", message))
+                .call()
+                .content();
     }
 
     /**

@@ -33,11 +33,14 @@ public class ChatController {
     @PostMapping
     @Transactional
     public ChatAnswer ask(@Valid @RequestBody ChatRequest req,
+                          @RequestHeader(value = "X-OpenAI-Key", required = false) String apiKey,
                           @AuthenticationPrincipal UserPrincipal principal) {
         User user = require(principal.user().getId());
         save(user, "user", req.message(), null);
 
-        ChatAnswer answer = ai.answer(req.message(), user);
+        // Per-request "bring your own key": the key (if any) is used only for this
+        // call and never stored or logged; the message still gets saved to history.
+        ChatAnswer answer = ai.answer(req.message(), user, apiKey, req.baseUrl(), req.model());
         save(user, "assistant", answer.answer(), answer.model());
         return answer;
     }
