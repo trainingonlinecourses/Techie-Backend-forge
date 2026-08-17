@@ -15,7 +15,11 @@ databases:
 
 services:
   - type: web
-    name: backendforge-academy-api
+    # Unique onrender.com subdomain — the service URL is https://<name>.onrender.com.
+    # If a name is taken, Render appends a suffix and the URL changes, so pick a
+    # unique name. If you rename this, update VITE_API_URL on Vercel to match and
+    # redeploy the frontend (the URL is inlined at build time).
+    name: backendforge-academy-api-bef2
     runtime: docker
     plan: free
     region: oregon

@@ -171,16 +171,18 @@ and `railway.toml` so the backend is one-click deployable on the free tier.
 1. Push this repo to GitHub.
 2. In the Render dashboard: **New + → Blueprint** → connect the repo.
 3. Render reads `render.yaml` at the repo root and provisions **two** resources on the free plan:
-   - `backendforge-academy-api` — the web service (builds `backend/Dockerfile`, Java 21),
+   - `backendforge-academy-api-bef2` — the web service (builds `backend/Dockerfile`, Java 21).
+     The name sets the public URL (`https://<name>.onrender.com`); if Render appends a suffix
+     because the name was taken, update `VITE_API_URL` below to the actual URL.
    - `backendforge-academy-db` — a Postgres database whose connection string is injected as
      `DATABASE_URL`.
    It also generates a random `APP_JWT_SECRET` and sets `APP_CORS_ORIGINS` to
    `https://techie-backend-forge.vercel.app`.
-4. When the deploy finishes, the API is at `https://backendforge-academy-api.onrender.com`.
+4. When the deploy finishes, the API is at `https://backendforge-academy-api-bef2.onrender.com`.
    Verify it:
 
    ```bash
-   curl https://backendforge-academy-api.onrender.com/actuator/health   # → {"status":"UP"}
+   curl https://backendforge-academy-api-bef2.onrender.com/actuator/health   # → {"status":"UP"}
    ```
 
 Free-tier notes: the web instance sleeps after ~15 min idle (the first request takes ~1 min to
@@ -214,8 +216,9 @@ The SPA's axios client uses `import.meta.env.VITE_API_URL || '/api'`. Vite inlin
 1. Vercel dashboard → **techie-backend-forge** → **Settings → Environment Variables**.
 2. Add:
    - **Key:** `VITE_API_URL`
-   - **Value:** `https://backendforge-academy-api.onrender.com/api` — keep the `/api` suffix; the
-     client joins it onto every request (`/content/curriculum`, `/auth/login`, …).
+   - **Value:** `https://backendforge-academy-api-bef2.onrender.com/api` — keep the `/api` suffix;
+     the client joins it onto every request (`/content/curriculum`, `/auth/login`, …). If Render
+     assigned a different URL, use the actual one from the service's dashboard.
    - **Scope:** Production (or All).
 3. **Redeploy**: Deployments → latest → ⋯ → **Redeploy** (or just push to `main`).
 
@@ -238,6 +241,6 @@ banner instead of crashing (the API client rejects non-JSON responses).
 ### Deployed URLs
 
 - **Frontend (Vercel):** https://techie-backend-forge.vercel.app — the React SPA.
-- **Backend (Render, after step 1):** https://backendforge-academy-api.onrender.com —
+- **Backend (Render, after step 1):** https://backendforge-academy-api-bef2.onrender.com —
   health check at `/actuator/health`.
 - **Local:** backend on `:8080`, frontend dev server on `:5173` (proxies `/api`).
