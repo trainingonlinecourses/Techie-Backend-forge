@@ -26,3 +26,6 @@ Thumbs.db
 # ---- Deployment / auth ----
 .vercel/
 .freebuff/
+
+# ---- Local secrets (never commit) ----
+.env-local.txt
