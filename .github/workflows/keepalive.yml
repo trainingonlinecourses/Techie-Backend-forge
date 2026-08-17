@@ -1,0 +1,22 @@
+name: Keep Render backend awake
+
+# Render free web services sleep after ~15 minutes of inbound-idle traffic and
+# take ~30-60s to wake, which makes the first request after a quiet period slow
+# (or fail the browser's initial calls). Pinging /actuator/health every 10
+# minutes keeps the instance warm. This repo is public, so GitHub Actions
+# scheduled runs are free with no minute limits.
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch: {}
+
+jobs:
+  ping:
+    name: Ping /actuator/health
+    runs-on: ubuntu-latest
+    steps:
+      - name: Hit the Render health endpoint
+        run: |
+          curl -fsS --retry 3 --retry-delay 5 --max-time 60 \
+            https://backendforge-academy-api-bef2.onrender.com/actuator/health \
+            && echo "Backend is awake"

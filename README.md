@@ -190,6 +190,11 @@ wake), and Render's free Postgres **expires after 30 days** — upgrade it to th
 permanent database. Demo accounts (`admin`/`admin123`, `learner`/`learner123`) are seeded at
 startup only if they don't exist yet, so your own users are never touched.
 
+The repo ships a GitHub Actions workflow (`.github/workflows/keepalive.yml`) that pings
+`/actuator/health` every 10 minutes, so the free instance stays warm and never makes users wait
+for a cold start. It runs on the public-repo free tier — no setup needed. If you move the repo
+private, GitHub's 2,000 monthly Actions minutes still cover this easily (~0.3 min per run).
+
 ### Alternative: Railway
 
 1. Create a project on railway.com and connect this repo. It reads `railway.toml`, which sets the
