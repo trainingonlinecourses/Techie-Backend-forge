@@ -1,5 +1,5 @@
 ---
-title: "Aspect-Oriented Programming: The Big Picture"
+title: Aspect-Oriented Programming: The Big Picture
 module: spring-aop
 order: 1
 minutes: 25

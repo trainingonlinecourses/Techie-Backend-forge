@@ -1,5 +1,5 @@
 ---
-title: "Pointcut Expressions: Matching Join Points"
+title: Pointcut Expressions: Matching Join Points
 module: spring-aop
 order: 2
 minutes: 30

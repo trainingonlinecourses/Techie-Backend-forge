@@ -1,5 +1,5 @@
 ---
-title: "Creating and Configuring Aspects"
+title: Creating and Configuring Aspects
 module: spring-aop
 order: 4
 minutes: 25

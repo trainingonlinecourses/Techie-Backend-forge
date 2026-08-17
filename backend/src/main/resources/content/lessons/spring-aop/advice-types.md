@@ -1,5 +1,5 @@
 ---
-title: "Advice Types: Before, After, Around, and More"
+title: Advice Types: Before, After, Around, and More
 module: spring-aop
 order: 3
 minutes: 35
