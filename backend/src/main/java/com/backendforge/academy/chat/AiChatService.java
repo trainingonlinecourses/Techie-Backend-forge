@@ -17,8 +17,10 @@ import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.ai.tool.annotation.Tool;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import org.springframework.web.client.RestClient;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -141,7 +143,8 @@ public class AiChatService {
                     String apiKey = props.openai().apiKey();
                     OpenAiApi.Builder apiBuilder = OpenAiApi.builder()
                             // Keyless endpoints (free HF Spaces, Ollama) ignore the header.
-                            .apiKey(StringUtils.hasText(apiKey) ? apiKey : "keyless-endpoint");
+                            .apiKey(StringUtils.hasText(apiKey) ? apiKey : "keyless-endpoint")
+                            .restClientBuilder(llmRestClient());
                     if (ep.baseUrl() != null) {
                         apiBuilder.baseUrl(ep.baseUrl());
                     }
@@ -162,6 +165,18 @@ public class AiChatService {
             }
         }
         return local;
+    }
+
+    /**
+     * HTTP client with hard timeouts for LLM calls. Without these, a stalled provider
+     * (e.g. the free Hugging Face endpoint) hangs the chat request forever; with them
+     * the call fails and {@link #answer} falls back to the local knowledge assistant.
+     */
+    private static RestClient.Builder llmRestClient() {
+        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+        factory.setConnectTimeout((int) Duration.ofSeconds(10).toMillis());
+        factory.setReadTimeout((int) Duration.ofSeconds(60).toMillis());
+        return RestClient.builder().requestFactory(factory);
     }
 
     // ---- Provider resolution --------------------------------------------------
