@@ -178,5 +178,185 @@
     "color": "#e0af68",
     "tech": ["AOP", "Pointcuts", "Advice", "Proxies", "Aspects"],
     "docsUrl": "https://docs.spring.io/spring-framework/reference/core/aop.html"
+  },
+  {
+    "id": "spring-scheduling-async",
+    "title": "Scheduling & Async Execution",
+    "subtitle": "@Scheduled timing models, @Async pools, the TaskScheduler abstraction, cron in depth, and distributed scheduling with ShedLock.",
+    "order": 21,
+    "color": "#9ece6a",
+    "tech": ["@Scheduled", "@Async", "Cron", "TaskScheduler", "ShedLock"],
+    "docsUrl": "https://docs.spring.io/spring-framework/reference/integration/scheduling.html"
+  },
+  {
+    "id": "spring-cache",
+    "title": "Spring Cache in Depth",
+    "subtitle": "The cache abstraction, @CachePut/@CacheEvict consistency, Redis and Caffeine stores, CacheManagers compared, and cache design patterns.",
+    "order": 22,
+    "color": "#7dcfff",
+    "tech": ["@Cacheable", "Redis", "Caffeine", "CacheManager", "Patterns"],
+    "docsUrl": "https://docs.spring.io/spring-framework/reference/integration/cache.html"
+  },
+  {
+    "id": "rest-best-practices",
+    "title": "REST API Best Practices",
+    "subtitle": "Resource design and verbs, consistent RFC 7807 errors, pagination and filtering, versioning strategies, and idempotency with rate limiting.",
+    "order": 23,
+    "color": "#ff9e64",
+    "tech": ["REST", "Pagination", "Versioning", "Idempotency", "Rate Limiting"],
+    "docsUrl": "https://docs.spring.io/spring-framework/reference/web/webmvc.html"
+  },
+  {
+    "id": "observability",
+    "title": "Observability: Metrics & Tracing",
+    "subtitle": "Micrometer metrics and timers, health indicators and readiness, custom business metrics, Grafana dashboards and alerting, and distributed tracing.",
+    "order": 24,
+    "color": "#bb9af7",
+    "tech": ["Micrometer", "Prometheus", "Grafana", "Tracing", "SLOs"],
+    "docsUrl": "https://docs.spring.io/spring-boot/reference/actuator/metrics.html"
+  },
+  {
+    "id": "cicd-devops",
+    "title": "CI/CD & DevOps",
+    "subtitle": "GitHub Actions workflows, multi-stage Docker pipelines, deploying Spring Boot to Kubernetes with probes, and blue-green and canary releases.",
+    "order": 25,
+    "color": "#2ac3de",
+    "tech": ["GitHub Actions", "Docker", "Kubernetes", "Canary", "Incidents"],
+    "docsUrl": "https://docs.github.com/en/actions"
+  },
+  {
+    "id": "spring-webmvc-advanced",
+    "title": "Spring MVC Advanced",
+    "subtitle": "The exception resolver chain, content negotiation and message converters, forms and Bean Validation, view resolvers, and filters/interceptors.",
+    "order": 26,
+    "color": "#4cc2ff",
+    "tech": ["Exception Handling", "Negotiation", "Forms", "ViewResolvers", "Interceptors"],
+    "docsUrl": "https://docs.spring.io/spring-framework/reference/web/webmvc.html"
+  },
+  {
+    "id": "spring-testing-advanced",
+    "title": "Advanced Testing: Slices & Testcontainers",
+    "subtitle": "Test slices (@WebMvcTest/@DataJpaTest), the MockMvc DSL, client testing with MockRestServiceServer, Testcontainers for real dependencies, and test config.",
+    "order": 27,
+    "color": "#9ece6a",
+    "tech": ["Test Slices", "MockMvc", "Testcontainers", "MockWebServer", "Config"],
+    "docsUrl": "https://docs.spring.io/spring-boot/reference/testing/spring-boot-applications.html"
+  },
+  {
+    "id": "spring-amqp",
+    "title": "Spring AMQP & RabbitMQ",
+    "subtitle": "Exchanges, queues and bindings, publisher confirms, retries and dead-letter queues, consumer concurrency, and request-reply RPC over AMQP.",
+    "order": 28,
+    "color": "#f7768e",
+    "tech": ["RabbitMQ", "AMQP", "DLQ", "Confirms", "RPC"],
+    "docsUrl": "https://docs.spring.io/spring-amqp/reference/"
+  },
+  {
+    "id": "spring-jdbc",
+    "title": "Spring JDBC & SQL Access",
+    "subtitle": "JdbcTemplate and RowMappers, named parameters, SimpleJdbcInsert, transactions with raw SQL, and batch operations at scale.",
+    "order": 29,
+    "color": "#73daca",
+    "tech": ["JdbcTemplate", "NamedParameters", "Transactions", "Batching"],
+    "docsUrl": "https://docs.spring.io/spring-framework/reference/data-access/jdbc.html"
+  },
+  {
+    "id": "java-advanced-language",
+    "title": "Modern Java Language Features",
+    "subtitle": "Records, sealed classes and pattern matching, switch expressions, text blocks, modern collections, and Optional error handling.",
+    "order": 30,
+    "color": "#f5a623",
+    "tech": ["Records", "Sealed", "Pattern Matching", "Text Blocks", "Optional"],
+    "docsUrl": "https://docs.oracle.com/en/java/javase/21/language/java-language-changes.html"
+  },
+  {
+    "id": "java-collections-deep",
+    "title": "Java Collections Deep Dive",
+    "subtitle": "HashMap internals, concurrent collections, sets/maps and the equals-hashCode contract, performance and memory, and queues and deques.",
+    "order": 31,
+    "color": "#f5a623",
+    "tech": ["HashMap", "Concurrent", "Sets", "Performance", "Queues"],
+    "docsUrl": "https://docs.oracle.com/en/java/javase/21/core/collections.html"
+  },
+  {
+    "id": "java-streams-deep",
+    "title": "Java Streams Deep Dive",
+    "subtitle": "Pipeline internals and laziness, collectors and grouping, parallel streams, stream idioms for real code, and when NOT to use streams.",
+    "order": 32,
+    "color": "#9ece6a",
+    "tech": ["Streams", "Collectors", "Parallel", "Idioms", "groupingBy"],
+    "docsUrl": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/stream/package-summary.html"
+  },
+  {
+    "id": "java-concurrency-deep",
+    "title": "Java Concurrency Deep Dive",
+    "subtitle": "Threads and executors, locks and atomicity, CompletableFuture composition, race/deadlock pathology, and virtual threads (Project Loom).",
+    "order": 33,
+    "color": "#ff6b6b",
+    "tech": ["Executors", "Locks", "CompletableFuture", "Virtual Threads"],
+    "docsUrl": "https://docs.oracle.com/en/java/javase/21/core/concurrency.html"
+  },
+  {
+    "id": "spring-transactions-deep",
+    "title": "Transactions in Depth",
+    "subtitle": "Propagation semantics, isolation and locking, TransactionTemplate, rollback rules, and distributed transactions with the outbox pattern.",
+    "order": 34,
+    "color": "#6fce6f",
+    "tech": ["Propagation", "Isolation", "Locking", "Outbox", "Saga"],
+    "docsUrl": "https://docs.spring.io/spring-framework/reference/data-access/transaction.html"
+  },
+  {
+    "id": "grpc-apis",
+    "title": "gRPC & Protocol Buffers",
+    "subtitle": "Protobuf schema design, building gRPC servers and clients, streaming and deadlines, production hardening, and gRPC vs REST.",
+    "order": 35,
+    "color": "#7aa2f7",
+    "tech": ["gRPC", "Protobuf", "Streaming", "HTTP/2", "RPC"],
+    "docsUrl": "https://grpc.io/docs/"
+  },
+  {
+    "id": "ddd-architecture",
+    "title": "DDD & Clean Architecture",
+    "subtitle": "Entities, value objects and aggregates, hexagonal ports and adapters, the clean-architecture dependency rule, and domain events.",
+    "order": 36,
+    "color": "#e0af68",
+    "tech": ["DDD", "Aggregates", "Hexagonal", "Clean Architecture", "Events"],
+    "docsUrl": "https://martinfowler.com/tags/domain%20driven%20design.html"
+  },
+  {
+    "id": "maven-gradle",
+    "title": "Maven & Gradle Builds",
+    "subtitle": "The Maven lifecycle and plugins, dependency management and BOMs, Gradle as the modern alternative, and multi-module project builds.",
+    "order": 37,
+    "color": "#9ece6a",
+    "tech": ["Maven", "Gradle", "Dependencies", "Plugins", "Multi-Module"],
+    "docsUrl": "https://maven.apache.org/guides/"
+  },
+  {
+    "id": "postgresql-deep",
+    "title": "PostgreSQL Deep Dive",
+    "subtitle": "SQL fundamentals and window functions, indexing and EXPLAIN, transactions and MVCC, JSONB documents, and performance tuning.",
+    "order": 38,
+    "color": "#7dcfff",
+    "tech": ["PostgreSQL", "Indexes", "MVCC", "JSONB", "Tuning"],
+    "docsUrl": "https://www.postgresql.org/docs/current/"
+  },
+  {
+    "id": "distributed-systems",
+    "title": "Distributed Systems Patterns",
+    "subtitle": "CAP and consistency models, Raft consensus and quorums, idempotency, distributed locks with fencing tokens, and sagas.",
+    "order": 39,
+    "color": "#f7768e",
+    "tech": ["CAP", "Raft", "Idempotency", "Locks", "Saga"],
+    "docsUrl": "https://microservices.io/patterns/index.html"
+  },
+  {
+    "id": "spring-data-jpa-deep",
+    "title": "Spring Data JPA in Depth",
+    "subtitle": "Entity mapping and identifiers, derived queries and JPQL, killing the N+1 with fetch strategies, the persistence context, and Specifications.",
+    "order": 40,
+    "color": "#4cc2ff",
+    "tech": ["JPA", "JPQL", "EntityGraph", "N+1", "Specifications"],
+    "docsUrl": "https://docs.spring.io/spring-data/jpa/reference/"
   }
 ]

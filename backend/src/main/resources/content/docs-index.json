@@ -209,6 +209,128 @@
     ]
   },
   {
+    "title": "Scheduling & Async",
+    "links": [
+      {"title": "Task Execution and Scheduling", "url": "https://docs.spring.io/spring-framework/reference/integration/scheduling.html", "description": "@Scheduled, @Async, TaskScheduler, cron expressions and the executor abstraction."},
+      {"title": "ShedLock", "url": "https://github.com/lukas-krecan/ShedLock", "description": "Distributed locks for scheduled tasks across cluster nodes."},
+      {"title": "Cron expressions", "url": "https://docs.spring.io/spring-framework/reference/integration/scheduling.html#scheduling-cron-expression", "description": "The six-field cron syntax used by Spring @Scheduled."}
+    ]
+  },
+  {
+    "title": "Caching",
+    "links": [
+      {"title": "Cache Abstraction", "url": "https://docs.spring.io/spring-framework/reference/integration/cache.html", "description": "@Cacheable, @CachePut, @CacheEvict and CacheManager configuration."},
+      {"title": "Spring Data Redis caching", "url": "https://docs.spring.io/spring-data/redis/reference/redis/redis-cache.html", "description": "Redis as the shared cache store with TTLs and serialization."},
+      {"title": "Caffeine", "url": "https://github.com/ben-manes/caffeine", "description": "The high-performance in-memory cache for single-node apps."}
+    ]
+  },
+  {
+    "title": "REST API Design",
+    "links": [
+      {"title": "Spring MVC REST support", "url": "https://docs.spring.io/spring-framework/reference/web/webmvc.html", "description": "Controllers, @ResponseBody, message converters and content negotiation."},
+      {"title": "Problem Details (RFC 7807)", "url": "https://www.rfc-editor.org/rfc/rfc7807", "description": "The standard machine-readable error format."},
+      {"title": "Bucket4j", "url": "https://github.com/bucket4j/bucket4j", "description": "Token-bucket rate limiting for JVM applications."}
+    ]
+  },
+  {
+    "title": "Observability",
+    "links": [
+      {"title": "Spring Boot Metrics", "url": "https://docs.spring.io/spring-boot/reference/actuator/metrics.html", "description": "Micrometer metrics, tags, timers and the /actuator/metrics endpoints."},
+      {"title": "Spring Boot Health", "url": "https://docs.spring.io/spring-boot/reference/actuator/health.html", "description": "Health indicators, readiness/liveness groups and probes."},
+      {"title": "Micrometer Tracing", "url": "https://docs.spring.io/spring-boot/reference/actuator/tracing.html", "description": "Distributed tracing with Brave/OpenTelemetry and Zipkin."},
+      {"title": "Prometheus", "url": "https://prometheus.io/docs/prometheus/latest/querying/basics/", "description": "Query language and scraping for time-series metrics."},
+      {"title": "Grafana", "url": "https://grafana.com/docs/", "description": "Dashboards and alerting on top of Prometheus."}
+    ]
+  },
+  {
+    "title": "CI/CD & DevOps",
+    "links": [
+      {"title": "GitHub Actions", "url": "https://docs.github.com/en/actions", "description": "Workflows, jobs, steps, secrets and caching."},
+      {"title": "Docker best practices", "url": "https://docs.docker.com/build/building/best-practices/", "description": "Multi-stage builds and layer caching."},
+      {"title": "Kubernetes Deployment", "url": "https://kubernetes.io/docs/concepts/workloads/controllers/deployment/", "description": "Rolling updates, strategies and probes."},
+      {"title": "SRE Book", "url": "https://sre.google/sre-book/table-of-contents/", "description": "Google's site reliability engineering handbook."}
+    ]
+  },
+  {
+    "title": "Spring AMQP / RabbitMQ",
+    "links": [
+      {"title": "Spring AMQP Reference", "url": "https://docs.spring.io/spring-amqp/reference/", "description": "RabbitTemplate, @RabbitListener, confirms and retry."},
+      {"title": "RabbitMQ Tutorials", "url": "https://www.rabbitmq.com/tutorials", "description": "Official tutorials: exchanges, queues, bindings and patterns."},
+      {"title": "RabbitMQ Reliability Guide", "url": "https://www.rabbitmq.com/confirms.html", "description": "Publisher confirms and consumer acknowledgements."}
+    ]
+  },
+  {
+    "title": "Spring JDBC",
+    "links": [
+      {"title": "JDBC with Spring", "url": "https://docs.spring.io/spring-framework/reference/data-access/jdbc.html", "description": "JdbcTemplate, NamedParameterJdbcTemplate, SimpleJdbcInsert and batches."},
+      {"title": "Transaction Management", "url": "https://docs.spring.io/spring-framework/reference/data-access/transaction.html", "description": "The transaction abstraction shared by JDBC and JPA."}
+    ]
+  },
+  {
+    "title": "Modern Java",
+    "links": [
+      {"title": "Java 21 Language Changes", "url": "https://docs.oracle.com/en/java/javase/21/language/java-language-changes.html", "description": "Records, sealed classes, pattern matching, switch expressions and text blocks."},
+      {"title": "Text Blocks", "url": "https://docs.oracle.com/en/java/javase/21/text-blocks.html", "description": "Multiline strings with indentation handling and formatted()."},
+      {"title": "Concurrency", "url": "https://docs.oracle.com/en/java/javase/21/core/concurrency.html", "description": "Executors, locks, CompletableFuture and virtual threads."},
+      {"title": "Virtual Threads", "url": "https://docs.oracle.com/en/java/javase/21/core/virtual-threads.html", "description": "Project Loom: millions of lightweight threads."},
+      {"title": "Collections Framework", "url": "https://docs.oracle.com/en/java/javase/21/core/collections.html", "description": "The collection interfaces, implementations and concurrency."},
+      {"title": "Stream API", "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/stream/package-summary.html", "description": "Lazy pipelines, collectors and parallel streams."}
+    ]
+  },
+  {
+    "title": "Transactions in Depth",
+    "links": [
+      {"title": "Declarative transaction management", "url": "https://docs.spring.io/spring-framework/reference/data-access/transaction/declarative/tx-annotation.html", "description": "@Transactional rollback rules and the transaction boundary."},
+      {"title": "Propagation", "url": "https://docs.spring.io/spring-framework/reference/data-access/transaction/declarative/tx-propagation.html", "description": "REQUIRED, REQUIRES_NEW, NESTED and the rest."},
+      {"title": "PostgreSQL MVCC", "url": "https://www.postgresql.org/docs/current/mvcc.html", "description": "Isolation levels and locking in Postgres."},
+      {"title": "Transactional Outbox", "url": "https://microservices.io/patterns/data/transactional-outbox.html", "description": "Atomic DB + broker writes via an outbox table."}
+    ]
+  },
+  {
+    "title": "gRPC & Protobuf",
+    "links": [
+      {"title": "gRPC Concepts", "url": "https://grpc.io/docs/what-is-grpc/concepts/", "description": "RPC types, deadlines, status codes and channels."},
+      {"title": "Protobuf Language Guide", "url": "https://protobuf.dev/programming-guides/proto3/", "description": "Messages, scalars, repeated, oneof and versioning."},
+      {"title": "gRPC-Web", "url": "https://grpc.io/docs/platforms/web/", "description": "gRPC from browsers via a proxy."}
+    ]
+  },
+  {
+    "title": "DDD & Architecture",
+    "links": [
+      {"title": "DDD Reference (Fowler)", "url": "https://martinfowler.com/tags/domain%20driven%20design.html", "description": "Entities, value objects, aggregates and repositories."},
+      {"title": "Hexagonal Architecture", "url": "https://alistair.cockburn.us/hexagonal-architecture/", "description": "Ports and adapters around the domain."},
+      {"title": "Clean Architecture", "url": "https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html", "description": "The dependency rule and concentric circles."},
+      {"title": "DDD Aggregate (Fowler)", "url": "https://martinfowler.com/bliki/DDD_Aggregate.html", "description": "Consistency boundaries and aggregate roots."}
+    ]
+  },
+  {
+    "title": "Maven & Gradle",
+    "links": [
+      {"title": "Maven Dependency Mechanism", "url": "https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html", "description": "Scopes, transitivity and conflict resolution."},
+      {"title": "Maven Lifecycle", "url": "https://maven.apache.org/guides/introduction/introduction-to-the-lifecycle.html", "description": "Phases, goals and plugins."},
+      {"title": "Gradle User Guide", "url": "https://docs.gradle.org/current/userguide/userguide.html", "description": "Tasks, the DSL and incremental builds."}
+    ]
+  },
+  {
+    "title": "PostgreSQL",
+    "links": [
+      {"title": "PostgreSQL Documentation", "url": "https://www.postgresql.org/docs/current/", "description": "The authoritative reference."},
+      {"title": "Indexes", "url": "https://www.postgresql.org/docs/current/indexes.html", "description": "B-tree, composite, partial and covering indexes."},
+      {"title": "MVCC", "url": "https://www.postgresql.org/docs/current/mvcc.html", "description": "Isolation levels and concurrency control."},
+      {"title": "JSON Types", "url": "https://www.postgresql.org/docs/current/datatype-json.html", "description": "jsonb operators, GIN indexes and document queries."},
+      {"title": "Performance Tips", "url": "https://www.postgresql.org/docs/current/performance-tips.html", "description": "EXPLAIN and query tuning."}
+    ]
+  },
+  {
+    "title": "Distributed Systems",
+    "links": [
+      {"title": "CAP Theorem", "url": "https://en.wikipedia.org/wiki/CAP_theorem", "description": "Consistency, availability, partition tolerance."},
+      {"title": "Raft Consensus", "url": "https://raft.github.io/", "description": "Leader election and log replication."},
+      {"title": "Distributed Locks with Redis", "url": "https://redis.io/docs/latest/develop/use/patterns/distributed-locks/", "description": "SET NX EX, leases and fencing tokens."},
+      {"title": "Saga Pattern", "url": "https://microservices.io/patterns/data/saga.html", "description": "Choreography and orchestration with compensation."}
+    ]
+  },
+  {
     "title": "Community & Release Info",
     "links": [
       {"title": "Spring Releases (versions & support)", "url": "https://spring.io/projects/spring-boot#support", "description": "OSSRH versions, support timelines and release notes."},

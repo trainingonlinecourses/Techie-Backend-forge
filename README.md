@@ -36,11 +36,34 @@ It is **not** a static site. It is a real application:
 | 17 Spring Modulith & Modular Monoliths | 4 | Monolith vs microservices, @ApplicationModule, reliable in-process events, architecture-as-test |
 | 18 Microservices Architecture Patterns | 5 | Saga, CQRS, event sourcing, strangler fig migration, distributed data consistency |
 | 19 Cloud Native: Docker & Kubernetes | 6 | Docker images & multi-stage builds, k8s objects, Spring probes/limits, ConfigMaps/Secrets, 12-factor |
+| 20 Spring AOP: Aspects in Depth | 4 | Pointcuts, advice types, aspects, proxying |
+| 21 Scheduling & Async Execution | 5 | @Scheduled, @Async, TaskScheduler, cron, distributed scheduling (ShedLock) |
+| 22 Spring Cache in Depth | 5 | @Cacheable/@CachePut/@CacheEvict, Redis + Caffeine, CacheManagers, design patterns |
+| 23 REST API Best Practices | 5 | Resource design, RFC 7807 errors, pagination/filtering, versioning, idempotency + rate limiting |
+| 24 Observability: Metrics & Tracing | 5 | Micrometer, health indicators, business metrics, dashboards/alerting, distributed tracing |
+| 25 CI/CD & DevOps | 5 | GitHub Actions, Docker pipelines, K8s deploy, blue-green/canary, incidents |
+| 26 Spring MVC Advanced | 5 | Exception resolver chain, content negotiation, forms/validation, view resolvers, filters/interceptors |
+| 27 Advanced Testing: Slices & Testcontainers | 5 | Test slices, MockMvc, client testing, Testcontainers, test config patterns |
+| 28 Spring AMQP & RabbitMQ | 5 | Exchanges/queues/bindings, publisher confirms, retries & DLQs, consumer concurrency, RPC |
+| 29 Spring JDBC & SQL Access | 5 | JdbcTemplate, named parameters, SimpleJdbcInsert, JDBC transactions, batch operations |
+| 30 Modern Java Language Features | 5 | Records, sealed classes, pattern matching, switch expressions, text blocks, Optional |
+| 31 Java Collections Deep Dive | 5 | HashMap internals, concurrent collections, sets/maps contract, performance, queues |
+| 32 Java Streams Deep Dive | 5 | Pipelines, collectors, parallel streams, idioms, when NOT to stream |
+| 33 Java Concurrency Deep Dive | 5 | Executors, locks/atomicity, CompletableFuture, race/deadlock pathology, virtual threads |
+| 34 Transactions in Depth | 5 | Propagation, isolation/locking, TransactionTemplate, rollback rules, outbox/saga |
+| 35 gRPC & Protocol Buffers | 5 | Protobuf, gRPC server/client, streaming/deadlines, production, gRPC vs REST |
+| 36 DDD & Clean Architecture | 5 | Building blocks, aggregates, hexagonal, clean architecture, domain events |
+| 37 Maven & Gradle Builds | 5 | Lifecycle/plugins, dependency management/BOMs, Gradle, multi-module builds |
+| 38 PostgreSQL Deep Dive | 5 | SQL + window functions, indexing/EXPLAIN, transactions/MVCC, JSONB, tuning |
+| 39 Distributed Systems Patterns | 5 | CAP, Raft/quorum, idempotency, distributed locks, sagas |
+| 40 Spring Data JPA in Depth | 5 | Entity mapping, query methods, N+1/fetch strategies, persistence context, Specifications |
 
 Every lesson includes: explanation, runnable code, an *"Why it matters (organizational view)"* callout,
 and links to the authoritative reference on docs.spring.io. The **Docs index** page organizes
-130+ official links (Framework, Boot, Security, AI, Cloud, Kafka, WebFlux, Data, Batch, GraphQL,
-REST Docs, Testing, JVM, Migrations, Modulith, Microservices, Kubernetes, Java, OWASP, Maven/Gradle).
+179 official links (Framework, Boot, Security, AI, Cloud, Kafka, WebFlux, Data, Batch, GraphQL,
+REST Docs, Testing, JVM, Migrations, Modulith, Microservices, Kubernetes, Java, OWASP, Maven/Gradle,
+Scheduling, Caching, REST Design, Observability, CI/CD, AMQP, JDBC, Modern Java, Transactions, gRPC,
+DDD, PostgreSQL, Distributed Systems, Spring Data JPA).
 
 ## Run it
 
@@ -164,7 +187,7 @@ claims, JSON 401/403 via `AuthenticationEntryPoint`/`AccessDeniedHandler`.
 │   └── src/main/resources/content/
 │       ├── modules.json      curriculum metadata
 │       ├── docs-index.json   curated docs.spring.io index
-│       └── lessons/<module>/ 148 markdown lessons (loaded + searched at runtime)
+│       └── lessons/<module>/ 248 markdown lessons (loaded + searched at runtime)
 ├── frontend/                 React SPA
 └── projects/payments-api/    Capstone: complete runnable payments API
 ```
