@@ -62,7 +62,7 @@ export default function Navbar() {
         <input
           id="nav-search"
           type="text"
-          placeholder="search 110 lessons — jwt, outbox, Mono/Flux, RAG…"
+          placeholder="search 144 lessons — jwt, outbox, saga, k8s, RAG…"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />

@@ -617,6 +617,54 @@ h1.ptitle { font-family: var(--disp); font-weight: 700; font-size: clamp(24px, 4
 .demo b { font-family: var(--mono); font-size: 10px; letter-spacing: .2em; color: var(--dim); }
 .demo span { font-size: 12px; color: var(--mut); }
 
+/* ---------------- UX additions: reading bar, toast, back-to-top, continue ---------------- */
+.readbar {
+  position: fixed; top: 0; left: 0; height: 3px; z-index: 90;
+  background: linear-gradient(90deg, var(--amber), var(--amber2));
+  box-shadow: 0 0 12px rgba(245,166,35,.5);
+  transition: width .08s linear;
+}
+.toast {
+  position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%); z-index: 95;
+  background: var(--surface2); border: 1px solid var(--line2); border-left: 3px solid var(--green);
+  border-radius: 10px; padding: 11px 18px; font-size: 13px; color: var(--txt);
+  box-shadow: 0 16px 40px rgba(0,0,0,.5);
+  animation: toastin .25s ease-out;
+  font-family: var(--body); white-space: nowrap;
+}
+@keyframes toastin { from { opacity: 0; transform: translateX(-50%) translateY(10px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+.totop {
+  position: fixed; right: 22px; bottom: 26px; z-index: 90;
+  width: 42px; height: 42px; border-radius: 12px;
+  background: var(--surface2); border: 1px solid var(--line2); color: var(--amber);
+  font-size: 17px; cursor: pointer;
+  box-shadow: 0 12px 30px rgba(0,0,0,.45); transition: all .2s;
+  display: grid; place-items: center;
+}
+.totop:hover { border-color: var(--amber); transform: translateY(-3px); }
+.toc a.active { color: var(--amber); border-left-color: var(--amber); background: rgba(245,166,35,.06); }
+
+.lesson-complete-cta {
+  margin: 30px 0 0; padding: 18px; text-align: center;
+  background: var(--surface); border: 1px dashed var(--line2); border-radius: 12px;
+}
+.lesson-complete-cta .btn { min-width: 260px; }
+.call.ok { background: rgba(111,206,111,.06); border-color: rgba(111,206,111,.3); } .call.ok .ct { color: var(--green); }
+
+.continuecard {
+  margin-top: 26px; display: flex; align-items: center; justify-content: space-between; gap: 18px;
+  background: linear-gradient(90deg, rgba(245,166,35,.1), rgba(245,166,35,.03));
+  border: 1px solid rgba(245,166,35,.35); border-radius: 14px;
+  padding: 16px 20px; flex-wrap: wrap;
+}
+.continuecard.done { background: linear-gradient(90deg, rgba(111,206,111,.1), rgba(111,206,111,.03)); border-color: rgba(111,206,111,.35); }
+.cc-info { display: grid; gap: 3px; min-width: 0; flex: 1; }
+.cc-label { font-family: var(--mono); font-size: 10px; letter-spacing: .24em; color: var(--amber); }
+.continuecard.done .cc-label { color: var(--green); }
+.cc-title { font-family: var(--disp); font-weight: 700; font-size: 16px; color: var(--txt); }
+.cc-title:hover { color: var(--amber); text-decoration: none; }
+.cc-mod { font-family: var(--mono); font-size: 10.5px; color: var(--dim); letter-spacing: .06em; }
+
 /* ---------------- responsive ---------------- */
 @media (max-width: 980px) {
   .sidebar { display: none; }

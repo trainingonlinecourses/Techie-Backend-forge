@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { api } from '../api/client';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useProgress } from '../hooks/useProgress.js';
@@ -7,11 +7,17 @@ import Markdown from '../components/Markdown.jsx';
 
 export default function LessonPage() {
   const { lessonId } = useParams();
+  const navigate = useNavigate();
   const { user } = useAuth();
   const { progress, toggle } = useProgress();
   const [lesson, setLesson] = useState(null);
   const [curriculum, setCurriculum] = useState(null);
   const [error, setError] = useState(null);
+  const [scrollPct, setScrollPct] = useState(0);
+  const [showTop, setShowTop] = useState(false);
+  const [activeToc, setActiveToc] = useState(null);
+  const [toast, setToast] = useState(null);
+  const articleRef = useRef(null);
 
   useEffect(() => {
     setLesson(null);
@@ -27,6 +33,27 @@ export default function LessonPage() {
     api.get('/content/curriculum').then((res) => setCurriculum(res.data)).catch(() => {});
     window.scrollTo(0, 0);
   }, [lessonId]);
+
+  // Reading progress bar + scroll-spy TOC + back-to-top visibility.
+  useEffect(() => {
+    function onScroll() {
+      const el = document.documentElement;
+      const max = el.scrollHeight - el.clientHeight;
+      setScrollPct(max > 0 ? Math.min(100, (el.scrollTop / max) * 100) : 0);
+      setShowTop(el.scrollTop > 600);
+      const headings = articleRef.current?.querySelectorAll('h2, h3');
+      if (headings) {
+        let current = null;
+        for (const h of headings) {
+          if (h.getBoundingClientRect().top <= 96) current = h.id || slug(h.textContent);
+        }
+        setActiveToc(current);
+      }
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener('scroll', onScroll);
+  }, [lesson]);
 
   const toc = useMemo(() => {
     if (!lesson) return [];
@@ -48,6 +75,25 @@ export default function LessonPage() {
     return { prev: idx > 0 ? all[idx - 1] : null, next: idx >= 0 && idx < all.length - 1 ? all[idx + 1] : null };
   }, [curriculum, lesson]);
 
+  function flash(msg) {
+    setToast(msg);
+    window.clearTimeout(flash._t);
+    flash._t = window.setTimeout(() => setToast(null), 2000);
+  }
+
+  async function onToggle() {
+    await toggle(l?.id, completed);
+    flash(completed ? 'Marked as unread' : '✓ Lesson marked complete');
+  }
+
+  async function markAndContinue() {
+    if (!completed && user) {
+      await toggle(l.id, false);
+      flash('✓ Lesson marked complete');
+    }
+    if (nav.next) navigate(`/lessons/${nav.next.id}`);
+  }
+
   if (error) return <div className="call warn"><div className="ct">⚠ Lesson unavailable</div><p>{error}</p></div>;
   if (!lesson) return <div className="page-loading">Loading lesson…</div>;
 
@@ -56,6 +102,7 @@ export default function LessonPage() {
 
   return (
     <div className="page lesson">
+      <div className="readbar" style={{ width: `${scrollPct}%` }} />
       <div className="crumbs">
         <Link to="/">Academy</Link> <span className="sep">/</span>
         <Link to={`/modules/${l.moduleId}`}>{l.moduleTitle}</Link> <span className="sep">/</span>
@@ -75,9 +122,16 @@ export default function LessonPage() {
         <p className="lede">{l.summary}</p>
         <div className="head-actions">
           {user ? (
-            <button className={`btn ${completed ? 'donebtn' : 'primary'}`} onClick={() => toggle(l.id, completed)}>
-              {completed ? '✓ Completed — mark as unread' : 'Mark lesson complete'}
-            </button>
+            <>
+              <button className={`btn ${completed ? 'donebtn' : 'primary'}`} onClick={onToggle}>
+                {completed ? '✓ Completed — mark as unread' : 'Mark lesson complete'}
+              </button>
+              {nav.next && (
+                <button className="btn ghost" onClick={markAndContinue}>
+                  {completed ? 'Next lesson →' : 'Mark complete & continue →'}
+                </button>
+              )}
+            </>
           ) : (
             <Link to="/login" className="btn primary">Sign in to track progress</Link>
           )}
@@ -85,7 +139,7 @@ export default function LessonPage() {
       </div>
 
       <div className="lesson-layout">
-        <article className="lesson-body">
+        <article className="lesson-body" ref={articleRef}>
           <Markdown>{lesson.body}</Markdown>
 
           <div className="docsbox">
@@ -101,6 +155,21 @@ export default function LessonPage() {
               ))}
             </ul>
           </div>
+
+          {user && (
+            <div className="lesson-complete-cta">
+              {nav.next ? (
+                <button className="btn primary" onClick={markAndContinue}>
+                  {completed ? `Continue to next lesson →` : `Mark complete & continue →`}
+                </button>
+              ) : (
+                <div className="call ok">
+                  <div className="ct">🏁 You finished the curriculum!</div>
+                  <p>That was the last lesson. Review any module from the sidebar or ask the AI tutor about anything you missed.</p>
+                </div>
+              )}
+            </div>
+          )}
 
           <div className="pn">
             {nav.prev ? (
@@ -122,11 +191,23 @@ export default function LessonPage() {
           <aside className="toc">
             <div className="toc-title">ON THIS PAGE</div>
             {toc.map((h) => (
-              <a key={h.id} href={`#${h.id}`} style={{ paddingLeft: h.level === 3 ? 24 : 12 }}>{h.text}</a>
+              <a
+                key={h.id}
+                href={`#${h.id}`}
+                className={activeToc === h.id ? 'active' : ''}
+                style={{ paddingLeft: h.level === 3 ? 24 : 12 }}
+              >
+                {h.text}
+              </a>
             ))}
           </aside>
         )}
       </div>
+
+      {toast && <div className="toast" role="status">{toast}</div>}
+      {showTop && (
+        <button className="totop" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} aria-label="Back to top">↑</button>
+      )}
     </div>
   );
 }

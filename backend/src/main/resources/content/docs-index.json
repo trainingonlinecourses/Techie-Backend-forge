@@ -128,7 +128,74 @@
       {"title": "springdoc-openapi", "url": "https://springdoc.org/", "description": "OpenAPI 3 descriptors and Swagger UI generated from your controllers."},
       {"title": "OpenAPI Specification", "url": "https://swagger.io/specification/", "description": "The machine-readable contract format for HTTP APIs."},
       {"title": "REST Clients (RestClient, WebClient, HTTP interfaces)", "url": "https://docs.spring.io/spring-framework/reference/integration/rest-clients.html", "description": "Synchronous and reactive HTTP clients plus the Spring 6 typed interface clients."},
-      {"title": "WebSocket & STOMP", "url": "https://docs.spring.io/spring-framework/reference/web/websocket.html", "description": "Full-duplex messaging: STOMP endpoints, @MessageMapping and broker relays."}
+      {"title": "WebSocket & STOMP", "url": "https://docs.spring.io/spring-framework/reference/web/websocket.html", "description": "Full-duplex messaging: STOMP endpoints, @MessageMapping and broker relays."},
+      {"title": "Spring HATEOAS", "url": "https://docs.spring.io/spring-hateoas/reference/", "description": "Hypermedia APIs — EntityModel, link builders and self-describing resources."},
+      {"title": "Spring Data REST", "url": "https://docs.spring.io/spring-data/rest/reference/", "description": "Exposing repositories as HAL hypermedia APIs without controllers."}
+    ]
+  },
+  {
+    "title": "Java Testing",
+    "links": [
+      {"title": "JUnit 5 User Guide", "url": "https://junit.org/junit5/docs/current/user-guide/", "description": "Lifecycle, assertions, parameterized and repeated tests, extensions."},
+      {"title": "AssertJ", "url": "https://assertj.github.io/doc/", "description": "Fluent assertions for values, collections, exceptions and soft assertions."},
+      {"title": "Mockito", "url": "https://site.mockito.org/", "description": "Mocks, stubs, spies and verification for unit tests."},
+      {"title": "TestDouble (Martin Fowler)", "url": "https://martinfowler.com/bliki/TestDouble.html", "description": "The five kinds of test double and when to use each."},
+      {"title": "Test-Driven Development (Fowler)", "url": "https://martinfowler.com/bliki/TestDrivenDevelopment.html", "description": "The red-green-refactor loop and the design value of tests."},
+      {"title": "xUnit Test Patterns", "url": "https://xunitpatterns.com/Test%20Double.html", "description": "The classic test-double taxonomy in depth."}
+    ]
+  },
+  {
+    "title": "JVM Performance & Tuning",
+    "links": [
+      {"title": "Garbage Collection Tuning Guide", "url": "https://docs.oracle.com/en/java/javase/21/gctuning/", "description": "Generational collection, G1, ZGC, GC logs and tuning."},
+      {"title": "java tool reference", "url": "https://docs.oracle.com/en/java/javase/21/docs/specs/man/java.html", "description": "JVM flags, sizing and runtime options."},
+      {"title": "jcmd / jfr tools", "url": "https://docs.oracle.com/en/java/javase/21/docs/specs/man/jfr.html", "description": "Java Flight Recorder — production-safe profiling built into the JDK."},
+      {"title": "async-profiler", "url": "https://github.com/async-profiler/async-profiler", "description": "Safepoint-bias-free CPU, allocation, wall and lock flame graphs."},
+      {"title": "jmap tool", "url": "https://docs.oracle.com/en/java/javase/21/docs/specs/man/jmap.html", "description": "Heap dumps and JVM memory inspection."},
+      {"title": "Eclipse MAT", "url": "https://www.eclipse.org/mat/", "description": "Heap analysis: leak suspects, dominator tree, path to GC roots."}
+    ]
+  },
+  {
+    "title": "Database Migrations",
+    "links": [
+      {"title": "Flyway (Redgate)", "url": "https://documentation.red-gate.com/fd/", "description": "Versioned SQL migrations, checksums and the schema history table."},
+      {"title": "Liquibase", "url": "https://docs.liquibase.com/", "description": "Declarative changeSets, rollbacks and changelogs."},
+      {"title": "Parallel Change (Fowler)", "url": "https://martinfowler.com/bliki/ParallelChange.html", "description": "Expand-contract: safe schema evolution without downtime."},
+      {"title": "Spring Boot Data Initialization", "url": "https://docs.spring.io/spring-boot/reference/how-to/data-initialization.html", "description": "JPA import, script init, Flyway/Liquibase wiring and ordering."}
+    ]
+  },
+  {
+    "title": "Spring Modulith & Architecture",
+    "links": [
+      {"title": "Spring Modulith Reference", "url": "https://docs.spring.io/spring-modulith/reference/", "description": "Application modules, events with publication tracking, testing and docs."},
+      {"title": "Application Modules", "url": "https://docs.spring.io/spring-modulith/reference/application-modules.html", "description": "@ApplicationModule, named interfaces and the dependency rule."},
+      {"title": "Modulith Events", "url": "https://docs.spring.io/spring-modulith/reference/events.html", "description": "Reliable in-process events: publication registry, completion handlers."},
+      {"title": "Modulith Testing", "url": "https://docs.spring.io/spring-modulith/reference/testing.html", "description": "@ApplicationModuleTest and the Scenario DSL for event flows."},
+      {"title": "MonolithFirst (Fowler)", "url": "https://martinfowler.com/bliki/MonolithFirst.html", "description": "Why most teams should build a modular monolith before splitting."}
+    ]
+  },
+  {
+    "title": "Microservices Patterns",
+    "links": [
+      {"title": "Saga (microservices.io)", "url": "https://microservices.io/patterns/data/saga.html", "description": "Local transactions + compensation for distributed flows."},
+      {"title": "CQRS (microservices.io)", "url": "https://microservices.io/patterns/data/cqrs.html", "description": "Separating write and read models, projections."},
+      {"title": "CQRS (Fowler)", "url": "https://martinfowler.com/bliki/CQRS.html", "description": "The pattern and its trade-offs."},
+      {"title": "Event Sourcing (Fowler)", "url": "https://martinfowler.com/eaaDev/EventSourcing.html", "description": "The event log as the source of truth."},
+      {"title": "Strangler Fig (Fowler)", "url": "https://martinfowler.com/bliki/StranglerFigApplication.html", "description": "Incremental legacy replacement through a facade."},
+      {"title": "Data patterns index (microservices.io)", "url": "https://microservices.io/patterns/data/index.html", "description": "The full catalog of distributed data patterns."}
+    ]
+  },
+  {
+    "title": "Cloud Native — Docker & Kubernetes",
+    "links": [
+      {"title": "Docker Get Started", "url": "https://docs.docker.com/get-started/", "description": "Images, layers, containers and the basic workflow."},
+      {"title": "Dockerfile best practices", "url": "https://docs.docker.com/build/building/best-practices/", "description": "Multi-stage builds, layer caching, .dockerignore."},
+      {"title": "Kubernetes Concepts", "url": "https://kubernetes.io/docs/concepts/", "description": "Pods, deployments, services, control plane and reconciliation."},
+      {"title": "Kubernetes Basics tutorial", "url": "https://kubernetes.io/docs/tutorials/kubernetes-basics/", "description": "Hands-on intro to deployments, services and scaling."},
+      {"title": "Resource management (requests/limits)", "url": "https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/", "description": "Requests, limits and quality-of-service for containers."},
+      {"title": "ConfigMaps & Secrets", "url": "https://kubernetes.io/docs/concepts/configuration/configmap/", "description": "Configuration as first-class cluster objects."},
+      {"title": "Spring Boot on Kubernetes", "url": "https://docs.spring.io/spring-boot/reference/deployment/kubernetes.html", "description": "Probes, health endpoints and deployment notes for Boot apps."},
+      {"title": "12-factor app", "url": "https://12factor.net/", "description": "The twelve factors of deployable applications."}
     ]
   },
   {

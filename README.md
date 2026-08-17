@@ -30,11 +30,17 @@ It is **not** a static site. It is a real application:
 | 11 Spring Data Beyond JPA | 6 | Repositories & query methods, projections, MongoDB, Redis, Spring Data JDBC aggregates, cache abstraction |
 | 12 APIs Beyond REST | 6 | GraphQL (schema, queries, mutations, errors), OpenAPI/springdoc, REST Docs, HTTP clients, WebSocket/STOMP |
 | 13 Security: OAuth2 & Hardening | 5 | Authorization server, JWT resource server, SSO/OAuth2 client, session management, OWASP Top 10 |
+| 14 Java Testing: JUnit 5 & TDD | 6 | JUnit 5 lifecycle/assertions, AssertJ, Mockito, parameterized tests, test doubles, TDD & legacy code |
+| 15 JVM Performance & Tuning | 5 | Memory regions, garbage collection (G1/ZGC), JFR + async profiler, heap-dump analysis, tuning checklist |
+| 16 Database Migrations & Schema Evolution | 4 | Flyway, Liquibase, expand-contract schema evolution, seed data & environments |
+| 17 Spring Modulith & Modular Monoliths | 4 | Monolith vs microservices, @ApplicationModule, reliable in-process events, architecture-as-test |
+| 18 Microservices Architecture Patterns | 5 | Saga, CQRS, event sourcing, strangler fig migration, distributed data consistency |
+| 19 Cloud Native: Docker & Kubernetes | 6 | Docker images & multi-stage builds, k8s objects, Spring probes/limits, ConfigMaps/Secrets, 12-factor |
 
 Every lesson includes: explanation, runnable code, an *"Why it matters (organizational view)"* callout,
 and links to the authoritative reference on docs.spring.io. The **Docs index** page organizes
-90 official links (Framework, Boot, Security, AI, Cloud, Kafka, WebFlux, Data, Batch, GraphQL,
-REST Docs, Java, OWASP, Maven/Gradle).
+130+ official links (Framework, Boot, Security, AI, Cloud, Kafka, WebFlux, Data, Batch, GraphQL,
+REST Docs, Testing, JVM, Migrations, Modulith, Microservices, Kubernetes, Java, OWASP, Maven/Gradle).
 
 ## Run it
 
@@ -158,7 +164,7 @@ claims, JSON 401/403 via `AuthenticationEntryPoint`/`AccessDeniedHandler`.
 │   └── src/main/resources/content/
 │       ├── modules.json      curriculum metadata
 │       ├── docs-index.json   curated docs.spring.io index
-│       └── lessons/<module>/ 110 markdown lessons (loaded + searched at runtime)
+│       └── lessons/<module>/ 144 markdown lessons (loaded + searched at runtime)
 ├── frontend/                 React SPA
 └── projects/payments-api/    Capstone: complete runnable payments API
 ```

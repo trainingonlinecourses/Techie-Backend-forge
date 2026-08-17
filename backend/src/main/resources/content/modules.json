@@ -115,5 +115,59 @@
     "color": "#bb9af7",
     "tech": ["OAuth2", "OIDC", "Sessions", "PKCE", "OWASP"],
     "docsUrl": "https://docs.spring.io/spring-security/reference/"
+  },
+  {
+    "id": "java-testing",
+    "title": "Java Testing: JUnit 5 & TDD",
+    "subtitle": "JUnit 5 lifecycle and assertions, AssertJ fluent matchers, Mockito, parameterized tests, the test-double taxonomy and TDD for legacy code.",
+    "order": 14,
+    "color": "#e0af68",
+    "tech": ["JUnit 5", "AssertJ", "Mockito", "TDD", "Test Doubles"],
+    "docsUrl": "https://junit.org/junit5/docs/current/user-guide/"
+  },
+  {
+    "id": "jvm-performance",
+    "title": "JVM Performance & Tuning",
+    "subtitle": "Memory regions, garbage collectors, JFR and async-profiler, heap-dump analysis and the measurement-first tuning checklist.",
+    "order": 15,
+    "color": "#9ece6a",
+    "tech": ["JFR", "GC", "Heap Analysis", "Profiling", "Tuning"],
+    "docsUrl": "https://docs.oracle.com/en/java/javase/21/gctuning/"
+  },
+  {
+    "id": "db-migrations",
+    "title": "Database Migrations & Schema Evolution",
+    "subtitle": "Flyway and Liquibase migrations-as-code, the expand-contract pattern for zero-downtime changes, backfills and environment seed data.",
+    "order": 16,
+    "color": "#7dcfff",
+    "tech": ["Flyway", "Liquibase", "Expand-Contract", "Backfills", "Seeding"],
+    "docsUrl": "https://documentation.red-gate.com/fd/"
+  },
+  {
+    "id": "spring-modulith",
+    "title": "Spring Modulith & Modular Monoliths",
+    "subtitle": "Modular monolith vs microservices, @ApplicationModule boundaries, reliable in-process events with publication tracking, and architecture-as-test.",
+    "order": 17,
+    "color": "#bb9af7",
+    "tech": ["Modular Monolith", "Application Modules", "Events", "Verification"],
+    "docsUrl": "https://docs.spring.io/spring-modulith/reference/"
+  },
+  {
+    "id": "microservices-patterns",
+    "title": "Microservices Architecture Patterns",
+    "subtitle": "Saga choreography and orchestration, CQRS read models, event sourcing, the strangler fig migration and distributed data consistency.",
+    "order": 18,
+    "color": "#f7768e",
+    "tech": ["Saga", "CQRS", "Event Sourcing", "Strangler Fig", "Consistency"],
+    "docsUrl": "https://microservices.io/patterns/index.html"
+  },
+  {
+    "id": "cloud-native",
+    "title": "Cloud Native: Docker & Kubernetes",
+    "subtitle": "Docker images and multi-stage builds, Kubernetes objects and reconciliation, deploying Spring Boot with probes and limits, ConfigMaps/Secrets and 12-factor production.",
+    "order": 19,
+    "color": "#2ac3de",
+    "tech": ["Docker", "Kubernetes", "Probes", "ConfigMaps", "12-Factor"],
+    "docsUrl": "https://kubernetes.io/docs/concepts/"
   }
 ]

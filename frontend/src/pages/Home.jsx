@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../api/client';
 import { useAuth } from '../context/AuthContext.jsx';
@@ -25,6 +25,18 @@ export default function Home() {
       .catch(() => setCurriculum(FALLBACK_CURRICULUM));
   }, [user]);
 
+  // The next incomplete lesson, in curriculum order — powers the "Continue learning" card.
+  const nextLesson = useMemo(() => {
+    if (!Array.isArray(curriculum)) return null;
+    for (const m of curriculum) {
+      const next = m.lessons.find((l) => !progress[l.id]);
+      if (next) return { module: m.module, lesson: next };
+    }
+    return null;
+  }, [curriculum, progress]);
+
+  const totalLessons = curriculum?.reduce((n, m) => n + (m.module.lessonCount ?? m.lessons.length), 0) ?? 0;
+
   return (
     <div className="home">
       <section className="hero">
@@ -48,11 +60,34 @@ export default function Home() {
             {!user && <Link to="/register" className="btn ghost">Create account · track progress</Link>}
           </div>
           <div className="stats">
-            <div className="stat"><div className="v">{stats?.lessons ?? '110'}</div><div className="l">LESSONS</div></div>
-            <div className="stat"><div className="v">{stats?.modules ?? 13}</div><div className="l">MODULES</div></div>
-            <div className="stat"><div className="v">{(stats?.minutes ?? 1825) / 60 | 0}<b>h</b></div><div className="l">CURRICULUM</div></div>
-            <div className="stat"><div className="v">{stats?.docsLinks ?? 90}+</div><div className="l">DOC LINKS</div></div>
+            <div className="stat"><div className="v">{stats?.lessons ?? '144'}</div><div className="l">LESSONS</div></div>
+            <div className="stat"><div className="v">{stats?.modules ?? 19}</div><div className="l">MODULES</div></div>
+            <div className="stat"><div className="v">{(stats?.minutes ?? 2308) / 60 | 0}<b>h</b></div><div className="l">CURRICULUM</div></div>
+            <div className="stat"><div className="v">{stats?.docsLinks ?? 127}+</div><div className="l">DOC LINKS</div></div>
           </div>
+
+          {user && nextLesson && (
+            <div className="continuecard">
+              <div className="cc-info">
+                <span className="cc-label">CONTINUE LEARNING</span>
+                <Link to={`/lessons/${nextLesson.lesson.id}`} className="cc-title">{nextLesson.lesson.title}</Link>
+                <span className="cc-mod">
+                  MODULE {String(nextLesson.module.order).padStart(2, '0')} · {nextLesson.module.title}
+                </span>
+              </div>
+              <Link to={`/lessons/${nextLesson.lesson.id}`} className="btn primary">Continue →</Link>
+            </div>
+          )}
+          {user && !nextLesson && totalLessons > 0 && (
+            <div className="continuecard done">
+              <div className="cc-info">
+                <span className="cc-label">🏁 ALL DONE</span>
+                <span className="cc-title">You completed all {totalLessons} lessons — outstanding!</span>
+                <span className="cc-mod">Revisit any module from the sidebar or ask the AI tutor.</span>
+              </div>
+              <Link to="/chat" className="btn primary">Ask the AI tutor →</Link>
+            </div>
+          )}
         </div>
       </section>
 
@@ -66,7 +101,7 @@ export default function Home() {
 
       <h2 className="sec">The curriculum</h2>
       <p className="lede">
-        Thirteen modules, ordered the way an organization rolls out Java and Spring: foundation first,
+        Nineteen modules, ordered the way an organization rolls out Java and Spring: foundation first,
         then the framework, then production practice — finishing with a complete runnable project.
       </p>
       <div className="modgrid">
@@ -97,7 +132,7 @@ export default function Home() {
         <div className="bcol ok">
           <h4>LEARN</h4>
           <ul>
-            <li>110 lessons with explanations + runnable code</li>
+            <li>144 lessons with explanations + runnable code</li>
             <li>Every topic linked to its official docs</li>
             <li>Marked from the sidebar; progress is saved</li>
           </ul>
