@@ -41,20 +41,20 @@ public class ContentService {
                 .toList();
     }
 
-    /** The whole curriculum tree (modules + ordered lessons) in two queries. */
+    /** The whole curriculum tree (modules + ordered lessons) in two lightweight queries. */
     public List<CurriculumModule> curriculum() {
         List<Module> mods = modules.findAllByOrderByOrderIndexAsc();
         Map<String, String> titles = mods.stream()
                 .collect(Collectors.toMap(Module::getId, Module::getTitle));
-        Map<String, List<Lesson>> byModule = lessons.findAll().stream()
-                .collect(Collectors.groupingBy(Lesson::getModuleId));
+        Map<String, List<LessonSummaryData>> byModule = lessons.findAllSummaries().stream()
+                .collect(Collectors.groupingBy(LessonSummaryData::moduleId));
         return mods.stream().map(m -> {
-            List<Lesson> ls = byModule.getOrDefault(m.getId(), List.of());
+            List<LessonSummaryData> ls = byModule.getOrDefault(m.getId(), List.of());
             List<LessonSummaryDto> summaries = ls.stream()
-                    .map(l -> LessonSummaryDto.from(l, titles.get(l.getModuleId())))
+                    .map(l -> LessonSummaryDto.from(l, titles.get(l.moduleId())))
                     .toList();
             return new CurriculumModule(ModuleDto.from(m, ls.size(),
-                    ls.stream().mapToInt(Lesson::getMinutes).sum()), summaries);
+                    ls.stream().mapToInt(LessonSummaryData::minutes).sum()), summaries);
         }).toList();
     }
 

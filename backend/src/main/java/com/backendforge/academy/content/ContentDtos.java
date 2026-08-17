@@ -22,6 +22,12 @@ public final class ContentDtos {
                     l.getTitle(), l.getSummary(), l.getOrderIndex(), l.getMinutes(),
                     l.getTopics(), l.isCapstone());
         }
+
+        /** Summary-tree variant — no body and no topics/docs collections in the payload. */
+        public static LessonSummaryDto from(LessonSummaryData d, String moduleTitle) {
+            return new LessonSummaryDto(d.id(), d.moduleId(), moduleTitle, d.title(), d.summary(),
+                    d.order(), d.minutes(), List.of(), d.capstone());
+        }
     }
 
     public record LessonDto(LessonSummaryDto lesson, String body, List<String> docs) {
