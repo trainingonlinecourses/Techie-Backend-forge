@@ -164,7 +164,7 @@ claims, JSON 401/403 via `AuthenticationEntryPoint`/`AccessDeniedHandler`.
 │   └── src/main/resources/content/
 │       ├── modules.json      curriculum metadata
 │       ├── docs-index.json   curated docs.spring.io index
-│       └── lessons/<module>/ 144 markdown lessons (loaded + searched at runtime)
+│       └── lessons/<module>/ 148 markdown lessons (loaded + searched at runtime)
 ├── frontend/                 React SPA
 └── projects/payments-api/    Capstone: complete runnable payments API
 ```

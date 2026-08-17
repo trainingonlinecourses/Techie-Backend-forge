@@ -169,5 +169,14 @@
     "color": "#2ac3de",
     "tech": ["Docker", "Kubernetes", "Probes", "ConfigMaps", "12-Factor"],
     "docsUrl": "https://kubernetes.io/docs/concepts/"
+  },
+  {
+    "id": "spring-aop",
+    "title": "Spring AOP: Aspects in Depth",
+    "subtitle": "Cross-cutting concerns done right — pointcut designators, all five advice types, aspect configuration and proxying, with full code walkthroughs.",
+    "order": 20,
+    "color": "#e0af68",
+    "tech": ["AOP", "Pointcuts", "Advice", "Proxies", "Aspects"],
+    "docsUrl": "https://docs.spring.io/spring-framework/reference/core/aop.html"
   }
 ]

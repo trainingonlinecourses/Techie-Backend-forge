@@ -3,13 +3,19 @@ import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../api/client';
 import { useAuth } from '../context/AuthContext.jsx';
 
-export default function Navbar() {
+export default function Navbar({ onMenu, drawerOpen }) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [query, setQuery] = useState('');
   const [stats, setStats] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [theme, setTheme] = useState(() => localStorage.getItem('bf-theme') || 'dark');
   const menuRef = useRef(null);
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('bf-theme', theme);
+  }, [theme]);
 
   useEffect(() => {
     api
@@ -47,6 +53,10 @@ export default function Navbar() {
 
   return (
     <header>
+      <button className="hambtn" onClick={onMenu} aria-label="Toggle curriculum menu" aria-expanded={!!drawerOpen}>
+        {drawerOpen ? '✕' : '☰'}
+      </button>
+
       <Link to="/" className="logo">
         <div className="mark">&gt;_</div>
         <div>
@@ -57,12 +67,21 @@ export default function Navbar() {
         </div>
       </Link>
 
+      <button
+        className="themebtn"
+        onClick={() => setTheme((t) => (t === 'dark' ? 'light' : 'dark'))}
+        title="Toggle light / dark theme"
+        aria-label="Toggle color theme"
+      >
+        {theme === 'dark' ? '☀' : '🌙'}
+      </button>
+
       <form className="searchwrap" onSubmit={submitSearch}>
         <span className="ic">⌕</span>
         <input
           id="nav-search"
           type="text"
-          placeholder="search 144 lessons — jwt, outbox, saga, k8s, RAG…"
+          placeholder="search 148 lessons — jwt, outbox, saga, k8s, RAG…"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />

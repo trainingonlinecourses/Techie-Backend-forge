@@ -25,6 +25,11 @@ function Protected({ children }) {
 export default function App() {
   const { progress } = useProgress();
   const [apiDown, setApiDown] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
+  // Close the mobile drawer whenever the route changes.
+  const location = window.location.pathname;
+  useEffect(() => setDrawerOpen(false), [location]);
 
   // Probe the API once: if it's unreachable (e.g. static-only deployment without a
   // backend), show a banner so login/lessons/AI-tutor being unavailable is clear.
@@ -47,8 +52,9 @@ export default function App() {
           <code>VITE_API_URL</code> to make this site fully live (see README).
         </div>
       )}
-      <Navbar />
-      <div className="layout">
+      <Navbar onMenu={() => setDrawerOpen((v) => !v)} drawerOpen={drawerOpen} />
+      <div className={`layout ${drawerOpen ? 'drawer-open' : ''}`} onClick={() => drawerOpen && setDrawerOpen(false)}>
+        <div className="drawer-backdrop" onClick={() => setDrawerOpen(false)} />
         <Sidebar progress={progress} />
         <main id="main">
           <Routes>
