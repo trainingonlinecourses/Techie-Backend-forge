@@ -14,7 +14,7 @@ import java.net.URISyntaxException;
  * Hosting-platform persistence.
  *
  * <p>Render and Railway inject a Postgres connection string as the
- * {@code DATABASE_URL} environment variable ({@code postgres://user:password@host:port/database}),
+ * {@code DATABASE_URL} environment variable ({@code postgres://…} or {@code postgresql://…}),
  * which Spring Boot cannot consume directly. When that variable is present we build the JDBC
  * DataSource from it — so user registrations, progress and chat history live in Postgres and
  * survive web-service redeploys. Locally (no {@code DATABASE_URL}) the app keeps using the
@@ -27,8 +27,11 @@ public class DatabaseConfig {
     @ConditionalOnProperty(name = "DATABASE_URL")
     DataSource dataSource(Environment env) throws URISyntaxException {
         URI uri = new URI(env.getProperty("DATABASE_URL"));
-        if (!"postgres".equalsIgnoreCase(uri.getScheme())) {
-            throw new IllegalArgumentException("Unsupported DATABASE_URL scheme: " + uri.getScheme());
+        // Render and Railway both use postgres:// in their docs, but Render has been
+        // observed injecting postgresql:// — accept either scheme.
+        String scheme = uri.getScheme();
+        if (!("postgres".equalsIgnoreCase(scheme) || "postgresql".equalsIgnoreCase(scheme))) {
+            throw new IllegalArgumentException("Unsupported DATABASE_URL scheme: " + scheme);
         }
 
         int port = uri.getPort() > 0 ? uri.getPort() : 5432;
