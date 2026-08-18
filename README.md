@@ -60,7 +60,7 @@ It is **not** a static site. It is a real application:
 
 Every lesson includes: explanation, runnable code, an *"Why it matters (organizational view)"* callout,
 and links to the authoritative reference on docs.spring.io. The **Docs index** page organizes
-179 official links (Framework, Boot, Security, AI, Cloud, Kafka, WebFlux, Data, Batch, GraphQL,
+303 official links (Framework, Boot, Security, AI, Cloud, Kafka, WebFlux, Data, Batch, GraphQL,
 REST Docs, Testing, JVM, Migrations, Modulith, Microservices, Kubernetes, Java, OWASP, Maven/Gradle,
 Scheduling, Caching, REST Design, Observability, CI/CD, AMQP, JDBC, Modern Java, Transactions, gRPC,
 DDD, PostgreSQL, Distributed Systems, Spring Data JPA).
@@ -187,7 +187,7 @@ claims, JSON 401/403 via `AuthenticationEntryPoint`/`AccessDeniedHandler`.
 │   └── src/main/resources/content/
 │       ├── modules.json      curriculum metadata
 │       ├── docs-index.json   curated docs.spring.io index
-│       └── lessons/<module>/ 348 markdown lessons (loaded + searched at runtime)
+│       └── lessons/<module>/ 448 markdown lessons (loaded + searched at runtime)
 ├── frontend/                 React SPA
 └── projects/payments-api/    Capstone: complete runnable payments API
 ```

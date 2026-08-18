@@ -1458,5 +1458,415 @@
         "description": "Reference and tutorials."
       }
     ]
+  },
+  {
+    "title": "Java Generics",
+    "links": [
+      {
+        "title": "Generics tutorial (Oracle)",
+        "url": "https://docs.oracle.com/javase/tutorial/java/generics/index.html",
+        "description": "Official generics tutorial: type parameters, wildcards, generic methods, erasure."
+      },
+      {
+        "title": "Java Generics FAQ",
+        "url": "http://www.angelikalanger.com/GenericsFAQ/JavaGenericsFAQ.html",
+        "description": "The definitive deep dive into generics, wildcards, and erasure edge cases."
+      },
+      {
+        "title": "Type Erasure (JLS)",
+        "url": "https://docs.oracle.com/javase/specs/jls/se21/html/jls-4.html#jls-4.6",
+        "description": "The Java Language Specification section that defines how type erasure works."
+      }
+    ]
+  },
+  {
+    "title": "Java Exceptions",
+    "links": [
+      {
+        "title": "Exceptions tutorial (Oracle)",
+        "url": "https://docs.oracle.com/javase/tutorial/essential/exceptions/index.html",
+        "description": "Official tutorial: the exception hierarchy, try-with-resources, custom exceptions."
+      },
+      {
+        "title": "Unchecked Exceptions — The Controversy (Oracle)",
+        "url": "https://docs.oracle.com/javase/tutorial/essential/exceptions/runtime.html",
+        "description": "Why the Java platform designers allowed unchecked exceptions and when to use them."
+      },
+      {
+        "title": "Effective Java exceptions chapter",
+        "url": "https://www.oreilly.com/library/view/effective-java/9780134686097/",
+        "description": "Bloch's rules: exception translation, failure atomicity, and API design with exceptions."
+      }
+    ]
+  },
+  {
+    "title": "Reflection & Annotations",
+    "links": [
+      {
+        "title": "Reflection API (Oracle)",
+        "url": "https://docs.oracle.com/javase/tutorial/reflect/index.html",
+        "description": "Official reflection tutorial: classes, members, arrays, proxies, and the security model."
+      },
+      {
+        "title": "Annotations tutorial (Oracle)",
+        "url": "https://docs.oracle.com/javase/tutorial/java/annotations/index.html",
+        "description": "Declaring and using annotations, repeatable annotations, and processing them."
+      },
+      {
+        "title": "java.lang.reflect.Proxy",
+        "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/reflect/Proxy.html",
+        "description": "JDK dynamic proxies — the foundation Spring AOP is built on."
+      },
+      {
+        "title": "Method Handles",
+        "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/invoke/MethodHandle.html",
+        "description": "The faster, type-checked successor to reflection for method invocation."
+      }
+    ]
+  },
+  {
+    "title": "Java Networking",
+    "links": [
+      {
+        "title": "Networking tutorial (Oracle)",
+        "url": "https://docs.oracle.com/javase/tutorial/networking/index.html",
+        "description": "Official tutorial: URLs, sockets, datagrams, and secure networking."
+      },
+      {
+        "title": "java.net.http.HttpClient",
+        "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.net.http/java/net/http/HttpClient.html",
+        "description": "The modern HTTP client: sync/async, HTTP/2, and reactive streams."
+      },
+      {
+        "title": "New I/O (NIO) tutorial",
+        "url": "https://docs.oracle.com/javase/tutorial/essential/io/fileio.html",
+        "description": "Channels, buffers, and selectors — non-blocking networking in the JDK."
+      }
+    ]
+  },
+  {
+    "title": "Data Structures & Algorithms",
+    "links": [
+      {
+        "title": "Algorithms, 4th ed. (Sedgewick)",
+        "url": "https://algs4.cs.princeton.edu/home/",
+        "description": "The classic free textbook with Java implementations of every core algorithm."
+      },
+      {
+        "title": "Big-O Cheat Sheet",
+        "url": "https://www.bigocheatsheet.com/",
+        "description": "Complexity of every common data structure and algorithm at a glance."
+      },
+      {
+        "title": "Visualgo",
+        "url": "https://visualgo.net/",
+        "description": "Interactive visualizations of sorting, trees, graphs, and more."
+      }
+    ]
+  },
+  {
+    "title": "Redis",
+    "links": [
+      {
+        "title": "Redis documentation",
+        "url": "https://redis.io/docs/latest/",
+        "description": "The official Redis docs: data types, persistence, replication, clustering, modules."
+      },
+      {
+        "title": "Spring Data Redis",
+        "url": "https://docs.spring.io/spring-data/redis/reference/",
+        "description": "Spring Data Redis reference: RedisTemplate, repositories, caching, pub/sub."
+      },
+      {
+        "title": "Redis University",
+        "url": "https://university.redis.com/",
+        "description": "Free courses on Redis data structures and production patterns."
+      }
+    ]
+  },
+  {
+    "title": "MongoDB",
+    "links": [
+      {
+        "title": "MongoDB manual",
+        "url": "https://www.mongodb.com/docs/manual/",
+        "description": "The official manual: document model, CRUD, aggregation, indexes, operations."
+      },
+      {
+        "title": "Spring Data MongoDB",
+        "url": "https://docs.spring.io/spring-data/mongodb/reference/",
+        "description": "Spring Data MongoDB reference: repositories, mapping, aggregation, transactions."
+      },
+      {
+        "title": "MongoDB University",
+        "url": "https://learn.mongodb.com/",
+        "description": "Free courses on the document model and aggregation pipelines."
+      }
+    ]
+  },
+  {
+    "title": "Apache Kafka",
+    "links": [
+      {
+        "title": "Kafka documentation",
+        "url": "https://kafka.apache.org/documentation/",
+        "description": "The official Kafka docs: architecture, design, protocols, and operations."
+      },
+      {
+        "title": "Spring for Apache Kafka",
+        "url": "https://docs.spring.io/spring-kafka/reference/",
+        "description": "Spring Kafka reference: listeners, producers, transactions, and error handling."
+      },
+      {
+        "title": "Confluent developer docs",
+        "url": "https://developer.confluent.io/",
+        "description": "Tutorials and courses on Kafka internals, exactly-once, and stream processing."
+      }
+    ]
+  },
+  {
+    "title": "Elasticsearch",
+    "links": [
+      {
+        "title": "Elasticsearch guide",
+        "url": "https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html",
+        "description": "The official Elasticsearch reference: mapping, analysis, the query DSL, aggregation."
+      },
+      {
+        "title": "Spring Data Elasticsearch",
+        "url": "https://docs.spring.io/spring-data/elasticsearch/reference/",
+        "description": "Spring Data Elasticsearch reference: repositories, queries, and indexing."
+      },
+      {
+        "title": "Elasticsearch: The Definitive Guide",
+        "url": "https://www.elastic.co/guide/en/elasticsearch/guide/current/index.html",
+        "description": "The classic deep-dive book, now free online."
+      }
+    ]
+  },
+  {
+    "title": "Advanced SQL",
+    "links": [
+      {
+        "title": "PostgreSQL documentation",
+        "url": "https://www.postgresql.org/docs/current/",
+        "description": "The reference for window functions, CTEs, EXPLAIN, and every SQL feature."
+      },
+      {
+        "title": "SQL Window Functions (PostgreSQL)",
+        "url": "https://www.postgresql.org/docs/current/tutorial-window.html",
+        "description": "The official tutorial on window functions and how they differ from aggregates."
+      },
+      {
+        "title": "Use The Index, Luke",
+        "url": "https://use-the-index-luke.com/",
+        "description": "A free book on SQL indexing and query performance, language-agnostic."
+      }
+    ]
+  },
+  {
+    "title": "Kubernetes",
+    "links": [
+      {
+        "title": "Kubernetes documentation",
+        "url": "https://kubernetes.io/docs/home/",
+        "description": "The official docs: architecture, workloads, services, config, security, networking."
+      },
+      {
+        "title": "Kubernetes in Action (online)",
+        "url": "https://www.manning.com/books/kubernetes-in-action",
+        "description": "The classic hands-on book on running containers with Kubernetes."
+      },
+      {
+        "title": "Kubernetes the Hard Way",
+        "url": "https://github.com/kelseyhightower/kubernetes-the-hard-way",
+        "description": "Bootstrap a cluster from scratch to learn every moving part."
+      }
+    ]
+  },
+  {
+    "title": "Terraform",
+    "links": [
+      {
+        "title": "Terraform documentation",
+        "url": "https://developer.hashicorp.com/terraform/docs",
+        "description": "The official docs: HCL, state, providers, modules, and the CLI workflow."
+      },
+      {
+        "title": "Terraform tutorials (HashiCorp)",
+        "url": "https://developer.hashicorp.com/terraform/tutorials",
+        "description": "Free hands-on tutorials from basics to advanced patterns."
+      },
+      {
+        "title": "Terraform: Up & Running (online)",
+        "url": "https://www.terraformupandrunning.com/",
+        "description": "The widely recommended book on writing Terraform at scale."
+      }
+    ]
+  },
+  {
+    "title": "JUnit 5",
+    "links": [
+      {
+        "title": "JUnit 5 user guide",
+        "url": "https://junit.org/junit5/docs/current/user-guide/",
+        "description": "The official user guide: architecture, assertions, parameterized tests, extensions."
+      },
+      {
+        "title": "JUnit 5 API (javadoc)",
+        "url": "https://junit.org/junit5/docs/current/api/",
+        "description": "The complete JUnit 5 API reference."
+      },
+      {
+        "title": "Spring Boot testing docs",
+        "url": "https://docs.spring.io/spring-boot/reference/testing/index.html",
+        "description": "Testing Spring Boot applications with JUnit 5, slices, and MockMvc."
+      }
+    ]
+  },
+  {
+    "title": "Mockito",
+    "links": [
+      {
+        "title": "Mockito documentation",
+        "url": "https://javadoc.io/doc/org.mockito/mockito-core/latest/org/mockito/Mockito.html",
+        "description": "The official Mockito docs: stubbing, verification, argument matchers, BDD."
+      },
+      {
+        "title": "Mockito wiki",
+        "url": "https://github.com/mockito/mockito/wiki",
+        "description": "Best practices, pitfalls, and recipes from the Mockito team."
+      },
+      {
+        "title": "Spring Boot @MockBean reference",
+        "url": "https://docs.spring.io/spring-boot/reference/testing/spring-boot-applications.html",
+        "description": "Replacing beans with mocks in Spring Boot tests."
+      }
+    ]
+  },
+  {
+    "title": "OAuth2 & OpenID Connect",
+    "links": [
+      {
+        "title": "OAuth 2.0 spec (RFC 6749)",
+        "url": "https://datatracker.ietf.org/doc/html/rfc6749",
+        "description": "The OAuth2 specification: grant types, tokens, and endpoints."
+      },
+      {
+        "title": "OpenID Connect spec",
+        "url": "https://openid.net/developers/how-connect-works/",
+        "description": "The OIDC specification and how identity builds on OAuth2."
+      },
+      {
+        "title": "Spring Security OAuth2 docs",
+        "url": "https://docs.spring.io/spring-security/reference/servlet/oauth2/index.html",
+        "description": "Spring Security's OAuth2/OIDC client and resource-server support."
+      },
+      {
+        "title": "OAuth 2.0 and OIDC in Plain English",
+        "url": "https://developer.okta.com/blog/2017/06/21/what-the-heck-is-oauth",
+        "description": "A friendly deep dive into the flows, scopes, and tokens."
+      }
+    ]
+  },
+  {
+    "title": "OWASP Web Security",
+    "links": [
+      {
+        "title": "OWASP Top 10",
+        "url": "https://owasp.org/Top10/",
+        "description": "The current Top 10 web application security risks, with mitigations."
+      },
+      {
+        "title": "OWASP Cheat Sheet Series",
+        "url": "https://cheatsheetseries.owasp.org/",
+        "description": "Practical, concise cheat sheets for every security topic."
+      },
+      {
+        "title": "OWASP ASVS",
+        "url": "https://owasp.org/www-project-application-security-verification-standard/",
+        "description": "The Application Security Verification Standard — a checklist for secure apps."
+      }
+    ]
+  },
+  {
+    "title": "Jackson & JSON",
+    "links": [
+      {
+        "title": "Jackson documentation",
+        "url": "https://github.com/FasterXML/jackson-docs",
+        "description": "Official Jackson docs: databind, annotations, performance, and extensions."
+      },
+      {
+        "title": "FasterXML/jackson-databind",
+        "url": "https://github.com/FasterXML/jackson-databind",
+        "description": "The core databind module source and issue tracker."
+      },
+      {
+        "title": "JSON Schema",
+        "url": "https://json-schema.org/",
+        "description": "The JSON Schema specification and learning resources."
+      }
+    ]
+  },
+  {
+    "title": "Event-Driven Architecture",
+    "links": [
+      {
+        "title": "Microservices.io patterns",
+        "url": "https://microservices.io/patterns/data/event-driven.html",
+        "description": "Chris Richardson's catalog: event-driven architecture, outbox, saga, CQRS."
+      },
+      {
+        "title": "The Outbox Pattern (microservices.io)",
+        "url": "https://microservices.io/patterns/data/transactional-outbox.html",
+        "description": "The transactional outbox pattern in detail."
+      },
+      {
+        "title": "Event Sourcing (microservices.io)",
+        "url": "https://microservices.io/patterns/data/event-sourcing.html",
+        "description": "Event sourcing explained with pros, cons, and trade-offs."
+      }
+    ]
+  },
+  {
+    "title": "Spring Integration",
+    "links": [
+      {
+        "title": "Spring Integration reference",
+        "url": "https://docs.spring.io/spring-integration/reference/",
+        "description": "The official reference: channels, gateways, routers, transformers, adapters."
+      },
+      {
+        "title": "Enterprise Integration Patterns",
+        "url": "https://www.enterpriseintegrationpatterns.com/",
+        "description": "The EIP catalog that Spring Integration implements."
+      },
+      {
+        "title": "Spring Integration on GitHub",
+        "url": "https://github.com/spring-projects/spring-integration",
+        "description": "Source, samples, and issue tracker."
+      }
+    ]
+  },
+  {
+    "title": "GraalVM Native",
+    "links": [
+      {
+        "title": "GraalVM documentation",
+        "url": "https://www.graalvm.org/latest/docs/",
+        "description": "The official GraalVM docs: native image, AOT, and tooling."
+      },
+      {
+        "title": "Spring Boot native image docs",
+        "url": "https://docs.spring.io/spring-boot/reference/packaging/native-image/index.html",
+        "description": "Compiling Spring Boot apps to native executables with GraalVM."
+      },
+      {
+        "title": "Reachability Metadata Repository",
+        "url": "https://github.com/oracle/graalvm-reachability-metadata",
+        "description": "The metadata that makes third-party libraries work in native images."
+      }
+    ]
   }
 ]

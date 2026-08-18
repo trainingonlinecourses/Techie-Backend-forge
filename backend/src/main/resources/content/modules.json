@@ -890,5 +890,286 @@
       "GitHub Flow"
     ],
     "docsUrl": "https://git-scm.com/doc"
+  },
+  {
+    "id": "java-generics-deep",
+    "title": "Java Generics Deep",
+    "subtitle": "Type parameters, wildcards, erasure, and generic methods — the full generics system explained from first principles.",
+    "order": 61,
+    "color": "#f5a623",
+    "tech": [
+      "Generics",
+      "Type Safety",
+      "Erasure"
+    ],
+    "docsUrl": "https://docs.oracle.com/javase/tutorial/java/generics/index.html"
+  },
+  {
+    "id": "java-exceptions-deep",
+    "title": "Java Exceptions Deep",
+    "subtitle": "The exception hierarchy, try-with-resources, custom exceptions, and error-handling design that scales.",
+    "order": 62,
+    "color": "#ff6b6b",
+    "tech": [
+      "Exceptions",
+      "Try-with-Resources",
+      "Error Handling"
+    ],
+    "docsUrl": "https://docs.oracle.com/javase/tutorial/essential/exceptions/index.html"
+  },
+  {
+    "id": "java-reflection-annotations",
+    "title": "Reflection and Annotations Deep",
+    "subtitle": "Reflection, custom annotations, dynamic proxies, and method handles — the machinery behind every framework.",
+    "order": 63,
+    "color": "#bb9af7",
+    "tech": [
+      "Reflection",
+      "Annotations",
+      "Proxies"
+    ],
+    "docsUrl": "https://docs.oracle.com/javase/tutorial/reflect/index.html"
+  },
+  {
+    "id": "java-networking",
+    "title": "Java Networking",
+    "subtitle": "Sockets, HTTP clients, NIO selectors, and TLS — the full network programming stack in the JDK.",
+    "order": 64,
+    "color": "#7dcfff",
+    "tech": [
+      "Sockets",
+      "HttpClient",
+      "NIO",
+      "TLS"
+    ],
+    "docsUrl": "https://docs.oracle.com/javase/tutorial/networking/index.html"
+  },
+  {
+    "id": "data-structures-algorithms",
+    "title": "Data Structures and Algorithms",
+    "subtitle": "Big-O, arrays, hash tables, trees, graphs, and sorting — the algorithmic foundation with Java implementations.",
+    "order": 65,
+    "color": "#9ece6a",
+    "tech": [
+      "Big-O",
+      "Hash Tables",
+      "Trees",
+      "Graphs",
+      "Sorting"
+    ],
+    "docsUrl": "https://algs4.cs.princeton.edu/home/"
+  },
+  {
+    "id": "redis-deep",
+    "title": "Redis Deep",
+    "subtitle": "Redis data structures, Spring Data Redis, persistence, clustering, and the production patterns — caching, rate limiting, queues, locks.",
+    "order": 66,
+    "color": "#f7768e",
+    "tech": [
+      "Redis",
+      "Caching",
+      "Rate Limiting",
+      "Locks"
+    ],
+    "docsUrl": "https://redis.io/docs/latest/"
+  },
+  {
+    "id": "mongodb-deep",
+    "title": "MongoDB Deep",
+    "subtitle": "The document model, data modeling, Spring Data MongoDB, aggregation pipelines, and production operations.",
+    "order": 67,
+    "color": "#73daca",
+    "tech": [
+      "MongoDB",
+      "Document Model",
+      "Aggregation"
+    ],
+    "docsUrl": "https://www.mongodb.com/docs/manual/"
+  },
+  {
+    "id": "kafka-deep",
+    "title": "Kafka Deep",
+    "subtitle": "Kafka architecture, producers and consumers, consumer groups, exactly-once semantics, and operations — beyond the basics.",
+    "order": 68,
+    "color": "#2ac3de",
+    "tech": [
+      "Kafka",
+      "Partitions",
+      "Consumer Groups",
+      "EOS"
+    ],
+    "docsUrl": "https://kafka.apache.org/documentation/"
+  },
+  {
+    "id": "elasticsearch-deep",
+    "title": "Elasticsearch Deep",
+    "subtitle": "Inverted indexes, mappings and analysis, the query DSL, Spring Data Elasticsearch, and cluster operations.",
+    "order": 69,
+    "color": "#ff9e64",
+    "tech": [
+      "Elasticsearch",
+      "Inverted Index",
+      "Query DSL",
+      "ELK"
+    ],
+    "docsUrl": "https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html"
+  },
+  {
+    "id": "sql-advanced",
+    "title": "Advanced SQL",
+    "subtitle": "Window functions, CTEs and recursion, advanced joins, EXPLAIN ANALYZE, and the production SQL patterns.",
+    "order": 70,
+    "color": "#7dcfff",
+    "tech": [
+      "Window Functions",
+      "CTEs",
+      "EXPLAIN",
+      "Patterns"
+    ],
+    "docsUrl": "https://www.postgresql.org/docs/current/"
+  },
+  {
+    "id": "kubernetes-deep",
+    "title": "Kubernetes Deep",
+    "subtitle": "Cluster architecture, pods and deployments, services and ingress, ConfigMaps and Secrets, Helm and GitOps.",
+    "order": 71,
+    "color": "#2ac3de",
+    "tech": [
+      "Kubernetes",
+      "Pods",
+      "Ingress",
+      "Helm",
+      "GitOps"
+    ],
+    "docsUrl": "https://kubernetes.io/docs/home/"
+  },
+  {
+    "id": "terraform-infra",
+    "title": "Terraform Infrastructure as Code",
+    "subtitle": "Terraform basics, HCL in depth, state management, modules, and the CI/CD workflow — infrastructure as code done right.",
+    "order": 72,
+    "color": "#bb9af7",
+    "tech": [
+      "Terraform",
+      "HCL",
+      "State",
+      "Modules",
+      "CI/CD"
+    ],
+    "docsUrl": "https://developer.hashicorp.com/terraform/docs"
+  },
+  {
+    "id": "junit5-deep",
+    "title": "JUnit 5 Deep",
+    "subtitle": "JUnit 5 architecture, assertions, parameterized tests, extensions, lifecycle, and test organization — the complete testing toolkit.",
+    "order": 73,
+    "color": "#9ece6a",
+    "tech": [
+      "JUnit 5",
+      "Assertions",
+      "Extensions",
+      "Lifecycle"
+    ],
+    "docsUrl": "https://junit.org/junit5/docs/current/user-guide/"
+  },
+  {
+    "id": "mockito-deep",
+    "title": "Mockito Deep",
+    "subtitle": "Mocks, stubs, injection, verification, Mockito with Spring Boot — and the best practices that make mocking a design tool.",
+    "order": 74,
+    "color": "#e0af68",
+    "tech": [
+      "Mockito",
+      "Stubbing",
+      "@MockBean",
+      "Verification"
+    ],
+    "docsUrl": "https://javadoc.io/doc/org.mockito/mockito-core/latest/org/mockito/Mockito.html"
+  },
+  {
+    "id": "oauth2-oidc",
+    "title": "OAuth2 and OpenID Connect",
+    "subtitle": "OAuth2 roles and grants, the authorization code flow, JWT access tokens, OpenID Connect identity, and production token practices.",
+    "order": 75,
+    "color": "#ff6b6b",
+    "tech": [
+      "OAuth2",
+      "OIDC",
+      "JWT",
+      "PKCE"
+    ],
+    "docsUrl": "https://datatracker.ietf.org/doc/html/rfc6749"
+  },
+  {
+    "id": "owasp-security",
+    "title": "OWASP Web Security",
+    "subtitle": "The OWASP Top 10, injection prevention, XSS and CSRF, authentication and authorization failures, and secure coding practices.",
+    "order": 76,
+    "color": "#f7768e",
+    "tech": [
+      "OWASP",
+      "Injection",
+      "XSS",
+      "CSRF",
+      "Secure Coding"
+    ],
+    "docsUrl": "https://owasp.org/Top10/"
+  },
+  {
+    "id": "jackson-json",
+    "title": "Jackson and JSON Deep",
+    "subtitle": "ObjectMapper, annotations, custom serializers, performance, and JSON Schema — the complete JSON layer of a Spring API.",
+    "order": 77,
+    "color": "#73daca",
+    "tech": [
+      "Jackson",
+      "JSON",
+      "Serialization",
+      "Validation"
+    ],
+    "docsUrl": "https://github.com/FasterXML/jackson-docs"
+  },
+  {
+    "id": "event-driven-architecture",
+    "title": "Event-Driven Architecture",
+    "subtitle": "Events, the outbox pattern, event sourcing, change data capture, and sagas — the patterns for decoupled, reliable systems.",
+    "order": 78,
+    "color": "#2ac3de",
+    "tech": [
+      "Events",
+      "Outbox",
+      "Event Sourcing",
+      "CDC",
+      "Sagas"
+    ],
+    "docsUrl": "https://microservices.io/patterns/data/event-driven.html"
+  },
+  {
+    "id": "spring-integration",
+    "title": "Spring Integration",
+    "subtitle": "Enterprise Integration Patterns in Spring — channels, gateways, routing, transformation, and adapters to files, HTTP, JDBC, and brokers.",
+    "order": 79,
+    "color": "#f7768e",
+    "tech": [
+      "EIP",
+      "Channels",
+      "Gateways",
+      "Adapters"
+    ],
+    "docsUrl": "https://docs.spring.io/spring-integration/reference/"
+  },
+  {
+    "id": "graalvm-native",
+    "title": "GraalVM Native Image",
+    "subtitle": "Compiling Java to a binary — native basics, Spring Boot's AOT path, native testing, performance, and deployment.",
+    "order": 80,
+    "color": "#bb9af7",
+    "tech": [
+      "GraalVM",
+      "Native",
+      "AOT",
+      "Startup"
+    ],
+    "docsUrl": "https://www.graalvm.org/latest/docs/"
   }
 ]

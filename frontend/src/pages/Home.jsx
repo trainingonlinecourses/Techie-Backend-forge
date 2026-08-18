@@ -60,10 +60,10 @@ export default function Home() {
             {!user && <Link to="/register" className="btn ghost">Create account · track progress</Link>}
           </div>
           <div className="stats">
-            <div className="stat"><div className="v">{stats?.lessons ?? '348'}</div><div className="l">LESSONS</div></div>
-            <div className="stat"><div className="v">{stats?.modules ?? 60}</div><div className="l">MODULES</div></div>
-            <div className="stat"><div className="v">{(stats?.minutes ?? 7206) / 60 | 0}<b>h</b></div><div className="l">CURRICULUM</div></div>
-            <div className="stat"><div className="v">{stats?.docsLinks ?? 179}+</div><div className="l">DOC LINKS</div></div>
+            <div className="stat"><div className="v">{stats?.lessons ?? '448'}</div><div className="l">LESSONS</div></div>
+            <div className="stat"><div className="v">{stats?.modules ?? 80}</div><div className="l">MODULES</div></div>
+            <div className="stat"><div className="v">{(stats?.minutes ?? 9768) / 60 | 0}<b>h</b></div><div className="l">CURRICULUM</div></div>
+            <div className="stat"><div className="v">{stats?.docsLinks ?? 303}+</div><div className="l">DOC LINKS</div></div>
           </div>
 
           {user && nextLesson && (
@@ -101,7 +101,7 @@ export default function Home() {
 
       <h2 className="sec">The curriculum</h2>
       <p className="lede">
-        Sixty modules, ordered the way an organization rolls out Java and Spring: foundation first,
+        Eighty modules, ordered the way an organization rolls out Java and Spring: foundation first,
         then the framework, then production practice — finishing with a complete runnable project.
       </p>
       <div className="modgrid">
@@ -122,6 +122,9 @@ export default function Home() {
                   {done === total && total > 0 ? '✓ complete' : `${done}/${total} done`}
                 </span>
               </div>
+              <div className="mbar">
+                <div className="mbar-fill" style={{ width: `${total > 0 ? Math.round(done / total * 100) : 0}%`, background: m.module.color }} />
+              </div>
             </Link>
           );
         })}
@@ -132,7 +135,7 @@ export default function Home() {
         <div className="bcol ok">
           <h4>LEARN</h4>
           <ul>
-            <li>348 lessons with explanations + runnable code</li>
+            <li>448 lessons with explanations + runnable code</li>
             <li>Every topic linked to its official docs</li>
             <li>Marked from the sidebar; progress is saved</li>
           </ul>
