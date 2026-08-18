@@ -1868,5 +1868,140 @@
         "description": "The metadata that makes third-party libraries work in native images."
       }
     ]
+  },
+  {
+    "title": "Java Language & JDK APIs",
+    "links": [
+      {
+        "title": "Enum tutorial (Oracle)",
+        "url": "https://docs.oracle.com/javase/tutorial/java/javaOO/enum.html",
+        "description": "Enums, constant-specific methods, and when to prefer them over int constants."
+      },
+      {
+        "title": "BigDecimal (javadoc)",
+        "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/math/BigDecimal.html",
+        "description": "Arbitrary-precision decimal arithmetic — the standard for money."
+      },
+      {
+        "title": "Regular Expressions (Oracle)",
+        "url": "https://docs.oracle.com/javase/tutorial/essential/regex/index.html",
+        "description": "Pattern, Matcher, groups, and quantifiers in the JDK regex engine."
+      },
+      {
+        "title": "Object class (javadoc)",
+        "url": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html",
+        "description": "equals/hashCode/toString contracts and the Java Language Specification."
+      },
+      {
+        "title": "Class Loading (JVM Spec)",
+        "url": "https://docs.oracle.com/javase/specs/jvms/se21/html/jvms-5.html",
+        "description": "The JVM spec chapter on loading, linking, and initialization."
+      }
+    ]
+  },
+  {
+    "title": "Spring Method Security & Sessions",
+    "links": [
+      {
+        "title": "Method Security (Spring Security)",
+        "url": "https://docs.spring.io/spring-security/reference/servlet/authorization/method-security.html",
+        "description": "@PreAuthorize/@PostAuthorize, @Secured, and the SpEL authorization expressions."
+      },
+      {
+        "title": "Password Storage (Spring Security)",
+        "url": "https://docs.spring.io/spring-security/reference/features/authentication/password-storage.html",
+        "description": "BCrypt, Argon2, and DelegatingPasswordEncoder's {id} format."
+      },
+      {
+        "title": "Session Management (Spring Security)",
+        "url": "https://docs.spring.io/spring-security/reference/servlet/authentication/session-management.html",
+        "description": "Session fixation, concurrency control, and creation policies."
+      },
+      {
+        "title": "Authentication Architecture",
+        "url": "https://docs.spring.io/spring-security/reference/servlet/authentication/architecture.html",
+        "description": "AuthenticationManager, ProviderManager, and AuthenticationProvider."
+      }
+    ]
+  },
+  {
+    "title": "Spring MVC & Async Web",
+    "links": [
+      {
+        "title": "Request Mapping (Spring)",
+        "url": "https://docs.spring.io/spring-framework/reference/web/webmvc/mvc-controller/ann-requestmapping.html",
+        "description": "Path patterns, params, headers, consumes/produces conditions."
+      },
+      {
+        "title": "Multipart (Spring)",
+        "url": "https://docs.spring.io/spring-framework/reference/web/webmvc/mvc-controller/ann-methods/multipart.html",
+        "description": "MultipartFile and multipart/form-data handling."
+      },
+      {
+        "title": "Async Requests (Spring)",
+        "url": "https://docs.spring.io/spring-framework/reference/web/webmvc/mvc-controller/ann-methods/async.html",
+        "description": "Callable, DeferredResult, StreamingResponseBody, and SSE."
+      },
+      {
+        "title": "Redirect/Flash Attributes (Spring)",
+        "url": "https://docs.spring.io/spring-framework/reference/web/webmvc/mvc-controller/ann-methods/redirect-attributes.html",
+        "description": "POST/Redirect/GET and flash attributes across redirects."
+      }
+    ]
+  },
+  {
+    "title": "Spring Data JPA Advanced",
+    "links": [
+      {
+        "title": "JPA Auditing (Spring Data)",
+        "url": "https://docs.spring.io/spring-data/jpa/reference/auditing.html",
+        "description": "@CreatedDate/@LastModifiedDate, AuditorAware, and entity listeners."
+      },
+      {
+        "title": "Paging & Sorting (Spring Data)",
+        "url": "https://docs.spring.io/spring-data/commons/reference/repositories/paging-and-sorting.html",
+        "description": "Pageable, Page vs Slice, and the COUNT query cost."
+      },
+      {
+        "title": "Projections (Spring Data)",
+        "url": "https://docs.spring.io/spring-data/jpa/reference/repositories/projections.html",
+        "description": "Interface and DTO projections for narrower reads."
+      },
+      {
+        "title": "Locking (Hibernate guide)",
+        "url": "https://docs.jboss.org/hibernate/orm/6.6/userguide/html_single/Hibernate_User_Guide.html#locking",
+        "description": "Optimistic @Version and pessimistic LockModeType semantics."
+      }
+    ]
+  },
+  {
+    "title": "Spring Boot Startup & Dev Experience",
+    "links": [
+      {
+        "title": "Graceful Shutdown (Spring Boot)",
+        "url": "https://docs.spring.io/spring-boot/reference/features/graceful-shutdown.html",
+        "description": "server.shutdown=graceful and draining in-flight requests."
+      },
+      {
+        "title": "CommandLineRunner (Spring Boot)",
+        "url": "https://docs.spring.io/spring-boot/reference/features/spring-application.html#features.spring-application.command-line-runners",
+        "description": "Running code after the context is ready."
+      },
+      {
+        "title": "DevTools (Spring Boot)",
+        "url": "https://docs.spring.io/spring-boot/reference/using/devtools.html",
+        "description": "Restart, LiveReload, and the dev inner loop."
+      },
+      {
+        "title": "Configuration Properties Validation",
+        "url": "https://docs.spring.io/spring-boot/reference/features/validation.html",
+        "description": "Validating @ConfigurationProperties at startup for fail-fast config."
+      },
+      {
+        "title": "Spring AOT / Native Image",
+        "url": "https://docs.spring.io/spring-boot/reference/packaging/native-image/index.html",
+        "description": "Ahead-of-time processing and GraalVM native startup."
+      }
+    ]
   }
 ]
