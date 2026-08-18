@@ -118,10 +118,44 @@ public class ContentLoader implements CommandLineRunner {
         Matcher m = FRONT_MATTER.matcher(text);
         if (!m.matches()) return new ParsedLesson(Map.of(), text);
         Map<String, String> meta = new LinkedHashMap<>();
+        List<String> docs = new ArrayList<>();
+        boolean inDocs = false;
+        String pendingUrl = null; // url from a title/url pair, resolved when the next line carries url:
         for (String line : m.group(1).split("\\n")) {
+            String trimmed = line.trim();
+            if (inDocs) {
+                if (trimmed.startsWith("-")) {
+                    // New entry: flush any pending url, then capture this line's url if present.
+                    if (pendingUrl != null) docs.add(pendingUrl);
+                    pendingUrl = null;
+                    String entry = trimmed.substring(1).trim();
+                    Matcher urlM = Pattern.compile("url\\s*[:=]\\s*[\"']?([^\"'\\s]+)[\"']?").matcher(entry);
+                    if (urlM.find()) {
+                        pendingUrl = urlM.group(1);
+                    } else if (entry.matches("https?://.*")) {
+                        docs.add(entry.replaceAll("[\"']", ""));
+                    }
+                } else {
+                    // Continuation line of the previous entry — carry title/url pairs here.
+                    Matcher urlM = Pattern.compile("url\\s*[:=]\\s*[\"']?([^\"'\\s]+)[\"']?").matcher(trimmed);
+                    if (urlM.find()) pendingUrl = urlM.group(1);
+                }
+                continue;
+            }
             Matcher kv = KEY_VALUE.matcher(line);
-            if (kv.matches()) meta.put(kv.group(1), kv.group(2));
+            if (kv.matches()) {
+                String key = kv.group(1);
+                String val = kv.group(2);
+                if (key.equals("docs")) {
+                    inDocs = true;
+                } else {
+                    meta.put(key, val);
+                }
+                continue;
+            }
         }
+        if (pendingUrl != null) docs.add(pendingUrl);
+        if (!docs.isEmpty()) meta.put("docs", String.join(",", docs));
         return new ParsedLesson(meta, m.group(2));
     }
 
@@ -141,6 +175,7 @@ public class ContentLoader implements CommandLineRunner {
         }
         return Arrays.stream(trimmed.split(","))
                 .map(String::trim)
+                .map(s -> s.replaceAll("^[\"']+|[\"']+$", "")) // strip surrounding quotes
                 .filter(s -> !s.isBlank())
                 .toList();
     }
