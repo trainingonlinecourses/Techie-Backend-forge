@@ -81,7 +81,7 @@ export default function Navbar({ onMenu, drawerOpen }) {
         <input
           id="nav-search"
           type="text"
-          placeholder="search 540 lessons — jwt, JWT, outbox, saga, k8s, RAG…"
+          placeholder="search 554 lessons — jwt, JWT, outbox, saga, k8s, RAG…"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
