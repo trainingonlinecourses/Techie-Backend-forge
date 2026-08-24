@@ -87,7 +87,7 @@ export default function ChatPage() {
           <div className="kicker"><span className="pulse" /> AI TUTOR</div>
           <h1 className="ptitle">Ask anything about the curriculum</h1>
           <p className="lede">
-            Answers come from the academy's 513 lessons. No key needed — the backend automatically uses
+            Answers come from the academy's 540 lessons. No key needed — the backend automatically uses
             <strong>OpenAI</strong> (if a key is set), a local <strong>Ollama</strong> (auto-detected),
             a free <strong>Hugging Face</strong> endpoint by default, or <strong>Spring AI's ChatClient</strong>
             with retrieval + a lesson tool — falling back to a local knowledge assistant only if everything
