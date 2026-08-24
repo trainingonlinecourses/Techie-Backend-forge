@@ -225,9 +225,19 @@ permanent database. Demo accounts (`admin`/`admin123`, `learner`/`learner123`) a
 startup only if they don't exist yet, so your own users are never touched.
 
 The repo ships a GitHub Actions workflow (`.github/workflows/keepalive.yml`) that pings
-`/actuator/health` every 10 minutes, so the free instance stays warm and never makes users wait
-for a cold start. It runs on the public-repo free tier — no setup needed. If you move the repo
-private, GitHub's 2,000 monthly Actions minutes still cover this easily (~0.3 min per run).
+`/actuator/health` **and** `/api/content/stats` every **5 minutes**, so the free instance stays
+warm and the content cache never cold-starts. It runs on the public-repo free tier — no setup
+needed. If you move the repo private, GitHub's 2,000 monthly Actions minutes still cover this
+(≈0.6 min per run).
+
+**Backup pinger (cron-job.org)** — for extra safety, set up a second independent pinger so the
+keep-alive cadence doesn't depend on GitHub's schedule queue:
+
+1. Sign up at https://cron-job.org (free).
+2. Create a new job: `URL = https://backendforge-academy-api-bef2.onrender.com/actuator/health`,
+   `Schedule = every 10 minutes`, `Request method = GET`.
+3. Enable it — that's it. Two independent pingers means Render stays warm even if one service
+   has a hiccup.
 
 ### Alternative: Railway
 
