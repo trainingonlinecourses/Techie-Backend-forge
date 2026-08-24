@@ -135,7 +135,7 @@ export default function Home() {
         <div className="bcol ok">
           <h4>LEARN</h4>
           <ul>
-            <li>554 lessons with explanations + runnable code</li>
+            <li>563 lessons with explanations + runnable code</li>
             <li>Every topic linked to its official docs</li>
             <li>Marked from the sidebar; progress is saved</li>
           </ul>
