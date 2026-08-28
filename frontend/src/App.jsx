@@ -14,6 +14,9 @@ import ChatPage from './pages/ChatPage.jsx';
 import LoginPage from './pages/LoginPage.jsx';
 import RegisterPage from './pages/RegisterPage.jsx';
 import NotFound from './pages/NotFound.jsx';
+import QuizPage from './pages/QuizPage.jsx';
+import CertificatePage from './pages/CertificatePage.jsx';
+import ProgressPage from './pages/ProgressPage.jsx';
 
 function Protected({ children }) {
   const { user, loading } = useAuth();
@@ -73,6 +76,10 @@ export default function App() {
             />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
+            <Route path="/quiz/:lessonId" element={<QuizPage />} />
+            <Route path="/certificates" element={<CertificatePage />} />
+            <Route path="/certificates/verify/:code" element={<CertificatePage />} />
+            <Route path="/progress" element={<ProgressPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </main>

@@ -1,3 +1,5 @@
+@import './components/interactive.css';
+
 /* ============================================================
    BackendForge Academy — dark professional theme
    ============================================================ */
@@ -900,4 +902,25 @@ h1.ptitle { font-family: var(--disp); font-weight: 700; font-size: clamp(24px, 4
   .byok-grid { grid-template-columns: 1fr; }
   .chatbox { padding: 12px; }
   .cm-content { padding: 10px 12px; font-size: 13px; }
+}
+
+/* Lesson Quiz & Code Sections */
+.lesson-quiz-section,
+.lesson-code-section {
+  margin: 2rem 0;
+  padding: 1.5rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.lesson-quiz-section h3,
+.lesson-code-section h3 {
+  margin: 0 0 0.5rem 0;
+  color: var(--amber);
+}
+
+.code-description {
+  color: var(--mut);
+  margin-bottom: 1rem;
 }

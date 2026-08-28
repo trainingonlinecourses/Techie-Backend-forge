@@ -1,0 +1,9 @@
+package com.backendforge.academy.quiz;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import java.util.Optional;
+
+public interface QuizRepository extends JpaRepository<Quiz, Long> {
+    Optional<Quiz> findByLessonId(String lessonId);
+    boolean existsByLessonId(String lessonId);
+}

@@ -4,6 +4,8 @@ import { api } from '../api/client';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useProgress } from '../hooks/useProgress.js';
 import Markdown from '../components/Markdown.jsx';
+import Quiz from '../components/Quiz.jsx';
+import CodeEditor from '../components/CodeEditor.jsx';
 
 export default function LessonPage() {
   const { lessonId } = useParams();
@@ -142,6 +144,26 @@ export default function LessonPage() {
         <article className="lesson-body" ref={articleRef}>
           <Markdown>{lesson.body}</Markdown>
 
+          {/* Interactive Quiz */}
+          <div className="lesson-quiz-section">
+            <Quiz lessonId={lessonId} onComplete={(result) => {
+              if (result.passed) {
+                flash('🎉 Quiz passed! Great job!');
+              }
+            }} />
+          </div>
+
+          {/* Practice Code Editor */}
+          <div className="lesson-code-section">
+            <h3>💻 Practice Code</h3>
+            <p className="code-description">Try writing code to reinforce what you learned:</p>
+            <CodeEditor 
+              initialCode={extractCodeExample(lesson.body)}
+              language="java"
+              onChange={(code) => console.log('Code updated:', code.length, 'chars')}
+            />
+          </div>
+
           <div className="docsbox">
             <div className="db-title">⚑ OFFICIAL DOCUMENTATION</div>
             <p>Read the authoritative reference for this lesson:</p>
@@ -214,4 +236,19 @@ export default function LessonPage() {
 
 function slug(text) {
   return String(text).toLowerCase().replace(/[^a-z0-9\s-]/g, '').trim().replace(/\s+/g, '-');
+}
+
+function extractCodeExample(body) {
+  // Extract the first Java code block from the lesson body
+  const codeBlockRegex = /```java\n([\s\S]*?)```/;
+  const match = body.match(codeBlockRegex);
+  if (match && match[1]) {
+    return match[1].trim();
+  }
+  // Fallback: return a simple Hello World
+  return `public class Main {
+    public static void main(String[] args) {
+        System.out.println("Hello, World!");
+    }
+}`;
 }
