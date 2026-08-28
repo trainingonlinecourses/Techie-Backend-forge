@@ -1,88 +1,267 @@
 ---
-title: 12-Factor & Cloud-Native Production
-summary: The twelve factors that make an app run anywhere — config, disposability, observability, and the production checklist for a Spring Boot service.
-order: 6
-minutes: 14
-topics: [12 factor, cloud native, observability, autoscaling, production checklist]
+title: Cloud-Native Production — Complete Beginner's Guide
+summary: Health checks, readiness probes, graceful shutdown, externalized config, and the 12-factor checklist for deploying Spring Boot to the cloud.
+order: 4
+minutes: 22
+topics: [cloud-native, health checks, readiness, graceful shutdown, 12-factor, production]
 docs:
-  - https://12factor.net/
-  - https://docs.spring.io/spring-boot/reference/deployment/cloud.html
+  - https://docs.spring.io/spring-boot/reference/actuator/endpoints.html
+  - https://docs.spring.io/spring-boot/reference/web/graceful-shutdown.html
 ---
 
-# 12-Factor & Cloud-Native Production
+# Cloud-Native Production — Complete Beginner's Guide
 
-## The twelve factors, mapped to Spring Boot
+## What "cloud-native" means
 
-The 12-factor manifesto is the "works anywhere" contract — every factor maps to a concrete Spring Boot practice:
+A **cloud-native** application is designed to run in dynamic, automated environments (Kubernetes, ECS, Cloud Run). It's not about "being in the cloud" — it's about following patterns that make deployment, scaling, and recovery automatic.
 
-| Factor | The rule | In Spring Boot |
+```
+Traditional app:                    Cloud-native app:
+- Deploy once a month               - Deploy multiple times a day
+- Manual scaling                     - Auto-scaling based on load
+- SSH to debug                       - Logs + metrics + health checks
+- Restart manually on crash          - Auto-restart on failure
+- Config in properties files         - Config from environment variables
+```
+
+## The 12-Factor App checklist
+
+The 12-Factor App is a methodology for building modern, cloud-native applications:
+
+| Factor | What it means | Spring Boot implementation |
 |---|---|---|
-| 1. Codebase | one repo per app, deployable anywhere | one `backend/`, built the same everywhere |
-| 2. Dependencies | explicit, isolated | `pom.xml`/`gradle` — declare everything, no ambient system packages |
-| 3. Config | config in **environment**, not code | `APP_JWT_SECRET`, `DATABASE_URL` (this academy's env-var pattern) |
-| 4. Backing services | attached resources are swappable | `DATABASE_URL` swap = new DB, zero code change (`DatabaseConfig`) |
-| 5. Build/release/run | build once, release with config, run immutably | CI builds the image once; deploy = config + run |
-| 6. Processes | stateless processes | no local state; sessions in Redis/DB (Spring Session lesson) |
-| 7. Port binding | the app is self-contained, exports HTTP | embedded Tomcat on `$PORT` |
-| 8. Concurrency | scale via processes, not threads | horizontal replicas (k8s/Render) — the free-tier keepalive keeps them warm |
-| 9. Disposability | fast start, graceful stop | startupProbe + `server.shutdown: graceful` (k8s lesson) |
-| 10. Dev/prod parity | same stack everywhere | Testcontainers — real Postgres in tests (the testing lesson) |
-| 11. Logs | logs are streams, not files | stdout + structured logging (the logging lesson) |
-| 12. Admin processes | one-off scripts as release processes | migrations run in the deploy, not ad-hoc |
+| 1. Codebase | One codebase in version control | Git |
+| 2. Dependencies | Explicitly declare dependencies | `pom.xml` / `build.gradle` |
+| 3. Config | Store config in environment | `application.yml` + env vars |
+| 4. Backing services | Treat databases as attached resources | `DATABASE_URL` env var |
+| 5. Build, release, run | Strict separation of build and run | Docker + CI/CD |
+| 6. Processes | Stateless processes | No in-memory session state |
+| 7. Port binding | Export services via port binding | Embedded Tomcat |
+| 8. Concurrency | Scale via process model | Multiple container instances |
+| 9. Disposability | Fast startup and graceful shutdown | `server.shutdown=graceful` |
+| 10. Dev/prod parity | Keep environments as similar as possible | Docker + Testcontainers |
+| 11. Logs | Treat logs as event streams | stdout/stderr + log aggregator |
+| 12. Admin processes | Run admin tasks as one-off processes | `CommandLineRunner`, `@Job` |
 
-The one this academy demonstrates end to end: **config in environment** — the same jar runs with H2 locally, Postgres on Render, and (soon) a k8s Secret — the binary never knows where it lives.
+## Health checks — how the cloud knows you're alive
 
-## Observability: the production trinity
-
-A cloud-native app is *auditable* — three pillars, all from the code:
-
-1. **Metrics** — Actuator + Micrometer: `http.server.requests`, JVM, Hikari pool (the performance lesson's list). Prometheus scrapes; Grafana draws.
-2. **Logs** — structured stdout with a correlation ID per request (the logging lesson); the platform (Loki/CloudWatch/ELK) collects.
-3. **Traces** — Micrometer Tracing propagates `traceId`/`spanId` (the distributed-tracing lesson); each log line and each downstream call shares the trace.
-
-The Spring Boot checklist: `management.endpoints.web.exposure.include: health,info,metrics,prometheus`, probes wired to `/actuator/health/*`, and a dashboard that answers "is it healthy, is it slow, where is the time going?" — before the alert fires, ideally.
-
-## Autoscaling: when the platform scales for you
+Kubernetes and other orchestrators need to know if your app is healthy. Spring Boot Actuator provides two endpoints:
 
 ```yaml
-apiVersion: autoscaling/v2
-kind: HorizontalPodAutoscaler
-metadata: { name: academy-api }
+# application.yml
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus  # Line 1: Expose these endpoints
+  endpoint:
+    health:
+      show-details: when-authorized              # Line 2: Show details to authenticated users
+```
+
+### Liveness vs Readiness
+
+```
+Liveness: "Is the app alive?" (If not → restart it)
+Readiness: "Is the app ready to serve traffic?" (If not → stop sending requests)
+```
+
+```java
+// Custom health indicator
+@Component
+public class DatabaseHealthIndicator implements HealthIndicator {
+    private final DataSource dataSource;
+    
+    @Override
+    public Health health() {
+        try (Connection conn = dataSource.getConnection()) {
+            conn.isValid(5);  // Line 1: Check if DB is reachable
+            return Health.up()                    // Line 2: App is healthy
+                .withDetail("database", "reachable")
+                .build();
+        } catch (Exception e) {
+            return Health.down()                  // Line 3: App is unhealthy
+                .withDetail("database", e.getMessage())
+                .build();
+        }
+    }
+}
+```
+
+```bash
+# Check health
+curl http://localhost:8080/actuator/health
+# Response: {"status":"UP","components":{"db":{"status":"UP"}}}
+
+# Kubernetes uses this for:
+# livenessProbe: /actuator/health/liveness
+# readinessProbe: /actuator/health/readiness
+```
+
+## Graceful shutdown — don't drop requests
+
+When Kubernetes sends a SIGTERM to stop your app, you don't want to drop in-flight requests:
+
+```yaml
+# application.yml
+server:
+  shutdown: graceful                    # Line 1: Enable graceful shutdown
+
+spring:
+  lifecycle:
+    timeout-per-shutdown-phase: 30s    # Line 2: Wait up to 30s for requests to complete
+```
+
+**What happens during graceful shutdown:**
+1. Kubernetes sends SIGTERM to your app
+2. Tomcat stops accepting NEW connections
+3. Existing requests continue processing (up to 30s)
+4. `@PreDestroy` methods run (close DB connections, flush caches)
+5. App exits cleanly
+
+```java
+// Cleanup on shutdown
+@Component
+public class ShutdownCleanup {
+    @PreDestroy
+    public void cleanup() {
+        // Line 1: Close database connections
+        // Line 2: Flush caches
+        // Line 3: Deregister from service discovery
+        // Line 4: Stop background threads
+        System.out.println("Cleaning up before shutdown...");
+    }
+}
+```
+
+## Externalized config — environment variables
+
+```yaml
+# application.yml — defaults for local development
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/academy
+    username: academy
+    password: dev-secret
+
+app:
+  jwt:
+    secret: dev-secret-key-at-least-32-chars
+```
+
+```bash
+# Production — override via environment variables
+export DATABASE_URL="jdbc:postgresql://prod-db:5432/academy"
+export APP_JWT_SECRET="production-secret-key-must-be-32-chars"
+# Spring Boot reads these automatically — no code changes needed
+```
+
+**Spring Boot's property resolution order (highest to lowest priority):**
+1. Command-line arguments (`--server.port=9090`)
+2. Environment variables (`DATABASE_URL`)
+3. `application-prod.yml` (profile-specific)
+4. `application.yml` (default)
+5. Defaults in code
+
+## The production checklist
+
+```yaml
+# Complete production configuration
+server:
+  port: 8080
+  shutdown: graceful                    # Graceful shutdown
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      probes:
+        enabled: true                   # Enable liveness/readiness probes
+
+spring:
+  datasource:
+    url: ${DATABASE_URL}
+    hikari:
+      maximum-pool-size: 20             # Connection pool size
+      connection-timeout: 5000          # Fail fast if DB is down
+
+logging:
+  level:
+    root: INFO
+    com.acme: DEBUG                     # App-specific debug logging
+
+# JVM flags for containers
+# -XX:MaxRAMPercentage=75.0             # Use 75% of container memory
+# -XX:+UseG1GC                          # Garbage collector
+# -Djava.security.egd=file:/dev/./urandom  # Faster startup
+```
+
+## Real-world scenario — deploying to Kubernetes
+
+```yaml
+# kubernetes/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: academy-api
 spec:
-  scaleTargetRef: { apiVersion: apps/v1, kind: Deployment, name: academy-api }
-  minReplicas: 2
-  maxReplicas: 10
-  metrics:
-    - type: Resource
-      resource:
-        name: cpu
-        target: { type: Utilization, averageUtilization: 70 }
+  replicas: 3                          # Run 3 instances
+  selector:
+    matchLabels:
+      app: academy-api
+  template:
+    spec:
+      containers:
+      - name: academy-api
+        image: academy-api:latest
+        ports:
+        - containerPort: 8080
+        env:
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: db-secret
+              key: url
+        livenessProbe:
+          httpGet:
+            path: /actuator/health/liveness
+            port: 8080
+          initialDelaySeconds: 30      # Wait 30s before first check
+          periodSeconds: 10            # Check every 10s
+        readinessProbe:
+          httpGet:
+            path: /actuator/health/readiness
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
 ```
 
-The conditions for autoscaling to be *correct*: the app is stateless (factor 6), pods take traffic only when ready (readiness), and there's no hard external limit being pounded (DB connections scale with pods — the pool sizing lesson). Autoscaling on CPU is the baseline; latency/queue-depth targets come later. On Render's free tier this is moot (one instance); on k8s it's the point.
+## Common mistakes
 
-## The production readiness checklist
-
-```text
-□ health endpoints: /actuator/health/liveness + readiness, wired to probes
-□ graceful shutdown configured (server.shutdown: graceful)
-□ resource requests/limits set; JVM sized with MaxRAMPercentage
-□ config via env/ConfigMap/Secret — no secrets in the image
-□ logs to stdout, structured, with correlation IDs
-□ metrics exposed and scraped; dashboard exists before the incident
-□ migrations run in the deploy (Flyway), validated in CI
-□ backups for the database (the platform's managed backup — this academy's free Postgres expires Sep 16; upgrade for a permanent DB)
-□ image pinned + scanned; dependency updates automated (renovate)
-□ a rollback path rehearsed (rollout undo / redeploy previous release)
-```
-
-Every item on this list is a *deploy-day* habit, not a project — the checklist is how "it worked on my machine" becomes "it works on the platform".
+| Mistake | Why it fails | Fix |
+|---|---|---|
+| Config in properties files | Can't change without redeploy | Use environment variables |
+| No health checks | Orchestrator can't detect failures | Add Actuator health endpoints |
+| No graceful shutdown | Requests dropped on deploy | Enable `server.shutdown: graceful` |
+| Hardcoded URLs | Breaks in different environments | Use `DATABASE_URL` env var |
+| No resource limits | One app consumes all container memory | Set memory/CPU limits |
 
 ## Key takeaways
 
-- The 12 factors = the "runs anywhere" contract; env-based config is the one that makes everything else possible.
-- Observability = metrics + logs + traces, all emitted by the code, consumed by the platform.
-- Autoscaling is only correct on stateless apps with readiness-gated traffic and bounded downstreams.
-- Run the production readiness checklist per deploy; rehearse rollback before you need it.
+- Cloud-native = stateless, configurable via env vars, health-checked, gracefully shutdown
+- Health checks: liveness (alive?) and readiness (ready?) — Kubernetes uses both
+- Graceful shutdown: stop accepting new requests, finish existing ones, then exit
+- Externalized config: environment variables override `application.yml`
+- The 12-Factor checklist is your production deployment guide
 
-Official docs: [12-factor](https://12factor.net/) · [Spring Boot Cloud Deployment](https://docs.spring.io/spring-boot/reference/deployment/cloud.html)
+**Official docs:** [Actuator Endpoints](https://docs.spring.io/spring-boot/reference/actuator/endpoints.html) · [Graceful Shutdown](https://docs.spring.io/spring-boot/reference/web/graceful-shutdown.html)

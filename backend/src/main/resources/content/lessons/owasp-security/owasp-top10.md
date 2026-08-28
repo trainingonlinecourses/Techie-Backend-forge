@@ -1,92 +1,274 @@
 ---
-title: The OWASP Top 10 — The Web Security Syllabus
-module: owasp-security
+title: OWASP Top 10 — Complete Beginner's Guide
+summary: The 10 most critical web security risks, explained with real examples, how Spring Boot prevents them, and the code that fixes each one.
 order: 1
-minutes: 27
-topics: ["OWASP Top 10", "web security", "injection", "XSS", "security risks", "vulnerabilities"]
+minutes: 22
+topics: [owasp, injection, xss, csrf, broken authentication, security misconfiguration]
 docs:
-  - title: "OWASP Top 10 (owasp.org)"
-    url: "https://owasp.org/www-project-top-ten/"
-  - title: "OWASP Cheat Sheet Series"
-    url: "https://cheatsheetseries.owasp.org/"
+  - https://owasp.org/Top10/
+  - https://docs.spring.io/spring-security/reference/
 ---
 
-# The OWASP Top 10 — The Web Security Syllabus
+# OWASP Top 10 — Complete Beginner's Guide
 
-## The Concept: The Shared Vocabulary of Web Vulnerabilities
+## What is OWASP?
 
-Every web developer should know the most common ways applications get attacked — not to become a security engineer, but because *the developer writes the code the attacker reads*. The **OWASP Top 10** is the community's ranked list of the most critical web application security risks, updated roughly every four years (latest: 2021). It's not an exhaustive catalog — it's the *syllabus*: the risks so common and so damaging that every team should know them, recognize them in their own code, and have a first-line defense for each.
+OWASP (Open Worldwide Application Security Project) is a nonprofit that identifies the most critical web application security risks. The **OWASP Top 10** is a regularly updated list of the 10 most dangerous vulnerabilities. Every web developer should know these.
 
-**The mental model:** the Top 10 is the attacker's playbook made public. Each entry is a *failure pattern* — a way your application can be made to do something it shouldn't — with a name, a mechanism, and a mitigation. When you read "injection," you should instantly think "my SQL query with string concatenation." When you read "XSS," you should think "my React component rendering user input as HTML." The list converts "security" from a vague anxiety into a checklist your code can be measured against.
+## A01: Broken Access Control (most common!)
 
-## The 2021 Top 10, Ranked and Explained
-
-**A01 — Broken Access Control (rank 1).** The app fails to enforce "who may do what": a user can view another user's data by changing an ID in the URL, or call an admin endpoint directly. The #1 web risk because it's so common and so damaging. *First defense:* enforce authorization server-side on every request (never trust client-side hiding), use object-level checks (`@PreAuthorize`, ownership checks), and deny-by-default.
-
-**A02 — Cryptographic Failures.** Secrets stored or transmitted without proper encryption: passwords in plaintext, credit cards in logs, TLS missing. *First defense:* hash passwords with bcrypt/Argon2, encrypt sensitive data at rest, enforce HTTPS everywhere, and never log secrets.
-
-**A03 — Injection.** Untrusted input reaches an interpreter (SQL, NoSQL, OS, LDAP) and is executed as code: `SELECT * FROM users WHERE name = '` + userInput + `'` — the attacker's `' OR '1'='1` turns the query into a logic bomb. *First defense:* parameterized queries/prepared statements (never string concatenation), ORM binding, and input validation.
-
-**A04 — Insecure Design.** The architecture itself enables attacks — missing rate limits, no threat modeling, trust placed in client-supplied values. *First defense:* threat modeling at design time, rate limiting, and secure defaults.
-
-**A05 — Security Misconfiguration.** Default credentials, verbose error pages exposing stack traces, unpatched components, unnecessary features enabled. *First defense:* hardened configs, least privilege, automated scanning, and the discipline of "secure by default."
-
-**A06 — Vulnerable and Outdated Components.** Running libraries with known CVEs — the dependency you never update is the one that gets exploited. *First defense:* dependency scanning (OWASP Dependency-Check, Snyk, Dependabot) in CI, and a patch cadence.
-
-**A07 — Identification and Authentication Failures.** Weak or broken login: session fixation, credential stuffing, no MFA, session IDs in URLs. *First defense:* strong password policy, MFA, rate-limited login, secure session management (HttpOnly, Secure cookies), and Spring Security's battle-tested defaults.
-
-**A08 — Software and Data Integrity Failures.** Code or data that can't be verified — deserializing untrusted objects, unsigned updates, CI/CD pipelines that trust unverified code. *First defense:* signature verification, integrity checks, and never deserializing untrusted input.
-
-**A09 — Security Logging and Monitoring Failures.** Attacks happen *undetected* because nothing is logged or monitored. *First defense:* log security events (logins, access denials, admin actions), centralize logs, and alert on anomalies.
-
-**A10 — Server-Side Request Forgery (SSRF).** The server fetches a URL supplied by the attacker — reaching internal services, cloud metadata endpoints, or the local network from inside. *First defense:* validate/allowlist URLs, block private IP ranges, and never trust user-supplied URLs in server-side fetches.
-
-## The Three That Bite Spring Developers Most
-
-Every entry matters, but three dominate real Spring Boot applications:
-
-**1. Injection (A03) — the SQL variety.** The classic vulnerability in Java is still string-built SQL:
+**What it is:** Users can access data or perform actions they shouldn't be able to.
 
 ```java
-// VULNERABLE — never do this:
-String sql = "SELECT * FROM users WHERE name = '" + name + "'";
-jdbcTemplate.execute(sql);   // name = "'; DROP TABLE users; --" destroys the table
+// VULNERABLE — no authorization check
+@GetMapping("/api/orders/{id}")
+public Order getOrder(@PathVariable Long id) {
+    return orderRepo.findById(id).orElseThrow();  // Any user can see ANY order!
+}
 
-// SAFE — parameterized query; the input can never become code:
-jdbcTemplate.query(
-    "SELECT * FROM users WHERE name = ?",
-    (rs, i) -> new User(rs.getString("name")), name);
-```
-
-The rule is absolute: **SQL with `?` placeholders and bound parameters, always** — whether via `JdbcTemplate`, JPA's named parameters, or an ORM. The `?` tells the database "this is data, never code" — the attacker's quotes become part of the *value*, not the query.
-
-**2. Broken Access Control (A01) — the object-reference bug.** The most common real-world bug:
-
-```java
-@GetMapping("/api/lessons/{id}")
-public LessonDto getLesson(@PathVariable Long id, Authentication auth) {
-    // VULNERABLE: any authenticated user can read ANY lesson by guessing ids.
-    return lessonService.findById(id);
-
-    // SAFE: verify the caller owns (or may access) this object:
-    // if (!lessonService.isAccessibleTo(id, auth.getName())) throw new ForbiddenException();
-    // ...or enforce with @PreAuthorize("hasRole('ADMIN') or @lessonService.owns(#id, principal)")
+// FIXED — check that the user owns this order
+@GetMapping("/api/orders/{id}")
+public Order getOrder(@PathVariable Long id, 
+                      @AuthenticationPrincipal UserPrincipal principal) {
+    Order order = orderRepo.findById(id).orElseThrow();
+    if (!order.getUserId().equals(principal.getId())) {
+        throw new AccessDeniedException("Not your order!");  // Line 1: Authorization check
+    }
+    return order;
 }
 ```
 
-**3. XSS — the stored/reflected script injection.** The classic web vulnerability: user input rendered as HTML executes the attacker's script. React/JSX escapes by default (the `<` becomes `&lt;`) — the danger returns the moment you use `dangerouslySetInnerHTML` or concatenate HTML. *First defense:* never render raw user input as HTML, use the framework's escaping (default), and apply `Content-Security-Policy` headers as the safety net.
+**How Spring Security prevents it:**
+```java
+.authorizeHttpRequests(auth -> auth
+    .requestMatchers("/api/admin/**").hasRole("ADMIN")   // Line 1: Admin only
+    .requestMatchers("/api/orders/**").authenticated()    // Line 2: Must be logged in
+    .anyRequest().denyAll()                              // Line 3: Deny everything else
+)
+```
 
-## How to Use the Top 10, Practically
+## A02: Cryptographic Failures
 
-1. **Read it as a design checklist** — before building a feature, ask: "where does untrusted input enter? where do I authorize? what do I log?"
-2. **Map it to your stack** — Spring Security mitigates A01/A07; prepared statements mitigate A03; dependency scanning mitigates A06; structured logging + monitoring mitigates A09. Knowing the *mitigation for each* is the skill.
-3. **Test against it** — automated scanners (OWASP ZAP, Burp) run the Top 10 checks against your running app; SAST tools (Semgrep, SonarQube) scan the code. Both belong in CI.
-4. **Fix the root, not the symptom** — the Top 10 entries are *categories* of failure; a fix that patches one instance without changing the pattern leaves the next instance open.
+**What it is:** Sensitive data exposed due to weak encryption, plaintext storage, or improper key management.
 
-## The Follow-on Curriculum
+```java
+// VULNERABLE — storing passwords in plaintext
+user.setPassword(rawPassword);  // NEVER do this!
 
-The Top 10 is the map; the deeper lessons follow the roads: injection and XSS/CSRF get dedicated deep-dives (the next lessons in this module), authentication/authorization map to the Spring Security modules in this academy, SSRF and deserialization get their own patterns, and the OWASP **Cheat Sheet Series** is the definitive per-topic reference (password storage, SQL injection prevention, input validation — every one links from the Top 10 page).
+// FIXED — hash with BCrypt
+user.setPassword(passwordEncoder.encode(rawPassword));  // Line 1: Hash before storing
 
-## Recap
+// VULNERABLE — weak encryption
+Cipher cipher = Cipher.getInstance("DES");  // DES is broken!
 
-The OWASP Top 10 is the web security syllabus: broken access control (the #1 risk — enforce authorization server-side on every request), cryptographic failures (hash passwords, encrypt at rest, TLS), injection (parameterized queries, never string-built SQL), insecure design, misconfiguration, vulnerable components (scan dependencies in CI), auth failures (MFA, secure sessions), integrity failures (don't deserialize untrusted data), logging/monitoring gaps, and SSRF. For Spring developers, the three that bite most are **SQL injection** (fix: `?` parameters), **broken object-level access control** (fix: server-side ownership checks), and **XSS** (fix: framework escaping + CSP). Use the list as a design checklist, map each entry to your stack's mitigation, and scan/test against it in CI — the Top 10 turns "be secure" into "check these ten boxes, and check them again after every feature."
+// FIXED — use strong encryption
+Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");  // Line 1: AES-256 with GCM mode
+```
+
+**The rules:**
+- Passwords: BCrypt/Argon2 (never MD5, SHA1, plaintext)
+- Data at rest: AES-256-GCM
+- Data in transit: TLS 1.3 (HTTPS)
+- Secrets: Environment variables or vault (never in code)
+
+## A03: Injection (SQL, NoSQL, LDAP)
+
+**What it is:** Untrusted data sent to an interpreter as part of a command or query.
+
+```java
+// VULNERABLE — SQL injection
+String query = "SELECT * FROM users WHERE username = '" + username + "'";
+// If username = "admin' OR '1'='1", the query becomes:
+// SELECT * FROM users WHERE username = 'admin' OR '1'='1'
+// Returns ALL users!
+
+// FIXED — use parameterized queries
+@Query("SELECT u FROM User u WHERE u.username = :username")
+User findByUsername(@Param("username") String username);  // Line 1: Safe — parameters are bound
+
+// FIXED — use JPA (auto-parameterized)
+User user = userRepo.findByUsername(username);  // Line 1: Spring Data handles safety
+```
+
+## A04: Insecure Design
+
+**What it is:** Security flaws in the design itself, not the implementation.
+
+```java
+// INSECURE DESIGN — password reset doesn't expire the token
+@PostMapping("/reset-password")
+public void resetPassword(@RequestBody ResetRequest req) {
+    String token = generateToken();  // Line 1: Generate token
+    sendEmail(req.getEmail(), token);  // Line 2: Send email
+    // Problem: Token never expires! Attacker can use it forever.
+}
+
+// SECURE DESIGN — token expires in 15 minutes
+@PostMapping("/reset-password")
+public void resetPassword(@RequestBody ResetRequest req) {
+    String token = tokenProvider.generate(req.getEmail(), Duration.ofMinutes(15));  // Line 1: Expiring token
+    sendEmail(req.getEmail(), token);
+}
+```
+
+## A05: Security Misconfiguration
+
+**What it is:** Default settings, unnecessary features, or missing security headers.
+
+```java
+// INSECURE — debug mode in production
+server:
+  error:
+    include-stacktrace: always     // Exposes stack traces to users!
+
+// SECURE — hide details in production
+server:
+  error:
+    include-stacktrace: never      // Line 1: No stack traces
+    include-message: never         // Line 2: No error messages
+
+// Security headers (Spring Security enables these by default)
+// But verify they're active:
+http.headers(headers -> headers
+    .contentSecurityPolicy(csp -> csp.policyDirectives("default-src 'self'"))  // Line 1: CSP
+    .httpStrictTransportSecurity(hsts -> hsts                                  // Line 2: HSTS
+        .includeSubDomains(true)
+        .maxAgeInSeconds(31536000)
+    )
+);
+```
+
+## A06: Vulnerable and Outdated Components
+
+**What it is:** Using libraries with known vulnerabilities.
+
+```xml
+<!-- Check for vulnerable dependencies -->
+<plugin>
+    <groupId>org.owasp</groupId>
+    <artifactId>dependency-check-maven</artifactId>
+    <version>9.0.0</version>
+</plugin>
+```
+
+```bash
+# Scan for vulnerabilities
+mvn dependency-check:check
+
+# Or use Spring Boot's built-in check
+mvn dependency:tree | grep -i "CVE"
+```
+
+**Prevention:**
+- Keep dependencies updated
+- Use `mvn versions:display-dependency-updates`
+- Run OWASP Dependency Check in CI
+- Remove unused dependencies
+
+## A07: Identification and Authentication Failures
+
+**What it is:** Weak authentication, session management, or credential handling.
+
+```java
+// VULNERABLE — no rate limiting on login
+@PostMapping("/login")
+public AuthResponse login(@RequestBody LoginRequest req) {
+    // Attacker can try 1 million passwords per second!
+}
+
+// FIXED — rate limiting + account lockout
+@Service
+public class LoginService {
+    private final RateLimiter rateLimiter;  // Line 1: Limit login attempts
+    
+    public AuthResponse login(LoginRequest req) {
+        if (!rateLimiter.tryAcquire(req.getUsername())) {
+            throw new TooManyAttemptsException("Too many login attempts");  // Line 2: Block brute force
+        }
+        // ... normal login logic
+    }
+}
+```
+
+## A08: Software and Data Integrity Failures
+
+**What it is:** Code or data that's been tampered with during deployment or runtime.
+
+```java
+// VULNERABLE — deserializing untrusted data
+ObjectInputStream ois = new ObjectInputStream(untrustedInputStream);
+Object obj = ois.readObject();  // Can execute arbitrary code!
+
+// FIXED — use JSON instead of Java serialization
+// Jackson deserialization is safe (no code execution)
+ObjectMapper mapper = new ObjectMapper();
+User user = mapper.readValue(jsonInput, User.class);  // Line 1: Safe deserialization
+```
+
+## A09: Security Logging and Monitoring Failures
+
+**What it is:** Not logging security events, making incidents undetectable.
+
+```java
+// Log security events
+@Component
+public class SecurityAuditLogger {
+    
+    public void logLoginSuccess(String username) {
+        log.info("LOGIN_SUCCESS user={} timestamp={}", username, Instant.now());  // Line 1: Structured log
+    }
+    
+    public void logLoginFailure(String username, String reason) {
+        log.warn("LOGIN_FAILURE user={} reason={}", username, reason);  // Line 2: Warning for failures
+    }
+    
+    public void logUnauthorizedAccess(String username, String resource) {
+        log.error("UNAUTHORIZED user={} resource={}", username, resource);  // Line 3: Error for access denial
+    }
+}
+```
+
+**What to log:**
+- Login success/failure
+- Password changes
+- Privileged actions
+- Data exports
+- Authorization failures
+
+## A10: Server-Side Request Forgery (SSRF)
+
+**What it is:** App fetches a URL provided by the user, but the URL points to internal resources.
+
+```java
+// VULNERABLE — fetch any URL the user provides
+@GetMapping("/fetch")
+public String fetchUrl(@RequestParam String url) {
+    return restTemplate.getForObject(url, String.class);  // Attacker can access internal services!
+}
+
+// FIXED — validate and whitelist URLs
+@GetMapping("/fetch")
+public String fetchUrl(@RequestParam String url) {
+    if (!isAllowedUrl(url)) {                              // Line 1: Validate URL
+        throw new BadRequestException("URL not allowed");
+    }
+    return restTemplate.getForObject(url, String.class);
+}
+
+private boolean isAllowedUrl(String url) {
+    List<String> allowedHosts = List.of("api.example.com", "data.example.com");
+    URI uri = URI.create(url);
+    return allowedHosts.contains(uri.getHost());           // Line 2: Check against whitelist
+}
+```
+
+## Key takeaways
+
+- Broken Access Control is #1 — always check authorization
+- Never store plaintext passwords — use BCrypt/Argon2
+- Use parameterized queries — never concatenate user input into SQL
+- Keep dependencies updated — run vulnerability scans
+- Log security events — you can't detect what you don't log
+- Validate URLs before fetching — prevent SSRF
+
+**Official docs:** [OWASP Top 10](https://owasp.org/Top10/) · [Spring Security Reference](https://docs.spring.io/spring-security/reference/)

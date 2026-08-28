@@ -1,90 +1,218 @@
 ---
-title: Elasticsearch Operations — Clusters, Shards, and the ELK Stack
-module: elasticsearch-deep
-order: 5
-minutes: 26
-topics: ["cluster", "shards", "ELK stack", "snapshots", "performance", "capacity planning"]
+title: Elasticsearch Operations — Complete Beginner's Guide
+summary: Indexing documents, searching with DSL, filtering, aggregations, and Spring Data Elasticsearch integration.
+order: 2
+minutes: 20
+topics: [elasticsearch, indexing, searching, dsl, aggregations, spring data elasticsearch]
 docs:
-  - title: "Elasticsearch Cluster (Elastic docs)"
-    url: "https://www.elastic.co/guide/en/elasticsearch/reference/current/scalability.html"
-  - title: "Snapshots and Restore (Elastic docs)"
-    url: "https://www.elastic.co/guide/en/elasticsearch/reference/current/snapshot-restore.html"
+  - https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html
+  - https://docs.spring.io/spring-data/elasticsearch/reference/
 ---
 
-# Elasticsearch Operations — Clusters, Shards, and the ELK Stack
+# Elasticsearch Operations — Complete Beginner's Guide
 
-## The Concept: The Cluster Is the Product
+## What Elasticsearch is
 
-The search API is easy; the **cluster** is what production runs. An Elasticsearch deployment is a set of **nodes** (JVM processes) forming a cluster: documents are stored in shards spread across nodes, replicas provide redundancy, and a master-eligible node coordinates. Understanding how shards and replicas actually behave — and what they cost — is the difference between a search that scales and a cluster that melts at 2 AM.
-
-**The mental model:** the cluster is a team of librarians. Documents (books) live in **shards** (bookshelves); each shelf is assigned to a librarian (node). **Replicas** are duplicate shelves — if a librarian is out sick, the duplicate shelf serves requests. The **master-eligible node** is the head librarian who decides which shelves go where. When you add a librarian (node), the head librarian *moves shelves around* to balance the load — and that moving costs I/O while it happens.
-
-## Shards and Replicas: The Two Dials
-
-**Shards** split an index horizontally: an index with 3 primary shards stores each document in exactly one shard, determined by `hash(routing) % 3`. Shards give **scale** — an index too big for one node's disk or CPU is spread across many.
-
-**Replicas** are copies of a shard on *different* nodes. They give **availability** (a node dies; its shards' replicas serve) and **read parallelism** (queries load-balance across primary + replicas). Writes go to the primary shard and replicate to replicas.
-
-**The decision that's hard to reverse:** the primary shard count is fixed at index creation. Choose it for the *peak* size you expect (the rule of thumb: ~20–40GB per shard, and a few shards per GB of heap). Too few shards = an index that can't scale; too many = overhead (each shard has its own data structures, and every query fans out to every shard). Replicas, by contrast, can be changed anytime (`PUT /index/_settings { "number_of_replicas": 2 }`).
-
-**The classic capacity numbers:** a 3-node cluster with `number_of_shards: 3, number_of_replicas: 1` gives 6 shards total — 3 primaries + 3 replicas, one of each per node. Lose one node and every shard still has a copy elsewhere. That's the minimum sensible production shape.
-
-## The ELK Stack: Where Elasticsearch Lives in the Wild
-
-The overwhelming majority of Elasticsearch deployments run the **ELK stack** (now "Elastic Stack"): **Elasticsearch** (storage + search), **Logstash** (ingestion/transformation), **Kibana** (visualization/dashboards). The modern variant replaces Logstash with **Beats/Filebeat** (lightweight agents) shipping straight to Elasticsearch, often via Kafka for buffering.
+Elasticsearch is a **search engine** built on Apache Lucene. It stores, searches, and analyzes large volumes of data in near-real-time. Think of it as a super-powered database optimized for **full-text search** and **analytics**.
 
 ```
-App logs ──▶ Filebeat ──▶ [Kafka] ──▶ Logstash ──▶ Elasticsearch ──▶ Kibana
+Traditional database (PostgreSQL):
+  SELECT * FROM products WHERE name LIKE '%iPhone%';  -- Slow on millions of rows!
+
+Elasticsearch:
+  GET /products/_search?q=iPhone  -- Returns results in milliseconds, even with millions of docs
 ```
 
-**Why it matters to you as a Java/Spring developer:** the ELK stack is how production applications get *searchable logs*. The flow: your Spring Boot app logs to stdout/file; Filebeat ships them; Logstash parses them into fields (timestamp, level, message, exception stack as one field); Elasticsearch indexes them; Kibana gives dashboards and the famous "search across all logs in seconds" experience. The pattern to learn: **logs are documents** — each log line becomes a searchable, aggregatable document (with `@timestamp` for the date histogram "errors per hour"). The `logstash-logback-encoder` for Logback is the Spring side of this — it emits structured JSON logs that the pipeline parses natively.
+**Why use it alongside a database?**
+- **Full-text search** — "find products containing 'wireless noise cancelling headphones'"
+- **Fuzzy matching** — "find 'iphon' → matches 'iPhone'"
+- **Autocomplete** — suggest completions as you type
+- **Analytics** — "count products by category, average price per category"
 
-## Snapshots: The Backup That Works
+## Core concepts
 
-Elasticsearch's backup mechanism is the **snapshot API**: point-in-time copies of indices (or the whole cluster) to a shared filesystem or object storage (S3, GCS):
+| Concept | What it is | Database analogy |
+|---|---|---|
+| **Index** | A collection of documents | Database table |
+| **Document** | A JSON object | A row |
+| **Field** | A key-value pair in a document | A column |
+| **Mapping** | Schema definition for an index | Table schema |
+| **Cluster** | A group of nodes | Database cluster |
 
-```bash
-# Register a snapshot repository:
-PUT /_snapshot/my_backups
-{ "type": "s3", "settings": { "bucket": "es-backups", "region": "us-east-1" } }
+## Indexing documents — adding data
 
-# Take a snapshot of the critical indices:
-PUT /_snapshot/my_backups/snapshot_20250115
-{ "indices": "products,orders,logs-*", "ignore_unavailable": true }
+```java
+// Spring Data Elasticsearch — just annotate your entity
+@Document(indexName = "products")
+public class Product {
+    @Id
+    private Long id;
+    
+    @Field(type = FieldType.Text, analyzer = "standard")  // Line 1: Full-text searchable
+    private String name;
+    
+    @Field(type = FieldType.Text)
+    private String description;
+    
+    @Field(type = FieldType.Double)
+    private Double price;
+    
+    @Field(type = FieldType.Keyword)  // Line 2: Exact match (not analyzed)
+    private String category;
+    
+    @Field(type = FieldType.Date)
+    private LocalDateTime createdAt;
+}
 ```
 
-**The two truths about snapshots:** they're **incremental** (only changed segments are copied — cheap after the first), and they're **restorable to a different cluster** (the migration/disaster-recovery story). The discipline: schedule snapshots, store them *off the cluster* (object storage), and **test a restore** — a snapshot that's never been restored is a hope, not a plan.
+```java
+// Repository — Spring Data generates the implementation
+@Repository
+public interface ProductRepository extends ElasticsearchRepository<Product, Long> {
+    // Custom search methods
+    List<Product> findByNameContaining(String name);                    // Full-text search
+    List<Product> findByCategoryAndPriceLessThan(String cat, Double p); // Filter + range
+}
+```
 
-## Performance: The Heap and the Hot Path
+## Searching with Query DSL
 
-The operational facts that dominate Elasticsearch performance:
+Elasticsearch has its own query language (DSL). Spring Data Elasticsearch wraps it, but understanding DSL helps:
 
-1. **The JVM heap is the working set.** ES wants ~50% of RAM as heap (up to ~30GB — beyond that, compressed ordinary object pointers stop helping); the rest is OS page cache for the Lucene files. **Query performance is determined by whether the index fits in cache** — a working set exceeding RAM means every query hits disk.
-2. **Refresh interval controls visibility.** Documents become searchable only after a **refresh** (default 1s). That's why ES is *near-real-time*, not real-time — writes are visible within ~1s. For bulk loads you can disable refresh during the load (`refresh=false`) and enable after — the classic bulk-indexing speedup.
-3. **Bulk API for writes.** Indexing document-by-document over HTTP is slow; the `_bulk` API batches hundreds/thousands of documents per request. Spring's `BulkOperations` wraps it.
-4. **Query caching.** Filter clauses are cached (that's why constraints belong in `filter`); heavy aggregations and wildcard-heavy queries are the CPU hogs to watch.
+```java
+// Method 1: Repository methods (simple)
+List<Product> products = productRepository.findByNameContaining("wireless headphones");
 
-## Capacity Planning: The Numbers That Matter
+// Method 2: ElasticsearchOperations (complex queries)
+SearchQuery query = new NativeSearchQueryBuilder()
+    .withQuery(QueryBuilders.matchQuery("name", "wireless headphones"))  // Line 1: Full-text search
+    .withFilter(QueryBuilders.rangeQuery("price").lt(100.0))            // Line 2: Price filter
+    .withSort(Sort.by("price").ascending())                              // Line 3: Sort by price
+    .withPageable(PageRequest.of(0, 10))                                 // Line 4: Pagination
+    .build();
 
-The practical planning process:
+List<Product> products = operations.queryForList(query, Product.class);
+```
 
-1. **Estimate document size and count** → total index size. Add replication factor.
-2. **Check RAM:** working set (hot indices) should fit in node memory + cache. ~30–50GB RAM per data node is a typical sweet spot.
-3. **Check disk:** total size × (1 + margin for segments, merges) — ES writes *new* segments during merges, so it needs ~1.5× the final index size transiently.
-4. **Shard count:** primary shards ≈ total size ÷ 30GB (per-shard target), distributed across nodes.
+## Common search patterns
 
-**The warning signs:** high CPU from `term` queries on high-cardinality `keyword` fields (use aggregations instead), disk filling (set disk watermark thresholds — ES auto-blocks writes at 95% by default — *and alert before*), and **unassigned shards** (replicas that couldn't be placed — the first thing to check in any cluster health issue: `GET /_cluster/health` shows `red`/`yellow`/`green`, and `GET /_cat/shards` shows what's stuck).
+### Full-text search
 
-## The Operational Checklist
+```java
+// "find products where name OR description contains 'wireless'"
+SearchQuery query = new NativeSearchQueryBuilder()
+    .withQuery(QueryBuilders.multiMatchQuery("wireless", "name", "description"))
+    .build();
+```
 
-1. **Cluster health** (`green` = all primaries + replicas allocated) monitored with alerting.
-2. **Snapshots** scheduled to off-cluster storage; restores tested.
-3. **Heap** sized correctly (half the RAM, ≤30GB); working set fits in cache.
-4. **Shards** sized ~20–40GB; primaries fixed at creation, replicas tuned live.
-5. **Disk watermarks** monitored *before* the auto-write-block.
-6. **Security on**: TLS, authentication, authorization — Elasticsearch trusts the network by default and must not.
-7. **Bulk indexing** for writes; refresh discipline for load windows.
+### Fuzzy search (typo-tolerant)
 
-## Recap
+```java
+// "find products matching 'iphon' (fuzzy → matches 'iPhone')"
+SearchQuery query = new NativeSearchQueryBuilder()
+    .withQuery(QueryBuilders.fuzzyQuery("name", "iphon")
+        .fuzziness(Fuzziness.AUTO))  // Line 1: Allow typos
+    .build();
+```
 
-The cluster is the product: shards split indices for scale (fixed at creation, sized ~20–40GB), replicas provide availability and read parallelism (tunable live), and a master-eligible node coordinates placement. The ELK stack — Elasticsearch, Logstash, Kibana — is where search meets ops: logs become searchable documents, with structured JSON logging from Spring as the pipeline's input. Snapshots (incremental, off-cluster, tested) are the backup story; heap sizing, refresh intervals, and bulk indexing are the performance levers; and cluster health color plus unassigned shards are the first diagnostics. Search engines reward the same discipline as databases — plan capacity, back up, monitor, and keep the working set in memory.
+### Autocomplete
+
+```java
+// Suggest completions as user types
+SearchQuery query = new NativeSearchQueryBuilder()
+    .withSuggestBuilder(new SuggestBuilder()
+        .addSuggestion("product-suggest",
+            SuggestBuilders.completionSuggestion("name")
+                .prefix("wire")           // Line 1: User typed "wire"
+                .skipDuplicates(true)      // Line 2: No duplicate suggestions
+                .size(5)))                // Line 3: Top 5 suggestions
+    .build();
+```
+
+## Aggregations — analytics
+
+```java
+// "count products by category, average price per category"
+SearchQuery query = new NativeSearchQueryBuilder()
+    .addAggregation(AggregationBuilders
+        .terms("by_category")                     // Line 1: Group by category
+        .field("category")                        // Line 2: Field to group on
+        .subAggregation(                          // Line 3: Nested aggregation
+            AggregationBuilders.avg("avg_price")
+                .field("price")                   // Line 4: Average price
+        )
+    )
+    .build();
+
+Aggregations aggregations = operations.query(query, SearchResponse.class).getAggregations();
+Terms byCategory = aggregations.get("by_category");
+
+for (Terms.Bucket bucket : byCategory.getBuckets()) {
+    String category = bucket.getKeyAsString();     // Line 1: Category name
+    long count = bucket.getDocCount();             // Line 2: Number of products
+    Avg avgPrice = bucket.getAggregations().get("avg_price");  // Line 3: Average price
+    System.out.println(category + ": " + count + " products, avg $" + avgPrice.getValue());
+}
+```
+
+## Real-world scenario — product search
+
+```java
+@Service
+public class ProductSearchService {
+    private final ElasticsearchOperations operations;
+    
+    // Advanced search with filters, sorting, and pagination
+    public SearchResults<Product> search(String query, String category, 
+                                         Double minPrice, Double maxPrice,
+                                         int page, int size) {
+        NativeSearchQueryBuilder builder = new NativeSearchQueryBuilder();
+        
+        // Full-text search across name and description
+        if (query != null && !query.isEmpty()) {
+            builder.withQuery(QueryBuilders.multiMatchQuery(query, "name", "description"));
+        } else {
+            builder.withQuery(QueryBuilders.matchAllQuery());  // Line 1: No query → return all
+        }
+        
+        // Category filter
+        if (category != null) {
+            builder.withFilter(QueryBuilders.termQuery("category", category));  // Line 2: Exact match
+        }
+        
+        // Price range filter
+        if (minPrice != null || maxPrice != null) {
+            RangeQueryBuilder priceRange = QueryBuilders.rangeQuery("price");
+            if (minPrice != null) priceRange.gte(minPrice);  // Line 3: Minimum price
+            if (maxPrice != null) priceRange.lte(maxPrice);  // Line 4: Maximum price
+            builder.withFilter(priceRange);
+        }
+        
+        // Sorting and pagination
+        builder.withSort(Sort.by("price").ascending());
+        builder.withPageable(PageRequest.of(page, size));
+        
+        return operations.queryForPage(builder.build(), Product.class);
+    }
+}
+```
+
+## Common mistakes
+
+| Mistake | Why it's bad | Fix |
+|---|---|---|
+| Using `match` for exact values | Wrong results for categories, IDs | Use `term` for exact, `match` for full-text |
+| No mapping for text fields | Can't search properly | Define `@Field` annotations |
+| Searching without pagination | Returns millions of results | Always use `Pageable` |
+| Syncing manually | Data gets out of sync | Use `@Document` + Spring Data |
+| Ignoring analyzers | Wrong tokenization | Define analyzers in mapping |
+
+## Key takeaways
+
+- Elasticsearch is for full-text search and analytics, not primary data storage
+- `@Document(indexName = "products")` defines the index; `@Field` defines searchable fields
+- `match` for full-text, `term` for exact, `range` for numeric ranges
+- Aggregations enable analytics (counts, averages, histograms)
+- Spring Data Elasticsearch generates repositories like JPA — minimal code
+
+**Official docs:** [Elasticsearch Reference](https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html) · [Spring Data Elasticsearch](https://docs.spring.io/spring-data/elasticsearch/reference/)

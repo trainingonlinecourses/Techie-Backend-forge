@@ -1,92 +1,169 @@
 ---
-title: Class Loading & the JVM Runtime — From Bytecode to Running App
-summary: How classes are loaded, linked and initialized, the parent-delegation model, and how it explains Spring, drivers and NoClassDefFoundError.
-order: 26
-minutes: 20
-topics: [classloader, class-loading, jvm, bytecode, parent-delegation, initialization, classpath]
+title: Class Loading & the JVM — Complete Beginner's Guide
+summary: How the JVM loads classes, the three class loaders, delegation model, and why classloader leaks crash redeployments.
+order: 18
+minutes: 18
+topics: [classloading, classloader, delegation, parent-first, classpath, metaspace]
 docs:
+  - https://docs.oracle.com/en/java/javase/21/docs/specs/man/java.html
   - https://docs.oracle.com/javase/specs/jvms/se21/html/jvms-5.html
-  - https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/ClassLoader.html
 ---
 
-# Class Loading & the JVM Runtime — From Bytecode to Running App
+# Class Loading & the JVM — Complete Beginner's Guide
 
-## The concept: what happens when you use a class
+## What is class loading?
 
-Java compiles source to **bytecode** (`.class` files). At runtime the JVM doesn't run them all up front — it **loads a class lazily, the first time it is actually referenced**. The lifecycle has three phases:
+When you run a Java program, the JVM doesn't load all your code at once. It loads classes **on demand** — when they're first referenced. Class loading is the process of finding the `.class` file, reading its bytecode, and putting it into memory.
 
-1. **Loading** — a `ClassLoader` reads the bytecode and creates a `Class` object. Lazy: nothing loads until touched.
-2. **Linking** — the JVM **verifies** the bytecode is valid, **prepares** static storage, and optionally **resolves** referenced classes.
-3. **Initialization** — runs static initializers and `static final` field assignments, exactly once per class (guarded by the JVM so concurrent first-touches initialize once).
+```java
+// This triggers class loading:
+Order order = new Order();  // Line 1: JVM loads Order.class when this line executes
+                            // Line 2: Before this, Order.class wasn't loaded
+```
 
-This laziness is why a Spring Boot app can start with hundreds of MB of dependencies: only the classes actually touched during startup get loaded. It's also why "it works in unit tests but blows up in production" usually traces to a class that was never exercised.
+**The three steps of class loading:**
+1. **Loading** — Find the `.class` file and read the bytecode
+2. **Linking** — Verify the bytecode, allocate memory for static fields, resolve references
+3. **Initialization** — Run static initializers (`static { }` blocks, static field assignments)
 
-## The parent-delegation model
+## The three class loaders
 
-Class loaders are hierarchical. When asked for a class, a loader **delegates to its parent first**; only if the parent can't find it does the loader search its own scope:
+The JVM has a hierarchy of class loaders, each with a specific job:
 
-```text
-Bootstrap ClassLoader   → java.lang, java.util (JVM core, no classpath)
+```
+Bootstrap ClassLoader (C code, loads core Java classes)
     ↑
-Platform ClassLoader    → JDK modules
+Platform ClassLoader (loads Java module classes)
     ↑
-Application ClassLoader → your classpath (Maven/Gradle dependencies + your code)
+Application ClassLoader (loads YOUR classes from classpath)
 ```
-
-**Why this matters:** it guarantees core classes (`java.lang.String`) are always the JVM's, never shadowed by a dependency that ships its own `String.class` — the foundation of Java's type safety. It also explains classic failures:
-
-- **`NoClassDefFoundError`** — the class compiled against existed, but at runtime the *loader that should provide it* can't find it (missing jar, or wrong scope like `provided`/`test`). The class was *linked* but not *found*.
-- **`ClassNotFoundException`** — a *loader* was explicitly asked for a class (reflection, `Class.forName`, driver registration) and its delegation chain failed.
-
-## How we use it in an organization: the scenarios
-
-**Scenario 1 — JDBC driver loading (the classic):**
 
 ```java
-// Old JDBC style — Class.forName forced the driver class to load so its
-// static block could register itself with DriverManager
-Class.forName("org.postgresql.Driver");
-
-// Modern style — the driver registers via ServiceLoader (META-INF/services),
-// and DataSource is created directly; no explicit loading needed
-DataSource ds = new HikariDataSource(hikariConfig);
+// You can see the class loader hierarchy:
+public class ClassLoaderDemo {
+    public static void main(String[] args) {
+        // Line 1: Application ClassLoader — loads your classes
+        ClassLoader appLoader = ClassLoaderDemo.class.getClassLoader();
+        System.out.println("App loader: " + appLoader);
+        // Output: sun.misc.Launcher$AppClassLoader@...
+        
+        // Line 2: Platform ClassLoader — loads java.sql, java.xml, etc.
+        ClassLoader platformLoader = appLoader.getParent();
+        System.out.println("Platform loader: " + platformLoader);
+        // Output: sun.misc.Launcher$ExtClassLoader@... (or PlatformClassLoader)
+        
+        // Line 3: Bootstrap ClassLoader — loads java.lang, java.util (C code, returns null)
+        ClassLoader bootstrapLoader = platformLoader.getParent();
+        System.out.println("Bootstrap loader: " + bootstrapLoader);
+        // Output: null (it's implemented in C, not Java)
+    }
+}
 ```
 
-`Class.forName(name)` triggers **initialization** (static blocks run) — which is precisely how legacy driver registration worked. Reflection APIs give you the same three knobs: `forName` (load + initialize), `loadClass` (load only), and `Class.forName(name, false, loader)` (load + link, skip init).
+## The delegation model — parent-first loading
 
-**Scenario 2 — why Spring works (the deep reason):**
+When a class loader needs to load a class, it **delegates to its parent first**:
 
-Spring's whole engine is class loading + reflection. `@ComponentScan` tells Spring which packages to inspect; Spring loads the candidate classes, reads annotations, and registers beans:
+```
+1. Application ClassLoader receives: "load Order.class"
+2. Delegates to Platform ClassLoader
+3. Platform ClassLoader delegates to Bootstrap ClassLoader
+4. Bootstrap ClassLoader: "I don't have Order.class"
+5. Platform ClassLoader: "I don't have it either"
+6. Application ClassLoader: "I'll load it from classpath"
+```
+
+**Why parent-first?** Prevents loading the same class twice with different implementations. If you wrote your own `java.lang.String`, the parent-first model ensures the bootstrap loader's `String` is used instead — critical for security and consistency.
 
 ```java
-@ComponentScan(basePackages = "com.acme.orders")  // Spring loads and inspects these classes lazily
+// The delegation model prevents this:
+// Your classloader loads: java.lang.String (malicious)
+// Bootstrap classloader loads: java.lang.String (real)
+// Without delegation: two String classes exist → chaos
+
+// With delegation: parent loaders always win → consistent behavior
 ```
 
-When you see "consider defining a bean of type X in your configuration", the class *was* found but Spring's **type-filtering** decided it wasn't a bean — loading succeeded, registration didn't. The class loader is the plumbing under every framework you use.
+## How Spring Boot uses class loading
 
-**Scenario 3 — plugins and isolation:**
+Spring Boot's executable JAR uses a custom class loader to read nested JARs:
+
+```
+my-app.jar
+├── BOOT-INF/
+│   ├── classes/                    ← Your compiled .class files
+│   └── lib/                        ← Dependencies (nested JARs)
+│       ├── spring-boot-3.2.jar
+│       └── ...
+├── META-INF/
+│   └── MANIFEST.MF                ← Points to the custom launcher
+└── org/springframework/boot/loader/  ← The custom class loader
+```
+
+**Why can't you just `java -cp my-app.jar Main`?** Because JARs inside JARs aren't on the classpath. Spring Boot's `LaunchedURLClassLoader` reads nested JARs directly from the outer JAR's entries.
+
+## Class loader leaks — the redeployment killer
+
+When you undeploy a web app (e.g., hot-reload in Tomcat), the old class loader should be garbage collected. But if any reference to old classes survives, the class loader and ALL its classes stay in memory — that's a **classloader leak**.
 
 ```java
-// An application that loads customer plugins from jars:
-URLClassLoader pluginLoader = new URLClassLoader(
-    new URL[]{ pluginJar.toURI().toURL() },
-    getClass().getClassLoader());          // parent = app loader
-Class<?> pluginClass = pluginLoader.loadClass("com.acme.plugins.TaxPlugin");
-TaxPlugin plugin = (TaxPlugin) pluginClass.getConstructor().newInstance();
+// A classloader leak in action:
+// 1. Deploy app → ClassLoader A loads 500 classes
+// 2. Redeploy app → ClassLoader B loads 500 new classes
+// 3. ClassLoader A should be GC'd → but it's not!
+// 4. Result: 1000 classes in Metaspace → OutOfMemoryError
+
+// Common causes:
+// - Static fields holding references to old classes
+// - ThreadLocal variables never removed
+// - JDBC drivers never deregistered
+// - Listeners/observers never unregistered
+
+// Prevention:
+public class CleanupListener implements ServletContextListener {
+    @Override
+    public void contextDestroyed(ServletContextEvent sce) {
+        // Line 1: Deregister JDBC drivers
+        Enumeration<Driver> drivers = DriverManager.getDrivers();
+        while (drivers.hasMoreElements()) {
+            Driver driver = drivers.nextElement();
+            DriverManager.deregisterDriver(driver);  // Line 2: Release the reference
+        }
+        
+        // Line 3: Stop thread pools
+        // Line 4: Close connections
+        // Line 5: Clear ThreadLocals
+    }
+}
 ```
 
-App servers (Tomcat, Jetty) do exactly this per webapp — each webapp gets its own class loader so two apps can use different versions of the same library without conflict. **Your own code rarely needs a custom loader** — that's the app server's job — but understanding it explains dependency conflicts and classloader leaks (a webapp redeploy that leaks its loader never releases its classes → `OutOfMemoryError: Metaspace`).
+## Real-world scenario — debugging a classloader leak
 
-## Diagnosing class-loading failures
+```bash
+# Symptom: Metaspace grows on each redeploy
+jcmd <pid> GC.heap_info  # Metaspace keeps growing
 
-- `NoClassDefFoundError: Could not initialize class X` — the static initializer of X **threw** during init (an `ExceptionInInitializerError` was swallowed). Check X's static block for the real cause.
-- Duplicate classes on the classpath (`commons-logging` in two versions) → check `mvn dependency:tree`; the loader picks the first on the path, which may be the wrong one.
-- `Metaspace` OOM after repeated redeploys → a class loader leak; a proper shutdown hook or a container that reuses loaders is the fix.
+# Step 1: Take a heap dump after 3 redeployments
+jmap -dump:live,format=b,file=heap.hprof <pid>
+
+# Step 2: Open in Eclipse MAT → Leak Suspects
+# Finding: 3 copies of com.acme.OrderService loaded by different classloaders
+
+# Step 3: Path to GC Roots
+# Root cause: A static field in ApplicationStartup holds a reference to the old class
+
+# Step 4: Fix — remove the static reference or use a WeakReference
+public class ApplicationStartup {
+    private static WeakReference<ClassLoader> oldLoader;  // WeakReference allows GC
+}
+```
 
 ## Key takeaways
 
-- Classes load lazily, then link, then initialize once; static blocks run at init.
-- Parent delegation keeps core classes authoritative and prevents shadowing.
-- `Class.forName` initializes; `loadClass` only loads — the distinction powers legacy drivers and lazy frameworks.
-- Spring, JDBC drivers, and app servers are all class-loading machines; understanding the loader explains their behaviors and failures.
-- `NoClassDefFoundError` vs `ClassNotFoundException` have different root causes — check classpath and static initializers respectively.
+- Class loading: load bytecode → link (verify/prepare/resolve) → initialize (static blocks)
+- Three loaders: Bootstrap (core), Platform (modules), Application (your code)
+- Parent-first delegation prevents duplicate classes and security issues
+- Spring Boot's `LaunchedURLClassLoader` reads nested JARs in executable JARs
+- Classloader leaks happen when references survive redeployment — deregister drivers, clear ThreadLocals
+
+**Official docs:** [java tool](https://docs.oracle.com/en/java/javase/21/docs/specs/man/java.html) · [JVM Spec — class loading](https://docs.oracle.com/javase/specs/jvms/se21/html/jvms-5.html)

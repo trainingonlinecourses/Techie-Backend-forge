@@ -1,97 +1,161 @@
 ---
-title: Chunk-Oriented Processing
-summary: The read-process-write pipeline in depth — chunk sizing, commit intervals, transactions per chunk, and how restartability works at the chunk level.
-order: 2
-minutes: 13
-topics: [chunk processing, commit interval, transactions, restartability, step execution]
+title: Chunk-Oriented Processing — Complete Beginner's Guide
+summary: How Spring Batch processes data in chunks, the Reader-Processor-Writer pattern, and why chunking beats one-by-one processing.
+order: 3
+minutes: 20
+topics: [chunk processing, reader, processor, writer, batch processing, commit interval]
 docs:
-  - https://docs.spring.io/spring-batch/reference/step/chunk-oriented-processing.html
+  - https://docs.spring.io/spring-batch/reference/core/chunk-container.html
+  - https://docs.spring.io/spring-batch/reference/core/itemreaders.html
 ---
 
-# Chunk-Oriented Processing
+# Chunk-Oriented Processing — Complete Beginner's Guide
 
-## The chunk loop
+## What is chunk processing?
 
-Every chunk-oriented step runs a tight loop driven by the chunk size:
+Instead of processing records one by one (slow) or all at once (memory explosion), Spring Batch processes data in **chunks** — groups of records processed together.
 
 ```
-1. reader.read()          → one item
-2. processor.process()    → one output (may return null to skip)
-3. repeat until `chunkSize` items are buffered
-4. writer.write(chunk)    → one transaction commits them all
-5. repeat until reader returns null (end of data)
+One-by-one (slow):
+  Record 1 → Read → Process → Write
+  Record 2 → Read → Process → Write
+  Record 3 → Read → Process → Write
+  ... 1 million records = 1 million database writes!
+
+Chunk processing (fast):
+  Chunk 1: [Record 1, Record 2, ..., Record 100] → Read → Process → Write (1 batch write)
+  Chunk 2: [Record 101, ..., Record 200] → Read → Process → Write (1 batch write)
+  ... 1 million records = 10,000 database writes!
 ```
+
+**The key insight:** Reading 100 records and writing them in one batch is MUCH faster than reading and writing one at a time. Database round-trips are expensive — chunking reduces them dramatically.
+
+## The Reader-Processor-Writer pattern
+
+```
+┌──────────┐    ┌───────────┐    ┌──────────┐
+│  READER  │ →  │ PROCESSOR │ →  │  WRITER  │
+│ (reads   │    │ (transforms│    │ (writes  │
+│  chunks) │    │  each item)│    │  chunks) │
+└──────────┘    └───────────┘    └──────────┘
+```
+
+**Line-by-line code example:**
 
 ```java
-.<Transaction, Statement>chunk(1000, tx)
-```
+// Step 1: Reader — reads chunks of data from a source
+@Bean
+public FlatFileItemReader<Order> reader() {
+    return new FlatFileItemReaderBuilder<Order>()     // Line 1: Builder pattern
+        .name("orderReader")                          // Line 2: Name for logging
+        .resource(new ClassPathResource("orders.csv")) // Line 3: Input file
+        .delimited()                                  // Line 4: CSV format
+        .names("id", "customer", "total", "status")  // Line 5: Column names
+        .fieldSetMapper(fieldSet -> new Order(        // Line 6: Map CSV to Java object
+            fieldSet.readLong("id"),
+            fieldSet.readString("customer"),
+            fieldSet.readBigDecimal("total"),
+            fieldSet.readString("status")
+        ))
+        .build();
+}
 
-- The **commit interval** = chunk size: 1000 items per database transaction.
-- A **commit point is recorded** in the StepExecution after each chunk — that's the restart checkpoint.
-- A failure inside a chunk rolls back *that chunk only*; the next restart resumes from the last successful commit point.
+// Step 2: Processor — transforms each item
+@Bean
+public ItemProcessor<Order, ProcessedOrder> processor() {
+    return order -> {
+        // Line 1: Validate the order
+        if (order.getTotal().compareTo(BigDecimal.ZERO) <= 0) {
+            return null;  // Line 2: Return null to skip invalid items
+        }
+        // Line 3: Transform to the output format
+        return new ProcessedOrder(
+            order.getId(),
+            order.getCustomer().toUpperCase(),  // Line 4: Transform data
+            order.getTotal(),
+            Instant.now()                       // Line 5: Add processing timestamp
+        );
+    };
+}
 
-## Choosing the chunk size
-
-It's a throughput-vs-memory-and-latency trade-off:
-
-| Size | Effect |
-|---|---|
-| too small (10) | many small transactions — DB commit overhead dominates |
-| too large (100k) | big transaction, big memory buffer, long-held locks, long rollback |
-| sweet spot | 500–5,000 typically; tune by measuring, not guessing |
-
-The buffered items sit in memory — with heavy objects, chunk size directly bounds heap usage. For "write everything at the end" needs, Spring Batch has **multi-resource writers** and an **item-writer adapter** to an in-memory collection, but a moderate chunk size usually beats the all-or-nothing approach on both memory and restart behavior.
-
-## Readers: cursor vs. paging
-
-The two read strategies for databases differ in memory profile:
-
-- **Cursor** (`JdbcCursorItemReader`) — a single streaming `ResultSet` with one open connection; constant memory, but the connection stays open for the whole step.
-- **Paging** (`JdbcPagingItemReader`) — fetches `pageSize` rows per query; bounded memory per page, each query re-establishes state, but needs a well-defined sort order (pagination without `ORDER BY` is broken).
-
-```java
-new JdbcCursorItemReaderBuilder<Transaction>()
-    .dataSource(ds)
-    .sql("SELECT id, amount FROM tx WHERE date = ? ORDER BY id")
-    .rowMapper((rs, i) -> new Transaction(rs.getLong("id"), rs.getBigDecimal("amount")))
-    .build();
-```
-
-Rule: **cursor for flat scans, paging for large/filtered datasets** and when the connection must not be held.
-
-## Processors: transform, filter, enrich
-
-- Return the transformed item → written.
-- Return `null` → **silently skipped** (no write, not counted as failure) — the idiomatic way to filter.
-- Throw → counted against skip policy (see the error-handling lesson).
-
-```java
-public Statement process(Transaction t) {
-    if (!t.amount().signum() > 0) return null;      // filter
-    return new Statement(t.id(), t.amount().multiply(TARIFF)); // transform
+// Step 3: Writer — writes chunks to the destination
+@Bean
+public JdbcBatchItemWriter<ProcessedOrder> writer(DataSource dataSource) {
+    return new JdbcBatchItemWriterBuilder<ProcessedOrder>()
+        .dataSource(dataSource)                     // Line 1: Database connection
+        .sql("INSERT INTO processed_orders (id, customer, total, processed_at) " +
+             "VALUES (:id, :customer, :total, :processedAt)")  // Line 2: SQL with named params
+        .beanMapped()                               // Line 3: Use bean properties for parameters
+        .build();
 }
 ```
 
-## Commit-point and restart mechanics
+## The complete job — putting it together
 
-The restart contract lives in the JobRepository:
+```java
+@Bean
+public Job importOrdersJob(JobRepository jobRepository, 
+                           Step importStep) {
+    return new JobBuilder("importOrders", jobRepository)  // Line 1: Create job
+        .start(importStep)                                 // Line 2: Add the step
+        .build();
+}
 
-- `StepExecution.readCount / writeCount / skipCount / commitCount` track progress.
-- On restart, the step **starts again from the last committed chunk** — items in the uncommitted chunk are re-read and re-processed. That means **processors must be idempotent** (no side effects outside the transaction), because a chunk can run twice.
-- `JobInstanceAlreadyCompleteException` blocks re-running a completed job with identical parameters — pass a unique parameter (run id / file hash / date) to legitimately re-run.
+@Bean
+public Step importStep(JobRepository jobRepository,
+                       PlatformTransactionManager transactionManager,
+                       FlatFileItemReader<Order> reader,
+                       ItemProcessor<Order, ProcessedOrder> processor,
+                       JdbcBatchItemWriter<ProcessedOrder> writer) {
+    return new StepBuilder("importStep", jobRepository)   // Line 1: Create step
+        .<Order, ProcessedOrder>chunk(100, transactionManager)  // Line 2: Chunk size = 100
+        .reader(reader)                                   // Line 3: Set the reader
+        .processor(processor)                             // Line 4: Set the processor
+        .writer(writer)                                   // Line 5: Set the writer
+        .build();
+}
+```
 
-## The classic chunk pitfalls
+**What happens at runtime:**
+1. Job starts → Step starts
+2. Reader reads 100 orders from CSV
+3. Processor transforms each order (validate, enrich, convert)
+4. Writer writes all 100 processed orders to database in one batch
+5. Repeat until all records are processed
+6. Step completes → Job completes
 
-1. **Processor with external side effects** (email, API call) — if the chunk rolls back, the side effect already happened. Move side effects to a listener that fires only on commit (`ChunkListener.afterChunk` with `ChunkContext.isComplete()`), or write "to-send" records and let another job send them.
-2. **Reader returning null early** — null means "end of input", not "skip this item"; skipping is the processor's job.
-3. **Huge chunk sizes** — memory spikes and long lock windows; measure before raising.
-4. **No `ORDER BY` in a paging reader** — rows repeat or vanish across page boundaries.
+## Chunk size — tuning for performance
+
+```java
+// Small chunk (10) — more database round-trips, less memory
+.chunk(10, transactionManager)
+
+// Large chunk (1000) — fewer round-trips, more memory
+.chunk(1000, transactionManager)
+
+// The sweet spot depends on:
+// - Record size (small records → larger chunks)
+// - Database performance (fast DB → larger chunks)
+// - Memory available (limited memory → smaller chunks)
+// - Transaction overhead (high overhead → larger chunks)
+```
+
+## Common mistakes
+
+| Mistake | Why it's slow | Fix |
+|---|---|---|
+| Chunk size too small | Too many database round-trips | Increase to 100-500 |
+| Chunk size too large | Out of memory | Decrease to 50-100 |
+| Processing in writer | Skips processor | Process in the processor step |
+| Not returning null to skip | Invalid items get written | Return null in processor |
+| No transaction management | Partial writes on failure | Use `@Transactional` or chunk transaction |
 
 ## Key takeaways
 
-- Chunk = one transaction; commit interval = chunk size; restart resumes at the last commit point.
-- Cursor readers stream (constant memory), paging readers bound memory per page.
-- Processor returning null filters; returning an item writes it within the chunk transaction.
-- Keep processors free of external side effects so re-running a chunk is safe.
+- Chunk processing reads/writes in batches — fewer database round-trips
+- Reader → Processor → Writer: each has a single responsibility
+- Chunk size tunes performance: too small = slow, too large = OOM
+- Return null from processor to skip invalid items
+- Spring Batch handles transactions automatically per chunk
 
-Official docs: [Chunk-Oriented Processing](https://docs.spring.io/spring-batch/reference/step/chunk-oriented-processing.html)
+**Official docs:** [Chunk-Oriented Processing](https://docs.spring.io/spring-batch/reference/core/chunk-container.html) · [Item Readers](https://docs.spring.io/spring-batch/reference/core/itemreaders.html)
