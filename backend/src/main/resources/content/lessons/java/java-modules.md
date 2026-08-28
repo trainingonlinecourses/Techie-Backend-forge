@@ -1,94 +1,194 @@
 ---
-title: JPMS: The Java Platform Module System
-summary: Modularity in Java — module-info.java, strong encapsulation, requires/exports/opens, and what changes for Spring Boot applications.
-order: 17
-minutes: 16
-topics: [jigsaw, modules, module-info, strong-encapsulation, classpath-vs-modulepath]
+title: Java Platform Module System (JPMS) — Java 9+ Modules
+summary: What modules solve (the JAR hell), module-info.java anatomy, automatic vs named modules, and how organizations modularize large codebases. Beginner-friendly with line-by-line code.
+order: 94
+minutes: 20
+topics: [JPMS, modules, module-info.java, requires, exports, automatic module, module path, encapsulation]
 docs:
-  - https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/module/package-summary.html
-  - https://docs.oracle.com/javase/tutorial/java/modules/
+  - https://docs.oracle.com/en/java/javase/21/language/java-platform-module-system.html
+  - https://openjdk.org/projects/jigsaw/
 ---
 
-# JPMS: The Java Platform Module System
+# Java Platform Module System (JPMS) — Java 9+ Modules
 
-## Why modules (Jigsaw, Java 9)
+## What are Java Modules? (From Zero)
 
-The classpath has a core problem: **everything is visible to everything**. Two jars with the same class silently override each other, and nothing can say "I expose this package, hide that one." JPMS adds:
+Before Java 9, the entire JDK was one giant package — you could access anything from anywhere. This caused problems:
 
-- **Strong encapsulation** — a module declares what it exposes; everything else is hidden at the language level.
-- **Explicit dependencies** — `requires` replaces "hope the jar is on the classpath".
-- **Reliable configuration** — missing or duplicate modules fail at startup, not at runtime with `ClassNotFoundException`.
-- **The JDK itself is modularized** — smaller runtimes via `jlink`.
+1. **JAR Hell**: Two libraries using the same package name but different classes → conflicts
+2. **No encapsulation**: You could `sun.misc.Unsafe` your way into anything
+3. **Slow startup**: The JVM had to load the entire JDK even if you only used `java.lang.String`
 
-## Anatomy of module-info.java
+Java 9 introduced the **Platform Module System (JPMS)** — a way to divide code into modules that declare what they **provide** (export) and what they **need** (requires).
+
+Think of it like an apartment building:
+- Each apartment (module) has a public entrance (exported packages)
+- Private rooms inside (non-exported packages — invisible to other modules)
+- A list of neighbors they depend on (requires)
+
+---
+
+## The Module Declaration
+
+Every module has a `module-info.java` at the root of its source tree:
 
 ```java
-module com.acme.orders {
-    requires java.sql;                 // JDK modules you use
-    requires transitive org.slf4j;     // 'transitive' = consumers see it too
-    requires static com.acme.tools;    // optional at runtime (test/compile only)
+// File: src/main/java/module-info.java
+module com.myapp.orders {                            // Module name
 
-    exports com.acme.orders.api;       // public API packages
-    exports com.acme.orders.spi;
+    // === WHAT THIS MODULE NEEDS ===
+    requires java.sql;                               // Needs JDBC APIs
+    requires java.net.http;                          // Needs HttpClient
+    requires spring.context;                         // Needs Spring DI
+    requires spring.web;                             // Needs Spring MVC
+    requires static org.slf4j;                       // Compile-only dependency (optional)
 
-    opens com.acme.orders.domain;      // reflective access (JPA/Hibernate!)
+    // === WHAT THIS MODULE PROVIDES ===
+    exports com.myapp.orders.api;                    // Public API — other modules can use this
+    exports com.myapp.orders.model;                  // Public models
+    // Note: com.myapp.orders.internal is NOT exported — private to this module
+
+    // === SERVICE PROVIDERS ===
+    provides com.myapp.common.spi.PaymentProcessor    // Implements this service interface
+        with com.myapp.orders.StripePaymentProcessor; // The implementation class
+
+    // === OPENS (for reflection — Spring needs this) ===
+    opens com.myapp.orders.model;                    // Allow reflection on these classes
+    opens com.myapp.orders.service;                  // Spring can inject into these
 }
 ```
 
-| Directive | Meaning |
-|---|---|
-| `requires` | I depend on that module |
-| `requires transitive` | Anyone who requires me can see it too |
-| `requires static` | Compile-time only (optional at runtime) |
-| `exports` | Those packages are public to other modules |
-| `opens` | Allow reflection into those packages (framework needs) |
-| `uses` / `provides with` | ServiceLoader-based service consumption/provision |
+**Line-by-line explained:**
+- `module com.myapp.orders` — The module's unique name. Convention: reverse domain name.
+- `requires java.sql` — "I need the java.sql module." At compile time and runtime, this module must be present.
+- `requires static` — "I need this at compile time, but it's optional at runtime." Good for annotation processors.
+- `exports com.myapp.orders.api` — These packages are PUBLIC. Other modules can import and use classes from here.
+- `provides ... with ...` — This module implements a service interface. Other modules can discover the implementation via `ServiceLoader`.
+- `opens` — Allows deep reflection (Spring, Hibernate need this for DI and ORM). Without `opens`, Spring can't inject into your classes.
 
-## The reflection gotcha (why `opens` matters)
+---
 
-Reflection into a non-exported, non-opened package throws `InaccessibleObjectException`:
+## The Code — Line by Line
 
-```java
-// Without "opens com.acme.orders.domain" this fails:
-Object obj = clazz.getDeclaredConstructor().newInstance();
-```
-
-**Hibernate/JPA, Jackson, Mockito and Spring all reflect into your classes.** With modules you must explicitly `opens` every package they need. This is the main friction point for modularizing Spring Boot apps — see the "pragmatic" path below.
-
-## Module path vs classpath
-
-- **Classpath** (`java -cp ...`): legacy behavior — everything readable, no encapsulation.
-- **Module path** (`java -p ... --module ...`): strong encapsulation, `module-info.java` honored.
-- **Automatic modules**: a plain jar on the module path gets a synthesized module (its filename), requires everything, exports everything — a migration bridge.
-
-## Pragmatic adoption for backend teams
-
-Full modularity (all layers in named modules) is achievable but costs ongoing `opens` maintenance. The pragmatic ladder:
-
-1. **Keep the classpath** (Spring Boot's default) — modules are opt-in.
-2. **Structure code into packages as if modular** (an `api` package per component) — most of the discipline, none of the ceremony.
-3. **Use `jlink` to build a trimmed runtime** for container images — shrink the JRE to the modules you need, drop tens of MB.
-4. Adopt named modules for **small, leaf libraries** first (no reflection); add `opens` where frameworks need it.
-
-## Building a runnable image
+### Module Dependencies
 
 ```java
-// module-info.java
-module com.acme.app {
-    requires java.base;             // always implicit
-    requires java.sql;
+// In a module that USES the orders module:
+module com.myapp.api {
+    requires com.myapp.orders;      // Need the orders module
+    requires spring.web;
+
+    // Now you can import and use the exported classes:
 }
-
-// Then:
-//   jlink --module-path $JAVA_HOME/jmods:out --add-modules com.acme.app \
-//         --launcher app=com.acme.app/com.acme.Main --output runtime-image
-//   runtime-image/bin/app
 ```
 
-## Key takeaways
+```java
+// In a class inside com.myapp.api:
+import com.myapp.orders.api.OrderService;      // ✅ This package is exported
+import com.myapp.orders.model.Order;           // ✅ This package is exported
+import com.myapp.orders.internal.CacheManager; // ❌ COMPILE ERROR — not exported!
+```
 
-- JPMS = strong encapsulation + explicit dependencies + reliable startup.
-- `exports` for compile-time APIs, `opens` for reflective frameworks (JPA/Jackson/Spring).
-- Spring Boot apps can stay on the classpath; use `jlink` for smaller images and `opens`-aware design when you modularize.
+### Automatic Modules (Legacy JARs)
 
-Official docs: [java.lang.module](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/module/package-summary.html) · [Modules tutorial](https://docs.oracle.com/javase/tutorial/java/modules/)
+When you put a regular JAR (without `module-info.java`) on the module path, it becomes an **automatic module**:
+
+```
+# The module name is derived from the JAR filename:
+orders-service-1.0.jar  →  module orders.service   (dots from dashes, version stripped)
+```
+
+```java
+// An automatic module "reads" all other modules:
+module orders.service {   // Auto-generated name
+    // Implicitly requires EVERY module on the module path
+    // No exports — all packages are exported
+}
+```
+
+**Line-by-line explained:**
+- Automatic modules are a **migration bridge** — they let you use non-modular JARs in a modular system.
+- But they have quirks: implicit requires, no encapsulation. Migrate to named modules when possible.
+
+---
+
+## Real-World Scenarios
+
+### Scenario 1: Clean API Boundaries
+
+```java
+// Module: com.myapp.payment
+module com.myapp.payment {
+    exports com.myapp.payment.api;      // Public: PaymentService, PaymentResult
+    // com.myapp.payment.stripe is NOT exported — internal implementation
+
+    provides com.myapp.payment.api.PaymentProcessor
+        with com.myapp.payment.stripe.StripeProcessor;   // Stripe is the implementation
+}
+```
+
+```java
+// Module: com.myapp.orders (uses payment)
+module com.myapp.orders {
+    requires com.myapp.payment;         // Can use the exported API
+
+    // Can import: PaymentService, PaymentResult ✅
+    // Cannot import: StripeProcessor ❌ (internal, not exported)
+}
+```
+
+**Benefit:** The Orders module depends on the Payment **API**, not the Stripe implementation. You can swap Stripe for PayPal by changing the `provides` declaration — Orders doesn't know or care.
+
+### Scenario 2: Spring Boot Application
+
+```java
+module com.myapp {
+    requires spring.boot;              // Spring Boot starter
+    requires spring.context;           // Spring DI
+    requires spring.web;               // Spring MVC
+    requires spring.data.jpa;          // Spring Data JPA
+    requires java.sql;                 // JDBC
+    requires static org.mapstruct;     // Compile-time only
+
+    opens com.myapp.controller;        // Spring MVC needs reflection
+    opens com.myapp.service;           // Spring DI needs reflection
+    opens com.myapp.model;             // JPA needs reflection
+    exports com.myapp;                 // Main module
+}
+```
+
+### Scenario 3: Testing Modules
+
+```java
+// Test module (src/test/java/module-info.java):
+open module com.myapp.test {
+    requires com.myapp;                // Test the main module
+    requires org.junit.jupiter;        // JUnit 5
+    requires spring.test;              // Spring Test
+    opens com.myapp.controller;        // @WebMvcTest needs reflection
+}
+```
+
+---
+
+## Common Mistakes
+
+| Mistake | Why It Breaks | Fix |
+|---|---|---|
+| Not adding `opens` for Spring | Spring can't inject, Hibernate can't proxy | `opens` every package with `@Component`/`@Entity` |
+| Forgetting `requires java.sql` | JDBC classes not found at runtime | Add `requires java.sql` if using JPA/JDBC |
+| Using `requires transitive` carelessly | Forces downstream modules to inherit dependencies | Only use when your API exposes the dependency's types |
+| Module name collisions | Two modules with same name → resolution fails | Use reverse domain convention (`com.myapp.x`) |
+| Not testing on module path | Bugs only appear when modularized | Run integration tests on the module path |
+
+---
+
+## Key Takeaways
+
+- **Modules enforce boundaries** — unexported packages are truly hidden, not just a convention.
+- **`exports`** = public API, **`opens`** = reflection-friendly (needed for Spring/Hibernate).
+- **Automatic modules** are a migration bridge for legacy JARs, but prefer named modules.
+- **Service providers** (`provides...with`) enable plug-in architectures with clean decoupling.
+- **Spring Boot + modules**: always add `opens` for packages with DI/ORM annotations.
+
+Official docs: [JPMS Tutorial](https://docs.oracle.com/en/java/javase/21/language/java-platform-module-system.html) · [Project Jigsaw](https://openjdk.org/projects/jigsaw/)

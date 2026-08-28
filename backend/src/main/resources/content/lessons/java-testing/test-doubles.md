@@ -1,91 +1,260 @@
 ---
-title: Test Doubles — Fakes, Stubs, Mocks & Spies
-summary: The five kinds of test double from the classic taxonomy — and the discipline of choosing fakes over mocks at the architecture boundary.
-order: 5
-minutes: 14
-topics: [test doubles, fakes, stubs, mocks, spies, test taxonomy]
+title: Test Doubles — Mocks, Stubs, Fakes, and Spies
+summary: The five types of test doubles, when to use each, Mockito deep dive, and how organizations build reliable test suites without hitting real databases or APIs.
+order: 6
+minutes: 22
+topics: [test doubles, mocks, stubs, fakes, spies, mockito, verification, argument captor, BDD]
 docs:
-  - https://martinfowler.com/bliki/TestDouble.html
-  - https://xunitpatterns.com/Test%20Double.html
+  - https://site.mockito.org/
+  - https://docs.spring.io/spring-framework/reference/testing.html
 ---
 
-# Test Doubles — Fakes, Stubs, Mocks & Spies
+# Test Doubles — Mocks, Stubs, Fakes, and Spies
 
-## The taxonomy (Fowler / Meszaros)
+## What are Test Doubles? (From Zero)
 
-"Mock" is a catch-all word — but the five precise kinds of double behave differently:
+When testing a class, you often don't want to use real dependencies — a real database is slow, a real payment API costs money, a real email service sends real emails. **Test doubles** are fake objects that stand in for real dependencies during testing.
 
-| Double | What it is | Example | Verify behavior? |
-|---|---|---|---|
-| **Dummy** | passed around, never used | a required constructor arg | no |
-| **Fake** | a working lightweight implementation | in-memory repository | no |
-| **Stub** | returns canned answers | `when(repo.find(1)).thenReturn(o)` | no |
-| **Mock** | pre-programmed + expects calls | `verify(repo).save(o)` | yes |
-| **Spy** | real object, wrapped to observe/call | `spy(realService)` | yes |
+Think of it like a movie stunt double — they look like the real actor, do the important moves, but it's safe (no one gets hurt, no real money spent).
 
-The practical split: **dummies/fakes** replace *dependencies*; **stubs/mocks/spies** are *Mockito's* vocabulary for controlling behavior.
+### The Five Types
 
-## The fake: the unsung hero
+| Double | What it does | When to use |
+|---|---|---|
+| **Dummy** | Passed around but never used | Filling parameter lists |
+| **Stub** | Returns predefined data | When you need known inputs/outputs |
+| **Spy** | Wraps a real object, records calls | When you need to verify interactions on real code |
+| **Mock** | Fake object that you verify interactions against | When behavior (calls, args) matters more than state |
+| **Fake** | Working implementation of an interface (but simplified) | When you need a lightweight substitute (in-memory DB) |
 
-A **fake** is a real implementation — usually in-memory — that behaves like the real thing. It's the best double for repositories and clocks:
+---
+
+## The Code — Line by Line
+
+### 1. Stub (Predefined Responses)
 
 ```java
-class InMemoryOrderRepository implements OrderRepository {
-    private final Map<Long, Order> store = new HashMap<>();
-    private long seq = 1;
-    public Order save(Order o) { o.id(seq++); store.put(o.id(), o); return o; }
-    public Optional<Order> findById(long id) { return Optional.ofNullable(store.get(id)); }
-    public List<Order> findAll() { return List.copyOf(store.values()); }
+// The real dependency:
+public interface UserRepository {
+    Optional<User> findById(String id);
+    User save(User user);
 }
 
-// Test: no mocking, real behavior, milliseconds fast:
-OrderService service = new OrderService(new InMemoryOrderRepository());
+// A stub: returns whatever you tell it to
+@Test
+void shouldProcessOrder() {
+    // Arrange: create a stub that always returns a specific user
+    UserRepository stub = Mockito.mock(UserRepository.class);
+    Mockito.when(stub.findById("user-123"))                         // When findById is called
+        .thenReturn(Optional.of(new User("user-123", "Alice")));   // Return this user
+
+    // Act: use the stub in your service
+    OrderService service = new OrderService(stub);
+    Order order = service.createOrder("user-123", List.of(item1));
+
+    // Assert: verify the result
+    assertThat(order.getUserId()).isEqualTo("user-123");
+    assertThat(order.getStatus()).isEqualTo(OrderStatus.CREATED);
+}
 ```
 
-Fakes shine because they **don't pin implementation** — refactor `findAll()` internally and the fake-based test still passes. When the fake gets complicated (sorting, filtering, transactions), that's the signal the real collaborator is doing too much.
+**Line-by-line explained:**
+- `Mockito.mock(UserRepository.class)` — Creates a fake implementation of `UserRepository`. Every method returns null/empty by default.
+- `Mockito.when(stub.findById("user-123")).thenReturn(...)` — **Stubbing**: when this specific method is called with this specific argument, return this specific value.
+- The test never touches a real database — it uses the stub's predefined response.
 
-## Mockito: stub or verify?
-
-The Mockito distinction matters more than the taxonomy:
-
-- **Stubbing** (`when(x).thenReturn(y)`) answers the question "what does the unit need to proceed?" — it sets up *inputs*.
-- **Verifying** (`verify(x)`) asks "did the unit do the right thing?" — it asserts on *outputs* (side effects).
-
-The trap: treating stubs as verification. `when(repo.save(o)).thenReturn(o)` doesn't assert the save happened — only `verify(repo).save(o)` does. Teams that only stub write tests that pass while the real system silently skips work.
-
-## Choosing: the architecture-boundary rule
-
-The honest rule for *which* double:
-
-1. **Prefer fakes** for heavy, stateful collaborators (repositories, caches) — real behavior, no implementation pinning. Write a tiny fake per test class or share one.
-2. **Prefer stubs** for I/O you can't fake cheaply (HTTP clients, message brokers) — you don't want the test to really call Stripe.
-3. **Verify sparingly** — only for side effects that are *business rules* (charge the payment, publish the event), never for incidental call sequences.
-4. **Spies only when** one method of a real object needs overriding — usually a refactor smell.
-
-## The double that bites: partial fakes
-
-A fake that only implements *some* methods throws `UnsupportedOperationException` on the rest — which is exactly right: it tells you the test is using an unfaked seam. Don't "just add a stub" — decide: this collaborator belongs at the boundary, so give it a real fake.
-
-## Dummies and nulls
-
-The Java null problem: constructors force arguments. A **dummy** is `null` or an empty object passed only to satisfy the signature. Two tools keep dummies honest:
+### 2. Mock (Verify Interactions)
 
 ```java
-assertDoesNotThrow(() -> service.create(order, DUMMY_CLOCK));   // clock unused in this path
+@Test
+void shouldSendEmailWhenOrderCreated() {
+    // Arrange: create a mock
+    EmailService mockEmail = Mockito.mock(EmailService.class);
 
-// Or make the dependency optional and pass null deliberately — with a comment:
-service.create(order, null);  // null audit logger: not used on the happy path
+    // Act: use the mock in the service under test
+    OrderService service = new OrderService(userRepo, mockEmail);
+    service.createOrder("user-123", List.of(item1));
+
+    // Assert: verify the mock was called with the right arguments
+    Mockito.verify(mockEmail)                                      // Check this mock
+        .sendOrderConfirmation(                                    // This method was called
+            Mockito.eq("user-123"),                                // With this argument
+            Mockito.argThat(order ->                               // And this argument matches
+                order.getStatus() == OrderStatus.CREATED &&
+                order.getTotal().compareTo(BigDecimal.ZERO) > 0
+            )
+        );
+    // If sendOrderConfirmation was NOT called → test fails!
+    // If called with wrong arguments → test fails!
+}
 ```
 
-## When integration tests replace doubles entirely
+**Line-by-line explained:**
+- `Mockito.verify(mockEmail)` — Now we're in **verification mode**. We're checking that a method WAS called.
+- `.sendOrderConfirmation(Mockito.eq("user-123"), ...)` — Assert the first argument was exactly "user-123".
+- `Mockito.argThat(order -> ...)` — Custom argument matcher — the second argument must satisfy this condition.
+- **Mocks verify behavior** (was this method called?), while **stubs verify state** (did this return the right thing?).
 
-The pyramid's message: the *integration* layer (real Postgres via Testcontainers, real Spring context) is where the doubles' blind spots (SQL dialect, transaction semantics, serialization) get caught. Doubles make the **logic** fast and isolated; integration tests make the **boundary** true. Both, in that order.
+### 3. Spy (Record Calls on Real Objects)
 
-## Key takeaways
+```java
+@Test
+void shouldCacheUserAfterFirstLookup() {
+    // Arrange: spy on a REAL repository
+    UserRepository realRepo = new JdbcUserRepository(dataSource);
+    UserRepository spy = Mockito.spy(realRepo);    // Wraps real object, records all calls
 
-- Dummy / Fake / Stub / Mock / Spy — know the difference; "mock" alone is imprecise.
-- Fakes (in-memory implementations) beat mocks for stateful collaborators — real behavior, no pinning.
-- Stubs set up inputs; verification asserts outputs — stubbing is not verifying.
-- Doubles for the fast logic layer; Testcontainers/integration tests for the real boundary.
+    OrderService service = new OrderService(spy, emailService);
 
-Official docs: [TestDouble (Fowler)](https://martinfowler.com/bliki/TestDouble.html) · [xUnit Patterns](https://xunitpatterns.com/Test%20Double.html)
+    // Act: call twice
+    service.createOrder("user-123", List.of(item1));
+    service.createOrder("user-123", List.of(item2));
+
+    // Assert: findById was called only ONCE (second call used cache)
+    Mockito.verify(spy, Mockito.times(1))          // Only once
+        .findById("user-123");
+}
+```
+
+**Line-by-line explained:**
+- `Mockito.spy(realRepo)` — Creates a wrapper around the REAL `JdbcUserRepository`. All calls go through to the real object.
+- But we can still verify: `Mockito.verify(spy, Mockito.times(1)).findById(...)` checks it was called exactly once.
+- **Spies are for testing caching** — if the cache works, the real method shouldn't be called again.
+
+### 4. Fake (Working Implementation)
+
+```java
+// A fake: simplified but working implementation
+public class InMemoryUserRepository implements UserRepository {
+    private final Map<String, User> store = new ConcurrentHashMap<>();
+
+    @Override
+    public Optional<User> findById(String id) {
+        return Optional.ofNullable(store.get(id));      // Simple map lookup
+    }
+
+    @Override
+    public User save(User user) {
+        store.put(user.getId(), user);                  // Simple map store
+        return user;
+    }
+}
+
+// Usage in tests:
+@Test
+void shouldPersistUser() {
+    UserRepository fake = new InMemoryUserRepository();  // No database needed!
+    OrderService service = new OrderService(fake, emailService);
+
+    service.createUser("user-123", "Alice");
+
+    assertThat(fake.findById("user-123"))
+        .isPresent()
+        .hasValueSatisfying(user -> assertThat(user.getName()).isEqualTo("Alice"));
+}
+```
+
+**Line-by-line explained:**
+- `InMemoryUserRepository` is a **fake** — it implements the real interface but uses an in-memory `ConcurrentHashMap` instead of a database.
+- It's a **working** implementation — `save()` actually stores data, `findById()` actually retrieves it.
+- Fakes are the most realistic test doubles — they exercise the actual code paths.
+
+---
+
+## Real-World Scenarios
+
+### Scenario 1: Testing Payment Processing
+
+```java
+@SpringBootTest
+class PaymentServiceTest {
+
+    @MockBean
+    PaymentGateway gateway;                    // Mock the external payment API
+
+    @MockBean
+    OrderRepository orderRepo;                 // Mock the database
+
+    @Autowired
+    PaymentService paymentService;             // Real service under test
+
+    @Test
+    void shouldProcessPaymentSuccessfully() {
+        // Arrange: stub the gateway
+        when(gateway.charge(any(PaymentRequest.class)))
+            .thenReturn(new PaymentResult("txn-123", "SUCCESS"));
+
+        when(orderRepo.findById("order-1"))
+            .thenReturn(Optional.of(new Order("order-1", BigDecimal.valueOf(99.99))));
+
+        // Act
+        PaymentResult result = paymentService.processPayment("order-1");
+
+        // Assert: verify interactions
+        assertThat(result.getTransactionId()).isEqualTo("txn-123");
+        verify(gateway).charge(argThat(req ->
+            req.getAmount().compareTo(BigDecimal.valueOf(99.99)) == 0
+        ));
+        verify(orderRepo).save(argThat(order ->
+            "PAID".equals(order.getStatus())
+        ));
+    }
+
+    @Test
+    void shouldHandlePaymentFailure() {
+        // Arrange: stub the gateway to fail
+        when(gateway.charge(any()))
+            .thenThrow(new PaymentDeclinedException("Insufficient funds"));
+
+        // Act & Assert
+        assertThatThrownBy(() -> paymentService.processPayment("order-1"))
+            .isInstanceOf(PaymentDeclinedException.class);
+
+        verify(orderRepo).save(argThat(order ->
+            "PAYMENT_FAILED".equals(order.getStatus())    // Order marked as failed
+        ));
+    }
+}
+```
+
+### Scenario 2: Argument Captor (Capture and Inspect)
+
+```java
+@Test
+void shouldSendCorrectEmailContent() {
+    ArgumentCaptor<EmailMessage> captor = ArgumentCaptor.forClass(EmailMessage.class);
+
+    // ... setup and act ...
+
+    verify(emailService).send(captor.capture());   // Capture the argument
+
+    EmailMessage sent = captor.getValue();         // Inspect what was actually sent
+    assertThat(sent.getSubject()).contains("Order Confirmation");
+    assertThat(sent.getBody()).contains("Alice");
+    assertThat(sent.getRecipients()).contains("alice@example.com");
+}
+```
+
+---
+
+## Common Mistakes
+
+| Mistake | Why It Breaks | Fix |
+|---|---|---|
+| Mocking everything | Tests don't verify real behavior | Use mocks for external deps, fakes for internal ones |
+| Over-specifying mock expectations | Brittle tests that break on refactoring | Verify behavior, not implementation details |
+| Using mocks for value objects | Pointless — just create the real object | Use real objects for simple POJOs/records |
+| Not resetting mocks between tests | Shared state causes flaky tests | Use `@BeforeEach` with `Mockito.reset()` or `@MockBean` |
+| Stubbing in assertion phase | Tests read backwards | Arrange → Act → Assert (AAA pattern) |
+
+---
+
+## Key Takeaways
+
+- **Stubs** return predefined data. **Mocks** verify interactions. **Fakes** are working implementations. **Spies** wrap real objects.
+- **Mockito is the standard** for Java mocking — learn `when/thenReturn`, `verify`, `argThat`, and `ArgumentCaptor`.
+- **Use the simplest double that works** — don't mock what you can create as a real object.
+- **Fakes > Mocks** for internal dependencies — they're more realistic and less brittle.
+- **AAA pattern**: Arrange (set up doubles) → Act (call the method) → Assert (verify results + interactions).
+
+Official docs: [Mockito](https://site.mockito.org/) · [Spring Testing](https://docs.spring.io/spring-framework/reference/testing.html)

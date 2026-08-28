@@ -1,88 +1,181 @@
 ---
-title: Performance Tuning in Practice
-summary: The measurement-first checklist for a Spring Boot backend — latency targets, connection pools, JIT and warmup, and the anti-patterns that waste effort.
+title: JVM Performance Tuning — The Complete Guide
+summary: A systematic approach to JVM tuning — measuring first, understanding GC algorithms, choosing the right flags, and avoiding premature optimization.
 order: 5
-minutes: 15
-topics: [performance tuning, jit, warmup, connection pools, latency, throughput]
+minutes: 25
+topics: [performance tuning, GC selection, throughput, latency, p99, G1GC, ZGC, tuning methodology, benchmarks]
 docs:
   - https://docs.oracle.com/en/java/javase/21/docs/specs/man/java.html
-  - https://docs.spring.io/spring-boot/reference/actuator/metrics.html
+  - https://www.oracle.com/java/technologies/gctuning.html
 ---
 
-# Performance Tuning in Practice
+# JVM Performance Tuning — The Complete Guide
 
-## The first rule: measure, then measure again
+## What is JVM Performance Tuning? (From Zero)
 
-Tuning without a baseline is astrology. Before changing anything:
+JVM performance tuning is the process of adjusting JVM settings to meet your application's **latency** (how fast each request is) or **throughput** (how many requests per second) requirements. The key insight: **measure first, tune second**. Most performance problems aren't JVM issues — they're code issues.
+
+### The Tuning Methodology (Always Follow This)
+
+```
+1. Set clear goals    → p99 latency < 200ms? Throughput > 10k req/s?
+2. Measure baseline   → What do you get with DEFAULT settings?
+3. Identify bottleneck → Is it CPU? Memory? I/O? Lock contention?
+4. Make ONE change    → Change ONE setting at a time
+5. Measure again      → Did it improve? By how much?
+6. Repeat             → Go back to step 3 until goals are met
+```
+
+**Never skip step 2.** You can't improve what you haven't measured.
+
+---
+
+## GC Algorithms — The Big Choice
+
+| Algorithm | Best For | Pause Time | Throughput | When to Use |
+|---|---|---|---|---|
+| **Serial GC** | Single-core, small heaps | High (stop-the-world) | Lowest | Embedded, tiny apps |
+| **Parallel GC** | Batch jobs, high throughput | Medium (50-200ms) | Highest | Batch processing, data pipelines |
+| **G1 GC** | Balanced (default since Java 9) | Low (10-50ms) | High | General-purpose web apps |
+| **ZGC** | Ultra-low latency | <1ms | Medium | Real-time systems, gaming, trading |
+| **Shenandoah** | Ultra-low latency | <1ms | Medium | Similar to ZGC (Red Hat alternative) |
+
+### How to Choose
 
 ```bash
-# Baseline: latency distribution + throughput under representative load
-# (k6 / Gatling / wrk — the same tool the whole team uses):
-wrk -t4 -c100 -d60s http://localhost:8080/api/content/lessons/jwt-auth
+# For most web apps (balanced):
+java -XX:+UseG1GC -Xmx2g -jar app.jar
+
+# For batch processing (max throughput):
+java -XX:+UseParallelGC -Xmx4g -jar app.jar
+
+# For ultra-low latency (sub-millisecond pauses):
+java -XX:+UseZGC -Xmx2g -jar app.jar
+
+# For Java 21+ with virtual threads (G1 is recommended):
+java -XX:+UseG1GC -Xmx2g -jar app.jar
 ```
 
-Capture: **p50 / p95 / p99 latency**, throughput (req/s), and error rate — under a load profile that resembles production (concurrency, data volume, cache warmth). The p99 is the number users feel; the error rate is the number that makes the p99 irrelevant.
+---
 
-## The tuning checklist, in order of payoff
+## The Code — Key Tuning Flags
 
-**1. The database is usually the story.** Query count per request, index usage, N+1:
-
-```sql
--- count queries per request with Hibernate:
-logging.level.org.hibernate.SQL: DEBUG
--- or P6Spy; find the repeat query → join fetch / @EntityGraph (the query-methods lesson)
-```
-
-**2. Connection pools.** The pool bounds parallelism — too small and requests queue; too large and the DB thrashes. Spring Boot default (Hikari, 10) is a fine start; tune with the DB's own limits:
-
-```yaml
-spring.datasource.hikari.maximum-pool-size: 20   # not 200 — contention, not speed
-spring.datasource.hikari.connection-timeout: 3000  # fail fast > queue forever
-```
-
-**3. HTTP client timeouts.** Every downstream call needs connect+read timeouts (the rest-clients lesson) — a 30s hang on a p95 path is a tuning problem with a two-line fix.
-
-**4. Caching the read path** — `@Cacheable` on the hot read (the caching lesson). A 99% hit ratio on a hot endpoint beats any JVM flag.
-
-**5. JSON serialization** — Jackson is fast; the cost is usually the *size* of the payload. Profile, then consider DTO projections over entity graphs.
-
-## JIT and warmup: the first requests lie
-
-The JVM **JIT-compiles** hot methods as they run — the 1st request is interpreter-speed, the 10,000th is optimized. Consequences:
-
-- Load tests must **warm up** (discard the first N minutes) or every conclusion is wrong.
-- p99 measured on a cold JVM ≠ p99 in production.
-- For latency-critical services, **AppCDS** (`-XX:ArchiveClassesAtExit` / `-XX:SharedArchiveFile`) and **AOT** (GraalVM native — the cloud-native lesson) reduce startup and warmup; for most Spring Boot services, warming in a load test is enough.
-
-## The four failure modes of tuning effort
-
-1. **Tuning GC before profiling allocations** — fixing the symptom; the alloc profile shows the cause.
-2. **Thread-pool magic numbers** — "100 threads" is a guess; the right number comes from measuring queue depth and downstream limits.
-3. **Premature caching** — a cache on a cold key space is memory for nothing; measure the hit ratio (the caching lesson's metric).
-4. **Local-only measurements** — a laptop benchmark of `BigDecimal` math is not the p99 of the deployed system. Test where it runs, with production-shaped data.
-
-## The metrics that run the show (Actuator + Micrometer)
-
-```yaml
-management.endpoints.web.exposure.include: health,info,metrics,prometheus
-```
+### Heap Sizing
 
 ```bash
-curl localhost:8080/actuator/metrics/http.server.requests
+# Set initial and max heap size:
+java -Xms2g -Xmx2g -jar app.jar
+
+# Why set both equal?
+# -Xms = Xmx avoids heap resizing pauses (heap grows/shrinks dynamically)
+# Trade-off: uses 2GB even when idle, but no resize pauses
 ```
 
-The numbers to watch in production: **http.server.requests** (latency percentiles per endpoint), **hikaricp.connections.pending** (pool exhaustion), **jvm.gc.pause** (GC latency), **jvm.memory.used** (leak ratchet). A dashboard on these four catches the incident before users file it.
+### G1 GC Tuning
 
-## The one-sentence methodology
+```bash
+# Target pause time (default 200ms):
+java -XX:+UseG1GC \
+     -XX:MaxGCPauseMillis=50 \        # Aim for 50ms pauses
+     -XX:G1HeapRegionSize=16m \        # Region size (1-32MB, power of 2)
+     -XX:G1NewSizePercent=30 \         # Min young gen (30% of heap)
+     -XX:G1MaxNewSizePercent=60 \      # Max young gen (60% of heap)
+     -Xmx2g -jar app.jar
+```
 
-**Baseline → hypothesis from data (profile, GC log, metrics) → one change → re-measure against the same baseline.** If the change didn't move the p99, revert it and form a new hypothesis. Discipline beats cleverness; most "performance work" is actually removing the one N+1 query nobody measured.
+**Line-by-line explained:**
+- `-XX:MaxGCPauseMillis=50` — G1 tries to keep pauses under 50ms. It's a target, not a guarantee — G1 adjusts region counts to meet it.
+- `-XX:G1HeapRegionSize=16m` — Divides the heap into 16MB regions. Larger regions = fewer GC events, but less granular.
+- `-XX:G1NewSizePercent=30` — Minimum 30% of heap for young generation. More young gen = fewer minor GCs.
+- `-XX:G1MaxNewSizePercent=60` — Maximum young gen can grow to 60%. Prevents old gen from being too small.
 
-## Key takeaways
+### ZGC Tuning (Java 21+)
 
-- Baseline p50/p95/p99 + throughput + errors before touching anything.
-- The payoff order: query count → connection pool → timeouts → caching → payload size → JVM knobs.
-- Warm up before measuring; JIT makes the first requests meaningless.
-- Watch `http.server.requests`, pool pending, GC pauses, heap trend in production.
-- One change, same baseline, re-measure — or revert.
+```bash
+# Ultra-low latency:
+java -XX:+UseZGC \
+     -XX:+ZGenerational \            # Use generational ZGC (Java 21+)
+     -Xmx2g \
+     -jar app.jar
+```
 
-Official docs: [java tool](https://docs.oracle.com/en/java/javase/21/docs/specs/man/java.html) · [Actuator metrics](https://docs.spring.io/spring-boot/reference/actuator/metrics.html)
+ZGC is much simpler to tune — it's designed for "set it and forget it." The main decision is heap size.
+
+---
+
+## Real-World Scenarios
+
+### Scenario 1: Web App with p99 Latency Goals
+
+**Problem:** API p99 latency is 500ms, goal is under 200ms.
+
+```bash
+# Step 1: Baseline with G1 (default)
+java -XX:+UseG1GC -Xmx2g -jar app.jar
+# Result: p99 = 500ms, GC pause = 200ms
+
+# Step 2: Reduce pause target
+java -XX:+UseG1GC -XX:MaxGCPauseMillis=50 -Xmx2g -jar app.jar
+# Result: p99 = 250ms, GC pause = 40ms (but more frequent GCs)
+
+# Step 3: Switch to ZGC for sub-millisecond pauses
+java -XX:+UseZGC -XX:+ZGenerational -Xmx2g -jar app.jar
+# Result: p99 = 150ms, GC pause = <1ms ✅
+```
+
+### Scenario 2: Batch Job with High Throughput
+
+**Problem:** Processing 1M records is slow because GC interrupts frequently.
+
+```bash
+# Parallel GC maximizes throughput (but longer pauses):
+java -XX:+UseParallelGC \
+     -XX:ParallelGCThreads=8 \         # Use 8 threads for GC
+     -XX:MaxGCPauseMillis=200 \        # Allow longer pauses
+     -Xmx4g -jar app.jar
+
+# Result: 40% throughput improvement (fewer, longer pauses)
+# For batch jobs, total speed matters more than individual pause length
+```
+
+### Scenario 3: Diagnosing a Performance Regression
+
+```bash
+# Step 1: Check if it's GC
+jstat -gc <pid> 1000
+# If Full GC is running frequently → memory issue
+# If Minor GC is running every few seconds → young gen too small
+
+# Step 2: Check if it's CPU
+top -H -p <pid>
+# If one thread is at 100% → hot method, use JFR to find it
+
+# Step 3: Check if it's I/O
+jcmd <pid> JFR.start name=io settings=profile duration=60s filename=io.jfr
+# Look at FileRead/FileWrite events in JMC
+```
+
+---
+
+## Common Mistakes
+
+| Mistake | Why It Hurts | Fix |
+|---|---|---|
+| Not setting `-Xmx` in containers | JVM guesses wrong, gets OOM-killed | Always set explicitly |
+| Tuning without measuring | Wasted effort, might make things worse | Baseline first, then change ONE thing |
+| Copying flags from StackOverflow | Flags that work for one app may hurt another | Understand what each flag does |
+| Using `-XX:+PrintGCDetails` (deprecated) | Use `-Xlog:gc*` instead | Java 9+ unified logging |
+| Ignoring code-level issues | No GC tuning fixes a memory leak | Fix the leak, then tune GC |
+| Setting `-XX:MaxGCPauseMillis` too low | GC runs constantly, throughput drops | Start with 50-100ms, measure |
+
+---
+
+## Key Takeaways
+
+- **Measure first, tune second** — set clear goals, baseline, identify bottleneck, change ONE thing.
+- **G1 GC is the default** for most apps — it's balanced and well-tuned out of the box.
+- **ZGC for ultra-low latency** — sub-millisecond pauses, simple to configure.
+- **Set `-Xmx` explicitly** in containers — don't let the JVM guess.
+- **Most performance problems are code issues**, not JVM settings — profile before you tune.
+
+Official docs: [java tool](https://docs.oracle.com/en/java/javase/21/docs/specs/man/java.html) · [GC Tuning Guide](https://www.oracle.com/java/technologies/gctuning.html)

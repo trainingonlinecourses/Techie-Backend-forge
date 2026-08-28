@@ -1,90 +1,212 @@
 ---
-title: Testing Async Code — Awaitility, Polling and Eventually-True Assertions
-summary: Why fixed sleeps fail, Awaitility's await().until() model, and the async-testing scenarios (consumers, jobs, caches) with deterministic waits.
-order: 8
-minutes: 15
-topics: [awaitility, async-testing, polling, eventually, kafka-consumer, scheduled-jobs, flaky-tests]
+title: Awaitility — Testing Asynchronous Code
+summary: Why Thread.sleep is wrong, how Awaitility polls conditions, and the patterns for testing async operations, message queues, and event-driven systems. Beginner-friendly with line-by-line code.
+order: 7
+minutes: 18
+topics: [Awaitility, async testing, polling, condition, eventual consistency, Thread.sleep, asynchronous assertions]
 docs:
-  - https://github.com/awaitility/awaitility
+  - https://www.awaitility.org/
+  - https://www.awaitility.org/documentation.html
 ---
 
-# Testing Async Code — Awaitility, Polling and Eventually-True Assertions
+# Awaitility — Testing Asynchronous Code
 
-## The concept: async means "eventually"
+## Why Not Thread.sleep? (From Zero)
 
-Code that runs on another thread — a Kafka consumer, a `@Scheduled` job, a `CompletableFuture`, an `@Async` method, a cache that fills lazily — doesn't complete synchronously with the test's assertion. The naive fix is `Thread.sleep(2000)` before asserting, and it's the **#1 source of flaky tests**: too short a sleep fails on slow CI; too long wastes minutes and still fails under load. The correct tool waits *until a condition becomes true*, polling with a timeout:
+When testing async operations (message listeners, scheduled tasks, event processing), you need to wait for the result. The naive approach:
 
 ```java
-@Test
-void consumerProcessesMessageEventually() {
-    kafkaTemplate.send("orders", orderJson);          // fire the event
+// ❌ THE WRONG WAY:
+orderService.processPayment(orderId);
+Thread.sleep(5000);                                    // Wait 5 seconds
+Order order = orderRepository.findById(orderId).orElseThrow();
+assertThat(order.getStatus()).isEqualTo(OrderStatus.PAID);   // Check result
+```
 
-    await().atMost(5, TimeUnit.SECONDS)
-           .untilAsserted(() -> assertThat(orderRepo.count()).isEqualTo(1));
+**Problems with Thread.sleep:**
+1. **Too short**: If the operation takes 6 seconds, the test fails (flaky!)
+2. **Too long**: If the operation takes 100ms, you waste 4.9 seconds per test (slow CI!)
+3. **No signal**: You don't know WHEN the condition becomes true — you just guess and wait
+
+**Awaitility** fixes this: it **polls** the condition repeatedly until it's true (or times out). You get fast, reliable tests.
+
+---
+
+## The Code — Line by Line
+
+### Basic Awaitility Pattern
+
+```java
+import org.awaitility.Awaitility;
+import java.time.Duration;
+
+@Test
+void shouldProcessPayment() {
+    // Arrange
+    String orderId = orderService.createOrder(List.of(item1));
+
+    // Act
+    orderService.processPayment(orderId);
+
+    // Assert: poll until the condition is true (max 10 seconds)
+    Awaitility.await()
+        .atMost(Duration.ofSeconds(10))         // Give up after 10 seconds
+        .until(() -> {                          // Poll this condition
+            Order order = orderRepository.findById(orderId).orElseThrow();
+            return order.getStatus() == OrderStatus.PAID;
+        });
 }
 ```
 
-Awaitility polls the condition (default ~100ms intervals), re-evaluates until it passes or the deadline hits. **Deterministic, fast when things work, and fails with a clear timeout message.**
+**Line-by-line explained:**
+- `Awaitility.await()` — Start building an assertion that polls.
+- `.atMost(Duration.ofSeconds(10))` — Maximum wait time. If the condition isn't met in 10 seconds, the test fails.
+- `.until(() -> ...)` — The condition to check. Awaitility calls this repeatedly (default: every 100ms) until it returns `true`.
+- **No Thread.sleep needed** — if the operation finishes in 200ms, the test passes in 200ms + 100ms polling = 300ms.
 
-## The Awaitility API you'll use
-
-```java
-// Core shape: await().<timeout>.<polling>.<condition>
-await().atMost(10, TimeUnit.SECONDS)
-       .pollInterval(200, TimeUnit.MILLISECONDS)     // how often to re-check
-       .until(() -> statusService.isReady());         // condition as a boolean supplier
-
-// Assertion-style (preferred — gives you the actual failure):
-await().atMost(5, TimeUnit.SECONDS)
-       .untilAsserted(() -> assertThat(cache.get("k")).isEqualTo(expected));
-
-// With data (poll a value until it matches):
-await().atMost(5, TimeUnit.SECONDS)
-       .until(() -> counter.get(), greaterThan(10));  // Hamcrest matcher on a supplier
-
-// Ignore transient exceptions during the wait (e.g., the repo throws until a row exists):
-await().atMost(5, TimeUnit.SECONDS)
-       .ignoreExceptions()                            // retry through them
-       .until(() -> reportService.generate().rows() > 0);
-```
-
-The golden rule: **assert inside the wait** (via `untilAsserted` or a matcher) instead of sleeping, then asserting once — the wait *is* the assertion.
-
-## How we use it in an organization: the scenarios
-
-**Scenario 1 — Kafka/Rabbit consumer test.** Send a message, wait until the consumer processed it (a DB row appears, an event fires):
+### Polling Configuration
 
 ```java
-await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-    assertThat(orderRepo.findByRef("ref-1")).isPresent();
-});
+Awaitility.await()
+    .atMost(Duration.ofSeconds(30))             // Max wait: 30 seconds
+    .pollInterval(Duration.ofSeconds(2))         // Check every 2 seconds (instead of default 100ms)
+    .pollDelay(Duration.ofSeconds(1))            // Wait 1 second before first check
+    .untilAsserted(() -> {                       // Run assertions inside the polling loop
+        List<Order> orders = orderRepository.findByStatus(OrderStatus.PROCESSING);
+        assertThat(orders).isEmpty();            // No orders should be processing
+    });
 ```
 
-**Scenario 2 — scheduled job test.** Trigger the job (or wait for the cron tick in a fast test schedule), then `await()` until the outcome is visible.
+**Line-by-line explained:**
+- `pollInterval(Duration.ofSeconds(2))` — Check every 2 seconds instead of every 100ms. Good for operations that take a while to settle.
+- `pollDelay(Duration.ofSeconds(1))` — Wait 1 second before the first check. Useful when the operation needs time to start.
+- `untilAsserted(() -> ...)` — Instead of returning a boolean, run assertion methods. If any assertion fails, the poll continues. When all pass, the test passes.
 
-**Scenario 3 — cache warm-up / async cache fill.** After `cacheManager.getCache("products").clear()`, request an item (the cache fills asynchronously), then await until the second read hits the populated cache.
+### Testing Message Queue Consumers
 
-**Scenario 4 — email/webhook assertion.** `@Async` email sender: send the order, await until the mock emailer's `sent()` list has one entry, then assert its content. The mock *records* asynchronously; Awaitility waits for the record.
+```java
+@Test
+void shouldProcessOrderEvent() {
+    // Send a message to the queue
+    kafkaTemplate.send("order-events", new OrderCreatedEvent("order-123"));
 
-**Scenario 5 — eventual consistency tests.** After a write to a primary store, await until the read replica (or the search index, or the outbox consumer's target) reflects it — with a timeout that matches the real propagation SLA.
+    // Wait for the consumer to process it
+    Awaitility.await()
+        .atMost(Duration.ofSeconds(10))
+        .until(() -> {
+            Optional<Order> order = orderRepository.findById("order-123");
+            return order.isPresent() &&
+                   order.get().getStatus() == OrderStatus.CONFIRMED &&
+                   order.get().getConfirmationEmailSent();
+        });
+}
+```
 
-## Wait — should your test await at all?
+### Testing Scheduled Tasks
 
-Sometimes the async behavior *shouldn't* be waited on in the test: if the test isn't about the async outcome (e.g., "the endpoint returns 202 immediately"), assert the synchronous contract (202 + job id) and test the async processing separately with Awaitility. Waiting for async work you don't care about slows the suite and couples tests to internal timing.
+```java
+@Test
+void shouldRunDailyCleanup() {
+    // Create old orders that should be cleaned up
+    orderRepository.save(createOldOrder(90));    // 90 days old
+    orderRepository.save(createOldOrder(30));    // 30 days old (should NOT be cleaned)
 
-## Pitfalls
+    // Trigger the scheduled task
+    cleanupTask.runDailyCleanup();
 
-- **`Thread.sleep` in tests — banned in review** — it's a race, not a wait. If you see `sleep` in test code, the question is always "why aren't you using Awaitility?".
-- **Timeouts too tight** — CI machines are slow; a 2s timeout that passes locally and fails in CI is a config bug. Give async tests generous-but-bounded timeouts (5-15s).
-- **Polling without timeout** — `await().until(...)` with no `atMost` defaults to 10s (configurable globally via `awaitility.timeout`); always set an explicit `atMost` for clarity.
-- **Asserting after the wait** — `await().until(someFlag)` then `assertThat(...)` is a race if the flag isn't the final state; prefer `untilAsserted(() -> assertThat(actualState))` so the *assertion itself* is the condition.
-- **Ignore transient exceptions deliberately** — `ignoreExceptions()` can mask real failures; scope it and always have the `until` condition fail on genuine errors.
-- **Shared state across tests** — async tests that mutate the DB/cache must clean up; use `@DirtiesContext` or transactional resets so a late consumer from test A doesn't corrupt test B.
+    // Verify old orders are deleted
+    Awaitility.await()
+        .atMost(Duration.ofSeconds(5))
+        .untilAsserted(() -> {
+            assertThat(orderRepository.findById("old-90")).isEmpty();     // Deleted
+            assertThat(orderRepository.findById("old-30")).isPresent();  // Still exists
+        });
+}
+```
 
-## Key takeaways
+---
 
-- Async outcomes need *eventually-true* waits, not sleeps — Awaitility polls until the condition passes.
-- `await().atMost(t).untilAsserted(() -> assertThat(...))` is the canonical shape.
-- Use it for consumers, jobs, caches, async senders, and eventual-consistency checks.
-- Bounded, generous timeouts; assert inside the wait; scope `ignoreExceptions`.
-- Ban `Thread.sleep` in tests — it's a race, not a wait.
+## Real-World Scenarios
+
+### Scenario 1: Event-Driven Architecture
+
+```java
+@Test
+void shouldPropagateEventAcrossServices() {
+    // User places an order
+    String orderId = orderClient.placeOrder(new OrderRequest("user-1", items));
+
+    // Wait for: order created → payment processed → inventory updated → confirmation sent
+    Awaitility.await()
+        .atMost(Duration.ofSeconds(30))
+        .until(() -> {
+            Order order = orderClient.getOrder(orderId);
+            return order != null
+                && order.getStatus() == OrderStatus.CONFIRMED
+                && order.isPaymentProcessed()
+                && order.isInventoryReserved()
+                && order.isConfirmationSent();
+        });
+}
+```
+
+### Scenario 2: Cache Invalidation
+
+```java
+@Test
+void shouldInvalidateCacheAfterUpdate() {
+    // Cache has old data
+    Product cached = cacheService.getProduct("prod-1");
+    assertThat(cached.getName()).isEqualTo("Old Name");
+
+    // Update the product
+    productService.updateName("prod-1", "New Name");
+
+    // Wait for cache to be invalidated and refreshed
+    Awaitility.await()
+        .atMost(Duration.ofSeconds(5))
+        .until(() -> {
+            Product fresh = cacheService.getProduct("prod-1");
+            return "New Name".equals(fresh.getName());
+        });
+}
+```
+
+### Scenario 3: Database Replication Lag
+
+```java
+@Test
+void shouldReadFromReplicaAfterWrite() {
+    // Write to primary
+    userRepository.save(new User("user-1", "Alice"));
+
+    // Read from replica (might lag behind primary)
+    Awaitility.await()
+        .atMost(Duration.ofSeconds(5))
+        .until(() -> userRepository.findByUsernameFromReplica("user-1").isPresent());
+}
+```
+
+---
+
+## Common Mistakes
+
+| Mistake | Why It Breaks | Fix |
+|---|---|---|
+| Using Thread.sleep | Flaky (too short) or slow (too long) | Use Awaitility for async assertions |
+| No timeout (await forever) | Test hangs if condition never becomes true | Always set `atMost()` |
+| Polling too frequently | High CPU usage, may overwhelm the system | Use `pollInterval()` for heavy operations |
+| Not cleaning up test data | Tests affect each other | Use `@BeforeEach` to reset state |
+| Testing the wrong thing | Asserting on mocks instead of real state | Test the actual side effect (DB, cache, queue) |
+
+---
+
+## Key Takeaways
+
+- **Never use Thread.sleep for testing** — use Awaitility instead.
+- **`Awaitility.await().atMost(...).until(...)`** — the basic pattern: poll until condition is true.
+- **`untilAsserted()`** — for more complex assertions inside the polling loop.
+- **Configure `pollInterval()`** — for operations that take a while to settle.
+- **Always set `atMost()`** — prevent tests from hanging forever.
+
+Official docs: [Awaitility](https://www.awaitility.org/) · [Documentation](https://www.awaitility.org/documentation.html)

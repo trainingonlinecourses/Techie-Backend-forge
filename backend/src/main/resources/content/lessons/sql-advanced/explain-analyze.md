@@ -1,92 +1,182 @@
 ---
-title: EXPLAIN ANALYZE — Reading the Query Plan
-module: sql-advanced
-order: 4
-minutes: 27
-topics: ["EXPLAIN ANALYZE", "query plans", "seq scan", "index scan", "optimization", "cost estimation"]
+title: EXPLAIN ANALYZE — Reading Query Execution Plans
+summary: How to read EXPLAIN output, sequential vs index scans, join algorithms, cost estimation, and how organizations optimize slow SQL queries. Beginner-friendly with line-by-line code.
+order: 5
+minutes: 22
+topics: [EXPLAIN, query plan, execution plan, index scan, sequential scan, join algorithm, cost estimation, query optimization]
 docs:
-  - title: "Using EXPLAIN (PostgreSQL docs)"
-    url: "https://www.postgresql.org/docs/current/using-explain.html"
-  - title: "EXPLAIN (PostgreSQL docs)"
-    url: "https://www.postgresql.org/docs/current/sql-explain.html"
+  - https://www.postgresql.org/docs/current/using-explain.html
+  - https://use-the-index-luke.com/
 ---
 
-# EXPLAIN ANALYZE — Reading the Query Plan
+# EXPLAIN ANALYZE — Reading Query Execution Plans
 
-## The Concept: The Database Shows You Its Work
+## What is EXPLAIN ANALYZE? (From Zero)
 
-A slow query is a mystery until you see *how* the database actually executes it. **`EXPLAIN`** reveals the query plan — the tree of steps the planner chose (scan this table, join these, filter there) — and **`EXPLAIN ANALYZE`** *runs* the query and reports what actually happened: rows produced, time taken, at every step. This is the single most important tool in SQL performance work, and reading it is a teachable skill — not intuition.
+When a SQL query is slow, you need to understand **how the database executes it**. `EXPLAIN ANALYZE` shows you the **query execution plan** — the step-by-step process the database uses to retrieve your data, including estimated costs, actual rows, and timing.
 
-**The mental model:** the planner is a chef planning a meal. `EXPLAIN` shows the recipe it wrote: "grab the fridge contents (scan), then for each ingredient check freshness (filter)". `EXPLAIN ANALYZE` cooks the meal and times each step: "the 'grab everything from the fridge' step took 3 seconds and pulled 2 million ingredients — that's the problem." You don't guess at the bottleneck; the plan shows you exactly where the time goes, step by step.
+Think of it like GPS directions: instead of just saying "drive there," it shows you every turn, how long each segment takes, and which routes are fastest.
 
-## Running It and Reading the Output
+### EXPLAIN vs EXPLAIN ANALYZE
+
+| Command | What it shows | Risk |
+|---|---|---|
+| `EXPLAIN` | Estimated plan (no execution) | Safe — never runs the query |
+| `EXPLAIN ANALYZE` | Actual plan + real execution | Runs the query! Use with care on writes |
+| `EXPLAIN (ANALYZE, BUFFERS)` | Plan + memory/disk usage | More detail, still runs the query |
+
+---
+
+## The Code — Line by Line
+
+### Basic Usage
+
+```sql
+-- See the plan without running the query (safe):
+EXPLAIN SELECT * FROM orders WHERE status = 'PAID';
+
+-- See the plan AND run the query (shows actual timing):
+EXPLAIN ANALYZE SELECT * FROM orders WHERE status = 'PAID';
+
+-- With buffer/cache information:
+EXPLAIN (ANALYZE, BUFFERS, FORMAT TEXT) SELECT * FROM orders WHERE status = 'PAID';
+```
+
+### Reading the Output
 
 ```sql
 EXPLAIN ANALYZE
-SELECT * FROM orders WHERE customer_id = 42 AND total > 100;
+SELECT o.id, o.total, c.name
+FROM orders o
+JOIN customers c ON o.customer_id = c.id
+WHERE o.status = 'PAID'
+ORDER BY o.created_at DESC
+LIMIT 10;
 ```
 
 ```
-Seq Scan on orders  (cost=0.00..2345.00 rows=512 width=32)
-                      (actual time=0.05..23.41 rows=387 loops=1)
-  Filter: ((customer_id = 42) AND (total > 100))
-  Rows Removed by Filter: 19987
-Planning Time: 0.18 ms
-Execution Time: 23.6 ms
+Sort  (cost=1250.35..1250.38 rows=10 width=48) (actual time=15.234..15.236 rows=10 loops=1)
+  Sort Key: o.created_at DESC
+  Sort Method: top-N heapsort  Memory: 25kB
+  ->  Hash Join  (cost=100.20..1245.00 rows=500 width=48) (actual time=2.145..15.102 rows=100 loops=1)
+        Hash Cond: (o.customer_id = c.id)
+        ->  Index Scan using idx_orders_status on orders o  (cost=0.29..1100.00 rows=500 width=20) (actual time=0.025..10.234 rows=500 loops=1)
+              Filter: (status = 'PAID')
+              Rows Removed by Filter: 200
+        ->  Hash  (cost=80.00..80.00 rows=2000 width=36) (actual time=1.890..1.891 rows=2000 loops=1)
+              Buckets: 2048  Batches: 1  Memory Usage: 129kB
+              ->  Seq Scan on customers c  (cost=0.00..80.00 rows=2000 width=36) (actual time=0.008..1.234 rows=2000 loops=1)
+Planning Time: 0.234 ms
+Execution Time: 15.345 ms
 ```
 
-**Reading it line by line:**
-
-- **`Seq Scan on orders`** — the *operation*: a sequential scan (read the whole table top to bottom). This is the red flag — the table has ~20,000 rows and we read every one. The fix (usually): an index on the filtered columns.
-- **`cost=0.00..2345.00`** — the planner's *estimated* cost (arbitrary units): 0.00 to start, 2345.00 to finish. Estimates guide the plan choice; they're *estimates* — the actuals are what matter.
-- **`rows=512`** — the planner's *guess* at how many rows will pass. It guessed 512; the reality follows.
-- **`(actual time=0.05..23.41 rows=387 loops=1)`** — what *really* happened: 23.4ms total, 387 rows kept. When the estimate and the actual diverge wildly, you've found a **statistics problem** (stale or missing stats — often fixed by `ANALYZE`).
-- **`Rows Removed by Filter: 19987`** — the smoking gun: 19,987 rows were read and discarded. 20,374 rows scanned to return 387. That's the waste a sequential scan represents.
-- **`Planning Time` / `Execution Time`** — the split between planning and execution.
-
-The verdict: 23ms isn't terrible — but at 10× the table size or under load, a sequential scan becomes the bottleneck. With an index, the plan becomes:
+### How to Read This (Line by Line)
 
 ```
-Index Scan using idx_orders_customer on orders  (actual time=0.02..0.38 rows=387 loops=1)
-  Index Cond: (customer_id = 42)
-  Filter: (total > 100)
+Sort  (cost=1250.35..1250.38 rows=10 width=48) (actual time=15.234..15.236 rows=10 loops=1)
+```
+- **Node type**: `Sort` — sorting the results
+- **Estimated cost**: 1250.35 (startup) to 1250.38 (total) — abstract units
+- **Estimated rows**: 10 — the planner thinks 10 rows will match
+- **Actual time**: 15.234ms (first row) to 15.236ms (last row) — real timing
+- **Actual rows**: 10 — how many rows actually matched
+- **loops=1**: This node executed once
+
+```
+->  Index Scan using idx_orders_status on orders o  (cost=0.29..1100.00 rows=500 width=20)
+```
+- **Index Scan** — using an index (fast!) instead of sequential scan (slow!)
+- **`idx_orders_status`** — the index name
+- **cost=0.29..1100.00** — very cheap to start (index lookup), expensive to scan 500 rows
+
+```
+Filter: (status = 'PAID')
+Rows Removed by Filter: 200
+```
+- The index returned 700 rows (500 matching + 200 filtered out)
+- **200 rows were scanned but discarded** — the index isn't perfectly selective
+
+### Key Numbers to Watch
+
+| Metric | Good | Bad | What It Means |
+|---|---|---|---|
+| **Seq Scan** | Small tables only | Large tables | Full table scan — needs an index |
+| **Index Scan** | Most queries | — | Using an index — fast |
+| **rows Removed by Filter** | 0-10% of scanned | >50% of scanned | Index not selective enough |
+| **actual time** | <10ms | >100ms | Query is slow |
+| **loops** | 1 | >1 | Nested loops — check if N+1 problem |
+
+---
+
+## Real-World Scenarios
+
+### Scenario 1: Slow Query — Missing Index
+
+```sql
+-- Before: 5 seconds (sequential scan on 1M rows)
+EXPLAIN ANALYZE SELECT * FROM orders WHERE customer_id = 12345;
+-- Seq Scan on orders  (cost=0.00..25000.00 rows=1 width=20)
+--   Filter: (customer_id = 12345)
+--   Rows Removed by Filter: 999999
+
+-- Add an index:
+CREATE INDEX idx_orders_customer_id ON orders(customer_id);
+
+-- After: 0.1ms (index scan)
+EXPLAIN ANALYZE SELECT * FROM orders WHERE customer_id = 12345;
+-- Index Scan using idx_orders_customer_id on orders  (cost=0.29..8.31 rows=1 width=20)
 ```
 
-The index scan touches only the customer's rows — 387 rows instead of 20,374. That's the whole point of the tool: the plan shows you the waste, and the fix is usually obvious once you see it.
+### Scenario 2: N+1 Query Problem
 
-## The Plan Vocabulary
+```sql
+-- BAD: N+1 queries (one for each order)
+EXPLAIN ANALYZE SELECT * FROM orders WHERE id = 1;
+EXPLAIN ANALYZE SELECT * FROM orders WHERE id = 2;
+-- ... repeated 1000 times!
 
-The operations you'll see most, and what each means:
+-- GOOD: Single query with IN clause
+EXPLAIN ANALYZE SELECT * FROM orders WHERE id IN (1, 2, 3, ...);
+-- Single Index Scan using idx_orders_pkey
+```
 
-- **`Seq Scan`** — full table read. Fine for small tables; a red flag on big ones filtered by a non-indexed column.
-- **`Index Scan`** — reads the index to find rows, then fetches them. Fast for selective queries.
-- **`Index Only Scan`** — the query needs only indexed columns; the index itself answers without touching the table. The fastest scan.
-- **`Bitmap Index Scan` + `Bitmap Heap Scan`** — the optimizer reads many index entries, builds a bitmap of candidate rows, then fetches — used when a filter matches *many* rows.
-- **`Nested Loop` / `Hash Join` / `Merge Join`** — the join strategies from the joins lesson, each with its own cost profile.
-- **`Sort`** — the planner sorted rows (for `ORDER BY` without an index, `GROUP BY`, or merge joins). Expensive for large sets; an index on the sort key removes it.
-- **`Limit`** — stops early (good). If the `Limit` sits *after* an expensive Sort, you're paying to sort everything before keeping the top 10.
+### Scenario 3: Subquery vs JOIN
 
-## The Optimization Workflow
+```sql
+-- Subquery (often slower):
+EXPLAIN ANALYZE
+SELECT * FROM orders
+WHERE customer_id IN (SELECT id FROM customers WHERE region = 'US');
+-- Hash Semi Join  (cost=100.20..1245.00 rows=500 width=20)
 
-**Step 1 — identify the slow query.** From logs (slow query log, `log_min_duration_statement`), from profiling (Spring Boot + p6spy/datasource-proxy), or from reports. Never optimize blind.
+-- JOIN (usually faster):
+EXPLAIN ANALYZE
+SELECT o.* FROM orders o
+JOIN customers c ON o.customer_id = c.id
+WHERE c.region = 'US';
+-- Hash Join  (cost=100.20..1240.00 rows=500 width=20)
+```
 
-**Step 2 — `EXPLAIN ANALYZE` it.** Look for: sequential scans on big tables, `Rows Removed by Filter` far exceeding kept rows, sorts of large sets, and **estimate/actual divergence** (the stats problem).
+---
 
-**Step 3 — fix with evidence.** The standard plays, in order:
+## Common Mistakes
 
-1. **Index the filter/join/sort columns.** `CREATE INDEX idx_orders_customer ON orders (customer_id);` — and for combined filters, a **composite index** on the columns in the right order (`(customer_id, total)`), because a composite index on `(customer_id, total)` serves both filters and avoids the residual filter.
-2. **Refresh statistics** — `ANALYZE orders;` if estimates are far from actuals.
-3. **Rewrite the query** — a join doing more work than needed, a `WHERE` on a function of a column (`WHERE YEAR(created_at) = 2025` — unindexable! use `created_at >= ... AND created_at < ...`), a missing `LIMIT`.
-4. **Confirm with `EXPLAIN ANALYZE` again** — the plan should change (Seq Scan → Index Scan), and the actual times should prove it.
+| Mistake | Why It's a Problem | Fix |
+|---|---|---|
+| Not checking EXPLAIN before optimizing | Guessing instead of measuring | Always `EXPLAIN ANALYZE` slow queries first |
+| Adding indexes to every column | Slows down writes, wastes disk space | Add indexes only for WHERE/JOIN columns you query often |
+| Ignoring "Seq Scan" on small tables | Sequential scan is actually faster for tiny tables | Only optimize when table > 10K rows |
+| Using EXPLAIN ANALYZE on DELETE/UPDATE | Actually modifies data! | Use EXPLAIN (no ANALYZE) for writes, or wrap in a transaction and ROLLBACK |
+| Not considering statistics freshness | Stale stats → bad plans | Run `ANALYZE` after bulk data changes |
 
-**The discipline:** every change is verified by the plan and the timings — this is evidence-based performance work, not folklore.
+---
 
-## The Three Golden Rules
+## Key Takeaways
 
-1. **`EXPLAIN` (estimate) vs `EXPLAIN ANALYZE` (truth).** Analyze actually runs the query — on a production-sized table, use it in staging or wrap in a transaction you roll back (`BEGIN; EXPLAIN ANALYZE ...; ROLLBACK;`).
-2. **Read bottom-up / right-to-left.** The plan is a tree; the *leaves* (bottom) execute first — scans and early filters — and the root (top) is the final result. The biggest `actual time` is usually where the work happens.
-3. **Trust the actuals over the estimates.** The planner's cost model is a guess; a plan that guessed 512 rows and found 387 is healthy, but a guess of 512 against a reality of 2,000,000 means stale statistics — fix with `ANALYZE` before changing the query.
+- **EXPLAIN ANALYZE shows the actual execution plan** — use it to understand WHY a query is slow.
+- **Seq Scan on large tables = add an index**. Index Scan = using an index (fast).
+- **Watch "rows Removed by Filter"** — if it's high, the index isn't selective enough.
+- **EXPLAIN is safe, EXPLAIN ANALYZE actually runs the query** — be careful with writes.
+- **Most slow queries need one or two well-placed indexes**, not a complete rewrite.
 
-## Recap
-
-`EXPLAIN ANALYZE` runs your query and shows the actual plan — the scan type (Seq Scan = red flag on big tables, Index Scan = good), the rows read vs kept (`Rows Removed by Filter` is the waste meter), the join strategy, and per-step timings. The optimization workflow is evidence-driven: find the slow query, analyze it, fix with indexes (composite for multi-column filters), refreshed statistics, or a query rewrite, then re-analyze to prove the improvement. Read plans bottom-up, trust actuals over estimates, and remember the tool's real power: it turns "this query is slow, I wonder why" into "this scan is reading 20,000 rows to keep 387 — there's the problem."
+Official docs: [EXPLAIN (PostgreSQL)](https://www.postgresql.org/docs/current/using-explain.html) · [Use The Index, Luke](https://use-the-index-luke.com/)

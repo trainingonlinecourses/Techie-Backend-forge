@@ -1,90 +1,223 @@
 ---
-title: Native Performance — Startup, Memory, and Peak Throughput
-module: graalvm-native
-order: 4
-minutes: 24
-topics: ["performance", "startup time", "memory", "peak throughput", "PGO", "profile-guided optimization"]
+title: GraalVM Native Image — Java Without the JVM
+summary: Ahead-of-time compilation, build-time reflection, native executables, and how organizations deploy Spring Boot apps as instant-startup containers. Beginner-friendly with line-by-line code.
+order: 5
+minutes: 20
+topics: [GraalVM, native image, AOT compilation, build-time reflection, startup time, container deployment, Spring Native]
 docs:
-  - title: "Native Image Performance (GraalVM docs)"
-    url: "https://www.graalvm.org/latest/docs/reference-manual/native-image/optimizations/"
-  - title: "Profile-Guided Optimization (GraalVM docs)"
-    url: "https://www.graalvm.org/latest/docs/reference-manual/native-image/guides/optimize-native-executable-with-pgo/"
+  - https://www.graalvm.org/latest/docs/getting-started/
+  - https://docs.spring.io/spring-boot/reference/packaging/native-image/introducing-graalvm-native-images.html
 ---
 
-# Native Performance — Startup, Memory, and Peak Throughput
+# GraalVM Native Image — Java Without the JVM
 
-## The Concept: The Honest Performance Picture
+## What is GraalVM Native Image? (From Zero)
 
-The native-image pitch leads with *instant startup* — and the fine print is the rest of the performance story: **peak throughput** (where the JVM usually wins), **memory** (where native usually wins), and **PGO** (the tool that changes the equation). Choosing between JVM and native for performance means knowing *which metric your workload actually depends on* — this lesson is the honest comparison, with the numbers and the reasoning.
+Traditional Java runs on the JVM — you compile `.java` to `.class` to `.jar`, then the JVM interprets/JIT-compiles it at runtime. This gives you portability and great performance, but the JVM needs time to start up and uses significant memory.
 
-**The mental model:** the JVM is a marathon runner who warms up slowly but runs a world-record pace once warm; the native binary is a sprinter off the blocks instantly but without the JIT's ability to re-optimize on the fly. Startup is the race's first 100 meters; throughput is the whole course. For a request that takes 200ms server-side, startup is noise (the app runs for years); for a serverless function billed per 100ms, startup *is* the bill.
+**GraalVM Native Image** compiles your Java code **ahead of time (AOT)** into a standalone native executable — no JVM required. The result starts in milliseconds instead of seconds and uses a fraction of the memory.
 
-## The Three Metrics, Honestly
+### JVM vs Native Image
 
-**1. Startup — native wins by ~2 orders of magnitude.**
-
-| | JVM Spring Boot | Native Spring Boot |
+| Aspect | JVM (Traditional) | Native Image (GraalVM) |
 |---|---|---|
-| Startup | 2–10 seconds | **50–150ms** |
-| First request latency | seconds (JIT warmup) | ~immediate |
+| **Startup time** | 2-10 seconds | 10-50 milliseconds |
+| **Memory usage** | 200-500 MB | 30-100 MB |
+| **Binary size** | Depends on JRE install | 30-100 MB (includes everything) |
+| **Peak throughput** | Higher (JIT optimizes over time) | Slightly lower (no runtime JIT) |
+| **Build time** | Fast (seconds) | Slow (minutes) |
+| **Reflection** | Full support | Limited (must declare at build time) |
+| **Dynamic class loading** | Full support | Not supported |
 
-The native binary starts in milliseconds because there's no JVM to boot, no classpath to scan, no component scanning to do — the AOT build already wired everything. For serverless (cold starts), autoscaling from zero, and short-lived jobs (CLIs, batch tools, cron jobs), this is the decisive metric: a 3-second startup on a 500ms job means 85% of your runtime is overhead.
+**When to use native image:**
+- Microservices that need fast startup (serverless, auto-scaling)
+- CLI tools and developer utilities
+- Container environments where memory is expensive
+- Edge computing and IoT
 
-**2. Memory — native wins (lower footprint).**
+**When NOT to use it:**
+- Long-running services where peak throughput matters more than startup
+- Applications that heavily use reflection, proxies, or dynamic class loading
+- Development environments (JVM is faster to iterate with)
 
-The JVM carries the JIT compiler, class metadata, and the code cache; a Spring Boot app typically uses 300–800MB RSS. A native image drops the JVM entirely — the same app in native runs in 100–200MB (and can be tuned lower). For container fleets billed by memory, and for running many instances, the savings are real and steady. The flip side: the native *build* is memory-hungry (the compiler needs multiple GB) — build machines, not runtimes, pay that cost.
+---
 
-**3. Peak throughput — the JVM usually wins (with nuance).**
+## The Code — Line by Line
 
-The JIT observes the running workload and optimizes the hot paths aggressively — inlining, specializing, de-virtualizing — reaching peak throughput that *statically compiled* code can't always match. Native image's static compilation is very good, but it can't adapt to the actual runtime distribution. **The honest numbers:** for typical Spring Boot workloads (JSON I/O, DB access — where the bottleneck is I/O, not CPU), the difference is often small (0–20%). For CPU-bound, compute-heavy loops, the JVM's JIT advantage grows.
+### Setting Up Spring Boot with Native Image
 
-## PGO: Closing the Throughput Gap
-
-**Profile-Guided Optimization (PGO)** is the tool that makes static compilation *learn* the workload: you run the native binary against representative traffic, capture the profiling data, and rebuild using it:
-
-```bash
-# 1. Build a PGO-instrumented image:
-./mvnw -Pnative -Dnative.profile=instrument native:compile
-
-# 2. Run it against REPRESENTATIVE load, capture the profile:
-./target/academy -XX:ProfilesDumpFile=app.iprof   # (GraalVM flag)
-# ...drive realistic traffic through it (the more realistic, the better)
-
-# 3. Rebuild, feeding the profile to the compiler:
-./mvnw -Pnative -Dnative.profile=optimize native:compile
-# (the build tools pass the .iprof to native-image automatically)
+```xml
+<!-- pom.xml — Add the native image plugin -->
+<build>
+    <plugins>
+        <plugin>
+            <groupId>org.graalvm.buildtools</groupId>
+            <artifactId>native-maven-plugin</artifactId>
+            <configuration>
+                <imageName>academy</imageName>                    <!-- Output binary name -->
+                <mainClass>com.example.academy.AcademyApplication</mainClass>
+                <buildArgs>
+                    <arg>--no-fallback</arg>                      <!-- Don't fall back to JVM -->
+                    <arg>-H:+ReportExceptionStackTraces</arg>    <!-- Better error messages -->
+                </buildArgs>
+            </configuration>
+        </plugin>
+    </plugins>
+</build>
 ```
 
-**The PGO insight:** the JIT's advantage is that it *knows the workload*; PGO hands the same knowledge to the AOT compiler — "branch X is hot, method Y is called 10,000×, inline it this way." With good PGO data, native peak throughput approaches (and for some workloads matches) the JIT. The requirement is the discipline: **the profiling run must reflect production traffic** — PGO trained on a test workload optimizes for the wrong workload.
+### Building a Native Image
 
-## The I/O-Bound Reality (Why It Often Doesn't Matter)
+```bash
+# Build the native executable:
+./mvnw -Pnative native:compile
 
-Most Spring Boot applications are **I/O-bound**: they wait on databases, message brokers, and external APIs — the CPU spends most of its time blocked. For these, the JIT-vs-AOT throughput difference is largely invisible: the bottleneck is the database, not the method dispatch. The metrics that *do* matter for I/O-bound services: startup (native wins), memory (native wins), and **connection/resource efficiency** (roughly equal). The honest conclusion: for the typical microservice, the performance case for native is startup + memory, and the throughput gap is a non-issue — which is why the real decision is about the *other* trade-offs (reflection discipline, build time, tooling).
+# Result: ./target/academy (Linux binary, ~60MB)
+# Run it directly:
+./target/academy
 
-## The Workload Decision Matrix
+# Startup time: ~15ms (vs 3-5 seconds on JVM)
+```
 
-| Workload | Metric that matters | Verdict |
+### Handling Reflection (The Big Challenge)
+
+```java
+// Native image needs to know about reflection at BUILD TIME, not runtime.
+
+// This works on JVM but FAILS on native image:
+User user = (User) objectMapper.readValue(json, User.class);   // Runtime reflection
+
+// SOLUTION 1: Register reflection configuration
+// In src/main/resources/META-INF/native-image/reflect-config.json:
+[
+  {
+    "name": "com.example.academy.model.User",
+    "allDeclaredConstructors": true,
+    "allPublicMethods": true,
+    "allPublicFields": true
+  }
+]
+
+// SOLUTION 2: Use Spring's built-in AOT processing (preferred)
+// Spring Boot's native support automatically registers reflection for:
+// - @Entity classes
+// - @Configuration classes
+// - @Component classes
+// - @JsonProperty annotations
+// You don't need to manually configure reflection for Spring-managed beans
+```
+
+### Custom Native Configuration
+
+```java
+@Configuration
+@ImportRuntimeHints(CustomRuntimeHints.class)
+public class NativeConfig {
+
+    @Bean
+    RuntimeHints runtimeHints() {
+        RuntimeHints hints = new RuntimeHints();
+
+        // Register resources that should be included in the native image
+        hints.resources().registerPattern("content/lessons/**");       // Include lesson files
+        hints.resources().registerPattern("templates/**");             // Include templates
+        hints.resources().registerPattern("static/**");                // Include static assets
+
+        // Register reflection for classes not managed by Spring
+        hints.reflection().registerType(ExternalApiClient.class,
+            MemberInferenceCategory.ALL_DECLARED_CONSTRUCTORS);
+
+        // Register proxy interfaces
+        hints.proxies().registerJdkProxy(OrderService.class);
+
+        return hints;
+    }
+}
+```
+
+---
+
+## Real-World Scenarios
+
+### Scenario 1: Serverless (AWS Lambda)
+
+```java
+// With JVM: cold start = 3-5 seconds (unacceptable for API gateway)
+// With native image: cold start = 50ms (imperceptible to users)
+
+@LambdaProxy(apiGateway = true)
+public class OrderHandler implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
+
+    @Autowired
+    private OrderService orderService;
+
+    @Override
+    public APIGatewayProxyResponseEvent handleRequest(APIGatewayProxyRequestEvent input, Context context) {
+        Order order = orderService.findById(input.getPathParameters().get("id"));
+        return new APIGatewayProxyResponseEvent()
+            .withStatusCode(200)
+            .withBody(objectMapper.writeValueAsString(order));
+    }
+}
+```
+
+### Scenario 2: Fast Auto-Scaling
+
+```java
+// Kubernetes HPA (Horizontal Pod Autoscaler) scales based on CPU/memory
+// Native image: starts in 50ms → new pod serves traffic almost immediately
+// JVM: starts in 5 seconds → traffic backs up while waiting
+
+// In k8s deployment:
+// spec:
+//   containers:
+//     - name: academy
+//       image: academy-native:latest     # GraalVM native image
+//       resources:
+//         limits:
+//           memory: "128Mi"              # Only needs 128MB (vs 512MB for JVM)
+//           cpu: "200m"                  # Low CPU (starts so fast, no burst needed)
+```
+
+### Scenario 3: CLI Tool
+
+```java
+@SpringBootApplication
+public class AcademyCli implements CommandLineRunner {
+
+    @Autowired
+    private ContentService contentService;
+
+    @Override
+    public void run(String... args) {
+        // Native image: starts instantly, runs, exits
+        // JVM: 3-5 second startup for a simple CLI tool
+        contentService.validateAllLessons();
+        System.out.println("All lessons validated successfully.");
+    }
+}
+```
+
+---
+
+## Common Mistakes
+
+| Mistake | Why It Breaks | Fix |
 |---|---|---|
-| Serverless / cold starts | startup | **native** |
-| Short-lived jobs (CLI, cron, batch) | startup + footprint | **native** |
-| Long-running API service, I/O-bound | startup (minor), throughput ~equal | either — native for ops, JVM for comfort |
-| CPU-bound compute hot loops | peak throughput | **JVM** (or native + PGO) |
-| Memory-bounded fleets | footprint | **native** |
-| Heavy dynamic/reflection use | flexibility | JVM (native needs hints) |
+| Using `Class.forName()` dynamically | Native image can't resolve at build time | Use `@RegisterReflection` or Spring AOT |
+| Forgetting resource registration | Properties/config files not found | Register with `RuntimeHints` or `reflect-config.json` |
+| Using `java.lang.reflect.Proxy` heavily | Dynamic proxies need build-time registration | Use `hints.proxies().registerJdkProxy()` |
+| Expecting JIT performance | Native image has no JIT — peak throughput is lower | Profile before switching; native is for startup, not throughput |
+| Building native image in CI without GraalVM | Build fails with "native-image not found" | Install GraalVM or use Docker with GraalVM base image |
 
-**The composite reality most teams land on:** JVM for the long-running core services (peak performance, dynamic freedom, mature tooling), native for the cold-start-sensitive edges (serverless functions, autoscaling tiers, CLIs) — with PGO reserved for the CPU-bound natives that need to close the throughput gap.
+---
 
-## The Memory Deep-Dive (For the Curious)
+## Key Takeaways
 
-Why is native memory smaller? The JVM's footprint breaks down as: heap (application data), metaspace (class metadata — significant in Spring, with thousands of classes), code cache (JIT-compiled methods), and the JIT compiler itself. Native image eliminates: the JIT compiler, the interpreter, the metaspace machinery, and the class-loading infrastructure — and the AOT-processed context removes the *runtime* cost of component scanning and bean wiring. What remains is the heap (which native image manages with its own, tuned GC — SerialGC by default, G1 available) plus the compiled code. The takeaway: native's memory win comes from removing the *runtime machinery*, not from magic compression — which is why it's most dramatic for framework-heavy apps (like Spring) with lots of metadata to eliminate.
+- **Native image = instant startup** (50ms vs 5s) and **low memory** (128MB vs 512MB).
+- **The trade-off**: slower build time, limited reflection, slightly lower peak throughput.
+- **Spring Boot has native support** — most Spring annotations work automatically with AOT processing.
+- **Resource registration** is needed for files accessed by path (not by Spring).
+- **Best for**: serverless, auto-scaling microservices, CLI tools, container environments.
 
-## The Measurement Discipline
-
-- **Measure startup honestly** — `curl -w "%{time_total}"` on the first response, not the "Started in X" log line alone.
-- **Measure memory in the container** — RSS/container metrics, not the JVM's reported heap.
-- **Measure throughput under production-shaped load** — a benchmark with your real payloads, request mix, and concurrency; never a synthetic microbenchmark.
-- **Measure both before deciding** — "native is faster" is workload-dependent; your workload's numbers are the only ones that matter.
-
-## Recap
-
-The honest native performance picture: **startup** (native wins by ~100× — milliseconds vs seconds), **memory** (native wins — no JVM machinery), and **peak throughput** (JVM's JIT usually leads, especially CPU-bound — but often irrelevant for I/O-bound services, and closable with **PGO**, which trains the AOT compiler on production-shaped profiling runs). The decision matrix is workload-driven: serverless and short-lived jobs go native; long-running I/O-bound services can go either way (startup/memory vs comfort); CPU-bound hot loops stay JVM (or native + PGO). Measure your workload's actual metrics — startup, RSS, and throughput under realistic load — and the "which is faster" debate resolves into a per-deployment calculation.
+Official docs: [GraalVM](https://www.graalvm.org/latest/docs/getting-started/) · [Spring Boot Native](https://docs.spring.io/spring-boot/reference/packaging/native-image/introducing-graalvm-native-images.html)

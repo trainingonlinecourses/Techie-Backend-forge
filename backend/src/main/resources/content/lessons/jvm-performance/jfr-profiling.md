@@ -1,88 +1,239 @@
 ---
-title: Profiling with JFR & Async Profiler
-summary: Java Flight Recorder, the async profiler and the flame graph — finding the methods that actually cost you CPU and allocations.
-order: 3
-minutes: 14
-topics: [jfr, async profiler, flame graph, cpu profiling, allocation profiling]
+title: JFR Profiling — Flight Recorder for Production
+summary: Java Flight Recorder captures low-overhead diagnostic data in production — CPU hotspots, lock contention, I/O latency, GC pauses — without stopping the app.
+order: 2
+minutes: 22
+topics: [JFR, flight recorder, profiling, CPU hotspot, lock contention, I/O latency, jdk.jfr, continuous profiling]
 docs:
   - https://docs.oracle.com/en/java/javase/21/docs/specs/man/jfr.html
-  - https://github.com/async-profiler/async-profiler
+  - https://docs.oracle.com/javase/8/docs/platform/jdk/jfr/
 ---
 
-# Profiling with JFR & Async Profiler
+# JFR Profiling — Flight Recorder for Production
 
-## Profiling without the profiler tax
+## What is Java Flight Recorder? (From Zero)
 
-Classic sampling profilers attach agents that slow the app and distort the measurement. **Java Flight Recorder (JFR)** is built into the JDK and designed for production: low overhead (< 1–2%), always-on-able, and rich (CPU, allocations, locks, exceptions, I/O, GC).
+Java Flight Recorder (JFR) is a **built-in profiling tool** that comes with every JDK (since Java 11, it's open source and free). It records low-overhead diagnostic events while your application runs — CPU usage, memory allocation, lock contention, I/O operations, GC pauses — all without stopping the app.
+
+Think of it as a **dashboard data recorder** for your JVM, like a car's black box flight recorder:
+
+| Tool | Overhead | Use in production? | What it captures |
+|---|---|---|---|
+| **JFR** | <1% | ✅ Yes | Everything: CPU, memory, locks, I/O, GC, threads |
+| **async-profiler** | <1% | ✅ Yes | CPU + wall-clock sampling |
+| **jvisualvm** | 5-15% | ⚠️ Dev only | Heap dumps, CPU sampling |
+| **jprofiler** | 10-20% | ❌ Dev only | Full profiling with UI |
+
+**JFR's killer feature**: it's always-on and production-safe. You can leave it running in production with negligible overhead, then analyze the data when something goes wrong.
+
+---
+
+## The Code — Line by Line
+
+### Starting JFR from Command Line
 
 ```bash
-# Record to a file for 60s, then stop:
-jcmd <pid> JFR.start name=profile filename=profile.jfr
-sleep 60
+# Start JFR recording for 60 seconds:
+jcmd <pid> JFR.start name=profile duration=60s filename=profile.jfr
+
+# Start continuous recording (until you stop it):
+jcmd <pid> JFR.start name=continuous settings=profile filename=continuous.jfr
+
+# Check running recordings:
+jcmd <pid> JFR.recording
+
+# Stop a recording:
 jcmd <pid> JFR.stop name=profile
+```
 
-# Or record on demand with the CLI:
+**Line-by-line explained:**
+- `jcmd <pid> JFR.start` — The `jcmd` tool sends commands to a running JVM. You need the PID (use `jps` to find it).
+- `name=profile` — A label for this recording session. You can have multiple recordings running.
+- `duration=60s` — Automatically stop after 60 seconds. Omit for continuous recording.
+- `filename=profile.jfr` — Where to write the recording file. JFR files are binary — use JDK Mission Control to view them.
+- `settings=profile` — Use the "profile" preset (more detailed than "default"). Other presets: `default`, `minimal`.
+
+### Programmatic JFR Control
+
+```java
+import jdk.jfr.*;
+
+@Configuration
+public class JfrConfig {
+
+    @Bean
+    public Recording jfrRecording() {
+        Recording recording = new Recording();
+
+        // Enable specific event categories
+        recording.enable("jdk.CPUInformation");      // CPU info
+        recording.enable("jdk.GarbageCollection");     // GC events
+        recording.enable("jdk.JavaMonitorWait");       // Lock contention
+        recording.enable("jdk.FileRead");              // File I/O
+        recording.enable("jdk.FileWrite");
+        recording.enable("jdk.SocketRead");            // Network I/O
+        recording.enable("jdk.SocketWrite");
+        recording.enable("jdk.ExecutionSample");       // CPU profiling (method-level)
+
+        // Configure settings
+        recording.setSetting("jdk.CPULoader.interval", "10 ms");
+        recording.setSetting("jdk.NativeMethodSampling.interval", "10 ms");
+
+        recording.setDuration(Duration.ofMinutes(30));  // Record for 30 minutes
+        recording.setDestination(Path.of("/var/log/app/recording.jfr"));
+
+        recording.start();
+        return recording;     // Bean lifecycle manages start/stop
+    }
+}
+```
+
+**Line-by-line explained:**
+- `recording.enable("jdk.CPUInformation")` — Enables specific event types. Each event type captures different data.
+- `jdk.ExecutionSample` — The CPU profiler: periodically samples what method each thread is executing. This is how you find hot methods.
+- `jdk.JavaMonitorWait` — Tracks lock contention: which threads are waiting for which locks, and for how long.
+- `recording.setDuration(Duration.ofMinutes(30))` — Auto-stop after 30 minutes. Important for production: you don't want recordings running forever.
+- `recording.setDestination(...)` — Write to a specific file path. Make sure the path is writable and has space.
+
+### Custom JFR Events (Your Business Metrics)
+
+```java
+// Define a custom event — JFR records it automatically
+@Label("Order Processing")
+@StackTrace(true)           // Capture the full stack trace
+@Category("Business")       // Organize in JMC
+public class OrderProcessingEvent extends jdk.jfr.Event {
+
+    @Label("Order ID")
+    String orderId;
+
+    @Label("Item Count")
+    int itemCount;
+
+    @Label("Total Amount")
+    @Timespan              // JFR renders this as a duration
+    long processingNanos;
+
+    @Label("Success")
+    boolean success;
+}
+
+// Usage in your service:
+@Service
+public class OrderService {
+    public Order processOrder(OrderRequest request) {
+        OrderProcessingEvent event = new OrderProcessingEvent();   // Create event
+        event.orderId = request.getId();                           // Set fields
+        event.itemCount = request.getItems().size();
+        event.begin();                                             // Start timing
+
+        try {
+            Order order = doProcess(request);                      // Actual work
+            event.success = true;
+            return order;
+        } catch (Exception e) {
+            event.success = false;
+            throw e;
+        } finally {
+            event.end();                                           // Stop timing — record the event
+        }
+    }
+}
+```
+
+**Line-by-line explained:**
+- `@Label("Order Processing")` — Human-readable name in JDK Mission Control.
+- `@StackTrace(true)` — Capture the full call stack. Useful for understanding HOW you got to this code path.
+- `@Category("Business")` — Groups this event with other business events in the JMC UI.
+- `event.begin()` / `event.end()` — Times the code between these calls. JFR records the duration.
+- The try/finally ensures `event.end()` is always called, even on exceptions.
+
+---
+
+## Real-World Scenarios
+
+### Scenario 1: Finding a CPU Hotspot
+
+A production API is slow but you don't know why:
+
+```bash
+# Start profiling
+jcmd <pid> JFR.start name=cpu settings=profile duration=120s filename=cpu.jfr
+
+# After 120 seconds, open cpu.jfr in JDK Mission Control:
+# Top Methods → shows which methods consume the most CPU
+# Flame Graph → shows the call chains leading to hot methods
+```
+
+JMC might show that `String.format()` in a tight loop is consuming 40% of CPU. You replace it with `StringBuilder` and the API gets 3x faster.
+
+### Scenario 2: Debugging Lock Contention
+
+```bash
+jcmd <pid> JFR.start name=locks settings=profile duration=60s filename=locks.jfr
+```
+
+In JMC, the "Locks" tab shows:
+- Thread "http-nio-8080-exec-5" waited 2.3 seconds for a lock held by "http-nio-8080-exec-12"
+- The lock is on `OrderRepository.save()` — the bottleneck is database serialization
+
+### Scenario 3: Memory Allocation Hotspot
+
+```bash
+jcmd <pid> JFR.start name=alloc settings=profile duration=60s filename=alloc.jfr
+```
+
+JMC's "TLAB Allocation" view shows:
+- `String.concat()` allocates 2GB of temporary strings per minute
+- Fix: use `StringBuilder` or pre-allocate
+
+---
+
+## Analyzing JFR Files
+
+### Using JDK Mission Control (JMC)
+
+1. Open the `.jfr` file in JMC (free, comes with JDK)
+2. **Dashboard** → Overview of events
+3. **Method Profiling** → Top CPU-consuming methods
+4. **Lock Profiling** → Which threads are waiting for locks
+5. **I/O Profiling** → Slow file/network operations
+6. **Event Browser** → Raw event data
+
+### Using JFR Tool (Command Line)
+
+```bash
+# Print summary of a JFR file:
 jfr summary profile.jfr
-jfr print --events jdk.ExecutionSample profile.jfr | head
+
+# Print specific events:
+jfr print --eventsjdk.GarbageCollection profile.jfr
+
+# Print to text format for scripting:
+jfr print --json profile.jfr | jq '.events[] | select(.eventType == "jdk.GarbageCollection")'
 ```
 
-Open the `.jfr` file in **JMC (JDK Mission Control)** or **IntelliJ**: flame graphs, allocation views, lock contention, exception counts. JFR also has a WebSocket/HTTP API (`jdk.jfr` events over `jfr.jmc.io`), and Spring Boot's Actuator can start recordings via `POST /actuator/jfr/recording` in recent versions.
+---
 
-## The async profiler: CPU + allocations, wall-clock true
+## Common Mistakes
 
-The **async profiler** samples at fixed intervals *without* safepoint bias (the classic problem: safepoint-based sampling over-reports code near safepoints):
+| Mistake | Why It's a Problem | Fix |
+|---|---|---|
+| Using VisualVM in production | 5-15% overhead can cause issues | Use JFR (<1% overhead) instead |
+| Not enabling `jdk.ExecutionSample` | Can't see CPU hotspots at method level | Always include in profiling settings |
+| Setting duration too long | Large files, disk space issues | Use 60-300 seconds for targeted profiling |
+| Forgetting to enable lock events | Can't diagnose contention | Enable `jdk.JavaMonitorWait` |
+| Not using custom events | Can't correlate JVM data with business metrics | Define custom Event classes for critical paths |
+| Running multiple JFR recordings | Each adds overhead | Use one continuous recording, enable/disable events as needed |
 
-```bash
-# Attach to a running JVM (Linux/macOS; Windows support via WSL):
-./profiler.sh -d 60 -o flamegraph -f profile.html <pid>
+---
 
-# Allocation profiling — who allocates, in bytes (the GC root-cause view):
-./profiler.sh -d 60 -e alloc -o flamegraph -f alloc.html <pid>
-```
+## Key Takeaways
 
-Output: interactive **flame graphs** — the wider a frame, the more time/bytes it accounts for. The `alloc` profile is the single best tool for "GC is busy": it shows the call paths allocating, so you fix *that*, not the GC settings.
+- **JFR is production-safe** (<1% overhead) — use it instead of VisualVM/profilers in production.
+- **Always-on profiling** — leave JFR running continuously, analyze when incidents happen.
+- **Custom events** bridge JVM metrics and business logic — track order processing, payment latency, etc.
+- **JDK Mission Control** is the free analysis tool — learn its Method Profiling, Lock Profiling, and I/O views.
+- **Flame graphs** are the fastest way to understand CPU hotspots — they show the full call chain.
 
-## The reading discipline
-
-1. **Profile the right environment** — a local dev box with a warm cache and a prod box with real data give different answers. Profile prod (JFR is safe) or a load-tested staging.
-2. **Find the widest frame first** — the flame graph answers "where does time go?" before "how do I tune?". A method taking 40% of CPU that you've never heard of is the story.
-3. **CPU vs wall** — `-e cpu` shows CPU burn; `-e wall` includes waiting (locks, I/O). A thread that "spins" might be blocked 95% of the time — wall profile shows it.
-4. **Allocation profile drives GC fixes** — allocate 50% less in one hot path and the GC pressure story changes completely.
-
-## A worked diagnosis
-
-```text
-Symptom: p99 latency spikes every few minutes; GC logs show frequent young GCs.
-1. JFR: jdk.GCPhasePause — pauses are short (4ms). Not the spike.
-2. Async profiler -e alloc: hottest path is OrderService.create →
-   stream().collect(toList()) building a BigDecimal per row.
-3. Fix: reuse a BigDecimal.ZERO accumulator, avoid per-row BigDecimal allocations.
-4. Re-profile: young-GC frequency drops 3×; p99 recovers.
-```
-
-The pattern: **measure → identify the widest frame → one fix → re-measure**. Profiling without the re-measure is guessing with fancier tools.
-
-## Lock contention & the async-profiler lock view
-
-`-e lock` shows contended monitors — the "every thread waiting on one synchronized block" story:
-
-```bash
-./profiler.sh -d 30 -e lock -o flamegraph -f locks.html <pid>
-```
-
-Hot locks in Spring apps are usually singletons doing too much (a shared `ObjectMapper` is fine; a shared `SimpleDateFormat`-like mutable object is not). Contention fixes: narrower critical sections, `ConcurrentHashMap`/`AtomicX`, or redesigning the shared resource.
-
-## Integrating profiling into the workflow
-
-- **Always-on JFR in production**: `-XX:StartFlightRecording=settings=default,disk=true,maxage=1h` gives you a rolling recording — when the incident happens, the data is already there.
-- **Profile on demand**: a recording started 5 minutes after the alert captures the incident, not the aftermath.
-- **Make it a habit, not a fire drill**: profile after every significant performance change; the flame-graph diff is the changelog.
-
-## Key takeaways
-
-- JFR is built-in, low-overhead, production-safe — record with `jcmd`, view in JMC.
-- The async profiler gives safepoint-bias-free CPU, allocation, wall and lock flame graphs.
-- `-e alloc` flame graph is the root-cause view for GC pressure — fix the allocator, not the GC.
-- Measure → widest frame → one fix → re-measure; keep rolling JFR in prod so incidents are already recorded.
-
-Official docs: [jfr tool](https://docs.oracle.com/en/java/javase/21/docs/specs/man/jfr.html) · [async-profiler](https://github.com/async-profiler/async-profiler)
+Official docs: [jfr tool](https://docs.oracle.com/en/java/javase/21/docs/specs/man/jfr.html) · [JFR API](https://docs.oracle.com/javase/8/docs/platform/jdk/jfr/)

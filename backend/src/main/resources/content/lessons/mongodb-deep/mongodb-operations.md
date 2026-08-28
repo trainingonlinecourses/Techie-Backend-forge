@@ -1,95 +1,276 @@
 ---
-title: MongoDB Operations — Indexes, Replication, Sharding, Backups
-module: mongodb-deep
+title: MongoDB Operations — CRUD, Aggregation, and Indexing
+summary: Spring Data MongoDB operations — insert, find, update, aggregate pipelines, indexing strategies, and how organizations use MongoDB for document-oriented data. Beginner-friendly with line-by-line code.
 order: 5
-minutes: 26
-topics: ["indexes", "replication", "sharding", "backup", "operations", "monitoring"]
+minutes: 22
+topics: [MongoDB, MongoTemplate, MongoRepository, aggregation, indexing, document model, embedding, referencing]
 docs:
-  - title: "Indexes (MongoDB Manual)"
-    url: "https://www.mongodb.com/docs/manual/indexes/"
-  - title: "Replication and Sharding (MongoDB Manual)"
-    url: "https://www.mongodb.com/docs/manual/replication/"
+  - https://docs.spring.io/spring-data/mongodb/docs/current/reference/html/
+  - https://www.mongodb.com/docs/manual/crud/
 ---
 
-# MongoDB Operations — Indexes, Replication, Sharding, Backups
+# MongoDB Operations — CRUD, Aggregation, and Indexing
 
-## The Concept: The Part Nobody Teaches Until It Breaks
+## What is MongoDB? (From Zero)
 
-Developers learn CRUD and aggregation; production learns that **the database is an operational system**. Indexes decide whether queries are instant or melt the server; replication decides whether an outage takes down the app; sharding decides whether the dataset outgrows one machine; backups decide whether a bad deploy is a 5-minute rollback or a data-loss incident. This lesson is the operations layer — what runs *around* your queries.
+MongoDB is a **document database** — instead of rows and columns (like SQL), it stores JSON-like documents. Each document can have different fields, nested objects, and arrays. This makes it perfect for data that doesn't fit neatly into tables.
 
-## Indexes: The Query Accelerators
+### SQL vs MongoDB
 
-Without an index, MongoDB scans every document in the collection to answer a query — a **collection scan**, O(n), and at scale it's catastrophic. An **index** is a sorted structure over the indexed field(s), giving O(log n) lookup. The rules:
+| SQL Concept | MongoDB Equivalent |
+|---|---|
+| Database | Database |
+| Table | Collection |
+| Row | Document |
+| Column | Field |
+| JOIN | Embedded document or lookup |
+| Index | Index |
 
-- **Index what you filter and sort on.** `find({status: "active"}).sort({createdAt: -1})` wants `{status: 1, createdAt: -1}` — a **compound index** covering both.
-- **Index the "selectivity" field first.** Put the most discriminating field first in a compound index.
-- **Unique indexes enforce integrity** — the document model's substitute for a primary-key constraint on business fields:
-
-```js
-// Enforce one account per email — at the DATABASE level:
-db.users.createIndex({ email: 1 }, { unique: true });
-
-// Compound index for the common query pattern:
-db.orders.createIndex({ customerId: 1, createdAt: -1 });
-
-// TTL index — auto-delete documents after N seconds (sessions, logs!):
-db.sessions.createIndex({ lastSeen: 1 }, { expireAfterSeconds: 3600 });
+```json
+// A MongoDB document (stored as BSON — binary JSON):
+{
+  "_id": "order-123",
+  "customer": {
+    "name": "Alice",
+    "email": "alice@example.com"
+  },
+  "items": [
+    {"product": "Laptop", "quantity": 1, "price": 999.99},
+    {"product": "Mouse", "quantity": 2, "price": 29.99}
+  ],
+  "status": "PAID",
+  "total": 1059.97,
+  "createdAt": "2024-01-15T10:30:00Z"
+}
 ```
 
-In Spring Data, declare them on the model: `@Indexed(unique = true)`, `@CompoundIndex(def = "{'customerId': 1, 'createdAt': -1}")` — indexes are created at startup. The TTL index is the operational gem: MongoDB deletes expired documents automatically, giving you session cleanup for free.
+---
 
-**How to know you need one:** run the query with `.explain("executionStats")` — it reports `COLLSCAN` (bad — full scan) vs `IXSCAN` (good — index used). Every slow-query investigation in MongoDB starts and ends with explain.
+## The Code — Line by Line
 
-## Replication: Replica Sets
+### 1. MongoDB Entity (Document)
 
-A **replica set** is a group of MongoDB servers holding the same data: one **primary** (accepts writes) and multiple **secondaries** (replicate from the primary, serve reads if configured). It's the availability layer — if the primary dies, the set *elects* a new primary automatically (typically within seconds), and the app keeps working.
+```java
+@Document(collection = "orders")          // Maps to the "orders" collection
+public class Order {
 
-- Writes go to the primary, which journals them to its **oplog** (operation log); secondaries replay the oplog.
-- **Read preferences** control routing: `primary` (default — reads from primary, strong consistency), `primaryPreferred`, `secondary` (read scaling), `nearest` (lowest latency).
-- **Write concerns** dial durability: `w: 1` (ack from primary only — default), `w: majority` (ack from a majority of members — survives a primary loss without losing acknowledged writes). The production rule for critical data: `w: majority`.
+    @Id                                  // Maps to the "_id" field
+    private String id;
 
-Spring Data configures all of this via the URI: `mongodb://host1,host2,host3/academy?replicaSet=rs0&w=majority`.
+    @Field("customer_name")              // Custom field name in MongoDB
+    private String customerName;
 
-## Sharding: Scaling Out
+    @Embedded                             // Nested object (embedded in the document)
+    private Address shippingAddress;
 
-When a single replica set can't hold the data or handle the write rate, **sharding** splits the dataset across many nodes. MongoDB partitions collections by a **shard key** — the field that determines which shard holds which documents:
+    private List<OrderItem> items;        // Array of embedded documents
 
-- **The shard key must be chosen with your access patterns.** If you query by `customerId`, shard on `customerId` — then all of one customer's data lives on one shard, and queries route to a single node.
-- **Bad shard keys kill performance:** low-cardinality keys (a boolean — only 2 shards ever used), monotonically-increasing keys (all writes to one shard — a hot spot), or keys you don't filter by (every query becomes a scatter-gather across all shards).
-- **Chunks** (ranges of shard-key values) migrate between shards automatically for balance; **`hashed` shard keys** (`sh.shardCollection("db.c", {_id: "hashed"})`) spread writes evenly when there's no natural range.
+    @Indexed                              // Create an index on this field
+    private String status;
 
-Sharding is the last resort, not the default: it adds real operational complexity (balancers, chunk migrations, cross-shard query costs). The sane ladder: single node → replica set → sharded cluster — and only when measured growth demands it.
+    @CreatedDate
+    private Instant createdAt;
 
-## Backups: The Undo Button
+    @Version                              // Optimistic locking
+    private Long version;
+}
+```
 
-Replication protects against *node* failure; backups protect against *everything else* — bad deploys, `db.dropDatabase()` typos, ransomware. The standard methods:
+### 2. MongoRepository (Simple CRUD)
 
-- **`mongodump`/`mongorestore`** — logical backups (BSON files). Simple, but slow for large datasets and not a point-in-time story by itself.
-- **File-system snapshots** — consistent physical backups (LVM snapshots, cloud disk snapshots). Fast, but require coordinated quiescing (`db.fsyncLock()`/`unlock`).
-- **Managed services (MongoDB Atlas)** — automated continuous backups with point-in-time recovery; the pragmatic choice for most teams.
+```java
+@Repository
+public interface OrderRepository extends MongoRepository<Order, String> {
 
-The discipline: **back up regularly, test restores, and keep backups off the primary's machine.** An untested backup is a hope, not a plan.
+    // Method name queries (same as Spring Data JPA):
+    List<Order> findByStatus(String status);
+    Optional<Order> findByCustomerName(String name);
+    List<Order> findByStatusAndTotalGreaterThan(String status, double minTotal);
+    List<Order> findByItemsProductId(String productId);     // Query nested array
+    Page<Order> findByStatus(String status, Pageable pageable);
 
-## The Monitoring Essentials
+    // @Query with MongoDB query syntax:
+    @Query("{ 'status': ?0, 'total': { $gte: ?1 } }")
+    List<Order> findHighValueOrders(String status, double minTotal);
 
-- **`db.serverStatus()`** — connection counts, memory, operations.
-- **`db.currentOp()`** — what's running right now; find long-running queries to kill (`db.killOp(opid)`).
-- **`db.collection.stats()`** — sizes, index sizes, fragmentation.
-- **Slow query log** — set `slowms` (default 100ms) and watch for `COLLSCAN`s.
-- **Atlas / Ops Manager** — dashboards for the standard metrics: connections, opcounters, cache usage, replication lag.
+    // Aggregation:
+    @Aggregation(pipeline = {
+        "{ $match: { status: ?0 } }",
+        "{ $group: { _id: '$customerName', total: { $sum: '$total' } } }",
+        "{ $sort: { total: -1 } }"
+    })
+    List<Document> getTopCustomersByStatus(String status);
+}
+```
 
-The two numbers that predict incidents: **replication lag** (secondaries falling behind → read staleness, election risks) and **working set vs memory** (when the hot data exceeds RAM, every query hits disk and latency explodes).
+**Line-by-line explained:**
+- `@Document(collection = "orders")` — This entity maps to the "orders" collection in MongoDB.
+- `@Id private String id` — MongoDB uses `_id` as the primary key. Spring Data auto-generates if null.
+- `@Indexed private String status` — Creates a MongoDB index on the "status" field for fast queries.
+- `findByItemsProductId` — Queries into the nested `items` array. Spring Data handles the MongoDB query generation.
+- `@Query("{ 'status': ?0 }")` — Raw MongoDB query syntax (not JPQL). Use when method names aren't expressive enough.
 
-## The Operational Checklist
+### 3. MongoTemplate (Advanced Operations)
 
-1. Index every field you filter, sort, or join on — verified with `.explain()`.
-2. Run a replica set in production (`w: majority` for critical writes).
-3. Shard only when a single replica set is measurably insufficient — and choose the shard key from your access patterns.
-4. Back up continuously, store off-machine, and *test restores*.
-5. Monitor lag, memory, and slow queries; act on `COLLSCAN`s immediately.
-6. Apply TTL indexes for expiring data; unique indexes for integrity.
-7. Protect the deployment: authentication, TLS, and network isolation (the ops security basics every database needs).
+```java
+@Service
+public class OrderMongoService {
 
-## Recap
+    private final MongoTemplate mongoTemplate;
 
-MongoDB operations are what make it production-safe: indexes turn collection scans into instant lookups (verified via `explain`, declared with `@Indexed` in Spring), replica sets provide automatic failover with `w: majority` durability, sharding scales out across machines when one node can't cope, and backups — tested, off-machine — provide the undo button. The operational habits — index-first, monitor lag and memory, shard deliberately, back up religiously — are identical in spirit to running Postgres or any database. The document model changes your queries, but the laws of running a database at scale do not.
+    // Find with complex criteria:
+    public List<Order> findOrders(OrderSearchCriteria criteria) {
+        Query query = new Query();
+
+        if (criteria.getStatus() != null) {
+            query.addCriteria(Criteria.where("status").is(criteria.getStatus()));
+        }
+        if (criteria.getMinTotal() != null) {
+            query.addCriteria(Criteria.where("total").gte(criteria.getMinTotal()));
+        }
+        if (criteria.getCustomerName() != null) {
+            query.addCriteria(Criteria.where("customerName")
+                .regex(criteria.getCustomerName(), "i"));    // Case-insensitive regex
+        }
+
+        query.with(Sort.by(Sort.Direction.DESC, "createdAt"));
+        query.limit(20);                                    // Max 20 results
+
+        return mongoTemplate.find(query, Order.class);
+    }
+
+    // Update specific fields (partial update):
+    public void updateOrderStatus(String orderId, String newStatus) {
+        Query query = Query.query(Criteria.where("_id").is(orderId));
+        Update update = new Update()
+            .set("status", newStatus)                       // Set the status field
+            .set("updatedAt", Instant.now());               // Set the timestamp
+
+        mongoTemplate.updateFirst(query, update, Order.class);
+    }
+
+    // Upsert (insert or update):
+    public void upsertOrder(Order order) {
+        Query query = Query.query(Criteria.where("_id").is(order.getId()));
+        mongoTemplate.upsert(query, order, Order.class);
+    }
+
+    // Aggregation pipeline:
+    public List<Document> getRevenueByDay() {
+        Aggregation aggregation = Aggregation.newAggregation(
+            Aggregation.match(Criteria.where("status").is("PAID")),
+            Aggregation.group("createdAt")
+                .sum("total").as("dailyRevenue")
+                .count().as("orderCount"),
+            Aggregation.sort(Sort.Direction.ASC, "_id"),
+            Aggregation.limit(30)                           // Last 30 days
+        );
+
+        return mongoTemplate.aggregate(aggregation, "orders", Document.class)
+            .getMappedResults();
+    }
+}
+```
+
+---
+
+## Real-World Scenarios
+
+### Scenario 1: E-Commerce Product Catalog
+
+```java
+@Document(collection = "products")
+public class Product {
+    @Id
+    private String id;
+    private String name;
+    private String description;
+    private double price;
+    private String category;
+    private List<String> tags;                          // Array of strings
+    private Map<String, Object> attributes;             // Dynamic attributes (color, size, weight)
+    private List<Review> reviews;                       // Embedded reviews
+    private int stockQuantity;
+}
+
+// Query: find products by tag (uses multikey index):
+List<Product> products = productRepository.findByTagsContaining("laptop");
+
+// Query: find products by dynamic attribute:
+Query query = Query.query(Criteria.where("attributes.color").is("black")
+    .and("attributes.weight").lte(2.0));
+```
+
+### Scenario 2: Logging/Analytics (Time Series)
+
+```java
+@Document(collection = "events")
+@Indexed(name = "timestamp_idx", direction = IndexDirection.DESCENDING)
+public class AnalyticsEvent {
+    @Id
+    private String id;
+    private String eventType;
+    private String userId;
+    private Map<String, Object> properties;
+    private Instant timestamp;
+}
+
+// Find events in the last 24 hours:
+Query query = Query.query(
+    Criteria.where("timestamp").gte(Instant.now().minus(Duration.ofHours(24)))
+);
+query.with(Sort.by(Sort.Direction.DESC, "timestamp"));
+query.limit(1000);
+```
+
+### Scenario 3: Chat Messages (Embedded vs Referenced)
+
+```java
+// EMBEDDED (denormalized): messages inside the conversation
+@Document(collection = "conversations")
+public class Conversation {
+    @Id
+    private String id;
+    private String title;
+    private List<Message> messages;             // Embedded — fast to read
+}
+
+// REFERENCED (normalized): messages in separate collection
+@Document(collection = "messages")
+public class Message {
+    @Id
+    private String id;
+    private String conversationId;             // Reference to parent
+    private String sender;
+    private String content;
+    private Instant timestamp;
+}
+
+// When to use which:
+// Embedded: messages are always loaded with the conversation (< 16MB total)
+// Referenced: messages are loaded independently, or conversation has > 100K messages
+```
+
+---
+
+## Common Mistakes
+
+| Mistake | Why It Breaks | Fix |
+|---|---|---|
+| No indexes on query fields | Full collection scan on every query | Add `@Indexed` on frequently queried fields |
+| Embedding too much data | Documents exceed 16MB limit | Reference large collections instead of embedding |
+| Using MongoDB like a relational DB | Missing the document model benefits | Design around access patterns, not normalization |
+| Not monitoring slow queries | Performance degrades silently | Enable MongoDB profiler, review slow queries |
+| Ignoring connection pool size | Thread starvation under load | Configure `spring.data.mongodb.max-connection-pool-size` |
+
+---
+
+## Key Takeaways
+
+- **MongoDB stores documents** (JSON-like) — not rows. Design around your access patterns.
+- **MongoRepository** gives you Spring Data's method-name queries for free.
+- **MongoTemplate** for complex queries, partial updates, and aggregation pipelines.
+- **Index everything you query by** — MongoDB does full collection scans without indexes.
+- **Embed vs Reference**: embed for 1:1 and 1:few relationships. Reference for 1:many and many:many.
+
+Official docs: [Spring Data MongoDB](https://docs.spring.io/spring-data/mongodb/docs/current/reference/html/) · [MongoDB CRUD](https://www.mongodb.com/docs/manual/crud/)

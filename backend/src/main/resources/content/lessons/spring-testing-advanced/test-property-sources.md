@@ -1,91 +1,215 @@
 ---
-title: Test Property Sources — @TestPropertySource and @DynamicPropertySource
-summary: The property override mechanisms for tests, precedence vs application files, and the dynamic-port pattern for Testcontainers.
-order: 10
-minutes: 16
-topics: [testpropertysource, dynamicpropertysource, test-properties, property-override, testcontainers-ports]
+title: Test Property Sources — Configuring Test Environments
+summary: @TestPropertySource, @DynamicPropertySource, test profiles, and how to isolate tests from external dependencies like databases and APIs. Beginner-friendly with line-by-line code.
+order: 8
+minutes: 18
+topics: [test properties, @TestPropertySource, @DynamicPropertySource, test profiles, test configuration, property override]
 docs:
-  - https://docs.spring.io/spring-framework/reference/testing/testcontext-framework/ctx-management.html
-  - https://docs.spring.io/spring-boot/reference/testing/spring-boot-applications.html
+  - https://docs.spring.io/spring-framework/reference/testing.html#testcontext-ctx-management-env-profiles
+  - https://docs.spring.io/spring-boot/reference/testing/spring-boot-tests.html#autoconfigured-tests
 ---
 
-# Test Property Sources — @TestPropertySource and @DynamicPropertySource
+# Test Property Sources — Configuring Test Environments
 
-## The concept: tests need different config, cleanly
+## Why Test Properties Matter (From Zero)
 
-Tests must point at test databases, stub URLs, and in-memory services — without touching production config files. Spring's test framework gives three mechanisms, in increasing power:
+Your `application.yml` has production database URLs, API keys, and service endpoints. When running tests, you don't want to connect to the production database or call the real payment API. **Test property sources** let you override specific properties for tests without affecting the main configuration.
 
-1. **`@SpringBootTest(properties = "...")`** — inline key/value overrides for one test class.
-2. **`@TestPropertySource`** — point at a properties file (`classpath:test.properties`) or inline values.
-3. **`@DynamicPropertySource`** — register property values *at runtime*, from code — the pattern for Testcontainers (ports are only known after the container starts).
+Think of it like a hotel room: the main config is the hotel's standard room setup, but test configs are like sticky notes that say "use this soap instead" or "turn off the TV."
+
+---
+
+## The Code — Line by Line
+
+### 1. @TestPropertySource (Static Properties)
 
 ```java
-@SpringBootTest(properties = {
-    "app.features.new-checkout=false",      // per-class inline override
-    "app.retry.max=1"                       // speed up retry-heavy tests
+@SpringBootTest
+@TestPropertySource(properties = {
+    "spring.datasource.url=jdbc:h2:mem:testdb",        // Override: in-memory database
+    "spring.datasource.driver-class-name=org.h2.Driver", // Override: H2 driver
+    "app.jwt.secret=test-secret-key-for-testing-only",   // Override: test JWT secret
+    "app.payment.gateway.url=http://localhost:9999"       // Override: mock payment service
 })
-class CheckoutTest { ... }
-```
+class OrderServiceTest {
 
-`@TestPropertySource` adds a whole file:
+    @Autowired
+    private OrderService orderService;
 
-```java
-@TestPropertySource(locations = "classpath:test.properties")
-// or inline:
-@TestPropertySource(properties = "app.db.url=jdbc:h2:mem:test")
-class OrderServiceTest { ... }
-```
-
-## Precedence — where test properties sit
-
-Test property sources are added with **higher precedence than `application.properties`** (but below command-line args and some env sources). So a test override *wins* over the app's config file — exactly what you want — while still letting environment-level sources (real env vars) override the test if needed.
-
-The practical effect: `application-test.properties` (profile-based) vs `@TestPropertySource` (test-class-based) both work; the class-level annotation is more explicit about what a *specific* test needs, the profile file is shared by many tests.
-
-## @DynamicPropertySource — the Testcontainers pattern
-
-The container's port isn't known until the container starts, so the property must be registered *dynamically*:
-
-```java
-@DataJpaTest
-@Testcontainers
-class OrderRepositoryTest {
-    @Container
-    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16");
-
-    @DynamicPropertySource
-    static void datasourceProps(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", postgres::getJdbcUrl);
-        registry.add("spring.datasource.username", postgres::getUsername);
-        registry.add("spring.datasource.password", postgres::getPassword);
+    @Test
+    void shouldCreateOrder() {
+        // This test uses the TEST properties, not production
+        // H2 in-memory database, not PostgreSQL
+        // Mock payment URL, not real Stripe
     }
 }
 ```
 
-The `registry.add(key, supplier)` form is key: the supplier is called **lazily** when the property is first resolved — which is after the container has started and its port is known. This is the canonical way to wire Testcontainers into Spring tests, and it works for Redis, Kafka, Elasticsearch, and every other containerized dependency.
+**Line-by-line explained:**
+- `@TestPropertySource(properties = {...})` — Overrides specific properties for this test class only. The main `application.yml` is still loaded for everything else.
+- `spring.datasource.url=jdbc:h2:mem:testdb` — Tests use an in-memory H2 database. Fast, isolated, no cleanup needed.
+- `app.jwt.secret=test-secret-key...` — Use a test JWT secret. Don't use the production secret in tests!
 
-## How we use it in an organization: the scenarios
+### 2. @DynamicPropertySource (For Containers)
 
-**Scenario 1 — per-class behavior overrides.** One test class exercises the "feature flag off" path, another "on" — `properties = "app.features.x=false"` per class, no shared mutable state.
+```java
+@SpringBootTest
+@Testcontainers
+class OrderServiceIntegrationTest {
 
-**Scenario 2 — the shared test profile.** Many tests share `application-test.properties` (in-memory DB, stub URLs, short timeouts), activated via `@ActiveProfiles("test")` — the team default for the fast suite.
+    @Container
+    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:15")
+        .withDatabaseName("testdb")
+        .withUsername("test")
+        .withPassword("test");
 
-**Scenario 3 — Testcontainers wiring.** `@DynamicPropertySource` for every containerized dependency — the pattern above, repeated per service (Postgres, Redis, Kafka, Elasticsearch).
+    @Container
+    static GenericContainer<?> redis = new GenericContainer<>("redis:7")
+        .withExposedPorts(6379);
 
-**Scenario 4 — deterministic time.** Tests that need a fixed `Clock`/time zone override the property or inject a `Clock` bean — deterministic date-dependent logic.
+    @DynamicPropertySource    // Properties are set at RUNTIME (after containers start)
+    static void configureProperties(DynamicPropertyRegistry registry) {
+        // PostgreSQL — random port assigned by Testcontainers
+        registry.add("spring.datasource.url", postgres::getJdbcUrl);
+        registry.add("spring.datasource.username", postgres::getUsername);
+        registry.add("spring.datasource.password", postgres::getPassword);
 
-## The pitfalls
+        // Redis — random port assigned by Testcontainers
+        registry.add("spring.data.redis.host", redis::getHost);
+        registry.add("spring.data.redis.port", () -> redis.getMappedPort(6379));
+    }
+}
+```
 
-- **`@DynamicPropertySource` methods must be static** — a non-static method fails with a clear error; the registry pattern requires static access.
-- **Precedence confusion** — a test override *not* taking effect usually means a higher-precedence source (env var, command line) is winning; check the property source order (see the Environment lesson).
-- **`application-test.properties` silently stale** — a shared test file drifts from what individual tests need; the class-level override is the escape hatch.
-- **Secrets in test files** — test property files can carry dummy credentials; keep them clearly fake and never point tests at real prod-like secrets.
-- **Testcontainers + `@DynamicPropertySource` with a shared context** — the container is per-class (static); tests sharing a cached context must not assume different containers.
+**Line-by-line explained:**
+- `@Testcontainers` — Enables Testcontainers support in Spring Boot.
+- `@Container` — Starts a PostgreSQL and Redis container before tests, stops after.
+- `@DynamicPropertySource` — Sets properties that depend on container runtime (random ports, generated credentials).
+- `registry.add("spring.datasource.url", postgres::getJdbcUrl)` — The JDBC URL is only known AFTER the container starts, so we use a dynamic property.
 
-## Key takeaways
+### 3. Test Profiles
 
-- Three mechanisms: inline `properties`, `@TestPropertySource` (files/inline), `@DynamicPropertySource` (runtime values).
-- Test property sources outrank `application.properties` — clean overrides without touching app config.
-- `@DynamicPropertySource` + lazy suppliers is the Testcontainers wiring pattern.
-- Use per-class `properties` for behavior toggles; a shared `application-test.properties` for the common fast suite.
-- Watch precedence, keep test files free of real secrets, and keep the methods static.
+```java
+// application-test.yml — dedicated test configuration
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop                # Create schema fresh for each test run
+    show-sql: true                          # Log SQL in tests for debugging
+
+app:
+  payment:
+    gateway:
+      url: http://localhost:9999            # Mock payment service
+    mock-enabled: true                      # Enable payment mocking
+
+logging:
+  level:
+    com.example.academy: DEBUG              # Verbose logging for debugging
+```
+
+```java
+@SpringBootTest
+@ActiveProfiles("test")                     // Activate the test profile
+class PaymentServiceTest {
+
+    @Test
+    void shouldMockPaymentGateway() {
+        // Uses application-test.yml properties
+        // Mock payment service is enabled
+        // H2 in-memory database
+    }
+}
+```
+
+---
+
+## Real-World Scenarios
+
+### Scenario 1: Database Per Developer
+
+```java
+@SpringBootTest
+@TestPropertySource(properties = {
+    "spring.datasource.url=jdbc:postgresql://localhost:5432/test_${user.name}"
+    // Each developer gets their own database:
+    // test_alice, test_bob, test_charlie
+})
+class DeveloperIntegrationTest {
+    // No conflicts between developers running tests simultaneously
+}
+```
+
+### Scenario 2: Mock External Services
+
+```java
+@SpringBootTest
+@TestPropertySource(properties = {
+    "app.services.payment.url=http://localhost:8082",
+    "app.services.email.url=http://localhost:8083",
+    "app.services.sms.url=http://localhost:8084"
+})
+@Testcontainers
+class EndToEndTest {
+
+    @Container
+    static MockServerContainer paymentMock = new MockServerContainer("mockserver/mockserver:latest");
+
+    @Container
+    static MockServerContainer emailMock = new MockServerContainer("mockserver/mockserver:latest");
+
+    @DynamicPropertySource
+    static void mockServices(DynamicPropertyRegistry registry) {
+        registry.add("app.services.payment.url", () ->
+            "http://" + paymentMock.getHost() + ":" + paymentMock.getServerPort());
+        registry.add("app.services.email.url", () ->
+            "http://" + emailMock.getHost() + ":" + emailMock.getServerPort());
+    }
+}
+```
+
+### Scenario 3: CI/CD Pipeline Properties
+
+```yaml
+# In CI, environment variables override test properties:
+# CI environment:
+SPRING_DATASOURCE_URL=jdbc:postgresql://ci-db:5432/ci_test
+SPRING_DATASOURCE_USERNAME=ci_user
+SPRING_DATASOURCE_PASSWORD=ci_password
+```
+
+```java
+// application.yml uses environment variables:
+spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:h2:mem:default}     // Default to H2 if not set
+    username: ${SPRING_DATASOURCE_USERNAME:sa}             // Default to 'sa' if not set
+    password: ${SPRING_DATASOURCE_PASSWORD:}               // Default to empty if not set
+```
+
+---
+
+## Common Mistakes
+
+| Mistake | Why It Breaks | Fix |
+|---|---|---|
+| Hardcoded test URLs | Breaks when ports/config changes | Use `@DynamicPropertySource` for containers |
+| Using production secrets in tests | Security risk, tests hit real services | Override secrets with test values |
+| Not using @ActiveProfiles("test") | Test loads production config | Always activate the test profile |
+| Forgetting @TestPropertySource scope | Properties affect all test classes | Use class-level annotation |
+| Not cleaning up test databases | Tests affect each other | Use `create-drop` or `@Transactional` |
+
+---
+
+## Key Takeaways
+
+- **`@TestPropertySource`** overrides specific properties for tests (static, known at compile time).
+- **`@DynamicPropertySource`** overrides properties that depend on runtime values (container ports).
+- **`@ActiveProfiles("test")`** activates a test-specific configuration file.
+- **Testcontainers + Dynamic properties** = real database in tests without hardcoded ports.
+- **Always override secrets and URLs** — never use production values in tests.
+
+Official docs: [Test Properties (Spring)](https://docs.spring.io/spring-framework/reference/testing.html) · [Testcontainers (Spring Boot)](https://docs.spring.io/spring-boot/reference/testing/spring-boot-tests.html#autoconfigured-tests)

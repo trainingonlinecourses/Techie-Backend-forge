@@ -1,95 +1,240 @@
 ---
-title: SpEL — Spring Expression Language
-summary: The expression language behind @Value, @PreAuthorize, security rules and Spring Integration — syntax, evaluation contexts and when to use it.
-order: 10
-minutes: 14
-topics: [spel, expression language, evaluation context, template expressions]
+title: Spring Expression Language (SpEL) — Dynamic Values at Runtime
+summary: SpEL basics — property placeholders, bean references, conditional expressions, collection filtering, and how organizations use SpEL for dynamic configuration and security rules. Beginner-friendly with line-by-line code.
+order: 6
+minutes: 20
+topics: [SpEL, Spring Expression Language, property placeholders, bean references, conditional, collection filtering, dynamic config]
 docs:
   - https://docs.spring.io/spring-framework/reference/core/expressions.html
 ---
 
-# SpEL — Spring Expression Language
+# Spring Expression Language (SpEL) — Dynamic Values at Runtime
 
-## What SpEL is
+## What is SpEL? (From Zero)
 
-SpEL is a small expression language evaluated at runtime, wired into nearly every Spring project:
+SpEL (Spring Expression Language) is a powerful expression language that lets you compute values **at runtime**. You've already used it without knowing — `${server.port}` in `application.yml` is a SpEL-like placeholder. But SpEL goes much further: it can call methods, access collections, use conditional logic, and reference Spring beans.
 
-- `@Value("#{systemProperties['user.name']}")` — property injection from an expression
-- `@PreAuthorize("hasRole('ADMIN') and #order.amount < 1000")` — security rules
-- `@Cacheable(key = "#id")`, `@EventListener(condition = "#event.ok")`, Spring Integration routers, Spring Data queries
+Think of it like Excel formulas for Spring: instead of hardcoding a value, you write an expression that Spring evaluates when the app starts (or when the value is needed).
 
-An expression is **parsed once** into a `Expression` object, then evaluated many times:
+### Where You'll See SpEL
 
-```java
-ExpressionParser parser = new SpelExpressionParser();
-Expression expr = parser.parseExpression("'Hello, '.concat(#name)");
-String out = expr.getValue(new EvaluationContext() /* with #name bound */, String.class);
-```
-
-## Core syntax
-
-| Construct | Example | Meaning |
+| Where | Example | What It Does |
 |---|---|---|
-| Literals | `'text'`, `42`, `3.14`, `true` | strings need single quotes |
-| Property/method access | `user.name`, `order.total()` | navigation and method calls |
-| Elvis operator | `name ?: 'anonymous'` | null-coalescing (`name != null ? name : 'anonymous'`) |
-| Safe navigation | `user?.address?.city` | null-safe chain (no NPE) |
-| Collections | `items[0]`, `map['key']`, `items.?[price > 10]` | index, selection (filter) |
-| Projection | `items.![name]` | map over a collection |
-| Ternary | `age >= 18 ? 'adult' : 'minor'` | conditional |
-| Operators | `and`, `or`, `not`, `matches`, `instanceof`, `matches '^\\d+$'` | logical and regex |
-| Types | `T(java.lang.Math).PI` | access static members |
+| `application.yml` | `${DB_PASSWORD}` | Reads environment variable |
+| `@Value` annotation | `@Value("#{T(java.lang.Math).PI}")` | Injects computed value |
+| `@Scheduled` | `cron = "#{@cronConfig.daily}"` | References a bean's method |
+| Security expressions | `hasRole('ADMIN')` | Dynamic authorization |
+| Cache key | `key = "#userId"` | Uses method parameter as key |
 
-```java
-// Selection + projection: expensive items, then their names
-List<String> names = (List<String>) parser.parseExpression(
-    "items.?[price > 10].![name]").getValue(context);
+---
+
+## The Code — Line by Line
+
+### 1. Property Placeholders (Simple SpEL)
+
+```yaml
+# application.yml — SpEL placeholders:
+server:
+  port: ${SERVER_PORT:8080}           # Use SERVER_PORT env var, default to 8080
+
+spring:
+  datasource:
+    url: ${DATABASE_URL:jdbc:h2:mem:test}
+    username: ${DB_USER:sa}
+    password: ${DB_PASS:}
+
+app:
+  jwt:
+    secret: ${JWT_SECRET}
+    expiration: ${JWT_EXPIRATION:3600000}
 ```
 
-## The evaluation context
+**Line-by-line explained:**
+- `${SERVER_PORT:8080}` — SpEL placeholder. Looks for the `SERVER_PORT` environment variable. If not found, uses `8080`.
+- `${DATABASE_URL:jdbc:h2:mem:test}` — Use the environment variable in production, default to H2 in development.
+- `${JWT_SECRET}` — No default value. The app FAILS to start if this isn't set (intentional — you don't want a default secret).
 
-`StandardEvaluationContext` binds variables (`#name`), root objects and functions; **`SimpleEvaluationContext`** is the restricted, safer subset (no type constructors, no bean references) recommended for expressions you don't fully control — e.g. user-supplied input.
-
-```java
-StandardEvaluationContext ctx = new StandardEvaluationContext();
-ctx.setVariable("name", "Ada");
-ctx.setRootObject(order);
-```
-
-## Bean references and templates
-
-- `@beanName` (or `@('beanName')`) resolves a Spring bean — `#{@mailer.send(#to)}` inside `@Value`.
-- **Template expressions** mix literal text and SpEL: `#{'Hello ' + #name}` — but the property placeholder `#{}` vs `${}` distinction trips everyone:
+### 2. @Value with SpEL Expressions
 
 ```java
-@Value("${app.name}")          // property placeholder — resolved from Environment/properties
-@Value("#{systemProperties['user.name']}")  // SpEL — evaluated as an expression
-@Value("${app.welcome} #{systemProperties['user.name']}")  // both, in one string
+@Component
+public class AppConfig {
+
+    @Value("${app.jwt.secret}")                              // Simple property lookup
+    private String jwtSecret;
+
+    @Value("#{T(java.lang.Math).PI}")                        // Reference a Java class
+    private double pi;
+
+    @Value("#{${app.limits}}")                               // Nested placeholder (map from properties)
+    private Map<String, Integer> limits;
+
+    @Value("#{2 * 60 * 1000}")                               // Inline computation
+    private long cacheTtlMs;
+
+    @Value("#{systemProperties['user.home']}")               // System property
+    private String userHome;
+
+    @Value("#{environment['PATH']}")                         // Environment variable
+    private String path;
+
+    @Value("#{@myBean.calculateTimeout()}")                  // Call a Spring bean's method
+    private long timeout;
+
+    @Value("#{configService.getMaxRetries()}")               // Call another bean's method
+    private int maxRetries;
+}
 ```
 
-## Security with SpEL
+**Line-by-line explained:**
+- `#{T(java.lang.Math).PI}` — Access a static field of a Java class. `T()` is the type operator.
+- `#{${app.limits}}` — Double placeholder: first resolves `${app.limits}` to a string like `{"max":100,"min":0}`, then SpEL parses it as a map.
+- `#{2 * 60 * 1000}` — Inline math. Result: 120000 (2 minutes in milliseconds).
+- `#{systemProperties['user.home']}` — Access JVM system properties.
+- `#{@myBean.calculateTimeout()}` — Call a method on a Spring bean. The `@` prefix accesses beans by name.
 
-`@PreAuthorize` and `@PostAuthorize` are SpEL over the `SecurityExpressionRoot`:
+### 3. Conditional Expressions
 
 ```java
-@PreAuthorize("hasAuthority('ORDER_WRITE')")
-@PreAuthorize("hasRole('ADMIN') or #order.owner == authentication.name")
-@PostAuthorize("returnObject.owner == authentication.name")  // filter the returned object
+@Component
+public class FeatureFlags {
+
+    @Value("#{${app.feature.cache-enabled:false} ? 'redis' : 'concurrent-map'}")
+    private String cacheType;                                // "redis" if enabled, "concurrent-map" otherwise
+
+    @Value("#{${app.profile} == 'production' ? 'INFO' : 'DEBUG'}")
+    private String logLevel;                                 // INFO in prod, DEBUG elsewhere
+
+    @Value("#{${app.replicas:1} > 1 ? true : false}")
+    private boolean multiInstance;                           // True if multiple replicas
+}
 ```
 
-`hasRole`, `hasAuthority`, `hasIpAddress`, `#root`, `authentication`, `returnObject` are all available in that context.
+### 4. SpEL in Annotations
 
-## When (not) to use SpEL
+```java
+// @Scheduled with SpEL:
+@Scheduled("#{@cronConfig.orderCleanup}")                    // References a bean's method that returns cron expression
+public void cleanupOldOrders() { ... }
 
-**Use it** for declarative, configuration-driven behavior: security rules, caching keys, routing conditions — places where the expression is data, not code.
+// Cache key using SpEL:
+@Cacheable(value = "users", key = "#userId + ':' + #region")
+public User findUser(String userId, String region) { ... }
 
-**Avoid it** for application logic you could write in Java: it's stringly-typed, slower than compiled code, and IDE/refactor-unfriendly. And never evaluate untrusted input against `StandardEvaluationContext` — arbitrary type construction makes it a code-execution vector.
+// Security expressions:
+@PreAuthorize("hasRole('ADMIN') or #userId == authentication.name")
+public User getUser(String userId) { ... }
 
-## Key takeaways
+@PostFilter("filterObject.region == authentication.details.region")
+public List<Order> getAllOrders() { ... }
+```
 
-- SpEL powers `@Value` (`#{}`), `@PreAuthorize`, cache keys, event conditions, Integration routing.
-- Parse once, evaluate many times; bind data via `EvaluationContext` variables.
-- `?[...]` filters, `![...]` projects, `?:` elvis, `?.` safe navigation — the five you'll actually use.
-- Use `SimpleEvaluationContext` for untrusted expressions; keep logic in Java and SpEL as configuration.
+---
 
-Official docs: [Spring Expression Language](https://docs.spring.io/spring-framework/reference/core/expressions.html)
+## Real-World Scenarios
+
+### Scenario 1: Dynamic Feature Flags
+
+```java
+@Service
+public class OrderService {
+
+    @Value("#{${app.features.new-payment:false}}")
+    private boolean newPaymentEnabled;
+
+    public PaymentResult processPayment(Order order) {
+        if (newPaymentEnabled) {
+            return newPaymentService.charge(order);          // New payment gateway
+        } else {
+            return legacyPaymentService.charge(order);       // Legacy payment gateway
+        }
+    }
+}
+```
+
+```yaml
+# Toggle via environment variable without code change:
+# app.features.new-payment=true → uses new gateway
+# app.features.new-payment=false → uses legacy gateway
+```
+
+### Scenario 2: Security Rules with SpEL
+
+```java
+@Configuration
+@EnableMethodSecurity
+public class SecurityConfig {
+
+    @Bean
+    public MethodSecurityExpressionHandler methodSecurityExpressionHandler() {
+        return new DefaultMethodSecurityExpressionHandler();
+    }
+}
+
+@Service
+public class OrderService {
+
+    @PreAuthorize("hasRole('ADMIN') or #order.customerId == authentication.name")
+    public Order updateOrder(String orderId, OrderUpdate update) {
+        // Only admins or the order's own customer can update
+    }
+
+    @PostFilter("filterObject.status != 'DELETED'")
+    public List<Order> getAllOrders() {
+        // Filter out deleted orders from the result
+    }
+}
+```
+
+### Scenario 3: Environment-Specific Configuration
+
+```java
+@Configuration
+public class CacheConfig {
+
+    @Bean
+    @ConditionalOnProperty(name = "app.cache.type", havingValue = "redis")
+    public CacheManager redisCacheManager(RedisConnectionFactory factory) {
+        return RedisCacheManager.builder(factory).build();
+    }
+
+    @Bean
+    @ConditionalOnProperty(name = "app.cache.type", havingValue = "concurrent-map",
+                           matchIfMissing = true)
+    public CacheManager concurrentMapCacheManager() {
+        return new ConcurrentMapCacheManager("users", "orders", "products");
+    }
+}
+```
+
+```yaml
+# Dev: uses ConcurrentMapCacheManager (in-memory, no Redis needed)
+app.cache.type: concurrent-map
+
+# Prod: uses Redis (shared across instances)
+app.cache.type: redis
+```
+
+---
+
+## Common Mistakes
+
+| Mistake | Why It Breaks | Fix |
+|---|---|---|
+| SpEL syntax error | App fails to start with cryptic error | Test expressions in SpEL evaluator first |
+| No default for required properties | App fails without clear message | Use `${PROP}` (no default) intentionally for required config |
+| Overusing SpEL | Hard to debug complex expressions | Keep SpEL simple; move logic to Java code |
+| SpEL injection vulnerability | User input in SpEL = remote code execution | Never put user input in SpEL expressions |
+| Missing `#{}` vs `${}` | `#{}` = SpEL expression, `${}` = property placeholder | `#{}` evaluates SpEL, `${}` resolves properties |
+
+---
+
+## Key Takeaways
+
+- **`${}` = property placeholder** (resolves properties/env vars). **`#{}` = SpEL expression** (evaluates at runtime).
+- **`@Value("#{expression}")`** — inject computed values into your beans.
+- **SpEL in annotations** — `@PreAuthorize`, `@Cacheable key`, `@Scheduled cron`.
+- **Conditional expressions** — `#{condition ? trueVal : falseVal}` for feature flags.
+- **Never put user input in SpEL** — it can execute arbitrary code (security vulnerability).
+
+Official docs: [SpEL Reference](https://docs.spring.io/spring-framework/reference/core/expressions.html) · [Spring Expression Language](https://docs.spring.io/spring-framework/reference/core/expressions.html)
