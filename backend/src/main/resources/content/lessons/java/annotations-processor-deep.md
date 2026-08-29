@@ -1,7 +1,7 @@
 ---
 title: Java Annotations Deep — Meta-annotations and Annotation Processing
 summary: Annotation retention policies, target elements, meta-annotations like @Inherited and @Repeatable, writing custom annotations with annotation processors, and how Spring uses annotations to power its entire framework.
-order: 50
+order: 53
 minutes: 22
 topics: [annotations, meta-annotations, retention-policy, annotation-processor, compile-time-processing, source-generation]
 docs:

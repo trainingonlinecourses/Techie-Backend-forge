@@ -1,7 +1,7 @@
 ---
 title: String Comparison — equals, ==, compareTo and ContentEquals
 summary: Why == fails on strings, the equals/equalsIgnoreCase/compareTo/contentEquals family, locale-aware comparison, and the identity-comparison pattern.
-order: 34
+order: 37
 minutes: 18
 topics: [string-comparison, equals, compareto, contentequals, equalsignorecase, locale, identity]
 docs:

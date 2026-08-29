@@ -1,7 +1,7 @@
 ---
 title: Advanced SQL Patterns — Upserts, Pivots, and Time Bucketing
 module: sql-advanced
-order: 5
+order: 4
 minutes: 27
 topics: ["upsert", "ON CONFLICT", "pivot", "crosstab", "date_trunc", "generate_series", "full-text search"]
 docs:

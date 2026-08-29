@@ -1,7 +1,7 @@
 ---
 title: ArrayList and HashMap Internals — How They Actually Work
 summary: Under the hood: array resizing, load factor, hash collision handling, treeification, and why a wrong initial capacity or hashCode() can destroy application performance.
-order: 40
+order: 43
 minutes: 25
 topics: [arraylist-internal, hashmap-internal, load-factor, treeification, hash-collision, initial-capacity, amortized-o1]
 docs:

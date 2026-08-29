@@ -1,7 +1,7 @@
 ---
 title: TDD & Testing Legacy Code
 summary: Red-green-refactor in practice, characterization tests for code without tests, and the test-driven workflow that makes refactoring safe.
-order: 6
+order: 5
 minutes: 15
 topics: [tdd, red green refactor, characterization tests, refactoring, testing legacy]
 docs:

@@ -1,7 +1,7 @@
 ---
 title: WebSockets & STOMP in Spring
 summary: Full-duplex browser-server communication — STOMP over WebSocket, @MessageMapping handlers, broker configuration, and when WebSocket beats polling and SSE.
-order: 6
+order: 7
 minutes: 15
 topics: [websocket, stomp, messaging, spring websocket, realtime]
 docs:

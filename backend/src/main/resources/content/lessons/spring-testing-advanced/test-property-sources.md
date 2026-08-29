@@ -1,7 +1,7 @@
 ---
 title: Test Property Sources — Configuring Test Environments
 summary: @TestPropertySource, @DynamicPropertySource, test profiles, and how to isolate tests from external dependencies like databases and APIs. Beginner-friendly with line-by-line code.
-order: 8
+order: 9
 minutes: 18
 topics: [test properties, @TestPropertySource, @DynamicPropertySource, test profiles, test configuration, property override]
 docs:

@@ -1,7 +1,7 @@
 ---
 title: equals, hashCode & toString — The Object Contracts
 summary: The equals/hashCode contract, why HashSet and HashMap break when you violate it, and how records made the boilerplate obsolete.
-order: 23
+order: 24
 minutes: 20
 topics: [equals, hashcode, contract, hashmap, hashset, records, identity-vs-equality]
 docs:

@@ -1,7 +1,7 @@
 ---
 title: Custom Actuator Endpoints & Health Indicators — Ops Visibility
 summary: Building custom HealthIndicator beans, custom @Endpoint operations, and the metrics patterns that make an app's operational state visible.
-order: 19
+order: 22
 minutes: 17
 topics: [actuator, healthindicator, custom-endpoint, metrics, readiness, liveness, ops]
 docs:

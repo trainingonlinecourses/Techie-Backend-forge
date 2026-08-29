@@ -1,7 +1,7 @@
 ---
 title: Building Custom Spring Boot Starters — Packaging Reusable Auto-Configuration
 summary: How to create a reusable starter with auto-configuration, conditional beans, configuration properties, and the naming conventions that make your starter discoverable.
-order: 21
+order: 25
 minutes: 22
 topics: [starters, auto-configuration, conditional beans, META-INF, spring.factories, configuration properties]
 docs:

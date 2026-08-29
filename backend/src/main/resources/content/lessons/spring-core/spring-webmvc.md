@@ -1,7 +1,7 @@
 ---
 title: Spring MVC & the Servlet Stack
 summary: DispatcherServlet, controllers, argument resolution, message converters and exception handling — the request lifecycle.
-order: 9
+order: 10
 minutes: 18
 topics: [mvc, dispatcherservlet, controllers, rest]
 docs:

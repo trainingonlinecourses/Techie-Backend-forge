@@ -1,7 +1,7 @@
 ---
 title: Spring Boot Events and Listeners — ApplicationEvent Deep Dive
 summary: Custom events, @EventListener, @TransactionalEventListener for post-commit hooks, async events, event ordering, and the decoupled communication pattern that replaces tight service coupling.
-order: 35
+order: 44
 minutes: 20
 topics: [application-event, event-listener, transactional-event, async-event, observer-pattern, event-decoupling]
 docs:

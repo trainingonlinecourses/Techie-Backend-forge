@@ -1,7 +1,7 @@
 ---
 title: Test Slices Deep — @WebMvcTest, @DataJpaTest and Custom Slices
 summary: How test slices load a subset of the context, the difference between MockMvc and TestRestTemplate, writing your own custom slice, and avoiding the most common mistakes.
-order: 11
+order: 12
 minutes: 20
 topics: [test slices, @WebMvcTest, @DataJpaTest, MockMvc, @AutoConfigureMockMvc, custom slice, test context]
 docs:

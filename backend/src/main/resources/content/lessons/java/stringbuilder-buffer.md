@@ -1,7 +1,7 @@
 ---
 title: StringBuilder, StringBuffer & StringJoiner — Efficient String Building
 summary: Why string concatenation in loops is slow, StringBuilder vs StringBuffer (thread-safety cost), StringJoiner for delimiters, and the org patterns.
-order: 35
+order: 38
 minutes: 17
 topics: [stringbuilder, stringbuffer, stringjoiner, string-concatenation, mutable-string, delimiter]
 docs:

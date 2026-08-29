@@ -1,7 +1,7 @@
 ---
 title: Synchronized and Monitors — Java's Built-in Locking
 summary: The monitor lock, synchronized blocks vs methods, lock contention, reentrant locking, the wait/notify protocol, and why organizations prefer ReentrantLock for production systems.
-order: 43
+order: 46
 minutes: 22
 topics: [synchronized, monitor, lock-contention, reentrant, wait-notify, intrinsic-lock, lock-word]
 docs:

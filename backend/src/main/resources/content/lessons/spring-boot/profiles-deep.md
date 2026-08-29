@@ -1,7 +1,7 @@
 ---
 title: Spring Profiles — Environment-Specific Configuration
 summary: Profile-based beans, YAML multi-document profiles, @Profile on @Configuration, activation strategies, profile groups, and how organizations isolate dev/staging/prod without config drift.
-order: 21
+order: 27
 minutes: 22
 topics: [spring-profile, profile-activation, profile-specific-yaml, @profile, profile-groups, config-drift, environment-isolation]
 docs:

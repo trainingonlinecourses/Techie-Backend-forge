@@ -1,7 +1,7 @@
 ---
 title: JMS & Spring Messaging — Decoupling Services with Message Brokers
 summary: The JMS programming model (queues vs topics), Spring's JmsTemplate and @JmsListener, message acknowledgment modes, and how organizations use ActiveMQ to survive downstream outages.
-order: 51
+order: 53
 minutes: 24
 topics: [jms, messaging, activemq, jmslistener, queue, topic, decoupling]
 docs:

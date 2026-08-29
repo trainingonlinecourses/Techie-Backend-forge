@@ -1,7 +1,7 @@
 ---
 title: Chunk-Oriented Processing — Complete Beginner's Guide
 summary: How Spring Batch processes data in chunks, the Reader-Processor-Writer pattern, and why chunking beats one-by-one processing.
-order: 3
+order: 2
 minutes: 20
 topics: [chunk processing, reader, processor, writer, batch processing, commit interval]
 docs:

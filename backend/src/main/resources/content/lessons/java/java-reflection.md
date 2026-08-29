@@ -1,7 +1,7 @@
 ---
 title: Java Reflection — Inspecting and Modifying Classes at Runtime
 summary: What reflection is and why it exists, reading class metadata, accessing fields and methods dynamically, creating instances, annotation processing, and how frameworks like Spring and Hibernate use reflection under the hood with line-by-line walkthroughs.
-order: 12
+order: 13
 minutes: 28
 topics: [reflection, class-object, getdeclaredfield, getdeclaredmethod, annotation-processing, dynamic-instantiation, spring-reflection]
 docs:

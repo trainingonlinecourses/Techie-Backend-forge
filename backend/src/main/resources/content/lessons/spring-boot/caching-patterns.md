@@ -1,7 +1,7 @@
 ---
 title: Spring Boot Caching — Multi-Level Cache Patterns
 summary: @Cacheable and @CacheEvict, Redis vs Caffeine vs Ehcache, multi-level caching, cache key design, stampede prevention, and how production systems cache data without stale reads.
-order: 37
+order: 46
 minutes: 22
 topics: [caching, cacheable, cacheevict, cache-manager, redis-cache, caffeine, multi-level-cache, cache-stampede]
 docs:

@@ -1,7 +1,7 @@
 ---
 title: Enums in Depth — Constants with Behavior
 summary: Why plain int/String constants fail in production, constant-specific methods, EnumMap/EnumSet, and the strategy-enum pattern that eliminates switch blocks in organizations.
-order: 21
+order: 19
 minutes: 22
 topics: [enums, enummap, enumset, constant-specific-methods, strategy-pattern, switch-pitfalls]
 docs:

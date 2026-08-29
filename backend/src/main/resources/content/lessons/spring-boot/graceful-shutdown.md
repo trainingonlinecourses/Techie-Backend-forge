@@ -1,7 +1,7 @@
 ---
 title: Graceful Shutdown — Draining Traffic Without Dropping Work
 summary: Why hard kills lose requests, how server.shutdown=graceful and lifecycle hooks drain in-flight work, and the org patterns for zero-downtime deploys.
-order: 13
+order: 16
 minutes: 18
 topics: [graceful-shutdown, draining, lifecycle, preDestroy, sigterm, zero-downtime, kubernetes]
 docs:

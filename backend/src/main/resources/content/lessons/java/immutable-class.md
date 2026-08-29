@@ -1,7 +1,7 @@
 ---
 title: Immutable Classes — Thread-Safe Objects by Design
 summary: How to build truly immutable classes, why final fields matter, the copy-constructor pattern, immutable collections, and how organizations use immutability for caching, DTOs, and thread safety.
-order: 60
+order: 63
 minutes: 22
 topics: [immutable-class, final-fields, defensive-copy, immutable-collection, thread-safety, value-object]
 docs:

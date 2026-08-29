@@ -1,7 +1,7 @@
 ---
 title: Data Access & Transactions
 summary: The transaction abstraction, @Transactional semantics, propagation and isolation — and the pitfalls that break them.
-order: 8
+order: 9
 minutes: 20
 topics: [transactions, jdbc, jdbctemplate, isolation, propagation]
 docs:

@@ -1,7 +1,7 @@
 ---
 title: Deploying Native Images — Containers, CI, and Production Patterns
 module: graalvm-native
-order: 5
+order: 4
 minutes: 25
 topics: ["deployment", "containers", "CI/CD", "buildpacks", "distroless", "production native", "observability"]
 docs:

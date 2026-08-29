@@ -1,7 +1,7 @@
 ---
 title: @PatchMapping — Partial Updates in REST APIs
 summary: PUT vs PATCH semantics, partial updates with nullable DTOs, JSON Merge Patch (RFC 7396), and safe field-by-field updates.
-order: 21
+order: 26
 minutes: 14
 topics: [patch-mapping, partial-update, put-vs-patch, json-merge-patch, rest-api-design]
 docs:

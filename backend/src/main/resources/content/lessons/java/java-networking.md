@@ -1,7 +1,7 @@
 ---
 title: Java Networking — Sockets, HTTP, and URL Handling
 summary: TCP/UDP sockets, HttpClient for REST calls, URL/URLConnection for simple fetches, and how organizations build reliable networked systems. Beginner-friendly with line-by-line code.
-order: 93
+order: 84
 minutes: 20
 topics: [networking, TCP, UDP, socket, HttpClient, URL, URLConnection, DNS, timeout, retry]
 docs:

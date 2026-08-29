@@ -1,7 +1,7 @@
 ---
 title: Loading Initial Data with Spring Boot
 summary: CommandLineRunner data seeding, data.sql and schema.sql, Flyway migrations, ApplicationRunner, and profile-specific seeders.
-order: 22
+order: 29
 minutes: 14
 topics: [data-seeding, commandline-runner, flyway, data-sql, application-runner, profiles]
 docs:

@@ -1,7 +1,7 @@
 ---
 title: Primitives vs Wrappers — Autoboxing, Nulls and Performance
 summary: int vs Integer, when autoboxing happens, the wrapper pitfalls that cause NPEs, and the nullability conventions organizations enforce.
-order: 25
+order: 29
 minutes: 18
 topics: [primitives, wrappers, autoboxing, npe, nullability, integer-cache, performance]
 docs:

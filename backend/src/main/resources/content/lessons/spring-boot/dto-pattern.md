@@ -1,7 +1,7 @@
 ---
 title: DTO Pattern — Data Transfer Objects
 summary: Why never return entities directly, request/response DTOs with records, MapStruct for conversion, API versioning, and security best practices.
-order: 20
+order: 24
 minutes: 18
 topics: [dto-pattern, data-transfer-object, mapstruct, entity-to-dto, api-versioning, security]
 docs:

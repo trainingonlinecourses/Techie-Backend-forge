@@ -1,7 +1,7 @@
 ---
 title: Text Blocks — Multi-Line Strings in Java
 summary: Triple-quoted strings for HTML, SQL, and JSON templates, indentation handling, escape sequences, and .formatted() for dynamic content.
-order: 26
+order: 30
 minutes: 14
 topics: [text-blocks, multi-line-strings, triple-quotes, string-formatting, template-literals]
 docs:

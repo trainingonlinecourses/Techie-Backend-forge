@@ -1,7 +1,7 @@
 ---
 title: Spring Transaction Management In Depth — @Transactional Pitfalls
 summary: Transaction propagation, isolation levels, rollback rules, self-invocation, @Transactional on private methods, and how organizations prevent lost updates and phantom reads in production databases.
-order: 28
+order: 37
 minutes: 22
 topics: [transactional, propagation, isolation, rollback, self-invocation, proxy, read-only, transaction-timeout, phantom-read]
 docs:

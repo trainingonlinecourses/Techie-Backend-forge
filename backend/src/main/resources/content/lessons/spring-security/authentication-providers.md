@@ -1,7 +1,7 @@
 ---
 title: Authentication Providers — How Spring Actually Authenticates
 summary: AuthenticationManager, ProviderManager, DaoAuthenticationProvider, custom providers for LDAP/OTP/SSO, and the chain that decides "who are you?".
-order: 13
+order: 15
 minutes: 18
 topics: [authenticationmanager, providermanager, daoauthenticationprovider, custom-provider, userdetailsservice, authentication]
 docs:

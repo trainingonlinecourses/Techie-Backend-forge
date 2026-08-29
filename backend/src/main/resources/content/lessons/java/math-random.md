@@ -1,7 +1,7 @@
 ---
 title: Math Class & Random — Numbers Beyond Basic Arithmetic
 summary: The Math utility methods every developer should know, why Math.random() is the wrong tool for real applications, and the SecureRandom vs Random vs ThreadLocalRandom decision organizations actually face.
-order: 76
+order: 74
 minutes: 16
 topics: [math-class, random, securerandom, threadlocalrandom, rounding, abs-pow]
 docs:

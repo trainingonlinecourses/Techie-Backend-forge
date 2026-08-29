@@ -1,7 +1,7 @@
 ---
 title: Security in Production — Hardening Your Application
 summary: Production security checklist — HTTPS everywhere, secure cookies, rate limiting, audit logging, secrets management, and the common vulnerabilities that trip up real deployments.
-order: 13
+order: 16
 minutes: 20
 topics: [production security, HTTPS, secure cookies, rate limiting, audit logging, secrets management, OWASP, security checklist]
 docs:

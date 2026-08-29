@@ -1,7 +1,7 @@
 ---
 title: Reactive WebSocket — Real-Time Communication with WebFlux
 summary: WebSocket endpoints in Spring WebFlux — handler functions, broadcast patterns, room-based messaging, heartbeat, and the patterns for scalable real-time applications. Beginner-friendly with line-by-line code.
-order: 13
+order: 14
 minutes: 22
 topics: [WebSocket, reactive WebSocket, real-time, broadcast, rooms, heartbeat, SSE vs WebSocket, WebSocket handler]
 docs:

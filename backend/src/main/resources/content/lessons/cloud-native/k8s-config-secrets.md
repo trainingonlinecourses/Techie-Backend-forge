@@ -1,7 +1,7 @@
 ---
 title: ConfigMaps & Secrets in Kubernetes
 summary: Configuration as first-class objects — ConfigMaps for non-secret config, Secrets for credentials, and the env/volume wiring patterns.
-order: 5
+order: 6
 minutes: 13
 topics: [configmap, secrets, kubernetes config, env injection, sealed secrets]
 docs:

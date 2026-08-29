@@ -1,7 +1,7 @@
 ---
 title: Spring Boot Rate Limiting — API Protection Patterns
 summary: Token bucket, sliding window and fixed window algorithms, Bucket4j integration, per-user and per-endpoint limits, Redis-backed distributed rate limiting, and how production APIs prevent abuse without blocking legitimate traffic.
-order: 39
+order: 48
 minutes: 20
 topics: [rate-limiting, token-bucket, sliding-window, bucket4j, api-abuse, throttling, backpressure]
 docs:

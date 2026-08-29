@@ -1,7 +1,7 @@
 ---
 title: Java Operators — Beyond the Basics That Trip Up Production Code
 summary: Bitwise operators, instanceof pattern matching, the ternary operator pitfalls, string concatenation in loops, and operator precedence mistakes organizations catch in code review.
-order: 22
+order: 21
 minutes: 20
 topics: [operators, bitwise, instanceof, ternary, precedence, string-concat]
 docs:

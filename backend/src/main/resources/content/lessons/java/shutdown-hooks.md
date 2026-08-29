@@ -1,7 +1,7 @@
 ---
 title: Shutdown Hooks — Graceful Cleanup When the JVM Exits
 summary: Runtime.addShutdownHook, orderly shutdown sequences, signal handling, why shutdown hooks are NOT guarantees, and how Spring Boot hooks into this lifecycle for graceful drain.
-order: 46
+order: 49
 minutes: 16
 topics: [shutdown-hook, addShutdownHook, graceful-shutdown, signal-handler, jvm-lifecycle, spring-shutdown]
 docs:

@@ -1,7 +1,7 @@
 ---
 title: Production Readiness
 summary: Profiles, logging, graceful shutdown, Docker, health probes and the 12-factor checklist.
-order: 8
+order: 9
 minutes: 16
 topics: [production, docker, 12-factor, graceful-shutdown, profiles]
 docs:

@@ -1,7 +1,7 @@
 ---
 title: Java Serialization Deep — Serializable, Externalizable and Pitfalls
 summary: The Serializable contract, writeReplace/readResolve for control, Externalizable for performance, serialVersionUID, cross-version pitfalls, and why JSON often beats Java serialization in production.
-order: 48
+order: 51
 minutes: 22
 topics: [serialization, deserialization, serializable, externalizable, uid, security, json-alternative]
 docs:

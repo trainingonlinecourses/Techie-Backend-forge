@@ -1,7 +1,7 @@
 ---
 title: ThreadLocal — Thread-Isolated Storage for Request-Scoped Data
 summary: How ThreadLocal provides per-thread copies of data, why it's essential for request tracing and user context, memory leak traps with thread pools, and the InheritableThreadLocal alternative.
-order: 62
+order: 65
 minutes: 20
 topics: [threadlocal, inheritable-threadlocal, request-context, thread-isolation, memory-leak, thread-pool]
 docs:

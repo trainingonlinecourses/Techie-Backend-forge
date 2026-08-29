@@ -1,7 +1,7 @@
 ---
 title: DevTools & Automatic Restart — Complete Beginner's Guide
 summary: How Spring Boot DevTools works, automatic restart vs LiveReload, what restarts and what doesn't, and the performance trade-offs.
-order: 12
+order: 15
 minutes: 16
 topics: [devtools, automatic restart, livereload, restart classloader, developer tools]
 docs:

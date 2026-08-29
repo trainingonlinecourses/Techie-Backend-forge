@@ -1,7 +1,7 @@
 ---
 title: Method Handles — Faster Dynamic Invocation Than Reflection
 summary: MethodHandle, MethodType, and MethodHandles.Lookup — the java.lang.invoke package that gives you reflection-like flexibility with JIT-inlinable performance.
-order: 85
+order: 81
 minutes: 18
 topics: [method-handle, method-type, method-handles-lookup, invokedynamic, reflection-performance, dynamic-dispatch]
 docs:

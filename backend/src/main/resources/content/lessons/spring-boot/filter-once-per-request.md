@@ -1,7 +1,7 @@
 ---
 title: Spring Boot Filters — OncePerRequestFilter and Filter Chains
 summary: Servlet filters vs Spring interceptors, OncePerRequestFilter for guaranteed single execution, filter registration and ordering, CORS filters, and the filter patterns that production APIs rely on.
-order: 34
+order: 43
 minutes: 20
 topics: [servlet-filter, once-per-request, filter-chain, cors-filter, security-filter, request-wrapper, logging-filter]
 docs:

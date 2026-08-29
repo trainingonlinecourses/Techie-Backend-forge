@@ -1,7 +1,7 @@
 ---
 title: Jackson Customization — Serializers, Mixins and API Design
 summary: Custom serializers for Money and enums, Jackson mixins for third-party classes, global naming strategies, and the annotations that shape your JSON contract.
-order: 22
+order: 28
 minutes: 20
 topics: [Jackson, ObjectMapper, custom serializer, mixin, naming strategy, @JsonFormat, @JsonProperty]
 docs:

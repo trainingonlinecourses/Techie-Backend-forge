@@ -1,7 +1,7 @@
 ---
 title: Application Events & Decoupling
 summary: Publish-subscribe inside the JVM, @EventListener, transactional events and when to reach for a broker.
-order: 7
+order: 8
 minutes: 15
 topics: [events, eventlistener, transactional-event, decoupling]
 docs:

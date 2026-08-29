@@ -1,7 +1,7 @@
 ---
 title: Volatile and the Happens-Before Relationship
 summary: What volatile actually guarantees at the hardware level, the JMM happens-before rules, double-checked locking with volatile, and why volatile is not a substitute for synchronization.
-order: 44
+order: 47
 minutes: 20
 topics: [volatile, happens-before, memory-barrier, visibility, double-checked-locking, ordering, store-buffer]
 docs:

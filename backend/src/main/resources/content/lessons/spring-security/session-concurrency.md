@@ -1,7 +1,7 @@
 ---
 title: Session Management & Concurrency Control
 summary: Concurrent session control, session fixation protection, session timeout, and how to handle "one session per user" vs "multiple sessions" policies. Beginner-friendly with line-by-line code.
-order: 12
+order: 14
 minutes: 18
 topics: [session management, concurrent sessions, session fixation, session timeout, session repository, session registry]
 docs:

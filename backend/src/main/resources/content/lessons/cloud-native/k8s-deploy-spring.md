@@ -1,7 +1,7 @@
 ---
 title: Deploying Spring Boot to Kubernetes
 summary: Probes, resource limits, rolling updates and graceful shutdown — the deployment manifest details that separate a demo from a production Spring app.
-order: 4
+order: 5
 minutes: 15
 topics: [spring boot kubernetes, probes, resource limits, rolling update, graceful shutdown]
 docs:

@@ -1,7 +1,7 @@
 ---
 title: Varargs, Method Overloading & Overriding — Signatures That Work
 summary: How varargs desugar, the overload resolution rules, @Override discipline, and the signature-design patterns that keep APIs clean and bug-free.
-order: 32
+order: 36
 minutes: 18
 topics: [varargs, overloading, overriding, method-signature, overload-resolution, @Override]
 docs:

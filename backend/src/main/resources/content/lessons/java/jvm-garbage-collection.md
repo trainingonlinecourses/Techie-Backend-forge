@@ -1,7 +1,7 @@
 ---
 title: JVM Garbage Collection — How Java Manages Memory
 summary: Generational hypothesis, minor vs major GC, how objects become eligible for collection, and the real-world impact of GC pauses on application performance.
-order: 65
+order: 67
 minutes: 22
 topics: [garbage collection, GC roots, generational, minor GC, major GC, finalize, phantom reference, memory management]
 docs:

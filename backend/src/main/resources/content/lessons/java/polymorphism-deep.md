@@ -1,7 +1,7 @@
 ---
 title: Runtime Polymorphism and Dynamic Dispatch
 summary: How Java resolves method calls at runtime, covariant return types, the method table, and why understanding dispatch is critical for designing extensible frameworks.
-order: 39
+order: 42
 minutes: 20
 topics: [polymorphism, dynamic-dispatch, method-overriding, covariant-return, instanceof-pattern, dispatch-table]
 docs:

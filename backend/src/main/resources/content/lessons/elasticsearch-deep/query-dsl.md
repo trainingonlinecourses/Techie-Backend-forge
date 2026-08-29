@@ -1,7 +1,7 @@
 ---
 title: The Query DSL — Match, Term, Bool, and Relevance
 module: elasticsearch-deep
-order: 3
+order: 4
 minutes: 28
 topics: ["query DSL", "match query", "bool query", "term query", "relevance scoring", "filters"]
 docs:

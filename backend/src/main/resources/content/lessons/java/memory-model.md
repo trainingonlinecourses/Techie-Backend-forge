@@ -1,7 +1,7 @@
 ---
 title: The Java Memory Model — Visibility, Happens-Before and Volatile
 summary: Why shared fields go stale across threads, the happens-before rules that make visibility deterministic, and the volatile/atomic patterns orgs rely on.
-order: 27
+order: 31
 minutes: 22
 topics: [memory-model, happens-before, volatile, visibility, atomicity, data-race, memory-barrier]
 docs:

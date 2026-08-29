@@ -1,7 +1,7 @@
 ---
 title: Java Logging Deep — SLF4J, Logback and Structured Logging
 summary: The logging facade pattern, SLF4J and Logback setup, log levels in production, MDC for request context, structured JSON logs, and the logging patterns that make debugging production issues possible.
-order: 49
+order: 52
 minutes: 22
 topics: [logging, slf4j, logback, mdc, structured-logging, log-levels, correlation-id]
 docs:

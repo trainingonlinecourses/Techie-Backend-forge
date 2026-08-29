@@ -1,7 +1,7 @@
 ---
 title: Essential String Methods — The API You Use Every Single Day
 summary: substring, split, indexOf, replace, strip, format, isBlank, repeat, chars — each method explained with what it actually returns, edge cases, and the production bugs each one has caused.
-order: 79
+order: 77
 minutes: 22
 topics: [string-methods, substring, split, indexof, format, isblank]
 docs:

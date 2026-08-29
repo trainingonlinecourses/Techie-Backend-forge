@@ -1,7 +1,7 @@
 ---
 title: Comparable & Comparator — Sorting Objects in Java
 summary: The difference between natural ordering (Comparable) and custom ordering (Comparator), building comparators with chained methods, and how organizations handle multi-field sorts that survive nulls.
-order: 24
+order: 25
 minutes: 20
 topics: [comparable, comparator, sorting, chaining, nullsfirst, nullslast]
 docs:

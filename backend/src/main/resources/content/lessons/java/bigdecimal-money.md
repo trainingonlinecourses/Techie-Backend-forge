@@ -1,7 +1,7 @@
 ---
 title: BigDecimal & Money — Never Use double for Currency
 summary: Why floating point corrupts money, scale and rounding modes, BigDecimal arithmetic, and the money-handling standards organizations enforce.
-order: 22
+order: 20
 minutes: 24
 topics: [bigdecimal, money, rounding, scale, floating-point, monetary-arithmetic, currency]
 docs:

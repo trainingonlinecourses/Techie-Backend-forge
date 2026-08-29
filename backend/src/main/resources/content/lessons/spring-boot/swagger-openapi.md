@@ -1,7 +1,7 @@
 ---
 title: API Documentation with OpenAPI / Swagger — Living Documentation
 summary: springdoc-openapi setup, @Operation and @Schema annotations, grouping, authentication in docs, Swagger UI, and how organizations maintain API docs that stay in sync with code.
-order: 29
+order: 38
 minutes: 18
 topics: [openapi, swagger, springdoc, api-documentation, schema, grouping, bearer-auth, swagger-ui]
 docs:

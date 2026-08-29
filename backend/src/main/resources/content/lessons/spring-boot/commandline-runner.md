@@ -1,7 +1,7 @@
 ---
 title: CommandLineRunner & ApplicationRunner
 summary: Run code at startup after Spring context loads, ordered runners, conditional execution, data seeding, cache warming, and health checks.
-order: 15
+order: 17
 minutes: 14
 topics: [commandline-runner, application-runner, startup, data-seeding, cache-warming, application-events]
 docs:

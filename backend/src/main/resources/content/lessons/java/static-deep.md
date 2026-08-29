@@ -1,7 +1,7 @@
 ---
 title: Static in Depth — Blocks, Nested Classes, and Imports
 summary: Static fields, static blocks (initialization order), static nested classes, static imports, and why static + mutable state is the most common source of test pollution in enterprise Java.
-order: 38
+order: 41
 minutes: 20
 topics: [static-field, static-block, static-nested, static-import, initialization-order, test-pollution]
 docs:

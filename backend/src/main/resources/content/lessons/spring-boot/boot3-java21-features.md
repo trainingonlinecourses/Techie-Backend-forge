@@ -1,7 +1,7 @@
 ---
 title: Spring Boot 3 & Java 21 — The Modern Stack
 summary: Virtual threads, records and pattern matching with Spring, Docker Compose support, Problem Details, and the modernization checklist orgs follow.
-order: 20
+order: 23
 minutes: 18
 topics: [spring-boot-3, java-21, virtual-threads, records, docker-compose, problem-details, modernization]
 docs:

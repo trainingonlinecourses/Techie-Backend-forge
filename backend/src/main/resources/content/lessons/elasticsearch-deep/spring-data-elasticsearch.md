@@ -1,7 +1,7 @@
 ---
 title: Spring Data Elasticsearch — Repositories and the Search Template
 module: elasticsearch-deep
-order: 4
+order: 5
 minutes: 26
 topics: ["Spring Data Elasticsearch", "ElasticsearchRepository", "search template", "@Document", "native query"]
 docs:

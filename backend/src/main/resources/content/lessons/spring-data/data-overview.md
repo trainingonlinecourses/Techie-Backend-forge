@@ -1,7 +1,7 @@
 ---
 title: Spring Data — The Complete Guide
 summary: Spring Data's repository abstraction, JPA repositories, method name query derivation, QueryDSL, auditing, and how to build data access layers that scale from simple CRUD to complex queries. Beginner-friendly with line-by-line code.
-order: 3
+order: 2
 minutes: 22
 topics: [Spring Data, repositories, CRUD, method name queries, QueryDSL, auditing, paging, sorting, projections]
 docs:

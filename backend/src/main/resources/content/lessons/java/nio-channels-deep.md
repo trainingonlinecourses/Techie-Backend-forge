@@ -1,7 +1,7 @@
 ---
 title: Java NIO Networking — Non-blocking I/O with Selectors
 summary: NIO channels, buffers, selectors, non-blocking I/O, the reactor pattern, socket programming with NIO, and how high-performance servers handle thousands of connections without thousands of threads.
-order: 52
+order: 55
 minutes: 22
 topics: [nio, channel, buffer, selector, non-blocking, reactor-pattern, socket-channel, bytebuffer]
 docs:

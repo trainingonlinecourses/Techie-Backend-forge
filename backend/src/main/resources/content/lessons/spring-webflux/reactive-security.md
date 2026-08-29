@@ -1,7 +1,7 @@
 ---
 title: Reactive Security — Authentication & Authorization in WebFlux
 summary: SecurityWebFilterChain, reactive authentication, JWT validation, route-level authorization, and the patterns that secure reactive applications. Beginner-friendly with line-by-line code.
-order: 14
+order: 15
 minutes: 22
 topics: [reactive security, SecurityWebFilterChain, reactive authentication, JWT, route authorization, security filter, CORS, CSRF]
 docs:

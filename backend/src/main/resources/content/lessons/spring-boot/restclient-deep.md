@@ -1,7 +1,7 @@
 ---
 title: RestClient — Modern HTTP Client (Spring 6.1)
 summary: Fluent API for synchronous HTTP calls, replacing RestTemplate, request interceptors, error handling, and calling external microservices.
-order: 45
+order: 50
 minutes: 16
 topics: [restclient, resttemplate, http-client, microservices, external-api, request-interceptor]
 docs:

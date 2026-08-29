@@ -1,7 +1,7 @@
 ---
 title: Async Methods in Spring Boot — @Async, Thread Pools and Error Handling
 summary: How @Async works under the hood, configuring task executors, exception handling for async methods, and the patterns that prevent thread starvation.
-order: 23
+order: 31
 minutes: 20
 topics: [@Async, TaskExecutor, thread pool, CompletableFuture, error handling, async patterns]
 docs:

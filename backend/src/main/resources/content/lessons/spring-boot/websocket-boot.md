@@ -1,7 +1,7 @@
 ---
 title: WebSocket with Spring Boot — Real-Time Bidirectional Communication
 summary: STOMP vs raw WebSocket, SockJS fallback, message broker configuration, @MessageMapping, room-based broadcasting, and how organizations build live dashboards and chat systems.
-order: 25
+order: 34
 minutes: 22
 topics: [websocket, stomp, sockjs, message-mapping, simpbroker, broadcast, realtime, live-dashboard]
 docs:

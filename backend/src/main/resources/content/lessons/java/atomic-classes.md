@@ -1,7 +1,7 @@
 ---
 title: Atomic Classes — Lock-Free Thread Safety with CAS
 summary: AtomicInteger, AtomicReference, LongAdder, and the compare-and-swap mechanism that lets you write lock-free concurrent code — when to use atomics instead of synchronized.
-order: 84
+order: 80
 minutes: 20
 topics: [atomic-integer, atomic-reference, long-adder, compare-and-swap, cas, lock-free, volatile]
 docs:

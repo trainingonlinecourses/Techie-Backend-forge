@@ -1,7 +1,7 @@
 ---
 title: Advanced Reactive Operators — The Complete Toolkit
 summary: Advanced Reactor operators — transform, filter, combine, window, buffer, groupBy, retry, and the operator decision tree for choosing the right one. Beginner-friendly with line-by-line code.
-order: 11
+order: 12
 minutes: 25
 topics: [reactive operators, transform, filter, combine, window, buffer, groupBy, retry, timeout, operator selection]
 docs:

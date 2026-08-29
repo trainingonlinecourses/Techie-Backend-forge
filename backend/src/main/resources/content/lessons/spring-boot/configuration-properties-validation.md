@@ -1,7 +1,7 @@
 ---
 title: @ConfigurationProperties Validation — Failing Fast on Bad Config
 summary: Typed binding vs @Value, validation with jakarta annotations, nested properties, and why validated config prevents silent misconfig in prod.
-order: 15
+order: 18
 minutes: 17
 topics: [configurationproperties, validation, binding, nested-properties, fail-fast, config-errors]
 docs:

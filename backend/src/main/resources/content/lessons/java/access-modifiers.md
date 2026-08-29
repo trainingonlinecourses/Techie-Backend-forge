@@ -1,7 +1,7 @@
 ---
 title: Access Modifiers — Controlling Who Can See What
 summary: private, default (package-private), protected, and public explained with the visibility table, why organizations lock almost everything down, and how encapsulation prevents real production incidents.
-order: 72
+order: 70
 minutes: 20
 topics: [access-modifiers, encapsulation, private, protected, public, package-private]
 docs:

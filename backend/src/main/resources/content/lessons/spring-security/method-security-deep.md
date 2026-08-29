@@ -1,7 +1,7 @@
 ---
 title: Method Security — @PreAuthorize, @PostAuthorize and the Expression Language
 summary: Enforcing authorization inside methods with @PreAuthorize/@PostAuthorize, SpEL expressions, @Secured and @RolesAllowed, and when method security beats URL rules.
-order: 10
+order: 9
 minutes: 20
 topics: [method-security, preauthorize, postauthorize, secured, rolesallowed, spel, authorization]
 docs:

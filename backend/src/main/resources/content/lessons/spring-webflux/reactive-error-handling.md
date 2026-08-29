@@ -1,7 +1,7 @@
 ---
 title: Reactive Error Handling — Graceful Failures in WebFlux
 summary: Error handling in reactive streams — onErrorResume, onErrorReturn, retry patterns, global error handlers, and the patterns that prevent cascading failures. Beginner-friendly with line-by-line code.
-order: 12
+order: 13
 minutes: 22
 topics: [error handling, onErrorResume, onErrorReturn, retry, global error handler, reactive exceptions, fallback, circuit breaker]
 docs:

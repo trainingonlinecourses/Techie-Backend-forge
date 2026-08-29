@@ -1,7 +1,7 @@
 ---
 title: Spring Boot HTTP Interface Clients — Declarative REST
 summary: The declarative HTTP interface pattern, @HttpExchange, WebClient for reactive clients, RestTemplate evolution, interceptors, error handling, and how organizations build resilient service-to-service communication.
-order: 36
+order: 45
 minutes: 20
 topics: [http-interface, declarative-client, resttemplate, webclient, http-exchange, service-client, resilience]
 docs:

@@ -1,7 +1,7 @@
 ---
 title: JdbcClient — Modern JDBC (Spring 6.1)
 summary: Fluent builder API for SQL queries, named parameters, batch operations, stored procedures, and replacing JdbcTemplate in new projects.
-order: 46
+order: 51
 minutes: 16
 topics: [jdbcclient, jdbc-template, sql, named-parameters, batch-operations, transactions]
 docs:

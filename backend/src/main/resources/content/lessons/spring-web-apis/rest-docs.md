@@ -1,7 +1,7 @@
 ---
 title: API Docs with Spring REST Docs
 summary: Test-driven API documentation — assertions on the request/response contract, Asciidoctor snippets, and how REST Docs differs from Swagger UI.
-order: 5
+order: 6
 minutes: 13
 topics: [spring rest docs, api documentation, test-driven docs, asciidoctor, snippets]
 docs:

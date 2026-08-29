@@ -1,7 +1,7 @@
 ---
 title: Password Storage — BCrypt, Argon2 and DelegatingPasswordEncoder
 summary: Why plaintext and hashes without salt fail, BCrypt/Argon2 semantics, the {id} encoded-password format, and the upgrade path for legacy systems.
-order: 11
+order: 12
 minutes: 18
 topics: [password-storage, bcrypt, argon2, delegatingpasswordencoder, salting, hash, password-upgrade]
 docs:

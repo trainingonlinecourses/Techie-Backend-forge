@@ -1,7 +1,7 @@
 ---
 title: RestTemplate and WebClient — Calling External APIs
 summary: RestTemplate vs WebClient, synchronous vs reactive HTTP, error handling with RestTemplate exchange, WebClient with filters and retry, and how organizations build resilient API clients.
-order: 26
+order: 35
 minutes: 22
 topics: [resttemplate, webclient, http-client, api-client, error-handling, retry, resilience, synchronous, reactive]
 docs:

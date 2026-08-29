@@ -1,7 +1,7 @@
 ---
 title: Spring Boot Content Negotiation — JSON, XML and Multiple Formats
 summary: Content negotiation strategy, media type configuration, Jackson and JAXB, produce/consume annotations, custom MessageConverters, and API versioning through content type.
-order: 38
+order: 47
 minutes: 18
 topics: [content-negotiation, media-type, jackson, xml, message-converter, api-versioning, accept-header]
 docs:

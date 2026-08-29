@@ -1,7 +1,7 @@
 ---
 title: The String Constant Pool — Why == Fails and Intern Saves Memory
 summary: How Java's string interning works, the heap vs pool distinction, when == gives wrong answers, String.intern(), and why modern code avoids the pool for performance.
-order: 59
+order: 62
 minutes: 20
 topics: [string-pool, string-intern, string-literal, heap-string, ==-vs-equals, string-caching]
 docs:

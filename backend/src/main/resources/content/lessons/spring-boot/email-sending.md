@@ -1,7 +1,7 @@
 ---
 title: Sending Email — SMTP, Templates, and Attachments
 summary: JavaMailSender configuration, HTML email with Thymeleaf templates, attachments, async email sending, and how organizations build reliable email pipelines with retries and bounce handling.
-order: 24
+order: 33
 minutes: 18
 topics: [email, javamailsender, smtp, thymeleaf-email, html-email, async-email, email-template, attachment]
 docs:

@@ -1,7 +1,7 @@
 ---
 title: Cloning & Copying — clone(), Copy Constructors and Defensive Copies
 summary: Why Object.clone is broken, copy constructors and factories, shallow vs deep copies, and the defensive-copy patterns that prevent mutation bugs.
-order: 31
+order: 35
 minutes: 18
 topics: [clone, copy-constructor, shallow-copy, deep-copy, defensive-copy, immutability, record-copy]
 docs:

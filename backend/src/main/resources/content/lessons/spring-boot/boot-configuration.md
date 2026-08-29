@@ -1,7 +1,7 @@
 ---
 title: Spring Boot Configuration — Properties, YAML, @ConfigurationProperties, and Profiles
 summary: application.properties vs application.yml, binding properties to Java objects with @ConfigurationProperties, profile-specific configs, external configuration sources (env vars, command line, config server), validation, and how organizations manage configuration across environments with line-by-line walkthroughs.
-order: 4
+order: 5
 minutes: 30
 topics: [configuration-properties, application-properties, application-yml, profiles, externalized-config, config-validation, config-binding]
 docs:

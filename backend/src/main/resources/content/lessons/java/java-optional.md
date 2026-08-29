@@ -1,7 +1,7 @@
 ---
 title: Optional — Eliminating NullPointerExceptions — Complete Beginner's Guide
 summary: What Optional is, when to use it, when NOT to use it, and the common patterns that prevent NPEs in production.
-order: 11
+order: 12
 minutes: 18
 topics: [optional, null-safety, npe, functional-style, optional-patterns]
 docs:

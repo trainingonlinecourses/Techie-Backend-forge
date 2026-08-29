@@ -1,7 +1,7 @@
 ---
 title: Testing Spring Boot Applications — Unit Tests, Integration Tests, and Test Slices
 summary: Why testing matters, unit testing services with Mockito, @SpringBootTest for integration tests, MockMvc for testing REST endpoints without starting the server, @DataJpaTest for repository tests, @MockBean for replacing dependencies, and test organization best practices with line-by-line walkthroughs.
-order: 3
+order: 4
 minutes: 35
 topics: [testing, junit5, mockito, mockmvc, spring-boot-test, datajpatest, mockbean, test-slice, integration-test]
 docs:

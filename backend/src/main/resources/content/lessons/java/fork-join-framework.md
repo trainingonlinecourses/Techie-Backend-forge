@@ -1,7 +1,7 @@
 ---
 title: The Fork/Join Framework — Divide-and-Conquer Parallelism
 summary: RecursiveTask and RecursiveAction, work-stealing queues, when ForkJoinPool beats ExecutorService, and the parallel stream trap.
-order: 55
+order: 58
 minutes: 20
 topics: [fork-join, RecursiveTask, RecursiveAction, work-stealing, parallel streams, divide-and-conquer]
 docs:

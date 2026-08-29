@@ -1,7 +1,7 @@
 ---
 title: Startup Performance — Lazy Init, Spring AOT and Faster Boots
 summary: Why startup time matters in serverless and scale-to-zero, @Lazy beans, Spring AOT, and the profiling workflow to find slow startup beans.
-order: 16
+order: 20
 minutes: 18
 topics: [startup, lazy-init, spring-aot, aot, cold-start, serverless, startup-profiling, graalvm]
 docs:

@@ -1,7 +1,7 @@
 ---
 title: Structured Concurrency — Predictable Parallelism in Java 21
 summary: Why structured concurrency replaces thread pools and CompletableFuture for many tasks, how TaskScope manages the lifecycle of concurrent work, and the patterns for gathering results.
-order: 56
+order: 59
 minutes: 18
 topics: [structured concurrency, TaskScope, Java 21, concurrency, thread management, gather results]
 docs:

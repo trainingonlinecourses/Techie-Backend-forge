@@ -1,7 +1,7 @@
 ---
 title: Redis Persistence — RDB Snapshots and AOF
 module: redis-deep
-order: 3
+order: 4
 minutes: 25
 topics: ["RDB", "AOF", "persistence", "durability", "Redis config", "data loss"]
 docs:

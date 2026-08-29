@@ -1,7 +1,7 @@
 ---
 title: @MockBean & @SpyBean — Replacing Real Beans in Tests
 summary: When to mock a bean in a Spring context, @MockBean vs @SpyBean semantics, reset behavior, and why @MockitoBean/@MockitoSpyBean replaced them in Boot 3.4+.
-order: 7
+order: 8
 minutes: 16
 topics: [mockbean, spybean, mockitobean, bean-replacement, test-doubles, spring-boot-3-4]
 docs:

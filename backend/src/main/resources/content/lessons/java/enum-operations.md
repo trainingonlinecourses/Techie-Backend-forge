@@ -1,7 +1,7 @@
 ---
 title: Enum Operations — valueOf, EnumSet, EnumMap and Strategy Patterns
 summary: Using enums beyond simple constants — EnumSet for fast bitset operations, EnumMap for type-safe mapping, abstract methods per constant, and the strategy pattern that replaces whole class hierarchies.
-order: 82
+order: 78
 minutes: 20
 topics: [enumset, enummap, enum-values, enum-valueof, enum-strategy, enum-abstract-method, bitwise-enum]
 docs:

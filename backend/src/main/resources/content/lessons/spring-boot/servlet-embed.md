@@ -1,7 +1,7 @@
 ---
 title: Spring Boot Embedded Servlet Containers — Tomcat, Jetty and Undertow
 summary: Embedded server architecture, switching between Tomcat and Jetty, customizing connectors, SSL/TLS configuration, connection pooling, graceful shutdown hooks, and production hardening of the embedded container.
-order: 40
+order: 49
 minutes: 20
 topics: [embedded-server, tomcat, jetty, undertow, ssl, connector, connection-pool, container-customization]
 docs:

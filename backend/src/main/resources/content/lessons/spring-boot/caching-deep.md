@@ -1,7 +1,7 @@
 ---
 title: Spring Caching In Depth — @Cacheable, Eviction, and Cache Providers
 summary: Cache abstraction, @Cacheable vs @CacheEvict vs @CachePut, cache key generation, conditional caching, Caffeine/Redis/EhCache providers, and how organizations prevent stale data in cached systems.
-order: 27
+order: 36
 minutes: 20
 topics: [spring-cache, cacheable, cacheevict, cacheput, cache-key, caffeine, redis-cache, conditional-cache, cache-eviction]
 docs:

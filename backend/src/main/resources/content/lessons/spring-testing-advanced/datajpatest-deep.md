@@ -1,7 +1,7 @@
 ---
 title: @DataJpaTest in Depth — Real JPA Against a Real Database
 summary: The slice test for repositories, why H2 differs from Postgres, flush/clear assertions, and Testcontainers for the real thing.
-order: 9
+order: 10
 minutes: 17
 topics: [datajpatest, slice-test, h2, testcontainers, repository-test, flush, rollback]
 docs:

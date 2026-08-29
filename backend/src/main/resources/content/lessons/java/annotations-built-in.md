@@ -1,7 +1,7 @@
 ---
 title: Java Built-In Annotations — @Override, @Deprecated, @SuppressWarnings, @SafeVarargs, @FunctionalInterface
 summary: Every built-in annotation explained with line-by-line code, why @Override catches bugs at compile time, when @Deprecated matters, and how @FunctionalInterface prevents accidental lambda-breaking.
-order: 63
+order: 66
 minutes: 20
 topics: [override-annotation, deprecated, suppress-warnings, safe-varargs, functional-interface, java-annotations]
 docs:

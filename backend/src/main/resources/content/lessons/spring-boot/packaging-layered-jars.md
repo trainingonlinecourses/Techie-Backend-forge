@@ -1,7 +1,7 @@
 ---
 title: Packaging — Fat Jars, Layered Jars and Buildpacks
 summary: How the Spring Boot repackaged jar works, layered jars for efficient Docker images, and Cloud Native Buildpacks for image builds without Dockerfiles.
-order: 18
+order: 21
 minutes: 18
 topics: [packaging, fat-jar, layered-jars, buildpacks, docker-image, spring-boot-maven-plugin, deploy]
 docs:

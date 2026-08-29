@@ -1,7 +1,7 @@
 ---
 title: The Final Keyword — Variables, Methods, and Classes
 summary: What final actually guarantees at the JVM level, final vs effectively-final for lambdas, final fields and safe publication, and why some teams ban final locals while others require it everywhere.
-order: 37
+order: 40
 minutes: 18
 topics: [final-variable, final-method, final-class, effectively-final, immutability, safe-publication]
 docs:

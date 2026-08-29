@@ -1,7 +1,7 @@
 ---
 title: Thymeleaf — Server-Side HTML Templates in Spring Boot
 summary: How Thymeleaf renders HTML on the server with natural templating, th:text vs th:utext security, iteration and conditionals, form binding to objects, and when organizations choose it over a JS frontend.
-order: 50
+order: 52
 minutes: 24
 topics: [thymeleaf, server-side-rendering, templates, form-binding, fragments]
 docs:

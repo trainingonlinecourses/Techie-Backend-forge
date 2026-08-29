@@ -1,7 +1,7 @@
 ---
 title: Packages & Imports — Organizing a Codebase That Scales
 summary: What packages really are (namespaces + folders), how imports work under the hood, wildcard vs explicit imports, fully-qualified names, and the package structures real organizations use.
-order: 73
+order: 71
 minutes: 18
 topics: [packages, imports, namespace, classpath, package-by-feature, fully-qualified-name]
 docs:

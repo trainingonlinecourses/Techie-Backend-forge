@@ -1,7 +1,7 @@
 ---
 title: Constructors in Depth — How Objects Are Actually Born
 summary: Default vs no-arg vs parameterized constructors, constructor chaining with this() and super(), copy constructors, and the initialization order rules that trip up even experienced developers.
-order: 71
+order: 69
 minutes: 24
 topics: [constructors, constructor-chaining, this-super, copy-constructor, default-constructor, initialization-order]
 docs:

@@ -1,7 +1,7 @@
 ---
 title: Java File I/O — Reading, Writing, Copying, and Compressing Files
 summary: NIO.2 Path/Files API vs legacy File, reading/writing text and binary, directory traversal, file copy/move, try-with-resources for streams, and when to use each approach in production.
-order: 61
+order: 64
 minutes: 24
 topics: [file-io, nio2, path, files-api, readwrite, directory-walk, try-with-resources, file-copy, zip-compress]
 docs:

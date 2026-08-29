@@ -1,7 +1,7 @@
 ---
 title: Arrays in Depth — The Contiguous, Zero-Indexed Workhorse
 summary: Array internals, the array/List bridge, sorting and searching, multidimensional arrays, and the array pitfalls (covariance, boxing, generics).
-order: 29
+order: 33
 minutes: 20
 topics: [arrays, arraylist, covariance, arrays-util, sorting, binary-search, multidimensional, array-vs-list]
 docs:

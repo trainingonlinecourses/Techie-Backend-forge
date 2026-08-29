@@ -1,7 +1,7 @@
 ---
 title: Assertions and Debugging — Catching Bugs at the Source
 summary: Programming-by-contract with assert, when assertions are disabled, assert vs validation, jdb basics, logging diagnostics, and how organizations use assertions as executable documentation.
-order: 45
+order: 48
 minutes: 16
 topics: [assert, assertions, assertions-disabled, debugging, jdb, programming-by-contract, invariant-checking]
 docs:

@@ -1,7 +1,7 @@
 ---
 title: Record Patterns and Pattern Matching — Destructuring Data in Java
 summary: How record patterns deconstruct nested data, pattern matching with switch, sealed class exhaustiveness, and the elimination of verbose instanceof chains.
-order: 57
+order: 60
 minutes: 18
 topics: [records, pattern matching, sealed classes, switch expressions, destructuring, Java 21]
 docs:

@@ -1,7 +1,7 @@
 ---
 title: Virtual Threads & Modern Concurrency — Complete Beginner's Guide
 summary: Java 21 virtual threads explained from scratch — what they solve, how they work, Spring Boot integration, and the rules that keep them fast.
-order: 12
+order: 14
 minutes: 20
 topics: [virtual-threads, loom, thread-per-request, carrier-threads, pinning, synchronized]
 docs:

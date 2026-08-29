@@ -1,7 +1,7 @@
 ---
 title: Abstract Classes vs Interfaces — When to Use Which
 summary: The contract difference between abstract classes and interfaces, diamond problem rules, when an abstract class beats an interface, and the Java 8+ default-method overlap that confuses every team.
-order: 36
+order: 39
 minutes: 20
 topics: [abstract-class, interface, diamond-problem, default-methods, template-method, is-a-vs-can-do]
 docs:

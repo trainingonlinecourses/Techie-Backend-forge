@@ -1,7 +1,7 @@
 ---
 title: Java Generics Wildcards — PECS and Bounded Types
 summary: Unbounded wildcards, upper and lower bounds, the PECS rule, generic methods, type erasure pitfalls, and when to use wildcards vs type parameters in real code.
-order: 51
+order: 54
 minutes: 22
 topics: [generics, wildcards, pecs, upper-bound, lower-bound, type-erasure, covariance, contravariance]
 docs:

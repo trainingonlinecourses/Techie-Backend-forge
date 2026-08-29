@@ -1,7 +1,7 @@
 ---
 title: Bean Validation and Custom Constraints — Beyond @NotNull
 summary: @Valid vs @Validated, validation groups, custom constraint annotations with Validator implementation, nested object validation, and how organizations enforce data quality at the API boundary.
-order: 22
+order: 30
 minutes: 20
 topics: [bean-validation, custom-constraint, @valid, @validated, validation-groups, nested-validation, hibernate-validator]
 docs:

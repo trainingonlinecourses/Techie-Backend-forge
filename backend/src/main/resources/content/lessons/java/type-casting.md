@@ -1,7 +1,7 @@
 ---
 title: Type Casting — Widening, Narrowing, Autoboxing and Unboxing
 summary: When Java promotes numbers automatically, when it truncates silently, how autoboxing creates hidden object allocations, and the integer-cache trap that makes == lie.
-order: 53
+order: 56
 minutes: 18
 topics: [casting, widening, narrowing, autoboxing, unboxing, promotion, Integer cache, object allocation]
 docs:

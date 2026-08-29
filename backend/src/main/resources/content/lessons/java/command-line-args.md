@@ -1,7 +1,7 @@
 ---
 title: Command-Line Arguments — Configuring Programs Without Recompiling
 summary: How the String[] args array in main works, parsing and validating arguments safely, flag-style arguments, and how organizations use flags to switch behavior without code changes.
-order: 75
+order: 73
 minutes: 14
 topics: [command-line-arguments, main-method, string-args, cli-flags, configuration]
 docs:

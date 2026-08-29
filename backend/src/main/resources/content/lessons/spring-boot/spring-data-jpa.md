@@ -1,7 +1,7 @@
 ---
 title: Spring Data JPA — Entities, Repositories, Relationships
 summary: Entities, derived queries, @Query, relationships, auditing, and the N+1 trap.
-order: 5
+order: 7
 minutes: 22
 topics: [jpa, entities, repositories, derived-queries, n-plus-one, auditing]
 docs:

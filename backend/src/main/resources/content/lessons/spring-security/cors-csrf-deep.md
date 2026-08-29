@@ -1,7 +1,7 @@
 ---
 title: CORS & CSRF in Depth — Browser Security Models and API Hardening
 summary: Same-origin policy, CORS preflight, when CSRF applies (cookies) vs not (Bearer tokens), and the exact configurations production APIs use.
-order: 12
+order: 13
 minutes: 20
 topics: [cors, csrf, same-origin, preflight, cookies, bearer-tokens, browser-security, headers]
 docs:

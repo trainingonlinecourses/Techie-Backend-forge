@@ -1,7 +1,7 @@
 ---
 title: Java Platform Module System (JPMS) — Java 9+ Modules
 summary: What modules solve (the JAR hell), module-info.java anatomy, automatic vs named modules, and how organizations modularize large codebases. Beginner-friendly with line-by-line code.
-order: 94
+order: 85
 minutes: 20
 topics: [JPMS, modules, module-info.java, requires, exports, automatic module, module path, encapsulation]
 docs:

@@ -1,7 +1,7 @@
 ---
 title: The Object Class — Every Class's Hidden Parent
 summary: toString, equals, hashCode, getClass, clone and finalize — what each method does, how every Java object inherits them, and why organizations override three of them in almost every entity.
-order: 70
+order: 68
 minutes: 25
 topics: [object-class, tostring, equals, hashcode, getclass, clone]
 docs:

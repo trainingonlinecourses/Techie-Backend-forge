@@ -1,7 +1,7 @@
 ---
 title: Initializer Blocks & Initialization Order — The Hidden Constructor Code
 summary: Instance initializer blocks, static initializer blocks, the exact execution order rules, and why organizations mostly avoid them in favor of clearer alternatives.
-order: 77
+order: 75
 minutes: 15
 topics: [initializer-blocks, static-block, initialization-order, field-initializers]
 docs:

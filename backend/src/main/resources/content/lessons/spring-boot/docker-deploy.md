@@ -1,7 +1,7 @@
 ---
 title: Dockerizing Spring Boot — From JAR to Container
 summary: Multi-stage Dockerfiles, layer caching, Jib vs Dockerfile, .dockerignore, health checks, and how organizations build production-ready containers with minimal image size and fast builds.
-order: 30
+order: 39
 minutes: 20
 topics: [docker, dockerfile, multi-stage-build, layer-caching, jib, container, health-check, image-size, dockerignore]
 docs:

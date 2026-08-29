@@ -1,7 +1,7 @@
 ---
 title: File Upload and Download — Multipart, Storage, and Streaming
 summary: MultipartFile handling, file size limits, streaming large files to S3/local disk, download with Content-Disposition, and how organizations handle file uploads safely without running out of memory.
-order: 23
+order: 32
 minutes: 20
 topics: [multipart, file-upload, file-download, multipartfile, content-disposition, streaming-upload, file-storage]
 docs:

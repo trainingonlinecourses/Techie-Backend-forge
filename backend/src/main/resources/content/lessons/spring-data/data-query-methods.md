@@ -1,7 +1,7 @@
 ---
 title: Query Methods — Derived, @Query, Projections & Paging
 summary: The full query toolkit — derived queries, JPQL with @Query, native SQL, projections, pagination and sorting, and the performance traps.
-order: 2
+order: 1
 minutes: 16
 topics: [derived queries, jpql, native queries, projections, pagination, sorting]
 docs:

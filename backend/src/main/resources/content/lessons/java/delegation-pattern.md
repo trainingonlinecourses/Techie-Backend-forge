@@ -1,7 +1,7 @@
 ---
 title: Delegation Pattern — Composition Over Inheritance Done Right
 summary: What delegation really is, when to use it instead of inheritance, the decorator pattern as its cousin, and how Spring itself is built on delegation.
-order: 87
+order: 83
 minutes: 18
 topics: [delegation, composition-over-inheritance, decorator, forwarding, spring-context]
 docs:

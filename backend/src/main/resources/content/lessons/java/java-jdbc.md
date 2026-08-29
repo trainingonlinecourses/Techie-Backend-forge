@@ -1,7 +1,7 @@
 ---
 title: Java JDBC — Connecting to Databases, Queries, and Transactions
 summary: What JDBC is and why it exists, connecting to databases, Statement vs PreparedStatement (why you always use PreparedStatement), transactions with commit/rollback, connection pooling with HikariCP, batch operations, and how Spring JDBC simplifies everything with line-by-line walkthroughs.
-order: 13
+order: 15
 minutes: 30
 topics: [jdbc, connection, prepared-statement, result-set, transactions, connection-pooling, batch-operations, hikaricp]
 docs:

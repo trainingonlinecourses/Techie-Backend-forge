@@ -1,7 +1,7 @@
 ---
 title: ApplicationRunner & CommandLineRunner — Startup Work After Context Load
 summary: Running code after the context starts, the difference between the two runner interfaces, ordering, and the startup-job scenarios teams use them for.
-order: 12
+order: 14
 minutes: 16
 topics: [applicationrunner, commandlinerunner, startup-tasks, data-seeding, warmup, exit-codes]
 docs:

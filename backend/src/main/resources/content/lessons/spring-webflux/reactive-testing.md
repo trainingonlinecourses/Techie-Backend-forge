@@ -1,7 +1,7 @@
 ---
 title: Testing Reactive Code — StepVerifier and Beyond
 summary: Testing Mono and Flux with StepVerifier, virtual time, test publishers, WebTestClient, and the patterns that catch reactive bugs before production. Beginner-friendly with line-by-line code.
-order: 10
+order: 11
 minutes: 22
 topics: [reactive testing, StepVerifier, virtual time, test publisher, WebTestClient, reactive assertions, backpressure testing]
 docs:

@@ -1,7 +1,7 @@
 ---
 title: Two-Dimensional Arrays — Matrices, Jagged Arrays, and Real-World Grids
 summary: How 2D arrays work in memory, jagged vs rectangular arrays, why most teams wrap them in Lists, matrix traversal patterns, and common bugs with row-major layout.
-order: 58
+order: 61
 minutes: 18
 topics: [2d-array, matrix, jagged-array, row-major, array-of-arrays, grid-traversal]
 docs:

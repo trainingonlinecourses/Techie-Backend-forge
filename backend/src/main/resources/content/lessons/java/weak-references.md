@@ -1,7 +1,7 @@
 ---
 title: Weak, Soft & Phantom References — Memory-Sensitive Caching and Cleanup
 summary: Reference types beyond strong — WeakReference for caches, SoftReference for memory-sensitive storage, PhantomReference for cleanup, and ReferenceQueue for post-GC notification.
-order: 86
+order: 82
 minutes: 18
 topics: [weak-reference, soft-reference, phantom-reference, reference-queue, memory-cache, gc-integration, weakhashmap]
 docs:

@@ -1,7 +1,7 @@
 ---
 title: Java Threads Deep — Lifecycle, States and Coordination
 summary: Thread states from NEW to TERMINATED, synchronized blocks and the monitor, wait/notify protocol, daemon threads, and how production code coordinates thousands of concurrent workers without deadlocks.
-order: 47
+order: 50
 minutes: 25
 topics: [thread-lifecycle, thread-states, synchronized, wait-notify, daemon-threads, thread-groups, monitor]
 docs:

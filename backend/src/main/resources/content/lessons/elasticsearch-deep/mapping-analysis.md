@@ -1,7 +1,7 @@
 ---
 title: Mapping and Analysis — How Fields Become Searchable
 module: elasticsearch-deep
-order: 2
+order: 3
 minutes: 27
 topics: ["mapping", "analyzers", "tokenization", "stemming", "field types", "dynamic mapping"]
 docs:

@@ -1,7 +1,7 @@
 ---
 title: Building REST APIs with Spring Boot — Controllers, DTOs, and Error Handling
 summary: @RestController explained line by line, @GetMapping/@PostMapping/@PutMapping/@DeleteMapping, @PathVariable vs @RequestBody vs @RequestParam, ResponseEntity for status codes, DTO pattern for API responses, global exception handling with @ControllerAdvice, and CORS configuration with line-by-line walkthroughs.
-order: 2
+order: 3
 minutes: 35
 topics: [rest-controller, get-mapping, post-mapping, path-variable, request-body, response-entity, dto, exception-handling, cors]
 docs:

@@ -1,7 +1,7 @@
 ---
 title: Logging with SLF4J & Logback
 summary: Structured, level-aware logging with the SLF4J API and Logback — configuration, log levels, patterns, structured (JSON) logging and common anti-patterns.
-order: 10
+order: 11
 minutes: 14
 topics: [slf4j, logback, log levels, structured logging, log configuration]
 docs:

@@ -1,7 +1,7 @@
 ---
 title: Iterator and Iterable — Making Custom Collections ForEach-able
 summary: The Iterable contract, writing custom iterators, Iterator vs Spliterator, fail-fast vs fail-safe, and how this pattern powers Java Streams and Spring Data repositories.
-order: 41
+order: 44
 minutes: 18
 topics: [iterator, iterable, spliterator, fail-fast, for-each, custom-collection, streaming-pattern]
 docs:

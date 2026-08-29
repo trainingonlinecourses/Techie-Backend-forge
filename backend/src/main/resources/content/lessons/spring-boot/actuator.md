@@ -1,7 +1,7 @@
 ---
 title: Actuator, Metrics & Observability
 summary: Health checks, metrics, info, Micrometer, logging best practices and the golden signals.
-order: 7
+order: 8
 minutes: 16
 topics: [actuator, metrics, health, micrometer, logging]
 docs:

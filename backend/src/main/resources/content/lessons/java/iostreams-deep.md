@@ -1,7 +1,7 @@
 ---
 title: Java IO Streams — Byte Streams, Character Streams, and NIO Channels
 summary: The InputStream/OutputStream vs Reader/Writer split, buffered I/O, try-with-resources, NIO channels and buffers, and when to pick NIO over classic IO for high-throughput file and network operations.
-order: 42
+order: 45
 minutes: 22
 topics: [inputstream, outputstream, reader, writer, buffered-io, try-with-resources, nio-channel, nio-buffer, memory-mapped]
 docs:

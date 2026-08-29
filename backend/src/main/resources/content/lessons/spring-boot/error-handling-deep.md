@@ -1,7 +1,7 @@
 ---
 title: Spring Boot Error Handling — @ControllerAdvice, Custom Exceptions, and Error Responses
 summary: How Spring Boot handles exceptions, @ControllerAdvice for global error handling, custom exception classes, validation error formatting, problem-detail responses (RFC 7807), error logging best practices, and how organizations build consistent error APIs with line-by-line walkthroughs.
-order: 5
+order: 6
 minutes: 28
 topics: [error-handling, controller-advice, exception-handler, custom-exceptions, validation-errors, problem-detail, error-response]
 docs:
