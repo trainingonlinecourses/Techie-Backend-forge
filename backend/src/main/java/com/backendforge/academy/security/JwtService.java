@@ -30,8 +30,14 @@ public class JwtService {
 
     public JwtService(AppProperties props) {
         this.props = props;
+        String secret = props.jwt().secret();
+        if (secret == null || secret.length() < 32) {
+            throw new IllegalStateException(
+                    "APP_JWT_SECRET must be set to a value with at least 32 characters in production. " +
+                    "Current length: " + (secret == null ? 0 : secret.length()));
+        }
         SecretKey key = new SecretKeySpec(
-                props.jwt().secret().getBytes(StandardCharsets.UTF_8), "HmacSHA256");
+                secret.getBytes(StandardCharsets.UTF_8), "HmacSHA256");
         JWKSource<SecurityContext> jwkSource = new ImmutableSecret<>(key);
         this.encoder = new NimbusJwtEncoder(jwkSource);
         this.decoder = NimbusJwtDecoder.withSecretKey(key).macAlgorithm(MacAlgorithm.HS256).build();

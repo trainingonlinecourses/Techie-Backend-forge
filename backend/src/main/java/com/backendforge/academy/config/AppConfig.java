@@ -13,15 +13,16 @@ import java.util.List;
 @EnableConfigurationProperties(AppProperties.class)
 public class AppConfig {
 
-    /** CORS for the SPA during development (the Vite dev server also proxies /api). */
+    /** CORS for the SPA — explicit origin allowlist, never wildcard. */
     @Bean
     CorsConfigurationSource corsConfigurationSource(AppProperties props) {
         CorsConfiguration cfg = new CorsConfiguration();
         cfg.setAllowedOrigins(props.cors().allowedOrigins());
-        cfg.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
-        cfg.setAllowedHeaders(List.of("*"));
+        cfg.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        cfg.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-OpenAI-Key"));
         cfg.setExposedHeaders(List.of("Authorization"));
         cfg.setAllowCredentials(true);
+        cfg.setMaxAge(3600L); // preflight cache: 1 hour
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", cfg);
         return source;

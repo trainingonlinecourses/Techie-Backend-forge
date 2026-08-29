@@ -44,6 +44,13 @@ public class GlobalExceptionHandler {
                 .body(ApiError.of(400, "Bad Request", "Validation failed", req.getRequestURI(), errors));
     }
 
+    /** Rate-limited login — return 429 before the generic 401 handler. */
+    @ExceptionHandler(org.springframework.security.authentication.DisabledException.class)
+    ResponseEntity<ApiError> rateLimited(org.springframework.security.authentication.DisabledException ex, HttpServletRequest req) {
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                .body(ApiError.of(429, "Too Many Requests", ex.getMessage(), req.getRequestURI()));
+    }
+
     @ExceptionHandler({BadCredentialsException.class, AuthenticationException.class})
     ResponseEntity<ApiError> badCredentials(Exception ex, HttpServletRequest req) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)

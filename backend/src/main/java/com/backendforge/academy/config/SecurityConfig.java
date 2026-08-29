@@ -55,11 +55,21 @@ public class SecurityConfig {
             .exceptionHandling(e -> e
                 .authenticationEntryPoint(entryPoint)
                 .accessDeniedHandler(deniedHandler))
-            .headers(h -> h.frameOptions(f -> f.sameOrigin()))   // allow H2 console frames
+            .headers(h -> h
+                .frameOptions(f -> f.deny())                     // X-Frame-Options: DENY (no frames)
+                .httpStrictTransportSecurity(hsts -> hsts         // HSTS: force HTTPS for 1 year
+                    .includeSubDomains(true)
+                    .maxAgeInSeconds(31536000))
+                .contentTypeOptions(cto -> {})                     // X-Content-Type-Options: nosniff
+                .referrerPolicy(rp -> rp.policy(                   // Referrer-Policy: strict-origin
+                    org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter
+                        .ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN))
+                .permissionsPolicy(pp -> pp.policy(                // Permissions-Policy: deny camera, mic, geolocation
+                    "camera=(), microphone=(), geolocation=()")))
             .authorizeHttpRequests(a -> a
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers("/api/auth/**", "/api/content/**", "/actuator/health",
-                        "/h2-console/**", "/error").permitAll()
+                        "/error").permitAll()
                 .anyRequest().authenticated())
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
