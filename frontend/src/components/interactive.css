@@ -1188,3 +1188,179 @@
     box-shadow: none;
   }
 }
+
+/* ============================================================
+   Admin Reorder Page — Drag-and-Drop Lesson Ordering
+   ============================================================ */
+
+.reorder-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 16px 0;
+}
+
+.reorder-controls label {
+  font-weight: 600;
+  color: var(--fg2, #aaa);
+  white-space: nowrap;
+}
+
+.reorder-select {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border, #333);
+  background: var(--bg2, #1a1a2e);
+  color: var(--fg, #e0e0e0);
+  font-size: 0.95rem;
+  min-width: 280px;
+}
+
+.reorder-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  color: var(--fg2, #aaa);
+  font-size: 0.9rem;
+}
+
+.reorder-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.reorder-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background: var(--bg2, #1a1a2e);
+  border: 1px solid var(--border, #333);
+  border-radius: 8px;
+  cursor: grab;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.reorder-item:hover {
+  border-color: var(--accent, #f5a623);
+  box-shadow: 0 0 0 1px var(--accent, #f5a623);
+}
+
+.reorder-item.dragging {
+  opacity: 0.5;
+  border-color: var(--accent, #f5a623);
+  background: var(--bg3, #16213e);
+}
+
+.reorder-item.drag-over {
+  border-top: 3px solid var(--accent, #f5a623);
+}
+
+.reorder-handle {
+  color: var(--fg3, #666);
+  font-size: 1.2rem;
+  cursor: grab;
+  padding: 0 4px;
+}
+
+.reorder-handle:active {
+  cursor: grabbing;
+}
+
+.reorder-num {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--accent, #f5a623);
+  color: #000;
+  font-weight: 700;
+  font-size: 0.8rem;
+  flex-shrink: 0;
+}
+
+.reorder-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.reorder-title {
+  display: block;
+  font-weight: 600;
+  color: var(--fg, #e0e0e0);
+  text-decoration: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.reorder-title:hover {
+  color: var(--accent, #f5a623);
+}
+
+.reorder-meta {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--fg3, #666);
+  margin-top: 2px;
+}
+
+.reorder-arrows {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.arrow-btn {
+  width: 28px;
+  height: 24px;
+  border: 1px solid var(--border, #333);
+  border-radius: 4px;
+  background: var(--bg, #0f0f23);
+  color: var(--fg2, #aaa);
+  cursor: pointer;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.1s;
+}
+
+.arrow-btn:hover:not(:disabled) {
+  background: var(--accent, #f5a623);
+  color: #000;
+  border-color: var(--accent, #f5a623);
+}
+
+.arrow-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  .reorder-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .reorder-select {
+    min-width: unset;
+    width: 100%;
+  }
+  .reorder-info {
+    flex-direction: column;
+    gap: 8px;
+    align-items: stretch;
+  }
+  .reorder-item {
+    padding: 8px;
+  }
+  .reorder-title {
+    font-size: 0.9rem;
+  }
+}

@@ -122,6 +122,9 @@ export default function Navbar({ onMenu, drawerOpen }) {
               </div>
               <Link to="/" onClick={() => setMenuOpen(false)}>Dashboard</Link>
               <Link to="/chat" onClick={() => setMenuOpen(false)}>AI Tutor</Link>
+              {user.role === 'ADMIN' && (
+                <Link to="/admin/reorder" onClick={() => setMenuOpen(false)}>🔀 Reorder Lessons</Link>
+              )}
               <button
                 onClick={() => {
                   logout();

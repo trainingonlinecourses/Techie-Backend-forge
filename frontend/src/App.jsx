@@ -17,6 +17,7 @@ import NotFound from './pages/NotFound.jsx';
 import QuizPage from './pages/QuizPage.jsx';
 import CertificatePage from './pages/CertificatePage.jsx';
 import ProgressPage from './pages/ProgressPage.jsx';
+import AdminReorderPage from './pages/AdminReorderPage.jsx';
 
 function Protected({ children }) {
   const { user, loading } = useAuth();
@@ -80,6 +81,7 @@ export default function App() {
             <Route path="/certificates" element={<CertificatePage />} />
             <Route path="/certificates/verify/:code" element={<CertificatePage />} />
             <Route path="/progress" element={<ProgressPage />} />
+            <Route path="/admin/reorder" element={<Protected><AdminReorderPage /></Protected>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </main>
