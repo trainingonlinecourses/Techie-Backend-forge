@@ -17,6 +17,6 @@ public interface LessonRepository extends JpaRepository<Lesson, String> {
 
     /** Summary fields only (no body, no topics/docs collections) — the curriculum tree. */
     @Query("select new com.backendforge.academy.content.LessonSummaryData(" +
-            "l.id, l.moduleId, l.title, l.summary, l.orderIndex, l.minutes, l.capstone) from Lesson l")
+            "l.id, l.moduleId, l.title, l.summary, l.orderIndex, l.minutes, l.capstone) from Lesson l order by l.moduleId, l.orderIndex")
     List<LessonSummaryData> findAllSummaries();
 }

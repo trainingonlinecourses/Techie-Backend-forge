@@ -60,7 +60,7 @@ export default function ModulePage() {
       </div>
 
       <div className="lessongrid">
-        {lessons.map((l) => (
+        {[...lessons].sort((a, b) => a.order - b.order).map((l) => (
           <Link key={l.id} to={`/lessons/${l.id}`} className={`lessoncard ${progress[l.id] ? 'done' : ''}`}>
             <span className="lc-num">{progress[l.id] ? '✓' : l.order}</span>
             <div className="lc-body">

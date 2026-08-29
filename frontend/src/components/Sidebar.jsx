@@ -42,7 +42,7 @@ export default function Sidebar({ progress }) {
               </span>
             </Link>
             <div className="modlessons">
-              {m.lessons.map((l) => (
+              {[...m.lessons].sort((a, b) => a.order - b.order).map((l) => (
                 <Link
                   key={l.id}
                   to={`/lessons/${l.id}`}

@@ -49,7 +49,9 @@ public class ContentService {
         Map<String, List<LessonSummaryData>> byModule = lessons.findAllSummaries().stream()
                 .collect(Collectors.groupingBy(LessonSummaryData::moduleId));
         return mods.stream().map(m -> {
-            List<LessonSummaryData> ls = byModule.getOrDefault(m.getId(), List.of());
+            List<LessonSummaryData> ls = byModule.getOrDefault(m.getId(), List.of()).stream()
+                    .sorted(Comparator.comparingInt(LessonSummaryData::order))
+                    .toList();
             List<LessonSummaryDto> summaries = ls.stream()
                     .map(l -> LessonSummaryDto.from(l, titles.get(l.moduleId())))
                     .toList();
