@@ -7,6 +7,7 @@ topics: ["synchronized", "ReentrantLock", "atomic classes", "volatile", "visibil
 docs:
   - title: "Locks in Java"
     url: "https://docs.oracle.com/en/java/javase/21/core/concurrency.html"
+summary: Concurrency bugs are invisible: no compile error, no crash — just wrong results under load. This lesson covers the three pillars — atomicity (indiv...
 ---
 
 # Locks, Atomicity and Visibility

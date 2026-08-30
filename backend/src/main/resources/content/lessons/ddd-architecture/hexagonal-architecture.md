@@ -7,6 +7,7 @@ topics: ["hexagonal", "ports", "adapters", "domain isolation", "dependency rule"
 docs:
   - title: "Hexagonal architecture"
     url: "https://alistair.cockburn.us/hexagonal-architecture/"
+summary: Hexagonal architecture (also called Ports & Adapters) puts the domain at the center, surrounded by ports (interfaces) and adapters (implementations...
 ---
 
 # Hexagonal Architecture (Ports & Adapters)

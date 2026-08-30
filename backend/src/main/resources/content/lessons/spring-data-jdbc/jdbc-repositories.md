@@ -7,6 +7,7 @@ topics: ["Spring Data JDBC", "aggregates", "repositories", "derived queries", "n
 docs:
   - title: "Spring Data JDBC reference"
     url: "https://docs.spring.io/spring-data/jdbc/reference/"
+summary: JPA (covered in the Data JPA module) is a full objectrelational mapper: it manages a persistence context, tracks entity changes, and generates SQL....
 ---
 
 # Spring Data JDBC — Repositories Without JPA

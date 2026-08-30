@@ -7,6 +7,7 @@ topics: ["resource naming", "HTTP verbs", "status codes", "idempotency", "REST c
 docs:
   - title: "Spring REST reference"
     url: "https://docs.spring.io/spring-framework/reference/web/webmvc.html"
+summary: REST is a set of architectural constraints, not a URL style guide. This lesson covers the five constraints, what they imply for Spring controllers,...
 ---
 
 # REST API Design Fundamentals

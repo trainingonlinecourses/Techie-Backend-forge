@@ -7,6 +7,7 @@ topics: ["contract-first", "API design", "spec-first", "code generation", "break
 docs:
   - title: "OpenAPI Generator"
     url: "https://openapi-generator.tech/"
+summary: Most APIs are built codefirst: the backend team writes controllers, then (maybe) documentation follows. The frontend team waits, guesses, and chase...
 ---
 
 # Contract-First Design — The API as the Agreement

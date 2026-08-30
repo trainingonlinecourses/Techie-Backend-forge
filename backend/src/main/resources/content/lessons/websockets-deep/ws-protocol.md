@@ -7,6 +7,7 @@ topics: ["WebSocket", "handshake", "frames", "full-duplex", "vs HTTP polling", "
 docs:
   - title: "RFC 6455 — The WebSocket Protocol"
     url: "https://datatracker.ietf.org/doc/html/rfc6455"
+summary: HTTP is a requestresponse protocol: the client asks, the server answers, the connection closes (or idles). For realtime features — chat, live notif...
 ---
 
 # The WebSocket Protocol — Full-Duplex Over One Connection

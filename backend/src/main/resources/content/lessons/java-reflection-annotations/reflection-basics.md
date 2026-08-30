@@ -9,6 +9,7 @@ docs:
     url: "https://docs.oracle.com/javase/tutorial/reflect/index.html"
   - title: "Class (Java SE API)"
     url: "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Class.html"
+summary: Normally, a program works with objects: you call methods, read fields, pass values. Reflection is the ability of a running program to inspect itsel...
 ---
 
 # Reflection Basics — Inspecting Classes at Runtime

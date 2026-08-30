@@ -7,6 +7,7 @@ topics: ["branches", "merge", "conflicts", "fast-forward", "checkout", "feature 
 docs:
   - title: "Git branching (Pro Git book)"
     url: "https://git-scm.com/book/en/v2/Git-Branching-Branches-in-a-Nutshell"
+summary: A branch is a movable label on a commit — a separate timeline of work. The default branch is main (the "official" line). When you create a branch, ...
 ---
 
 # Branching and Merging — Parallel Work, Joined History

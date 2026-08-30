@@ -7,6 +7,7 @@ topics: ["normal forms", "1NF", "2NF", "3NF", "data redundancy", "update anomali
 docs:
   - title: "Database normalization (Wikipedia)"
     url: "https://en.wikipedia.org/wiki/Database_normalization"
+summary: Why bother? Consider what happens with redundant data:
 ---
 
 # Normalization — Designing Tables That Don't Lie

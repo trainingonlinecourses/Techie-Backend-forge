@@ -7,6 +7,7 @@ topics: ["DIP", "dependency injection", "abstractions", "high-level vs low-level
 docs:
   - title: "Dependency inversion principle (Wikipedia)"
     url: "https://en.wikipedia.org/wiki/Dependency_inversion_principle"
+summary: The Dependency Inversion Principle (the D in SOLID) has two rules:
 ---
 
 # DIP — Dependency Inversion Principle

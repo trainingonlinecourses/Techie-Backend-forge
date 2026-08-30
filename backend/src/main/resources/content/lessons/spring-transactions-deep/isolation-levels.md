@@ -7,6 +7,7 @@ topics: ["isolation levels", "dirty reads", "non-repeatable reads", "phantom rea
 docs:
   - title: "Isolation"
     url: "https://docs.spring.io/spring-framework/reference/data-access/transaction/declarative/tx-propagation.html"
+summary: Isolation controls what a transaction sees of other transactions' uncommitted changes. The four levels trade consistency against concurrency, and t...
 ---
 
 # Isolation Levels and Locking

@@ -7,6 +7,7 @@ topics: ["EXPLAIN", "query tuning", "connection pooling", "work_mem", "vacuum", 
 docs:
   - title: "PostgreSQL performance"
     url: "https://www.postgresql.org/docs/current/performance-tips.html"
+summary: A slow database is almost never "Postgres is slow" — it's a missing index, a runaway query, a connection pool exhausted, or bloat from unvacuumed t...
 ---
 
 # Postgres Performance Tuning

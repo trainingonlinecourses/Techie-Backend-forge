@@ -7,6 +7,7 @@ topics: ["clean architecture", "dependency rule", "use cases", "entities", "boun
 docs:
   - title: "Clean architecture"
     url: "https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html"
+summary: Clean Architecture (Uncle Bob) generalizes hexagonal: concentric circles of responsibility, with the dependency rule — source code dependencies poi...
 ---
 
 # Clean Architecture and the Dependency Rule

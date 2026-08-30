@@ -7,6 +7,7 @@ topics: ["string pool", "intern", "heap vs pool", "memory", "literals"]
 docs:
   - title: "String.intern()"
     url: "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html#intern()"
+summary: Imagine a library where every patron writes their name on the membership card — and every time they visit, a new card is printed even though the na...
 ---
 
 # The String Pool and intern()

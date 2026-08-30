@@ -7,6 +7,7 @@ topics: ["composition", "andThen", "compose", "currying", "partial application",
 docs:
   - title: "Function (Java SE API)"
     url: "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/function/Function.html"
+summary: A Function<T,R is a single brick: "T in, R out." Real programs need multistep processing — clean, validate, transform, format. Two ways to do that:
 ---
 
 # Composing Functions — Building Pipelines from Small Pieces

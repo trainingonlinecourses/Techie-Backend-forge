@@ -7,6 +7,7 @@ topics: ["rollbackFor", "noRollbackFor", "checked exceptions", "transaction boun
 docs:
   - title: "Rollback rules"
     url: "https://docs.spring.io/spring-framework/reference/data-access/transaction/declarative/tx-annotation.html"
+summary: @Transactional rolls back on RuntimeException — and not on checked exceptions. That one default causes more "committed when it should have rolled b...
 ---
 
 # Rollback Rules and the Transaction Boundary

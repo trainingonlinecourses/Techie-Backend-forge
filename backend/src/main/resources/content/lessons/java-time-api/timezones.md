@@ -7,6 +7,7 @@ topics: ["ZonedDateTime", "ZoneId", "UTC offset", "DST", "time zone conversions"
 docs:
   - title: "ZonedDateTime (Java SE API)"
     url: "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/time/ZonedDateTime.html"
+summary: "3:30 PM" is not a moment — it's a local clock reading. To pin it to the timeline you must add where: 3:30 PM in which place? That's what a time zo...
 ---
 
 # Time Zones and ZonedDateTime — "Where" Matters

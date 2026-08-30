@@ -7,6 +7,7 @@ topics: ["STOMP", "message broker", "destinations", "subscriptions", "@MessageMa
 docs:
   - title: "Using STOMP over WebSocket (Spring docs)"
     url: "https://docs.spring.io/spring-framework/reference/web/websocket/stomp.html"
+summary: Raw WebSockets give you frames — but no routing, no topics, no requestreply, no "subscribe to a channel". You end up handrolling a miniprotocol (th...
 ---
 
 # STOMP — Messaging Semantics on Top of WebSocket

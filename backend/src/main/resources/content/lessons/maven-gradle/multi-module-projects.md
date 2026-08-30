@@ -7,6 +7,7 @@ topics: ["multi-module Maven", "reactor", "module boundaries", "dependency graph
 docs:
   - title: "Maven multi-module"
     url: "https://maven.apache.org/guides/mini/guide-multiple-modules.html"
+summary: As projects grow, one flat module becomes a tangle: the domain leaks into web controllers, tests drag in every dependency, and "where does this bel...
 ---
 
 # Multi-Module Builds

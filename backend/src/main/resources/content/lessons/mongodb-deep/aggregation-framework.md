@@ -9,6 +9,7 @@ docs:
     url: "https://www.mongodb.com/docs/manual/core/aggregation-pipeline/"
   - title: "Aggregation Stages (MongoDB Manual)"
     url: "https://www.mongodb.com/docs/manual/reference/operator/aggregation-pipeline/"
+summary: MongoDB's find handles simple queries, but real reporting needs aggregation: grouping, summing, averaging, counting, joining collections, reshaping...
 ---
 
 # The Aggregation Framework — Pipelines, Grouping, and Joins

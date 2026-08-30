@@ -7,6 +7,7 @@ topics: ["strategy", "polymorphism", "composition over inheritance", "algorithm 
 docs:
   - title: "Strategy (Refactoring Guru)"
     url: "https://refactoring.guru/design-patterns/strategy"
+summary: Your checkout needs discounts. Rules so far:
 ---
 
 # Strategy Pattern — Swapping Algorithms at Runtime

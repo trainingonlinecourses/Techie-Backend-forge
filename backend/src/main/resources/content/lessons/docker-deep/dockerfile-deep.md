@@ -7,6 +7,7 @@ topics: ["Dockerfile", "multi-stage builds", "base images", "layers", "build con
 docs:
   - title: "Dockerfile reference"
     url: "https://docs.docker.com/reference/dockerfile/"
+summary: A Docker image is a frozen snapshot of an application and everything it needs to run: the OS libraries, the runtime (JRE), the app's code, the conf...
 ---
 
 # The Dockerfile — Building Reproducible Images

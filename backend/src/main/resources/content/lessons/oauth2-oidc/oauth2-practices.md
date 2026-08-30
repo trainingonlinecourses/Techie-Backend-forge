@@ -9,6 +9,7 @@ docs:
     url: "https://datatracker.ietf.org/doc/html/rfc6749#section-6"
   - title: "OAuth 2.0 Security Best Practices (draft-ietf)"
     url: "https://datatracker.ietf.org/doc/html/draft-ietf-oauth-security-topics"
+summary: The previous lessons covered getting tokens. Production is about managing them: what happens when the access token expires (refresh tokens), how to...
 ---
 
 # OAuth2 Production Practices — Refresh Tokens, Rotation, and Security

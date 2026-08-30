@@ -7,6 +7,7 @@ topics: ["primary keys", "foreign keys", "one-to-many", "many-to-many", "one-to-
 docs:
   - title: "PostgreSQL keys and constraints"
     url: "https://www.postgresql.org/docs/current/ddl-constraints.html"
+summary: A database table is a list of records, but a relational database earns its name from how records refer to each other. Two kinds of keys make this w...
 ---
 
 # Relationships and Keys — The Anatomy of a Schema

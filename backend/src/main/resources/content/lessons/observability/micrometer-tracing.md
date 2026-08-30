@@ -7,6 +7,7 @@ topics: ["traces", "spans", "Micrometer Tracing", "Brave", "Zipkin", "trace cont
 docs:
   - title: "Tracing"
     url: "https://docs.spring.io/spring-boot/reference/actuator/tracing.html"
+summary: Logs say what happened on one node. Traces say what happened across the whole request — every service, every database call, every queue hop. Microm...
 ---
 
 # Distributed Tracing with Micrometer Tracing

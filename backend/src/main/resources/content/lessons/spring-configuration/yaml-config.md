@@ -7,6 +7,7 @@ topics: ["YAML", "application.yml", "structured config", "lists and maps", "mult
 docs:
   - title: "YAML configuration (Spring Boot docs)"
     url: "https://docs.spring.io/spring-boot/reference/features/external-config.html#features.external-config.files"
+summary: application.properties is a flat list of key=value lines. As config grows, that gets repetitive and hard to group:
 ---
 
 # YAML Configuration — Structured and Readable

@@ -7,6 +7,7 @@ topics: ["starters", "dependencies", "spring-boot-starter", "version management"
 docs:
   - title: "Starters (Spring Boot docs)"
     url: "https://docs.spring.io/spring-boot/reference/using/build-systems.html#using.build-systems.starters"
+summary: In raw Spring (no Boot), wiring up a web app meant adding half a dozen dependencies by hand — springwebmvc, springcontext, jacksondatabind, tomcate...
 ---
 
 # Starters — Curated Dependency Bundles

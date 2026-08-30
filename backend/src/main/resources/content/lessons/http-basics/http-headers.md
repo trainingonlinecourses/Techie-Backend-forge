@@ -7,6 +7,7 @@ topics: ["headers", "Content-Type", "Authorization", "Accept", "CORS", "caching 
 docs:
   - title: "RFC 9110 — Fields (headers)"
     url: "https://datatracker.ietf.org/doc/html/rfc9110#section-5"
+summary: Every HTTP message has a body (the content) and headers — the metadata that tells both sides how to interpret it: what format the body is in, who's...
 ---
 
 # HTTP Headers — The Metadata of Every Request and Response

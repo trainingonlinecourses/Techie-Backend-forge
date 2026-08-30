@@ -9,6 +9,7 @@ docs:
     url: "https://datatracker.ietf.org/doc/html/rfc6749#section-4.1"
   - title: "PKCE (RFC 7636)"
     url: "https://datatracker.ietf.org/doc/html/rfc7636"
+summary: The authorization code flow is the workhorse of OAuth2 — the flow behind every "Sign in with Google / GitHub / Apple" button. Its genius is a twost...
 ---
 
 # The Authorization Code Flow — With PKCE

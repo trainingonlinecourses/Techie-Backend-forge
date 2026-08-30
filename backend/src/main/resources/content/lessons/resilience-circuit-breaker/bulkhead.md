@@ -7,6 +7,7 @@ topics: ["bulkhead", "isolation", "thread pools", "semaphores", "blast radius", 
 docs:
   - title: "Resilience4j Bulkhead"
     url: "https://resilience4j.readme.io/docs/bulkhead"
+summary: A bulkhead (in shipbuilding) is a partition inside the hull: if one compartment floods, the others stay dry and the ship floats. The software patte...
 ---
 
 # Bulkhead — Containing a Slow Dependency

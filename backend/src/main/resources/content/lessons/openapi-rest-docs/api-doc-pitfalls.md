@@ -7,6 +7,7 @@ topics: ["doc pitfalls", "DTO hygiene", "examples", "deprecation", "changelog", 
 docs:
   - title: "API documentation best practices (GitHub)"
     url: "https://github.com/tiimgreen/github-cheat-sheet"
+summary: Your API's documentation is the first impression a consumer has of your product. Bad docs cost real money: developers abandon APIs they can't figur...
 ---
 
 # API Documentation — Pitfalls and Best Practices

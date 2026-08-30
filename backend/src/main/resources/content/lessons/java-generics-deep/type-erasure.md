@@ -9,6 +9,7 @@ docs:
     url: "https://docs.oracle.com/javase/tutorial/java/generics/erasure.html"
   - title: "Effects of Type Erasure (Dev.java)"
     url: "https://dev.java/learn/generics/type-erasure/"
+summary: Here is the single most important fact about Java generics, and almost every "weird" generics error traces back to it: the JVM has no idea generics...
 ---
 
 # Type Erasure — What the JVM Actually Sees

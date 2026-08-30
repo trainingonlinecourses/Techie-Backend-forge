@@ -9,6 +9,7 @@ docs:
     url: "https://jwt.io/introduction"
   - title: "JSON Web Token (RFC 7519)"
     url: "https://datatracker.ietf.org/doc/html/rfc7519"
+summary: OAuth2 access tokens come in two flavors: opaque (random strings the resource server must look up at the auth server) and JWT (selfcontained JSON t...
 ---
 
 # JWT as Access Tokens — Structure, Signing, and Validation

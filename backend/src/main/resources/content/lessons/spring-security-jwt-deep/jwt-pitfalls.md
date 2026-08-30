@@ -7,6 +7,7 @@ topics: ["alg confusion", "secret management", "token theft", "XSS", "CSRF", "ha
 docs:
   - title: "JSON Web Token attacks (OWASP)"
     url: "https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/06-Session_Management_Testing/10-Testing_for_JSON_Web_Tokens"
+summary: A JWT's trust model rests on one assumption: only the server can produce a valid signature. Every JWT vulnerability is ultimately a way to violate ...
 ---
 
 # JWT Security — The Attacks and the Fixes

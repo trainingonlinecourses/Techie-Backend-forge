@@ -7,6 +7,7 @@ topics: ["CacheManager", "@Cacheable", "cache regions", "proxy behavior", "cache
 docs:
   - title: "Cache Abstraction"
     url: "https://docs.spring.io/spring-framework/reference/integration/cache.html"
+summary: Spring's cache abstraction decouples your code from any concrete cache — you annotate methods with @Cacheable and Spring handles store/retrieve thr...
 ---
 
 # The Spring Cache Abstraction

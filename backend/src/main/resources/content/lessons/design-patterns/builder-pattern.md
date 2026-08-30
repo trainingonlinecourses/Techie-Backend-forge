@@ -7,6 +7,7 @@ topics: ["builder", "telescoping constructors", "fluent API", "immutability", "L
 docs:
   - title: "Builder (Refactoring Guru)"
     url: "https://refactoring.guru/design-patterns/builder"
+summary: Here's a real object that needs a lot of configuration: an EmailMessage with a recipient, subject, body, attachments, priority, and whether to trac...
 ---
 
 # Builder Pattern — Constructing Complex Objects Step by Step

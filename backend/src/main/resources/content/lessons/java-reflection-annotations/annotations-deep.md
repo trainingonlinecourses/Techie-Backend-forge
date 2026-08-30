@@ -9,6 +9,7 @@ docs:
     url: "https://docs.oracle.com/javase/tutorial/java/annotations/index.html"
   - title: "Declaring an Annotation Type (Java Tutorials)"
     url: "https://docs.oracle.com/javase/tutorial/java/annotations/declaring.html"
+summary: An annotation is metadata attached to code — a label on a class, method, field, or parameter. By itself, an annotation does nothing: it's inert dat...
 ---
 
 # Annotations Deep — Metadata the Compiler and Frameworks Read

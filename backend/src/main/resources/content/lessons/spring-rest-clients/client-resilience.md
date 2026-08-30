@@ -7,6 +7,7 @@ topics: ["retry", "timeout", "circuit breaker", "fallback", "idempotency", "Resi
 docs:
   - title: "Resilience4j (GitHub)"
     url: "https://resilience4j.readme.io/docs"
+summary: The single most important mindset for backendtobackend calls: the remote service will fail — it will be slow, return 500s, time out, or be unreacha...
 ---
 
 # Client Resilience — Timeouts, Retries, and Fallbacks

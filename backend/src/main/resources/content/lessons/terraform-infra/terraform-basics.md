@@ -9,6 +9,7 @@ docs:
     url: "https://developer.hashicorp.com/terraform/intro"
   - title: "Terraform Language Documentation"
     url: "https://developer.hashicorp.com/terraform/language"
+summary: Clicking through a cloud console to create servers, databases, and load balancers is fast — and unmanageable: nobody can review your clicks, reprod...
 ---
 
 # Terraform Basics — Infrastructure as Code

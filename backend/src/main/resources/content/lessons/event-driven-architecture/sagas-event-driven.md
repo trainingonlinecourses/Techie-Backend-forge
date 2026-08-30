@@ -9,6 +9,7 @@ docs:
     url: "https://microservices.io/patterns/data/saga.html"
   - title: "Saga (Microsoft Azure Architecture)"
     url: "https://learn.microsoft.com/en-us/azure/architecture/reference-architectures/saga/saga"
+summary: A business operation often spans several services: place an order (order service), reserve stock (inventory), charge the card (payment), schedule s...
 ---
 
 # Sagas in Event-Driven Systems — Compensating the Long Journey

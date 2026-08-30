@@ -9,6 +9,7 @@ docs:
     url: "https://docs.oracle.com/javase/tutorial/essential/exceptions/tryResourceClose.html"
   - title: "AutoCloseable (Java SE API)"
     url: "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/AutoCloseable.html"
+summary: File handles, network sockets, database connections — Java calls these resources, and every one of them is a limited, shared, kernelbacked thing. Y...
 ---
 
 # Try-with-Resources — Safe Resource Management

@@ -7,6 +7,7 @@ topics: ["LocalDate", "LocalTime", "calendar arithmetic", "Period", "Duration", 
 docs:
   - title: "LocalDate (Java SE API)"
     url: "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/time/LocalDate.html"
+summary: The word local in LocalDate/LocalTime is the whole story: these types describe a date or time as written on a calendar or clock, with no time zone ...
 ---
 
 # LocalDate and LocalTime — Calendar Dates and Clock Times

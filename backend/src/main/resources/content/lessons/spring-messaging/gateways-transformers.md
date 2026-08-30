@@ -7,6 +7,7 @@ topics: ["@MessagingGateway", "transformers", "routers", "splitters", "aggregato
 docs:
   - title: "Enterprise Integration Patterns"
     url: "https://www.enterpriseintegrationpatterns.com/"
+summary: Messaging systems have a set of recurring problems: how do I expose messaging to business code? How do I reshape a message? How do I route it based...
 ---
 
 # Gateways and Transformers — The Integration Toolkit

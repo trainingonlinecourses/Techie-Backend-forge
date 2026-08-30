@@ -9,6 +9,7 @@ docs:
     url: "https://kubernetes.io/docs/concepts/workloads/controllers/deployment/"
   - title: "Configure Liveness, Readiness and Startup Probes (kubernetes.io)"
     url: "https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/"
+summary: Pods are ephemeral — you almost never create them directly. You create workload controllers — objects that manage pods on your behalf — and the mos...
 ---
 
 # Pods, Deployments, and Workloads — Running and Updating Apps

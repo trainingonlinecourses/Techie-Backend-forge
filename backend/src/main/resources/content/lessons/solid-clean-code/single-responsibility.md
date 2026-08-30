@@ -7,6 +7,7 @@ topics: ["SRP", "single responsibility", "cohesion", "class design", "refactorin
 docs:
   - title: "SOLID (Wikipedia)"
     url: "https://en.wikipedia.org/wiki/SOLID"
+summary: The Single Responsibility Principle (the S in SOLID) says: a class should have one reason to change. It should do one job — and do it completely — ...
 ---
 
 # SRP — Single Responsibility Principle

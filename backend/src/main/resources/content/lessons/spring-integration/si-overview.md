@@ -9,6 +9,7 @@ docs:
     url: "https://docs.spring.io/spring-integration/reference/"
   - title: "Enterprise Integration Patterns (Gregor Hohpe)"
     url: "https://www.enterpriseintegrationpatterns.com/"
+summary: Systems don't live alone: a Spring Boot service must read files, call REST APIs, listen to queues, watch directories, poll databases, and transform...
 ---
 
 # Spring Integration — Enterprise Integration Patterns, In Spring

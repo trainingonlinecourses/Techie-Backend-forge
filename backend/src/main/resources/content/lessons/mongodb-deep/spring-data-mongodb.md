@@ -9,6 +9,7 @@ docs:
     url: "https://docs.spring.io/spring-data/mongodb/reference/"
   - title: "MongoRepository (Spring API)"
     url: "https://docs.spring.io/spring-data/mongodb/docs/current/api/org/springframework/data/mongodb/repository/MongoRepository.html"
+summary: Spring Data MongoDB brings the familiar Spring Data contract to MongoDB: repositories with derived queries, entity mapping via annotations, and a M...
 ---
 
 # Spring Data MongoDB — Repositories, Queries, and Mapping

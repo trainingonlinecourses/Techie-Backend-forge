@@ -9,6 +9,7 @@ docs:
     url: "https://json-schema.org/"
   - title: "Networknt JSON Schema Validator"
     url: "https://github.com/networknt/json-schema-validator"
+summary: Serialization handles shape; validation handles correctness. The JSON your API accepts isn't just wellformed — it must satisfy business rules: a to...
 ---
 
 # JSON Schema, Validation, and Integration Patterns

@@ -7,6 +7,7 @@ topics: ["@HttpExchange", "HTTP interface", "declarative client", "typed API", "
 docs:
   - title: "HTTP Interface (Spring docs)"
     url: "https://docs.spring.io/spring-framework/reference/integration/rest-clients.html#rest-http-interface"
+summary: All the clients so far (RestClient, WebClient) make you write the request mechanics at every call site: URI, method, retrieve, convert. HTTP interf...
 ---
 
 # HTTP Interface Clients — REST Calls as Java Interfaces

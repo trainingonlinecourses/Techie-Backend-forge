@@ -7,6 +7,7 @@ topics: ["virtual threads", "structured concurrency", "millions of threads", "pl
 docs:
   - title: "Virtual threads"
     url: "https://docs.oracle.com/en/java/javase/21/core/virtual-threads.html"
+summary: Virtual threads (Java 21) are the biggest concurrency change since lambdas: millions of lightweight threads that make blocking I/O cheap. The class...
 ---
 
 # Virtual Threads (Project Loom)

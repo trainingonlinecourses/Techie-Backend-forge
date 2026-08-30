@@ -7,6 +7,7 @@ topics: ["NOT NULL", "UNIQUE", "CHECK", "FOREIGN KEY", "constraint design", "dat
 docs:
   - title: "PostgreSQL constraints"
     url: "https://www.postgresql.org/docs/current/ddl-constraints.html"
+summary: Application validation is the first line of defense — but it's not enough. Every app has bugs, every API has a path you forgot to validate, every f...
 ---
 
 # Constraints — The Database Refuses Bad Data

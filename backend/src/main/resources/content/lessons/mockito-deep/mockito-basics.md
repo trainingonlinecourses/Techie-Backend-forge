@@ -9,6 +9,7 @@ docs:
     url: "https://javadoc.io/doc/org.mockito/mockito-core/latest/org/mockito/Mockito.html"
   - title: "Mockito Reference (site.mockito.org)"
     url: "https://site.mockito.org/"
+summary: A unit test isolates one class. But real classes depend on other classes — repositories, web clients, clocks — and those dependencies bring their o...
 ---
 
 # Mockito Basics — Mocks, Stubs, and the Test Double

@@ -7,6 +7,7 @@ topics: ["AOP concepts", "cross-cutting concerns", "join points", "advice"]
 docs:
   - title: "Aspect-Oriented Programming with Spring"
     url: "https://docs.spring.io/spring-framework/reference/core/aop.html"
+summary: AspectOriented Programming (AOP) complements ObjectOriented Programming (OOP) by providing another way to think about program structure. Where OOP'...
 ---
 
 # Aspect-Oriented Programming: The Big Picture

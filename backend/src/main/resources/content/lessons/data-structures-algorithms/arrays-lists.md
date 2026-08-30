@@ -9,6 +9,7 @@ docs:
     url: "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/ArrayList.html"
   - title: "LinkedList (Java SE API)"
     url: "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/LinkedList.html"
+summary: An array and a linked list both store a sequence of elements — but they organize memory in fundamentally different ways, and that difference decide...
 ---
 
 # Arrays and Lists — Contiguous Memory vs Linked Nodes

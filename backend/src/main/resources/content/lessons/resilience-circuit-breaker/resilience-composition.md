@@ -7,6 +7,7 @@ topics: ["pattern composition", "timeout", "fallback", "resilience stack", "degr
 docs:
   - title: "Resilience4j documentation"
     url: "https://resilience4j.readme.io/"
+summary: No single pattern is enough. A complete resilience story composes five layers, each with a distinct job:
 ---
 
 # Composing Resilience — Timeout, Retry, Breaker, Bulkhead, Fallback

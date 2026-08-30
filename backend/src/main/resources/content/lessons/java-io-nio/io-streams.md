@@ -7,6 +7,7 @@ topics: ["InputStream", "OutputStream", "byte streams", "buffering", "try-with-r
 docs:
   - title: "java.io package summary"
     url: "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/io/package-summary.html"
+summary: Think of water flowing through a pipe. You don't load the entire ocean into the pipe at once — water arrives continuously, in whatever amount the p...
 ---
 
 # I/O Streams — Bytes and the Stream Model

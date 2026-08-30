@@ -9,6 +9,7 @@ docs:
     url: "https://docs.oracle.com/javase/tutorial/essential/exceptions/catchOrDeclare.html"
   - title: "Unchecked Exceptions — The Controversy (Java Tutorials)"
     url: "https://docs.oracle.com/javase/tutorial/essential/exceptions/runtime.html"
+summary: Every method in Java has an implicit contract: "what can go wrong here, and who deals with it?" Checked and unchecked exceptions are the two ways J...
 ---
 
 # Checked vs Unchecked — When the Compiler Forces Your Hand

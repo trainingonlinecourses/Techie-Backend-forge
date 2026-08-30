@@ -7,6 +7,7 @@ topics: ["springdoc-openapi", "swagger config", "OpenAPI bean", "security scheme
 docs:
   - title: "springdoc-openapi documentation"
     url: "https://springdoc.org/"
+summary: Most apps need nothing beyond the dependency. The configuration work begins when you want to customize: the API's metadata (title, version, descrip...
 ---
 
 # Springdoc — OpenAPI in Spring Boot

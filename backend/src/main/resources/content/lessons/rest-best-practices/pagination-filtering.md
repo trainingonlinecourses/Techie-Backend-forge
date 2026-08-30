@@ -7,6 +7,7 @@ topics: ["Pageable", "Page", "offset vs cursor", "filtering", "sorting", "pagina
 docs:
   - title: "Spring Data web support"
     url: "https://docs.spring.io/spring-data/commons/reference/repositories/core-domain-events.html#core.web"
+summary: Unbounded list endpoints are a performance and UX bug: a GET /api/courses that returns 100,000 rows chokes the DB, the network, and the client. Pag...
 ---
 
 # Pagination, Filtering and Sorting

@@ -9,6 +9,7 @@ docs:
     url: "https://docs.spring.io/spring-boot/reference/packaging/native-image/index.html"
   - title: "GraalVM Hints and AOT (Spring docs)"
     url: "https://docs.spring.io/spring-boot/reference/packaging/native-image/advanced-topics.html"
+summary: Raw GraalVM native image on a Spring Boot app used to be a heroic configuration exercise — handwritten metadata for every framework feature. Spring...
 ---
 
 # Spring Boot Native — The Automated Path

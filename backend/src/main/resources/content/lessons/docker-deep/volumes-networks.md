@@ -7,6 +7,7 @@ topics: ["volumes", "bind mounts", "bridge networks", "container networking", "d
 docs:
   - title: "Manage data in Docker"
     url: "https://docs.docker.com/storage/"
+summary: Two facts shape everything about running containers:
 ---
 
 # Volumes and Networks — State and Connectivity

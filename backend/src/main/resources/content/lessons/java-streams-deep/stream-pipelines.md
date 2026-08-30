@@ -7,6 +7,7 @@ topics: ["lazy evaluation", "intermediate operations", "terminal operations", "s
 docs:
   - title: "Stream API"
     url: "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/stream/package-summary.html"
+summary: Streams look like fluent chains — but understanding them as lazy, pullbased pipelines is what separates working code from code that's correct by ac...
 ---
 
 # Stream Pipelines Under the Hood

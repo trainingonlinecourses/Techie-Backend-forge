@@ -7,6 +7,7 @@ topics: ["MockMvc builders", "perform andExpect", "jsonPath", "request builders"
 docs:
   - title: "Testing with MockMvc"
     url: "https://docs.spring.io/spring-framework/reference/testing/spring-mvc-test-framework.html"
+summary: MockMvc is the Swissarmy knife of Spring MVC testing: it drives the full dispatcher — mapping, validation, converters, interceptors, exception hand...
 ---
 
 # MockMvc Deep Dive

@@ -7,6 +7,7 @@ topics: ["lambdas", "anonymous classes", "behavior passing", "syntax", "effectiv
 docs:
   - title: "Lambda expressions (Java tutorial)"
     url: "https://docs.oracle.com/javase/tutorial/java/javaOO/lambdaexpressions.html"
+summary: Imagine a cooking show. The host doesn't tell you exactly how to chop every vegetable each episode — she says "and now, chop the onions" and hands ...
 ---
 
 # Lambda Expressions — Passing Behavior as Data

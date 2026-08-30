@@ -7,6 +7,7 @@ topics: ["@CachePut", "@CacheEvict", "cache invalidation", "write-through", "con
 docs:
   - title: "Cache annotation reference"
     url: "https://docs.spring.io/spring-framework/reference/integration/cache.html#cache-annotations"
+summary: @Cacheable only reads. Writes need @CachePut (update the cache alongside the write) and @CacheEvict (invalidate). Choosing the right one — and the ...
 ---
 
 # @CachePut, @CacheEvict and Cache Consistency

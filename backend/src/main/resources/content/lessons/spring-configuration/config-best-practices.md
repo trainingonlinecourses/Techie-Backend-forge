@@ -7,6 +7,7 @@ topics: ["config design", "secrets management", "12-factor", "fail-fast", "docum
 docs:
   - title: "The Twelve-Factor App — Config"
     url: "https://12factor.net/config"
+summary: Every config decision you make shapes how your app behaves in production — and whether your ops team (or future you) can operate it. Bad config des...
 ---
 
 # Configuration Best Practices — Designing for Operability

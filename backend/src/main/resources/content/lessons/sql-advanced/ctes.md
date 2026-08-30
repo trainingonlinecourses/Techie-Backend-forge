@@ -9,6 +9,7 @@ docs:
     url: "https://www.postgresql.org/docs/current/queries-with.html"
   - title: "WITH (Common Table Expressions) (SQLite docs)"
     url: "https://sqlite.org/lang_with.html"
+summary: A common table expression (CTE) lets you name a subquery and use it like a table in the rest of the query. Written with WITH, it turns a wall of ne...
 ---
 
 # Common Table Expressions — WITH, Recursion, and Query Structure

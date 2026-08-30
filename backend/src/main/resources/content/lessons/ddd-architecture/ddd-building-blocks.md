@@ -7,6 +7,7 @@ topics: ["domain model", "entities", "value objects", "aggregates", "repositorie
 docs:
   - title: "DDD reference"
     url: "https://martinfowler.com/tags/domain%20driven%20design.html"
+summary: DomainDriven Design is about putting the business rules in the code — not in a service layer full of getters and setters. The building blocks (enti...
 ---
 
 # DDD Building Blocks

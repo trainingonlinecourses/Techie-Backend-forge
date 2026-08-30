@@ -9,6 +9,7 @@ docs:
     url: "https://docs.spring.io/spring-integration/reference/file.html"
   - title: "HTTP Support (Spring Integration Reference)"
     url: "https://docs.spring.io/spring-integration/reference/http.html"
+summary: Everything so far has been inprocess: messages flowing through channels and stations inside your JVM. The real world is outside: files on disk, HTT...
 ---
 
 # Adapters — Connecting to Files, HTTP, JDBC, and Messaging Systems

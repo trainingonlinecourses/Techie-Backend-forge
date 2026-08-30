@@ -7,6 +7,7 @@ topics: ["aggregate design", "consistency boundary", "transaction scope", "aggre
 docs:
   - title: "Aggregates"
     url: "https://martinfowler.com/bliki/DDD_Aggregate.html"
+summary: The aggregate is DDD's most consequential (and most misused) idea: it defines the consistency boundary — the set of objects that change together at...
 ---
 
 # Aggregates in Practice

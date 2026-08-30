@@ -7,6 +7,7 @@ topics: ["git", "commits", "staging", "repositories", "history", "version contro
 docs:
   - title: "Git documentation"
     url: "https://git-scm.com/doc"
+summary: The core mental model — Git stores snapshots, not changes:
 ---
 
 # Git Basics — The Snapshot Machine

@@ -7,6 +7,7 @@ topics: ["SQL", "joins", "aggregations", "window functions", "CTEs", "query stru
 docs:
   - title: "PostgreSQL documentation"
     url: "https://www.postgresql.org/docs/current/queries.html"
+summary: SQL is the most important language most backend developers write least well. This lesson covers the parts that actually matter in production Spring...
 ---
 
 # SQL Fundamentals for Backend Developers

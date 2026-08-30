@@ -7,6 +7,7 @@ topics: ["@WebMvcTest", "@DataJpaTest", "@JsonTest", "test slicing", "context ca
 docs:
   - title: "Testing slices"
     url: "https://docs.spring.io/spring-boot/reference/testing/spring-boot-applications.html#testing.applying-slices"
+summary: @SpringBootTest boots the whole application — every bean, every autoconfiguration. That's slow (30s+ per context) and brittle. Test slices boot onl...
 ---
 
 # Spring Boot Test Slices

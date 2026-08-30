@@ -7,6 +7,7 @@ topics: ["propagation", "REQUIRED", "REQUIRES_NEW", "NESTED", "MANDATORY", "NOT_
 docs:
   - title: "Transaction propagation"
     url: "https://docs.spring.io/spring-framework/reference/data-access/transaction/declarative/tx-propagation.html"
+summary: Propagation defines how a transactional method joins an existing transaction — join it, suspend it, or demand it. Getting this right is what makes ...
 ---
 
 # Transaction Propagation Explained

@@ -7,6 +7,7 @@ topics: ["persistence context", "entity lifecycle", "dirty checking", "flush", "
 docs:
   - title: "Hibernate persistence context"
     url: "https://docs.jboss.org/hibernate/orm/current/userguide/html_single/Hibernate_User_Guide.html#pc"
+summary: JPA's magic — "I changed the field and it saved itself" — is the persistence context at work: a firstlevel cache that tracks entities, detects chan...
 ---
 
 # The Persistence Context and Dirty Checking

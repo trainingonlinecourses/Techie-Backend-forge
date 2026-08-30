@@ -9,6 +9,7 @@ docs:
     url: "https://kafka.apache.org/documentation/#operations"
   - title: "Kafka Monitoring (Kafka docs)"
     url: "https://kafka.apache.org/documentation/#monitoring"
+summary: The client APIs are the easy part — the hard part is that Kafka is a distributed system you operate: brokers to configure, topics to create and siz...
 ---
 
 # Kafka Operations — Admin, Monitoring, and Production Hardening

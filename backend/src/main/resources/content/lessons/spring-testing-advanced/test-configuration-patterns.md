@@ -7,6 +7,7 @@ topics: ["@TestConfiguration", "@MockBean", "profile isolation", "context cachin
 docs:
   - title: "Testing configuration"
     url: "https://docs.spring.io/spring-boot/reference/testing/spring-boot-applications.html"
+summary: The hardest part of testing Spring isn't writing assertions — it's configuring the context so tests are fast, isolated, and deterministic. This les...
 ---
 
 # Test Configuration & Isolation Patterns

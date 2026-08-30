@@ -7,6 +7,7 @@ topics: ["ER diagrams", "entities", "attributes", "cardinality", "schema design 
 docs:
   - title: "Entity–relationship model (Wikipedia)"
     url: "https://en.wikipedia.org/wiki/Entity%E2%80%93relationship_model"
+summary: An entityrelationship (ER) model is a diagram of your domain before it becomes SQL: the entities (things that exist: Student, Course, Lesson), thei...
 ---
 
 # ER Modeling — From Requirements to Tables

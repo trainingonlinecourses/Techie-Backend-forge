@@ -7,6 +7,7 @@ topics: ["business metrics", "metric naming", "cardinality", "@Timed", "meter fi
 docs:
   - title: "Metrics"
     url: "https://docs.spring.io/spring-boot/reference/actuator/metrics.html"
+summary: Platform metrics (JVM, HTTP, connection pools) come free. Business metrics — the numbers your product team asks about — must be added by you. This ...
 ---
 
 # Custom Metrics That Matter

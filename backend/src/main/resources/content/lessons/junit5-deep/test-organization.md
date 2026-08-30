@@ -9,6 +9,7 @@ docs:
     url: "https://martinfowler.com/articles/practical-test-pyramid.html"
   - title: "Unit Testing Principles (Pragmatic Programmer)"
     url: "https://pragprog.com/titles/utp2/unit-testing-principles-practices-and-patterns/"
+summary: A test suite isn't "a bunch of tests" — it's a portfolio with a strategy. The testing pyramid is the strategy the industry converged on: many fast ...
 ---
 
 # Test Organization — Unit, Integration, and the Testing Pyramid

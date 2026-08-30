@@ -9,6 +9,7 @@ docs:
     url: "https://docs.oracle.com/javase/tutorial/java/modules/index.html"
   - title: "Understanding Module Declarations (Oracle)"
     url: "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/module/package-summary.html"
+summary: Before Java 9, "encapsulation" was a convention: private fields stopped your code, but any library could call setAccessible(true) and reach into an...
 ---
 
 # Reflection and the Module System — Opens and Exports

@@ -9,6 +9,7 @@ docs:
     url: "https://aws.amazon.com/event-driven-architecture/"
   - title: "What is Event-Driven Architecture? (Confluent)"
     url: "https://developer.confluent.io/learn/event-driven-architecture/"
+summary: Traditional (requestdriven) architecture is built on commands: service A calls service B and waits — "please create the invoice, here's the order."...
 ---
 
 # Event-Driven Architecture — The Shift From Calls to Facts

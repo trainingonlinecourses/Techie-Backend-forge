@@ -9,6 +9,7 @@ docs:
     url: "https://www.graalvm.org/latest/docs/reference-manual/native-image/"
   - title: "Spring Boot Native Image Support"
     url: "https://docs.spring.io/spring-boot/reference/packaging/native-image/index.html"
+summary: Java's classic model: your .class files run on the JVM, which JITcompiles (JustInTime) the hot methods to machine code while the program runs. This...
 ---
 
 # GraalVM Native Image — Compiling Java to a Binary

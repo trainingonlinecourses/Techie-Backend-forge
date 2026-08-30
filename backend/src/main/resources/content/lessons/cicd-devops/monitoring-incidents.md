@@ -7,6 +7,7 @@ topics: ["runbooks", "incident response", "postmortems", "logging in prod", "on-
 docs:
   - title: "SRE book"
     url: "https://sre.google/sre-book/table-of-contents/"
+summary: Deployments are the easy part; operating production is where systems live or die. This lesson covers the operational layer: what to log, how to res...
 ---
 
 # Production Monitoring & Incident Response

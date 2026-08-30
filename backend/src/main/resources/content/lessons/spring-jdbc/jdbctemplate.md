@@ -7,6 +7,7 @@ topics: ["JdbcTemplate", "RowMapper", "query methods", "updates", "generated key
 docs:
   - title: "Spring JDBC docs"
     url: "https://docs.spring.io/spring-framework/reference/data-access/jdbc.html"
+summary: Spring Data JPA is great — until you need exact SQL, raw performance, or a query JPA can't express. JdbcTemplate is the middle ground: full SQL con...
 ---
 
 # JdbcTemplate Fundamentals

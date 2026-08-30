@@ -7,6 +7,7 @@ topics: ["cookies", "sessions", "SameSite", "HttpOnly", "Secure", "statelessness
 docs:
   - title: "RFC 6265 — HTTP State Management Mechanism"
     url: "https://datatracker.ietf.org/doc/html/rfc6265"
+summary: HTTP is stateless: each request is independent — the server doesn't know it's the same person who logged in a minute ago. Yet every web app remembe...
 ---
 
 # Cookies and Sessions — State on a Stateless Protocol

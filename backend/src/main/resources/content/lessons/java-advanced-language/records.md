@@ -7,6 +7,7 @@ topics: ["records", "sealed classes", "pattern matching", "switch expressions", 
 docs:
   - title: "Java language changes"
     url: "https://docs.oracle.com/en/java/javase/21/language/java-language-changes.html"
+summary: Java 16–21 completed the biggest language evolution in decades: records (immutable data carriers), sealed classes (closed type hierarchies), and pa...
 ---
 
 # Records, Sealed Classes and Pattern Matching

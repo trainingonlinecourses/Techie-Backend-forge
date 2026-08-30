@@ -9,6 +9,7 @@ docs:
     url: "https://www.postgresql.org/docs/current/sql-insert.html"
   - title: "Aggregate Functions — FILTER (PostgreSQL docs)"
     url: "https://www.postgresql.org/docs/current/functions-aggregate.html"
+summary: Beyond the fundamentals, production SQL is a handful of recurring recipes: upserts (insert or update depending on existence), pivots (rows → column...
 ---
 
 # Advanced SQL Patterns — Upserts, Pivots, and Time Bucketing

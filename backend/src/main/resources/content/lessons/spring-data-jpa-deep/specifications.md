@@ -7,6 +7,7 @@ topics: ["Specification", "Criteria API", "dynamic queries", "composable predica
 docs:
   - title: "JPA Specifications"
     url: "https://docs.spring.io/spring-data/jpa/reference/jpa/specifications.html"
+summary: Filter forms with ten optional fields can't use one hardcoded query. Specifications — Spring Data's wrapper around the Criteria API — let you compo...
 ---
 
 # Specifications and Dynamic Queries

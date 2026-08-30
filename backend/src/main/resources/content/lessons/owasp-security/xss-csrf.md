@@ -9,6 +9,7 @@ docs:
     url: "https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html"
   - title: "Cross-Site Request Forgery Prevention Cheat Sheet (OWASP)"
     url: "https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html"
+summary: Two of the most misunderstood web attacks share a theme: they abuse the browser's trust. XSS (CrossSite Scripting) makes your application execute t...
 ---
 
 # XSS and CSRF — The Browser Attacks

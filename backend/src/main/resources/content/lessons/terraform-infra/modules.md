@@ -9,6 +9,7 @@ docs:
     url: "https://developer.hashicorp.com/terraform/language/modules"
   - title: "Module Sources (Terraform docs)"
     url: "https://developer.hashicorp.com/terraform/language/modules/sources"
+summary: A config that provisions one environment works — until you need the same stack in staging and prod, or a second team wants the same database patter...
 ---
 
 # Terraform Modules — Reusable Infrastructure Packages

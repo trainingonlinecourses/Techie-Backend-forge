@@ -7,6 +7,7 @@ topics: ["ISP", "fat interfaces", "role interfaces", "segregation", "adapter"]
 docs:
   - title: "Interface segregation principle (Wikipedia)"
     url: "https://en.wikipedia.org/wiki/Interface_segregation_principle"
+summary: The Interface Segregation Principle (the I in SOLID):
 ---
 
 # ISP — Interface Segregation Principle

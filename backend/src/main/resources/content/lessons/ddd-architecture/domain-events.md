@@ -7,6 +7,7 @@ topics: ["domain events", "event storming", "event sourcing intro", "CQRS intro"
 docs:
   - title: "Domain events"
     url: "https://martinfowler.com/eaaDev/DomainEvent.html"
+summary: Domain events turn aggregates from objects that change into objects that announce changes. They're the bridge between DDD's consistency boundaries ...
 ---
 
 # Domain Events and Event-Driven DDD

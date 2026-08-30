@@ -9,6 +9,7 @@ docs:
     url: "https://docs.spring.io/spring-boot/reference/testing/spring-boot-applications.html"
   - title: "MockMvc (Spring docs)"
     url: "https://docs.spring.io/spring-framework/reference/testing/spring-mvc-test-framework.html"
+summary: Mockito's plain unit tests mock directly — no Spring involved. But Spring Boot tests (@SpringBootTest, @WebMvcTest) create a real application conte...
 ---
 
 # Mockito with Spring Boot — @MockBean and Slice Testing

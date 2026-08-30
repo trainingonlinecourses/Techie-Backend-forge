@@ -7,6 +7,7 @@ topics: ["circuit breaker", "states", "failure rate", "half-open", "Resilience4j
 docs:
   - title: "Resilience4j CircuitBreaker"
     url: "https://resilience4j.readme.io/docs/circuitbreaker"
+summary: Your app calls a downstream service (a payment gateway, an AI provider, a catalog API). The service starts failing — slowly at first, then every ca...
 ---
 
 # Circuit Breaker — Fail Fast When the Dependency Is Down

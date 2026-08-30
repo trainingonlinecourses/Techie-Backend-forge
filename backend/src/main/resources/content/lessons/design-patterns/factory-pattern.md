@@ -7,6 +7,7 @@ topics: ["factory method", "abstract factory", "encapsulation", "decoupling", "c
 docs:
   - title: "Factory Method (Refactoring Guru)"
     url: "https://refactoring.guru/design-patterns/factory-method"
+summary: Imagine a pizza restaurant. The customer says "I want a pizza." The kitchen decides which pizza — margherita, pepperoni, or veggie — based on what'...
 ---
 
 # Factory Pattern — Creating Objects Without Saying the Class Name

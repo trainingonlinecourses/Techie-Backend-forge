@@ -7,6 +7,7 @@ topics: ["Deployment", "Service", "Ingress", "probes", "resource limits", "rolli
 docs:
   - title: "Kubernetes concepts"
     url: "https://kubernetes.io/docs/concepts/"
+summary: The Docker image is your unit; Kubernetes is the orchestrator that runs it, scales it, restarts it, and routes traffic to it. This lesson walks a c...
 ---
 
 # Deploying Spring Boot to Kubernetes

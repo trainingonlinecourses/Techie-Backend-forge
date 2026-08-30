@@ -7,6 +7,7 @@ topics: ["stream idioms", "flatMap", "Optional streams", "nullable streams", "gr
 docs:
   - title: "Stream usage patterns"
     url: "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/stream/package-summary.html"
+summary: The previous lessons covered the mechanics; this one is the vocabulary. These are the stream idioms that appear in every real codebase — flatMap fo...
 ---
 
 # Stream Idioms for Real Code

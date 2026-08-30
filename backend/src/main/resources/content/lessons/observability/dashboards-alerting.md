@@ -7,6 +7,7 @@ topics: ["Prometheus", "Grafana", "alert rules", "SLOs", "on-call", "golden sign
 docs:
   - title: "Prometheus querying"
     url: "https://prometheus.io/docs/prometheus/latest/querying/basics/"
+summary: Metrics without dashboards are numbers; dashboards without alerts are archaeology. This lesson covers the standard stack — Prometheus scrapes, Graf...
 ---
 
 # Dashboards and Alerting

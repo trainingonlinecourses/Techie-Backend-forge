@@ -9,6 +9,7 @@ docs:
     url: "https://developer.hashicorp.com/terraform/language/state"
   - title: "Remote State (Terraform docs)"
     url: "https://developer.hashicorp.com/terraform/language/state/remote"
+summary: Terraform decides "create vs update vs destroy" by comparing three things: your config (the blueprint), the state (what Terraform believes exists),...
 ---
 
 # State Management — Remote State, Locking, and Drift

@@ -7,6 +7,7 @@ topics: ["REST Docs", "asciidoctor", "test-driven docs", "snippets", "MockMvc"]
 docs:
   - title: "Spring REST Docs"
     url: "https://docs.spring.io/spring-restdocs/reference/"
+summary: Springdoc generates documentation from code. Spring REST Docs goes further: it generates documentation from tests. Every endpoint's documentation i...
 ---
 
 # Spring REST Docs — Test-Driven Documentation

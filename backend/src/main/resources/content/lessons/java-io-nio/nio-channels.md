@@ -7,6 +7,7 @@ topics: ["NIO", "ByteBuffer", "Channels", "non-blocking", "Selector", "FileChann
 docs:
   - title: "java.nio package summary"
     url: "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/nio/package-summary.html"
+summary: The classic java.io streams are blocking: when you call in.read(), your thread sits and waits until bytes actually arrive. For a simple file copy t...
 ---
 
 # NIO Channels and Buffers — Non-Blocking I/O

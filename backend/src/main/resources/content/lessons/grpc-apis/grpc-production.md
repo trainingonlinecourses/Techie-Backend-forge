@@ -7,6 +7,7 @@ topics: ["TLS", "load balancing", "gRPC-Web", "observability", "health checks", 
 docs:
   - title: "gRPC production best practices"
     url: "https://grpc.io/docs/guides/performance/"
+summary: The .proto is done and the calls work locally. Production gRPC adds five concerns: TLS, load balancing (HTTP/2 changes everything), browser access ...
 ---
 
 # gRPC in Production

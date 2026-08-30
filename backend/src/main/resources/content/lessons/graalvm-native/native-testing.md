@@ -9,6 +9,7 @@ docs:
     url: "https://docs.spring.io/spring-boot/reference/packaging/native-image/testing-native-images.html"
   - title: "GraalVM Testing (graalvm.org)"
     url: "https://www.graalvm.org/latest/docs/reference-manual/native-image/Testing/"
+summary: Here's the trap: your test suite runs on the JVM — but production runs a native binary. The two execution models differ precisely at the seams nati...
 ---
 
 # Testing Native Images — JVM Tests, Native Tests, and the Gap

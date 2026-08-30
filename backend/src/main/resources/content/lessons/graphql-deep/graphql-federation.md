@@ -7,6 +7,7 @@ topics: ["federation", "subgraphs", "supergraph", "Apollo", "@key", "distributed
 docs:
   - title: "Apollo Federation"
     url: "https://www.apollographql.com/docs/federation/"
+summary: A monolith GraphQL API works until it doesn't: one schema, one team, one deployment — every team's fields ride in the same schema, and adding a fie...
 ---
 
 # GraphQL Federation — One Graph, Many Services

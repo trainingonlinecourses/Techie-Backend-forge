@@ -7,6 +7,7 @@ topics: ["blue-green", "canary", "feature flags", "rollback", "traffic shifting"
 docs:
   - title: "Deployment strategies"
     url: "https://kubernetes.io/docs/concepts/workloads/controllers/deployment/"
+summary: Rolling updates are the baseline. But for critical systems you want more control: bluegreen (instant switch + instant rollback), canary (gradual tr...
 ---
 
 # Blue-Green, Canary and Feature Flags

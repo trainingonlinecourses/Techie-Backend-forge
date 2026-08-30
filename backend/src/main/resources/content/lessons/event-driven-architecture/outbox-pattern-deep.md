@@ -9,6 +9,7 @@ docs:
     url: "https://microservices.io/patterns/data/transactional-outbox.html"
   - title: "Transactional Outbox (Event-Driven Architecture)"
     url: "https://developer.confluent.io/learn/transactional-outbox/"
+summary: When an event must be published because a database row changed, you face the dualwrite problem: two systems (the database and the broker) must both...
 ---
 
 # The Outbox Pattern — Atomic Writes to the Database and the Broker

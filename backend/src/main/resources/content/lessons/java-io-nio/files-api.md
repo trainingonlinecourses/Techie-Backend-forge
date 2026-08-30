@@ -7,6 +7,7 @@ topics: ["java.nio.file", "Path", "Files", "walk", "globs", "watch service"]
 docs:
   - title: "Files (Java SE API)"
     url: "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/nio/file/Files.html"
+summary: Before Java 7, file code was java.io.File — a class that bundled a name with operations, and couldn't express many realworld paths (symbolic links,...
 ---
 
 # The Files API — Modern File Handling

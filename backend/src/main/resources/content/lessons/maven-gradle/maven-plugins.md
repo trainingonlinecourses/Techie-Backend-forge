@@ -7,6 +7,7 @@ topics: ["plugin configuration", "compiler", "surefire", "failsafe", "checkstyle
 docs:
   - title: "Maven plugins"
     url: "https://maven.apache.org/plugins/index.html"
+summary: The lifecycle is the skeleton; plugins are the organs. This lesson covers the plugins every Spring project actually uses — compiler, surefire/fails...
 ---
 
 # Maven Plugins in Practice

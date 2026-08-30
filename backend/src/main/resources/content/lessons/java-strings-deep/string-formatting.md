@@ -7,6 +7,7 @@ topics: ["printf", "String.format", "format specifiers", "locale", "MessageForma
 docs:
   - title: "Formatter (Java SE API)"
     url: "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Formatter.html"
+summary: Concatenation with + gets ugly fast when you want control over layout:
 ---
 
 # String Formatting — printf, String.format, and MessageFormat

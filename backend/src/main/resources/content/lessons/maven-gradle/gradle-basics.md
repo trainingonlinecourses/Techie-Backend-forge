@@ -7,6 +7,7 @@ topics: ["Gradle", "build.gradle", "Groovy vs Kotlin DSL", "tasks", "dependency 
 docs:
   - title: "Gradle docs"
     url: "https://docs.gradle.org/current/userguide/userguide.html"
+summary: Gradle is the build tool of Android and a growing share of the JVM world. Where Maven is XML and fixed lifecycles, Gradle is a programmable build w...
 ---
 
 # Gradle: The Modern Alternative

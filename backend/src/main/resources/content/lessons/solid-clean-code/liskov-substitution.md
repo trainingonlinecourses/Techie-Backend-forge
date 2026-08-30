@@ -7,6 +7,7 @@ topics: ["LSP", "substitutability", "inheritance", "contract", "is-a vs has-a"]
 docs:
   - title: "Liskov substitution principle (Wikipedia)"
     url: "https://en.wikipedia.org/wiki/Liskov_substitution_principle"
+summary: The Liskov Substitution Principle (the L in SOLID) is the strictest, most precise rule about inheritance:
 ---
 
 # LSP — Liskov Substitution Principle

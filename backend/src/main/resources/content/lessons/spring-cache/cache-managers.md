@@ -7,6 +7,7 @@ topics: ["ConcurrentMapCacheManager", "CaffeineCacheManager", "CompositeCacheMan
 docs:
   - title: "Cache configuration"
     url: "https://docs.spring.io/spring-framework/reference/integration/cache.html#cache-store-configuration"
+summary: Spring's CacheManager is the plug point of the whole abstraction. Understand the four real options — and how to mix them — and you can pick the rig...
 ---
 
 # CacheManagers Compared

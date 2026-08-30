@@ -9,6 +9,7 @@ docs:
     url: "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/net/Socket.html"
   - title: "Networking Basics (Oracle)"
     url: "https://docs.oracle.com/javase/tutorial/networking/sockets/index.html"
+summary: Every network conversation in Java — HTTP requests, database connections, message queues — ultimately runs over sockets. A socket is the endpoint o...
 ---
 
 # Sockets — The Foundation of Network Programming

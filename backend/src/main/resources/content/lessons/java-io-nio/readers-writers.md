@@ -7,6 +7,7 @@ topics: ["Reader", "Writer", "charsets", "UTF-8", "text encoding", "line reading
 docs:
   - title: "Charset (Java SE API)"
     url: "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/nio/charset/Charset.html"
+summary: Here is the single most important idea in this lesson: a file on disk is a sequence of bytes. Text is a convention for interpreting those bytes. Th...
 ---
 
 # Readers and Writers — Text I/O and Encodings

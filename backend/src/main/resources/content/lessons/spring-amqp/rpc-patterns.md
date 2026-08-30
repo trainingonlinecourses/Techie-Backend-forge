@@ -7,6 +7,7 @@ topics: ["RPC", "replyTo", "correlationId", "convertSendAndReceive", "async requ
 docs:
   - title: "Request and reply"
     url: "https://docs.spring.io/spring-amqp/reference/template.html#template-send-and-receive"
+summary: Most messaging is fireandforget, but some flows need an answer: "validate this address", "compute this quote", "translate this text". RabbitMQ's re...
 ---
 
 # Request-Reply and RPC Patterns

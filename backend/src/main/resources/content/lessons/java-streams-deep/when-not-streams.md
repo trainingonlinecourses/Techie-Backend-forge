@@ -7,6 +7,7 @@ topics: ["stream limitations", "loops vs streams", "debuggability", "checked exc
 docs:
   - title: "Stream package"
     url: "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/stream/package-summary.html"
+summary: Streams are elegant — and occasionally the wrong tool. This lesson is the honest counterpart: the five situations where a plain loop beats a stream...
 ---
 
 # When NOT to Use Streams

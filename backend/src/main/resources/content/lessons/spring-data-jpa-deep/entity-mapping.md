@@ -7,6 +7,7 @@ topics: ["@Entity", "identifiers", "associations", "cascade", "orphan removal", 
 docs:
   - title: "JPA reference"
     url: "https://docs.jboss.org/hibernate/orm/current/userguide/html_single/Hibernate_User_Guide.html"
+summary: JPA mapping is where the object model meets the relational model — and where subtle mistakes (lazy loading, cascade surprises, identity problems) b...
 ---
 
 # Entity Mapping in Depth

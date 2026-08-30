@@ -7,6 +7,7 @@ topics: ["Queue", "Deque", "PriorityQueue", "ArrayDeque", "heap", "producer cons
 docs:
   - title: "Queue interface"
     url: "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Queue.html"
+summary: Queues are the backbone of producerconsumer systems, task processing, and buffering. This lesson covers the Queue/Deque families — including the Pr...
 ---
 
 # Queues, Deques and PriorityQueue

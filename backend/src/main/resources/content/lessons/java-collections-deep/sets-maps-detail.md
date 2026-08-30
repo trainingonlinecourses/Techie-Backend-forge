@@ -7,6 +7,7 @@ topics: ["HashSet", "LinkedHashSet", "TreeSet", "equals hashCode", "LinkedHashMa
 docs:
   - title: "Set and Map interfaces"
     url: "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Set.html"
+summary: Sets and maps are their contracts: equals/hashCode decide membership, compareTo decides order, and the concrete class decides the strategy. This le...
 ---
 
 # Sets, Maps and the equals/hashCode Contract

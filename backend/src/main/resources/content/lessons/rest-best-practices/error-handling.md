@@ -7,6 +7,7 @@ topics: ["@RestControllerAdvice", "Problem Details", "error envelope", "validati
 docs:
   - title: "Error handling"
     url: "https://docs.spring.io/spring-framework/reference/web/webmvc.html#mvc-ann-rest-exceptions"
+summary: A good error response is a contract. Every error, from a validation failure to a null pointer, should arrive in the same shape with the same fields...
 ---
 
 # Consistent Error Handling

@@ -9,6 +9,7 @@ docs:
     url: "https://docs.oracle.com/javase/tutorial/essential/exceptions/index.html"
   - title: "Throwable (Java SE API)"
     url: "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Throwable.html"
+summary: When a program fails, the worst thing it can do is fail silently — corrupt data, skip a step, and pretend everything is fine. Java's answer to fail...
 ---
 
 # The Exception Hierarchy — Throwable, Error, and Exception

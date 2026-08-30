@@ -9,6 +9,7 @@ docs:
     url: "https://en.wikipedia.org/wiki/Tree_(data_structure)"
   - title: "Graph (abstract data type) — Wikipedia"
     url: "https://en.wikipedia.org/wiki/Graph_(abstract_data_type)"
+summary: Lists and maps organize data linearly. Trees and graphs organize relationships — and they're everywhere in software: file systems (directories nest...
 ---
 
 # Trees and Graphs — Hierarchies and Networks

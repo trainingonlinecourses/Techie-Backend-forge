@@ -9,6 +9,7 @@ docs:
     url: "https://kubernetes.io/docs/concepts/"
   - title: "Kubernetes Components (kubernetes.io)"
     url: "https://kubernetes.io/docs/concepts/overview/components/"
+summary: Docker gives you containers — isolated processes with their own filesystem. But running containers at scale (dozens of machines, hundreds of contai...
 ---
 
 # Kubernetes Architecture — Nodes, Pods, and the Control Plane

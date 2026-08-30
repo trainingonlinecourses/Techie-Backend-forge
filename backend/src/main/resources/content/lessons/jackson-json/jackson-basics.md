@@ -9,6 +9,7 @@ docs:
     url: "https://github.com/FasterXML/jackson-databind"
   - title: "Jackson Documentation (FasterXML)"
     url: "https://github.com/FasterXML/jackson-docs"
+summary: Every Spring Boot REST API lives on a JSON bridge: the request body arrives as JSON text, becomes a Java object, flows through your service, and re...
 ---
 
 # Jackson Basics — ObjectMapper, Serialization, and Deserialization

@@ -7,6 +7,7 @@ topics: ["timeouts", "onStatus", "interceptors", "error handlers", "ClientHttpRe
 docs:
   - title: "RestClient customization"
     url: "https://docs.spring.io/spring-framework/reference/integration/rest-clients.html#rest-restclient-customization"
+summary: A bare RestClient call works great when the server responds quickly with 200. Production is when the server is slow, down, or returns errors — and ...
 ---
 
 # RestClient Configuration — Timeouts, Errors, and Interceptors

@@ -9,6 +9,7 @@ docs:
     url: "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/invoke/MethodHandle.html"
   - title: "MethodHandles.Lookup (Java SE API)"
     url: "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/invoke/MethodHandles.Lookup.html"
+summary: Classic reflection (Method.invoke) has two real problems: it's slow (every call does access checks, argument boxing, and dynamic dispatch through l...
 ---
 
 # Method Handles — Faster, Safer Reflection

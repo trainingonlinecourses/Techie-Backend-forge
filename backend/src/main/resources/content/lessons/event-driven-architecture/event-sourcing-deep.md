@@ -9,6 +9,7 @@ docs:
     url: "https://martinfowler.com/eaaDev/EventSourcing.html"
   - title: "Event Sourcing Pattern (Microsoft)"
     url: "https://learn.microsoft.com/en-us/azure/architecture/patterns/event-sourcing"
+summary: Conventional persistence stores the current state: an account row says balance = 500. Event sourcing stores the history: a ledger of every event — ...
 ---
 
 # Event Sourcing — The Events Are the State

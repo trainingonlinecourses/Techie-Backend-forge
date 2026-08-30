@@ -7,6 +7,7 @@ topics: ["ViewResolver", "Thymeleaf", "View", "model attributes", "redirect vs f
 docs:
   - title: "View resolution"
     url: "https://docs.spring.io/spring-framework/reference/web/webmvc.html#mvc-viewresolver"
+summary: A controller returns a logical view name; a ViewResolver turns it into rendered HTML. Understanding the resolver chain, the model, and the redirect...
 ---
 
 # View Resolvers and Rendering

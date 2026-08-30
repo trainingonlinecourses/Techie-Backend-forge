@@ -7,6 +7,7 @@ topics: ["auto-configuration", "@ConditionalOnClass", "@EnableAutoConfiguration"
 docs:
   - title: "Auto-configuration (Spring Boot docs)"
     url: "https://docs.spring.io/spring-boot/reference/using/auto-configuration.html"
+summary: When you add springbootstarterweb and write a @RestController, Spring Boot magically sets up an embedded Tomcat, Jackson JSON, an error handler, a ...
 ---
 
 # Auto-Configuration — How Spring Boot Configures Itself

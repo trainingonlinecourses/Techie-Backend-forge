@@ -7,6 +7,7 @@ topics: ["blocking stub", "async stub", "client streaming", "bidi streaming", "d
 docs:
   - title: "gRPC client concepts"
     url: "https://grpc.io/docs/guides/concepts/"
+summary: The client side of gRPC comes in three stubs — blocking, async, and streaming — generated from the same .proto. This lesson covers all three, plus ...
 ---
 
 # gRPC Clients, Streaming and Deadlines

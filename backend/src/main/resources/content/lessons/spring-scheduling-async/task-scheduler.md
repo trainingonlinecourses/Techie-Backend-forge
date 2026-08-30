@@ -7,6 +7,7 @@ topics: ["TaskScheduler", "ScheduledFuture", "Trigger", "programmatic scheduling
 docs:
   - title: "TaskScheduler"
     url: "https://docs.spring.io/spring-framework/reference/integration/scheduling.html#scheduling-task-scheduler"
+summary: @Scheduled is declarative — the schedule is baked into the method at compile time. But real systems sometimes need dynamic scheduling: schedules re...
 ---
 
 # The TaskScheduler Abstraction

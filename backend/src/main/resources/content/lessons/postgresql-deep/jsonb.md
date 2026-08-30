@@ -7,6 +7,7 @@ topics: ["jsonb", "document queries", "GIN indexes", "jsonb operators", "hybrid 
 docs:
   - title: "PostgreSQL JSON types"
     url: "https://www.postgresql.org/docs/current/datatype-json.html"
+summary: Postgres's jsonb type gives you documentdatabase capabilities inside a relational database: store arbitrary JSON, query into it, index it. The resu...
 ---
 
 # JSONB: Documents in Postgres

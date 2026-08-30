@@ -9,6 +9,7 @@ docs:
     url: "https://docs.oracle.com/javase/tutorial/java/generics/methods.html"
   - title: "Bounded Type Parameters (Java Tutorials)"
     url: "https://docs.oracle.com/javase/tutorial/java/generics/bounded.html"
+summary: A generic class (class Box<T) makes every member of the class generic. But most of the time you need generics for just one method — a helper that w...
 ---
 
 # Generic Methods — Type Parameters on Methods

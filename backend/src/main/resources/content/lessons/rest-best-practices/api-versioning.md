@@ -7,6 +7,7 @@ topics: ["URI versioning", "header versioning", "media type versioning", "deprec
 docs:
   - title: "Versioning REST APIs"
     url: "https://docs.spring.io/spring-framework/reference/web/webmvc.html#mvc-ann-requestmapping-advanced"
+summary: APIs evolve, but consumers don't update at your pace. Versioning is how you change behavior without breaking the clients you already have. Four str...
 ---
 
 # API Versioning Strategies

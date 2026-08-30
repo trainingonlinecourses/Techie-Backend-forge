@@ -7,6 +7,7 @@ topics: ["GraphQL schema", "SDL", "types", "queries", "mutations", "schema desig
 docs:
   - title: "GraphQL schema (graphql.org)"
     url: "https://graphql.org/learn/schema/"
+summary: GraphQL's defining idea: the client asks for exactly the fields it wants — no overfetching (getting 50 fields when you need 3), no underfetching (n...
 ---
 
 # GraphQL Schema Design — Types, Queries, and Mutations

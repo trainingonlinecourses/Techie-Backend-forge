@@ -7,6 +7,7 @@ topics: ["CAP", "consistency models", "eventual consistency", "strong consistenc
 docs:
   - title: "CAP theorem"
     url: "https://en.wikipedia.org/wiki/CAP_theorem"
+summary: Every distributed system makes the same fundamental trade — and most teams discover it by accident in production. The CAP theorem and its successor...
 ---
 
 # The CAP Theorem and Consistency Models

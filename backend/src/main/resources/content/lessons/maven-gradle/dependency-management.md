@@ -7,6 +7,7 @@ topics: ["dependency scopes", "transitive deps", "exclusions", "dependencyManage
 docs:
   - title: "Maven dependency mechanism"
     url: "https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html"
+summary: Dependencies are the biggest source of build pain: conflicts, scope mistakes, and silent version drift. This lesson covers the dependency mechanism...
 ---
 
 # Dependency Management and Versioning

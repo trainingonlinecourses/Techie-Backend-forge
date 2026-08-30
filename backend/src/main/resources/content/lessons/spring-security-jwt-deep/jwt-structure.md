@@ -7,6 +7,7 @@ topics: ["JWT", "JWS", "header", "payload", "signature", "base64url"]
 docs:
   - title: "RFC 7519 — JSON Web Token"
     url: "https://datatracker.ietf.org/doc/html/rfc7519"
+summary: A JWT (JSON Web Token) is a compact, URLsafe string that carries claims (statements about a subject — "user 42 is an admin", "this token expires at...
 ---
 
 # JWT Structure — What's Actually in a Token

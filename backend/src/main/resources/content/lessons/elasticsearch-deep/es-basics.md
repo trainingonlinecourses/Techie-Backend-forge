@@ -9,6 +9,7 @@ docs:
     url: "https://www.elastic.co/guide/en/elasticsearch/reference/current/elasticsearch-intro.html"
   - title: "Inverted Index (Elastic docs)"
     url: "https://www.elastic.co/guide/en/elasticsearch/reference/current/documents-indices.html"
+summary: A database finds rows by matching values — WHERE title = 'spring'. But real search is fuzzy, ranked, and languageaware: "spring boot tutorial" shou...
 ---
 
 # Elasticsearch Basics — Inverted Indexes and Distributed Search

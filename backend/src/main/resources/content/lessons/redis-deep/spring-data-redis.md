@@ -9,6 +9,7 @@ docs:
     url: "https://docs.spring.io/spring-data/redis/reference/"
   - title: "RedisTemplate (Spring API)"
     url: "https://docs.spring.io/spring-data/redis/docs/current/api/org/springframework/data/redis/core/RedisTemplate.html"
+summary: Raw Jedis/Lettuce calls work, but they leave you managing connections, serialization, and error handling. Spring Data Redis wraps the client (Lettu...
 ---
 
 # Spring Data Redis — RedisTemplate, Repositories, and Serialization

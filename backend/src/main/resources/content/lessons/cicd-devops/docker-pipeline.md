@@ -7,6 +7,7 @@ topics: ["Dockerfile", "multi-stage builds", "layers", "image size", "CI docker 
 docs:
   - title: "Docker best practices"
     url: "https://docs.docker.com/build/building/best-practices/"
+summary: CI produces a jar; Docker turns it into a deployable unit. The Dockerfile you write decides build time, image size, attack surface, and how fast yo...
 ---
 
 # The Docker Build Pipeline

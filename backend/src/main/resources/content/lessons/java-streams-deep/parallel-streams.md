@@ -7,6 +7,7 @@ topics: ["parallel streams", "fork-join", "spliterator", "thread safety", "when 
 docs:
   - title: "Parallel streams"
     url: "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/stream/package-summary.html"
+summary: .parallel() sounds like free speed. In practice it's a shared ForkJoinPool, hidden threadsafety traps, and a threshold below which parallel is slow...
 ---
 
 # Parallel Streams and Performance

@@ -7,6 +7,7 @@ topics: ["text blocks", "multiline strings", "formatted", "indentation", "SQL te
 docs:
   - title: "Text blocks"
     url: "https://docs.oracle.com/en/java/javase/21/text-blocks.html"
+summary: Multiline strings in Java used to mean \n escapes and string concatenation soup. Text blocks (Java 15+) make JSON, SQL, HTML, and templates readabl...
 ---
 
 # Text Blocks and String Processing

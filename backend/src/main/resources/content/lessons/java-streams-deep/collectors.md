@@ -7,6 +7,7 @@ topics: ["Collectors", "groupingBy", "partitioningBy", "toMap", "joining", "teei
 docs:
   - title: "Collectors"
     url: "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/stream/Collectors.html"
+summary: collect is where streams turn into the structures you actually need — maps, grouped lists, joins, and stats. Collectors is a toolbox of composable ...
 ---
 
 # Collectors and Aggregation

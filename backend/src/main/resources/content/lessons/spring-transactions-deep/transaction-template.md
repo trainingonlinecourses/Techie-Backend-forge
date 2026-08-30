@@ -7,6 +7,7 @@ topics: ["TransactionTemplate", "PlatformTransactionManager", "programmatic tx",
 docs:
   - title: "Programmatic transactions"
     url: "https://docs.spring.io/spring-framework/reference/data-access/transaction/programmatic.html"
+summary: @Transactional is declarative and covers whole methods. But real code sometimes needs multiple transaction boundaries inside one method — peritem t...
 ---
 
 # TransactionTemplate & Programmatic Transactions

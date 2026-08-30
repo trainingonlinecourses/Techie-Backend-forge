@@ -9,6 +9,7 @@ docs:
     url: "https://docs.spring.io/spring-integration/reference/channel.html"
   - title: "Channel Implementations (Spring Integration Reference)"
     url: "https://docs.spring.io/spring-integration/reference/channel-implementations.html"
+summary: The channel is the pipe of the integration — but not all pipes behave alike. The channel type you choose is the integration's semantics: direct cha...
 ---
 
 # Message Channels — Direct, Queue, Publish-Subscribe, and Priority

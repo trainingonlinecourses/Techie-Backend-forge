@@ -7,6 +7,7 @@ topics: ["@Async", "Executor", "CompletableFuture", "async exceptions", "thread 
 docs:
   - title: "Async invocation"
     url: "https://docs.spring.io/spring-framework/reference/integration/scheduling.html#scheduling-annotation-support-async"
+summary: @Async moves a method's execution onto a separate thread, freeing the caller immediately. It's the standard way to fireandforget side effects (noti...
 ---
 
 # Async Execution with @Async

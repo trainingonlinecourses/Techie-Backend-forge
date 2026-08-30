@@ -7,6 +7,7 @@ topics: ["WebClient", "reactive", "Mono", "Flux", "non-blocking", "WebFlux"]
 docs:
   - title: "WebClient (Spring docs)"
     url: "https://docs.spring.io/spring-framework/reference/web/webflux-webclient.html"
+summary: A blocking HTTP call (RestClient) occupies a thread for the whole round trip: the thread sits idle waiting for the server. With thousands of concur...
 ---
 
 # WebClient — Reactive HTTP Calls

@@ -7,6 +7,7 @@ topics: ["Testcontainers", "@ServiceConnection", "PostgreSQL", "Redis", "Kafka",
 docs:
   - title: "Testcontainers docs"
     url: "https://java.testcontainers.org/"
+summary: Inmemory substitutes (H2 for Postgres, embedded Redis) drift from production. Testcontainers runs the real thing — actual Postgres, actual Redis, a...
 ---
 
 # Testcontainers for Real Dependencies

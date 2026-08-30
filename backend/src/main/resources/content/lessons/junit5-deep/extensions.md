@@ -9,6 +9,7 @@ docs:
     url: "https://junit.org/junit5/docs/current/user-guide/#extensions"
   - title: "Extension Registration (JUnit 5 User Guide)"
     url: "https://junit.org/junit5/docs/current/user-guide/#extensions-registration"
+summary: JUnit 5's deepest architectural idea: test execution is a pipeline of extension points, and almost everything the framework does is itself an exten...
 ---
 
 # Extensions — The Extension Model That Makes JUnit 5 Powerful

@@ -9,6 +9,7 @@ docs:
     url: "https://cheatsheetseries.owasp.org/cheatsheets/Deserialization_Cheat_Sheet.html"
   - title: "Server-Side Request Forgery Prevention Cheat Sheet (OWASP)"
     url: "https://cheatsheetseries.owasp.org/cheatsheets/Server_Side_Request_Forgery_Prevention_Cheat_Sheet.html"
+summary: Injection, XSS, and access control get the attention; the quieter vulnerabilities get the breaches. This lesson covers four productioncritical area...
 ---
 
 # Secure Coding — Deserialization, SSRF, Logging, and Secrets

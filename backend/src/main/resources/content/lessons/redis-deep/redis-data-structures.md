@@ -9,6 +9,7 @@ docs:
     url: "https://redis.io/docs/latest/develop/data-types/"
   - title: "An Introduction to Redis Data Types (redis.io)"
     url: "https://redis.io/docs/latest/develop/data-types/introduction/"
+summary: import redis.clients.jedis.Jedis;
 ---
 
 # Redis Data Structures — Strings, Lists, Sets, Hashes, Sorted Sets

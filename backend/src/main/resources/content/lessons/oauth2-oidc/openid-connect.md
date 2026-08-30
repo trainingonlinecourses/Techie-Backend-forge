@@ -9,6 +9,7 @@ docs:
     url: "https://openid.net/specs/openid-connect-core-1_0.html"
   - title: "OIDC Discovery 1.0"
     url: "https://openid.net/specs/openid-connect-discovery-1_0.html"
+summary: OAuth2 answers "what can this app do for the user?" — but it famously does not answer "who is the user?" A resource server can verify a token's val...
 ---
 
 # OpenID Connect — OAuth2 Plus Identity

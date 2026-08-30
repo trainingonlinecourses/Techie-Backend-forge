@@ -7,6 +7,7 @@ topics: ["docker-compose.yml", "services", "networks", "dependencies", "dev envi
 docs:
   - title: "Docker Compose overview"
     url: "https://docs.docker.com/compose/"
+summary: A real application is rarely one container: the backend, the database, Redis, RabbitMQ — each is a container, and they must network together, know ...
 ---
 
 # Docker Compose — Multi-Container Apps Made Manageable

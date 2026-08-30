@@ -7,6 +7,7 @@ topics: ["Raft", "leader election", "log replication", "quorum", "majority", "Zo
 docs:
   - title: "Raft paper"
     url: "https://raft.github.io/"
+summary: When multiple nodes must agree on one value — who is the leader, what is the committed log — you need consensus. Raft is the algorithm behind etcd ...
 ---
 
 # Consensus: Raft and Quorum

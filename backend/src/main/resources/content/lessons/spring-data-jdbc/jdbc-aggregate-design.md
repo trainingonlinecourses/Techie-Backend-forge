@@ -7,6 +7,7 @@ topics: ["aggregates", "aggregate root", "boundaries", "value objects", "referen
 docs:
   - title: "Aggregate design in Spring Data JDBC"
     url: "https://docs.spring.io/spring-data/jdbc/reference/jdbc/entity-persistence.html"
+summary: The central design decision in Spring Data JDBC is the aggregate: the cluster of objects that are loaded, saved, and deleted as one unit. The term ...
 ---
 
 # Aggregate Design — Choosing the Boundaries

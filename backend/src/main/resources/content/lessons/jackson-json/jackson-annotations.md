@@ -9,6 +9,7 @@ docs:
     url: "https://github.com/FasterXML/jackson-annotations"
   - title: "Jackson Annotations Wiki (FasterXML)"
     url: "https://github.com/FasterXML/jackson-docs/wiki/Jackson-Annotations"
+summary: The previous lesson's ObjectMapper configuration applies globally — one set of rules for everything. Annotations are the pertype instructions: they...
 ---
 
 # Jackson Annotations — @JsonProperty, @JsonIgnore, and Friends

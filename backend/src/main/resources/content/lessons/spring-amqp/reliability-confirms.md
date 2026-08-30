@@ -7,6 +7,7 @@ topics: ["publisher confirms", "mandatory", "returned messages", "transactions",
 docs:
   - title: "Spring AMQP template"
     url: "https://docs.spring.io/spring-amqp/reference/template.html"
+summary: "Sent" is not "delivered". Without confirms, a publish that hits a downed broker, a full queue, or a missing exchange silently disappears. Publishe...
 ---
 
 # Publisher Confirms & Reliability

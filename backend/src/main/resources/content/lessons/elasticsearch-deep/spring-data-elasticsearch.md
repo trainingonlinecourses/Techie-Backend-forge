@@ -9,6 +9,7 @@ docs:
     url: "https://docs.spring.io/spring-data/elasticsearch/reference/"
   - title: "ElasticsearchRepository (Spring API)"
     url: "https://docs.spring.io/spring-data/elasticsearch/docs/current/api/org/springframework/data/elasticsearch/repository/ElasticsearchRepository.html"
+summary: Spring Data Elasticsearch brings the repository pattern to Elasticsearch: @Document classes map to indices, repository interfaces provide derived q...
 ---
 
 # Spring Data Elasticsearch — Repositories and the Search Template

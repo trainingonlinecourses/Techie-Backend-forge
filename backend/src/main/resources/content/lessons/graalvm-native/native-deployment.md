@@ -9,6 +9,7 @@ docs:
     url: "https://www.graalvm.org/latest/docs/reference-manual/native-image/guides/containerise-native-executable-and-run-in-docker-container/"
   - title: "Spring Boot Native Deployment"
     url: "https://docs.spring.io/spring-boot/reference/packaging/native-image/index.html#packaging.native-image"
+summary: A native binary is a different artifact than a jar: no JVM to install, no classpath to manage, a tiny container image, millisecond cold starts. But...
 ---
 
 # Deploying Native Images — Containers, CI, and Production Patterns

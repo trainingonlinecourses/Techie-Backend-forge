@@ -7,6 +7,7 @@ topics: ["pointcut designators", "execution", "within", "annotation", "bean", "c
 docs:
   - title: "Pointcut Designators"
     url: "https://docs.spring.io/spring-framework/reference/core/aop/pointcuts/designators.html"
+summary: Pointcuts are the "where" of AOP — they define which join points an aspect should intercept. Spring AOP provides a rich set of pointcut designators...
 ---
 
 # Pointcut Expressions: Matching Join Points

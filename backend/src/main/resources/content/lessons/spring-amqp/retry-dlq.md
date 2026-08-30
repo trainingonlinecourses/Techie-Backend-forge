@@ -7,6 +7,7 @@ topics: ["retry", "backoff", "DLQ", "poison messages", "reprocessing", "message 
 docs:
   - title: "Retry and recovery"
     url: "https://docs.spring.io/spring-amqp/reference/retry.html"
+summary: Transient failures deserve a retry; permanent failures deserve a dead letter. Without a retry policy, a database blip during a message storm causes...
 ---
 
 # Retries, Dead Letter Queues and Poison Messages

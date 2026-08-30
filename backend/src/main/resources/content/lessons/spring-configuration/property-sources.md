@@ -7,6 +7,7 @@ topics: ["@PropertySource", "Environment", "property sources", "custom sources",
 docs:
   - title: "Environment abstraction (Spring docs)"
     url: "https://docs.spring.io/spring-framework/reference/core/beans/environment.html"
+summary: The Environment is Spring's unified view of configuration: a list of property sources (each a Maplike of key → value), consulted in order. Every ${...
 ---
 
 # Property Sources — Where Configuration Comes From

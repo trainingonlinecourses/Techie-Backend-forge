@@ -7,6 +7,7 @@ topics: ["@Scheduled", "fixedDelay", "cron", "TaskScheduler", "thread pools"]
 docs:
   - title: "Task Execution and Scheduling"
     url: "https://docs.spring.io/spring-framework/reference/integration/scheduling.html"
+summary: Scheduling is how Spring applications run logic at fixed intervals, after fixed delays, or at cronaligned times. The @Scheduled annotation turns an...
 ---
 
 # Scheduled Tasks with @Scheduled

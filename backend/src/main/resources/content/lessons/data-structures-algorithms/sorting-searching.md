@@ -9,6 +9,7 @@ docs:
     url: "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Collections.html#sort(java.util.List)"
   - title: "Arrays.sort (Java SE API)"
     url: "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Arrays.html#sort(java.lang.Object%5B%5D)"
+summary: Sorting feels like a chore, but it's actually the enabler of nearly everything: sorted data can be searched in O(log n) instead of O(n), merged eff...
 ---
 
 # Sorting and Searching — The Workhorses of Algorithms

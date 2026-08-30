@@ -7,6 +7,7 @@ topics: ["Maven lifecycle", "phases", "goals", "plugins", "pom.xml", "profiles"]
 docs:
   - title: "Maven lifecycle"
     url: "https://maven.apache.org/guides/introduction/introduction-to-the-lifecycle.html"
+summary: Maven isn't a build script — it's a fixed lifecycle with pluggable goals. Understanding the three lifecycles, the phase ordering, and how plugins b...
 ---
 
 # The Maven Lifecycle and Build Phases

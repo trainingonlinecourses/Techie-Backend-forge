@@ -7,6 +7,7 @@ topics: ["Thread", "Runnable", "Callable", "ExecutorService", "thread pools", "F
 docs:
   - title: "Concurrency in Java"
     url: "https://docs.oracle.com/en/java/javase/21/core/concurrency.html"
+summary: Threads are Java's unit of concurrent execution — and the most misused abstraction in the language. Creating threads directly is almost always wron...
 ---
 
 # Threads and ExecutorService

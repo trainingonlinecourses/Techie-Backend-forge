@@ -9,6 +9,7 @@ docs:
     url: "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/HashMap.html"
   - title: "Object.hashCode (Java SE API)"
     url: "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html#hashCode()"
+summary: A list answers "does this contain x?" by scanning every element — O(n). A map (dictionary) answers it in O(1): instead of searching, it computes wh...
 ---
 
 # Maps and Sets — Hash Tables and Trees

@@ -7,6 +7,7 @@ topics: ["MockRestServiceServer", "@RestClientTest", "MockWebServer", "stubbing"
 docs:
   - title: "RestClient testing"
     url: "https://docs.spring.io/spring-framework/reference/testing/spring-mvc-test-framework.html"
+summary: Your service calls other services. Those calls must be tested — but never against the real network. This lesson covers the three ways to stub HTTP:...
 ---
 
 # Testing HTTP Clients (RestClient/WebClient)

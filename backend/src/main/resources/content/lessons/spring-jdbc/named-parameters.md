@@ -7,6 +7,7 @@ topics: ["named parameters", "SqlParameterSource", "MapSqlParameterSource", "Bea
 docs:
   - title: "Named parameters"
     url: "https://docs.spring.io/spring-framework/reference/data-access/jdbc.html#jdbc-NamedParameterJdbcTemplate"
+summary: ? placeholders are positional — pass 7 parameters and pray you remember the order. NamedParameterJdbcTemplate names each parameter (:title, :level)...
 ---
 
 # NamedParameterJdbcTemplate

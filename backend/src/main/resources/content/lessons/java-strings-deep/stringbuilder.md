@@ -7,6 +7,7 @@ topics: ["StringBuilder", "mutable strings", "concatenation", "performance", "ca
 docs:
   - title: "StringBuilder (Java SE API)"
     url: "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/StringBuilder.html"
+summary: Recall that String is immutable — every operation that "changes" a string creates a new object. Now think about building a sentence word by word in...
 ---
 
 # StringBuilder — Building Strings Efficiently

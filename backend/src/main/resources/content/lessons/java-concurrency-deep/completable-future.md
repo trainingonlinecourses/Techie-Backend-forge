@@ -7,6 +7,7 @@ topics: ["CompletableFuture", "thenApply", "thenCompose", "allOf", "exceptionall
 docs:
   - title: "CompletableFuture"
     url: "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/CompletableFuture.html"
+summary: Future.get() blocks; CompletableFuture composes. It's the difference between waiting for each step and wiring the pipeline — parallel calls joined,...
 ---
 
 # CompletableFuture Composition

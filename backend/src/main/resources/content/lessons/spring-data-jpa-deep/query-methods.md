@@ -7,6 +7,7 @@ topics: ["derived queries", "@Query", "JPQL", "native queries", "modifying queri
 docs:
   - title: "Spring Data JPA queries"
     url: "https://docs.spring.io/spring-data/jpa/reference/jpa/query-methods.html"
+summary: Spring Data JPA gives you three ways to query: derived methods (name = query), @Query with JPQL, and native SQL. Each has a place — this lesson cov...
 ---
 
 # Repository Query Methods in Depth

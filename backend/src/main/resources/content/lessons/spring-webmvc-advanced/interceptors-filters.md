@@ -7,6 +7,7 @@ topics: ["OncePerRequestFilter", "HandlerInterceptor", "ArgumentResolver", "filt
 docs:
   - title: "Interceptors"
     url: "https://docs.spring.io/spring-framework/reference/web/webmvc.html#mvc-handlermapping-interceptor"
+summary: Three layers sit between the HTTP request and your controller method. Knowing which to use for what — Filter (servlet level), HandlerInterceptor (M...
 ---
 
 # Filters, Interceptors and Argument Resolvers

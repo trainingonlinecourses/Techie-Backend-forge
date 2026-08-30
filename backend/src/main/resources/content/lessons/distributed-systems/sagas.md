@@ -7,6 +7,7 @@ topics: ["saga pattern", "choreography", "orchestration", "compensating transact
 docs:
   - title: "Saga pattern"
     url: "https://microservices.io/patterns/data/saga.html"
+summary: A transaction spanning multiple services cannot use a database rollback — each service commits independently. The saga pattern is the distributed a...
 ---
 
 # Sagas: Choreography and Orchestration

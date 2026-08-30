@@ -9,6 +9,7 @@ docs:
     url: "https://docs.oracle.com/javase/tutorial/essential/exceptions/runtime.html"
   - title: "The State of Exception Handling (Oracle magazine)"
     url: "https://www.oracle.com/java/technologies/javase/exceptions.html"
+summary: Beginners treat exceptions as something to "wrap around" code when it crashes. Senior engineers treat exception handling as a contract with the cal...
 ---
 
 # Exception Handling Best Practices — Patterns That Scale

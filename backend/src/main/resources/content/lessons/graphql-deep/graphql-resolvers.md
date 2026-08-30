@@ -7,6 +7,7 @@ topics: ["resolvers", "field resolution", "@SchemaMapping", "data fetching", "ba
 docs:
   - title: "GraphQL resolvers (graphql.org)"
     url: "https://graphql.org/learn/execution/"
+summary: In REST, an endpoint returns a preshaped object. In GraphQL, the client selects fields — so the server can't know in advance what to fetch. The ans...
 ---
 
 # GraphQL Resolvers — How Fields Get Their Values

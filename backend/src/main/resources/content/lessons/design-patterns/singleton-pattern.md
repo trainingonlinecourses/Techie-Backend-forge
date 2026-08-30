@@ -7,6 +7,7 @@ topics: ["singleton", "static initialization", "thread safety", "Spring singleto
 docs:
   - title: "Singleton (Refactoring Guru)"
     url: "https://refactoring.guru/design-patterns/singleton"
+summary: Some things in a program should exist exactly once: a database connection pool, a logger, a configuration object, a randomnumber generator's seed. ...
 ---
 
 # Singleton — One Instance, Shared Everywhere
