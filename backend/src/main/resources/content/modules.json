@@ -1360,5 +1360,14 @@
     "color": "#bb9af7",
     "tech": ["Lombok", "MapStruct", "@Data", "@Builder", "Mappers"],
     "docsUrl": "https://projectlombok.org/features/all"
+  },
+  {
+    "id": "projects",
+    "title": "Complete Projects — 25 Production-Ready Applications",
+    "subtitle": "Build 25 real-world Java/Spring Boot projects — monolith CRUD apps, microservices architectures, CQRS, event sourcing, saga patterns — each with full code, Docker, tests, and architecture.",
+    "order": 102,
+    "color": "#2ac3de",
+    "tech": ["Projects", "Monolith", "Microservices", "CQRS", "Event Sourcing", "Saga", "Docker"],
+    "docsUrl": "https://docs.spring.io/spring-boot/reference/"
   }
 ]
