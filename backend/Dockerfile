@@ -5,6 +5,7 @@ WORKDIR /build
 # Copy POM first to cache dependency resolution across rebuilds.
 COPY pom.xml .
 RUN mvn -q -B dependency:go-offline
+RUN rm -rf src
 COPY src ./src
 RUN mvn -q -B -DskipTests package
 
