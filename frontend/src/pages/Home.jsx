@@ -4,6 +4,7 @@ import { api } from '../api/client';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useProgress } from '../hooks/useProgress.js';
 import { FALLBACK_CURRICULUM } from '../fallbackCurriculum.js';
+import { SkeletonCard } from '../components/Skeleton.jsx';
 
 const TECH = [
   ['JAVA', 'JDK 21'], ['SPRING FRAMEWORK', 'IoC · DI · AOP'], ['SPRING BOOT', '3.4'],
@@ -65,6 +66,11 @@ export default function Home() {
             <div className="stat"><div className="v">{(stats?.minutes ?? 11487) / 60 | 0}<b>h</b></div><div className="l">CURRICULUM</div></div>
             <div className="stat"><div className="v">{stats?.docsLinks ?? 303}+</div><div className="l">DOC LINKS</div></div>
           </div>
+          <div className="hero-tech-tags">
+            {['Java 21', 'Spring Boot 3.4', 'Spring Security', 'Spring AI', 'Docker', 'Kubernetes', 'PostgreSQL', 'Redis'].map((t) => (
+              <span key={t} className="hero-tag">{t}</span>
+            ))}
+          </div>
 
           {user && nextLesson && (
             <div className="continuecard">
@@ -105,25 +111,34 @@ export default function Home() {
         then the framework, then production practice — finishing with a complete runnable project.
       </p>
       <div className="modgrid">
-        {curriculum?.map((m, i) => {
+        {!curriculum ? (
+          Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)
+        ) : curriculum.map((m, i) => {
           const total = m.module.lessonCount ?? m.lessons.length;
           const done = m.lessons.filter((l) => progress[l.id]).length;
+          const pct = total > 0 ? Math.round(done / total * 100) : 0;
           return (
-            <Link key={m.module.id} to={`/modules/${m.module.id}`} className="modcard" data-num={m.module.order}>
-              <div className="g">MODULE {String(m.module.order).padStart(2, '0')}</div>
+            <Link key={m.module.id} to={`/modules/${m.module.id}`} className="modcard" data-num={m.module.order} style={{ animationDelay: `${Math.min(i * 0.03, 0.3)}s` }}>
+              <div className="modcard-top">
+                <div className="g">MODULE {String(m.module.order).padStart(2, '0')}</div>
+                <div className="modcard-icon" style={{ background: m.module.color + '18', color: m.module.color }}>
+                  {m.module.order <= 10 ? '☕' : m.module.order <= 30 ? '🚀' : m.module.order <= 60 ? '⚡' : '🏗️'}
+                </div>
+              </div>
               <h3>{m.module.title}</h3>
               <p>{m.module.subtitle}</p>
               <div className="techs">
-                {m.module.tech.map((t) => <span key={t}>{t}</span>)}
+                {m.module.tech.slice(0, 4).map((t) => <span key={t}>{t}</span>)}
+                {m.module.tech.length > 4 && <span className="tech-more">+{m.module.tech.length - 4}</span>}
               </div>
               <div className="foot">
                 <span>{total} lessons · {Math.round(m.module.minutes / 60 * 10) / 10}h</span>
-                <span className={`state ${done === total && total > 0 ? 'done' : 'todo'}`}>
-                  {done === total && total > 0 ? '✓ complete' : `${done}/${total} done`}
+                <span className={`state ${done === total && total > 0 ? 'done' : pct > 0 ? 'progress' : 'todo'}`}>
+                  {done === total && total > 0 ? '✓ complete' : pct > 0 ? `${pct}% done` : `${done}/${total}`}
                 </span>
               </div>
               <div className="mbar">
-                <div className="mbar-fill" style={{ width: `${total > 0 ? Math.round(done / total * 100) : 0}%`, background: m.module.color }} />
+                <div className="mbar-fill" style={{ width: `${pct}%`, background: m.module.color }} />
               </div>
             </Link>
           );
@@ -131,31 +146,36 @@ export default function Home() {
       </div>
 
       <h2 className="sec">How this platform works</h2>
-      <div className="board">
-        <div className="bcol ok">
-          <h4>LEARN</h4>
-          <ul>
-            <li>605 lessons with explanations + runnable code</li>
-            <li>Every topic linked to its official docs</li>
-            <li>Marked from the sidebar; progress is saved</li>
-          </ul>
-        </div>
-        <div className="bcol ok">
-          <h4>BUILD</h4>
-          <ul>
-            <li>Capstone: a complete payments API you can run</li>
-            <li>Layered architecture, JWT security, tests, Docker</li>
-            <li>Source in <code className="inline">projects/payments-api</code></li>
-          </ul>
-        </div>
-        <div className="bcol ok">
-          <h4>ASK</h4>
-          <ul>
-            <li>AI Tutor answers from the curriculum (Spring AI)</li>
-            <li>Works with zero keys — auto-detects Ollama, uses a free Hugging Face endpoint by default</li>
-            <li>Offline: a local knowledge assistant answers too</li>
-          </ul>
-        </div>
+      <div className="board">          <div className="bcol ok" style={{ animation: 'fadeInUp 0.5s ease-out 0.1s both' }}>
+            <div className="bcol-icon">📚</div>
+            <h4>LEARN</h4>
+            <ul>
+              <li>696+ in-depth lessons with beginner-friendly explanations</li>
+              <li>Every concept explained from zero — not just outlines</li>
+              <li>Code snippets with line-by-line annotations</li>
+              <li>Real-world organizational scenarios for each topic</li>
+            </ul>
+          </div>
+          <div className="bcol ok" style={{ animation: 'fadeInUp 0.5s ease-out 0.2s both' }}>
+            <div className="bcol-icon">🔨</div>
+            <h4>BUILD</h4>
+            <ul>
+              <li>25 complete projects: monoliths + microservices</li>
+              <li>CQRS, Event Sourcing, Saga patterns</li>
+              <li>Capstone: a complete payments API you can run</li>
+              <li>Docker, tests, architecture diagrams included</li>
+            </ul>
+          </div>
+          <div className="bcol ok" style={{ animation: 'fadeInUp 0.5s ease-out 0.3s both' }}>
+            <div className="bcol-icon">🤖</div>
+            <h4>ASK</h4>
+            <ul>
+              <li>AI Tutor answers from the curriculum (Spring AI)</li>
+              <li>Interactive Java code simulator — run code in browser</li>
+              <li>Quizzes after every lesson</li>
+              <li>Progress tracking with completion certificates</li>
+            </ul>
+          </div>
       </div>
 
       <h2 className="sec">What's inside the docs index</h2>

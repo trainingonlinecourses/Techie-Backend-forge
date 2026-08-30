@@ -7,6 +7,7 @@ import Markdown from '../components/Markdown.jsx';
 import Quiz from '../components/Quiz.jsx';
 import CodeEditor from '../components/CodeEditor.jsx';
 import KeyboardShortcuts from '../components/KeyboardShortcuts.jsx';
+import { SkeletonLesson } from '../components/Skeleton.jsx';
 
 export default function LessonPage() {
   const { lessonId } = useParams();
@@ -97,8 +98,19 @@ export default function LessonPage() {
     if (nav.next) navigate(`/lessons/${nav.next.id}`);
   }
 
-  if (error) return <div className="call warn"><div className="ct">⚠ Lesson unavailable</div><p>{error}</p></div>;
-  if (!lesson) return <div className="page-loading">Loading lesson…</div>;
+  if (error) return (
+    <div className="page lesson">
+      <div className="call warn" style={{ marginTop: 40 }}>
+        <div className="ct">⚠ Lesson unavailable</div>
+        <p>{error}</p>
+      </div>
+    </div>
+  );
+  if (!lesson) return (
+    <div className="page lesson">
+      <SkeletonLesson />
+    </div>
+  );
 
   const l = lesson.lesson;
   const completed = !!progress[l.id];
@@ -156,8 +168,11 @@ export default function LessonPage() {
 
           {/* Practice Code Editor */}
           <div className="lesson-code-section">
-            <h3>💻 Practice Code</h3>
-            <p className="code-description">Try writing code to reinforce what you learned:</p>
+            <div className="code-section-header">
+              <h3>💻 Practice Code</h3>
+              <span className="code-section-badge">Interactive</span>
+            </div>
+            <p className="code-description">Try writing code to reinforce what you learned. Edit the example below and click Run:</p>
             <CodeEditor 
               initialCode={extractCodeExample(lesson.body)}
               language="java"

@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import { api } from '../api/client';
 import { useProgress } from '../hooks/useProgress.js';
 import { FALLBACK_CURRICULUM } from '../fallbackCurriculum.js';
+import { SkeletonModulePage } from '../components/Skeleton.jsx';
 
 export default function ModulePage() {
   const { moduleId } = useParams();
@@ -28,8 +29,21 @@ export default function ModulePage() {
       });
   }, [moduleId]);
 
-  if (error) return <div className="call warn"><div className="ct">⚠ Not found</div><p>{error}</p></div>;
-  if (!detail) return <div className="page-loading">Loading module…</div>;
+  if (error) return (
+    <div className="page">
+      <div className="empty-state">
+        <div className="icon">⚠️</div>
+        <h3>Module not found</h3>
+        <p>{error}</p>
+        <Link to="/" className="btn ghost" style={{ marginTop: 16 }}>← Back to Academy</Link>
+      </div>
+    </div>
+  );
+  if (!detail) return (
+    <div className="page">
+      <SkeletonModulePage />
+    </div>
+  );
 
   const { module: m } = detail;
   const lessons = Array.isArray(detail.lessons) ? detail.lessons : [];
@@ -50,6 +64,12 @@ export default function ModulePage() {
         <div className="statusbar">
           <b>{done}/{lessons.length}</b> lessons completed
           <span>·</span> ≈ {Math.round((m.minutes / 60) * 10) / 10}h
+          {done > 0 && done < lessons.length && (
+            <>
+              <span>·</span>
+              <span style={{ color: 'var(--blue)' }}>{Math.round(done / lessons.length * 100)}% complete</span>
+            </>
+          )}
           {m.docsUrl && (
             <>
               <span>·</span>
@@ -76,13 +96,10 @@ export default function ModulePage() {
       </div>
 
       {lessons.length === 0 && (
-        <div className="call info">
-          <div className="ct">ℹ Lessons load when the backend is connected</div>
-          <p>
-            The module overview renders from the static fallback, but lesson content comes from the
-            Spring Boot API. Host the backend via the <code>render.yaml</code> blueprint or run it
-            locally (see the README Deployment section), then refresh.
-          </p>
+        <div className="empty-state">
+          <div className="icon">📭</div>
+          <h3>No lessons loaded yet</h3>
+          <p>Lessons load when the Spring Boot backend is connected. Deploy via Render or run locally.</p>
         </div>
       )}
     </div>
