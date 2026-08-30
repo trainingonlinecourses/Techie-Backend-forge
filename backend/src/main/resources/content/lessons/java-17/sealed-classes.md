@@ -1,215 +1,246 @@
 ---
-title: Sealed Classes — Controlling the Class Hierarchy
-summary: What sealed classes are, permits clause, why they matter for pattern matching, how they replace enums for complex hierarchies, and how organizations use them for domain modeling.
-order: 2
-minutes: 25
-topics: [sealed-classes, permits, non-sealed, final, java17]
+title: "Sealed Classes — Controlling Who Can Extend Your Code"
+summary: "What sealed classes are, why they exist, how permits restrict inheritance, and how organizations use them for type-safe domain modeling."
+order: 9
+minutes: 22
+topics: [sealed-classes, permits, final-sealed-non-sealed, java-17, exhaustiveness, domain-modeling]
 docs:
-  - https://docs.oracle.com/en/java/javase/17/language/sealed-classes-and-interfaces.html
   - https://openjdk.org/jeps/409
+  - https://docs.oracle.com/en/java/javase/17/language/sealed-classes-and-interfaces.html
 ---
 
 ## The Concept, From Zero
 
-Before Java 17, if you created an interface, ANY class in ANY package could implement it. You had no control over who could extend your type hierarchy.
+### What is a Sealed Class?
 
-**Sealed classes** let you restrict which classes can implement or extend a class/interface:
+Imagine you're building a payment system. You have a `Payment` class with three subtypes: `CreditCardPayment`, `BankTransferPayment`, and `CryptoPayment`. Right now, ANY class can extend `Payment` — even ones you don't control.
 
 ```java
-// Only these 3 shapes are allowed — no one else can implement Shape
-public sealed interface Shape permits Circle, Rectangle, Triangle {
-    double area();
+// Anyone can add a new payment type
+public class EvilPayment extends Payment { ... }
+```
+
+**Sealed classes fix this.** Introduced as a preview in Java 15 and finalized in Java 17 (JEP 409), a sealed class lets you explicitly list which classes can extend it:
+
+```java
+public sealed class Payment 
+    permits CreditCardPayment, BankTransferPayment, CryptoPayment {
+    // Only the three listed classes can extend this
+}
+```
+
+**Now the compiler knows ALL possible subtypes.** This enables:
+- Exhaustiveness checking in switch expressions
+- Better optimization by the JVM
+- Clear intent — you document your design decisions
+
+### Why Sealed Classes Exist
+
+Without sealed classes, there are two extremes:
+1. **`public class`** — anyone can extend it (too open)
+2. **`final class`** — nobody can extend it (too restrictive)
+
+Sealed classes give you the **middle ground** — you control exactly who can extend.
+
+### How Permits Work
+
+The `permits` clause lists all allowed subclasses:
+
+```java
+public sealed class Shape 
+    permits Circle, Rectangle, Triangle {
+    
+    // Common fields and methods
+    public abstract double area();
 }
 
-// Each permitted class must be final, non-sealed, or sealed
-public final record Circle(double radius) implements Shape {
+// Each permitted class must be one of:
+// 1. final — cannot be extended further
+// 2. sealed — has its own permits clause
+// 3. non-sealed — anyone can extend (default)
+
+public final class Circle extends Shape {
+    private final double radius;
+    
+    public Circle(double radius) { this.radius = radius; }
+    
+    @Override
     public double area() { return Math.PI * radius * radius; }
 }
 
-public final record Rectangle(double width, double height) implements Shape {
+public final class Rectangle extends Shape {
+    private final double width, height;
+    
+    public Rectangle(double width, double height) {
+        this.width = width;
+        this.height = height;
+    }
+    
+    @Override
     public double area() { return width * height; }
 }
 
-public final record Triangle(double base, double height) implements Shape {
+public final class Triangle extends Shape {
+    private final double base, height;
+    
+    public Triangle(double base, double height) {
+        this.base = base;
+        this.height = height;
+    }
+    
+    @Override
     public double area() { return 0.5 * base * height; }
 }
 ```
 
-**Why this matters for pattern matching:** The compiler KNOWS exactly which types are possible. This enables exhaustive `switch` expressions with no `default` needed:
+### The Three Modifiers for Permitted Subclasses
 
 ```java
-String describe(Shape shape) {
-    return switch (shape) {
-        case Circle c    -> "Circle with radius " + c.radius();
-        case Rectangle r -> "Rectangle " + r.width() + "x" + r.height();
-        case Triangle t  -> "Triangle with base " + t.base();
-        // No default needed — compiler knows these are ALL the possibilities
-    };
-}
+// 1. FINAL — cannot be extended
+public final class Circle extends Shape { ... }
+
+// 2. SEALED — has its own restrictions
+public sealed class Polygon extends Shape 
+    permits Triangle, Rectangle, Pentagon { ... }
+
+// 3. NON-SEALED — removes restrictions (someone else can extend)
+public non-sealed class CustomShape extends Shape { ... }
 ```
 
----
+### Exhaustive Pattern Matching
 
-## The Three Modalities
-
-```java
-// SEALED — restricts who can extend
-sealed interface Shape permits Circle, Rectangle, Triangle {}
-
-// FINAL — cannot be extended further
-final record Circle(double radius) implements Shape {}
-
-// NON-SEALED — opens the hierarchy back up (anyone can extend)
-non-sealed class CustomShape implements Shape {
-    // ...
-}
-```
-
----
-
-## Line-by-Line Walkthrough
+This is the **killer feature** of sealed classes. The compiler knows ALL subtypes, so you get exhaustiveness checking:
 
 ```java
-import java.util.*;
-
-public class SealedClassesDemo {
-    // Line 1: Define a sealed hierarchy for payment methods
-    sealed interface PaymentMethod permits CreditCard, DebitCard, BankTransfer {
-        boolean isInstant();
-        double processingFee(double amount);
-    }
-
-    // Line 2: Each permitted class is final (cannot be extended)
-    final record CreditCard(String number, String expiry) implements PaymentMethod {
-        public boolean isInstant() { return true; }
-        public double processingFee(double amount) { return amount * 0.029 + 0.30; }
-        // 2.9% + $0.30 per transaction
-    }
-
-    final record DebitCard(String number) implements PaymentMethod {
-        public boolean isInstant() { return true; }
-        public double processingFee(double amount) { return amount * 0.015; }
-        // 1.5% per transaction
-    }
-
-    final record BankTransfer(String routingNumber, String accountNumber) implements PaymentMethod {
-        public boolean isInstant() { return false; }     // takes 1-3 business days
-        public double processingFee(double amount) { return 0; }  // no fee
-    }
-
-    // Line 3: Use sealed hierarchy with exhaustive switch
-    static String describePayment(PaymentMethod method) {
-        return switch (method) {
-            case CreditCard cc   -> "Credit Card ending " + cc.number().substring(cc.number().length() - 4);
-            case DebitCard dc    -> "Debit Card ending " + dc.number().substring(dc.number().length() - 4);
-            case BankTransfer bt -> "Bank Transfer to account " + bt.accountNumber();
-            // No default needed — compiler knows all cases
+public class ShapePrinter {
+    static String describe(Shape shape) {
+        return switch (shape) {
+            case Circle c    -> "Circle with radius " + c.radius();
+            case Rectangle r -> "Rectangle " + r.width() + "x" + r.height();
+            case Triangle t  -> "Triangle base=" + t.base();
+            // No default needed! Compiler knows these are ALL the cases
+            // If you add a new shape to the sealed hierarchy,
+            // this switch will fail to compile until you handle it
         };
     }
-
-    // Line 4: Combine with pattern matching
-    static double calculateFee(PaymentMethod method, double amount) {
-        double fee = method.processingFee(amount);
-
-        // Additional pattern matching logic
-        if (method instanceof CreditCard cc && cc.number().startsWith("4")) {
-            fee += 0.50;  // Visa surcharge
-        }
-
-        return fee;
-    }
-
-    // Line 5: Sealed class with non-sealed escape hatch
-    sealed interface ApiResponse permits SuccessResponse, ErrorResponse, RawResponse {}
-    record SuccessResponse(int status, Object data) implements ApiResponse {}
-    record ErrorResponse(int status, String message) implements ApiResponse {}
-    non-sealed class RawResponse implements ApiResponse {
-        // Allows third-party extensions without modifying the sealed hierarchy
-        private final int status;
-        private final String body;
-        RawResponse(int status, String body) { this.status = status; this.body = body; }
-        public int status() { return status; }
-        public String body() { return body; }
-    }
-
-    public static void main(String[] args) {
-        // Line 6: Working with sealed hierarchy
-        PaymentMethod cc = new CreditCard("4111111111111234", "12/25");
-        PaymentMethod dc = new DebitCard("5222222222222222");
-        PaymentMethod bt = new BankTransfer("021000021", "123456789");
-
-        System.out.println(describePayment(cc));   // Credit Card ending 1234
-        System.out.println(describePayment(dc));   // Debit Card ending 2222
-        System.out.println(describePayment(bt));   // Bank Transfer to account 123456789
-
-        // Line 7: Polymorphism still works
-        List<PaymentMethod> methods = List.of(cc, dc, bt);
-        for (PaymentMethod m : methods) {
-            System.out.printf("%s: fee=$%.2f, instant=%s%n",
-                m.getClass().getSimpleName(),
-                m.processingFee(100),
-                m.isInstant());
-        }
-    }
 }
 ```
 
----
+### In the Same Package or Module
 
-## Real-World Scenarios
-
-### Scenario 1: State machine for order processing
+By default, permitted subclasses must be in the **same package** or **same module**:
 
 ```java
-sealed interface OrderState permits Draft, Submitted, Processing, Shipped, Delivered, Cancelled {}
+// In package com.example.shapes
+public sealed class Shape permits Circle, Rectangle { ... }
 
-record Draft(List<String> items) implements OrderState {}
-record Submitted(String orderId, Instant submittedAt) implements OrderState {}
-record Processing(String orderId, String warehouse) implements OrderState {}
-record Shipped(String orderId, String trackingNumber) implements OrderState {}
-record Delivered(String orderId, Instant deliveredAt) implements OrderState {}
-record Cancelled(String orderId, String reason) implements OrderState {}
+// Circle and Rectangle must be in:
+// 1. Same package (com.example.shapes), OR
+// 2. Same module (if module system is used)
+```
 
-OrderState next(OrderState current) {
-    return switch (current) {
-        case Draft d       -> new Submitted("ORD-" + UUID.randomUUID(), Instant.now());
-        case Submitted s   -> new Processing(s.orderId(), "Warehouse-A");
-        case Processing p  -> new Shipped(p.orderId(), "TRACK-" + p.orderId());
-        case Shipped sh    -> new Delivered(sh.orderId(), Instant.now());
-        case Delivered _   -> throw new IllegalStateException("Already delivered");
-        case Cancelled _   -> throw new IllegalStateException("Order cancelled");
+You can override this with `permits` in a different compilation unit (Java 17 relaxes this).
+
+### Organization Use Cases
+
+**1. API Response Types**
+```java
+public sealed interface ApiResponse<T> 
+    permits SuccessResponse, ErrorResponse, LoadingResponse {
+}
+
+public record SuccessResponse<T>(T data, int statusCode) implements ApiResponse<T> {}
+public record ErrorResponse<T>(String message, String errorCode) implements ApiResponse<T> {}
+public record LoadingResponse<T>() implements ApiResponse<T> {}
+```
+
+**2. Domain Events**
+```java
+public sealed interface DomainEvent 
+    permits OrderCreated, OrderShipped, OrderDelivered, OrderCancelled {
+}
+
+public record OrderCreated(String orderId, Instant timestamp) implements DomainEvent {}
+public record OrderShipped(String orderId, String trackingNumber) implements DomainEvent {}
+public record OrderDelivered(String orderId, Instant timestamp) implements DomainEvent {}
+public record OrderCancelled(String orderId, String reason) implements DomainEvent {}
+```
+
+**3. AST for Expression Evaluation**
+```java
+public sealed interface Expr 
+    permits Literal, Add, Multiply, Negate {
+}
+
+public record Literal(double value) implements Expr {}
+public record Add(Expr left, Expr right) implements Expr {}
+public record Multiply(Expr left, Expr right) implements Expr {}
+public record Negate(Expr operand) implements Expr {}
+```
+
+### Line-by-Line Code Explanation
+
+```java
+public sealed class Payment
+    permits CreditCardPayment, BankTransferPayment, CryptoPayment {
+    // ↑ sealed = this class controls who extends it
+    // ↑ permits = explicit list of allowed subclasses
+    // ↑ Only these THREE classes can extend Payment
+    // ↑ Any other class trying to extend Payment → compile error
+    
+    private final String transactionId;
+    // ↑ Common field — all payment types share this
+    
+    protected Payment(String transactionId) {
+        // ↑ protected constructor — only subclasses can call this
+        // ↑ Not public — external code cannot create Payment directly
+        this.transactionId = transactionId;
+    }
+    
+    public String transactionId() { return transactionId; }
+    // ↑ Public accessor — all payment types share this method
+}
+
+// Each permitted subclass MUST be one of: final, sealed, or non-sealed
+
+public final class CreditCardPayment extends Payment {
+    // ↑ final = this class cannot be extended further
+    // ↑ It's a leaf in the type hierarchy
+    
+    private final String cardNumber;
+    private final String cvv;
+    
+    public CreditCardPayment(String txId, String cardNumber, String cvv) {
+        super(txId);  // ↑ Call parent constructor
+        this.cardNumber = cardNumber;
+        this.cvv = cvv;
+    }
+    
+    // Accessor methods...
+}
+
+// Now pattern matching is exhaustive:
+static String describe(Payment payment) {
+    return switch (payment) {
+        case CreditCardPayment cc   -> "Credit card: " + cc.cardNumber();
+        case BankTransferPayment bt -> "Bank transfer: " + bt.accountNumber();
+        case CryptoPayment cp       -> "Crypto: " + cp.walletAddress();
+        // ↑ No default needed — compiler knows ALL cases
+        // ↑ If you add a new Payment subtype, this code won't compile
+        // ↑ Until you handle the new case — compile-time safety!
     };
 }
 ```
 
-### Scenario 2: AST for expression evaluation
+### Key Takeaways
 
-```java
-sealed interface Expr permits Literal, Add, Multiply {}
-record Literal(double value) implements Expr {}
-record Add(Expr left, Expr right) implements Expr {}
-record Multiply(Expr left, Expr right) implements Expr {}
+1. **Sealed classes control inheritance** — only permitted subclasses can extend
+2. **Three modifiers** — `final` (leaf), `sealed` (restricted), `non-sealed` (open)
+3. **Exhaustive pattern matching** — compiler knows all subtypes
+4. **Same package by default** — or same module
+5. **Document design intent** — make your type hierarchy explicit
+6. **Compile-time safety** — adding a new subtype forces code updates
 
-double evaluate(Expr expr) {
-    return switch (expr) {
-        case Literal l -> l.value();
-        case Add a     -> evaluate(a.left()) + evaluate(a.right());
-        case Multiply m -> evaluate(m.left()) * evaluate(m.right());
-    };
-}
+### Real-World Organization Scenario
 
-// Usage: (2 + 3) * 4 = 20
-Expr expr = new Multiply(new Add(new Literal(2), new Literal(3)), new Literal(4));
-System.out.println(evaluate(expr));  // 20.0
-```
-
----
-
-## Common Mistakes
-
-| Mistake | Problem | Fix |
-|---------|---------|-----|
-| Forgetting `permits` clause | Compiler error | List all permitted subclasses |
-| Permitted class not in same package/module | Compilation error | Put all classes in the same package |
-| Permitted class not final/non-sealed/sealed | Compilation error | Each permitted class must specify modality |
-| Using `default` in exhaustive switch | Unnecessary but not wrong | Remove `default` when compiler knows all cases |
+A banking platform models account types as a sealed hierarchy. When they add a new account type (e.g., `SavingsAccount`), the compiler forces them to handle it in every switch expression across the codebase. No forgotten cases, no runtime surprises. The sealed hierarchy also helps the JVM optimize dispatch — it knows there are exactly 4 account types, so it can use a faster lookup table instead of virtual dispatch.
