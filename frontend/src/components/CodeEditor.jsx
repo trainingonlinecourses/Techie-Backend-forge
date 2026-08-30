@@ -1,10 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { simulateJava } from './JavaSimulator';
 
 // Simple syntax highlighting for Java code
 function highlightJava(code) {
   if (!code) return '';
   
-  // Keywords
   const keywords = ['public', 'private', 'protected', 'static', 'final', 'class', 'interface',
     'extends', 'implements', 'new', 'return', 'if', 'else', 'for', 'while', 'do', 'switch',
     'case', 'break', 'continue', 'try', 'catch', 'finally', 'throw', 'throws', 'void',
@@ -12,19 +12,16 @@ function highlightJava(code) {
     'List', 'Map', 'Set', 'Optional', 'Stream', 'var', 'record', 'sealed', 'permits',
     'import', 'package', 'this', 'super', 'true', 'false', 'null', 'instanceof', 'enum'];
 
-  // Highlight keywords
   let highlighted = code.replace(
     new RegExp(`\\b(${keywords.join('|')})\\b`, 'g'),
     '<span class="kw">$1</span>'
   );
 
-  // Highlight strings
   highlighted = highlighted.replace(
     /"(?:[^"\\]|\\.)*"/g,
     '<span class="str">$&</span>'
   );
 
-  // Highlight comments
   highlighted = highlighted.replace(
     /(\/\/.*$)/gm,
     '<span class="cmt">$1</span>'
@@ -34,13 +31,11 @@ function highlightJava(code) {
     '<span class="str">$1</span>'
   );
 
-  // Highlight numbers
   highlighted = highlighted.replace(
     /\b(\d+\.?\d*)\b/g,
     '<span class="num">$1</span>'
   );
 
-  // Highlight annotations
   highlighted = highlighted.replace(
     /@(\w+)/g,
     '<span class="ann">@$1</span>'
@@ -84,28 +79,31 @@ export default function CodeEditor({ initialCode = '', language = 'java', readOn
 
   const runCode = async () => {
     setIsRunning(true);
-    setOutput('Running...\n');
+    setOutput('Compiling...\n');
 
     try {
-      // Simulate code execution (in real app, this would call a backend API)
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Simulate compilation delay
+      await new Promise(resolve => setTimeout(resolve, 600));
       
-      // Basic Java syntax validation
-      const errors = [];
-      if (!code.trim()) {
-        errors.push('Error: No code to execute');
-      }
-      if (code.includes('public static void main') && !code.includes('class ')) {
-        errors.push('Error: main method must be inside a class');
-      }
+      // Use the real Java simulator
+      const result = simulateJava(code);
       
-      if (errors.length > 0) {
-        setOutput(errors.join('\n'));
+      let outputText = '';
+      
+      if (result.errors && result.errors.length > 0) {
+        outputText = '❌ Compilation errors:\n';
+        result.errors.forEach(e => { outputText += '  ' + e + '\n'; });
       } else {
-        setOutput('✓ Code compiled successfully\n\nOutput:\nHello, World!');
+        outputText = '✅ Code compiled successfully\n\n';
+        outputText += '─'.repeat(40) + '\n';
+        outputText += 'Output:\n';
+        outputText += '─'.repeat(40) + '\n';
+        outputText += result.output || '(no output — add System.out.println() to see results)';
       }
+      
+      setOutput(outputText);
     } catch (err) {
-      setOutput(`Error: ${err.message}`);
+      setOutput(`❌ Runtime error: ${err.message}`);
     } finally {
       setIsRunning(false);
     }
@@ -145,7 +143,7 @@ export default function CodeEditor({ initialCode = '', language = 'java', readOn
               onClick={runCode} 
               disabled={isRunning}
             >
-              {isRunning ? '⏳' : '▶'} Run
+              {isRunning ? '⏳ Compiling...' : '▶ Run'}
             </button>
           )}
         </div>

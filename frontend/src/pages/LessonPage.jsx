@@ -239,16 +239,187 @@ function slug(text) {
 }
 
 function extractCodeExample(body) {
-  // Extract the first Java code block from the lesson body
-  const codeBlockRegex = /```java\n([\s\S]*?)```/;
-  const match = body.match(codeBlockRegex);
-  if (match && match[1]) {
-    return match[1].trim();
+  // Extract ALL Java code blocks from the lesson body
+  const codeBlockRegex = /```java\n([\s\S]*?)```/g;
+  const blocks = [];
+  let match;
+  while ((match = codeBlockRegex.exec(body)) !== null) {
+    if (match[1] && match[1].trim().length > 20) {
+      blocks.push(match[1].trim());
+    }
   }
-  // Fallback: return a simple Hello World
-  return `public class Main {
+
+  if (blocks.length > 0) {
+    // Pick the block with the most println/executable lines — most interactive
+    let best = blocks[0];
+    let bestScore = -1;
+    for (const block of blocks) {
+      const lines = block.split('\n').length;
+      const printCount = (block.match(/System\.out\.print/g) || []).length;
+      const hasMain = block.includes('public static void main') ? 5 : 0;
+      const score = lines * 2 + printCount * 3 + hasMain;
+      if (score > bestScore) {
+        bestScore = score;
+        best = block;
+      }
+    }
+    return best;
+  }
+
+  // Fallback based on module keywords in the body
+  const lowerBody = body.toLowerCase();
+  if (lowerBody.includes('array') || lowerBody.includes('indexed')) {
+    return `public class ArraysDemo {
     public static void main(String[] args) {
-        System.out.println("Hello, World!");
+        String[] languages = {"Java", "Python", "JavaScript", "Go", "Rust"};
+        System.out.println("We have " + languages.length + " languages:");
+        for (int i = 0; i < languages.length; i++) {
+            System.out.println("  " + (i + 1) + ". " + languages[i]);
+        }
+    }
+}`;
+  }
+  if (lowerBody.includes('loop') || lowerBody.includes('iteration')) {
+    return `public class LoopDemo {
+    public static void main(String[] args) {
+        System.out.println("Counting with for loop:");
+        for (int i = 1; i <= 10; i++) {
+            System.out.println("  " + i + " x 5 = " + (i * 5));
+        }
+        System.out.println("\nWhile loop — summing 1 to 100:");
+        int sum = 0, n = 1;
+        while (n <= 100) { sum += n; n++; }
+        System.out.println("Sum = " + sum);
+    }
+}`;
+  }
+  if (lowerBody.includes('string')) {
+    return `public class StringDemo {
+    public static void main(String[] args) {
+        String name = "BackendForge Academy";
+        System.out.println("Length: " + name.length());
+        System.out.println("Uppercase: " + name.toUpperCase());
+        System.out.println("Contains 'Forge': " + name.contains("Forge"));
+        System.out.println("Replace: " + name.replace("Backend", "Front"));
+        System.out.println("Substring(0,6): " + name.substring(0, 6));
+    }
+}`;
+  }
+  if (lowerBody.includes('class') || lowerBody.includes('object') || lowerBody.includes('oop')) {
+    return `class Animal {
+    String name;
+    int age;
+    Animal(String name, int age) { this.name = name; this.age = age; }
+    void speak() { System.out.println(name + " says hello!"); }
+}
+
+class Dog extends Animal {
+    Dog(String name, int age) { super(name, age); }
+    @Override
+    void speak() { System.out.println(name + " barks!"); }
+}
+
+public class OopDemo {
+    public static void main(String[] args) {
+        Animal cat = new Animal("Whiskers", 3);
+        Dog rex = new Dog("Rex", 5);
+        cat.speak();  // Whiskers says hello!
+        rex.speak();  // Rex barks!
+        System.out.println(cat instanceof Animal);  // true
+    }
+}`;
+  }
+  if (lowerBody.includes('exception') || lowerBody.includes('try') || lowerBody.includes('catch')) {
+    return `public class ExceptionDemo {
+    public static void main(String[] args) {
+        try {
+            int result = divide(10, 0);
+            System.out.println("Result: " + result);
+        } catch (ArithmeticException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+        try {
+            int[] arr = {1, 2, 3};
+            System.out.println(arr[10]);
+        } catch (ArrayIndexOutOfBoundsException e) {
+            System.out.println("Array index out of bounds!");
+        }
+        System.out.println("Program continues after exceptions.");
+    }
+    static int divide(int a, int b) {
+        if (b == 0) throw new ArithmeticException("Cannot divide by zero");
+        return a / b;
+    }
+}`;
+  }
+  if (lowerBody.includes('stream') || lowerBody.includes('lambda')) {
+    return `import java.util.*;
+import java.util.stream.*;
+
+public class StreamDemo {
+    public static void main(String[] args) {
+        List<String> names = Arrays.asList("Alice", "Bob", "Charlie", "Diana");
+        List<String> result = names.stream()
+            .filter(n -> n.length() > 3)
+            .map(String::toUpperCase)
+            .sorted()
+            .collect(Collectors.toList());
+        System.out.println("Long names (sorted, uppercase): " + result);
+
+        int sum = IntStream.rangeClosed(1, 100).sum();
+        System.out.println("Sum 1-100: " + sum);
+    }
+}`;
+  }
+  if (lowerBody.includes('map') || lowerBody.includes('hash')) {
+    return `import java.util.*;
+
+public class MapDemo {
+    public static void main(String[] args) {
+        Map<String, Integer> scores = new HashMap<>();
+        scores.put("Alice", 95);
+        scores.put("Bob", 87);
+        scores.put("Charlie", 92);
+        System.out.println("Alice's score: " + scores.get("Alice"));
+        System.out.println("All scores: " + scores);
+        scores.putIfAbsent("Diana", 88);
+        scores.computeIfPresent("Bob", (k, v) -> v + 5);
+        System.out.println("After updates: " + scores);
+    }
+}`;
+  }
+  if (lowerBody.includes('collection') || lowerBody.includes('list') || lowerBody.includes('set')) {
+    return `import java.util.*;
+
+public class CollectionDemo {
+    public static void main(String[] args) {
+        List<String> list = new ArrayList<>(Arrays.asList("Java", "Python", "Go"));
+        list.add("Rust");
+        System.out.println("List: " + list);
+
+        Set<Integer> set = new HashSet<>(Set.of(1, 2, 3, 3, 4));
+        System.out.println("Set (no duplicates): " + set);
+
+        Collections.sort(list);
+        System.out.println("Sorted: " + list);
+    }
+}`;
+  }
+  // Ultimate fallback — still useful code, not Hello World
+  return `public class Playground {
+    public static void main(String[] args) {
+        // --- Try editing this code! ---
+        String topic = "Java Programming";
+        int year = 2025;
+        double pi = 3.14159;
+        boolean learning = true;
+
+        System.out.println("Topic: " + topic);
+        System.out.println("Year: " + year);
+        System.out.println("Pi to 2 decimals: " + String.format("%.2f", pi));
+        System.out.println("Still learning? " + learning);
+
+        System.out.println("\n--- Try: arrays, loops, classes, streams! ---");
     }
 }`;
 }
