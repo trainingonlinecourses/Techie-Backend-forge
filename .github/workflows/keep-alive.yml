@@ -1,0 +1,58 @@
+# Keep-alive workflow — pings Render backend every 10 minutes
+# Render free-tier instances sleep after 15 minutes of inactivity.
+# This workflow sends a request to /actuator/health to keep it alive.
+
+name: Keep Render Alive
+
+on:
+  schedule:
+    # Run every 10 minutes
+    - cron: '*/10 * * * *'
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  keep-alive:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Render Backend
+        run: |
+          echo "Pinging Render backend at $(date -u)..."
+          RESPONSE=$(curl -s -w "\n%{http_code}" --max-time 30 \
+            "https://backendforge-academy-api-bef2.onrender.com/actuator/health" 2>&1)
+          
+          HTTP_CODE=$(echo "$RESPONSE" | tail -1)
+          BODY=$(echo "$RESPONSE" | head -n -1)
+          
+          echo "HTTP Status: $HTTP_CODE"
+          echo "Response: $BODY"
+          
+          if [ "$HTTP_CODE" = "200" ]; then
+            echo "✅ Render backend is alive and healthy"
+          else
+            echo "⚠️ Render backend returned status $HTTP_CODE"
+            # Don't fail the workflow — the instance might be waking up
+          fi
+      
+      - name: Ping Content API
+        run: |
+          echo "Pinging content API..."
+          RESPONSE=$(curl -s -w "\n%{http_code}" --max-time 60 \
+            "https://backendforge-academy-api-bef2.onrender.com/api/content/stats" 2>&1)
+          
+          HTTP_CODE=$(echo "$RESPONSE" | tail -1)
+          BODY=$(echo "$RESPONSE" | head -n -1)
+          
+          echo "HTTP Status: $HTTP_CODE"
+          echo "Response: $BODY"
+          
+          if [ "$HTTP_CODE" = "200" ]; then
+            echo "✅ Content API is responding"
+          else
+            echo "⚠️ Content API returned status $HTTP_CODE"
+          fi
+      
+      - name: Log Result
+        run: |
+          echo "Keep-alive ping completed at $(date -u)"
+          echo "Workflow: ${{ github.workflow }}"
+          echo "Run: ${{ github.run_number }}"
