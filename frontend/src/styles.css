@@ -924,3 +924,398 @@ h1.ptitle { font-family: var(--disp); font-weight: 700; font-size: clamp(24px, 4
   color: var(--mut);
   margin-bottom: 1rem;
 }
+
+/* ============================================================
+   MOBILE & UX IMPROVEMENTS
+   ============================================================ */
+
+/* Mobile-first responsive breakpoints */
+@media (max-width: 768px) {
+  /* Header: stack elements vertically on very small screens */
+  header {
+    padding: 0 12px;
+    gap: 8px;
+  }
+  
+  .logo .tag { display: none; }
+  .logo .name { font-size: 14px; }
+  .logo .mark { width: 28px; height: 28px; font-size: 11px; }
+  
+  .searchwrap { max-width: none; margin: 0 4px; }
+  .searchwrap input { font-size: 12px; padding: 8px 12px 8px 32px; }
+  .searchwrap kbd { display: none; }
+  
+  .progresspill { padding: 4px 10px 4px 6px; }
+  .progresspill .txt { font-size: 10px; }
+  .ring { width: 22px; height: 22px; }
+  
+  .navlinks { display: none; }
+  .authbtns .btn { padding: 6px 10px; font-size: 11px; }
+  
+  /* Sidebar: drawer on mobile */
+  .sidebar {
+    position: fixed;
+    top: var(--hh);
+    left: 0;
+    width: 280px;
+    height: calc(100vh - var(--hh));
+    z-index: 55;
+    transform: translateX(-100%);
+    transition: transform .3s cubic-bezier(0.4, 0, 0.2, 1);
+    background: var(--bg2);
+    box-shadow: 4px 0 20px rgba(0,0,0,.5);
+  }
+  .sidebar.open { transform: translateX(0); }
+  .sidebar-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.5);
+    z-index: 54;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .3s;
+  }
+  .sidebar-overlay.open { opacity: 1; pointer-events: auto; }
+  
+  /* Main content */
+  main { padding: 20px 16px 80px; }
+  
+  /* Hero section */
+  .hero .inner { padding: 24px 16px; }
+  .hero h1 { font-size: 28px; max-width: 100%; }
+  .hero .lede { font-size: 13px; }
+  .stats { gap: 16px; }
+  .stat .v { font-size: 22px; }
+  .stat .l { font-size: 9px; }
+  
+  /* Module cards */
+  .modgrid { grid-template-columns: 1fr; gap: 12px; }
+  .modcard { min-height: 140px; padding: 14px; }
+  .modcard::after { font-size: 40px; }
+  .modcard h3 { font-size: 14px; }
+  .modcard p { font-size: 11px; }
+  
+  /* Lesson cards */
+  .lessoncard { padding: 12px 14px; gap: 12px; }
+  .lc-num { width: 26px; height: 26px; font-size: 10px; }
+  .lc-body h3 { font-size: 13px; }
+  .lc-body p { font-size: 11px; }
+  
+  /* Lesson page */
+  .lesson-layout { flex-direction: column; gap: 20px; }
+  .toc { display: none !important; }
+  .pagehead { margin-bottom: 16px; }
+  h1.ptitle { font-size: 22px; margin: 4px 0 8px; }
+  .lede { font-size: 13px; }
+  .meta-chips { gap: 6px; }
+  .chip { font-size: 9px; padding: 3px 8px; }
+  .head-actions { flex-direction: column; }
+  .head-actions .btn { width: 100%; }
+  
+  /* Navigation buttons */
+  .pn { flex-direction: column; gap: 10px; }
+  .pn .prev, .pn .next { padding: 12px 14px; }
+  .pn .nm { font-size: 13px; }
+  
+  /* Code blocks */
+  .codeblock { border-radius: 10px; margin: 12px 0; }
+  .codeblock pre { padding: 10px 12px; font-size: 11px; line-height: 1.5; }
+  
+  /* Chat page */
+  .chatpage { min-height: 400px; }
+  .chatbox { padding: 14px; gap: 12px; }
+  .chatmsg { gap: 8px; }
+  .cm-avatar { width: 26px; height: 26px; font-size: 8px; }
+  .cm-body { max-width: 85%; }
+  .cm-content { padding: 10px 12px; font-size: 13px; }
+  .chatinput input { padding: 10px 14px; font-size: 13px; }
+  
+  /* Auth cards */
+  .authcard { padding: 24px 18px; border-radius: 14px; }
+  .authcard h1 { font-size: 20px; }
+  
+  /* Toast notifications */
+  .toast { 
+    bottom: 16px; 
+    left: 16px; 
+    right: 16px; 
+    transform: none;
+    font-size: 12px;
+    padding: 10px 14px;
+    white-space: normal;
+  }
+  @keyframes toastin { 
+    from { opacity: 0; transform: translateY(16px); } 
+    to { opacity: 1; transform: translateY(0); } 
+  }
+  
+  /* Back to top button */
+  .totop { 
+    width: 40px; 
+    height: 40px; 
+    right: 16px; 
+    bottom: 16px; 
+    font-size: 16px; 
+  }
+  
+  /* Reading progress bar */
+  .readbar { height: 2px; }
+  
+  /* Marquee */
+  .mq-track { gap: 24px; padding: 8px 0; }
+  .mq-track span { font-size: 10px; }
+  
+  /* Tables - horizontal scroll */
+  .tblwrap { margin: 12px 0; }
+  .markdown th, .markdown td { padding: 8px 10px; font-size: 11px; }
+  
+  /* Callouts */
+  .call { padding: 12px 14px; margin: 12px 0; }
+  .call .ct { font-size: 12px; }
+  .call p, .call li { font-size: 12px; }
+  
+  /* Docs page */
+  .doclinks { grid-template-columns: 1fr; }
+  .doclink { padding: 12px 14px; }
+  
+  /* Section headings */
+  .sec { font-size: 18px; margin: 28px 0 10px; }
+  
+  /* Depth grid */
+  .depthgrid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .depthgrid div { padding: 8px 10px; font-size: 10px; }
+  
+  /* Board columns */
+  .board { grid-template-columns: 1fr; gap: 12px; }
+  .bcol { padding: 14px; }
+  .bcol li { font-size: 12px; }
+}
+
+/* Very small screens */
+@media (max-width: 480px) {
+  .hero h1 { font-size: 24px; }
+  .stats { gap: 12px; }
+  .stat .v { font-size: 20px; }
+  .modgrid { gap: 10px; }
+  .depthgrid { grid-template-columns: 1fr; }
+}
+
+/* Touch-friendly improvements */
+@media (hover: none) and (pointer: coarse) {
+  /* Larger tap targets on touch devices */
+  .modlink { padding: 10px 12px; }
+  .lessonlink { padding: 8px 12px; }
+  .lessoncard { padding: 14px 16px; }
+  .btn { min-height: 44px; }
+  .btn.small { min-height: 36px; }
+  
+  /* Disable hover effects on touch */
+  .modcard:hover { transform: none; }
+  .lessoncard:hover { transform: none; }
+  .resultcard:hover { transform: none; }
+}
+
+/* Smooth scrolling for all users */
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+}
+
+/* Respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .mq-track { animation: none !important; }
+  .hero .bgimg { animation: none !important; }
+}
+
+/* Print styles */
+@media print {
+  header, .sidebar, .toc, .totop, .readbar, .toast, .chatinput {
+    display: none !important;
+  }
+  body { background: white; color: black; }
+  .markdown { max-width: 100%; }
+  .codeblock { break-inside: avoid; }
+}
+
+/* Focus visible for keyboard navigation */
+:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 2px;
+}
+
+/* Skip to main content link (accessibility) */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--amber);
+  color: #141005;
+  padding: 8px 16px;
+  border-radius: 0 0 8px 8px;
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 700;
+  z-index: 100;
+  transition: top .2s;
+}
+.skip-link:focus {
+  top: 0;
+}
+
+/* Loading spinner */
+.spinner {
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--line2);
+  border-top-color: var(--amber);
+  border-radius: 50%;
+  animation: spin .8s linear infinite;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Improved scrollbar for sidebar */
+.sidebar::-webkit-scrollbar { width: 4px; }
+.sidebar::-webkit-scrollbar-thumb { background: var(--line); border-radius: 2px; }
+.sidebar::-webkit-scrollbar-track { background: transparent; }
+
+/* Better mobile menu animation */
+@keyframes slideInFromLeft {
+  from { transform: translateX(-100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+/* Card hover glow effect */
+.modcard::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+  background: radial-gradient(
+    600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(245, 166, 35, 0.06),
+    transparent 40%
+  );
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+.modcard:hover::before { opacity: 1; }
+
+/* Improved code block copy button */
+.copybtn {
+  transition: all .2s ease;
+}
+.copybtn:active {
+  transform: scale(0.95);
+}
+.copybtn.ok {
+  animation: copyPulse .4s ease;
+}
+@keyframes copyPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+/* Better input focus states */
+input:focus, textarea:focus {
+  outline: none;
+  border-color: var(--amber) !important;
+  box-shadow: 0 
+ 0 0 3px rgba(245, 166, 35, 0.15) !important;
+}
+
+/* Improved button press state */
+.btn:active {
+  transform: scale(0.98) !important;
+  transition: transform .1s ease;
+}
+
+/* Stagger animation for lists */
+.modcard:nth-child(1) { animation-delay: 0s; }
+.modcard:nth-child(2) { animation-delay: 0.05s; }
+.modcard:nth-child(3) { animation-delay: 0.1s; }
+.modcard:nth-child(4) { animation-delay: 0.15s; }
+.modcard:nth-child(5) { animation-delay: 0.2s; }
+.modcard:nth-child(6) { animation-delay: 0.25s; }
+
+/* Tooltip styles */
+.tooltip { position: relative; }
+.tooltip::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--surface2);
+  border: 1px solid var(--line2);
+  color: var(--txt);
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-family: var(--mono);
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .2s, transform .2s;
+  z-index: 100;
+}
+.tooltip:hover::after {
+  opacity: 1;
+  transform: translateX(-50%) translateY(-4px);
+}
+
+/* Skip to main content (accessibility) */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--amber);
+  color: #141005;
+  padding: 8px 16px;
+  border-radius: 0 0 8px 8px;
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 700;
+  z-index: 100;
+  transition: top .2s;
+}
+.skip-link:focus { top: 0; }
+
+/* Loading spinner */
+.spinner {
+  width: 24px; height: 24px;
+  border: 2px solid var(--line2);
+  border-top-color: var(--amber);
+  border-radius: 50%;
+  animation: spin .8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Sidebar scrollbar */
+.sidebar::-webkit-scrollbar { width: 4px; }
+.sidebar::-webkit-scrollbar-thumb { background: var(--line); border-radius: 2px; }
+.sidebar::-webkit-scrollbar-track { background: transparent; }
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Print styles */
+@media print {
+  header, .sidebar, .toc, .totop, .readbar, .toast, .chatinput { display: none !important; }
+  body { background: white; color: black; }
+}
