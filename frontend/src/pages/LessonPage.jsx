@@ -6,6 +6,7 @@ import { useProgress } from '../hooks/useProgress.js';
 import Markdown from '../components/Markdown.jsx';
 import Quiz from '../components/Quiz.jsx';
 import CodeEditor from '../components/CodeEditor.jsx';
+import KeyboardShortcuts from '../components/KeyboardShortcuts.jsx';
 
 export default function LessonPage() {
   const { lessonId } = useParams();
@@ -227,6 +228,7 @@ export default function LessonPage() {
       </div>
 
       {toast && <div className="toast" role="status">{toast}</div>}
+      <KeyboardShortcuts prevLesson={nav.prev} nextLesson={nav.next} />
       {showTop && (
         <button className="totop" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} aria-label="Back to top">↑</button>
       )}

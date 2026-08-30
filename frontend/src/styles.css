@@ -1319,3 +1319,154 @@ input:focus, textarea:focus {
   header, .sidebar, .toc, .totop, .readbar, .toast, .chatinput { display: none !important; }
   body { background: white; color: black; }
 }
+
+/* ============================================================
+   Additional UX Improvements — Keyboard Hints, Tooltips, Polish
+   ============================================================ */
+
+/* Keyboard shortcut hint in navbar */
+.kbd-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--dim);
+  padding: 4px 8px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--surface);
+  cursor: pointer;
+  transition: all .2s;
+}
+.kbd-hint:hover {
+  border-color: var(--amber);
+  color: var(--amber);
+}
+kbd {
+  font-family: var(--mono);
+  font-size: 10px;
+  background: var(--bg2);
+  border: 1px solid var(--line2);
+  border-radius: 4px;
+  padding: 1px 6px;
+  color: var(--amber);
+  line-height: 1.4;
+}
+
+/* Tooltip on hover */
+[data-tooltip] {
+  position: relative;
+}
+[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--surface2);
+  color: var(--txt);
+  font-family: var(--mono);
+  font-size: 11px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--line2);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .2s, transform .2s;
+  z-index: 100;
+  box-shadow: 0 8px 20px rgba(0,0,0,.4);
+}
+[data-tooltip]:hover::after {
+  opacity: 1;
+  transform: translateX(-50%) translateY(-4px);
+}
+
+/* Smooth page transitions */
+.page {
+  animation: fadeInUp 0.35s ease-out;
+}
+
+/* Better mobile sidebar drawer */
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    left: -300px;
+    top: var(--hh);
+    z-index: 55;
+    background: var(--bg);
+    transition: left .3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: none;
+  }
+  .sidebar.open {
+    left: 0;
+    box-shadow: 20px 0 60px rgba(0,0,0,.6);
+  }
+  .sidebar-overlay {
+    position: fixed;
+    inset: 0;
+    top: var(--hh);
+    background: rgba(0,0,0,.5);
+    z-index: 54;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .3s;
+  }
+  .sidebar-overlay.visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .hambtn { display: grid; }
+  .navlinks { display: none; }
+  .searchwrap { max-width: 200px; }
+  .progresspill .txt { display: none; }
+  main { padding: 20px 16px 60px; }
+  .lesson-layout { flex-direction: column; gap: 0; }
+  .toc { display: none !important; }
+  .pn { flex-direction: column; }
+  .hero h1 { max-width: 100%; }
+  .hero .lede { max-width: 100%; }
+  .modgrid { grid-template-columns: 1fr; }
+  .board { grid-template-columns: 1fr; }
+  .depthgrid { grid-template-columns: 1fr 1fr; }
+  .chatpage { min-height: 400px; }
+  .chatmsg .cm-body { max-width: 90%; }
+  .chatinput input { font-size: 16px; }
+  .lessoncard { flex-direction: column; gap: 10px; }
+  .lessoncard .lc-num { align-self: flex-start; }
+}
+
+/* Lesson code section styling */
+.lesson-code-section {
+  margin: 24px 0;
+  padding: 20px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
+.lesson-code-section h3 {
+  font-family: var(--disp);
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+.lesson-code-section .code-description {
+  font-size: 13px;
+  color: var(--mut);
+  margin-bottom: 12px;
+}
+
+/* Lesson quiz section */
+.lesson-quiz-section {
+  margin: 24px 0;
+}
+
+/* Print improvements */
+@media print {
+  header, .sidebar, .toc, .pn, .lesson-complete-cta,
+  .readbar, .totop, .toast, .kbd-hint { display: none !important; }
+  main { max-width: 100%; padding: 20px; }
+  .markdown { font-size: 12pt; }
+  .codeblock { break-inside: avoid; }
+  body { background: white; color: black; }
+}
