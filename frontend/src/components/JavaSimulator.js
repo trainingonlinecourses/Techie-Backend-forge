@@ -2,7 +2,9 @@
  * JavaSimulator — lightweight browser-based Java code evaluator.
  * 
  * Handles: System.out.println/print, variables, for loops, if/else,
- * arrays, String methods, Math.*, basic arithmetic, comparison operators.
+ * arrays, String methods, Math.*, basic arithmetic, comparison operators,
+ * lambdas, Stream API, try/catch/finally, HashMap, ArrayList, HashSet,
+ * switch expressions, records, method references.
  */
 
 export function simulateJava(code) {
@@ -52,11 +54,16 @@ function runBlock(code, errors, parentVars, parentArrays) {
   let i = 0;
 
   while (i < stmts.length) {
-    const stmt = stmts[i].trim();
+    const stmt = stmts[i].trim().replace(/\)\s+\./g, ').').replace(/\s*\n\s*/g, ' ');
     if (!stmt || stmt === '{' || stmt === '}') { i++; continue; }
 
-    // Skip class/method declarations
+    // Skip class/method/record declarations
     if (stmt.startsWith('public') && !stmt.includes('public static void main')) {
+      // Check for record declarations: record Name(Type field, ...) { ... }
+      const recordMatch = /^(public\s+)?record\s+(\w+)\(([^)]*)\)/.exec(stmt);
+      if (recordMatch) {
+        i++; continue; // skip record declarations for now
+      }
       if (stmt.includes('{')) {
         let depth = 1;
         i++;
@@ -68,6 +75,30 @@ function runBlock(code, errors, parentVars, parentArrays) {
       } else {
         i++;
       }
+      continue;
+    }
+
+    // --- Record declaration (non-public) ---
+    const recordDeclMatch = /^record\s+(\w+)\(([^)]*)\)/.exec(stmt);
+    if (recordDeclMatch) {
+      if (stmt.includes('{')) {
+        let depth = 1;
+        i++;
+        while (i < stmts.length && depth > 0) {
+          if (stmts[i] === '{') depth++;
+          if (stmts[i] === '}') depth--;
+          i++;
+        }
+      } else {
+        i++;
+      }
+      continue;
+    }
+
+    // --- switch expression (Java 14+ arrow syntax) ---
+    const switchMatch = /^switch\s*\((.+)\)\s*\{?$/.exec(stmt);
+    if (switchMatch) {
+      i = executeSwitch(i, stmts, switchMatch[1], vars, arrays, output, errors);
       continue;
     }
 
@@ -430,7 +461,9 @@ function executeTryCatch(i, stmts, vars, arrays, output, errors) {
 }
 
 function executeStatement(stmt, vars, arrays, output, errors) {
-  if (!stmt || stmt === '{' || stmt === '}' || stmt === '') return;  // System.out.println(...)
+  if (!stmt || stmt === '{' || stmt === '}' || stmt === '') return;
+
+  // System.out.println(...)
     const printMatch = /^(System\.out\.print(?:ln)?)\((.+)\);?$/.exec(stmt);
     if (printMatch) {
       const isLn = printMatch[1].endsWith('ln');
@@ -479,8 +512,11 @@ function executeStatement(stmt, vars, arrays, output, errors) {
     return;
   }
 
-  // Any other statement
-  evaluateExpr(stmt.replace(/;$/, ''), vars, arrays);
+  // Any other statement — collect side-effect outputs from lambdas (forEach, etc.)
+  const exprResult = evaluateExpr(stmt.replace(/;$/, ''), vars, arrays);
+  if (exprResult && exprResult._lambdaOutputs) {
+    output.push(...exprResult._lambdaOutputs);
+  }
 }
 
 function splitStatements(code) {
@@ -569,6 +605,11 @@ function evaluateExpr(expr, vars, arrays) {
     const staticResult = tryStaticCall(expr, vars, arrays);
     if (staticResult !== undefined) return staticResult;
   }
+
+  // --- Lambda expression: (x) -> expr, (x, y) -> expr, x -> expr ---
+  // Must be before ternary/comparison since arrow uses > which is also a comparison op
+  const lambdaResult = tryLambda(expr, vars, arrays);
+  if (lambdaResult !== undefined) return lambdaResult;
 
   // --- Ternary ---
   const ternResult = tryTernary(expr, vars, arrays);
@@ -781,7 +822,7 @@ function tryArithmetic(expr, vars, arrays) {
       if (ch === '(') depth--;
       if (depth === 0 && (ch === '+' || ch === '-')) {
         if (ch === '-' && i === 0) continue;
-        if (ch === '-' && i > 0 && '+-*/(%= '.includes(expr[i - 1])) continue;
+        if (ch === '-' && i > 0 && '+-*/(%='.includes(expr[i - 1])) continue;
         if (ch === '+' && i + 1 < expr.length && expr[i + 1] === '+') continue;
 
         const left = evaluateExpr(expr.slice(0, i), vars, arrays);
@@ -798,6 +839,43 @@ function tryArithmetic(expr, vars, arrays) {
 }
 
 function tryMethodCall(expr, vars, arrays) {
+  // --- Chained method calls: obj.method1().method2() — balanced-paren parser (check FIRST) ---
+  if (/^\w+\./.test(expr) && /\)\./.test(expr)) {
+    const segments = [];
+    let pos = 0;
+    const rootMatch = /^(\w+)/.exec(expr);
+    if (rootMatch) pos = rootMatch[1].length;
+    while (pos < expr.length) {
+      if (expr[pos] !== '.') break;
+      pos++;
+      const methodNameMatch = /^([\w]+)/.exec(expr.slice(pos));
+      if (!methodNameMatch) break;
+      pos += methodNameMatch[1].length;
+      if (expr[pos] !== '(') break;
+      pos++;
+      let parenDepth = 1;
+      let argStart = pos;
+      while (pos < expr.length && parenDepth > 0) {
+        if (expr[pos] === '(') parenDepth++;
+        else if (expr[pos] === ')') parenDepth--;
+        if (parenDepth > 0) pos++;
+      }
+      const methodArgs = expr.slice(argStart, pos);
+      pos++;
+      segments.push({ name: methodNameMatch[1], args: methodArgs });
+    }
+    if (segments.length > 1 && pos === expr.length) {
+      let current = evaluateExpr(rootMatch[1], vars, arrays);
+      for (const seg of segments) {
+        const tmpName = '__chain_tmp';
+        vars[tmpName] = { type: 'object', value: current };
+        current = tryMethodCall(tmpName + '.' + seg.name + '(' + seg.args + ')', vars, arrays);
+        delete vars[tmpName];
+      }
+      return current;
+    }
+  }
+
   const methodMatch = /^(\w+)\.([\w]+)\((.*)?\)$/.exec(expr);
   if (methodMatch) {
     const [, objName, method, argsStr] = methodMatch;
@@ -805,6 +883,132 @@ function tryMethodCall(expr, vars, arrays) {
     if (!obj) return undefined;
 
     const val = obj.value;
+
+    // --- Stream methods ---
+    if (val && val._type === 'Stream') {
+      const data = val._data;
+      switch (method) {
+        case 'filter': {
+          const lambda = argsStr ? evaluateExpr(argsStr.trim(), vars, arrays) : null;
+          if (lambda && lambda._type === 'Lambda') {
+            const filtered = data.filter(item => isTruthy(lambda.apply([item]).value));
+            return { _type: 'Stream', _data: filtered };
+          }
+          return { _type: 'Stream', _data: data };
+        }
+        case 'map': {
+          const lambda = argsStr ? evaluateExpr(argsStr.trim(), vars, arrays) : null;
+          if (lambda && lambda._type === 'Lambda') {
+            return { _type: 'Stream', _data: data.map(item => lambda.apply([item]).value) };
+          }
+          return { _type: 'Stream', _data: data };
+        }
+        case 'flatMap': {
+          const lambda = argsStr ? evaluateExpr(argsStr.trim(), vars, arrays) : null;
+          if (lambda && lambda._type === 'Lambda') {
+            const flattened = data.flatMap(item => {
+              const r = lambda.apply([item]);
+              if (r.value && r.value._type === 'ArrayList') return r.value._data;
+              if (Array.isArray(r.value)) return r.value;
+              return [r.value];
+            });
+            return { _type: 'Stream', _data: flattened };
+          }
+          return { _type: 'Stream', _data: data };
+        }
+        case 'forEach': {
+          const lambda = argsStr ? evaluateExpr(argsStr.trim(), vars, arrays) : null;
+          if (lambda && lambda._type === 'Lambda') {
+            const allOutputs = [];
+            data.forEach(item => {
+              const r = lambda.apply([item]);
+              if (r && r.output) allOutputs.push(...r.output);
+            });
+            if (allOutputs.length > 0) return { _lambdaOutputs: allOutputs };
+          }
+          return undefined;
+        }
+        case 'collect':
+        case 'toList':
+          return { _type: 'ArrayList', _data: [...data] };
+        case 'count': return data.length;
+        case 'reduce': {
+          if (!argsStr) return data.length > 0 ? data[0] : undefined;
+          const parts = smartSplit(argsStr);
+          if (parts.length === 1) {
+            const lambda = evaluateExpr(parts[0].trim(), vars, arrays);
+            if (lambda && lambda._type === 'Lambda') {
+              return data.reduce((acc, item) => lambda.apply([acc, item]).value);
+            }
+          } else if (parts.length === 2) {
+            const identity = evaluateExpr(parts[0].trim(), vars, arrays);
+            const lambda = evaluateExpr(parts[1].trim(), vars, arrays);
+            if (lambda && lambda._type === 'Lambda') {
+              return data.reduce((acc, item) => lambda.apply([acc, item]).value, identity);
+            }
+          }
+          return data.length > 0 ? data[0] : undefined;
+        }
+        case 'sorted': return { _type: 'Stream', _data: [...data].sort((a, b) => a < b ? -1 : a > b ? 1 : 0) };
+        case 'distinct': return { _type: 'Stream', _data: [...new Set(data)] };
+        case 'skip': { const n = argsStr ? evaluateExpr(argsStr.trim(), vars, arrays) : 0; return { _type: 'Stream', _data: data.slice(n) }; }
+        case 'limit': { const n = argsStr ? evaluateExpr(argsStr.trim(), vars, arrays) : data.length; return { _type: 'Stream', _data: data.slice(0, n) }; }
+        case 'findFirst': return data.length > 0 ? { _type: 'Optional', _value: data[0] } : { _type: 'Optional', _value: undefined };
+        case 'anyMatch': {
+          const lambda = argsStr ? evaluateExpr(argsStr.trim(), vars, arrays) : null;
+          if (lambda && lambda._type === 'Lambda') return data.some(item => isTruthy(lambda.apply([item]).value));
+          return false;
+        }
+        case 'allMatch': {
+          const lambda = argsStr ? evaluateExpr(argsStr.trim(), vars, arrays) : null;
+          if (lambda && lambda._type === 'Lambda') return data.every(item => isTruthy(lambda.apply([item]).value));
+          return false;
+        }
+        case 'noneMatch': {
+          const lambda = argsStr ? evaluateExpr(argsStr.trim(), vars, arrays) : null;
+          if (lambda && lambda._type === 'Lambda') return !data.some(item => isTruthy(lambda.apply([item]).value));
+          return true;
+        }
+        case 'min': return data.length > 0 ? { _type: 'Optional', _value: data.reduce((a, b) => a < b ? a : b) } : { _type: 'Optional', _value: undefined };
+        case 'max': return data.length > 0 ? { _type: 'Optional', _value: data.reduce((a, b) => a > b ? a : b) } : { _type: 'Optional', _value: undefined };
+        case 'sum': return data.reduce((a, b) => a + b, 0);
+        case 'toArray': return data;
+        default: return undefined;
+      }
+    }
+
+    // --- Optional methods ---
+    if (val && val._type === 'Optional') {
+      switch (method) {
+        case 'isPresent': return val._value !== undefined && val._value !== null;
+        case 'get': return val._value;
+        case 'orElse': {
+          const def = argsStr ? evaluateExpr(argsStr.trim(), vars, arrays) : null;
+          return val._value != null ? val._value : def;
+        }
+        case 'orElseGet': {
+          const lambda = argsStr ? evaluateExpr(argsStr.trim(), vars, arrays) : null;
+          if (val._value != null) return val._value;
+          if (lambda && lambda._type === 'Lambda') return lambda.apply([]).value;
+          return undefined;
+        }
+        case 'ifPresent': {
+          const lambda = argsStr ? evaluateExpr(argsStr.trim(), vars, arrays) : null;
+          if (val._value != null && lambda && lambda._type === 'Lambda') lambda.apply([val._value]);
+          return undefined;
+        }
+        case 'map': {
+          const lambda = argsStr ? evaluateExpr(argsStr.trim(), vars, arrays) : null;
+          if (val._value != null && lambda && lambda._type === 'Lambda') return { _type: 'Optional', _value: lambda.apply([val._value]).value };
+          return { _type: 'Optional', _value: undefined };
+        }
+        case 'orElseThrow': {
+          if (val._value != null) return val._value;
+          throw new Error('java.util.NoSuchElementException: No value present');
+        }
+        default: return undefined;
+      }
+    }
 
     // --- HashMap methods ---
     if (val && val._type === 'HashMap') {
@@ -860,6 +1064,50 @@ function tryMethodCall(expr, vars, arrays) {
           const entries = Object.entries(data).map(([k, v]) => `${k}=${v}`);
           return '{' + entries.join(', ') + '}';
         }
+        case 'stream': {
+          const streamEntries = Object.entries(data).map(([k, v]) => ({ _type: 'MapEntry', key: k, value: v }));
+          return { _type: 'Stream', _data: streamEntries };
+        }
+        case 'forEach': {
+          const lambda = argsStr ? evaluateExpr(argsStr.trim(), vars, arrays) : null;
+          if (lambda && lambda._type === 'Lambda') {
+            const allOutputs = [];
+            Object.entries(data).forEach(([k, v]) => {
+              const r = lambda.apply([{ _type: 'MapEntry', key: k, value: v }]);
+              if (r && r.output) allOutputs.push(...r.output);
+            });
+            if (allOutputs.length > 0) return { _lambdaOutputs: allOutputs };
+          }
+          return undefined;
+        }
+        case 'computeIfAbsent': {
+          const parts = argsStr ? smartSplit(argsStr) : [];
+          const key = evaluateExpr(parts[0]?.trim(), vars, arrays);
+          const lambda = parts[1] ? evaluateExpr(parts[1].trim(), vars, arrays) : null;
+          if (!(key in data) && lambda && lambda._type === 'Lambda') {
+            data[key] = lambda.apply([]).value;
+          }
+          return data[key];
+        }
+        case 'merge': {
+          const parts = argsStr ? smartSplit(argsStr) : [];
+          const key = evaluateExpr(parts[0]?.trim(), vars, arrays);
+          const val = parts[1] ? evaluateExpr(parts[1].trim(), vars, arrays) : undefined;
+          const remappingFn = parts[2] ? evaluateExpr(parts[2].trim(), vars, arrays) : null;
+          if (remappingFn && remappingFn._type === 'Lambda') {
+            data[key] = remappingFn.apply([data[key], val]).value;
+          }
+          return data[key];
+        }
+        case 'replaceAll': {
+          const lambda = argsStr ? evaluateExpr(argsStr.trim(), vars, arrays) : null;
+          if (lambda && lambda._type === 'Lambda') {
+            Object.keys(data).forEach(k => {
+              data[k] = lambda.apply([k, data[k]]).value;
+            });
+          }
+          return undefined;
+        }
         default: return undefined;
       }
     }
@@ -905,6 +1153,47 @@ function tryMethodCall(expr, vars, arrays) {
         case 'isEmpty': return list.length === 0;
         case 'clear': list.length = 0; return undefined;
         case 'toString': return '[' + list.join(', ') + ']';
+        case 'stream': return { _type: 'Stream', _data: [...list] };
+        case 'of': return { _type: 'ArrayList', _data: [...list] };
+        case 'forEach': {
+          const lambda = argsStr ? evaluateExpr(argsStr.trim(), vars, arrays) : null;
+          if (lambda && lambda._type === 'Lambda') {
+            const allOutputs = [];
+            list.forEach(item => {
+              const r = lambda.apply([item]);
+              if (r && r.output) allOutputs.push(...r.output);
+            });
+            if (allOutputs.length > 0) return { _lambdaOutputs: allOutputs };
+          }
+          return undefined;
+        }
+        case 'sort': {
+          const lambda = argsStr ? evaluateExpr(argsStr.trim(), vars, arrays) : null;
+          if (lambda && lambda._type === 'Lambda') {
+            list.sort((a, b) => {
+              const r = lambda.apply([a, b]);
+              return typeof r.value === 'number' ? r.value : (r.value < 0 ? -1 : r.value > 0 ? 1 : 0);
+            });
+          } else {
+            list.sort((a, b) => a < b ? -1 : a > b ? 1 : 0);
+          }
+          return undefined;
+        }
+        case 'removeIf': {
+          const lambda = argsStr ? evaluateExpr(argsStr.trim(), vars, arrays) : null;
+          if (lambda && lambda._type === 'Lambda') {
+            for (let idx = list.length - 1; idx >= 0; idx--) {
+              if (isTruthy(lambda.apply([list[idx]]).value)) list.splice(idx, 1);
+            }
+          }
+          return undefined;
+        }
+        case 'addAll': {
+          const other = argsStr ? evaluateExpr(argsStr.trim(), vars, arrays) : null;
+          if (other && other._type === 'ArrayList') list.push(...other._data);
+          else if (Array.isArray(other)) list.push(...other);
+          return true;
+        }
         default: return undefined;
       }
     }
@@ -932,6 +1221,7 @@ function tryMethodCall(expr, vars, arrays) {
         case 'isEmpty': return set.length === 0;
         case 'clear': set.length = 0; return undefined;
         case 'toString': return '[' + set.join(', ') + ']';
+        case 'stream': return { _type: 'Stream', _data: [...set] };
         default: return undefined;
       }
     }
@@ -957,6 +1247,18 @@ function tryMethodCall(expr, vars, arrays) {
         case 'getMessage': return val._message;
         case 'getClass': return { _type: 'Class', _name: val._class };
         case 'printStackTrace': return undefined; // side effect only
+        default: return undefined;
+      }
+    }
+
+    // --- Lambda methods ---
+    if (val && val._type === 'Lambda') {
+      switch (method) {
+        case 'apply': {
+          const args = argsStr ? smartSplit(argsStr).map(a => evaluateExpr(a.trim(), vars, arrays)) : [];
+          return val.apply(args).value;
+        }
+        case 'toString': return val.toString();
         default: return undefined;
       }
     }
@@ -1005,27 +1307,6 @@ function tryMethodCall(expr, vars, arrays) {
       case 'parseDouble': return parseFloat(String(val));
       default: return undefined;
     }
-  }
-
-  // Chained method calls: obj.method1().method2()
-  const chainMatch = /^(\w+)(?:\.([\w]+)\(([^)]*)\))+/.exec(expr);
-  if (chainMatch && expr.includes('().')) {
-    // Evaluate each call in sequence
-    let current = evaluateExpr(chainMatch[1], vars, arrays);
-    const chainParts = expr.slice(chainMatch[1].length).split(/\)\.\(/);
-    for (const part of chainParts) {
-      const m = /^\.?(\w+)\((.*)?$/.exec(part);
-      if (m) {
-        const methodName = m[1];
-        const methodArgs = m[2] ? m[2].replace(/\)$/, '') : '';
-        // Create temp var
-        const tmpName = '__chain_tmp';
-        vars[tmpName] = { type: 'object', value: current };
-        current = tryMethodCall(tmpName + '.' + methodName + '(' + methodArgs + ')', vars, arrays);
-        delete vars[tmpName];
-      }
-    }
-    return current;
   }
 
   // Property access
@@ -1206,6 +1487,26 @@ function tryStaticCall(expr, vars, arrays) {
     return fmt;
   }
 
+  // Optional.of(value)
+  const optionalOfMatch = /^Optional\.of\((.+)\)$/.exec(expr);
+  if (optionalOfMatch) {
+    const val = evaluateExpr(optionalOfMatch[1].trim(), vars, arrays);
+    return { _type: 'Optional', _value: val };
+  }
+
+  // Optional.ofNullable(value)
+  const optionalNullMatch = /^Optional\.ofNullable\((.+)\)$/.exec(expr);
+  if (optionalNullMatch) {
+    const val = evaluateExpr(optionalNullMatch[1].trim(), vars, arrays);
+    return { _type: 'Optional', _value: val };
+  }
+
+  // Optional.empty()
+  const optionalEmptyMatch = /^Optional\.empty\(\)$/.exec(expr);
+  if (optionalEmptyMatch) {
+    return { _type: 'Optional', _value: undefined };
+  }
+
   return undefined;
 }
 
@@ -1244,4 +1545,146 @@ function parseLiteral(s) {
 function isTruthy(val) {
   if (val === null || val === undefined || val === false || val === 0 || val === '') return false;
   return true;
+}
+
+// ==================== LAMBDA SUPPORT ====================
+
+function tryLambda(expr, vars, arrays) {
+  // Match: (x) -> expr, (x, y) -> expr, x -> expr, x -> { ... }
+  const lambdaMatch = /^(?:\(([^)]*)\)|(\w+))\s*->\s*(.+)$/.exec(expr);
+  if (!lambdaMatch) return undefined;
+
+  const paramsStr = lambdaMatch[1] || lambdaMatch[2];
+  const bodyStr = lambdaMatch[3].trim();
+  const params = paramsStr.split(',').map(p => p.trim().replace(/^(int|long|double|float|String|var|boolean|char|Object)\s+/, ''));
+
+  // Return a callable lambda object
+  return {
+    _type: 'Lambda',
+    _params: params,
+    _body: bodyStr,
+    _closure: { vars: Object.create(vars), arrays: Object.create(arrays) },
+    apply: function(args) {
+      const childVars = Object.create(this._closure.vars);
+      const childArrays = Object.create(this._closure.arrays);
+      for (let j = 0; j < this._params.length; j++) {
+        childVars[this._params[j]] = { type: 'var', value: args[j] };
+      }
+      if (this._body.startsWith('{') && this._body.endsWith('}')) {
+        // Block body
+        const bodyCode = this._body.slice(1, -1);
+        const result = runBlock(bodyCode, [], childVars, childArrays);
+        if (result._pending) result.output.push(result._pending);
+        return { output: result.output, value: result.output.length === 1 ? result.output[0] : result.output };
+      } else if (this._body.includes('System.out') || this._body.includes('.')) {
+        // Statement-like expression body (e.g. System.out.println(n))
+        const result = runBlock(this._body, [], childVars, childArrays);
+        if (result._pending) result.output.push(result._pending);
+        return { output: result.output, value: result.output.length === 1 ? result.output[0] : result.output };
+      } else {
+        // Pure expression body
+        return { value: evaluateExpr(this._body, childVars, childArrays) };
+      }
+    },
+    toString: function() { return this._params.join(', ') + ' -> ' + this._body; }
+  };
+}
+
+function resolveLambda(lambda, args) {
+  if (lambda && lambda._type === 'Lambda') {
+    return lambda.apply(args);
+  }
+  return { value: undefined };
+}
+
+// ==================== SWITCH EXPRESSION SUPPORT ====================
+
+function executeSwitch(i, stmts, switchExpr, vars, arrays, output, errors) {
+  const switchVal = evaluateExpr(switchExpr, vars, arrays);
+
+  // Collect switch body
+  i++;
+  if (i < stmts.length && stmts[i].trim() === '{') i++;
+
+  const cases = [];
+  let defaultBody = null;
+  let depth = 1;
+  let currentCase = null;
+  let currentBody = [];
+
+  while (i < stmts.length && depth > 0) {
+    const bs = stmts[i].trim();
+    if (bs === '{') { depth++; if (depth > 1) { currentBody.push(bs); } i++; continue; }
+    if (bs === '}') {
+      depth--;
+      if (depth === 0) {
+        // Save last case
+        if (currentCase !== null && currentBody.length > 0) {
+          cases.push({ value: currentCase, body: currentBody });
+        } else if (currentCase === null && currentBody.length > 0) {
+          defaultBody = currentBody;
+        }
+        i++; continue;
+      }
+      currentBody.push(bs); i++; continue;
+    }
+
+    // case X: or case X -> ...
+    const caseMatch = /^case\s+(.+?)\s*:\s*$/.exec(bs);
+    const caseArrowMatch = /^case\s+(.+?)\s*->\s*(.*)$/.exec(bs);
+    const defaultMatch = /^default\s*:\s*$/.exec(bs);
+    const defaultArrowMatch = /^default\s*->\s*(.*)$/.exec(bs);
+
+    if (caseMatch || caseArrowMatch) {
+      // Save previous case
+      if (currentCase !== null && currentBody.length > 0) {
+        cases.push({ value: currentCase, body: currentBody });
+      }
+      currentCase = caseArrowMatch ? caseArrowMatch[1].trim() : caseMatch[1].trim();
+      currentBody = caseArrowMatch && caseArrowMatch[2].trim() ? [caseArrowMatch[2].trim()] : [];
+    } else if (defaultMatch || defaultArrowMatch) {
+      if (currentCase !== null && currentBody.length > 0) {
+        cases.push({ value: currentCase, body: currentBody });
+      }
+      currentCase = null;
+      currentBody = defaultArrowMatch && defaultArrowMatch[1].trim() ? [defaultArrowMatch[1].trim()] : [];
+    } else {
+      currentBody.push(bs);
+    }
+    i++;
+  }
+
+  // Save last case
+  if (currentCase !== null && currentBody.length > 0) {
+    cases.push({ value: currentCase, body: currentBody });
+  } else if (currentCase === null && currentBody.length > 0) {
+    defaultBody = currentBody;
+  }
+
+  // Execute matching case
+  let matched = false;
+  for (const { value: caseVal, body: caseBody } of cases) {
+    const cv = evaluateExpr(caseVal, vars, arrays);
+    if (cv == switchVal || String(cv) === String(switchVal)) {
+      const caseCode = caseBody.join('; ');
+      const result = runBlock(caseCode, errors, vars, arrays);
+      if (result.output.length > 0) {
+        output.push(...result.output);
+      }
+      if (result._pending) output.push(result._pending);
+      matched = true;
+      break;
+    }
+  }
+
+  if (!matched && defaultBody) {
+    const defCode = defaultBody.join('; ');
+    const result = runBlock(defCode, errors, vars, arrays);
+    if (result.output.length > 0) {
+      output.push(...result.output);
+    }
+    if (result._pending) output.push(result._pending);
+  }
+
+  return i;
 }
