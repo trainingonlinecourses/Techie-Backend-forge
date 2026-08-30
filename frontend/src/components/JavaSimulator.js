@@ -19,20 +19,24 @@ export function simulateJava(code) {
 
   // Find main method body
   const mainMatch = /public\s+static\s+void\s+main\s*\([^)]*\)\s*\{([\s\S]*)\}/.exec(src);
-  if (mainMatch) {
-    const result = runBlock(mainMatch[1], errors);
+  function flushResult(result) {
+    if (result._pending && result._pending.length > 0) {
+      result.output.push(result._pending);
+    }
     return { output: result.output.join('\n'), errors: result.errors };
+  }
+
+  if (mainMatch) {
+    return flushResult(runBlock(mainMatch[1], errors));
   }
 
   // No main — try class body
   const classBodyMatch = /class\s+\w+[^{]*\{([\s\S]*)\}\s*$/.exec(src);
   if (classBodyMatch) {
-    const result = runBlock(classBodyMatch[1], errors);
-    return { output: result.output.join('\n'), errors: result.errors };
+    return flushResult(runBlock(classBodyMatch[1], errors));
   }
 
-  const result = runBlock(src, errors);
-  return { output: result.output.join('\n'), errors: result.errors };
+  return flushResult(runBlock(src, errors));
 }
 
 /**
@@ -40,6 +44,7 @@ export function simulateJava(code) {
  */
 function runBlock(code, errors, parentVars, parentArrays) {
   const output = [];
+  output._pending = '';
   const vars = parentVars ? Object.create(parentVars) : {};
   const arrays = parentArrays ? Object.create(parentArrays) : {};
 
@@ -66,8 +71,8 @@ function runBlock(code, errors, parentVars, parentArrays) {
       continue;
     }
 
-    // --- Variable declaration ---
-    const declMatch = /^(int|long|double|float|boolean|char|byte|short|String|var|Integer|Long|Double|Float|Boolean|Character|Object)\s+(\w+)\s*=\s*(.+);?$/.exec(stmt);
+    // --- Variable declaration (primitives, String, collections, generic types) ---
+    const declMatch = /^(int|long|double|float|boolean|char|byte|short|String|var|Integer|Long|Double|Float|Boolean|Character|Object|ArrayList<[^>]+>|HashMap<[^>]+>|HashSet<[^>]+>|LinkedList<[^>]+>|List<[^>]+>|Map<[^>]+>|Set<[^>]+>|Collection<[^>]+>|Optional<[^>]+>|\w+(?:<[^>]+>)?)\s+(\w+)\s*=\s*(.+);?$/.exec(stmt);
     if (declMatch) {
       const [, type, name, expr] = declMatch;
       const val = evaluateExpr(expr.replace(/;$/, ''), vars, arrays);
@@ -109,7 +114,7 @@ function runBlock(code, errors, parentVars, parentArrays) {
       }
 
       // Execute loop — rebuild body as string and re-parse each iteration
-      const bodyCode = body.join(' ');
+      const bodyCode = body.join('; ');
       const maxIter = 10000;
       let iter = 0;
       while (iter < maxIter) {
@@ -128,7 +133,14 @@ function runBlock(code, errors, parentVars, parentArrays) {
         vars[varName] = { type: 'int', value: current };
         // Re-parse body each iteration so nested loops work
         const innerResult = runBlock(bodyCode, errors, vars, arrays);
-        output.push(...innerResult.output);
+        // Merge: prepend our pending to first output line, then push rest
+        if (innerResult.output.length > 0) {
+          output.push(output._pending + innerResult.output[0]);
+          output._pending = '';
+          output.push(...innerResult.output.slice(1));
+        }
+        // Carry pending across iterations
+        if (innerResult._pending) output._pending += innerResult._pending;
 
         current += step;
         iter++;
@@ -137,11 +149,35 @@ function runBlock(code, errors, parentVars, parentArrays) {
     }
 
     // --- for-each loop ---
-    const enhForMatch = /^for\s*\(\s*(?:int|long|double|float|String|char|boolean|var)\s+(\w+)\s*:\s*(\w+)\s*\)\s*\{?$/.exec(stmt);
+    const enhForMatch = /^for\s*\(\s*(?:int|long|double|float|String|char|boolean|var|Map\.Entry<[^>]+>|Object)\s+(\w+)\s*:\s*(.+?)\s*\)\s*\{?$/.exec(stmt);
     if (enhForMatch) {
-      const [, varName, arrName] = enhForMatch;
-      const arr = arrays[arrName] || vars[arrName];
-      const values = arr ? (arr.values || arr.value || []) : [];
+      const [, varName, collExpr] = enhForMatch;
+      // Evaluate collection expression — handles both simple vars and method calls like scores.entrySet()
+      const collResult = evaluateExpr(collExpr, vars, arrays);
+      let values = [];
+      let isMapIteration = false;
+      let mapData = null;
+
+      if (collResult && collResult._type === 'ArrayList') {
+        values = collResult._data;
+      } else if (collResult && collResult._type === 'HashMap') {
+        isMapIteration = true;
+        mapData = collResult._data;
+        values = Object.keys(collResult._data);
+      } else if (collResult && collResult._type === 'HashSet') {
+        values = collResult._data;
+      } else if (collResult && collResult._type === 'ArrayList') {
+        values = collResult._data;
+      } else {
+        // Fallback: look up as variable
+        const coll = vars[collExpr] || arrays[collExpr];
+        if (coll && coll.value) {
+          if (coll.value._type === 'ArrayList') { values = coll.value._data; }
+          else if (coll.value._type === 'HashMap') { isMapIteration = true; mapData = coll.value._data; values = Object.keys(coll.value._data); }
+          else if (coll.value._type === 'HashSet') { values = coll.value._data; }
+          else if (Array.isArray(coll.value)) { values = coll.value; }
+        } else if (coll && Array.isArray(coll.values)) { values = coll.values; }
+      }
 
       i++;
       if (i < stmts.length && stmts[i].trim() === '{') i++;
@@ -156,13 +192,52 @@ function runBlock(code, errors, parentVars, parentArrays) {
         i++;
       }
 
-      const bodyCode = body.join(' ');
+      const bodyCode = body.join('; ');
       for (const val of values) {
-        vars[varName] = { type: 'var', value: val };
+        if (isMapIteration) {
+          const isEntryIteration = stmt.includes('Map.Entry');
+          if (isEntryIteration) {
+            vars[varName] = { type: 'MapEntry', value: { _type: 'MapEntry', key: val, value: mapData ? mapData[val] : val } };
+          } else {
+            vars[varName] = { type: 'var', value: val };
+          }
+        } else {
+          vars[varName] = { type: 'var', value: val };
+        }
         const innerResult = runBlock(bodyCode, errors, vars, arrays);
-        output.push(...innerResult.output);
+        // Merge: prepend our pending to first output line, then push rest
+        if (innerResult.output.length > 0) {
+          output.push(output._pending + innerResult.output[0]);
+          output._pending = '';
+          output.push(...innerResult.output.slice(1));
+        }
+        // Carry pending across iterations
+        if (innerResult._pending) output._pending += innerResult._pending;
       }
       continue;
+    }
+
+    // --- try / catch / finally ---
+    const tryMatch = /^try\s*\{?$/.exec(stmt);
+    if (tryMatch) {
+      i = executeTryCatch(i, stmts, vars, arrays, output, errors);
+      continue;
+    }
+
+    // --- throw statement ---
+    const throwMatch = /^throw\s+(?:new\s+)?(.+);?$/.exec(stmt);
+    if (throwMatch) {
+      const excMsg = throwMatch[1].trim();
+      // Try to evaluate as expression first (e.g., new Exception("msg"))
+      const excVal = evaluateExpr(excMsg, vars, arrays);
+      if (typeof excVal === 'string') {
+        errors.push(excVal);
+      } else if (excVal && excVal._message) {
+        errors.push(excVal._class + ': ' + excVal._message);
+      } else {
+        errors.push(String(excVal));
+      }
+      i++; continue;
     }
 
     // --- if / else if / else ---
@@ -177,7 +252,8 @@ function runBlock(code, errors, parentVars, parentArrays) {
     i++;
   }
 
-  return { output, errors };
+  // Don't flush pending here — let the caller merge across iterations
+  return { output, errors, _pending: output._pending };
 }
 
 function collectBody(stmts, startIndex) {
@@ -226,9 +302,15 @@ function executeIfElse(i, stmts, condExpr, vars, arrays, output, errors) {
   }
 
   function runBody(bodyStmts) {
-    const code = bodyStmts.join(' ');
+    const code = bodyStmts.join('; ');
     const result = runBlock(code, errors, vars, arrays);
-    output.push(...result.output);
+    if (output._pending.length > 0 && result.output.length > 0) {
+      output._pending += result.output[0];
+      output.push(...result.output.slice(1));
+    } else {
+      output.push(...result.output);
+    }
+    output._pending += (result.output._pending || '');
   }
 
   if (isTruthy(cond)) {
@@ -250,20 +332,122 @@ function executeIfElse(i, stmts, condExpr, vars, arrays, output, errors) {
   return i;
 }
 
-function executeStatement(stmt, vars, arrays, output, errors) {
-  if (!stmt || stmt === '{' || stmt === '}' || stmt === '') return;
+function executeTryCatch(i, stmts, vars, arrays, output, errors) {
+  // Collect try body
+  const { body: tryBody, nextIndex: afterTry } = collectBody(stmts, i + 1);
+  i = afterTry;
 
-  // System.out.println(...)
-  const printMatch = /^(System\.out\.print(?:ln)?)\((.+)\);?$/.exec(stmt);
-  if (printMatch) {
-    const val = evaluateExpr(printMatch[2].trim(), vars, arrays);
-    if (val && val.error) {
-      errors.push(val.error);
-    } else {
-      output.push(String(val ?? ''));
+  let catchBlocks = [];
+  let finallyBody = null;
+
+  while (i < stmts.length) {
+    const next = stmts[i].trim();
+
+    // catch (ExceptionType e) {
+    const catchMatch = /^catch\s*\((\w+)\s+(\w+)\)\s*\{?$/.exec(next);
+    if (catchMatch) {
+      const [, excType, excVar] = catchMatch;
+      const result = collectBody(stmts, i + 1);
+      catchBlocks.push({ excType, excVar, body: result.body });
+      i = result.nextIndex;
+      continue;
     }
-    return;
+
+    // finally {
+    const finallyMatch = /^finally\s*\{?$/.exec(next);
+    if (finallyMatch) {
+      const result = collectBody(stmts, i + 1);
+      finallyBody = result.body;
+      i = result.nextIndex;
+      continue;
+    }
+
+    break;
   }
+
+  function runCode(bodyStmts) {
+    const code = bodyStmts.join('; ');
+    const result = runBlock(code, errors, vars, arrays);
+    output.push(...result.output);
+    return result.errors;
+  }
+
+  let thrownException = null;
+  let throwMsg = '';
+  try {
+    const tryErrors = [];
+    const tryResult = runBlock(tryBody.join('; '), tryErrors, vars, arrays);
+    output.push(...tryResult.output);
+    if (tryResult.errors.length > 0) {
+      thrownException = tryResult.errors[tryResult.errors.length - 1];
+      throwMsg = thrownException;
+    }
+    // Check for explicit throw statements that produced errors
+    if (tryErrors.length > 0) {
+      thrownException = tryErrors[tryErrors.length - 1];
+      throwMsg = thrownException;
+    }
+  } catch (e) {
+    thrownException = e.message || String(e);
+    throwMsg = thrownException;
+  }
+
+  if (thrownException && catchBlocks.length > 0) {
+    let caught = false;
+    for (const { excType, excVar, body } of catchBlocks) {
+      // Always catch generic types, or match specific type
+      const excMsg = String(thrownException);
+      if (excType === 'Exception' || excType === 'Throwable' || excType === 'RuntimeException' ||
+          excMsg.includes(excType) || excType === 'NullPointerException' ||
+          excType === 'ArrayIndexOutOfBoundsException' ||
+          excType === 'ArithmeticException' || excType === 'ClassCastException' ||
+          excType === 'NumberFormatException' || excType === 'IOException') {
+        // Create an exception object with toString()
+        vars[excVar] = {
+          type: excType,
+          value: { _type: 'Exception', _class: excType, _message: excMsg, toString: function() { return this._class + ': ' + this._message; } }
+        };
+        const catchErrors = [];
+        const catchResult = runBlock(body.join('; '), catchErrors, vars, arrays);
+        output.push(...catchResult.output);
+        errors.push(...catchErrors);
+        caught = true;
+        break;
+      }
+    }
+    if (!caught && catchBlocks.length > 0) {
+      errors.push(thrownException);
+    }
+  }
+
+  if (finallyBody) {
+    const finallyErrors = [];
+    const finallyResult = runBlock(finallyBody.join('; '), finallyErrors, vars, arrays);
+    output.push(...finallyResult.output);
+  }
+
+  return i;
+}
+
+function executeStatement(stmt, vars, arrays, output, errors) {
+  if (!stmt || stmt === '{' || stmt === '}' || stmt === '') return;  // System.out.println(...)
+    const printMatch = /^(System\.out\.print(?:ln)?)\((.+)\);?$/.exec(stmt);
+    if (printMatch) {
+      const isLn = printMatch[1].endsWith('ln');
+      const val = evaluateExpr(printMatch[2].trim(), vars, arrays);
+      if (val && val.error) {
+        errors.push(val.error);
+      } else {
+        const text = String(val ?? '');
+        if (isLn) {
+          output.push(output._pending + text);
+          output._pending = '';
+        } else {
+          output._pending += text;
+        }
+      }
+      return;
+    }
 
   // System.out.println() — no args
   if (/^System\.out\.print(?:ln)?\(\);?$/.test(stmt)) {
@@ -320,7 +504,7 @@ function splitStatements(code) {
           if (curlyDepth === 0) {
             // Block-level { — only if it follows ) or is standalone
             const trimmed = current.trim();
-            if (!trimmed || trimmed.endsWith(')') || trimmed.endsWith('else') || trimmed.endsWith('do')) {
+            if (!trimmed || trimmed.endsWith(')') || trimmed.endsWith('else') || trimmed.endsWith('do') || trimmed === 'finally' || trimmed === 'try') {
               if (trimmed) stmts.push(trimmed);
               current = '';
               stmts.push(ch);
@@ -378,6 +562,13 @@ function evaluateExpr(expr, vars, arrays) {
 
   // Variable reference (check local + prototype chain via Object.create)
   if (vars[expr] !== undefined && vars[expr] !== null && typeof vars[expr] === 'object' && 'value' in vars[expr]) return vars[expr].value;
+
+  // --- new Type<>() expressions — must be checked before comparison operators
+  //     because generics contain < > that would be misinterpreted as comparisons ---
+  if (expr.startsWith('new ')) {
+    const staticResult = tryStaticCall(expr, vars, arrays);
+    if (staticResult !== undefined) return staticResult;
+  }
 
   // --- Ternary ---
   const ternResult = tryTernary(expr, vars, arrays);
@@ -572,7 +763,7 @@ function tryArithmetic(expr, vars, arrays) {
           const right = evaluateExpr(expr.slice(i + 1), vars, arrays);
           if (typeof left === 'number' && typeof right === 'number') {
             if (op === '*') return left * right;
-            if (op === '/') return right === 0 ? 'Infinity' : left / right;
+            if (op === '/') { if (right === 0) { const e = new Error('java.lang.ArithmeticException: / by zero'); e._javaException = true; throw e; } return left / right; }
             if (op === '%') return left % right;
           }
         }
@@ -615,8 +806,164 @@ function tryMethodCall(expr, vars, arrays) {
 
     const val = obj.value;
 
+    // --- HashMap methods ---
+    if (val && val._type === 'HashMap') {
+      const data = val._data;
+      switch (method) {
+        case 'put': {
+          const parts = argsStr ? smartSplit(argsStr) : [];
+          const key = evaluateExpr(parts[0]?.trim(), vars, arrays);
+          const value = parts[1] ? evaluateExpr(parts[1].trim(), vars, arrays) : undefined;
+          data[key] = value;
+          return value;
+        }
+        case 'get': {
+          const key = argsStr ? evaluateExpr(argsStr.trim(), vars, arrays) : undefined;
+          return data[key];
+        }
+        case 'containsKey': {
+          const key = argsStr ? evaluateExpr(argsStr.trim(), vars, arrays) : undefined;
+          return key in data;
+        }
+        case 'containsValue': {
+          const value = argsStr ? evaluateExpr(argsStr.trim(), vars, arrays) : undefined;
+          return Object.values(data).some(v => v === value);
+        }
+        case 'size': return Object.keys(data).length;
+        case 'isEmpty': return Object.keys(data).length === 0;
+        case 'remove': {
+          const key = argsStr ? evaluateExpr(argsStr.trim(), vars, arrays) : undefined;
+          const removed = data[key];
+          delete data[key];
+          return removed;
+        }
+        case 'keySet': return { _type: 'Set', _data: Object.keys(data) };
+        case 'values': return { _type: 'ArrayList', _data: Object.values(data) };
+        case 'entrySet': {
+          const entries = Object.entries(data).map(([k, v]) => ({ _type: 'MapEntry', key: k, value: v }));
+          return { _type: 'ArrayList', _data: entries };
+        }
+        case 'putIfAbsent': {
+          const parts = argsStr ? smartSplit(argsStr) : [];
+          const key = evaluateExpr(parts[0]?.trim(), vars, arrays);
+          const value = parts[1] ? evaluateExpr(parts[1].trim(), vars, arrays) : undefined;
+          if (!(key in data)) data[key] = value;
+          return data[key];
+        }
+        case 'getOrDefault': {
+          const parts = argsStr ? smartSplit(argsStr) : [];
+          const key = evaluateExpr(parts[0]?.trim(), vars, arrays);
+          const def = parts[1] ? evaluateExpr(parts[1].trim(), vars, arrays) : null;
+          return key in data ? data[key] : def;
+        }
+        case 'toString': {
+          const entries = Object.entries(data).map(([k, v]) => `${k}=${v}`);
+          return '{' + entries.join(', ') + '}';
+        }
+        default: return undefined;
+      }
+    }
+
+    // --- ArrayList methods ---
+    if (val && val._type === 'ArrayList') {
+      const list = val._data;
+      switch (method) {
+        case 'add': {
+          const arg = argsStr ? evaluateExpr(argsStr.trim(), vars, arrays) : undefined;
+          list.push(arg);
+          return true;
+        }
+        case 'get': {
+          const idx = argsStr ? evaluateExpr(argsStr.trim(), vars, arrays) : 0;
+          return list[idx];
+        }
+        case 'set': {
+          const parts = argsStr ? smartSplit(argsStr) : [];
+          const idx = evaluateExpr(parts[0]?.trim(), vars, arrays);
+          const val = parts[1] ? evaluateExpr(parts[1].trim(), vars, arrays) : undefined;
+          const old = list[idx];
+          list[idx] = val;
+          return old;
+        }
+        case 'remove': {
+          const idx = argsStr ? evaluateExpr(argsStr.trim(), vars, arrays) : 0;
+          if (typeof idx === 'number') return list.splice(idx, 1)[0];
+          // remove by value
+          const i = list.indexOf(idx);
+          if (i >= 0) return list.splice(i, 1)[0];
+          return false;
+        }
+        case 'contains': {
+          const arg = argsStr ? evaluateExpr(argsStr.trim(), vars, arrays) : undefined;
+          return list.includes(arg);
+        }
+        case 'indexOf': {
+          const arg = argsStr ? evaluateExpr(argsStr.trim(), vars, arrays) : undefined;
+          return list.indexOf(arg);
+        }
+        case 'size': return list.length;
+        case 'isEmpty': return list.length === 0;
+        case 'clear': list.length = 0; return undefined;
+        case 'toString': return '[' + list.join(', ') + ']';
+        default: return undefined;
+      }
+    }
+
+    // --- HashSet methods ---
+    if (val && val._type === 'HashSet') {
+      const set = val._data;
+      switch (method) {
+        case 'add': {
+          const arg = argsStr ? evaluateExpr(argsStr.trim(), vars, arrays) : undefined;
+          if (!set.includes(arg)) { set.push(arg); return true; }
+          return false;
+        }
+        case 'contains': {
+          const arg = argsStr ? evaluateExpr(argsStr.trim(), vars, arrays) : undefined;
+          return set.includes(arg);
+        }
+        case 'remove': {
+          const arg = argsStr ? evaluateExpr(argsStr.trim(), vars, arrays) : undefined;
+          const i = set.indexOf(arg);
+          if (i >= 0) { set.splice(i, 1); return true; }
+          return false;
+        }
+        case 'size': return set.length;
+        case 'isEmpty': return set.length === 0;
+        case 'clear': set.length = 0; return undefined;
+        case 'toString': return '[' + set.join(', ') + ']';
+        default: return undefined;
+      }
+    }
+
+    // --- Map.Entry methods ---
+    if (val && val._type === 'MapEntry') {
+      switch (method) {
+        case 'getKey': return val.key;
+        case 'getValue': return val.value;
+        case 'setValue': {
+          const arg = argsStr ? evaluateExpr(argsStr.trim(), vars, arrays) : undefined;
+          val.value = arg;
+          return arg;
+        }
+        default: return undefined;
+      }
+    }
+
+    // --- Exception methods ---
+    if (val && val._type === 'Exception') {
+      switch (method) {
+        case 'toString': return val._class + ': ' + val._message;
+        case 'getMessage': return val._message;
+        case 'getClass': return { _type: 'Class', _name: val._class };
+        case 'printStackTrace': return undefined; // side effect only
+        default: return undefined;
+      }
+    }
+
+    // --- String methods ---
     switch (method) {
-      case 'length': return typeof val === 'string' ? val.length : (val.length || 0);
+      case 'length': return typeof val === 'string' ? val.length : (val && val.length) || 0;
       case 'toUpperCase': return typeof val === 'string' ? val.toUpperCase() : val;
       case 'toLowerCase': return typeof val === 'string' ? val.toLowerCase() : val;
       case 'trim': return typeof val === 'string' ? val.trim() : val;
@@ -651,7 +998,7 @@ function tryMethodCall(expr, vars, arrays) {
         const newV = parts[1] ? String(evaluateExpr(parts[1].trim(), vars, arrays)) : '';
         return typeof val === 'string' ? val.replace(old, newV) : val;
       }
-      case 'toString': return String(val);
+      case 'toString': return val && val._type ? (val._type === 'HashMap' ? '{' + Object.entries(val._data).map(([k,v]) => k+'='+v).join(', ') + '}' : '[' + (val._data || []).join(', ') + ']') : String(val);
       case 'valueOf': return String(val);
       case 'parseInt': return parseInt(String(val));
       case 'parseLong': return parseInt(String(val));
@@ -660,14 +1007,37 @@ function tryMethodCall(expr, vars, arrays) {
     }
   }
 
+  // Chained method calls: obj.method1().method2()
+  const chainMatch = /^(\w+)(?:\.([\w]+)\(([^)]*)\))+/.exec(expr);
+  if (chainMatch && expr.includes('().')) {
+    // Evaluate each call in sequence
+    let current = evaluateExpr(chainMatch[1], vars, arrays);
+    const chainParts = expr.slice(chainMatch[1].length).split(/\)\.\(/);
+    for (const part of chainParts) {
+      const m = /^\.?(\w+)\((.*)?$/.exec(part);
+      if (m) {
+        const methodName = m[1];
+        const methodArgs = m[2] ? m[2].replace(/\)$/, '') : '';
+        // Create temp var
+        const tmpName = '__chain_tmp';
+        vars[tmpName] = { type: 'object', value: current };
+        current = tryMethodCall(tmpName + '.' + methodName + '(' + methodArgs + ')', vars, arrays);
+        delete vars[tmpName];
+      }
+    }
+    return current;
+  }
+
   // Property access
   const propMatch = /^(\w+)\.(\w+)$/.exec(expr);
   if (propMatch) {
     const [, objName, prop] = propMatch;
-    if (prop === 'length') {
-      const obj = arrays[objName] || vars[objName];
-      if (obj) return (obj.values || obj.value || []).length;
-    }
+    const obj = vars[objName] || arrays[objName];
+    if (!obj) return undefined;
+    if (obj.value && obj.value._type === 'HashMap' && prop === 'size') return Object.keys(obj.value._data).length;
+    if (obj.value && obj.value._type === 'ArrayList' && prop === 'size') return obj.value._data.length;
+    if (obj.value && obj.value._type === 'HashSet' && prop === 'size') return obj.value._data.length;
+    if (prop === 'length') return (obj.values || obj.value || []).length;
   }
 
   return undefined;
@@ -703,15 +1073,119 @@ function tryStaticCall(expr, vars, arrays) {
     }
   }
 
+  // new ArrayList<>(){...} or new ArrayList<>(collection)
+  const arrayListMatch = /^new\s+ArrayList<(?:\w*)?>\((.*)\)$/.exec(expr);
+  if (arrayListMatch) {
+    const inner = arrayListMatch[1].trim();
+    if (!inner) return { _type: 'ArrayList', _data: [] };
+    // ArrayList<>(Arrays.asList(...))
+    const asListMatch = /^Arrays\.asList\((.+)\)$/.exec(inner);
+    if (asListMatch) {
+      const items = smartSplit(asListMatch[1]).map(a => evaluateExpr(a.trim(), vars, arrays));
+      return { _type: 'ArrayList', _data: items };
+    }
+    // ArrayList<>(List.of(...))
+    const listOfMatch = /^List\.of\((.+)\)$/.exec(inner);
+    if (listOfMatch) {
+      const items = smartSplit(listOfMatch[1]).map(a => evaluateExpr(a.trim(), vars, arrays));
+      return { _type: 'ArrayList', _data: items };
+    }
+    // ArrayList<>(otherList)
+    const otherList = evaluateExpr(inner, vars, arrays);
+    if (otherList && otherList._type === 'ArrayList') return { _type: 'ArrayList', _data: [...otherList._data] };
+    if (Array.isArray(otherList)) return { _type: 'ArrayList', _data: [...otherList] };
+    return { _type: 'ArrayList', _data: [] };
+  }
+
+  // new HashMap<>()
+  const hashMapMatch = /^new\s+HashMap<(?:\w*,\s*\w*)?>\((.*)\)$/.exec(expr);
+  if (hashMapMatch) {
+    const inner = hashMapMatch[1].trim();
+    if (!inner) return { _type: 'HashMap', _data: {} };
+    return { _type: 'HashMap', _data: {} };
+  }
+
+  // new LinkedHashMap<>()
+  const linkedHashMapMatch = /^new\s+LinkedHashMap<(?:\w*,\s*\w*)?>\(\)$/.exec(expr);
+  if (linkedHashMapMatch) return { _type: 'HashMap', _data: {} };
+
+  // new HashSet<>()
+  const hashSetMatch = /^new\s+HashSet<(?:\w*)?>\(\)$/.exec(expr);
+  if (hashSetMatch) return { _type: 'HashSet', _data: [] };
+
+  // new LinkedList<>()
+  const linkedListMatch = /^new\s+LinkedList<(?:\w*)?>\(\)$/.exec(expr);
+  if (linkedListMatch) return { _type: 'ArrayList', _data: [] };
+
   const listMatch = /^List\.of\((.+)\)$/.exec(expr);
   if (listMatch) {
-    return smartSplit(listMatch[1]).map(i => evaluateExpr(i.trim(), vars, arrays));
+    const items = smartSplit(listMatch[1]).map(a => evaluateExpr(a.trim(), vars, arrays));
+    return { _type: 'ArrayList', _data: items };
+  }
+
+  const setMatch = /^Set\.of\((.+)\)$/.exec(expr);
+  if (setMatch) {
+    const items = smartSplit(setMatch[1]).map(a => evaluateExpr(a.trim(), vars, arrays));
+    const unique = [...new Set(items)];
+    return { _type: 'HashSet', _data: unique };
+  }
+
+  const mapOfMatch = /^Map\.of\((.+)\)$/.exec(expr);
+  if (mapOfMatch) {
+    const items = smartSplit(mapOfMatch[1]).map(a => evaluateExpr(a.trim(), vars, arrays));
+    const data = {};
+    for (let k = 0; k < items.length; k += 2) data[items[k]] = items[k + 1];
+    return { _type: 'HashMap', _data: data };
+  }
+
+  // Map.ofEntries(Map.entry(...))
+  const mapEntriesMatch = /^Map\.ofEntries\((.+)\)$/.exec(expr);
+  if (mapEntriesMatch) {
+    const data = {};
+    const entryRegex = /Map\.entry\(([^,]+),\s*(.+)\)/g;
+    let m;
+    while ((m = entryRegex.exec(mapEntriesMatch[1])) !== null) {
+      const key = evaluateExpr(m[1].trim(), vars, arrays);
+      const val = evaluateExpr(m[2].trim(), vars, arrays);
+      data[key] = val;
+    }
+    return { _type: 'HashMap', _data: data };
   }
 
   const atsMatch = /^Arrays\.toString\((\w+)\)$/.exec(expr);
   if (atsMatch) {
-    const arr = arrays[atsMatch[1]] || vars[atsMatch[1]];
-    if (arr) return '[' + (arr.values || arr.value || []).join(', ') + ']';
+    const obj = arrays[atsMatch[1]] || vars[atsMatch[1]];
+    if (obj && obj._type === 'ArrayList') return '[' + obj._data.join(', ') + ']';
+    if (obj && obj._data && Array.isArray(obj.values || [])) return '[' + (obj.values || []).join(', ') + ']';
+    if (obj) return '[' + (obj.values || obj.value || []).join(', ') + ']';
+  }
+
+  // Collections.sort(list)
+  const collSortMatch = /^Collections\.sort\((\w+)\)$/.exec(expr);
+  if (collSortMatch) {
+    const listVar = vars[collSortMatch[1]];
+    if (listVar && listVar.value && listVar.value._type === 'ArrayList') {
+      listVar.value._data.sort((a, b) => a < b ? -1 : a > b ? 1 : 0);
+    }
+    return undefined;
+  }
+
+  // Collections.reverse(list)
+  const collReverseMatch = /^Collections\.reverse\((\w+)\)$/.exec(expr);
+  if (collReverseMatch) {
+    const listVar = vars[collReverseMatch[1]];
+    if (listVar && listVar.value && listVar.value._type === 'ArrayList') {
+      listVar.value._data.reverse();
+    }
+    return undefined;
+  }
+
+  // Arrays.sort(array)
+  const arrSortMatch = /^Arrays\.sort\((\w+)\)$/.exec(expr);
+  if (arrSortMatch) {
+    const arr = arrays[arrSortMatch[1]];
+    if (arr) arr.values.sort((a, b) => a - b);
+    return undefined;
   }
 
   const sfMatch = /^String\.format\("([^"]+)"(?:,\s*(.+))?\)$/.exec(expr);
