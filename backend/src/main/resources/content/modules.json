@@ -1279,5 +1279,86 @@
     "color": "#16a085",
     "tech": ["Profiles", "Configuration", "YAML", "Feature Flags"],
     "docsUrl": "https://docs.spring.io/spring-boot/reference/features/profiles.html"
+  },
+  {
+    "id": "java-arrays-deep",
+    "title": "Java Arrays Deep Dive",
+    "subtitle": "Array fundamentals, multi-dimensional arrays, copying, sorting, the Arrays utility class, and performance characteristics.",
+    "order": 93,
+    "color": "#f5a623",
+    "tech": ["Arrays", "Multi-dimensional", "Utility", "Performance"],
+    "docsUrl": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Arrays.html"
+  },
+  {
+    "id": "java-wrappers-deep",
+    "title": "Java Wrapper Classes Deep",
+    "subtitle": "Autoboxing/unboxing, the Integer cache, NumberFormatException, and when to use primitives vs wrappers.",
+    "order": 94,
+    "color": "#3498db",
+    "tech": ["Wrappers", "Autoboxing", "Cache", "Primitives"],
+    "docsUrl": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/package-summary.html"
+  },
+  {
+    "id": "java-nested-classes",
+    "title": "Java Nested & Inner Classes",
+    "subtitle": "Inner classes, static nested classes, local classes, anonymous classes, and lambda expressions — the complete picture.",
+    "order": 95,
+    "color": "#e67e22",
+    "tech": ["Inner Classes", "Static Nested", "Local", "Anonymous"],
+    "docsUrl": "https://docs.oracle.com/javase/tutorial/java/javaOO/index.html"
+  },
+  {
+    "id": "spring-autoconfig",
+    "title": "Spring Boot Auto-Configuration",
+    "subtitle": "How auto-configuration works, @Conditional beans, custom auto-configuration, and debugging configuration.",
+    "order": 96,
+    "color": "#27ae60",
+    "tech": ["Auto-Configuration", "@Conditional", "Custom Config", "Debugging"],
+    "docsUrl": "https://docs.spring.io/spring-boot/reference/features/auto-configuration.html"
+  },
+  {
+    "id": "spring-starters",
+    "title": "Spring Boot Starters & Custom Starters",
+    "subtitle": "What starters are, creating custom starters, dependency management, and version management.",
+    "order": 97,
+    "color": "#4cc2ff",
+    "tech": ["Starters", "Custom Starters", "Dependencies", "Versioning"],
+    "docsUrl": "https://docs.spring.io/spring-boot/reference/features/developing-auto-configuration.html"
+  },
+  {
+    "id": "spring-configproperties",
+    "title": "Spring @ConfigurationProperties",
+    "subtitle": "Type-safe configuration binding, nested properties, validation, YAML support, and profiles.",
+    "order": 98,
+    "color": "#6fce6f",
+    "tech": ["ConfigurationProperties", "Binding", "Validation", "YAML"],
+    "docsUrl": "https://docs.spring.io/spring-boot/reference/features/external-config.html"
+  },
+  {
+    "id": "spring-file-upload",
+    "title": "Spring Boot File Upload & Download",
+    "subtitle": "MultipartFile, file storage strategies, streaming downloads, validation, and cloud storage integration.",
+    "order": 99,
+    "color": "#9ece6a",
+    "tech": ["MultipartFile", "File Storage", "Streaming", "Cloud Storage"],
+    "docsUrl": "https://docs.spring.io/spring-boot/reference/web/servlet.html"
+  },
+  {
+    "id": "spring-logging",
+    "title": "Spring Boot Logging",
+    "subtitle": "SLF4J + Logback, log levels, file rotation, structured logging, MDC, and production logging patterns.",
+    "order": 100,
+    "color": "#f7768e",
+    "tech": ["SLF4J", "Logback", "MDC", "Structured Logging"],
+    "docsUrl": "https://docs.spring.io/spring-boot/reference/features/logging.html"
+  },
+  {
+    "id": "spring-lombok",
+    "title": "Lombok & MapStruct",
+    "subtitle": "Eliminate boilerplate with @Data, @Builder, @Value, @Slf4j, and type-safe mapping with MapStruct.",
+    "order": 101,
+    "color": "#bb9af7",
+    "tech": ["Lombok", "MapStruct", "@Data", "@Builder", "Mappers"],
+    "docsUrl": "https://projectlombok.org/features/all"
   }
 ]
