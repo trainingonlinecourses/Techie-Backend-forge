@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://backendforge-academy-api-bef2.onrender.com/api/:path*"
+    },
+    {
+      "source": "/actuator/:path*",
+      "destination": "https://backendforge-academy-api-bef2.onrender.com/actuator/:path*"
+    }
+  ]
+}
