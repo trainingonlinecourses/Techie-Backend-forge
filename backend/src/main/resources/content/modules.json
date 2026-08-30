@@ -1171,5 +1171,59 @@
       "Startup"
     ],
     "docsUrl": "https://www.graalvm.org/latest/docs/"
+  },
+  {
+    "id": "java-8",
+    "title": "Java 8 LTS Features",
+    "subtitle": "Lambda expressions, Stream API, Optional, functional interfaces, method references, default methods — the features that transformed Java.",
+    "order": 81,
+    "color": "#e74c3c",
+    "tech": ["Lambdas", "Streams", "Optional", "Functional Interfaces"],
+    "docsUrl": "https://docs.oracle.com/javase/8/docs/api/"
+  },
+  {
+    "id": "java-11",
+    "title": "Java 11 LTS Features",
+    "subtitle": "HttpClient API, var type inference, String new methods, single-file programs, Files API enhancements.",
+    "order": 82,
+    "color": "#3498db",
+    "tech": ["HttpClient", "var", "String", "Files API"],
+    "docsUrl": "https://docs.oracle.com/en/java/javase/11/docs/api/"
+  },
+  {
+    "id": "java-17",
+    "title": "Java 17 LTS Features",
+    "subtitle": "Records, sealed classes, pattern matching instanceof, text blocks, switch expressions, Stream.toList().",
+    "order": 83,
+    "color": "#2ecc71",
+    "tech": ["Records", "Sealed Classes", "Pattern Matching", "Text Blocks"],
+    "docsUrl": "https://docs.oracle.com/en/java/javase/17/docs/api/"
+  },
+  {
+    "id": "java-21",
+    "title": "Java 21 LTS Features",
+    "subtitle": "Virtual threads, sequenced collections, pattern matching switch, record patterns.",
+    "order": 84,
+    "color": "#9b59b6",
+    "tech": ["Virtual Threads", "Sequenced Collections", "Pattern Matching Switch", "Record Patterns"],
+    "docsUrl": "https://docs.oracle.com/en/java/javase/21/docs/api/"
+  },
+  {
+    "id": "java-25",
+    "title": "Java 25 LTS Features",
+    "subtitle": "Stream gatherers, stable values, unnamed variables — the latest LTS innovations.",
+    "order": 85,
+    "color": "#f39c12",
+    "tech": ["Stream Gatherers", "Stable Values", "Unnamed Variables"],
+    "docsUrl": "https://docs.oracle.com/en/java/javase/25/docs/api/"
+  },
+  {
+    "id": "java-26",
+    "title": "Java 26 Features",
+    "subtitle": "Structured concurrency, scoped values, flexible constructors — the cutting edge.",
+    "order": 86,
+    "color": "#1abc9c",
+    "tech": ["Structured Concurrency", "Scoped Values", "Flexible Constructors"],
+    "docsUrl": "https://docs.oracle.com/en/java/javase/26/docs/api/"
   }
 ]
