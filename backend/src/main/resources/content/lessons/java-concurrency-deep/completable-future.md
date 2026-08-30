@@ -1,242 +1,287 @@
 ---
-title: CompletableFuture Composition
-module: java-concurrency-deep
-order: 3
-minutes: 28
-topics: ["CompletableFuture", "thenApply", "thenCompose", "allOf", "exceptionally", "async pipelines"]
-summary: Future.get() blocks; CompletableFuture composes. It's the difference between waiting for each step and wiring the pipeline — parallel calls joined,...
+title: "CompletableFuture — Asynchronous Composition Without the Pain"
+summary: "What CompletableFuture is, how to chain async operations, handle errors gracefully, combine multiple futures, and build responsive applications."
+order: 10
+minutes: 22
+topics: [completable-future, async, chaining, exception-handling, composition, thenapply, thencompose]
 docs:
-  - title: "CompletableFuture"
-    url: "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/CompletableFuture.html"
+  - https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/CompletableFuture.html
 ---
 
-# CompletableFuture Composition
+## The Concept, From Zero
 
-`Future.get()` blocks; `CompletableFuture` composes. It's the difference between waiting for each step and *wiring the pipeline* — parallel calls joined, failures recovered, results transformed — without blocking a thread. This is the modern way to orchestrate async work in Java.
+### What is CompletableFuture?
 
-## From Future to CompletableFuture
+**CompletableFuture = a future value that you can chain operations on.** Unlike basic `Future`, you can:
+- Chain transformations (`thenApply`)
+- Chain async operations (`thenCompose`)
+- Combine multiple futures (`thenCombine`, `allOf`)
+- Handle errors gracefully (`exceptionally`, `handle`)
 
+Without CompletableFuture:
 ```java
-// Future: blocking, one result, no composition
-Future<Order> f = pool.submit(() -> fetchOrder(id));
-Order order = f.get(5, TimeUnit.SECONDS);   // thread blocked
-
-// CompletableFuture: non-blocking composition
-CompletableFuture<Order> cf = CompletableFuture
-    .supplyAsync(() -> fetchOrder(id), pool);
-cf.thenAccept(order -> process(order));      // runs when ready — no block
+// Sequential — waits for each call
+String user = getUser(id);           // 200ms
+List<Order> orders = getOrders(id);  // 300ms
+String recommendations = getRecs(id); // 150ms
+// Total: 650ms — all sequential
 ```
 
-## Creating Futures
-
+With CompletableFuture:
 ```java
-// Already-completed
-CompletableFuture.completedFuture(value);
-CompletableFuture.failedFuture(new IOException("down"));   // Java 9+
+// Parallel — all run simultaneously
+CompletableFuture<String> userF = CompletableFuture.supplyAsync(() -> getUser(id));
+CompletableFuture<List<Order>> ordersF = CompletableFuture.supplyAsync(() -> getOrders(id));
+CompletableFuture<String> recsF = CompletableFuture.supplyAsync(() -> getRecs(id));
 
-// From a task
-CompletableFuture.supplyAsync(() -> expensiveCall());       // common pool
-CompletableFuture.supplyAsync(() -> expensiveCall(), pool); // YOUR pool — always
-
-// From a Runnable
-CompletableFuture.runAsync(() -> fireAndForget());
+// Wait for all — total time: 300ms (the slowest one)
+CompletableFuture.allOf(userF, ordersF, recsF).join();
 ```
 
-**Always pass your executor** — the no-arg versions use the shared ForkJoin common pool (same starvation trap as parallel streams).
-
-## Transforming: thenApply
+### Creating CompletableFutures
 
 ```java
-CompletableFuture<Course> courseFuture = loadCourse(id);
+// 1. Already completed
+CompletableFuture<String> done = CompletableFuture.completedFuture("Hello");
 
-CompletableFuture<String> titleFuture = courseFuture
-    .thenApply(Course::title)            // Course → String (synchronous mapping)
-    .thenApply(String::toUpperCase);
+// 2. Async computation
+CompletableFuture<String> future = CompletableFuture.supplyAsync(() -> {
+    // Runs in the ForkJoinPool common pool
+    return fetchFromDatabase();
+});
+
+// 3. With custom executor
+CompletableFuture<String> future2 = CompletableFuture.supplyAsync(() -> {
+    return fetchFromDatabase();
+}, customExecutor);  // Use your own thread pool
 ```
 
-Each stage receives the previous result and returns a new future — a dependency chain, computed as results arrive.
-
-## Composing: thenCompose
+### Chaining Operations
 
 ```java
-// thenApply with a future-returning function gives Future<Future<T>> — WRONG
-CompletableFuture<CompletableFuture<Lesson>> bad = courseFuture
-    .thenApply(course -> loadLessons(course));    // nested!
+// thenApply — transform the result (like map)
+CompletableFuture<String> nameFuture = CompletableFuture
+    .supplyAsync(() -> getUserIdFromToken(token))
+    .thenApply(id -> userApi.getName(id))  // String → String
+    .thenApply(name -> "Hello, " + name);  // String → String
 
-// thenCompose FLATTENS: Future<Lesson>
-CompletableFuture<Lesson> good = courseFuture
-    .thenCompose(course -> loadLessons(course));
+// thenCompose — chain async operations (like flatMap)
+CompletableFuture<Order> orderFuture = CompletableFuture
+    .supplyAsync(() -> getUserIdFromToken(token))
+    .thenCompose(id -> orderApi.getLatestOrder(id));  // returns CompletableFuture<Order>
+// ↑ Use thenCompose when the next step returns a CompletableFuture
+
+// thenAccept — consume the result (no return value)
+CompletableFuture<Void> logFuture = CompletableFuture
+    .supplyAsync(() -> getOrder(id))
+    .thenAccept(order -> log.info("Order found: {}", order.getId()));
+
+// thenRun — run after completion (ignores the result)
+CompletableFuture<Void> cleanupFuture = CompletableFuture
+    .supplyAsync(() -> processData())
+    .thenRun(() -> cleanupTempFiles());
 ```
 
-**`thenApply`** = map (sync transform). **`thenCompose`** = flatMap (async dependency). Mixing them up is the most common CompletableFuture bug.
-
-## Parallel Composition: allOf
+### Combining Multiple Futures
 
 ```java
-CompletableFuture<Order> order = loadOrder(id);
-CompletableFuture<Customer> customer = loadCustomer(id);
-CompletableFuture<Inventory> inventory = checkInventory(id);
+// thenCombine — combine two futures
+CompletableFuture<String> result = userFuture
+    .thenCombine(orderFuture, (user, order) -> 
+        user.name() + " ordered " + order.product());
 
-// Run all three in parallel, wait for ALL, combine
-CompletableFuture<OrderDetail> detail = CompletableFuture
-    .allOf(order, customer, inventory)
-    .thenApply(v -> new OrderDetail(
-        order.join(),      // all completed — join() is safe now
-        customer.join(),
-        inventory.join()));
+// thenAcceptBoth — consume both results
+userFuture.thenAcceptBoth(orderFuture, (user, order) -> {
+    sendEmail(user.email(), "Your order: " + order.id());
+});
+
+// allOf — wait for ALL futures
+CompletableFuture<Void> all = CompletableFuture.allOf(
+    userFuture, orderFuture, recsFuture
+);
+all.join();  // Blocks until ALL complete
+
+// anyOf — wait for the FIRST future to complete
+CompletableFuture<Object> first = CompletableFuture.anyOf(
+    fastApi.call(), slowApi.call()
+);
 ```
 
-`allOf` takes varargs futures → completes when all complete → then combine with `join()`. Three sequential calls (~300ms) become one parallel batch (~100ms).
-
-### anyOf: First to Complete
+### Exception Handling
 
 ```java
-// Fastest provider wins
-CompletableFuture<Quote> fastest = CompletableFuture.anyOf(
-    fetchQuote("provider-a"), fetchQuote("provider-b"))
-    .thenApply(q -> (Quote) q);   // cast needed
-```
-
-## Error Handling
-
-```java
-// exceptionally: recover from a failure
-CompletableFuture<Course> safe = loadCourse(id)
+// exceptionally — handle errors, return fallback
+CompletableFuture<String> safe = CompletableFuture
+    .supplyAsync(() -> riskyOperation())
     .exceptionally(ex -> {
-        log.warn("Load failed: {}", ex.getMessage());
-        return defaultCourse();
+        log.error("Failed: {}", ex.getMessage());
+        return "fallback value";
     });
 
-// handle: always runs (success or failure)
-CompletableFuture<String> result = loadCourse(id)
-    .handle((course, ex) ->
-        ex != null ? "error: " + ex.getMessage() : course.title());
+// handle — handle both success and failure
+CompletableFuture<String> handled = CompletableFuture
+    .supplyAsync(() -> riskyOperation())
+    .handle((result, ex) -> {
+        if (ex != null) {
+            log.error("Error: {}", ex.getMessage());
+            return "fallback";
+        }
+        return result;
+    });
 
-// whenComplete: observe, don't change
-loadCourse(id).whenComplete((course, ex) -> {
-    if (ex != null) metrics.recordFailure();
-    else metrics.recordSuccess();
-});
+// exceptionallyCompose — try alternative on failure
+CompletableFuture<String> retry = CompletableFuture
+    .supplyAsync(() -> primaryService.call())
+    .exceptionallyCompose(ex -> 
+        CompletableFuture.supplyAsync(() -> fallbackService.call())
+    );
 ```
 
-## The Async Variants
+### Timeout Support (Java 9+)
 
 ```java
-// thenApplyAsync: run the transform on ANOTHER thread
-future.thenApplyAsync(x -> transform(x), pool);
+// Timeout after 5 seconds
+CompletableFuture<String> withTimeout = CompletableFuture
+    .supplyAsync(() -> slowOperation())
+    .orTimeout(5, TimeUnit.SECONDS)
+    .exceptionally(ex -> {
+        if (ex instanceof TimeoutException) {
+            return "Request timed out";
+        }
+        throw new CompletionException(ex);
+    });
 
-// Why it matters: by default, stages run on the thread that completed the previous stage
-// — for blocking work inside a stage, use the Async variant with your pool
+// Complete with default after timeout
+CompletableFuture<String> withDefault = CompletableFuture
+    .supplyAsync(() -> slowOperation())
+    .completeOnTimeout("default value", 5, TimeUnit.SECONDS);
 ```
 
-**Rule of thumb**: if a stage does blocking work (I/O, DB), use `thenApplyAsync`/`thenComposeAsync` with your pool; if it's pure computation, the sync variant is fine (and cheaper).
+### Organization Use Cases
 
-## Timeouts (Java 9+)
-
+**1. API Gateway Fan-Out**
 ```java
-CompletableFuture<Quote> withTimeout = fetchQuote(provider)
-    .completeOnTimeout(defaultQuote(), 3, TimeUnit.SECONDS)  // value on timeout
-    .orTimeout(5, TimeUnit.SECONDS);                          // exceptionallyComplete
-
-// orTimeout: fails the future after N — handle with exceptionally
-fetchQuote(provider)
-    .orTimeout(3, TimeUnit.SECONDS)
-    .exceptionally(ex -> { log.warn("timed out"); return fallback(); });
+public CompletableFuture<DashboardData> getDashboard(Long userId) {
+    CompletableFuture<UserProfile> profile = userService.getProfile(userId);
+    CompletableFuture<List<Order>> orders = orderService.getRecent(userId);
+    CompletableFuture<List<Notification>> notifs = notifService.getUnread(userId);
+    
+    return profile.thenCombine(orders, (p, o) -> 
+        new DashboardData(p, o, null)
+    ).thenCombine(notifs, (data, n) -> 
+        new DashboardData(data.profile(), data.orders(), n)
+    );
+}
 ```
 
-Every async pipeline needs a timeout — an unbounded wait is a leaked resource.
-
-## The Orchestration Pattern
-
+**2. Parallel Data Aggregation**
 ```java
-public CompletableFuture<OrderDetail> getOrderDetail(String orderId) {
-    return loadOrder(orderId)
-        .thenCompose(order ->
-            CompletableFuture.allOf(
-                    loadCustomer(order.customerId()),
-                    loadShipment(order.id()))
-                .thenApply(v -> new OrderDetail(order,
-                    customerCache.get(order.customerId()),   // or capture via join
-                    shipmentCache.get(order.id()))))
-        .exceptionally(ex -> {
-            log.error("Order detail failed", ex);
-            throw new OrderDetailException(orderId, ex);
+public CompletableFuture<Report> generateReport(Long id) {
+    CompletableFuture<Revenue> revenue = revenueService.calculate(id);
+    CompletableFuture<List<Transaction>> txns = txnService.list(id);
+    CompletableFuture<Map<String, Integer>> stats = statsService.aggregate(id);
+    
+    return CompletableFuture.allOf(revenue, txns, stats)
+        .thenApply(v -> new Report(
+            revenue.join(), txns.join(), stats.join()
+        ));
+}
+```
+
+**3. Retry with Backoff**
+```java
+public CompletableFuture<String> retryWithBackoff(int maxRetries, long delayMs) {
+    return CompletableFuture
+        .supplyAsync(() -> callExternalApi())
+        .exceptionallyCompose(ex -> {
+            if (maxRetries <= 0) {
+                return CompletableFuture.failedFuture(ex);
+            }
+            return CompletableFuture
+                .delayedExecutor(delayMs, TimeUnit.MILLISECONDS)
+                .submit(() -> retryWithBackoff(maxRetries - 1, delayMs * 2))
+                .thenCompose(Function.identity());
         });
 }
 ```
 
-Better — capture results without touching shared caches:
+### Common Mistakes
+
+| Mistake | Problem | Fix |
+|---------|---------|-----|
+| Calling .get() instead of .join() | .get() throws checked exception | Use .join() in lambdas (throws unchecked) |
+| Blocking on the common pool | Starves other tasks | Use custom executor for I/O-heavy tasks |
+| Not handling exceptions | Silently swallowed in background threads | Always use exceptionally() or handle() |
+| Using thenApply for async chains | Creates nested CompletableFuture | Use thenCompose() when next step is async |
+| Forgetting to handle Interruption | Tasks run even after timeout | Always check interrupt status |
+
+### Line-by-Line Code Explanation
 
 ```java
-public CompletableFuture<OrderDetail> getOrderDetail(String orderId) {
-    CompletableFuture<Order> orderF = loadOrder(orderId);
-    CompletableFuture<Customer> customerF = orderF.thenCompose(
-        o -> loadCustomer(o.customerId()));
-    CompletableFuture<Shipment> shipmentF = orderF.thenCompose(
-        o -> loadShipment(o.id()));
+import java.util.concurrent.CompletableFuture;
+// ↑ Import CompletableFuture — Java 8+ async composition API
 
-    return CompletableFuture.allOf(orderF, customerF, shipmentF)
-        .thenApply(v -> new OrderDetail(orderF.join(), customerF.join(), shipmentF.join()));
-}
-```
-
-## Spring Integration
-
-```java
-@Service
-public class OrderService {
-
-    @Async("reportExecutor")
-    public CompletableFuture<Report> generateReport(Long id) {
-        return CompletableFuture.completedFuture(reportGenerator.generate(id));
+public class FutureComposition {
+    
+    static CompletableFuture<String> fetchUserName(long id) {
+        // ↑ Returns CompletableFuture<String> — async operation
+        return CompletableFuture.supplyAsync(() -> {
+            // ↑ supplyAsync: runs the lambda in a background thread
+            // ↑ Returns a CompletableFuture that completes with the lambda's result
+            simulateDelay(200);  // Simulate 200ms network call
+            return "User-" + id;
+            // ↑ The string "User-{id}" becomes the future's value
+        });
+    }
+    
+    static CompletableFuture<String> fetchOrderSummary(long userId) {
+        // ↑ Another async operation — returns CompletableFuture<String>
+        return CompletableFuture.supplyAsync(() -> {
+            simulateDelay(300);  // Simulate 300ms database query
+            return "3 orders totaling $450";
+        });
+    }
+    
+    public static void main(String[] args) {
+        // Chain: fetch user → then fetch order → combine
+        CompletableFuture<String> result = fetchUserName(42L)
+            .thenApply(name -> {
+                // ↑ thenApply: transforms the result when future completes
+                // ↑ Input: "User-42", Output: modified string
+                System.out.println("Got user: " + name);
+                return name.toUpperCase();
+                // ↑ Returns uppercase version as the new future value
+            })
+            .thenCompose(name -> {
+                // ↑ thenCompose: chains another async operation
+                // ↑ Unlike thenCompose, the inner function returns CompletableFuture
+                return fetchOrderSummary(42L)
+                    .thenApply(orders -> name + " — " + orders);
+                // ↑ Combines user name with order summary
+            })
+            .exceptionally(ex -> {
+                // ↑ exceptionally: handles ANY error in the chain
+                // ↑ If any step above fails, this runs instead
+                return "Error: " + ex.getMessage();
+            });
+        
+        // .join() blocks until the future completes (no checked exception)
+        System.out.println(result.join());
+        // ↑ Prints: "USER-42 — 3 orders totaling $450"
     }
 }
 ```
 
-`@Async` + `CompletableFuture` return: Spring completes the future on success, completes it exceptionally on throw — the composition patterns above work transparently on async service methods.
+### Key Takeaways
 
-## Testing CompletableFutures
+1. **supplyAsync** — create a future from an async computation
+2. **thenApply** — transform the result (like Stream.map)
+3. **thenCompose** — chain async operations (like Stream.flatMap)
+4. **thenCombine** — merge two futures
+5. **allOf** — wait for all futures
+6. **exceptionally** — handle errors with fallback
+7. **Use .join() not .get()** in lambdas — avoids checked exceptions
 
-```java
-@Test
-void composesResults() {
-    CompletableFuture<String> f = CompletableFuture
-        .completedFuture("spring")
-        .thenApply(String::toUpperCase);
+### Real-World Organization Scenario
 
-    assertEquals("SPRING", f.join());
-}
-
-@Test
-void recoversFromFailure() {
-    CompletableFuture<String> f = CompletableFuture
-        .failedFuture(new RuntimeException("boom"))
-        .exceptionally(ex -> "recovered");
-
-    assertEquals("recovered", f.join());
-}
-
-@Test
-void parallelJoin() {
-    CompletableFuture<Integer> a = CompletableFuture.supplyAsync(() -> 1);
-    CompletableFuture<Integer> b = CompletableFuture.supplyAsync(() -> 2);
-    int sum = CompletableFuture.allOf(a, b)
-        .thenApply(v -> a.join() + b.join()).join();
-    assertEquals(3, sum);
-}
-```
-
-## Summary
-
-| Operation | Meaning |
-|-----------|---------|
-| `supplyAsync` | Start async work |
-| `thenApply` | Map the result (sync) |
-| `thenCompose` | Chain an async step (flatMap) |
-| `allOf` | Wait for all, then combine |
-| `anyOf` | First to complete wins |
-| `exceptionally` | Recover from failure |
-| `handle` | Transform success or failure |
-| `orTimeout` / `completeOnTimeout` | Bound the wait |
-
-CompletableFuture is the composition layer: parallel fetches, dependent pipelines, failure recovery, and timeouts — all without blocking threads. Use `thenCompose` for async dependencies, `allOf` for parallel fan-out, always pass your executor, and always bound with timeouts.
+A microservices dashboard makes 5 parallel API calls (user profile, orders, notifications, recommendations, billing). Using CompletableFuture.allOf(), all 5 calls run simultaneously. The total response time is the slowest call (200ms) instead of the sum (800ms). If any call fails, exceptionally() returns a graceful fallback. The dashboard loads 4x faster than the sequential version.

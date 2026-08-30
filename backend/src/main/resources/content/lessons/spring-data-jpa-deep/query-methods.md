@@ -1,280 +1,236 @@
 ---
-title: Repository Query Methods in Depth
-module: spring-data-jpa-deep
-order: 2
-minutes: 25
-topics: ["derived queries", "@Query", "JPQL", "native queries", "modifying queries", "named queries", "projections"]
-summary: Spring Data JPA gives you three ways to query: derived methods (name = query), @Query with JPQL, and native SQL. Each has a place — this lesson cov...
+title: "Query Methods — From Method Names to Native SQL"
+summary: "Derived query methods, JPQL @Query, native SQL, @Modifying, projections, and how organizations build efficient data access layers."
+order: 14
+minutes: 20
+topics: [query-methods, jpql, native-query, @query, projections, derived-queries, spring-data-jpa]
 docs:
-  - title: "Spring Data JPA queries"
-    url: "https://docs.spring.io/spring-data/jpa/reference/jpa/query-methods.html"
+  - https://docs.spring.io/spring-data/jpa/reference/repositories/query-methods.html
+  - https://docs.spring.io/spring-data/jpa/reference/jpa/query-methods.html
 ---
 
-# Repository Query Methods in Depth
+## The Concept, From Zero
 
-Spring Data JPA gives you three ways to query: **derived methods** (name = query), **`@Query` with JPQL**, and **native SQL**. Each has a place — this lesson covers when to use which, the full syntax of each, and the pitfalls (spellings, parameter binding, modifying queries).
+### What are Query Methods?
 
-## The Three Query Styles
-
-| Style | Syntax | When |
-|-------|--------|------|
-| Derived | `findByTitleContainingIgnoreCase(String)` | Simple filters |
-| JPQL | `@Query("select c from Course c where ...")` | Complex logic, joins |
-| Native | `@Query(value = "SELECT * FROM ...", nativeQuery = true)` | DB-specific SQL |
-
-## Derived Queries: The Name IS the Query
+Spring Data JPA lets you write database queries **just by naming your methods**. No SQL, no JPQL — just a method name that Spring translates into a query:
 
 ```java
-@Repository
-public interface CourseRepository extends JpaRepository<Course, Long> {
-
-    List<Course> findByLevel(String level);
-
-    List<Course> findByLevelAndPublishedTrue(String level);
-
-    List<Course> findByTitleContainingIgnoreCase(String title);
-
-    List<Course> findByMinutesGreaterThanEqual(int minutes);
-
-    List<Course> findByPublishedTrueOrderByMinutesDesc();
-
-    long countByLevel(String level);
-
-    boolean existsByCode(String code);
-
-    void deleteByArchivedTrue();
+public interface UserRepository extends JpaRepository<User, Long> {
+    
+    // Spring generates: SELECT u FROM User u WHERE u.email = :email
+    User findByEmail(String email);
+    
+    // SELECT u FROM User u WHERE u.age > :age
+    List<User> findByAgeGreaterThan(int age);
+    
+    // SELECT u FROM User u WHERE u.name LIKE %:keyword% AND u.active = true
+    List<User> findByNameContainingAndActiveTrue(String keyword);
 }
 ```
 
-**The subject parts**:
-
-```
-find | read | get | query | count | exists | delete
-  └── By ── property ── operator ── And/Or ── ...
-```
-
-| Operator | Meaning |
-|----------|---------|
-| `Containing` / `Like` | LIKE %value% |
-| `StartingWith` / `EndingWith` | LIKE value% / %value |
-| `IgnoreCase` | Case-insensitive |
-| `Between`, `LessThan`, `GreaterThanEqual` | Comparisons |
-| `In`, `NotIn` | IN lists |
-| `IsNull`, `NotNull` | NULL checks |
-| `True`, `False` | Boolean |
-| `OrderBy` | Sorting |
-| `Top3`, `First` | Limiting |
-
-**The pitfall**: a typo in the property name fails at **startup** (Spring validates derived queries) — that's good, but it means the entire context won't boot. Spell properties exactly (case-insensitive property names, exact relation paths).
-
-## JPQL: Query the Objects, Not the Tables
+### Derived Query Methods — Name Patterns
 
 ```java
-@Query("""
-    select c from Course c
-    where c.level = :level
-      and c.published = true
-    order by c.minutes desc
-    """)
-List<Course> findPublishedByLevel(@Param("level") String level);
-```
-
-JPQL operates on **entity names and properties**, not table/column names. It supports:
-
-```java
-// Joins
-@Query("""
-    select c from Course c
-    join fetch c.lessons l          -- fetch join: load lessons in the SAME query
-    where c.id = :id
-    """)
-Optional<Course> findWithLessons(@Param("id") Long id);
-
-// Projections
-@Query("select c.title, c.minutes from Course c where c.level = :level")
-List<Object[]> findTitleAndMinutesByLevel(String level);
-
-// Aggregate
-@Query("select c.level, count(c) from Course c group by c.level")
-List<Object[]> countByLevelGrouped();
-
-// Subqueries
-@Query("""
-    select c from Course c
-    where c.minutes = (select max(c2.minutes) from Course c2)
-    """)
-List<Course> findLongestCourses();
-```
-
-## The Fetch Join: Killing N+1
-
-```java
-// ❌ N+1: course.lessons triggers a query per course
-List<Course> courses = courseRepository.findAll();
-for (Course c : courses) {
-    c.getLessons().size();      // N extra queries
-}
-
-// ✅ Fetch join: one query, lessons pre-loaded
-@Query("select distinct c from Course c join fetch c.lessons")
-List<Course> findAllWithLessons();
-
-// ✅ Or @EntityGraph — the declarative fetch join
-@EntityGraph(attributePaths = "lessons")
-@Query("select c from Course c")
-List<Course> findAllWithLessons();
-```
-
-`@EntityGraph` is the cleaner option: it declares what to fetch without JPQL.
-
-## Modifying Queries
-
-```java
-@Modifying
-@Query("update Course c set c.published = false where c.archived = true")
-int archiveAll();
-
-@Modifying
-@Query("delete from Course c where c.id = :id")
-int deleteById(@Param("id") Long id);
-```
-
-**The critical requirement**: modifying queries run in a **transaction** and **clear the persistence context** by default:
-
-```java
-@Service
-public class CourseService {
-
-    @Transactional                       // REQUIRED for @Modifying
-    public int archiveAll() {
-        int updated = courseRepository.archiveAll();
-        courseRepository.flush();         // sync context before clearing
-        return updated;
-    }
+public interface ProductRepository extends JpaRepository<Product, Long> {
+    
+    // Find by single field
+    List<Product> findByName(String name);
+    
+    // Find by multiple fields
+    Product findByNameAndCategory(String name, String category);
+    
+    // Comparison operators
+    List<Product> findByPriceLessThan(double maxPrice);
+    List<Product> findByPriceBetween(double min, double max);
+    List<Product> findByPriceGreaterThanEqual(double minPrice);
+    
+    // String patterns
+    List<Product> findByNameContaining(String keyword);  // LIKE %keyword%
+    List_Product> findByNameStartingWith(String prefix); // LIKE prefix%
+    List<Product> findByNameEndingWith(String suffix);    // LIKE %suffix
+    List<Product> findByNameLike(String pattern);         // LIKE pattern
+    
+    // Null checks
+    List<Product> findByDescriptionIsNull();
+    List<Product> findByDescriptionIsNotNull();
+    
+    // Ordering
+    List<Product> findByPriceAsc();
+    List<Product> findByNameOrderByPriceDesc();
+    
+    // Limiting results
+    Product findFirstByOrderByNameAsc();
+    List<Product> findTop5ByOrderByPriceDesc();
+    Page<Product> findTop10ByCategory(String category, Pageable pageable);
+    
+    // Existence checks
+    boolean existsByEmail(String email);
+    boolean existsByNameAndCategory(String name, String category);
+    
+    // Counting
+    long countByCategory(String category);
+    long countByActiveTrueAndPriceLessThan(double maxPrice);
+    
+    // Deleting
+    void deleteByActiveFalse();
+    long deleteByCategory(String category);
+    
+    // In clause
+    List<Product> findByCategoryIdIn(List<Long> categoryIds);
+    
+    // Negation
+    List<Product> findByNameNot(String name);
 }
 ```
 
-`@Modifying(clearAutomatically = true, flushAutomatically = true)` — recommended to keep the context consistent.
+### @Query — JPQL
 
-## Native Queries
-
-```java
-@Query(value = """
-    SELECT * FROM courses
-    WHERE level = :level
-      AND metadata @> CAST(:filter AS jsonb)
-    """, nativeQuery = true)
-List<Course> findByJsonAttribute(@Param("level") String level,
-                                 @Param("filter") String jsonFilter);
-```
-
-- **Exact SQL control** — JSONB operators, window functions, DB-specific features
-- **Bypasses the second-level cache** and entity lifecycle
-- Native queries return projections; mapping to entities is manual (or use `@SqlResultSetMapping`)
-
-## Named Queries
+For complex queries, use JPQL (Java Persistence Query Language):
 
 ```java
-@Entity
-@NamedQuery(name = "Course.findTopByLevel",
-            query = "select c from Course c where c.level = :level order by c.minutes desc")
-public class Course { ... }
-```
-
-```java
-List<Course> top = entityManager.createNamedQuery(
-    "Course.findTopByLevel", Course.class)
-    .setParameter("level", "BEGINNER")
-    .setMaxResults(5)
-    .getResultList();
-```
-
-Named queries are validated at startup (good) — but `@Query` on the repository does the same with less ceremony.
-
-## Projections: Fetch Only What You Need
-
-```java
-// Interface projection
-public interface CourseSummary {
-    Long getId();
-    String getTitle();
-    int getMinutes();
-}
-
-List<CourseSummary> findTop10ByPublishedTrueOrderByMinutesDesc();
-
-// Class projection (DTO)
-public record CourseSummaryDto(Long id, String title, int minutes) {}
-
-@Query("select new com.academy.dto.CourseSummaryDto(c.id, c.title, c.minutes) " +
-       "from Course c where c.published = true")
-List<CourseSummaryDto> findSummaries();
-```
-
-Projections avoid loading `@Lob` bodies and full entity graphs — the fix for slow list endpoints.
-
-## Parameter Binding
-
-```java
-// ❌ Positional (fragile with many params)
-@Query("select c from Course c where c.level = ?1 and c.minutes > ?2")
-List<Course> findByLevel(String level, int minutes);
-
-// ✅ Named — the modern way
-@Query("""
-    select c from Course c
-    where (:level is null or c.level = :level)
-      and (:minMinutes is null or c.minutes >= :minMinutes)
-    """)
-List<Course> search(@Param("level") String level,
-                    @Param("minMinutes") Integer minMinutes);
-
-// ✅ SpEL for dynamic parts (Java 8+ / Spring Data 3)
-@Query("select c from Course c where c.#{#entityName}.level = :level")
-List<Course> findByLevel(@Param("level") String level);
-```
-
-The `:param is null or ...` pattern enables **optional filters** in one query.
-
-## Testing Queries
-
-```java
-@DataJpaTest
-@Testcontainers
-class QueryMethodTest {
-
-    @Autowired CourseRepository repository;
-
-    @Test
-    void derivedQueryFiltersCorrectly() {
-        repository.save(course("A", "BEGINNER", 25));
-        repository.save(course("B", "ADVANCED", 40));
-
-        List<Course> beginners = repository.findByLevel("BEGINNER");
-        assertEquals(1, beginners.size());
-    }
-
-    @Test
-    void fetchJoinLoadsLessons() {
-        // No LazyInitializationException outside the tx:
-        // the lessons were fetched in the same query
-        Course course = repository.findWithLessons(1L).orElseThrow();
-        assertEquals(3, course.getLessons().size());
-    }
+public interface UserRepository extends JpaRepository<User, Long> {
+    
+    // JPQL — works with entity names and field names
+    @Query("SELECT u FROM User u WHERE u.email = :email")
+    User findByEmailJPQL(@Param("email") String email);
+    
+    // Named parameters
+    @Query("SELECT u FROM User u WHERE u.age BETWEEN :min AND :max ORDER BY u.name")
+    List<User> findByAgeRange(@Param("min") int min, @Param("max") int max);
+    
+    // Projections — select specific fields
+    @Query("SELECT new com.example.dto.UserSummary(u.id, u.name, u.email) FROM User u WHERE u.active = true")
+    List<UserSummary> findActiveUsersSummary();
+    
+    // Aggregation
+    @Query("SELECT u.department, COUNT(u) FROM User u GROUP BY u.department")
+    List<Object[]> countByDepartment();
+    
+    // Joins
+    @Query("SELECT DISTINCT u FROM User u JOIN u.orders o WHERE o.total > :minTotal")
+    List<User> findUsersWithLargeOrders(@Param("minTotal") BigDecimal minTotal);
+    
+    // Pagination
+    @Query("SELECT u FROM User u WHERE u.name LIKE %:keyword%")
+    Page<User> searchByName(@Param("keyword") String keyword, Pageable pageable);
+    
+    // Sorting
+    @Query("SELECT u FROM User u WHERE u.active = true")
+    List<User> findActiveUsers(Sort sort);
+    
+    // EXISTS subquery
+    @Query("SELECT CASE WHEN COUNT(u) > 0 THEN true ELSE false END FROM User u WHERE u.email = :email")
+    boolean existsByEmailQuery(@Param("email") String email);
 }
 ```
 
-## Summary
+### @Query — Native SQL
 
-| Need | Mechanism |
-|------|-----------|
-| Simple filter | Derived method |
-| Complex join / logic | JPQL @Query |
-| DB-specific SQL | Native query |
-| N+1 fix | `join fetch` / `@EntityGraph` |
-| Bulk update/delete | `@Modifying` + @Transactional |
-| Only some columns | Projections |
-| Optional filters | `(:p is null or ...)` |
-| Startup safety | JPQL validated at boot |
+For database-specific features, use native SQL:
 
-The three query styles cover the spectrum: derived methods for filters, JPQL for object-graph logic, native SQL for DB power. The skills that separate the levels are the fetch join (killing N+1), projections (right-sized payloads), and `@Modifying` discipline (transaction + context clearing).
+```java
+public interface UserRepository extends JpaRepository<User, Long> {
+    
+    // Native SQL — works with actual table/column names
+    @Query(value = "SELECT * FROM users WHERE email = :email", nativeQuery = true)
+    User findByEmailNative(@Param("email") String email);
+    
+    // Native SQL with projection
+    @Query(value = "SELECT id, name, email FROM users WHERE active = 1", nativeQuery = true)
+    List<Object[]> findActiveUsersNative();
+    
+    // Native SQL with complex joins
+    @Query(value = """
+        SELECT u.*, COUNT(o.id) as order_count
+        FROM users u
+        LEFT JOIN orders o ON o.user_id = u.id
+        GROUP BY u.id
+        HAVING COUNT(o.id) > 5
+        """, nativeQuery = true)
+    List<Object[]> findPowerUsers();
+    
+    // Update with @Modifying
+    @Modifying
+    @Query("UPDATE User u SET u.active = false WHERE u.lastLogin < :date")
+    int deactivateInactiveUsers(@Param("date") LocalDate cutoff);
+    
+    // Delete with @Modifying
+    @Modifying
+    @Query("DELETE FROM User u WHERE u.active = false AND u.createdAt < :date")
+    int purgeOldInactiveUsers(@Param("date") LocalDate cutoff);
+}
+```
+
+### Common Mistakes
+
+| Mistake | Problem | Fix |
+|---------|---------|-----|
+| N+1 query problem | Too many database queries | Use @EntityGraph or JOIN FETCH |
+| Missing @Transactional on @Modifying | RuntimeException | Add @Transactional to modifying queries |
+| Using native SQL everywhere | Database lock-in | Prefer JPQL when possible |
+| Not using projections | Fetching all columns unnecessarily | Use DTOs or interface projections |
+| Wrong method name | NoSuchMethodException at startup | Verify the method name pattern |
+
+### Line-by-Line Code Explanation
+
+```java
+public interface UserRepository extends JpaRepository<User, Long> {
+    // ↑ Extends JpaRepository — provides CRUD operations automatically
+    // ↑ Type parameters: <Entity type, ID type>
+    // ↑ Spring Data JPA creates the implementation at runtime
+    
+    // DERIVED QUERY — name becomes the query
+    User findByEmail(String email);
+    // ↑ "findBy" = query prefix
+    // ↑ "Email" = field name on User entity
+    // ↑ Generated: SELECT u FROM User u WHERE u.email = :email
+    // ↑ Returns single user or null
+    
+    // COMPLEX DERIVED QUERY
+    List<User> findByNameContainingAndActiveTrueOrderByCreatedAtDesc(String keyword);
+    // ↑ "find" = query prefix
+    // ↑ "ByNameContaining" = WHERE name LIKE %:keyword%
+    // ↑ "AndActiveTrue" = AND active = true
+    // ↑ "OrderByCreatedAtDesc" = ORDER BY created_at DESC
+    // ↑ Returns list of matching users
+    
+    // JPQL QUERY — for complex logic
+    @Query("SELECT u FROM User u WHERE u.age >= :minAge AND u.name LIKE %:name%")
+    Page<User> searchUsers(@Param("minAge") int minAge, @Param("name") String name, Pageable pageable);
+    // ↑ @Query = custom JPQL query
+    // ↑ :minAge, :name = named parameters
+    // ↑ Pageable = pagination support (page number, size, sort)
+    // ↑ Returns Page<User> with total count + data
+    
+    // NATIVE SQL — for database-specific features
+    @Modifying
+    @Transactional
+    @Query(value = "UPDATE users SET active = false WHERE last_login < :cutoff", nativeQuery = true)
+    int deactivateInactive(@Param("cutoff") LocalDate cutoff);
+    // ↑ @Modifying = this is an UPDATE/DELETE, not a SELECT
+    // ↑ @Transactional = required for modifying queries
+    // ↑ nativeQuery = true = use raw SQL, not JPQL
+    // ↑ Returns int = number of rows affected
+}
+```
+
+### Key Takeaways
+
+1. **Derived queries** — method names become SQL; use `findBy`, `And`, `Or`, `GreaterThan`
+2. **@Query JPQL** — for complex joins, aggregations, subqueries
+3. **@Query nativeQuery** — for database-specific features
+4. **@Modifying** — required for UPDATE/DELETE queries
+5. **@Transactional** — required for modifying queries
+6. **Projections** — select only the fields you need
+7. **Pageable** — built-in pagination support
+
+### Real-World Organization Scenario
+
+An e-commerce platform has 20+ repositories. They use:
+- Derived queries for simple lookups (`findByEmail`, `findByStatus`)
+- @Query JPQL for complex reports (joins, aggregations)
+- Native SQL for PostgreSQL-specific features (JSONB queries, full-text search)
+- @Modifying for batch updates (deactivate users, update statuses)
+
+Each query is tested with `@DataJpaTest` and Testcontainers to ensure correctness across environments.
