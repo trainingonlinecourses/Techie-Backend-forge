@@ -81,7 +81,7 @@ export default function Navbar({ onMenu, drawerOpen }) {
         <input
           id="nav-search"
           type="text"
-          placeholder="search 605 lessons — jwt, JWT, outbox, saga, k8s, RAG…"
+          placeholder="search lessons — jwt, JWT, outbox, saga, k8s, RAG…"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
@@ -121,7 +121,9 @@ export default function Navbar({ onMenu, drawerOpen }) {
                 <span>@{user.username} · {user.role}</span>
               </div>
               <Link to="/" onClick={() => setMenuOpen(false)}>Dashboard</Link>
-              <Link to="/chat" onClick={() => setMenuOpen(false)}>AI Tutor</Link>
+              <Link to="/progress" onClick={() => setMenuOpen(false)}>📊 My Progress</Link>
+              <Link to="/certificates" onClick={() => setMenuOpen(false)}>🏆 Certificates</Link>
+              <Link to="/chat" onClick={() => setMenuOpen(false)}>✦ AI Tutor</Link>
               {user.role === 'ADMIN' && (
                 <Link to="/admin/reorder" onClick={() => setMenuOpen(false)}>🔀 Reorder Lessons</Link>
               )}

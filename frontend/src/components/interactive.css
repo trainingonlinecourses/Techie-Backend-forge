@@ -619,6 +619,19 @@
   color: #feb2b2;
 }
 
+.explanation-item .option.user-selected {
+  background: #2a2a4e;
+  border: 1px solid #7aa2f7;
+  color: #c0caf5;
+}
+
+.selected-badge {
+  font-size: 0.75rem;
+  color: #7aa2f7;
+  margin-left: 0.5rem;
+  font-style: italic;
+}
+
 .explanation {
   font-size: 0.875rem;
   color: #a0aec0;

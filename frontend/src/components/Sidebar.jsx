@@ -57,6 +57,14 @@ export default function Sidebar({ progress }) {
         );
       })}
       <div className="navgroup">RESOURCES</div>
+      <Link to="/progress" className="modlink resourcelink">
+        <span className="modnum">📊</span>
+        <span className="modttl">My Progress</span>
+      </Link>
+      <Link to="/certificates" className="modlink resourcelink">
+        <span className="modnum">🏆</span>
+        <span className="modttl">Certificates</span>
+      </Link>
       <Link to="/docs" className="modlink resourcelink">
         <span className="modnum">⚑</span>
         <span className="modttl">Official docs index</span>
@@ -66,7 +74,7 @@ export default function Sidebar({ progress }) {
         <span className="modttl">AI Tutor</span>
       </Link>
       <div className="sidefoot">
-        <p>605 lessons · 80 modules · full backend projects</p>
+        <p>{curriculum.reduce((n, m) => n + m.lessons.length, 0)} lessons · {curriculum.length} modules · full backend projects</p>
         <p className="dim">Java 21 · Spring Boot 3.4 · Spring AI 1.0</p>
       </div>
     </aside>

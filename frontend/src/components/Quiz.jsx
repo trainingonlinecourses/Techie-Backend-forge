@@ -134,10 +134,11 @@ export default function Quiz({ lessonId, onComplete }) {
                     <div 
                       key={optIndex}
                       className={`option ${
-                        optIndex === question.correctAnswerIndex ? 'correct' : ''
-                      } ${answers[index] === optIndex && optIndex !== question.correctAnswerIndex ? 'incorrect' : ''}`}
+                        answers[index] === optIndex ? 'user-selected' : ''
+                      }`}
                     >
-                      {option}
+                      <span className="option-letter" style={{fontWeight: 'bold'}}>{String.fromCharCode(65 + optIndex)}.</span> {option}
+                      {answers[index] === optIndex && <span className="selected-badge">← your answer</span>}
                     </div>
                   ))}
                 </div>

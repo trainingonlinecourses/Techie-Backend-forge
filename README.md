@@ -7,9 +7,10 @@ docs from docs.spring.io, progress tracking, and an AI tutor backed by Spring AI
 It is **not** a static site. It is a real application:
 
 - **Backend** — a Spring Boot 3.4 API (`backend/`) with JPA, JWT security, progress tracking,
-  full-text-ish search, and a Spring AI chat service.
+  full-text-ish search, quizzes, certificates, and a Spring AI chat service.
 - **Frontend** — a professional React + Vite SPA (`frontend/`): curriculum tree, markdown lesson
-  reader with syntax highlighting, search, official-docs index, AI tutor, login, and per-user progress.
+  reader with syntax highlighting, interactive quizzes, search, official-docs index, AI tutor,
+  login, per-user progress dashboard, and downloadable certificates.
 - **Sample project** — `projects/payments-api/`: a complete, runnable payments API used by the
   Capstone module (layered architecture, JWT, atomic idempotent transfers, tests, Docker).
 
@@ -60,10 +61,18 @@ It is **not** a static site. It is a real application:
 
 Every lesson includes: explanation, runnable code, an *"Why it matters (organizational view)"* callout,
 and links to the authoritative reference on docs.spring.io. The **Docs index** page organizes
-303 official links (Framework, Boot, Security, AI, Cloud, Kafka, WebFlux, Data, Batch, GraphQL,
+325 official links (Framework, Boot, Security, AI, Cloud, Kafka, WebFlux, Data, Batch, GraphQL,
 REST Docs, Testing, JVM, Migrations, Modulith, Microservices, Kubernetes, Java, OWASP, Maven/Gradle,
 Scheduling, Caching, REST Design, Observability, CI/CD, AMQP, JDBC, Modern Java, Transactions, gRPC,
 DDD, PostgreSQL, Distributed Systems, Spring Data JPA).
+
+### Key features
+
+- **Interactive quizzes** — timed quizzes at the end of lessons with pass/fail scoring and review
+- **Certificates** — downloadable PDF certificates after 80% completion with unique verification codes
+- **Progress dashboard** — per-user stats, quiz scores, recent activity, and completion tracking
+- **Java code playground** — browser-based Java simulator for practicing code from lessons
+- **Keyboard shortcuts** — j/k for prev/next lesson, h for home, / for search, ? for help
 
 ## Run it
 
@@ -169,11 +178,15 @@ frontend (React + Vite, :5173)
    ▼
 backend (Spring Boot 3.4, :8080)
    ├── SecurityConfig ─ JwtAuthFilter ─ JwtService (Nimbus, HS256)
-   ├── AuthController / AuthService        (register, login, me)
-   ├── ContentController / ContentService  (modules, lessons, curriculum, search, docs index)
-   ├── ProgressController / ProgressService (per-user lesson completion)
-   ├── ChatController ─ AiChatService       (Spring AI ChatClient + RAG, or local fallback)
-   ├── JPA: User, Module, Lesson, ProgressEntry, ChatMessage (H2 file DB)
+   ├── AuthController / AuthService           (register, login, me)
+   ├── ContentController / ContentService     (modules, lessons, curriculum, search, docs index)
+   ├── ProgressController / ProgressService   (per-user lesson completion)
+   ├── QuizController / QuizService           (interactive quizzes, scoring, history)
+   ├── CertificateController / CertificateService (certificate generation, verification)
+   ├── ChatController ─ AiChatService          (Spring AI ChatClient + RAG, or local fallback)
+   ├── AdminContentController                 (admin: reorder lessons)
+   ├── JPA: User, Module, Lesson, ProgressEntry, ChatMessage, Quiz, QuizQuestion,
+   │        QuizResult, Certificate (H2 file DB)
    └── Actuator: /actuator/health
 ```
 
@@ -185,9 +198,9 @@ claims, JSON 401/403 via `AuthenticationEntryPoint`/`AccessDeniedHandler`.
 ```
 ├── backend/                  Spring Boot API (the platform itself)
 │   └── src/main/resources/content/
-│       ├── modules.json      curriculum metadata
-│       ├── docs-index.json   curated docs.spring.io index
-│       └── lessons/<module>/ 605 markdown lessons (loaded + searched at runtime)
+│       ├── modules.json      curriculum metadata (105 modules)
+│       ├── docs-index.json   curated docs.spring.io index (325 links)
+│       └── lessons/<module>/ 712 markdown lessons (loaded + searched at runtime)
 ├── frontend/                 React SPA
 └── projects/payments-api/    Capstone: complete runnable payments API
 ```

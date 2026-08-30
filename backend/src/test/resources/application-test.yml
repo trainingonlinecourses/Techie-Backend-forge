@@ -1,0 +1,40 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+  h2:
+    console:
+      enabled: false
+  ai:
+    model:
+      chat: none
+  autoconfigure:
+    exclude:
+      - org.springframework.ai.model.openai.autoconfigure.OpenAiChatAutoConfiguration
+      - org.springframework.ai.model.openai.autoconfigure.OpenAiEmbeddingAutoConfiguration
+      - org.springframework.ai.model.openai.autoconfigure.OpenAiImageAutoConfiguration
+      - org.springframework.ai.model.openai.autoconfigure.OpenAiAudioSpeechAutoConfiguration
+      - org.springframework.ai.model.openai.autoconfigure.OpenAiAudioTranscriptionAutoConfiguration
+
+app:
+  jwt:
+    secret: test-secret-key-for-unit-tests-minimum-32-chars
+    expiration-seconds: 86400
+  cors:
+    allowed-origins: http://localhost:3000
+  openai:
+    api-key: test-key
+    model: gpt-4o-mini
+    base-url: http://localhost:11434
+    use-free-endpoint: false
+
+logging:
+  level:
+    root: WARN
+    com.backendforge: INFO

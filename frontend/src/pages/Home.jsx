@@ -61,10 +61,10 @@ export default function Home() {
             {!user && <Link to="/register" className="btn ghost">Create account · track progress</Link>}
           </div>
           <div className="stats">
-            <div className="stat"><div className="v">{stats?.lessons ?? '513'}</div><div className="l">LESSONS</div></div>
-            <div className="stat"><div className="v">{stats?.modules ?? 80}</div><div className="l">MODULES</div></div>
-            <div className="stat"><div className="v">{(stats?.minutes ?? 11487) / 60 | 0}<b>h</b></div><div className="l">CURRICULUM</div></div>
-            <div className="stat"><div className="v">{stats?.docsLinks ?? 303}+</div><div className="l">DOC LINKS</div></div>
+            <div className="stat"><div className="v">{totalLessons || stats?.lessons || '—'}</div><div className="l">LESSONS</div></div>
+            <div className="stat"><div className="v">{curriculum?.length || stats?.modules || '—'}</div><div className="l">MODULES</div></div>
+            <div className="stat"><div className="v">{(stats?.minutes ?? 0) / 60 | 0}<b>h</b></div><div className="l">CURRICULUM</div></div>
+            <div className="stat"><div className="v">{stats?.docsLinks ?? '—'}+</div><div className="l">DOC LINKS</div></div>
           </div>
           <div className="hero-tech-tags">
             {['Java 21', 'Spring Boot 3.4', 'Spring Security', 'Spring AI', 'Docker', 'Kubernetes', 'PostgreSQL', 'Redis'].map((t) => (
@@ -107,7 +107,7 @@ export default function Home() {
 
       <h2 className="sec">The curriculum</h2>
       <p className="lede">
-        Eighty modules, ordered the way an organization rolls out Java and Spring: foundation first,
+        {curriculum?.length || '…'} modules, ordered the way an organization rolls out Java and Spring: foundation first,
         then the framework, then production practice — finishing with a complete runnable project.
       </p>
       <div className="modgrid">
@@ -146,34 +146,59 @@ export default function Home() {
       </div>
 
       <h2 className="sec">How this platform works</h2>
-      <div className="board">          <div className="bcol ok" style={{ animation: 'fadeInUp 0.5s ease-out 0.1s both' }}>
+      <div className="board">
+          <div className="bcol ok" style={{ animation: 'fadeInUp 0.5s ease-out 0.1s both' }}>
             <div className="bcol-icon">📚</div>
             <h4>LEARN</h4>
             <ul>
-              <li>696+ in-depth lessons with beginner-friendly explanations</li>
-              <li>Every concept explained from zero — not just outlines</li>
-              <li>Code snippets with line-by-line annotations</li>
-              <li>Real-world organizational scenarios for each topic</li>
+              <li>{totalLessons || '…'} lessons with explanations + runnable code</li>
+              <li>Every topic linked to its official docs</li>
+              <li>Marked from the sidebar; progress is saved</li>
             </ul>
           </div>
           <div className="bcol ok" style={{ animation: 'fadeInUp 0.5s ease-out 0.2s both' }}>
             <div className="bcol-icon">🔨</div>
             <h4>BUILD</h4>
             <ul>
-              <li>25 complete projects: monoliths + microservices</li>
-              <li>CQRS, Event Sourcing, Saga patterns</li>
               <li>Capstone: a complete payments API you can run</li>
-              <li>Docker, tests, architecture diagrams included</li>
+              <li>Layered architecture, JWT security, tests, Docker</li>
+              <li>Source in <code className="inline">projects/payments-api</code></li>
             </ul>
           </div>
           <div className="bcol ok" style={{ animation: 'fadeInUp 0.5s ease-out 0.3s both' }}>
+            <div className="bcol-icon">📝</div>
+            <h4>QUIZ</h4>
+            <ul>
+              <li>Interactive quizzes at the end of each lesson</li>
+              <li>Timed tests with pass/fail scoring</li>
+              <li>Review your answers with detailed explanations</li>
+            </ul>
+          </div>
+          <div className="bcol ok" style={{ animation: 'fadeInUp 0.5s ease-out 0.4s both' }}>
             <div className="bcol-icon">🤖</div>
             <h4>ASK</h4>
             <ul>
               <li>AI Tutor answers from the curriculum (Spring AI)</li>
               <li>Interactive Java code simulator — run code in browser</li>
-              <li>Quizzes after every lesson</li>
-              <li>Progress tracking with completion certificates</li>
+              <li>Works with zero keys — free endpoint by default</li>
+            </ul>
+          </div>
+          <div className="bcol ok" style={{ animation: 'fadeInUp 0.5s ease-out 0.5s both' }}>
+            <div className="bcol-icon">🏆</div>
+            <h4>EARN</h4>
+            <ul>
+              <li>Certificate of completion after 80% progress</li>
+              <li>Downloadable PDF with unique verification code</li>
+              <li>Public verification link for employers</li>
+            </ul>
+          </div>
+          <div className="bcol ok" style={{ animation: 'fadeInUp 0.5s ease-out 0.6s both' }}>
+            <div className="bcol-icon">📊</div>
+            <h4>TRACK</h4>
+            <ul>
+              <li>Per-user progress dashboard with stats</li>
+              <li>Quiz scores and completion tracking</li>
+              <li>Continue learning from any device</li>
             </ul>
           </div>
       </div>

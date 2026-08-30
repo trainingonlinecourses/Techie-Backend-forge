@@ -44,8 +44,8 @@ export default function ProgressDashboard() {
     return <div className="dashboard-error">Failed to load dashboard</div>;
   }
 
-  const completionPercentage = stats.total > 0 
-    ? Math.round((stats.completed / stats.total) * 100) 
+  const completionPercentage = stats.totalLessons > 0 
+    ? Math.round((stats.completedLessons / stats.totalLessons) * 100) 
     : 0;
 
   return (
@@ -56,9 +56,9 @@ export default function ProgressDashboard() {
       <div className="stats-grid">
         <div className="stat-card">
           <div className="stat-icon">📚</div>
-          <div className="stat-value">{stats.completed}</div>
+          <div className="stat-value">{stats.completedLessons}</div>
           <div className="stat-label">Lessons Completed</div>
-          <div className="stat-sub">of {stats.total} total</div>
+          <div className="stat-sub">of {stats.totalLessons} total</div>
         </div>
         
         <div className="stat-card">
