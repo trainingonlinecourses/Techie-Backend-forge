@@ -1369,5 +1369,32 @@
     "color": "#2ac3de",
     "tech": ["Projects", "Monolith", "Microservices", "CQRS", "Event Sourcing", "Saga", "Docker"],
     "docsUrl": "https://docs.spring.io/spring-boot/reference/"
+  },
+  {
+    "id": "spring-boot-devtools",
+    "title": "Spring Boot DevTools & Development Productivity",
+    "subtitle": "Auto-restart, LiveReload, remote debugging, property defaults, and custom restart strategies that accelerate development.",
+    "order": 103,
+    "color": "#73daca",
+    "tech": ["DevTools", "LiveReload", "Auto-Restart", "Remote Debug"],
+    "docsUrl": "https://docs.spring.io/spring-boot/reference/using/devtools.html"
+  },
+  {
+    "id": "spring-session",
+    "title": "Spring Session — Distributed Session Management",
+    "subtitle": "Externalize HTTP sessions to Redis/JDBC, enable session sharing across instances, and secure sessions against hijacking.",
+    "order": 104,
+    "color": "#ff9e64",
+    "tech": ["Spring Session", "Redis Sessions", "CSRF", "Session Fixation"],
+    "docsUrl": "https://spring.io/projects/spring-session"
+  },
+  {
+    "id": "spring-shell",
+    "title": "Spring Shell — Building CLI Applications",
+    "subtitle": "Build interactive command-line tools with Spring Shell: commands, options, availability conditions, and completion.",
+    "order": 105,
+    "color": "#bb9af7",
+    "tech": ["Spring Shell", "CLI", "Commands", "Shell Components"],
+    "docsUrl": "https://spring.io/projects/spring-shell"
   }
 ]
