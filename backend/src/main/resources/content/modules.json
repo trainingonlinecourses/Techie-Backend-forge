@@ -1225,5 +1225,59 @@
     "color": "#1abc9c",
     "tech": ["Structured Concurrency", "Scoped Values", "Flexible Constructors"],
     "docsUrl": "https://docs.oracle.com/en/java/javase/26/docs/api/"
+  },
+  {
+    "id": "java-jpms",
+    "title": "Java Platform Module System",
+    "subtitle": "Module declarations, requires/exports, services, automatic modules, and migrating large codebases to JPMS.",
+    "order": 87,
+    "color": "#e67e22",
+    "tech": ["JPMS", "module-info", "Services", "Automatic Modules"],
+    "docsUrl": "https://docs.oracle.com/en/java/javase/17/language/java-module-system.htm"
+  },
+  {
+    "id": "java-memory-model",
+    "title": "Java Memory Model & Concurrency",
+    "subtitle": "Happens-before rules, volatile, synchronized, AtomicInteger, ReentrantLock, ReadWriteLock, StampedLock.",
+    "order": 88,
+    "color": "#c0392b",
+    "tech": ["Memory Model", "Happens-Before", "Atomics", "Locks"],
+    "docsUrl": "https://docs.oracle.com/javase/specs/jls/se17/html/jls-17.html"
+  },
+  {
+    "id": "spring-actuator-deep",
+    "title": "Spring Boot Actuator & Production",
+    "subtitle": "Health checks, metrics, custom health indicators, Micrometer, Prometheus, and production monitoring.",
+    "order": 89,
+    "color": "#27ae60",
+    "tech": ["Actuator", "Health", "Metrics", "Prometheus"],
+    "docsUrl": "https://docs.spring.io/spring-boot/reference/features/actuator.html"
+  },
+  {
+    "id": "java-annotation-processing",
+    "title": "Java Annotations Deep Dive",
+    "subtitle": "Custom annotations, retention policies, targets, reflection-based processing, AOP integration.",
+    "order": 90,
+    "color": "#8e44ad",
+    "tech": ["Annotations", "Reflection", "AOP", "Custom Annotations"],
+    "docsUrl": "https://docs.oracle.com/javase/tutorial/java/annotations/"
+  },
+  {
+    "id": "java-serialization-networking",
+    "title": "Java Serialization & Networking",
+    "subtitle": "Serializable, Externalizable, serialization proxies, Socket, NIO channels, and when to avoid Java serialization.",
+    "order": 91,
+    "color": "#2980b9",
+    "tech": ["Serialization", "Networking", "Sockets", "NIO"],
+    "docsUrl": "https://docs.oracle.com/javase/tutorial/essential/io/serializing.html"
+  },
+  {
+    "id": "spring-profiles-deep",
+    "title": "Spring Profiles & Configuration",
+    "subtitle": "Profile-specific beans, YAML multi-document, @Profile, feature flags, and environment management.",
+    "order": 92,
+    "color": "#16a085",
+    "tech": ["Profiles", "Configuration", "YAML", "Feature Flags"],
+    "docsUrl": "https://docs.spring.io/spring-boot/reference/features/profiles.html"
   }
 ]
