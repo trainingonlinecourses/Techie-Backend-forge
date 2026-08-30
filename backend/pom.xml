@@ -13,7 +13,7 @@
 
   <groupId>com.backendforge</groupId>
   <artifactId>academy-api</artifactId>
-  <version>1.0.0</version>
+  <version>1.0.1</version>
   <name>BackendForge Academy API</name>
   <description>Full-stack Spring learning platform API: content, auth, progress, AI assistant</description>
 
