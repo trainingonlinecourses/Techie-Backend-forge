@@ -13,6 +13,6 @@ FROM eclipse-temurin:21-jre
 WORKDIR /app
 # The platform injects PORT; Spring Boot reads it from application.yml.
 ENV PORT=8080
-COPY --from=build /build/target/academy-api-1.0.0.jar app.jar
+COPY --from=build /build/target/academy-api-*.jar app.jar
 EXPOSE 8080
 ENTRYPOINT ["java", "-XX:+UseContainerSupport", "-jar", "app.jar"]
