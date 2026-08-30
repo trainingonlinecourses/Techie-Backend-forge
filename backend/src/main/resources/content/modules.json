@@ -1396,5 +1396,41 @@
     "color": "#bb9af7",
     "tech": ["Spring Shell", "CLI", "Commands", "Shell Components"],
     "docsUrl": "https://spring.io/projects/spring-shell"
+  },
+  {
+    "id": "java-xml-processing",
+    "title": "Java XML Processing — DOM, SAX, StAX & XPath",
+    "subtitle": "Parse, query, modify and serialize XML documents with DOM trees, streaming parsers, and XPath expressions.",
+    "order": 106,
+    "color": "#e0af68",
+    "tech": ["DOM", "SAX", "StAX", "XPath", "JAXB", "XML"],
+    "docsUrl": "https://docs.oracle.com/javase/tutorial/jaxp/"
+  },
+  {
+    "id": "java-enums-deep",
+    "title": "Java Enums Deep — Patterns & Strategies",
+    "subtitle": "EnumSet, EnumMap, strategy pattern, state machines, serialization — enums as first-class design tools.",
+    "order": 107,
+    "color": "#f7768e",
+    "tech": ["EnumSet", "EnumMap", "Strategy Pattern", "State Machine", "Serialization"],
+    "docsUrl": "https://docs.oracle.com/javase/tutorial/java/javaOO/enum.html"
+  },
+  {
+    "id": "spring-boot-fullstack",
+    "title": "Spring Boot Full-Stack — REST + JPA + Security + Thymeleaf",
+    "subtitle": "Build complete production-ready applications combining REST APIs, JPA persistence, Spring Security, and server-side rendering.",
+    "order": 108,
+    "color": "#73daca",
+    "tech": ["Full-Stack", "REST", "JPA", "Security", "Thymeleaf", "Validation"],
+    "docsUrl": "https://spring.io/guides"
+  },
+  {
+    "id": "docker-compose-examples",
+    "title": "Docker Compose — Multi-Service Orchestration",
+    "subtitle": "Define and run multi-container applications with Docker Compose — real-world stacks with databases, caches, proxies and monitoring.",
+    "order": 109,
+    "color": "#41a6b6",
+    "tech": ["Docker Compose", "Networking", "Volumes", "Health Checks", "Production Stack"],
+    "docsUrl": "https://docs.docker.com/compose/"
   }
 ]
