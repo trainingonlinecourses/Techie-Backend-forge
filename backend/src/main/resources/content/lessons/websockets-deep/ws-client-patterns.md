@@ -4,10 +4,10 @@ module: websockets-deep
 order: 3
 minutes: 23
 topics: ["reconnection", "heartbeats", "backpressure", "client design", "SockJS"]
+summary: Servers treat sockets as disposable — they restart, deploy, and drain instances constantly (see the scaling lesson). The client decides whether use...
 docs:
   - title: "SockJS client"
     url: "https://github.com/sockjs/sockjs-client"
-summary: Servers treat sockets as disposable — they restart, deploy, and drain instances constantly (see the scaling lesson). The client decides whether use...
 ---
 
 # WebSocket Client Patterns — Reconnection, Heartbeats, Backpressure

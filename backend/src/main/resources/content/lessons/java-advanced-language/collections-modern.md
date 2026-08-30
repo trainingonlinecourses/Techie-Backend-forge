@@ -4,10 +4,10 @@ module: java-advanced-language
 order: 5
 minutes: 18
 topics: ["List.of", "Map.of", "unmodifiable", "copyOf", "Collection toArray", "new APIs"]
+summary: Java 9–21 added factory methods, copyOf, and streamfriendly toArray overloads that replaced a decade of boilerplate. This lesson is the modern coll...
 docs:
   - title: "Collection interfaces"
     url: "https://docs.oracle.com/en/java/javase/21/core/collections.html"
-summary: Java 9–21 added factory methods, copyOf, and streamfriendly toArray overloads that replaced a decade of boilerplate. This lesson is the modern coll...
 ---
 
 # Modern Collection APIs

@@ -4,10 +4,10 @@ module: ddd-architecture
 order: 1
 minutes: 30
 topics: ["domain model", "entities", "value objects", "aggregates", "repositories", "domain services", "ubiquitous language"]
+summary: DomainDriven Design is about putting the business rules in the code — not in a service layer full of getters and setters. The building blocks (enti...
 docs:
   - title: "DDD reference"
     url: "https://martinfowler.com/tags/domain%20driven%20design.html"
-summary: DomainDriven Design is about putting the business rules in the code — not in a service layer full of getters and setters. The building blocks (enti...
 ---
 
 # DDD Building Blocks

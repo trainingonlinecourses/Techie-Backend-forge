@@ -4,12 +4,12 @@ module: junit5-deep
 order: 4
 minutes: 24
 topics: ["test isolation", "TestInstance", "PER_CLASS", "test ordering", "parallel tests", "shared state"]
+summary: Reliable tests share one property: isolation — each test runs as if it were the only test. The three enemies are shared mutable state (a field that...
 docs:
   - title: "Test Instance Lifecycle (JUnit 5 User Guide)"
     url: "https://junit.org/junit5/docs/current/user-guide/#writing-tests-test-instance-lifecycle"
   - title: "Parallel Execution (JUnit 5 User Guide)"
     url: "https://junit.org/junit5/docs/current/user-guide/#writing-tests-parallel-execution"
-summary: Reliable tests share one property: isolation — each test runs as if it were the only test. The three enemies are shared mutable state (a field that...
 ---
 
 # Test Lifecycle and State — Isolation, Ordering, and Parallelism

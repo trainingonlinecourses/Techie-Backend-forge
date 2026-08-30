@@ -4,10 +4,10 @@ module: spring-messaging
 order: 2
 minutes: 23
 topics: ["channels", "point-to-point vs pub-sub channels", "pollable vs subscribable", "channel adapters"]
+summary: If messaging is a plumbing system, channels are the pipes. Producers write into a channel; consumers read from it. The channel is the coupling poin...
 docs:
   - title: "Message channels (Spring Integration)"
     url: "https://docs.spring.io/spring-integration/reference/channel.html"
-summary: If messaging is a plumbing system, channels are the pipes. Producers write into a channel; consumers read from it. The channel is the coupling poin...
 ---
 
 # Message Channels — The Wires of the Bus

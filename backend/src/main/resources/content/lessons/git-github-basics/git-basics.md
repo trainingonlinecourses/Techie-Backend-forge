@@ -4,10 +4,10 @@ module: git-github-basics
 order: 1
 minutes: 25
 topics: ["git", "commits", "staging", "repositories", "history", "version control"]
+summary: The core mental model — Git stores snapshots, not changes:
 docs:
   - title: "Git documentation"
     url: "https://git-scm.com/doc"
-summary: The core mental model — Git stores snapshots, not changes:
 ---
 
 # Git Basics — The Snapshot Machine

@@ -4,12 +4,12 @@ module: event-driven-architecture
 order: 2
 minutes: 27
 topics: ["outbox pattern", "transactional outbox", "atomicity", "dual write", "event publishing", "reliability"]
+summary: When an event must be published because a database row changed, you face the dualwrite problem: two systems (the database and the broker) must both...
 docs:
   - title: "The Outbox Pattern (microservices.io)"
     url: "https://microservices.io/patterns/data/transactional-outbox.html"
   - title: "Transactional Outbox (Event-Driven Architecture)"
     url: "https://developer.confluent.io/learn/transactional-outbox/"
-summary: When an event must be published because a database row changed, you face the dualwrite problem: two systems (the database and the broker) must both...
 ---
 
 # The Outbox Pattern — Atomic Writes to the Database and the Broker

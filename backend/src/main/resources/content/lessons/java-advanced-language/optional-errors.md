@@ -4,10 +4,10 @@ module: java-advanced-language
 order: 4
 minutes: 18
 topics: ["Optional", "null safety", "exception hierarchy", "fail fast", "error handling idioms"]
+summary: Null references cause more production bugs than any other single feature. Optional is Java's answer for nullable return values; the exception hiera...
 docs:
   - title: "Optional"
     url: "https://docs.oracle.com/en/java/javase/21/core/optional.html"
-summary: Null references cause more production bugs than any other single feature. Optional is Java's answer for nullable return values; the exception hiera...
 ---
 
 # Optional, Nullability and Error Handling

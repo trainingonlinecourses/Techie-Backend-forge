@@ -4,12 +4,12 @@ module: java-generics-deep
 order: 5
 minutes: 25
 topics: ["raw types", "generic arrays", "varargs", "type tokens", "best practices"]
+summary: You now understand the mechanics of generics — parameters, wildcards, erasure. This lesson is about the places real code gets hurt: the subtle trap...
 docs:
   - title: "Generics Best Practices (Effective Java summaries)"
     url: "https://docs.oracle.com/javase/tutorial/java/generics/restrictions.html"
   - title: "Restrictions on Generics (Java Tutorials)"
     url: "https://docs.oracle.com/javase/tutorial/java/generics/restrictions.html"
-summary: You now understand the mechanics of generics — parameters, wildcards, erasure. This lesson is about the places real code gets hurt: the subtle trap...
 ---
 
 # Generics Pitfalls — Raw Types, Arrays, and Real-World Rules

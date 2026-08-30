@@ -4,10 +4,10 @@ module: resilience-circuit-breaker
 order: 5
 minutes: 27
 topics: ["pattern composition", "timeout", "fallback", "resilience stack", "degraded responses"]
+summary: No single pattern is enough. A complete resilience story composes five layers, each with a distinct job:
 docs:
   - title: "Resilience4j documentation"
     url: "https://resilience4j.readme.io/"
-summary: No single pattern is enough. A complete resilience story composes five layers, each with a distinct job:
 ---
 
 # Composing Resilience — Timeout, Retry, Breaker, Bulkhead, Fallback

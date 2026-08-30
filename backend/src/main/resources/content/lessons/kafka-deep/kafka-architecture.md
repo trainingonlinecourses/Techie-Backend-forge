@@ -4,12 +4,12 @@ module: kafka-deep
 order: 1
 minutes: 27
 topics: ["Kafka", "brokers", "topics", "partitions", "offsets", "event streaming"]
+summary: Kafka is a distributed eventstreaming platform — but the cleanest way to understand it is as a distributed commit log: an appendonly, ordered, repl...
 docs:
   - title: "Kafka Documentation — Architecture"
     url: "https://kafka.apache.org/documentation/#intro_architecture"
   - title: "Kafka Design (kafka.apache.org)"
     url: "https://kafka.apache.org/documentation/#design"
-summary: Kafka is a distributed eventstreaming platform — but the cleanest way to understand it is as a distributed commit log: an appendonly, ordered, repl...
 ---
 
 # Kafka Architecture — Brokers, Topics, Partitions, and Offsets

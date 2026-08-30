@@ -4,10 +4,10 @@ module: observability
 order: 1
 minutes: 25
 topics: ["MeterRegistry", "Counter", "Timer", "Gauge", "DistributionSummary", "Actuator metrics"]
+summary: Observability has three pillars: metrics (numbers), logs (events), and traces (request paths). Micrometer is Spring Boot's metrics facade — a vendo...
 docs:
   - title: "Metrics"
     url: "https://docs.spring.io/spring-boot/reference/actuator/metrics.html"
-summary: Observability has three pillars: metrics (numbers), logs (events), and traces (request paths). Micrometer is Spring Boot's metrics facade — a vendo...
 ---
 
 # Micrometer Metrics Fundamentals

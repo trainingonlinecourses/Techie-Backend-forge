@@ -4,10 +4,10 @@ module: grpc-apis
 order: 4
 minutes: 20
 topics: ["gRPC vs REST", "HTTP/2", "schema evolution", "browser support", "decision framework"]
+summary: gRPC and REST are both servicetoservice protocols — but they optimize for different worlds. This lesson is the honest comparison: where each wins, ...
 docs:
   - title: "gRPC vs REST"
     url: "https://grpc.io/blog/grpc-vs-rest/"
-summary: gRPC and REST are both servicetoservice protocols — but they optimize for different worlds. This lesson is the honest comparison: where each wins, ...
 ---
 
 # gRPC vs REST: Choosing the Right Protocol

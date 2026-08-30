@@ -4,12 +4,12 @@ module: java-reflection-annotations
 order: 5
 minutes: 25
 topics: ["modules", "JPMS", "opens", "exports", "--add-opens", "deep reflection"]
+summary: Before Java 9, "encapsulation" was a convention: private fields stopped your code, but any library could call setAccessible(true) and reach into an...
 docs:
   - title: "Module System (Java Tutorials)"
     url: "https://docs.oracle.com/javase/tutorial/java/modules/index.html"
   - title: "Understanding Module Declarations (Oracle)"
     url: "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/module/package-summary.html"
-summary: Before Java 9, "encapsulation" was a convention: private fields stopped your code, but any library could call setAccessible(true) and reach into an...
 ---
 
 # Reflection and the Module System — Opens and Exports

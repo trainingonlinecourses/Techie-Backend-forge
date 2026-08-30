@@ -4,10 +4,10 @@ module: spring-webmvc-advanced
 order: 3
 minutes: 20
 topics: ["@ModelAttribute", "form binding", "@Valid", "BindingResult", "custom validators", "error rendering"]
+summary: REST APIs validate @RequestBody. Classic MVC apps bind form data to model objects with @ModelAttribute and render validation errors back to the use...
 docs:
   - title: "Data binding and validation"
     url: "https://docs.spring.io/spring-framework/reference/web/webmvc.html#mvc-ann-modelattrib-method-args"
-summary: REST APIs validate @RequestBody. Classic MVC apps bind form data to model objects with @ModelAttribute and render validation errors back to the use...
 ---
 
 # Forms, Validation and Data Binding

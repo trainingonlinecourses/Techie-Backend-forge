@@ -4,12 +4,12 @@ module: graalvm-native
 order: 1
 minutes: 26
 topics: ["GraalVM", "native image", "AOT compilation", "ahead-of-time", "startup time", "substrate"]
+summary: Java's classic model: your .class files run on the JVM, which JITcompiles (JustInTime) the hot methods to machine code while the program runs. This...
 docs:
   - title: "GraalVM Native Image (graalvm.org)"
     url: "https://www.graalvm.org/latest/docs/reference-manual/native-image/"
   - title: "Spring Boot Native Image Support"
     url: "https://docs.spring.io/spring-boot/reference/packaging/native-image/index.html"
-summary: Java's classic model: your .class files run on the JVM, which JITcompiles (JustInTime) the hot methods to machine code while the program runs. This...
 ---
 
 # GraalVM Native Image — Compiling Java to a Binary

@@ -4,10 +4,10 @@ module: spring-configuration
 order: 5
 minutes: 24
 topics: ["config design", "secrets management", "12-factor", "fail-fast", "documentation"]
+summary: Every config decision you make shapes how your app behaves in production — and whether your ops team (or future you) can operate it. Bad config des...
 docs:
   - title: "The Twelve-Factor App — Config"
     url: "https://12factor.net/config"
-summary: Every config decision you make shapes how your app behaves in production — and whether your ops team (or future you) can operate it. Bad config des...
 ---
 
 # Configuration Best Practices — Designing for Operability

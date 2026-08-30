@@ -4,10 +4,10 @@ module: resilience-circuit-breaker
 order: 3
 minutes: 25
 topics: ["retry", "backoff", "jitter", "idempotency", "exponential backoff", "Resilience4j Retry"]
+summary: Not all failures are outages. A database briefly restarts; a network packet drops; a service is momentarily overloaded (503). These transient failu...
 docs:
   - title: "Resilience4j Retry"
     url: "https://resilience4j.readme.io/docs/retry"
-summary: Not all failures are outages. A database briefly restarts; a network packet drops; a service is momentarily overloaded (503). These transient failu...
 ---
 
 # Retry — Recovering From Transient Failures

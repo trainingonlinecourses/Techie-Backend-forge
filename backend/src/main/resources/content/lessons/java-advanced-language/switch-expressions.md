@@ -4,10 +4,10 @@ module: java-advanced-language
 order: 2
 minutes: 18
 topics: ["switch expressions", "arrow syntax", "yield", "guards", "null handling"]
+summary: The switch you learned in Java 8 — colon statements, fallthrough, mutable accumulators — has been replaced by a modern expression form that returns...
 docs:
   - title: "Switch expressions"
     url: "https://docs.oracle.com/en/java/javase/21/language/switch-expressions.html"
-summary: The switch you learned in Java 8 — colon statements, fallthrough, mutable accumulators — has been replaced by a modern expression form that returns...
 ---
 
 # Switch Expressions and Pattern Guards

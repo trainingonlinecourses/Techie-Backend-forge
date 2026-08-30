@@ -4,12 +4,12 @@ module: data-structures-algorithms
 order: 1
 minutes: 26
 topics: ["big-O", "complexity", "time complexity", "space complexity", "growth rates"]
+summary: "How fast is this program?" is the wrong question — the honest answer depends on the machine, the language, the data. The useful question is: how d...
 docs:
   - title: "Analysis of Algorithms (Khan Academy)"
     url: "https://www.khanacademy.org/computing/computer-science/algorithms/asymptotic-notation/a/asymptotic-notation"
   - title: "Introduction to Algorithms (MIT OCW)"
     url: "https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-spring-2020/"
-summary: "How fast is this program?" is the wrong question — the honest answer depends on the machine, the language, the data. The useful question is: how d...
 ---
 
 # Big-O Notation — How Fast Is Your Code, Really

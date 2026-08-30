@@ -4,12 +4,12 @@ module: java-networking
 order: 2
 minutes: 24
 topics: ["URL", "HttpURLConnection", "HTTP client", "requests", "responses"]
+summary: The previous lesson built a raw socket conversation. HTTP — the protocol of the web — is nothing more than a specific dialect spoken over that same...
 docs:
   - title: "URL (Java SE API)"
     url: "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/net/URL.html"
   - title: "HttpURLConnection (Java SE API)"
     url: "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/net/HttpURLConnection.html"
-summary: The previous lesson built a raw socket conversation. HTTP — the protocol of the web — is nothing more than a specific dialect spoken over that same...
 ---
 
 # URL and HttpURLConnection — Talking to Web Servers

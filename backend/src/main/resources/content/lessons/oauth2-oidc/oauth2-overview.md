@@ -4,12 +4,12 @@ module: oauth2-oidc
 order: 1
 minutes: 27
 topics: ["OAuth2", "authorization server", "resource server", "scopes", "grants", "tokens"]
+summary: The worst way to let an app access your data on another service is to hand over your password — the app then has total, permanent, unrevocable acce...
 docs:
   - title: "OAuth 2.0 (RFC 6749)"
     url: "https://datatracker.ietf.org/doc/html/rfc6749"
   - title: "OAuth2 Concepts (oauth.net)"
     url: "https://oauth.net/2/"
-summary: The worst way to let an app access your data on another service is to hand over your password — the app then has total, permanent, unrevocable acce...
 ---
 
 # OAuth2 Overview — Roles, Grants, and the Protocol

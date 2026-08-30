@@ -4,12 +4,12 @@ module: kubernetes-deep
 order: 3
 minutes: 26
 topics: ["Services", "ClusterIP", "NodePort", "LoadBalancer", "Ingress", "DNS", "network policies"]
+summary: Pods die and get replaced with new IPs — so direct pod addressing is useless for anything stable. Services are the abstraction that fixes this: a s...
 docs:
   - title: "Service (kubernetes.io)"
     url: "https://kubernetes.io/docs/concepts/services-networking/service/"
   - title: "Ingress (kubernetes.io)"
     url: "https://kubernetes.io/docs/concepts/services-networking/ingress/"
-summary: Pods die and get replaced with new IPs — so direct pod addressing is useless for anything stable. Services are the abstraction that fixes this: a s...
 ---
 
 # Services and Ingress — Routing Traffic in the Cluster

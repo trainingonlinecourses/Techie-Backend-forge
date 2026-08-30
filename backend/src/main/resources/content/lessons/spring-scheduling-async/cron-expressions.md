@@ -4,10 +4,10 @@ module: spring-scheduling-async
 order: 4
 minutes: 20
 topics: ["cron fields", "special characters", "timezones", "cron testing", "common patterns"]
+summary: Cron is the de facto language for calendarbased scheduling. Spring's variant has six fields — seconds first — which differs from the fivefield Unix...
 docs:
   - title: "Cron expressions"
     url: "https://docs.spring.io/spring-framework/reference/integration/scheduling.html#scheduling-cron-expression"
-summary: Cron is the de facto language for calendarbased scheduling. Spring's variant has six fields — seconds first — which differs from the fivefield Unix...
 ---
 
 # Cron Expressions Deep Dive

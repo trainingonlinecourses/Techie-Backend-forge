@@ -4,10 +4,10 @@ module: spring-data-jdbc
 order: 3
 minutes: 24
 topics: ["derived queries", "@Query", "pagination", "sorting", "modifying queries"]
+summary: Spring Data JDBC gives you three ways to query, in increasing power:
 docs:
   - title: "Query methods (Spring Data JDBC)"
     url: "https://docs.spring.io/spring-data/jdbc/reference/jdbc/query-methods.html"
-summary: Spring Data JDBC gives you three ways to query, in increasing power:
 ---
 
 # Querying — Derived, Annotated, and Paged

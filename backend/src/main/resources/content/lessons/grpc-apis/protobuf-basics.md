@@ -4,10 +4,10 @@ module: grpc-apis
 order: 1
 minutes: 22
 topics: ["protobuf", ".proto files", "message types", "scalar types", "repeated", "oneof", "serialization"]
+summary: Protocol Buffers (protobuf) is Google's binary serialization format — the contract language of gRPC. Where JSON is humanreadable and wasteful, prot...
 docs:
   - title: "Protobuf language guide"
     url: "https://protobuf.dev/programming-guides/proto3/"
-summary: Protocol Buffers (protobuf) is Google's binary serialization format — the contract language of gRPC. Where JSON is humanreadable and wasteful, prot...
 ---
 
 # Protocol Buffers Fundamentals

@@ -4,10 +4,10 @@ module: graphql-deep
 order: 3
 minutes: 27
 topics: ["N+1", "DataLoader", "batch loading", "BatchingLoader", "query efficiency"]
+summary: The resolver chain is elegant — and potentially catastrophic for performance. Consider the innocent query:
 docs:
   - title: "DataLoader (graphql-java)"
     url: "https://www.graphql-java.com/documentation/data-fetching/"
-summary: The resolver chain is elegant — and potentially catastrophic for performance. Consider the innocent query:
 ---
 
 # The N+1 Problem and DataLoader — Batching Field Resolution

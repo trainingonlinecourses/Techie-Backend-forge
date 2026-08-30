@@ -4,10 +4,10 @@ module: spring-amqp
 order: 1
 minutes: 25
 topics: ["RabbitMQ", "AMQP", "exchanges", "queues", "bindings", "Spring AMQP setup"]
+summary: RabbitMQ is the most widely deployed opensource message broker. Its AMQP 091 model — exchanges, queues, bindings — is the mental model behind Sprin...
 docs:
   - title: "Spring AMQP reference"
     url: "https://docs.spring.io/spring-amqp/reference/"
-summary: RabbitMQ is the most widely deployed opensource message broker. Its AMQP 091 model — exchanges, queues, bindings — is the mental model behind Sprin...
 ---
 
 # RabbitMQ & AMQP Fundamentals

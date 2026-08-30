@@ -4,10 +4,10 @@ module: spring-data-jdbc
 order: 4
 minutes: 25
 topics: ["JDBC vs JPA", "persistence choice", "ORM trade-offs", "lazy loading", "when to pick"]
+summary: Both Spring Data JDBC and Spring Data JPA give you repositories, derived queries, and transactions. But underneath, they answer the fundamental que...
 docs:
   - title: "Spring Data JDBC vs JPA (Spring blog)"
     url: "https://spring.io/blog/2018/09/24/spring-data-jdbc-references-and-aggregates"
-summary: Both Spring Data JDBC and Spring Data JPA give you repositories, derived queries, and transactions. But underneath, they answer the fundamental que...
 ---
 
 # Spring Data JDBC vs JPA — Choosing Your Persistence

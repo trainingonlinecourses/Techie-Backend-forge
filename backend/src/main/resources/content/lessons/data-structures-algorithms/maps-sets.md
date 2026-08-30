@@ -4,12 +4,12 @@ module: data-structures-algorithms
 order: 3
 minutes: 26
 topics: ["HashMap", "HashSet", "hash tables", "hashCode", "TreeMap", "collisions"]
+summary: A list answers "does this contain x?" by scanning every element — O(n). A map (dictionary) answers it in O(1): instead of searching, it computes wh...
 docs:
   - title: "HashMap (Java SE API)"
     url: "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/HashMap.html"
   - title: "Object.hashCode (Java SE API)"
     url: "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html#hashCode()"
-summary: A list answers "does this contain x?" by scanning every element — O(n). A map (dictionary) answers it in O(1): instead of searching, it computes wh...
 ---
 
 # Maps and Sets — Hash Tables and Trees

@@ -4,10 +4,10 @@ module: graphql-deep
 order: 5
 minutes: 27
 topics: ["federation", "subgraphs", "supergraph", "Apollo", "@key", "distributed GraphQL"]
+summary: A monolith GraphQL API works until it doesn't: one schema, one team, one deployment — every team's fields ride in the same schema, and adding a fie...
 docs:
   - title: "Apollo Federation"
     url: "https://www.apollographql.com/docs/federation/"
-summary: A monolith GraphQL API works until it doesn't: one schema, one team, one deployment — every team's fields ride in the same schema, and adding a fie...
 ---
 
 # GraphQL Federation — One Graph, Many Services

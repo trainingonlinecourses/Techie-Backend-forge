@@ -4,12 +4,12 @@ module: jackson-json
 order: 4
 minutes: 24
 topics: ["performance", "streaming", "JsonGenerator", "ObjectMapper reuse", "serialization features", "bulk"]
+summary: For most APIs, Jackson's speed is a nonissue — the database and the network dominate. But at high throughput (a gateway, a log pipeline, a busy sea...
 docs:
   - title: "Jackson Performance (FasterXML wiki)"
     url: "https://github.com/FasterXML/jackson-docs/wiki/Performance"
   - title: "JsonGenerator (Jackson API)"
     url: "https://fasterxml.github.io/jackson-databind/javadoc/2.14/com/fasterxml/jackson/core/JsonGenerator.html"
-summary: For most APIs, Jackson's speed is a nonissue — the database and the network dominate. But at high throughput (a gateway, a log pipeline, a busy sea...
 ---
 
 # Jackson Performance — Streaming, Caching, and Serialization Features

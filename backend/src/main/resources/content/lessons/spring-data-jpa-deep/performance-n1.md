@@ -4,10 +4,10 @@ module: spring-data-jpa-deep
 order: 3
 minutes: 28
 topics: ["N+1 problem", "fetch joins", "EntityGraph", "batch fetching", "lazy loading", "session per request"]
+summary: The N+1 problem is the most common JPA performance killer: one query for the parent, then N queries for each child. This lesson covers how N+1 happ...
 docs:
   - title: "Hibernate fetching"
     url: "https://docs.jboss.org/hibernate/orm/current/userguide/html_single/Hibernate_User_Guide.html#fetching"
-summary: The N+1 problem is the most common JPA performance killer: one query for the parent, then N queries for each child. This lesson covers how N+1 happ...
 ---
 
 # N+1 Queries and Fetch Strategies

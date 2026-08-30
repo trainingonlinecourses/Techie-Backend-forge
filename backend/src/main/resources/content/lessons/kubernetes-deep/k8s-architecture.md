@@ -4,12 +4,12 @@ module: kubernetes-deep
 order: 1
 minutes: 27
 topics: ["Kubernetes", "pods", "nodes", "control plane", "kubelet", "containers"]
+summary: Docker gives you containers — isolated processes with their own filesystem. But running containers at scale (dozens of machines, hundreds of contai...
 docs:
   - title: "Kubernetes Concepts (kubernetes.io)"
     url: "https://kubernetes.io/docs/concepts/"
   - title: "Kubernetes Components (kubernetes.io)"
     url: "https://kubernetes.io/docs/concepts/overview/components/"
-summary: Docker gives you containers — isolated processes with their own filesystem. But running containers at scale (dozens of machines, hundreds of contai...
 ---
 
 # Kubernetes Architecture — Nodes, Pods, and the Control Plane

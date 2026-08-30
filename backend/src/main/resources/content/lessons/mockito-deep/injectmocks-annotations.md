@@ -4,12 +4,12 @@ module: mockito-deep
 order: 2
 minutes: 24
 topics: ["@InjectMocks", "@Spy", "@Captor", "argument captors", "dependency injection", "partial mocking"]
+summary: The basics lesson covered @Mock and stubbing. The professional workflow adds three more tools: @InjectMocks (wire mocks into the class under test a...
 docs:
   - title: "Mockito Annotations (Mockito docs)"
     url: "https://javadoc.io/doc/org.mockito/mockito-core/latest/org/mockito/Mockito.html#7"
   - title: "ArgumentCaptor (Mockito docs)"
     url: "https://javadoc.io/doc/org.mockito/mockito-core/latest/org/mockito/ArgumentCaptor.html"
-summary: The basics lesson covered @Mock and stubbing. The professional workflow adds three more tools: @InjectMocks (wire mocks into the class under test a...
 ---
 
 # Mockito Injection — @InjectMocks, @Spy, and @Captor

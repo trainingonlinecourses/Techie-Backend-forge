@@ -4,10 +4,10 @@ module: git-github-basics
 order: 5
 minutes: 26
 topics: ["GitHub Flow", "Git Flow", "pull requests", "code review", "CI", "trunk-based development"]
+summary: Git gives you branches, merges, and remotes — but how a team uses them is the workflow: which branches exist, when things merge, who reviews, where...
 docs:
   - title: "GitHub Flow"
     url: "https://docs.github.com/en/get-started/using-github/github-flow"
-summary: Git gives you branches, merges, and remotes — but how a team uses them is the workflow: which branches exist, when things merge, who reviews, where...
 ---
 
 # Git Workflows — How Teams Actually Use Git

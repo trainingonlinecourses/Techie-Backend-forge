@@ -4,10 +4,10 @@ module: spring-configuration
 order: 2
 minutes: 24
 topics: ["@Profile", "profiles", "environment-specific config", "active profiles", "conditional beans"]
+summary: Dev, test, staging, production — each environment wants slightly different behavior: dev uses an inmemory H2 database and fake email; production us...
 docs:
   - title: "Profiles (Spring Boot docs)"
     url: "https://docs.spring.io/spring-boot/reference/features/profiles.html"
-summary: Dev, test, staging, production — each environment wants slightly different behavior: dev uses an inmemory H2 database and fake email; production us...
 ---
 
 # Profiles — Environment-Specific Behavior

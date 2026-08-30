@@ -4,10 +4,10 @@ module: java-time-api
 order: 5
 minutes: 24
 topics: ["DateTimeFormatter", "ISO-8601", "parsing", "patterns", "locales"]
+summary: Data crosses system boundaries as text: a JSON field, a CSV column, a log line, a query parameter. Converting a LocalDate to text is formatting; co...
 docs:
   - title: "DateTimeFormatter (Java SE API)"
     url: "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/time/format/DateTimeFormatter.html"
-summary: Data crosses system boundaries as text: a JSON field, a CSV column, a log line, a query parameter. Converting a LocalDate to text is formatting; co...
 ---
 
 # Formatting and Parsing Dates

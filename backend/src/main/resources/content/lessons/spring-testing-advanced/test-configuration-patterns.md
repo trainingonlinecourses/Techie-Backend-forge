@@ -4,10 +4,10 @@ module: spring-testing-advanced
 order: 5
 minutes: 22
 topics: ["@TestConfiguration", "@MockBean", "profile isolation", "context caching", "random ports", "flaky test prevention"]
+summary: The hardest part of testing Spring isn't writing assertions — it's configuring the context so tests are fast, isolated, and deterministic. This les...
 docs:
   - title: "Testing configuration"
     url: "https://docs.spring.io/spring-boot/reference/testing/spring-boot-applications.html"
-summary: The hardest part of testing Spring isn't writing assertions — it's configuring the context so tests are fast, isolated, and deterministic. This les...
 ---
 
 # Test Configuration & Isolation Patterns

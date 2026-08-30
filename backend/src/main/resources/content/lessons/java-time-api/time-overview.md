@@ -4,10 +4,10 @@ module: java-time-api
 order: 1
 minutes: 25
 topics: ["java.time", "LocalDate", "LocalTime", "Instant", "design principles"]
+summary: Dates look simple — "August 18, 2026, 3:30 PM." But that innocent sentence hides three separate questions:
 docs:
   - title: "java.time package summary"
     url: "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/time/package-summary.html"
-summary: Dates look simple — "August 18, 2026, 3:30 PM." But that innocent sentence hides three separate questions:
 ---
 
 # java.time — The Modern Date & Time API

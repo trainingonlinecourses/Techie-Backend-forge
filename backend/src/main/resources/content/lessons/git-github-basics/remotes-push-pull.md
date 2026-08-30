@@ -4,10 +4,10 @@ module: git-github-basics
 order: 3
 minutes: 24
 topics: ["remote", "push", "pull", "fetch", "origin", "GitHub", "clone"]
+summary: So far, Git was local: your repository, your history, on your machine. Remotes connect your repo to a shared copy on a server (GitHub, GitLab, Rend...
 docs:
   - title: "Working with remotes (Pro Git book)"
     url: "https://git-scm.com/book/en/v2/Git-Basics-Working-with-Remotes"
-summary: So far, Git was local: your repository, your history, on your machine. Remotes connect your repo to a shared copy on a server (GitHub, GitLab, Rend...
 ---
 
 # Remotes, Push, and Pull — Sharing History

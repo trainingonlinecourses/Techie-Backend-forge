@@ -4,10 +4,10 @@ module: spring-boot-internals
 order: 4
 minutes: 25
 topics: ["@ConfigurationProperties", "property binding", "relaxed binding", "validation", "profiles"]
+summary: The naive way to read configuration in Spring is @Value:
 docs:
   - title: "Configuration properties (Spring Boot docs)"
     url: "https://docs.spring.io/spring-boot/reference/features/external-config.html#features.external-config.typesafe-configuration-properties"
-summary: The naive way to read configuration in Spring is @Value:
 ---
 
 # Configuration Properties — Typed, Bound Configuration

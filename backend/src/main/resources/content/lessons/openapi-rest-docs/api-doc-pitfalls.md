@@ -4,10 +4,10 @@ module: openapi-rest-docs
 order: 5
 minutes: 23
 topics: ["doc pitfalls", "DTO hygiene", "examples", "deprecation", "changelog", "naming"]
+summary: Your API's documentation is the first impression a consumer has of your product. Bad docs cost real money: developers abandon APIs they can't figur...
 docs:
   - title: "API documentation best practices (GitHub)"
     url: "https://github.com/tiimgreen/github-cheat-sheet"
-summary: Your API's documentation is the first impression a consumer has of your product. Bad docs cost real money: developers abandon APIs they can't figur...
 ---
 
 # API Documentation — Pitfalls and Best Practices

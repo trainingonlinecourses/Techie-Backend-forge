@@ -4,12 +4,12 @@ module: java-networking
 order: 3
 minutes: 26
 topics: ["HttpClient", "HttpRequest", "HttpResponse", "async", "HTTP/2", "WebSocket"]
+summary: For twenty years, Java's builtin HTTP story was HttpURLConnection — functional but clunky: verbose, no HTTP/2, awkward async, and easy to misuse. J...
 docs:
   - title: "HttpClient (Java SE API)"
     url: "https://docs.oracle.com/en/java/javase/21/docs/api/java.net.http/java/net/http/HttpClient.html"
   - title: "HTTP Client API (Dev.java)"
     url: "https://dev.java/learn/java-io/http-client/"
-summary: For twenty years, Java's builtin HTTP story was HttpURLConnection — functional but clunky: verbose, no HTTP/2, awkward async, and easy to misuse. J...
 ---
 
 # The Modern HttpClient — HTTP/2, Async, and Clean APIs

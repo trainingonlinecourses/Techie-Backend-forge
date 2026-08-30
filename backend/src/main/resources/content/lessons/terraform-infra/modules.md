@@ -4,12 +4,12 @@ module: terraform-infra
 order: 4
 minutes: 25
 topics: ["modules", "reusability", "module sources", "outputs", "versioned modules"]
+summary: A config that provisions one environment works — until you need the same stack in staging and prod, or a second team wants the same database patter...
 docs:
   - title: "Modules (Terraform docs)"
     url: "https://developer.hashicorp.com/terraform/language/modules"
   - title: "Module Sources (Terraform docs)"
     url: "https://developer.hashicorp.com/terraform/language/modules/sources"
-summary: A config that provisions one environment works — until you need the same stack in staging and prod, or a second team wants the same database patter...
 ---
 
 # Terraform Modules — Reusable Infrastructure Packages

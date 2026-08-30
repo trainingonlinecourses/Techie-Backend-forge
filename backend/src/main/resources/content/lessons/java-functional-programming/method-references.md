@@ -4,10 +4,10 @@ module: java-functional-programming
 order: 3
 minutes: 22
 topics: ["method references", "ClassName::method", "instance::method", "constructor references", "shorthand"]
+summary: Many lambdas are nothing but a forwarding call:
 docs:
   - title: "Method references (Java tutorial)"
     url: "https://docs.oracle.com/javase/tutorial/java/javaOO/methodreferences.html"
-summary: Many lambdas are nothing but a forwarding call:
 ---
 
 # Method References — Lambdas That Just Call Something

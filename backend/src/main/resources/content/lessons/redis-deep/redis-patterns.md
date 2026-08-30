@@ -4,12 +4,12 @@ module: redis-deep
 order: 5
 minutes: 28
 topics: ["cache-aside", "rate limiting", "queues", "distributed locks", "Redis patterns", "counter"]
+summary: Redis's structures are ingredients; patterns are the recipes — proven arrangements of structures and commands that solve recurring production probl...
 docs:
   - title: "Redis Patterns (redis.io)"
     url: "https://redis.io/docs/latest/develop/use/patterns/"
   - title: "Cache-Aside Pattern (Microsoft Learn)"
     url: "https://learn.microsoft.com/en-us/azure/architecture/patterns/cache-aside"
-summary: Redis's structures are ingredients; patterns are the recipes — proven arrangements of structures and commands that solve recurring production probl...
 ---
 
 # Redis Patterns — Caching, Rate Limiting, Queues, Distributed Locks

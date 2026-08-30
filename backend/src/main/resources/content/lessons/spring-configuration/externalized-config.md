@@ -4,10 +4,10 @@ module: spring-configuration
 order: 1
 minutes: 25
 topics: ["externalized config", "property sources", "precedence", "env vars", "command line"]
+summary: A deployed application is a generic machine: the same jar runs in dev, staging, and production. What differs is configuration — database URLs, API ...
 docs:
   - title: "Externalized Configuration (Spring Boot docs)"
     url: "https://docs.spring.io/spring-boot/reference/features/external-config.html"
-summary: A deployed application is a generic machine: the same jar runs in dev, staging, and production. What differs is configuration — database URLs, API ...
 ---
 
 # Externalized Configuration — One App, Many Environments

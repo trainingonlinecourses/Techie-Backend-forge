@@ -4,10 +4,10 @@ module: http-basics
 order: 1
 minutes: 25
 topics: ["HTTP methods", "GET POST PUT DELETE PATCH", "idempotency", "safe methods", "HTTP semantics"]
+summary: HTTP is a requestresponse protocol with a small set of methods (verbs) that say what the client wants done with the resource at the URL. The URL na...
 docs:
   - title: "RFC 9110 — HTTP Semantics (methods)"
     url: "https://datatracker.ietf.org/doc/html/rfc9110#section-9"
-summary: HTTP is a requestresponse protocol with a small set of methods (verbs) that say what the client wants done with the resource at the URL. The URL na...
 ---
 
 # HTTP Methods — The Verbs of the Web

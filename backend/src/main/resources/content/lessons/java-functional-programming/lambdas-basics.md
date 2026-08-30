@@ -4,10 +4,10 @@ module: java-functional-programming
 order: 1
 minutes: 26
 topics: ["lambdas", "anonymous classes", "behavior passing", "syntax", "effectively final"]
+summary: Imagine a cooking show. The host doesn't tell you exactly how to chop every vegetable each episode — she says "and now, chop the onions" and hands ...
 docs:
   - title: "Lambda expressions (Java tutorial)"
     url: "https://docs.oracle.com/javase/tutorial/java/javaOO/lambdaexpressions.html"
-summary: Imagine a cooking show. The host doesn't tell you exactly how to chop every vegetable each episode — she says "and now, chop the onions" and hands ...
 ---
 
 # Lambda Expressions — Passing Behavior as Data

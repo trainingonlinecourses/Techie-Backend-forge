@@ -4,12 +4,12 @@ module: elasticsearch-deep
 order: 1
 minutes: 26
 topics: ["Elasticsearch", "inverted index", "search", "Lucene", "documents", "indices"]
+summary: A database finds rows by matching values — WHERE title = 'spring'. But real search is fuzzy, ranked, and languageaware: "spring boot tutorial" shou...
 docs:
   - title: "Elasticsearch Guide — What Is Elasticsearch?"
     url: "https://www.elastic.co/guide/en/elasticsearch/reference/current/elasticsearch-intro.html"
   - title: "Inverted Index (Elastic docs)"
     url: "https://www.elastic.co/guide/en/elasticsearch/reference/current/documents-indices.html"
-summary: A database finds rows by matching values — WHERE title = 'spring'. But real search is fuzzy, ranked, and languageaware: "spring boot tutorial" shou...
 ---
 
 # Elasticsearch Basics — Inverted Indexes and Distributed Search

@@ -4,10 +4,10 @@ module: postgresql-deep
 order: 2
 minutes: 28
 topics: ["B-tree indexes", "composite indexes", "covering indexes", "EXPLAIN ANALYZE", "index-only scans", "partial indexes"]
+summary: An index is a sorted copy of a column (or columns) that lets the database find rows without scanning the whole table. This lesson covers what index...
 docs:
   - title: "PostgreSQL indexes"
     url: "https://www.postgresql.org/docs/current/indexes.html"
-summary: An index is a sorted copy of a column (or columns) that lets the database find rows without scanning the whole table. This lesson covers what index...
 ---
 
 # Indexing for Performance

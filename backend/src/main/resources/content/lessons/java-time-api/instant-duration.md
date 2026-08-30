@@ -4,10 +4,10 @@ module: java-time-api
 order: 3
 minutes: 24
 topics: ["Instant", "Duration", "epoch", "UTC", "timestamps", "timeouts"]
+summary: Two of the most important time concepts have nothing to do with calendars, months, or time zones:
 docs:
   - title: "Instant (Java SE API)"
     url: "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/time/Instant.html"
-summary: Two of the most important time concepts have nothing to do with calendars, months, or time zones:
 ---
 
 # Instant and Duration — Moments and Elapsed Time

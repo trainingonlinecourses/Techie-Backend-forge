@@ -4,12 +4,12 @@ module: mockito-deep
 order: 5
 minutes: 24
 topics: ["best practices", "testability", "strict stubs", "design for testing", "anti-patterns", "mockito hygiene"]
+summary: Here's the uncomfortable truth about mocking: how much mocking your tests require is a direct measurement of your code's design. Code with clear se...
 docs:
   - title: "Mockito Best Practices (site.mockito.org)"
     url: "https://site.mockito.org/"
   - title: "Mocking — Kent Beck's advice"
     url: "https://www.martinfowler.com/bliki/TestDouble.html"
-summary: Here's the uncomfortable truth about mocking: how much mocking your tests require is a direct measurement of your code's design. Code with clear se...
 ---
 
 # Mockito Best Practices — Design, Strictness, and Testability

@@ -4,10 +4,10 @@ module: docker-deep
 order: 2
 minutes: 23
 topics: ["layers", "union filesystem", "image sharing", "copy-on-write", "image size"]
+summary: Every Dockerfile instruction that adds data (RUN, COPY, ENV) creates a layer — an immutable filesystem delta. The final image is a stack of layers,...
 docs:
   - title: "About storage drivers"
     url: "https://docs.docker.com/storage/storagedriver/"
-summary: Every Dockerfile instruction that adds data (RUN, COPY, ENV) creates a layer — an immutable filesystem delta. The final image is a stack of layers,...
 ---
 
 # Image Layers — How Docker Stores and Shares

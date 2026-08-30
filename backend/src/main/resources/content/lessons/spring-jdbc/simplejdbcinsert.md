@@ -4,10 +4,10 @@ module: spring-jdbc
 order: 3
 minutes: 16
 topics: ["SimpleJdbcInsert", "generated keys", "table metadata", "multiple rows", "audit columns"]
+summary: SimpleJdbcInsert removes the last boilerplate from inserts: it reads table metadata once, then turns a Map or bean into a parameterized INSERT — in...
 docs:
   - title: "SimpleJdbcInsert"
     url: "https://docs.spring.io/spring-framework/reference/data-access/jdbc.html#jdbc-simple-jdbc-insert"
-summary: SimpleJdbcInsert removes the last boilerplate from inserts: it reads table metadata once, then turns a Map or bean into a parameterized INSERT — in...
 ---
 
 # SimpleJdbcInsert and Insert Patterns

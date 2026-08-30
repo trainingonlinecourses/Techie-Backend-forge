@@ -4,10 +4,10 @@ module: distributed-systems
 order: 1
 minutes: 25
 topics: ["CAP", "consistency models", "eventual consistency", "strong consistency", "partition tolerance", "PACELC"]
+summary: Every distributed system makes the same fundamental trade — and most teams discover it by accident in production. The CAP theorem and its successor...
 docs:
   - title: "CAP theorem"
     url: "https://en.wikipedia.org/wiki/CAP_theorem"
-summary: Every distributed system makes the same fundamental trade — and most teams discover it by accident in production. The CAP theorem and its successor...
 ---
 
 # The CAP Theorem and Consistency Models

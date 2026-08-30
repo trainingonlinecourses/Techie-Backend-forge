@@ -4,10 +4,10 @@ module: postgresql-deep
 order: 3
 minutes: 28
 topics: ["MVCC", "isolation levels", "read committed", "repeatable read", "serializable", "row locking", "FOR UPDATE"]
+summary: Postgres implements transactions with MVCC (MultiVersion Concurrency Control): readers never block writers, writers never block readers. This lesso...
 docs:
   - title: "PostgreSQL transactions"
     url: "https://www.postgresql.org/docs/current/mvcc.html"
-summary: Postgres implements transactions with MVCC (MultiVersion Concurrency Control): readers never block writers, writers never block readers. This lesso...
 ---
 
 # Transactions and Isolation in Postgres

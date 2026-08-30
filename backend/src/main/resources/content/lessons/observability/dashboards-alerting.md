@@ -4,10 +4,10 @@ module: observability
 order: 5
 minutes: 22
 topics: ["Prometheus", "Grafana", "alert rules", "SLOs", "on-call", "golden signals"]
+summary: Metrics without dashboards are numbers; dashboards without alerts are archaeology. This lesson covers the standard stack — Prometheus scrapes, Graf...
 docs:
   - title: "Prometheus querying"
     url: "https://prometheus.io/docs/prometheus/latest/querying/basics/"
-summary: Metrics without dashboards are numbers; dashboards without alerts are archaeology. This lesson covers the standard stack — Prometheus scrapes, Graf...
 ---
 
 # Dashboards and Alerting

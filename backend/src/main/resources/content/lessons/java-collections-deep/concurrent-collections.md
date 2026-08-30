@@ -4,10 +4,10 @@ module: java-collections-deep
 order: 2
 minutes: 28
 topics: ["ConcurrentHashMap", "CopyOnWriteArrayList", "BlockingQueue", "ConcurrentLinkedQueue", "lock-free", "thread safety"]
+summary: The java.util.concurrent collections are the difference between a multithreaded app that's correct and one that's slow, deadlocked, or corrupted. T...
 docs:
   - title: "Concurrent collections"
     url: "https://docs.oracle.com/en/java/javase/21/core/collections.html"
-summary: The java.util.concurrent collections are the difference between a multithreaded app that's correct and one that's slow, deadlocked, or corrupted. T...
 ---
 
 # Concurrent Collections Deep Dive

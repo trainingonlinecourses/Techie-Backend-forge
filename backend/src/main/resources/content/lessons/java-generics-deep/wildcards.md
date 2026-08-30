@@ -4,12 +4,12 @@ module: java-generics-deep
 order: 2
 minutes: 27
 topics: ["wildcards", "covariance", "contravariance", "producer extends", "consumer super"]
+summary: In the previous lesson we learned that List<String is not a subtype of List<Object. That rule protects type safety, but it creates an everyday prob...
 docs:
   - title: "Wildcards (Java Tutorials)"
     url: "https://docs.oracle.com/javase/tutorial/java/generics/wildcards.html"
   - title: "Guidelines for Wildcard Use (Java Tutorials)"
     url: "https://docs.oracle.com/javase/tutorial/java/generics/wildcardGuidelines.html"
-summary: In the previous lesson we learned that List<String is not a subtype of List<Object. That rule protects type safety, but it creates an everyday prob...
 ---
 
 # Wildcards — ? extends, ? super, and Unbounded

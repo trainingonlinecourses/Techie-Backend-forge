@@ -4,10 +4,10 @@ module: distributed-systems
 order: 3
 minutes: 22
 topics: ["idempotency keys", "at-least-once", "deduplication", "unique constraints", "retries", "distributed locks"]
+summary: Retries are a fact of distributed life: timeouts, dead letter reprocessing, and consumer restarts all deliver the same request twice. Idempotency i...
 docs:
   - title: "Idempotency patterns"
     url: "https://microservices.io/patterns/consumer-side.html"
-summary: Retries are a fact of distributed life: timeouts, dead letter reprocessing, and consumer restarts all deliver the same request twice. Idempotency i...
 ---
 
 # Idempotency in Distributed Systems

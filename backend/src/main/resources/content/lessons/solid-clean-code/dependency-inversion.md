@@ -4,10 +4,10 @@ module: solid-clean-code
 order: 5
 minutes: 25
 topics: ["DIP", "dependency injection", "abstractions", "high-level vs low-level", "Spring IoC"]
+summary: The Dependency Inversion Principle (the D in SOLID) has two rules:
 docs:
   - title: "Dependency inversion principle (Wikipedia)"
     url: "https://en.wikipedia.org/wiki/Dependency_inversion_principle"
-summary: The Dependency Inversion Principle (the D in SOLID) has two rules:
 ---
 
 # DIP — Dependency Inversion Principle

@@ -4,10 +4,10 @@ module: design-patterns
 order: 5
 minutes: 24
 topics: ["observer", "publish-subscribe", "event listeners", "decoupling", "Spring events"]
+summary: Think of a news subscription. You don't call the newspaper every morning asking "is there news yet?" — you subscribe, and the paper pushes new edit...
 docs:
   - title: "Observer (Refactoring Guru)"
     url: "https://refactoring.guru/design-patterns/observer"
-summary: Think of a news subscription. You don't call the newspaper every morning asking "is there news yet?" — you subscribe, and the paper pushes new edit...
 ---
 
 # Observer Pattern — Notifying When Things Change

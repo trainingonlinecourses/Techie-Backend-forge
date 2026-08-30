@@ -4,12 +4,12 @@ module: spring-integration
 order: 3
 minutes: 25
 topics: ["messaging gateways", "service interface", "@MessagingGateway", "request-reply", "GatewayProxyFactoryBean"]
+summary: Here's the integration dilemma: the internal machinery of Spring Integration is messagebased and asynchronous — but your application code wants pla...
 docs:
   - title: "Messaging Gateways (Spring Integration Reference)"
     url: "https://docs.spring.io/spring-integration/reference/gateway.html"
   - title: "Service Activator (Spring Integration Reference)"
     url: "https://docs.spring.io/spring-integration/reference/service-activator.html"
-summary: Here's the integration dilemma: the internal machinery of Spring Integration is messagebased and asynchronous — but your application code wants pla...
 ---
 
 # Messaging Gateways — Synchronous Facades Over Async Flows

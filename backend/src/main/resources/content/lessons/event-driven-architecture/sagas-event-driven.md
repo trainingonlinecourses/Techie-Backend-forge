@@ -4,12 +4,12 @@ module: event-driven-architecture
 order: 5
 minutes: 27
 topics: ["sagas", "compensation", "event-driven transactions", "choreography", "orchestration", "eventual consistency"]
+summary: A business operation often spans several services: place an order (order service), reserve stock (inventory), charge the card (payment), schedule s...
 docs:
   - title: "Saga Pattern (microservices.io)"
     url: "https://microservices.io/patterns/data/saga.html"
   - title: "Saga (Microsoft Azure Architecture)"
     url: "https://learn.microsoft.com/en-us/azure/architecture/reference-architectures/saga/saga"
-summary: A business operation often spans several services: place an order (order service), reserve stock (inventory), charge the card (payment), schedule s...
 ---
 
 # Sagas in Event-Driven Systems — Compensating the Long Journey

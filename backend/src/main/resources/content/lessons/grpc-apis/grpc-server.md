@@ -4,10 +4,10 @@ module: grpc-apis
 order: 2
 minutes: 25
 topics: ["gRPC", "service definitions", "Unary RPC", "server implementation", "Spring gRPC", "deadlines"]
+summary: gRPC is RPC over HTTP/2 with protobuf payloads: typed method calls, streaming in both directions, deadlines, and firstclass error codes. This lesso...
 docs:
   - title: "gRPC concepts"
     url: "https://grpc.io/docs/what-is-grpc/concepts/"
-summary: gRPC is RPC over HTTP/2 with protobuf payloads: typed method calls, streaming in both directions, deadlines, and firstclass error codes. This lesso...
 ---
 
 # Building a gRPC Server

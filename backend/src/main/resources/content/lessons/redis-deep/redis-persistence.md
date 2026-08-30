@@ -4,12 +4,12 @@ module: redis-deep
 order: 4
 minutes: 25
 topics: ["RDB", "AOF", "persistence", "durability", "Redis config", "data loss"]
+summary: Redis is inmemory — its entire dataset lives in RAM, and RAM is volatile: power loss, crash, or restart wipes it. For a cache, that's often fine (a...
 docs:
   - title: "Redis Persistence (redis.io)"
     url: "https://redis.io/docs/latest/operate/oss_and_stack/management/persistence/"
   - title: "Redis Durability and Safety (redis.io)"
     url: "https://redis.io/docs/latest/operate/oss_and_stack/management/security/"
-summary: Redis is inmemory — its entire dataset lives in RAM, and RAM is volatile: power loss, crash, or restart wipes it. For a cache, that's often fine (a...
 ---
 
 # Redis Persistence — RDB Snapshots and AOF

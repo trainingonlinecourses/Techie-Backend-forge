@@ -4,10 +4,10 @@ module: java-functional-programming
 order: 5
 minutes: 25
 topics: ["side effects", "mutable state", "performance", "readability", "when not to use streams"]
+summary: The previous lessons sold the functional style hard — and it is powerful. But every technique has a failure mode, and functional Java has several c...
 docs:
   - title: "Stream API (Java SE)"
     url: "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/stream/package-summary.html"
-summary: The previous lessons sold the functional style hard — and it is powerful. But every technique has a failure mode, and functional Java has several c...
 ---
 
 # Functional Style — Pitfalls and When to Stop

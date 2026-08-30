@@ -4,10 +4,10 @@ module: maven-gradle
 order: 2
 minutes: 22
 topics: ["dependency scopes", "transitive deps", "exclusions", "dependencyManagement", "BOM", "conflict resolution"]
+summary: Dependencies are the biggest source of build pain: conflicts, scope mistakes, and silent version drift. This lesson covers the dependency mechanism...
 docs:
   - title: "Maven dependency mechanism"
     url: "https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html"
-summary: Dependencies are the biggest source of build pain: conflicts, scope mistakes, and silent version drift. This lesson covers the dependency mechanism...
 ---
 
 # Dependency Management and Versioning

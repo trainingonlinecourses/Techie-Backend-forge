@@ -4,12 +4,12 @@ module: kafka-deep
 order: 3
 minutes: 25
 topics: ["consumer groups", "rebalancing", "partition assignment", "group coordinator", "lag"]
+summary: A single consumer reading a topic processes events one at a time. A consumer group is Kafka's mechanism for parallelizing that work: the group's me...
 docs:
   - title: "Consumer Groups (Kafka docs)"
     url: "https://kafka.apache.org/documentation/#intro_consumers"
   - title: "Kafka Consumer Group Internals (Confluent)"
     url: "https://docs.confluent.io/platform/current/clients/consumer.html"
-summary: A single consumer reading a topic processes events one at a time. A consumer group is Kafka's mechanism for parallelizing that work: the group's me...
 ---
 
 # Consumer Groups — Partition Assignment and Rebalancing

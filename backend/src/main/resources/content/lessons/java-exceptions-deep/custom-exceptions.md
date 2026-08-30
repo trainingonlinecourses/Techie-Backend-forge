@@ -4,12 +4,12 @@ module: java-exceptions-deep
 order: 3
 minutes: 22
 topics: ["custom exceptions", "exception design", "error codes", "exception wrapping", "causes"]
+summary: You can throw IllegalStateException("user not found") everywhere and be done. But consider what happens six months later, when a new developer need...
 docs:
   - title: "Creating Exception Classes (Java Tutorials)"
     url: "https://docs.oracle.com/javase/tutorial/essential/exceptions/create.html"
   - title: "Unchecked Exceptions — The Controversy (Java Tutorials)"
     url: "https://docs.oracle.com/javase/tutorial/essential/exceptions/runtime.html"
-summary: You can throw IllegalStateException("user not found") everywhere and be done. But consider what happens six months later, when a new developer need...
 ---
 
 # Custom Exceptions — Designing Failures That Mean Something

@@ -4,10 +4,10 @@ module: spring-webmvc-advanced
 order: 1
 minutes: 22
 topics: ["HandlerExceptionResolver", "@ExceptionHandler chains", "response status", "error page", "async exceptions"]
+summary: @RestControllerAdvice covers 90% of error handling. The remaining 10% — resolver chains, percontroller handlers, mapped exceptions, and error pages...
 docs:
   - title: "Spring MVC exceptions"
     url: "https://docs.spring.io/spring-framework/reference/web/webmvc.html#mvc-ann-exceptionhandler"
-summary: @RestControllerAdvice covers 90% of error handling. The remaining 10% — resolver chains, percontroller handlers, mapped exceptions, and error pages...
 ---
 
 # Advanced Exception Handling in Spring MVC

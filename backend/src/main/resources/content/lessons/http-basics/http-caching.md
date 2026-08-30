@@ -4,10 +4,10 @@ module: http-basics
 order: 5
 minutes: 24
 topics: ["Cache-Control", "ETag", "conditional requests", "expiration", "revalidation"]
+summary: Most HTTP responses don't change every second. The curriculum, a course's metadata, a logo — fetching them from the server on every page view waste...
 docs:
   - title: "RFC 9111 — HTTP Caching"
     url: "https://datatracker.ietf.org/doc/html/rfc9111"
-summary: Most HTTP responses don't change every second. The curriculum, a course's metadata, a logo — fetching them from the server on every page view waste...
 ---
 
 # HTTP Caching — Serving Old Responses When They're Still True

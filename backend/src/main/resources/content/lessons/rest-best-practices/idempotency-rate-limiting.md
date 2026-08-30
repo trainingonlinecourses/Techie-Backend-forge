@@ -4,10 +4,10 @@ module: rest-best-practices
 order: 5
 minutes: 25
 topics: ["idempotency keys", "retries", "rate limiting", "Bucket4j", "429 handling", "concurrency safety"]
+summary: Two protections every public API needs: idempotency so retries don't doubleexecute, and rate limiting so one misbehaving client can't take the API ...
 docs:
   - title: "Rate limiting with Bucket4j"
     url: "https://github.com/bucket4j/bucket4j"
-summary: Two protections every public API needs: idempotency so retries don't doubleexecute, and rate limiting so one misbehaving client can't take the API ...
 ---
 
 # Idempotency Keys and Rate Limiting

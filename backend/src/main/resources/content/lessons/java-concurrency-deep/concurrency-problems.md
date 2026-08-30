@@ -4,10 +4,10 @@ module: java-concurrency-deep
 order: 4
 minutes: 25
 topics: ["race conditions", "deadlock", "livelock", "starvation", "memory visibility", "detection tools"]
+summary: Concurrency bugs don't crash at compile time — they corrupt data under load, hang threads at 3 AM, and vanish when you add logging. This lesson is ...
 docs:
   - title: "Concurrency problems"
     url: "https://docs.oracle.com/en/java/javase/21/core/concurrency.html"
-summary: Concurrency bugs don't crash at compile time — they corrupt data under load, hang threads at 3 AM, and vanish when you add logging. This lesson is ...
 ---
 
 # Race Conditions, Deadlocks and LiveLocks

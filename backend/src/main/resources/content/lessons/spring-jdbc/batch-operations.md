@@ -4,10 +4,10 @@ module: spring-jdbc
 order: 5
 minutes: 22
 topics: ["batchUpdate", "JdbcBatchItemWriter", "chunking", "rewriteBatchedStatements", "performance tuning"]
+summary: Inserting one row at a time over JDBC is the single biggest performance mistake in dataheavy Spring apps. This lesson covers the batch patterns, th...
 docs:
   - title: "JDBC batch operations"
     url: "https://docs.spring.io/spring-framework/reference/data-access/jdbc.html#jdbc-advanced-jdbc-template-batch-operations"
-summary: Inserting one row at a time over JDBC is the single biggest performance mistake in dataheavy Spring apps. This lesson covers the batch patterns, th...
 ---
 
 # Batch Operations at Scale

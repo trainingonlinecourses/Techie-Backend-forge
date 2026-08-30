@@ -4,10 +4,10 @@ module: spring-boot-internals
 order: 3
 minutes: 23
 topics: ["embedded Tomcat", "executable jar", "server configuration", "context path", "ports"]
+summary: In the classic Spring era, deploying meant: install Tomcat on a server, drop your app's WAR file into Tomcat's webapps folder, and hope the Tomcat ...
 docs:
   - title: "Embedded web servers (Spring Boot docs)"
     url: "https://docs.spring.io/spring-boot/reference/howto/webserver.html"
-summary: In the classic Spring era, deploying meant: install Tomcat on a server, drop your app's WAR file into Tomcat's webapps folder, and hope the Tomcat ...
 ---
 
 # The Embedded Server — Tomcat Inside Your App

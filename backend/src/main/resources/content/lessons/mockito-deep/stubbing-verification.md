@@ -4,12 +4,12 @@ module: mockito-deep
 order: 3
 minutes: 26
 topics: ["argument matchers", "doAnswer", "verify modes", "inOrder", "timeouts", "stubbing chains"]
+summary: The basics cover when(x).thenReturn(y) and verify(x).times(n). Real tests outgrow them fast: stubs that must compute an answer from the arguments, ...
 docs:
   - title: "Argument Matchers (Mockito docs)"
     url: "https://javadoc.io/doc/org.mockito/mockito-core/latest/org/mockito/ArgumentMatchers.html"
   - title: "Verification (Mockito docs)"
     url: "https://javadoc.io/doc/org.mockito/mockito-core/latest/org/mockito/Mockito.html#4"
-summary: The basics cover when(x).thenReturn(y) and verify(x).times(n). Real tests outgrow them fast: stubs that must compute an answer from the arguments, ...
 ---
 
 # Advanced Stubbing and Verification — Matchers, doAnswer, and Verify Modes

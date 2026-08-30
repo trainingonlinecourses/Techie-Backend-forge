@@ -4,12 +4,12 @@ module: mongodb-deep
 order: 3
 minutes: 27
 topics: ["Spring Data MongoDB", "MongoRepository", "query methods", "@Document", "MongoTemplate"]
+summary: Spring Data MongoDB brings the familiar Spring Data contract to MongoDB: repositories with derived queries, entity mapping via annotations, and a M...
 docs:
   - title: "Spring Data MongoDB Reference"
     url: "https://docs.spring.io/spring-data/mongodb/reference/"
   - title: "MongoRepository (Spring API)"
     url: "https://docs.spring.io/spring-data/mongodb/docs/current/api/org/springframework/data/mongodb/repository/MongoRepository.html"
-summary: Spring Data MongoDB brings the familiar Spring Data contract to MongoDB: repositories with derived queries, entity mapping via annotations, and a M...
 ---
 
 # Spring Data MongoDB — Repositories, Queries, and Mapping

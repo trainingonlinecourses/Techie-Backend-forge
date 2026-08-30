@@ -4,10 +4,10 @@ module: spring-amqp
 order: 5
 minutes: 22
 topics: ["concurrency", "prefetch", "message ordering", "batching", "backpressure", "consumer tuning"]
+summary: A listener that processes one message at a time wastes the broker and your database. A listener with the wrong concurrency settings floods memory o...
 docs:
   - title: "Listener concurrency"
     url: "https://docs.spring.io/spring-amqp/reference/consumer-concurrency.html"
-summary: A listener that processes one message at a time wastes the broker and your database. A listener with the wrong concurrency settings floods memory o...
 ---
 
 # Consumer Concurrency & Best Practices

@@ -4,10 +4,10 @@ module: java-collections-deep
 order: 1
 minutes: 30
 topics: ["HashMap", "hash function", "collisions", "buckets", "resize", "treeification", "load factor"]
+summary: HashMap is the mostused data structure in Java — and the least understood. Interviewers love it, but more importantly: knowing how hashing, collisi...
 docs:
   - title: "HashMap source"
     url: "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/HashMap.html"
-summary: HashMap is the mostused data structure in Java — and the least understood. Interviewers love it, but more importantly: knowing how hashing, collisi...
 ---
 
 # HashMap Internals

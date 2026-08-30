@@ -4,10 +4,10 @@ module: spring-cache
 order: 5
 minutes: 25
 topics: ["cache-aside", "read-through", "write-through", "write-behind", "stampede", "anti-patterns"]
+summary: The annotations are syntax; the patterns are the actual design. This lesson covers the four canonical caching patterns, how they map to Spring, and...
 docs:
   - title: "Cache patterns"
     url: "https://docs.spring.io/spring-framework/reference/integration/cache.html#cache-annotations-cacheable"
-summary: The annotations are syntax; the patterns are the actual design. This lesson covers the four canonical caching patterns, how they map to Spring, and...
 ---
 
 # Cache Design Patterns & Anti-Patterns

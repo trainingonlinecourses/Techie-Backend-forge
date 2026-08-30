@@ -4,10 +4,10 @@ module: spring-boot-internals
 order: 5
 minutes: 24
 topics: ["actuator", "health", "metrics", "info", "endpoints", "readiness liveness"]
+summary: A deployed app is a black box: is it up? Is it healthy? How much memory? What's the request rate? Without tooling, answering means SSHing in and gu...
 docs:
   - title: "Actuator (Spring Boot docs)"
     url: "https://docs.spring.io/spring-boot/reference/actuator/index.html"
-summary: A deployed app is a black box: is it up? Is it healthy? How much memory? What's the request rate? Without tooling, answering means SSHing in and gu...
 ---
 
 # Actuator — Production Insights Built In

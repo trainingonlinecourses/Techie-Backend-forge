@@ -4,10 +4,10 @@ module: ddd-architecture
 order: 3
 minutes: 25
 topics: ["hexagonal", "ports", "adapters", "domain isolation", "dependency rule", "Spring wiring"]
+summary: Hexagonal architecture (also called Ports & Adapters) puts the domain at the center, surrounded by ports (interfaces) and adapters (implementations...
 docs:
   - title: "Hexagonal architecture"
     url: "https://alistair.cockburn.us/hexagonal-architecture/"
-summary: Hexagonal architecture (also called Ports & Adapters) puts the domain at the center, surrounded by ports (interfaces) and adapters (implementations...
 ---
 
 # Hexagonal Architecture (Ports & Adapters)

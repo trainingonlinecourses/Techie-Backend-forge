@@ -4,10 +4,10 @@ module: spring-messaging
 order: 1
 minutes: 25
 topics: ["messaging", "message brokers", "point-to-point", "pub-sub", "Spring Integration"]
+summary: In direct calls (REST), the caller waits: request → response, both parties alive, tightly coupled in time and space. Messaging replaces the phone l...
 docs:
   - title: "Spring Integration overview"
     url: "https://docs.spring.io/spring-integration/reference/overview.html"
-summary: In direct calls (REST), the caller waits: request → response, both parties alive, tightly coupled in time and space. Messaging replaces the phone l...
 ---
 
 # Messaging Architecture — The Big Picture

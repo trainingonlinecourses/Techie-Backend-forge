@@ -123,6 +123,18 @@ public class ContentLoader implements CommandLineRunner {
         String pendingUrl = null; // url from a title/url pair, resolved when the next line carries url:
         for (String line : m.group(1).split("\\n")) {
             String trimmed = line.trim();
+            // Check for key-value pairs even inside the docs block —
+            // summary/order/minutes may appear after docs in some files.
+            if (inDocs && !trimmed.startsWith("-")) {
+                Matcher kvInside = KEY_VALUE.matcher(line);
+                if (kvInside.matches()) {
+                    String k = kvInside.group(1);
+                    if (!k.equals("docs")) {
+                        meta.put(k, kvInside.group(2));
+                        continue;
+                    }
+                }
+            }
             if (inDocs) {
                 if (trimmed.startsWith("-")) {
                     // New entry: flush any pending url, then capture this line's url if present.

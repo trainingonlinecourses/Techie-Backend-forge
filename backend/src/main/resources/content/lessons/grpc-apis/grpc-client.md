@@ -4,10 +4,10 @@ module: grpc-apis
 order: 3
 minutes: 25
 topics: ["blocking stub", "async stub", "client streaming", "bidi streaming", "deadlines", "retry", "channel management"]
+summary: The client side of gRPC comes in three stubs — blocking, async, and streaming — generated from the same .proto. This lesson covers all three, plus ...
 docs:
   - title: "gRPC client concepts"
     url: "https://grpc.io/docs/guides/concepts/"
-summary: The client side of gRPC comes in three stubs — blocking, async, and streaming — generated from the same .proto. This lesson covers all three, plus ...
 ---
 
 # gRPC Clients, Streaming and Deadlines

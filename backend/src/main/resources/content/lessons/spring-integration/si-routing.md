@@ -4,12 +4,12 @@ module: spring-integration
 order: 4
 minutes: 26
 topics: ["routers", "transformers", "enrichers", "splitters", "aggregators", "content-based routing", "message transformation"]
+summary: Channels are the pipes; routers, transformers, enrichers, splitters, and aggregators are the verbs — the stations that decide where messages go and...
 docs:
   - title: "Message Routing (Spring Integration Reference)"
     url: "https://docs.spring.io/spring-integration/reference/message-routing.html"
   - title: "Message Transformation (Spring Integration Reference)"
     url: "https://docs.spring.io/spring-integration/reference/message-transformation.html"
-summary: Channels are the pipes; routers, transformers, enrichers, splitters, and aggregators are the verbs — the stations that decide where messages go and...
 ---
 
 # Routing, Transformation, and Enrichment — Shaping the Flow

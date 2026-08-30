@@ -4,12 +4,12 @@ module: graalvm-native
 order: 2
 minutes: 26
 topics: ["Spring Boot native", "buildpacks", "native plugin", "AOT engine", "hints", "configuration"]
+summary: Raw GraalVM native image on a Spring Boot app used to be a heroic configuration exercise — handwritten metadata for every framework feature. Spring...
 docs:
   - title: "Spring Boot Native Image (Spring docs)"
     url: "https://docs.spring.io/spring-boot/reference/packaging/native-image/index.html"
   - title: "GraalVM Hints and AOT (Spring docs)"
     url: "https://docs.spring.io/spring-boot/reference/packaging/native-image/advanced-topics.html"
-summary: Raw GraalVM native image on a Spring Boot app used to be a heroic configuration exercise — handwritten metadata for every framework feature. Spring...
 ---
 
 # Spring Boot Native — The Automated Path

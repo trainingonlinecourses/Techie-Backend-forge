@@ -4,12 +4,12 @@ module: java-networking
 order: 1
 minutes: 28
 topics: ["sockets", "TCP", "ServerSocket", "client-server", "streams"]
+summary: Every network conversation in Java — HTTP requests, database connections, message queues — ultimately runs over sockets. A socket is the endpoint o...
 docs:
   - title: "Socket (Java SE API)"
     url: "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/net/Socket.html"
   - title: "Networking Basics (Oracle)"
     url: "https://docs.oracle.com/javase/tutorial/networking/sockets/index.html"
-summary: Every network conversation in Java — HTTP requests, database connections, message queues — ultimately runs over sockets. A socket is the endpoint o...
 ---
 
 # Sockets — The Foundation of Network Programming

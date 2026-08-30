@@ -4,12 +4,12 @@ module: elasticsearch-deep
 order: 3
 minutes: 27
 topics: ["mapping", "analyzers", "tokenization", "stemming", "field types", "dynamic mapping"]
+summary: When you index a document, Elasticsearch must decide how to treat each field — is price a number (range queries, sorting) or text (tokenized search...
 docs:
   - title: "Mapping (Elastic docs)"
     url: "https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html"
   - title: "Analysis (Elastic docs)"
     url: "https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis.html"
-summary: When you index a document, Elasticsearch must decide how to treat each field — is price a number (range queries, sorting) or text (tokenized search...
 ---
 
 # Mapping and Analysis — How Fields Become Searchable

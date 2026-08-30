@@ -4,10 +4,10 @@ module: distributed-systems
 order: 2
 minutes: 30
 topics: ["Raft", "leader election", "log replication", "quorum", "majority", "ZooKeeper", "etcd"]
+summary: When multiple nodes must agree on one value — who is the leader, what is the committed log — you need consensus. Raft is the algorithm behind etcd ...
 docs:
   - title: "Raft paper"
     url: "https://raft.github.io/"
-summary: When multiple nodes must agree on one value — who is the leader, what is the committed log — you need consensus. Raft is the algorithm behind etcd ...
 ---
 
 # Consensus: Raft and Quorum

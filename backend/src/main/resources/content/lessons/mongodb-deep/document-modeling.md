@@ -4,12 +4,12 @@ module: mongodb-deep
 order: 2
 minutes: 28
 topics: ["data modeling", "embedding", "referencing", "one-to-many", "design patterns"]
+summary: The document model's core design decision: when a customer has orders, do the orders live inside the customer document (embedding) or in their own ...
 docs:
   - title: "Data Modeling Introduction (MongoDB Manual)"
     url: "https://www.mongodb.com/docs/manual/core/data-modeling-introduction/"
   - title: "Model One-to-Many Relationships (MongoDB Manual)"
     url: "https://www.mongodb.com/docs/manual/tutorial/model-referenced-one-to-many-relationships-between-documents/"
-summary: The document model's core design decision: when a customer has orders, do the orders live inside the customer document (embedding) or in their own ...
 ---
 
 # Document Modeling — Embedding vs Referencing

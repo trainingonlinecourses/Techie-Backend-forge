@@ -4,10 +4,10 @@ module: java-streams-deep
 order: 2
 minutes: 25
 topics: ["Collectors", "groupingBy", "partitioningBy", "toMap", "joining", "teeing", "custom collectors"]
+summary: collect is where streams turn into the structures you actually need — maps, grouped lists, joins, and stats. Collectors is a toolbox of composable ...
 docs:
   - title: "Collectors"
     url: "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/stream/Collectors.html"
-summary: collect is where streams turn into the structures you actually need — maps, grouped lists, joins, and stats. Collectors is a toolbox of composable ...
 ---
 
 # Collectors and Aggregation

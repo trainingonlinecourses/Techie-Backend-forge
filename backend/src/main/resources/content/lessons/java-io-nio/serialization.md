@@ -4,10 +4,10 @@ module: java-io-nio
 order: 5
 minutes: 26
 topics: ["Serializable", "ObjectOutputStream", "serialVersionUID", "transient", "security"]
+summary: Programs hold objects in memory: a User, a List<Order, a Map<String, Config. But memory is volatile — it dies with the process. To persist an objec...
 docs:
   - title: "Serializable (Java SE API)"
     url: "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/io/Serializable.html"
-summary: Programs hold objects in memory: a User, a List<Order, a Map<String, Config. But memory is volatile — it dies with the process. To persist an objec...
 ---
 
 # Serialization — Turning Objects into Bytes

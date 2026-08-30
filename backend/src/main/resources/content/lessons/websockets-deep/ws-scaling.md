@@ -4,10 +4,10 @@ module: websockets-deep
 order: 5
 minutes: 25
 topics: ["horizontal scaling", "session affinity", "Redis pub-sub", "sticky sessions", "broker relay"]
+summary: The chat handler from the first lesson keeps sessions in a ConcurrentHashMap — in one JVM's memory. That's fine for a single instance. But the mome...
 docs:
   - title: "STOMP broker relay (Spring docs)"
     url: "https://docs.spring.io/spring-framework/reference/web/websocket/stomp/configuration.html#websocket-stomp-handle-broker-relay"
-summary: The chat handler from the first lesson keeps sessions in a ConcurrentHashMap — in one JVM's memory. That's fine for a single instance. But the mome...
 ---
 
 # Scaling WebSockets — Beyond One Instance

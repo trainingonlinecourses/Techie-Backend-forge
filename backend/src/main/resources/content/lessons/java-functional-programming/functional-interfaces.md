@@ -4,10 +4,10 @@ module: java-functional-programming
 order: 2
 minutes: 24
 topics: ["functional interfaces", "Predicate", "Function", "Consumer", "Supplier", "@FunctionalInterface"]
+summary: A lambda doesn't float in the void — it must implement something. That something is a functional interface: an interface with exactly one abstract ...
 docs:
   - title: "java.util.function package summary"
     url: "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/function/package-summary.html"
-summary: A lambda doesn't float in the void — it must implement something. That something is a functional interface: an interface with exactly one abstract ...
 ---
 
 # Functional Interfaces — the Contract a Lambda Fulfills

@@ -4,12 +4,12 @@ module: mongodb-deep
 order: 1
 minutes: 25
 topics: ["MongoDB", "documents", "collections", "BSON", "NoSQL", "document model"]
+summary: For decades, the relational model was the only game in town: tables, rows, columns, and joins enforced by rigid schemas. MongoDB is the most popula...
 docs:
   - title: "MongoDB Manual — Core Concepts"
     url: "https://www.mongodb.com/docs/manual/core/document/"
   - title: "Introduction to MongoDB (MongoDB University)"
     url: "https://learn.mongodb.com/"
-summary: For decades, the relational model was the only game in town: tables, rows, columns, and joins enforced by rigid schemas. MongoDB is the most popula...
 ---
 
 # MongoDB Basics — Documents, Collections, and the Document Model

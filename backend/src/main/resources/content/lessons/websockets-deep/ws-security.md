@@ -4,10 +4,10 @@ module: websockets-deep
 order: 4
 minutes: 25
 topics: ["handshake auth", "origin checks", "destination authorization", "CSRF", "JWT over WS"]
+summary: A WebSocket is a longlived, bidirectional connection — which makes it a bigger risk than a request/response call:
 docs:
   - title: "STOMP security (Spring Security reference)"
     url: "https://docs.spring.io/spring-security/reference/servlet/integrations/websocket.html"
-summary: A WebSocket is a longlived, bidirectional connection — which makes it a bigger risk than a request/response call:
 ---
 
 # WebSocket Security — Auth, Origins, and Authorization

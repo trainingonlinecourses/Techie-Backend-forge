@@ -4,10 +4,10 @@ module: spring-aop
 order: 3
 minutes: 35
 topics: ["@Before", "@After", "@AfterReturning", "@AfterThrowing", "@Around", "advice ordering"]
+summary: Advice is the action taken by an aspect at a particular join point. Spring AOP provides five advice types, each with specific semantics and use cas...
 docs:
   - title: "Advice Types in Spring AOP"
     url: "https://docs.spring.io/spring-framework/reference/core/aop/around-advice.html"
-summary: Advice is the action taken by an aspect at a particular join point. Spring AOP provides five advice types, each with specific semantics and use cas...
 ---
 
 # Advice Types: Before, After, Around, and More

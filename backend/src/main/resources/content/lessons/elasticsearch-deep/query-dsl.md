@@ -4,12 +4,12 @@ module: elasticsearch-deep
 order: 4
 minutes: 28
 topics: ["query DSL", "match query", "bool query", "term query", "relevance scoring", "filters"]
+summary: The Query DSL is Elasticsearch's JSON query language — and its design reflects the engine's purpose: ranking, not just filtering. There are two fam...
 docs:
   - title: "Query DSL (Elastic docs)"
     url: "https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl.html"
   - title: "Boolean Query (Elastic docs)"
     url: "https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-bool-query.html"
-summary: The Query DSL is Elasticsearch's JSON query language — and its design reflects the engine's purpose: ranking, not just filtering. There are two fam...
 ---
 
 # The Query DSL — Match, Term, Bool, and Relevance

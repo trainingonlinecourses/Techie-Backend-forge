@@ -4,10 +4,10 @@ module: design-patterns
 order: 4
 minutes: 25
 topics: ["strategy", "polymorphism", "composition over inheritance", "algorithm selection", "DIP"]
+summary: Your checkout needs discounts. Rules so far:
 docs:
   - title: "Strategy (Refactoring Guru)"
     url: "https://refactoring.guru/design-patterns/strategy"
-summary: Your checkout needs discounts. Rules so far:
 ---
 
 # Strategy Pattern — Swapping Algorithms at Runtime

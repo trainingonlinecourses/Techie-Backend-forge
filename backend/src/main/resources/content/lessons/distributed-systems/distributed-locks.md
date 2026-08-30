@@ -4,10 +4,10 @@ module: distributed-systems
 order: 4
 minutes: 25
 topics: ["distributed locks", "Redis SET NX", "lease", "fencing tokens", "ShedLock", "lock expiry"]
+summary: A distributed lock coordinates work across nodes — exactly one instance runs the job, exactly one consumer drains the queue. But distributed locks ...
 docs:
   - title: "Distributed locks with Redis"
     url: "https://redis.io/docs/latest/develop/use/patterns/distributed-locks/"
-summary: A distributed lock coordinates work across nodes — exactly one instance runs the job, exactly one consumer drains the queue. But distributed locks ...
 ---
 
 # Distributed Locks

@@ -4,10 +4,10 @@ module: observability
 order: 2
 minutes: 20
 topics: ["HealthIndicator", "readiness vs liveness", "custom indicators", "HealthContributor", "probes"]
+summary: /actuator/health is the first thing every orchestrator, load balancer, and uptime monitor checks. Making it accurate — reporting real dependency he...
 docs:
   - title: "Health"
     url: "https://docs.spring.io/spring-boot/reference/actuator/health.html"
-summary: /actuator/health is the first thing every orchestrator, load balancer, and uptime monitor checks. Making it accurate — reporting real dependency he...
 ---
 
 # Health Indicators & Readiness

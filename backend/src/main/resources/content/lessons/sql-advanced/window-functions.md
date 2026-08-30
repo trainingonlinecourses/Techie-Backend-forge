@@ -4,12 +4,12 @@ module: sql-advanced
 order: 1
 minutes: 26
 topics: ["window functions", "OVER", "PARTITION BY", "ROW_NUMBER", "RANK", "running totals"]
+summary: GROUP BY collapses rows: it takes many rows and returns one row per group. But a huge class of real questions needs the opposite: keep every row, y...
 docs:
   - title: "Window Functions (PostgreSQL docs)"
     url: "https://www.postgresql.org/docs/current/tutorial-window.html"
   - title: "Window Function Concepts (PostgreSQL docs)"
     url: "https://www.postgresql.org/docs/current/functions-window.html"
-summary: GROUP BY collapses rows: it takes many rows and returns one row per group. But a huge class of real questions needs the opposite: keep every row, y...
 ---
 
 # Window Functions — RANK, ROW_NUMBER, and Running Totals

@@ -4,12 +4,12 @@ module: java-networking
 order: 5
 minutes: 27
 topics: ["TLS", "SSL", "certificates", "SSLSocket", "trust store", "HTTPS"]
+summary: A raw socket sends bytes in plaintext: anyone on the network path (a WiFi eavesdropper, a router, an ISP) can read everything — passwords, tokens, ...
 docs:
   - title: "SSLContext (Java SE API)"
     url: "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/javax/net/ssl/SSLContext.html"
   - title: "Java PKI Programmer's Guide"
     url: "https://docs.oracle.com/en/java/javase/21/security/java-pki-programmers-guide.html"
-summary: A raw socket sends bytes in plaintext: anyone on the network path (a WiFi eavesdropper, a router, an ISP) can read everything — passwords, tokens, ...
 ---
 
 # Network Security — TLS, Certificates, and Safe Clients

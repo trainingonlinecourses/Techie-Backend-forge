@@ -4,12 +4,12 @@ module: owasp-security
 order: 4
 minutes: 26
 topics: ["broken access control", "IDOR", "authentication failures", "session management", "authorization", "Spring Security"]
+summary: Two separate jobs, one acronym away from each other, and both in the Top 10: authentication — proving who you are (A07, Identification and Authenti...
 docs:
   - title: "Broken Access Control (OWASP Top 10)"
     url: "https://owasp.org/Top10/A01_2021-Broken_Access_Control/"
   - title: "Identification and Authentication Failures (OWASP Top 10)"
     url: "https://owasp.org/Top10/A07_2021-Identification_and_Authentication_Failures/"
-summary: Two separate jobs, one acronym away from each other, and both in the Top 10: authentication — proving who you are (A07, Identification and Authenti...
 ---
 
 # Authentication and Authorization — Broken Access Control and Auth Failures

@@ -4,12 +4,12 @@ module: event-driven-architecture
 order: 4
 minutes: 26
 topics: ["change data capture", "Debezium", "WAL", "binlog", "CDC", "database events", "legacy integration"]
+summary: Eventdriven systems need events — but existing applications don't publish them. Change Data Capture (CDC) solves the retrofit: it turns database ch...
 docs:
   - title: "Debezium Documentation"
     url: "https://debezium.io/documentation/reference/stable/index.html"
   - title: "Change Data Capture (Confluent)"
     url: "https://developer.confluent.io/learn/change-data-capture/"
-summary: Eventdriven systems need events — but existing applications don't publish them. Change Data Capture (CDC) solves the retrofit: it turns database ch...
 ---
 
 # Change Data Capture — The Database as Event Producer

@@ -4,10 +4,10 @@ module: java-concurrency-deep
 order: 2
 minutes: 30
 topics: ["synchronized", "ReentrantLock", "atomic classes", "volatile", "visibility", "deadlock", "happens-before"]
+summary: Concurrency bugs are invisible: no compile error, no crash — just wrong results under load. This lesson covers the three pillars — atomicity (indiv...
 docs:
   - title: "Locks in Java"
     url: "https://docs.oracle.com/en/java/javase/21/core/concurrency.html"
-summary: Concurrency bugs are invisible: no compile error, no crash — just wrong results under load. This lesson covers the three pillars — atomicity (indiv...
 ---
 
 # Locks, Atomicity and Visibility

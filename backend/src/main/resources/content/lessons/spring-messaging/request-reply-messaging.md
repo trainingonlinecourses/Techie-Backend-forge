@@ -4,10 +4,10 @@ module: spring-messaging
 order: 5
 minutes: 23
 topics: ["request-reply", "correlation id", "reply channels", "async request", "messaging patterns"]
+summary: Most messaging is oneway: drop an event, move on. But sometimes you need an answer: "here's an order — what's the shipping quote?" Direct REST does...
 docs:
   - title: "Request-reply (Enterprise Integration Patterns)"
     url: "https://www.enterpriseintegrationpatterns.com/RequestReply.html"
-summary: Most messaging is oneway: drop an event, move on. But sometimes you need an answer: "here's an order — what's the shipping quote?" Direct REST does...
 ---
 
 # Request-Reply and Correlation — Asking Questions Over Messaging

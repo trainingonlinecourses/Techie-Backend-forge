@@ -4,12 +4,12 @@ module: mockito-deep
 order: 4
 minutes: 25
 topics: ["@MockBean", "slice tests", "MockMvc", "Spring context", "WebMvcTest", "test doubles in Spring"]
+summary: Mockito's plain unit tests mock directly — no Spring involved. But Spring Boot tests (@SpringBootTest, @WebMvcTest) create a real application conte...
 docs:
   - title: "Testing with Spring Boot (Spring docs)"
     url: "https://docs.spring.io/spring-boot/reference/testing/spring-boot-applications.html"
   - title: "MockMvc (Spring docs)"
     url: "https://docs.spring.io/spring-framework/reference/testing/spring-mvc-test-framework.html"
-summary: Mockito's plain unit tests mock directly — no Spring involved. But Spring Boot tests (@SpringBootTest, @WebMvcTest) create a real application conte...
 ---
 
 # Mockito with Spring Boot — @MockBean and Slice Testing

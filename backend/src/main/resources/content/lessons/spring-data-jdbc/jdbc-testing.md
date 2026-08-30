@@ -4,10 +4,10 @@ module: spring-data-jdbc
 order: 5
 minutes: 25
 topics: ["@DataJdbcTest", "Testcontainers", "repository tests", "test slices", "H2 vs Postgres"]
+summary: Repository tests are the most valuable and the most errorprone layer: they must verify that your derived queries match the schema, that aggregates ...
 docs:
   - title: "@DataJdbcTest (Spring Boot docs)"
     url: "https://docs.spring.io/spring-boot/reference/testing/spring-boot-applications.html#testing.spring-boot-applications.autoconfigured-spring-data-jdbc"
-summary: Repository tests are the most valuable and the most errorprone layer: they must verify that your derived queries match the schema, that aggregates ...
 ---
 
 # Testing Spring Data JDBC — DataJdbcTest and Testcontainers

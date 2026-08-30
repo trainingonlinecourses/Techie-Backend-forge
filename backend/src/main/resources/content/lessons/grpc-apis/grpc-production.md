@@ -4,10 +4,10 @@ module: grpc-apis
 order: 5
 minutes: 22
 topics: ["TLS", "load balancing", "gRPC-Web", "observability", "health checks", "reflection"]
+summary: The .proto is done and the calls work locally. Production gRPC adds five concerns: TLS, load balancing (HTTP/2 changes everything), browser access ...
 docs:
   - title: "gRPC production best practices"
     url: "https://grpc.io/docs/guides/performance/"
-summary: The .proto is done and the calls work locally. Production gRPC adds five concerns: TLS, load balancing (HTTP/2 changes everything), browser access ...
 ---
 
 # gRPC in Production

@@ -4,12 +4,12 @@ module: java-networking
 order: 4
 minutes: 28
 topics: ["NIO", "Selector", "non-blocking", "Channel", "reactor pattern", "scalability"]
+summary: The classic server is one thread per client. It works until you have thousands of concurrent connections: each thread costs ~1MB of stack and sched...
 docs:
   - title: "Selector (Java SE API)"
     url: "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/nio/channels/Selector.html"
   - title: "Non-blocking I/O (Java Tutorials)"
     url: "https://docs.oracle.com/javase/tutorial/essential/io/nio.html"
-summary: The classic server is one thread per client. It works until you have thousands of concurrent connections: each thread costs ~1MB of stack and sched...
 ---
 
 # NIO Networking — Selectors and Non-Blocking I/O

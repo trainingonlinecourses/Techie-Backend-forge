@@ -4,10 +4,10 @@ module: spring-aop
 order: 4
 minutes: 25
 topics: ["@Aspect", "aspect instantiation", "aspect lifecycle", "aspect scoping", "aspect configuration"]
+summary: Aspects are the building blocks of AOP — they combine pointcuts with advice to create modular, reusable crosscutting concerns. This lesson covers h...
 docs:
   - title: "Aspect Instantiation"
     url: "https://docs.spring.io/spring-framework/reference/core/aop/aspect-instantiation.html"
-summary: Aspects are the building blocks of AOP — they combine pointcuts with advice to create modular, reusable crosscutting concerns. This lesson covers h...
 ---
 
 # Creating and Configuring Aspects

@@ -4,10 +4,10 @@ module: docker-deep
 order: 4
 minutes: 24
 topics: ["volumes", "bind mounts", "bridge networks", "container networking", "data persistence"]
+summary: Two facts shape everything about running containers:
 docs:
   - title: "Manage data in Docker"
     url: "https://docs.docker.com/storage/"
-summary: Two facts shape everything about running containers:
 ---
 
 # Volumes and Networks — State and Connectivity

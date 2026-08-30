@@ -4,10 +4,10 @@ module: resilience-circuit-breaker
 order: 4
 minutes: 24
 topics: ["rate limiter", "token bucket", "fixed window", "sliding window", "429", "Resilience4j"]
+summary: Every service has a capacity: threads, DB connections, API quota, cost. Rate limiting is the mechanism that caps how many requests a caller may mak...
 docs:
   - title: "Resilience4j RateLimiter"
     url: "https://resilience4j.readme.io/docs/rate-limiter"
-summary: Every service has a capacity: threads, DB connections, API quota, cost. Rate limiting is the mechanism that caps how many requests a caller may mak...
 ---
 
 # Rate Limiting — Protecting Capacity

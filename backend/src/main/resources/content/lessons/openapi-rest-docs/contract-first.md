@@ -4,10 +4,10 @@ module: openapi-rest-docs
 order: 4
 minutes: 24
 topics: ["contract-first", "API design", "spec-first", "code generation", "breaking changes"]
+summary: Most APIs are built codefirst: the backend team writes controllers, then (maybe) documentation follows. The frontend team waits, guesses, and chase...
 docs:
   - title: "OpenAPI Generator"
     url: "https://openapi-generator.tech/"
-summary: Most APIs are built codefirst: the backend team writes controllers, then (maybe) documentation follows. The frontend team waits, guesses, and chase...
 ---
 
 # Contract-First Design — The API as the Agreement

@@ -4,12 +4,12 @@ module: event-driven-architecture
 order: 1
 minutes: 27
 topics: ["event-driven architecture", "events", "event sourcing", "decoupling", "message brokers", "Kafka"]
+summary: Traditional (requestdriven) architecture is built on commands: service A calls service B and waits — "please create the invoice, here's the order."...
 docs:
   - title: "Event-Driven Architecture (AWS)"
     url: "https://aws.amazon.com/event-driven-architecture/"
   - title: "What is Event-Driven Architecture? (Confluent)"
     url: "https://developer.confluent.io/learn/event-driven-architecture/"
-summary: Traditional (requestdriven) architecture is built on commands: service A calls service B and waits — "please create the invoice, here's the order."...
 ---
 
 # Event-Driven Architecture — The Shift From Calls to Facts

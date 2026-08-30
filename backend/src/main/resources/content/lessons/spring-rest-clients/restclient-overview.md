@@ -4,10 +4,10 @@ module: spring-rest-clients
 order: 1
 minutes: 24
 topics: ["RestClient", "HTTP client", "JSON", "RestTemplate", "API consumption"]
+summary: So far your Spring app has been the server (accepting requests). But backend services constantly call other services: the frontend calls your API, ...
 docs:
   - title: "RestClient (Spring docs)"
     url: "https://docs.spring.io/spring-framework/reference/integration/rest-clients.html#rest-restclient"
-summary: So far your Spring app has been the server (accepting requests). But backend services constantly call other services: the frontend calls your API, ...
 ---
 
 # RestClient — The Modern Way to Call REST APIs

@@ -4,12 +4,12 @@ module: event-driven-architecture
 order: 3
 minutes: 27
 topics: ["event sourcing", "event store", "aggregates", "replay", "snapshots", "projections", "CQRS"]
+summary: Conventional persistence stores the current state: an account row says balance = 500. Event sourcing stores the history: a ledger of every event — ...
 docs:
   - title: "Event Sourcing (Martin Fowler)"
     url: "https://martinfowler.com/eaaDev/EventSourcing.html"
   - title: "Event Sourcing Pattern (Microsoft)"
     url: "https://learn.microsoft.com/en-us/azure/architecture/patterns/event-sourcing"
-summary: Conventional persistence stores the current state: an account row says balance = 500. Event sourcing stores the history: a ledger of every event — ...
 ---
 
 # Event Sourcing — The Events Are the State

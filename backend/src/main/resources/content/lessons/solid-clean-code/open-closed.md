@@ -4,10 +4,10 @@ module: solid-clean-code
 order: 2
 minutes: 23
 topics: ["OCP", "open for extension", "closed for modification", "polymorphism", "strategy"]
+summary: The Open/Closed Principle (the O in SOLID) is a oneliner with huge consequences:
 docs:
   - title: "Open/Closed Principle (Wikipedia)"
     url: "https://en.wikipedia.org/wiki/Open%E2%80%93closed_principle"
-summary: The Open/Closed Principle (the O in SOLID) is a oneliner with huge consequences:
 ---
 
 # OCP — Open/Closed Principle

@@ -4,10 +4,10 @@ module: spring-scheduling-async
 order: 1
 minutes: 20
 topics: ["@Scheduled", "fixedDelay", "cron", "TaskScheduler", "thread pools"]
+summary: Scheduling is how Spring applications run logic at fixed intervals, after fixed delays, or at cronaligned times. The @Scheduled annotation turns an...
 docs:
   - title: "Task Execution and Scheduling"
     url: "https://docs.spring.io/spring-framework/reference/integration/scheduling.html"
-summary: Scheduling is how Spring applications run logic at fixed intervals, after fixed delays, or at cronaligned times. The @Scheduled annotation turns an...
 ---
 
 # Scheduled Tasks with @Scheduled

@@ -4,10 +4,10 @@ module: solid-clean-code
 order: 4
 minutes: 21
 topics: ["ISP", "fat interfaces", "role interfaces", "segregation", "adapter"]
+summary: The Interface Segregation Principle (the I in SOLID):
 docs:
   - title: "Interface segregation principle (Wikipedia)"
     url: "https://en.wikipedia.org/wiki/Interface_segregation_principle"
-summary: The Interface Segregation Principle (the I in SOLID):
 ---
 
 # ISP — Interface Segregation Principle

@@ -4,12 +4,12 @@ module: java-generics-deep
 order: 1
 minutes: 24
 topics: ["generics", "type safety", "type parameters", "type erasure", "compiler checks"]
+summary: Imagine you are a librarian who receives boxes of books. Before generics existed in Java (before Java 5, released in 2004), every box was simply la...
 docs:
   - title: "Generics (Java Tutorials)"
     url: "https://docs.oracle.com/javase/tutorial/java/generics/index.html"
   - title: "Lesson: Generics (Dev.java)"
     url: "https://dev.java/learn/generics/"
-summary: Imagine you are a librarian who receives boxes of books. Before generics existed in Java (before Java 5, released in 2004), every box was simply la...
 ---
 
 # Generics Basics — Why Type Parameters Exist

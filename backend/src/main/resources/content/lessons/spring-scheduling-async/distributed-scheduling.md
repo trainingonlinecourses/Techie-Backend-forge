@@ -4,10 +4,10 @@ module: spring-scheduling-async
 order: 5
 minutes: 24
 topics: ["ShedLock", "leader election", "database locks", "idempotency", "cluster safety"]
+summary: Every scheduled task in this module so far assumes a single instance. The moment you run two replicas (or a blue/green deploy overlaps), every @Sch...
 docs:
   - title: "ShedLock"
     url: "https://github.com/lukas-krecan/ShedLock"
-summary: Every scheduled task in this module so far assumes a single instance. The moment you run two replicas (or a blue/green deploy overlaps), every @Sch...
 ---
 
 # Distributed Scheduling & Leader Election

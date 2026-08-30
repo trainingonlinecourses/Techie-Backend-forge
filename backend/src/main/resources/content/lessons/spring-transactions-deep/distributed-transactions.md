@@ -4,10 +4,10 @@ module: spring-transactions-deep
 order: 4
 minutes: 28
 topics: ["2PC", "XA", "saga", "outbox pattern", "eventual consistency", "transactional outbox"]
+summary: A transaction spanning two databases, or a database plus a message broker, cannot use a single ACID transaction. This lesson covers why 2PC/XA most...
 docs:
   - title: "Spring transaction management"
     url: "https://docs.spring.io/spring-framework/reference/data-access/transaction/transaction-strategies.html"
-summary: A transaction spanning two databases, or a database plus a message broker, cannot use a single ACID transaction. This lesson covers why 2PC/XA most...
 ---
 
 # Distributed Transactions and the Outbox

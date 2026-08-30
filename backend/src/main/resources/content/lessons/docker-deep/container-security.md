@@ -4,10 +4,10 @@ module: docker-deep
 order: 5
 minutes: 25
 topics: ["non-root", "image scanning", "secrets", "supply chain", "distroless", "least privilege"]
+summary: Containers provide isolation — but the isolation has limits: the kernel is shared with the host, and a compromised container is a beachhead for the...
 docs:
   - title: "Docker security best practices"
     url: "https://docs.docker.com/engine/security/"
-summary: Containers provide isolation — but the isolation has limits: the kernel is shared with the host, and a compromised container is a beachhead for the...
 ---
 
 # Container Security — Hardening Your Images

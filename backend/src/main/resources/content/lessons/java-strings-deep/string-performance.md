@@ -4,10 +4,10 @@ module: java-strings-deep
 order: 5
 minutes: 24
 topics: ["performance", "substring", "split", "regex", "deduplication", "compact strings"]
+summary: Strings look like a simple value type, but under the hood every one is a heap object with an array of characters. A program that builds and copies ...
 docs:
   - title: "Compact Strings (JEP 254)"
     url: "https://openjdk.org/jeps/254"
-summary: Strings look like a simple value type, but under the hood every one is a heap object with an array of characters. A program that builds and copies ...
 ---
 
 # String Performance — Pitfalls and Patterns

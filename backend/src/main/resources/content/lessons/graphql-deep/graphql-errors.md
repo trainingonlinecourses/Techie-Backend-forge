@@ -4,10 +4,10 @@ module: graphql-deep
 order: 4
 minutes: 24
 topics: ["GraphQL errors", "error extensions", "partial results", "error classification", "exception handling"]
+summary: REST errors are wholeresponse: a 500 or 400 kills everything. GraphQL errors are fieldscoped: one field can fail while its siblings succeed, and th...
 docs:
   - title: "GraphQL errors (graphql-java)"
     url: "https://www.graphql-java.com/documentation/execution/"
-summary: REST errors are wholeresponse: a 500 or 400 kills everything. GraphQL errors are fieldscoped: one field can fail while its siblings succeed, and th...
 ---
 
 # GraphQL Errors — Field-Scoped Failure

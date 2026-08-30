@@ -4,10 +4,10 @@ module: java-concurrency-deep
 order: 3
 minutes: 28
 topics: ["CompletableFuture", "thenApply", "thenCompose", "allOf", "exceptionally", "async pipelines"]
+summary: Future.get() blocks; CompletableFuture composes. It's the difference between waiting for each step and wiring the pipeline — parallel calls joined,...
 docs:
   - title: "CompletableFuture"
     url: "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/CompletableFuture.html"
-summary: Future.get() blocks; CompletableFuture composes. It's the difference between waiting for each step and wiring the pipeline — parallel calls joined,...
 ---
 
 # CompletableFuture Composition

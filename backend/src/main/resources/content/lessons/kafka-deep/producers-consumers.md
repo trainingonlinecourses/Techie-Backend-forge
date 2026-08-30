@@ -4,12 +4,12 @@ module: kafka-deep
 order: 2
 minutes: 27
 topics: ["producers", "consumers", "delivery semantics", "acks", "idempotence", "consumer groups"]
+summary: Producers and consumers are the endpoints of the Kafka conversation — and the subtlety of Kafka lives in their configuration: settings that trade t...
 docs:
   - title: "Producing Messages (Kafka docs)"
     url: "https://kafka.apache.org/documentation/#producerconfigs"
   - title: "Consuming Messages (Kafka docs)"
     url: "https://kafka.apache.org/documentation/#consumerconfigs"
-summary: Producers and consumers are the endpoints of the Kafka conversation — and the subtlety of Kafka lives in their configuration: settings that trade t...
 ---
 
 # Producers and Consumers — Configuration, Delivery Semantics, and Idioms

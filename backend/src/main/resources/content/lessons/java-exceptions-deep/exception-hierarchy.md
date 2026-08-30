@@ -4,12 +4,12 @@ module: java-exceptions-deep
 order: 1
 minutes: 23
 topics: ["exception hierarchy", "Throwable", "Error", "checked exceptions", "unchecked exceptions"]
+summary: When a program fails, the worst thing it can do is fail silently — corrupt data, skip a step, and pretend everything is fine. Java's answer to fail...
 docs:
   - title: "Exceptions (Java Tutorials)"
     url: "https://docs.oracle.com/javase/tutorial/essential/exceptions/index.html"
   - title: "Throwable (Java SE API)"
     url: "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Throwable.html"
-summary: When a program fails, the worst thing it can do is fail silently — corrupt data, skip a step, and pretend everything is fine. Java's answer to fail...
 ---
 
 # The Exception Hierarchy — Throwable, Error, and Exception

@@ -4,12 +4,12 @@ module: spring-integration
 order: 1
 minutes: 27
 topics: ["Spring Integration", "Enterprise Integration Patterns", "messages", "channels", "EIP", "integration flows"]
+summary: Systems don't live alone: a Spring Boot service must read files, call REST APIs, listen to queues, watch directories, poll databases, and transform...
 docs:
   - title: "Spring Integration Reference"
     url: "https://docs.spring.io/spring-integration/reference/"
   - title: "Enterprise Integration Patterns (Gregor Hohpe)"
     url: "https://www.enterpriseintegrationpatterns.com/"
-summary: Systems don't live alone: a Spring Boot service must read files, call REST APIs, listen to queues, watch directories, poll databases, and transform...
 ---
 
 # Spring Integration — Enterprise Integration Patterns, In Spring

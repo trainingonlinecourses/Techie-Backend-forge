@@ -4,12 +4,12 @@ module: kubernetes-deep
 order: 4
 minutes: 25
 topics: ["ConfigMap", "Secrets", "configuration", "environment variables", "mounted volumes"]
+summary: The worst deployment antipattern is baking configuration into the image: change a database URL, a feature flag, a log level → rebuild and redeploy ...
 docs:
   - title: "ConfigMaps (kubernetes.io)"
     url: "https://kubernetes.io/docs/concepts/configuration/configmap/"
   - title: "Secrets (kubernetes.io)"
     url: "https://kubernetes.io/docs/concepts/configuration/secret/"
-summary: The worst deployment antipattern is baking configuration into the image: change a database URL, a feature flag, a log level → rebuild and redeploy ...
 ---
 
 # ConfigMaps and Secrets — Configuration Without Rebuilding Images

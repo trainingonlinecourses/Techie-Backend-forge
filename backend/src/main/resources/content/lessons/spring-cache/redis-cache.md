@@ -4,10 +4,10 @@ module: spring-cache
 order: 3
 minutes: 22
 topics: ["RedisCacheManager", "TTL", "serialization", "distributed cache", "Redis config"]
+summary: Singleinstance apps can use Caffeine. The moment you scale out, every replica needs the same cache — that's what Redis provides: a shared, networka...
 docs:
   - title: "Spring Data Redis caching"
     url: "https://docs.spring.io/spring-data/redis/reference/redis/redis-cache.html"
-summary: Singleinstance apps can use Caffeine. The moment you scale out, every replica needs the same cache — that's what Redis provides: a shared, networka...
 ---
 
 # Redis as the Cache Store

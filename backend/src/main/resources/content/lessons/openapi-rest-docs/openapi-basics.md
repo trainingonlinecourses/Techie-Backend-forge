@@ -4,10 +4,10 @@ module: openapi-rest-docs
 order: 1
 minutes: 24
 topics: ["OpenAPI", "Swagger", "API specification", "JSON schema", "contract-first"]
+summary: A REST API without documentation is a guessing game: which endpoints exist? What does each expect and return? What status codes? Handwritten docs g...
 docs:
   - title: "OpenAPI Specification"
     url: "https://spec.openapis.org/oas/v3.1.0"
-summary: A REST API without documentation is a guessing game: which endpoints exist? What does each expect and return? What status codes? Handwritten docs g...
 ---
 
 # OpenAPI — Describing Your API for Machines and Humans

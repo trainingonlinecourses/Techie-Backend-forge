@@ -4,12 +4,12 @@ module: sql-advanced
 order: 3
 minutes: 26
 topics: ["joins", "self-join", "lateral join", "anti-join", "join strategies", "cross join"]
+summary: Beginners learn INNER JOIN and LEFT JOIN and stop. But joins are a family of set operations, and the advanced members solve problems the basic ones...
 docs:
   - title: "Joins (PostgreSQL docs)"
     url: "https://www.postgresql.org/docs/current/queries-table-expressions.html#QUERIES-JOIN"
   - title: "LATERAL Subqueries (PostgreSQL docs)"
     url: "https://www.postgresql.org/docs/current/queries-table-expressions.html#QUERIES-LATERAL"
-summary: Beginners learn INNER JOIN and LEFT JOIN and stop. But joins are a family of set operations, and the advanced members solve problems the basic ones...
 ---
 
 # Advanced Joins — Beyond the Basics

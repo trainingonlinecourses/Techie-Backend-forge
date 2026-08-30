@@ -4,10 +4,10 @@ module: http-basics
 order: 2
 minutes: 24
 topics: ["status codes", "2xx 4xx 5xx", "redirects", "error semantics", "REST responses"]
+summary: Every HTTP response begins with a status line — three digits that tell the client what happened in a machinereadable way. The first digit is the cl...
 docs:
   - title: "RFC 9110 — Status codes"
     url: "https://datatracker.ietf.org/doc/html/rfc9110#section-15"
-summary: Every HTTP response begins with a status line — three digits that tell the client what happened in a machinereadable way. The first digit is the cl...
 ---
 
 # HTTP Status Codes — The Outcome, in Three Digits

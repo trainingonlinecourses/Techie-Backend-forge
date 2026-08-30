@@ -4,10 +4,10 @@ module: spring-testing-advanced
 order: 4
 minutes: 25
 topics: ["Testcontainers", "@ServiceConnection", "PostgreSQL", "Redis", "Kafka", "container lifecycle"]
+summary: Inmemory substitutes (H2 for Postgres, embedded Redis) drift from production. Testcontainers runs the real thing — actual Postgres, actual Redis, a...
 docs:
   - title: "Testcontainers docs"
     url: "https://java.testcontainers.org/"
-summary: Inmemory substitutes (H2 for Postgres, embedded Redis) drift from production. Testcontainers runs the real thing — actual Postgres, actual Redis, a...
 ---
 
 # Testcontainers for Real Dependencies

@@ -4,10 +4,10 @@ module: java-strings-deep
 order: 3
 minutes: 23
 topics: ["StringBuilder", "mutable strings", "concatenation", "performance", "capacity"]
+summary: Recall that String is immutable — every operation that "changes" a string creates a new object. Now think about building a sentence word by word in...
 docs:
   - title: "StringBuilder (Java SE API)"
     url: "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/StringBuilder.html"
-summary: Recall that String is immutable — every operation that "changes" a string creates a new object. Now think about building a sentence word by word in...
 ---
 
 # StringBuilder — Building Strings Efficiently

@@ -4,10 +4,10 @@ module: rest-best-practices
 order: 4
 minutes: 20
 topics: ["URI versioning", "header versioning", "media type versioning", "deprecation", "migration"]
+summary: APIs evolve, but consumers don't update at your pace. Versioning is how you change behavior without breaking the clients you already have. Four str...
 docs:
   - title: "Versioning REST APIs"
     url: "https://docs.spring.io/spring-framework/reference/web/webmvc.html#mvc-ann-requestmapping-advanced"
-summary: APIs evolve, but consumers don't update at your pace. Versioning is how you change behavior without breaking the clients you already have. Four str...
 ---
 
 # API Versioning Strategies

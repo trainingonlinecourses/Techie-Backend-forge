@@ -4,12 +4,12 @@ module: terraform-infra
 order: 2
 minutes: 24
 topics: ["HCL", "expressions", "functions", "loops", "conditionals", "locals"]
+summary: The first lesson's config was declarative but flat. HCL (HashiCorp Configuration Language) is a full expression language: loops, conditionals, func...
 docs:
   - title: "Configuration Language (Terraform docs)"
     url: "https://developer.hashicorp.com/terraform/language"
   - title: "Functions (Terraform docs)"
     url: "https://developer.hashicorp.com/terraform/language/functions"
-summary: The first lesson's config was declarative but flat. HCL (HashiCorp Configuration Language) is a full expression language: loops, conditionals, func...
 ---
 
 # HCL Deep — Expressions, Functions, and the Language

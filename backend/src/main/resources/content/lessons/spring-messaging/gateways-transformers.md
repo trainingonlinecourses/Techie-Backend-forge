@@ -4,10 +4,10 @@ module: spring-messaging
 order: 3
 minutes: 24
 topics: ["@MessagingGateway", "transformers", "routers", "splitters", "aggregators", "EIP"]
+summary: Messaging systems have a set of recurring problems: how do I expose messaging to business code? How do I reshape a message? How do I route it based...
 docs:
   - title: "Enterprise Integration Patterns"
     url: "https://www.enterpriseintegrationpatterns.com/"
-summary: Messaging systems have a set of recurring problems: how do I expose messaging to business code? How do I reshape a message? How do I route it based...
 ---
 
 # Gateways and Transformers — The Integration Toolkit

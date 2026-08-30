@@ -4,10 +4,10 @@ module: java-strings-deep
 order: 1
 minutes: 22
 topics: ["immutability", "String internals", "security", "caching", "value objects"]
+summary: Imagine you write your name on a piece of paper. Now imagine that any program running on your computer could quietly erase part of your name and wr...
 docs:
   - title: "String (Java SE API)"
     url: "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html"
-summary: Imagine you write your name on a piece of paper. Now imagine that any program running on your computer could quietly erase part of your name and wr...
 ---
 
 # Why Strings Are Immutable

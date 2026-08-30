@@ -4,10 +4,10 @@ module: spring-testing-advanced
 order: 1
 minutes: 20
 topics: ["@WebMvcTest", "@DataJpaTest", "@JsonTest", "test slicing", "context caching", "fast tests"]
+summary: @SpringBootTest boots the whole application — every bean, every autoconfiguration. That's slow (30s+ per context) and brittle. Test slices boot onl...
 docs:
   - title: "Testing slices"
     url: "https://docs.spring.io/spring-boot/reference/testing/spring-boot-applications.html#testing.applying-slices"
-summary: @SpringBootTest boots the whole application — every bean, every autoconfiguration. That's slow (30s+ per context) and brittle. Test slices boot onl...
 ---
 
 # Spring Boot Test Slices

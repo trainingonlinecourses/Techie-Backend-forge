@@ -4,10 +4,10 @@ module: spring-transactions-deep
 order: 3
 minutes: 20
 topics: ["TransactionTemplate", "PlatformTransactionManager", "programmatic tx", "callback", "multi-boundary"]
+summary: @Transactional is declarative and covers whole methods. But real code sometimes needs multiple transaction boundaries inside one method — peritem t...
 docs:
   - title: "Programmatic transactions"
     url: "https://docs.spring.io/spring-framework/reference/data-access/transaction/programmatic.html"
-summary: @Transactional is declarative and covers whole methods. But real code sometimes needs multiple transaction boundaries inside one method — peritem t...
 ---
 
 # TransactionTemplate & Programmatic Transactions

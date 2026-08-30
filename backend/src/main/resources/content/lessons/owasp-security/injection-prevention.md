@@ -4,12 +4,12 @@ module: owasp-security
 order: 2
 minutes: 27
 topics: ["SQL injection", "parameterized queries", "prepared statements", "NoSQL injection", "command injection", "OWASP"]
+summary: // The attackercontrolled input arrives from a request:
 docs:
   - title: "SQL Injection Prevention Cheat Sheet (OWASP)"
     url: "https://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html"
   - title: "Injection (OWASP Top 10)"
     url: "https://owasp.org/Top10/A03_2021-Injection/"
-summary: // The attackercontrolled input arrives from a request:
 ---
 
 # Injection Prevention — SQL, NoSQL, and Command Injection

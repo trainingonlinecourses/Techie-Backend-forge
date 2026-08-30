@@ -4,12 +4,12 @@ module: junit5-deep
 order: 1
 minutes: 24
 topics: ["JUnit 5", "Jupiter", "Platform", "Vintage", "test lifecycle", "annotations"]
+summary: JUnit 5 isn't one library — it's an architecture of three cooperating projects, and understanding the split explains almost every "why is my test n...
 docs:
   - title: "JUnit 5 User Guide"
     url: "https://junit.org/junit5/docs/current/user-guide/"
   - title: "JUnit 5 Architecture (junit.org)"
     url: "https://junit.org/junit5/docs/current/user-guide/#overview"
-summary: JUnit 5 isn't one library — it's an architecture of three cooperating projects, and understanding the split explains almost every "why is my test n...
 ---
 
 # JUnit 5 Architecture — Jupiter, Platform, and Vintage

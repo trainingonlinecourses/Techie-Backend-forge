@@ -4,10 +4,10 @@ module: java-concurrency-deep
 order: 5
 minutes: 25
 topics: ["virtual threads", "structured concurrency", "millions of threads", "platform threads", "Spring Boot virtual threads"]
+summary: Virtual threads (Java 21) are the biggest concurrency change since lambdas: millions of lightweight threads that make blocking I/O cheap. The class...
 docs:
   - title: "Virtual threads"
     url: "https://docs.oracle.com/en/java/javase/21/core/virtual-threads.html"
-summary: Virtual threads (Java 21) are the biggest concurrency change since lambdas: millions of lightweight threads that make blocking I/O cheap. The class...
 ---
 
 # Virtual Threads (Project Loom)

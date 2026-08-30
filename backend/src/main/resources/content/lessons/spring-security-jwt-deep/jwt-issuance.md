@@ -4,10 +4,10 @@ module: spring-security-jwt-deep
 order: 2
 minutes: 25
 topics: ["token issuance", "jjwt", "claims", "expiry", "login flow"]
+summary: The issuance side of JWT auth is the login flow: the user presents credentials, the server verifies them, and — if valid — mints a token the user c...
 docs:
   - title: "jjwt (Java JWT library)"
     url: "https://github.com/jwtk/jjwt"
-summary: The issuance side of JWT auth is the login flow: the user presents credentials, the server verifies them, and — if valid — mints a token the user c...
 ---
 
 # Issuing JWTs — From Login to Token

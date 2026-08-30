@@ -4,12 +4,12 @@ module: sql-advanced
 order: 4
 minutes: 27
 topics: ["upsert", "ON CONFLICT", "pivot", "crosstab", "date_trunc", "generate_series", "full-text search"]
+summary: Beyond the fundamentals, production SQL is a handful of recurring recipes: upserts (insert or update depending on existence), pivots (rows → column...
 docs:
   - title: "INSERT ... ON CONFLICT (PostgreSQL docs)"
     url: "https://www.postgresql.org/docs/current/sql-insert.html"
   - title: "Aggregate Functions — FILTER (PostgreSQL docs)"
     url: "https://www.postgresql.org/docs/current/functions-aggregate.html"
-summary: Beyond the fundamentals, production SQL is a handful of recurring recipes: upserts (insert or update depending on existence), pivots (rows → column...
 ---
 
 # Advanced SQL Patterns — Upserts, Pivots, and Time Bucketing

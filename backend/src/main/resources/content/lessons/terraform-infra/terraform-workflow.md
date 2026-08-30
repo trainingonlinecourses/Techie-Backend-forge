@@ -4,12 +4,12 @@ module: terraform-infra
 order: 5
 minutes: 25
 topics: ["CI/CD", "plan gate", "terraform cloud", "pull request workflow", "team practices", "security"]
+summary: The previous lessons made infrastructure declarable. This lesson makes it governable: the workflow that turns "someone ran terraform apply" into "a...
 docs:
   - title: "Terraform Cloud / CI Integration"
     url: "https://developer.hashicorp.com/terraform/cloud-docs"
   - title: "Drift Detection and Sentinel Policies"
     url: "https://developer.hashicorp.com/terraform/cloud-docs/policy-enforcement"
-summary: The previous lessons made infrastructure declarable. This lesson makes it governable: the workflow that turns "someone ran terraform apply" into "a...
 ---
 
 # Terraform Workflows — CI, Plan Gates, and Team Practices

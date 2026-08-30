@@ -4,10 +4,10 @@ module: spring-jdbc
 order: 4
 minutes: 20
 topics: ["@Transactional", "TransactionTemplate", "programmatic transactions", "savepoints", "connection propagation"]
+summary: JdbcTemplate doesn't manage transactions itself — Spring's transaction infrastructure does, and the template joins whatever transaction is active. ...
 docs:
   - title: "Transaction management"
     url: "https://docs.spring.io/spring-framework/reference/data-access/transaction.html"
-summary: JdbcTemplate doesn't manage transactions itself — Spring's transaction infrastructure does, and the template joins whatever transaction is active. ...
 ---
 
 # Transactions With JdbcTemplate

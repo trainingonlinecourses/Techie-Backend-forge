@@ -4,12 +4,12 @@ module: junit5-deep
 order: 2
 minutes: 26
 topics: ["assertions", "assertAll", "parameterized tests", "ValueSource", "CsvSource", "MethodSource", "ArgumentSources"]
+summary: Two JUnit 5 features separate "tests that pass" from "tests that prove something": assertion composition (assertAll — report every failure, not jus...
 docs:
   - title: "Assertions (JUnit 5 User Guide)"
     url: "https://junit.org/junit5/docs/current/user-guide/#writing-tests-assertions"
   - title: "Parameterized Tests (JUnit 5 User Guide)"
     url: "https://junit.org/junit5/docs/current/user-guide/#writing-tests-parameterized-tests"
-summary: Two JUnit 5 features separate "tests that pass" from "tests that prove something": assertion composition (assertAll — report every failure, not jus...
 ---
 
 # Assertions in Depth and Parameterized Tests

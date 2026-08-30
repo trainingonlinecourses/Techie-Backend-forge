@@ -4,10 +4,10 @@ module: spring-messaging
 order: 4
 minutes: 25
 topics: ["error channels", "dead letter queue", "retries", "poison messages", "idempotency"]
+summary: When a method throws, the caller gets the exception in a stack trace. When a message consumer throws, there's often no caller — the message came fr...
 docs:
   - title: "Error handling (Spring Integration)"
     url: "https://docs.spring.io/spring-integration/reference/error-handling.html"
-summary: When a method throws, the caller gets the exception in a stack trace. When a message consumer throws, there's often no caller — the message came fr...
 ---
 
 # Error Handling — Dead Letters, Retries, and Poison Messages

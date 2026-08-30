@@ -4,12 +4,12 @@ module: kafka-deep
 order: 4
 minutes: 27
 topics: ["exactly-once", "transactions", "idempotence", "EOS", "Kafka transactions", "delivery semantics"]
+summary: "Every event processed exactly once, no losses, no duplicates." That's the promise behind exactlyonce semantics (EOS) — and for most of distributed...
 docs:
   - title: "Exactly-Once Semantics (Confluent docs)"
     url: "https://docs.confluent.io/platform/current/installation/configuration/consumer-configs.html"
   - title: "Kafka Transactions (Kafka docs)"
     url: "https://kafka.apache.org/documentation/#semantics"
-summary: "Every event processed exactly once, no losses, no duplicates." That's the promise behind exactlyonce semantics (EOS) — and for most of distributed...
 ---
 
 # Exactly-Once Semantics — Transactions, Idempotence, and Real Trade-offs

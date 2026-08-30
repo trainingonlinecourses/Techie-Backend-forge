@@ -4,12 +4,12 @@ module: java-reflection-annotations
 order: 3
 minutes: 27
 topics: ["dynamic proxies", "InvocationHandler", "AOP", "interception", "Spring proxies"]
+summary: A dynamic proxy is an object created at runtime that implements one or more interfaces you name, but with no handwritten class behind it. Instead, ...
 docs:
   - title: "Proxy (Java SE API)"
     url: "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/reflect/Proxy.html"
   - title: "InvocationHandler (Java SE API)"
     url: "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/reflect/InvocationHandler.html"
-summary: A dynamic proxy is an object created at runtime that implements one or more interfaces you name, but with no handwritten class behind it. Instead, ...
 ---
 
 # Dynamic Proxies — Intercepting Every Call

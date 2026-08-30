@@ -4,10 +4,10 @@ module: java-collections-deep
 order: 4
 minutes: 22
 topics: ["big-O", "ArrayList vs LinkedList", "memory overhead", "capacity", "primitive collections"]
+summary: BigO is theory; real collections have constants, memory layouts, and cache behavior. This lesson covers the practical performance landscape: ArrayL...
 docs:
   - title: "Collections performance"
     url: "https://docs.oracle.com/en/java/javase/21/core/collections.html"
-summary: BigO is theory; real collections have constants, memory layouts, and cache behavior. This lesson covers the practical performance landscape: ArrayL...
 ---
 
 # Collections Performance & Memory

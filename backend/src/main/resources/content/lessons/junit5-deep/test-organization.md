@@ -4,12 +4,12 @@ module: junit5-deep
 order: 5
 minutes: 25
 topics: ["testing pyramid", "unit tests", "integration tests", "test naming", "naming conventions", "test strategy"]
+summary: A test suite isn't "a bunch of tests" — it's a portfolio with a strategy. The testing pyramid is the strategy the industry converged on: many fast ...
 docs:
   - title: "The Practical Test Pyramid (Martin Fowler)"
     url: "https://martinfowler.com/articles/practical-test-pyramid.html"
   - title: "Unit Testing Principles (Pragmatic Programmer)"
     url: "https://pragprog.com/titles/utp2/unit-testing-principles-practices-and-patterns/"
-summary: A test suite isn't "a bunch of tests" — it's a portfolio with a strategy. The testing pyramid is the strategy the industry converged on: many fast ...
 ---
 
 # Test Organization — Unit, Integration, and the Testing Pyramid

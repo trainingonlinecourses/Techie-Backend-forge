@@ -4,12 +4,12 @@ module: jackson-json
 order: 2
 minutes: 25
 topics: ["@JsonProperty", "@JsonIgnore", "@JsonFormat", "@JsonInclude", "@JsonCreator", "@JsonAlias", "annotations"]
+summary: The previous lesson's ObjectMapper configuration applies globally — one set of rules for everything. Annotations are the pertype instructions: they...
 docs:
   - title: "Jackson Annotations (GitHub)"
     url: "https://github.com/FasterXML/jackson-annotations"
   - title: "Jackson Annotations Wiki (FasterXML)"
     url: "https://github.com/FasterXML/jackson-docs/wiki/Jackson-Annotations"
-summary: The previous lesson's ObjectMapper configuration applies globally — one set of rules for everything. Annotations are the pertype instructions: they...
 ---
 
 # Jackson Annotations — @JsonProperty, @JsonIgnore, and Friends

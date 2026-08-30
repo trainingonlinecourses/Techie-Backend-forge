@@ -4,10 +4,10 @@ module: spring-security-jwt-deep
 order: 3
 minutes: 25
 topics: ["JWT validation", "jjwt parser", "signature verification", "expiry check", "stateless auth"]
+summary: The validation side is the other half of the handshake. On every authenticated request, the server must answer: "is this token genuine, untampered,...
 docs:
   - title: "jjwt parsing"
     url: "https://github.com/jwtk/jjwt#reading-a-jws"
-summary: The validation side is the other half of the handshake. On every authenticated request, the server must answer: "is this token genuine, untampered,...
 ---
 
 # Validating JWTs — The Stateless Checkpoint

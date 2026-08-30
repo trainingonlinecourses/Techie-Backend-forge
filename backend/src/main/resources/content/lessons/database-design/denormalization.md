@@ -4,10 +4,10 @@ module: database-design
 order: 5
 minutes: 25
 topics: ["denormalization", "read models", "materialized views", "redundancy", "performance trade-offs"]
+summary: Normalization says "store each fact once." Denormalization says "sometimes storing a fact twice — deliberately, with a synchronization strategy — i...
 docs:
   - title: "Denormalization (Wikipedia)"
     url: "https://en.wikipedia.org/wiki/Denormalization"
-summary: Normalization says "store each fact once." Denormalization says "sometimes storing a fact twice — deliberately, with a synchronization strategy — i...
 ---
 
 # Denormalization — The Deliberate Trade-Off

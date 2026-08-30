@@ -4,12 +4,12 @@ module: jackson-json
 order: 5
 minutes: 24
 topics: ["JSON Schema", "validation", "Bean Validation", "JsonNode validation", "integration", "error handling"]
+summary: Serialization handles shape; validation handles correctness. The JSON your API accepts isn't just wellformed — it must satisfy business rules: a to...
 docs:
   - title: "JSON Schema (json-schema.org)"
     url: "https://json-schema.org/"
   - title: "Networknt JSON Schema Validator"
     url: "https://github.com/networknt/json-schema-validator"
-summary: Serialization handles shape; validation handles correctness. The JSON your API accepts isn't just wellformed — it must satisfy business rules: a to...
 ---
 
 # JSON Schema, Validation, and Integration Patterns

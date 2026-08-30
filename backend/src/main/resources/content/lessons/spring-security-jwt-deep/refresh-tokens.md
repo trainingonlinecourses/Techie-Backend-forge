@@ -4,10 +4,10 @@ module: spring-security-jwt-deep
 order: 4
 minutes: 27
 topics: ["refresh tokens", "token rotation", "revocation", "logout", "sliding sessions"]
+summary: A single longlived JWT is a liability: a stolen token works until expiry, and you can't revoke it (stateless). A single shortlived token is a UX ni...
 docs:
   - title: "OAuth 2.0 refresh tokens (RFC 6749 §1.5)"
     url: "https://datatracker.ietf.org/doc/html/rfc6749#section-1.5"
-summary: A single longlived JWT is a liability: a stolen token works until expiry, and you can't revoke it (stateless). A single shortlived token is a UX ni...
 ---
 
 # Refresh Tokens — Staying Logged In Safely

@@ -4,10 +4,10 @@ module: git-github-basics
 order: 4
 minutes: 25
 topics: ["git amend", "squash", "interactive rebase", "history rewriting", "reflog"]
+summary: Your published history (on the remote, shared with the team) is set in stone. But your local, unpublished history is still clay — you can reshape i...
 docs:
   - title: "Rewriting history (Pro Git book)"
     url: "https://git-scm.com/book/en/v2/Git-Tools-Rewriting-History"
-summary: Your published history (on the remote, shared with the team) is set in stone. But your local, unpublished history is still clay — you can reshape i...
 ---
 
 # Rewriting History — Amend, Squash, and Rebase -i

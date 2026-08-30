@@ -4,10 +4,10 @@ module: spring-webmvc-advanced
 order: 4
 minutes: 18
 topics: ["ViewResolver", "Thymeleaf", "View", "model attributes", "redirect vs forward", "template engines"]
+summary: A controller returns a logical view name; a ViewResolver turns it into rendered HTML. Understanding the resolver chain, the model, and the redirect...
 docs:
   - title: "View resolution"
     url: "https://docs.spring.io/spring-framework/reference/web/webmvc.html#mvc-viewresolver"
-summary: A controller returns a logical view name; a ViewResolver turns it into rendered HTML. Understanding the resolver chain, the model, and the redirect...
 ---
 
 # View Resolvers and Rendering

@@ -4,12 +4,12 @@ module: jackson-json
 order: 3
 minutes: 26
 topics: ["JsonSerializer", "JsonDeserializer", "custom serialization", "JsonNode", "polymorphism", "views"]
+summary: Annotations cover 95% of JSON mapping. The rest needs code: a value whose wire format is genuinely custom (a money amount as a string, a date in a ...
 docs:
   - title: "JsonSerializer (Jackson API)"
     url: "https://fasterxml.github.io/jackson-databind/javadoc/2.14/com/fasterxml/jackson/databind/JsonSerializer.html"
   - title: "JsonDeserializer (Jackson API)"
     url: "https://fasterxml.github.io/jackson-databind/javadoc/2.14/com/fasterxml/jackson/databind/JsonDeserializer.html"
-summary: Annotations cover 95% of JSON mapping. The rest needs code: a value whose wire format is genuinely custom (a money amount as a string, a date in a ...
 ---
 
 # Custom Serializers and Deserializers — Full Control

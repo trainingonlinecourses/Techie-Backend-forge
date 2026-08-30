@@ -4,12 +4,12 @@ module: kubernetes-deep
 order: 5
 minutes: 27
 topics: ["Helm", "HorizontalPodAutoscaler", "kubectl", "observability", "day-2 ops", "GitOps"]
+summary: Deploying a helloworld pod teaches the concepts; running a production system teaches the tooling. This lesson is the professional layer: Helm (pack...
 docs:
   - title: "Helm (helm.sh)"
     url: "https://helm.sh/docs/"
   - title: "Horizontal Pod Autoscaling (kubernetes.io)"
     url: "https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/"
-summary: Deploying a helloworld pod teaches the concepts; running a production system teaches the tooling. This lesson is the professional layer: Helm (pack...
 ---
 
 # Kubernetes in Practice — Helm, Autoscaling, and Day-2 Operations

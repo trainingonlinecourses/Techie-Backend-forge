@@ -4,10 +4,10 @@ module: spring-webmvc-advanced
 order: 2
 minutes: 20
 topics: ["Accept header", "produces/consumes", "HttpMessageConverter", "Jackson config", "custom converters"]
+summary: The same endpoint serves many representations. Content negotiation decides which representation a client gets, and HttpMessageConverters turn objec...
 docs:
   - title: "Content negotiation"
     url: "https://docs.spring.io/spring-framework/reference/web/webmvc.html#mvc-content-negotiation"
-summary: The same endpoint serves many representations. Content negotiation decides which representation a client gets, and HttpMessageConverters turn objec...
 ---
 
 # Content Negotiation & Message Conversion
