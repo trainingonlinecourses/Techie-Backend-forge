@@ -18,6 +18,8 @@ import QuizPage from './pages/QuizPage.jsx';
 import CertificatePage from './pages/CertificatePage.jsx';
 import ProgressPage from './pages/ProgressPage.jsx';
 import AdminReorderPage from './pages/AdminReorderPage.jsx';
+import MobileBottomNav from './components/MobileBottomNav.jsx';
+import './components/mobile.css';
 
 function Protected({ children }) {
   const { user, loading } = useAuth();
@@ -86,6 +88,7 @@ export default function App() {
           </Routes>
         </main>
       </div>
+      <MobileBottomNav />
     </div>
   );
 }
