@@ -12,7 +12,7 @@ RUN mvn -q -B -DskipTests package
 # ---- Runtime stage -----------------------------------------------------------
 FROM eclipse-temurin:21-jre
 ARG CACHE_BUST=1
-LABEL build-date="2026-08-30-v5"
+LABEL build-date="2026-08-31-v6"
 WORKDIR /app
 # The platform injects PORT; Spring Boot reads it from application.yml.
 ENV PORT=8080
