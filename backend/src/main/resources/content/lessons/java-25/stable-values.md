@@ -1,206 +1,98 @@
 ---
-title: Stable Values — Lazy, Thread-Safe, One-Time Computation
-summary: What stable values are, how they differ from lazy initialization, thread safety, and how organizations use them for expensive computations.
-order: 2
-minutes: 20
-topics: [stable-values, lazy-initialization, thread-safety, jep469, java25]
+title: Stable Values — Lazy, Thread-Safe, Single-Assignment Variables
+summary: The StableValue API provides a thread-safe, lazy, single-assignment variable that's cheaper than volatile fields and safer than double-checked locking.
+order: 5
+minutes: 18
+topics: [stable-values, value-classes, lazy-initialization, thread-safety]
 docs:
-  - https://openjdk.org/jeps/469
+  - https://openjdk.org/jeps/477
 ---
 
 ## The Concept, From Zero
 
-Sometimes you want to compute a value **once**, lazily, and cache it forever. Before Java 25, this required manual synchronization:
+In Java, when you want a value that's computed once and then never changes, you have several options — but all of them have problems:
+
+- **Final field**: Must be set in the constructor, can't be lazy
+- **Volatile field**: Thread-safe but every read goes to main memory (slow)
+- **Double-checked locking**: Thread-safe, lazy, but easy to get wrong
+- **Supplier memoize**: Works but creates garbage objects
+
+A StableValue is like a sealed envelope. Once you put a value in, it can never be changed, and reading it is as fast as reading a final field — no synchronization overhead.
+
+## The Code
 
 ```java
-// OLD: Double-checked locking — verbose and error-prone
-private volatile ExpensiveObject cached;
+import jdk.incubator.concurrent.StableValue;
 
-public ExpensiveObject getExpensiveObject() {
-    if (cached == null) {
-        synchronized (this) {
-            if (cached == null) {
-                cached = new ExpensiveObject();  // expensive computation
+public class ConfigManager {
+
+    // Thread-safe, lazy, single-assignment
+    private final StableValue<DatabaseConfig> config =
+        StableValue.of();
+
+    public DatabaseConfig getConfig() {
+        // First call computes and caches; subsequent calls return cached value
+        return config.orElseSet(() -> {
+            System.out.println("Loading config (only once!)");
+            return DatabaseConfig.loadFromEnv();
+        });
+    }
+
+    // Compare with traditional approaches:
+    private volatile DatabaseConfig volatileConfig;
+
+    // Traditional double-checked locking (verbose, error-prone)
+    public DatabaseConfig getVolatileConfig() {
+        if (volatileConfig == null) {
+            synchronized (this) {
+                if (volatileConfig == null) {
+                    volatileConfig = DatabaseConfig.loadFromEnv();
+                }
             }
         }
-    }
-    return cached;
-}
-
-// OLD: Simpler but not thread-safe
-private ExpensiveObject cached;
-
-public ExpensiveObject getExpensiveObject() {
-    if (cached == null) {
-        cached = new ExpensiveObject();  // race condition!
-    }
-    return cached;
-}
-```
-
-Java 25 introduces **stable values** — a clean, thread-safe way to compute and cache a value exactly once:
-
-```java
-// JAVA 25: Clean, thread-safe, lazy
-private final StableValue<ExpensiveObject> cached =
-    StableValue.of(() -> new ExpensiveObject());
-
-public ExpensiveObject getExpensiveObject() {
-    return cached.get();  // computed on first call, cached forever
-}
-```
-
----
-
-## How It Works
-
-```java
-import java.lang.StableValue;
-
-// Create a stable value with lazy computation
-StableValue<String> greeting = StableValue.of(() -> {
-    System.out.println("Computing greeting...");  // only runs once
-    return "Hello, World!";
-});
-
-// First call — computes and caches
-System.out.println(greeting.get());  // prints "Computing greeting..." then "Hello, World!"
-
-// Second call — returns cached value (no recomputation)
-System.out.println(greeting.get());  // prints "Hello, World!" (no "Computing..." message)
-```
-
----
-
-## Line-by-Line Walkthrough
-
-```java
-import java.lang.StableValue;
-import java.util.*;
-import java.util.concurrent.*;
-
-public class StableValuesDemo {
-    // Line 1: Basic stable value — expensive computation
-    private static final StableValue<Map<String, String>> configCache =
-        StableValue.of(() -> {
-            System.out.println("Loading configuration from disk...");
-            // Simulate expensive I/O
-            Thread.sleep(100);
-            return Map.of(
-                "db.url", "jdbc:postgresql://localhost:5432/mydb",
-                "db.pool", "10",
-                "cache.ttl", "300"
-            );
-        });
-
-    // Line 2: Stable value for expensive data structure
-    private static final StableValue<List<String>> allowedRoles =
-        StableValue.of(() -> {
-            System.out.println("Loading allowed roles...");
-            return List.of("ADMIN", "USER", "MODERATOR", "GUEST");
-        });
-
-    // Line 3: Stable value with validation
-    private static final StableValue<Integer> maxConnections =
-        StableValue.of(() -> {
-            int max = Integer.parseInt(
-                System.getProperty("db.maxConnections", "100")
-            );
-            if (max <= 0) throw new IllegalStateException("maxConnections must be positive");
-            return max;
-        });
-
-    // Line 4: Stable value for thread-safe singleton
-    private static final StableValue<ExecutorService> executor =
-        StableValue.of(() -> Executors.newVirtualThreadPerTaskExecutor());
-
-    public static void main(String[] args) throws Exception {
-        // Line 5: First access — triggers computation
-        System.out.println("First access:");
-        Map<String, String> config = configCache.get();
-        System.out.println("Config: " + config);
-
-        // Line 6: Second access — cached, no recomputation
-        System.out.println("\nSecond access:");
-        Map<String, String> config2 = configCache.get();
-        System.out.println("Same instance? " + (config == config2));  // true
-
-        // Line 7: Allowed roles
-        System.out.println("\nRoles: " + allowedRoles.get());
-        System.out.println("Contains ADMIN? " + allowedRoles.get().contains("ADMIN"));
-
-        // Line 8: Max connections
-        System.out.println("Max connections: " + maxConnections.get());
-
-        // Line 9: Thread safety — multiple threads compute only once
-        ExecutorService exec = executor.get();
-        List<Future<String>> futures = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            futures.add(exec.submit(() -> {
-                // All threads get the same stable value
-                return Thread.currentThread().getName();
-            }));
-        }
-        System.out.println("Thread names: " + futures.stream()
-            .map(f -> { try { return f.get(); } catch (Exception e) { return "?"; } })
-            .toList());
+        return volatileConfig;
     }
 }
 ```
 
----
+## Line-by-Line Explanation
+
+| Line | What It Does | Why It Matters |
+|------|-------------|----------------|
+| `StableValue.of()` | Creates an empty stable value | Initially unset; can be set exactly once |
+| `config.orElseSet(() -> ...)` | Set if empty, then return | Thread-safe: only one thread computes the value |
+| `volatile DatabaseConfig` | Volatile field comparison | Volatile works but is slower for reads |
+| `synchronized` block | Traditional lazy init | Verbose, easy to forget the inner null check |
 
 ## Real-World Scenarios
 
-### Scenario 1: Database connection pool
-
+**Scenario 1: Lazy database connection pool**
 ```java
-public class DatabasePool {
-    private final StableValue<HikariDataSource> dataSource =
-        StableValue.of(() -> {
-            var config = new HikariConfig();
-            config.setJdbcUrl("jdbc:postgresql://localhost:5432/mydb");
-            config.setUsername("user");
-            config.setPassword("pass");
-            config.setMaximumPoolSize(10);
-            return new HikariDataSource(config);
-        });
+private final StableValue<ConnectionPool> pool = StableValue.of();
 
-    public Connection getConnection() throws SQLException {
-        return dataSource.get().getConnection();
-    }
+public Connection getConnection() {
+    return pool.orElseSet(() -> ConnectionPool.create(
+        config.getUrl(), config.getUsername(), config.getPassword()
+    )).getConnection();
 }
 ```
 
-### Scenario 2: Feature flags
-
+**Scenario 2: Feature flag checked on every request**
 ```java
-public class FeatureFlags {
-    private final StableValue<Map<String, Boolean>> flags =
-        StableValue.of(() -> loadFlagsFromConfig());
+private final StableValue<Boolean> featureEnabled =
+    StableValue.of();
 
-    public boolean isEnabled(String feature) {
-        return flags.get().getOrDefault(feature, false);
-    }
-
-    private Map<String, Boolean> loadFlagsFromConfig() {
-        // Load from remote config service
-        return Map.of(
-            "dark-mode", true,
-            "beta-features", false,
-            "new-checkout", true
-        );
-    }
+public boolean isFeatureEnabled() {
+    return featureEnabled.orElseSet(() ->
+        featureFlagService.isEnabled("new-checkout-flow")
+    );
 }
 ```
 
----
+## Key Takeaways
 
-## Common Mistakes
-
-| Mistake | Problem | Fix |
-|---------|---------|-----|
-| Using for mutable state | Stable values are immutable | Use volatile + synchronization for mutable |
-| Forgetting the computation is lazy | Value computed on first .get() | Design for lazy evaluation |
-| Using where multiple values needed | StableValue is single-value | Use a cache or ConcurrentHashMap |
-| Overusing for simple values | Overkill for constants | Use static final fields for compile-time constants |
+1. **StableValue replaces double-checked locking** — same semantics, 10x less code
+2. **Reads are as fast as final fields** — no volatile overhead after initialization
+3. **Thread-safe by design** — the JVM handles the synchronization internally
+4. **Use for truly immutable values** — once set, it can never change
+5. **Preview feature** — may change based on feedback

@@ -1,254 +1,139 @@
 ---
 title: Stream Gatherers — Custom Intermediate Operations
-summary: What gatherers are, how they differ from collectors, creating custom gatherers, windowing, batching, and how organizations build reusable stream processing libraries.
-order: 1
-minutes: 28
-topics: [stream-gatherers, gatherer, windowing, custom-operations, java25]
+summary: The Gatherer API (JEP 461) lets you create custom intermediate stream operations, replacing complex flatMap chains and enabling streaming pagination, windowing, and stateful transformations.
+order: 4
+minutes: 22
+topics: [stream-gatherers, gatherer, intermediate-operations, custom-streams]
 docs:
   - https://openjdk.org/jeps/461
 ---
 
 ## The Concept, From Zero
 
-The Stream API has two types of operations:
-- **Intermediate** (lazy): filter, map, flatMap — return a new Stream
-- **Terminal** (eager): collect, forEach, reduce — produce a result
+Before Java 25, if you wanted to do something custom in a stream pipeline — like window elements into groups of N, or implement sliding averages — you had to use `flatMap` with awkward workarounds, or give up on streams entirely and write imperative loops.
 
-**Gatherers** are a new kind of intermediate operation that lets you create custom transformations. Think of them as "terminal-like operations that return a stream":
+A Gatherer is like a mini-assembly line station. Elements come in, the gatherer processes them (maybe buffering, maybe transforming, maybe emitting zero or more elements), and the processed elements flow downstream. You can even do things that are impossible with existing intermediate operations: windowing, stateful accumulation, and combining elements.
 
-```java
-// BEFORE: Windowing required external state
-List<List<Integer>> windows = new ArrayList<>();
-List<Integer> current = new ArrayList<>();
-for (int n : numbers) {
-    current.add(n);
-    if (current.size() == 3) {
-        windows.add(new ArrayList<>(current));
-        current.clear();
-    }
-}
-if (!current.isEmpty()) windows.add(current);
+Think of it this way: `map` transforms one element to one element, `flatMap` transforms one element to many, but a Gatherer can do both — and can also decide to hold elements until it has enough, or emit nothing at all.
 
-// JAVA 25: One line with gatherers
-List<List<Integer>> windows = numbers.stream()
-    .gather(Gatherer.ofConcurrent().map(n -> n).utschein(3))  // window(3)
-    .toList();
-```
-
----
-
-## The Gatherer Interface
-
-```java
-@FunctionalInterface
-public interface Gatherer<I, R, A> {
-    // I = input element type
-    // R = output element type
-    // A = accumulator type (internal state)
-
-    Gatherer.Integrator<I, A, R> integrator();
-}
-```
-
----
-
-## Built-in Gatherers
+## The Code
 
 ```java
 import java.util.stream.Gatherer;
+import java.util.stream.Stream;
 
-// Windowing — group into fixed-size batches
-List<List<Integer>> windows = IntStream.range(0, 10).boxed()
-    .gather(Gatherer.windowing(3))
-    .toList();
-// [[0,1,2], [3,4,5], [6,7,8], [9]]
+public class GathererDemo {
 
-// Sliding window — overlap
-List<List<Integer>> sliding = IntStream.range(0, 5).boxed()
-    .gather(Gatherer.slidingWindow(3))
-    .toList();
-// [[0,1,2], [1,2,3], [2,3,4]]
-
-// Scan — running accumulation
-List<Integer> runningSum = IntStream.range(1, 6).boxed()
-    .gather(Gatherer.scan(0, (sum, n) -> sum + n))
-    .toList();
-// [1, 3, 6, 10, 15]
-
-// MapConcurrent — parallel transformation
-List<String> uppercased = names.stream()
-    .gather(Gatherer.ofConcurrent().map(String::toUpperCase))
-    .toList();
-```
-
----
-
-## Line-by-Line Walkthrough
-
-```java
-import java.util.*;
-import java.util.stream.*;
-
-public class GatherersDemo {
-    // Line 1: Windowing — batch processing
-    static <T> Gatherer<T, ?, List<T>> window(int size) {
-        return Gatherer.windowing(size);
-    }
-
-    // Line 2: Custom gatherer — chunk with predicate
-    static <T> Gatherer<T, ?, List<T>> chunkWhile(java.util.function.BiPredicate<List<T>, T> predicate) {
+    // Custom Gatherer: window elements into groups of N
+    public static <T> Gatherer<T, ?, Stream<T>> window(int size) {
         return Gatherer.of(
-            // Initial state: empty list
+            // Initial state: an ArrayList buffer
             () -> new ArrayList<T>(),
-            // Integrator: add elements while predicate holds
-            (state, element, downstream) -> {
-                state.add(element);
-                if (!predicate.test(state, element)) {
-                    downstream.push(List.copyOf(state));
-                    state.clear();
+            // Integrator: add element to buffer, emit when full
+            (buffer, element, downstream) -> {
+                buffer.add(element);
+                if (buffer.size() == size) {
+                    downstream.push(List.copyOf(buffer));
+                    buffer.clear();
                 }
-                return true; // continue
+                return true; // keep processing
             },
-            // Finisher: push remaining elements
-            (state, downstream) -> {
-                if (!state.isEmpty()) {
-                    downstream.push(List.copyOf(state));
+            // Finisher: emit remaining elements if buffer isn't empty
+            (buffer, downstream) -> {
+                if (!buffer.isEmpty()) {
+                    downstream.push(List.copyOf(buffer));
                 }
             }
         );
     }
 
-    // Line 3: Custom gatherer — interleave two streams
-    static <T> Gatherer<T, ?, T> interleave(List<T> other) {
-        Iterator<T> otherIt = other.iterator();
+    // Custom Gatherer: sliding window average
+    public static Gatherer<Double, ?, Double> slidingAverage(int windowSize) {
         return Gatherer.of(
-            () -> new Object[]{ false },  // flag: other's turn
-            (state, element, downstream) -> {
-                boolean otherTurn = (boolean) state[0];
-                downstream.push(element);
-                if (otherTurn && otherIt.hasNext()) {
-                    downstream.push(otherIt.next());
+            () -> new ArrayDeque<Double>(),
+            (deque, value, downstream) -> {
+                deque.addLast(value);
+                if (deque.size() > windowSize) deque.removeFirst();
+                if (deque.size() == windowSize) {
+                    double avg = deque.stream()
+                        .mapToDouble(Double::doubleValue)
+                        .average()
+                        .orElse(0.0);
+                    downstream.push(avg);
                 }
-                state[0] = !otherTurn;
                 return true;
             }
         );
     }
 
     public static void main(String[] args) {
-        // Line 4: Windowing example — process orders in batches
-        var orders = IntStream.range(1, 11).boxed().toList();
-        System.out.println("All orders: " + orders);
-
-        var batches = orders.stream()
+        // Window: group numbers into pairs
+        Stream.of(1, 2, 3, 4, 5, 6, 7)
             .gather(window(3))
-            .toList();
-        // [[1,2,3], [4,5,6], [7,8,9], [10]]
+            .forEach(System.out::println);
+        // Output: [1, 2, 3] [4, 5, 6] [7]
 
-        System.out.println("Batches:");
-        batches.forEach(batch -> System.out.println("  " + batch));
-
-        // Line 5: Batch processing with side effects
-        var processedBatches = orders.stream()
-            .gather(window(3))
-            .peek(batch -> System.out.println("Processing batch of " + batch.size()))
-            .map(batch -> batch.stream().mapToInt(Integer::intValue).sum())
-            .toList();
-        // [6, 15, 24, 10]
-
-        System.out.println("Batch sums: " + processedBatches);
-
-        // Line 6: Sliding window — rolling averages
-        var temperatures = List.of(20.0, 22.0, 21.0, 25.0, 23.0, 20.0);
-        var rollingAvg = temperatures.stream()
-            .gather(Gatherer.slidingWindow(3))
-            .map(window -> window.stream().mapToDouble(Double::doubleValue).average().orElse(0))
-            .toList();
-        // [21.0, 22.67, 23.0, 22.67]
-
-        System.out.println("Rolling averages: " + rollingAvg);
-
-        // Line 7: Scan — running total
-        var purchases = List.of(10.0, 25.0, 5.0, 30.0, 15.0);
-        var runningTotal = purchases.stream()
-            .gather(Gatherer.scan(0.0, Double::sum))
-            .toList();
-        // [10.0, 35.0, 40.0, 70.0, 85.0]
-
-        System.out.println("Running totals: " + runningTotal);
-
-        // Line 8: Custom gatherer — chunkWhile
-        var data = List.of(1, 2, 3, 1, 2, 3, 4, 1, 2);
-        var chunks = data.stream()
-            .gather(chunkWhile((list, item) -> item != 1 || list.isEmpty()))
-            .toList();
-        // [[1,2,3], [1,2,3,4], [1,2]]
-
-        System.out.println("Chunks: " + chunks);
+        // Sliding average of stock prices
+        Stream.of(100.0, 105.0, 102.0, 108.0, 110.0, 107.0)
+            .gather(slidingAverage(3))
+            .forEach(avg -> System.out.printf("%.2f%n", avg));
+        // Output: 102.33 105.00 106.67 108.33
     }
 }
 ```
 
----
+## Line-by-Line Explanation
+
+| Line | What It Does | Why It Matters |
+|------|-------------|----------------|
+| `Gatherer.of(` | Creates a new Gatherer | Takes 3 functions: initializer, integrator, finisher |
+| `() -> new ArrayList<T>()` | Initializer | Creates the mutable state (buffer) for each stream pipeline |
+| `buffer.add(element)` | Integrator body | Adds element to buffer before checking if window is full |
+| `buffer.size() == size` | Window full check | When buffer reaches target size, emit it downstream |
+| `downstream.push(List.copyOf(buffer))` | Emit window | Pushes immutable copy to next stage; original buffer is reused |
+| `buffer.clear()` | Reset buffer | Ready for next window |
+| `return true` | Continue processing | Return false to short-circuit the stream |
+| `deque.addLast(value)` | Sliding window | Adds new element to end of fixed-size deque |
+| `deque.removeFirst()` | Evict oldest | Keeps window at exactly windowSize elements |
 
 ## Real-World Scenarios
 
-### Scenario 1: Batch database inserts
-
+**Scenario 1: Paginated API processing**
 ```java
-public void batchInsert(List<User> users) {
-    users.stream()
-        .gather(Gatherer.windowing(100))  // batches of 100
-        .forEach(batch -> {
-            String sql = "INSERT INTO users (name, email) VALUES " +
-                batch.stream()
-                    .map(u -> "('" + u.name() + "', '" + u.email() + "')")
-                    .collect(Collectors.joining(", "));
-            jdbcTemplate.execute(sql);
-        });
-}
+// Process 100 users at a time for bulk email
+users.stream()
+    .gather(window(100))
+    .forEach(batch -> emailService.sendBatch(batch));
 ```
 
-### Scenario 2: Time-series aggregation
-
+**Scenario 2: Real-time sensor averaging**
 ```java
-public List<HourlyStats> aggregateByHour(List<Request> requests) {
-    return requests.stream()
-        .sorted(Comparator.comparing(Request::timestamp))
-        .gather(Gatherer.windowing(60))  // 60-minute windows
-        .map(window -> new HourlyStats(
-            window.get(0).timestamp(),
-            window.size(),
-            window.stream().mapToLong(Request::responseTime).average().orElse(0)
-        ))
-        .toList();
-}
+// Average temperature readings over 5-minute windows
+sensorReadings.stream()
+    .gather(window(300))  // 5 per second × 300 = 5 min
+    .map(GathererDemo::averageTemperature)
+    .forEach(alertService::checkThreshold);
 ```
 
-### Scenario 3: Deduplication with order preservation
-
+**Scenario 3: Deduplication with state**
 ```java
-public <T> Gatherer<T, ?, T> distinctByKey(java.util.function.Function<T, ?> keyExtractor) {
-    Set<Object> seen = ConcurrentHashMap.newKeySet();
-    return Gatherer.of(
-        () -> new Object[]{},
-        (state, element, downstream) -> {
-            if (seen.add(keyExtractor.apply(element))) {
-                downstream.push(element);
-            }
+// Deduplicate while preserving order
+Stream.of("a", "b", "a", "c", "b", "d")
+    .gather(Gatherer.of(
+        HashSet::new,
+        (seen, item, downstream) -> {
+            if (seen.add(item)) downstream.push(item);
             return true;
         }
-    );
-}
+    ))
+    .forEach(System.out::println);
+// Output: a b c d
 ```
 
----
+## Key Takeaways
 
-## Common Mistakes
-
-| Mistake | Problem | Fix |
-|---------|---------|-----|
-| Using gatherers for simple ops | Overkill for filter/map | Use standard stream operations |
-| Not handling finisher | Last batch lost | Implement finisher for windowing |
-| Shared mutable state | Thread safety issues | Use thread-safe accumulators |
-| Too many chained gatherers | Hard to debug | Break into named operations |
+1. **Gatherers replace flatMap hacks** — windowing, sliding averages, deduplication become clean
+2. **Three functions**: initializer (state), integrator (process each element), finisher (flush remaining)
+3. **State is per-pipeline** — each stream gets its own state instance
+4. **Return false from integrator** to short-circuit (like takeWhile)
+5. **Works with parallel streams** when the state is thread-safe
