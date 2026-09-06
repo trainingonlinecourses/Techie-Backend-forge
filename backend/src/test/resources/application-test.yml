@@ -27,7 +27,8 @@ app:
     secret: test-secret-key-for-unit-tests-minimum-32-chars
     expiration-seconds: 86400
   cors:
-    allowed-origins: http://localhost:3000
+    allowed-origins:
+      - https://techie-backend-forge.vercel.app
   openai:
     api-key: test-key
     model: gpt-4o-mini
