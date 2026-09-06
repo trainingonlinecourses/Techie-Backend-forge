@@ -27,6 +27,8 @@ import org.springframework.web.cors.CorsConfigurationSource;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
+import org.springframework.core.env.Environment;
+
 /**
  * The heart of the security layer. Stateless API security:
  * <ul>
@@ -42,12 +44,24 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @EnableMethodSecurity
 public class SecurityConfig {
 
+    private final DatabaseConfig databaseConfig;
+
+    public SecurityConfig(DatabaseConfig databaseConfig) {
+        this.databaseConfig = databaseConfig;
+    }
+
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http,
                                             JwtAuthFilter jwtAuthFilter,
                                             RestAuthEntryPoint entryPoint,
                                             RestAccessDeniedHandler deniedHandler,
-                                            @Qualifier("corsConfigurationSource") CorsConfigurationSource cors) throws Exception {
+                                            @Qualifier("corsConfigurationSource") CorsConfigurationSource cors,
+                                            Environment env) throws Exception {
+        // Guardrail: refuse to start in a non-local environment without an external
+        // datasource. If this throws, the platform restarts the service (and the operator
+        // knows to set DATABASE_URL) instead of silently serving from a transient H2 file.
+        databaseConfig.assertExternalDatabase(env);
+
         http
             .csrf(AbstractHttpConfigurer::disable)               // stateless JWT API: no CSRF token needed
             .cors(withDefaults())
@@ -68,8 +82,8 @@ public class SecurityConfig {
                     "camera=(), microphone=(), geolocation=()")))
             .authorizeHttpRequests(a -> a
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                .requestMatchers("/api/auth/**", "/api/content/**", "/actuator/health",
-                        "/error").permitAll()
+                .requestMatchers("/api/auth/**", "/api/content/**", "/api/labs/**",
+                        "/actuator/health", "/error").permitAll()
                 .anyRequest().authenticated())
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
