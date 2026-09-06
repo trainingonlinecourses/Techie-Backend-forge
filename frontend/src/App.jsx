@@ -110,6 +110,7 @@ export default function App() {
             <Route path="/certificates" element={<CertificatePage />} />
             <Route path="/certificates/verify/:code" element={<CertificatePage />} />
             <Route path="/progress" element={<ProgressPage />} />
+            <Route path="/lab" element={<LabPage />} />
             <Route path="/admin/reorder" element={<Protected><AdminReorderPage /></Protected>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
