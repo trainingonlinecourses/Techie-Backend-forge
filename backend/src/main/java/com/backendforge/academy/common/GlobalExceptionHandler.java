@@ -57,6 +57,19 @@ public class GlobalExceptionHandler {
                 .body(ApiError.of(401, "Unauthorized", "Invalid username or password", req.getRequestURI()));
     }
 
+    @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
+    ResponseEntity<ApiError> accessDenied(org.springframework.security.access.AccessDeniedException ex, HttpServletRequest req) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(ApiError.of(401, "Unauthorized", "Authentication is required to access this resource", req.getRequestURI()));
+    }
+
+    @ExceptionHandler(NullPointerException.class)
+    ResponseEntity<ApiError> nullPointer(NullPointerException ex, HttpServletRequest req) {
+        log.warn("NullPointerException on {} — possible missing @AuthenticationPrincipal: {}", req.getRequestURI(), ex.getMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(ApiError.of(401, "Unauthorized", "Authentication is required", req.getRequestURI()));
+    }
+
     @ExceptionHandler(Exception.class)
     ResponseEntity<ApiError> unexpected(Exception ex, HttpServletRequest req) {
         log.error("Unhandled exception on {}", req.getRequestURI(), ex);

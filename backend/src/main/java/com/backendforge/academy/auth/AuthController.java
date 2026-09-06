@@ -40,9 +40,16 @@ public class AuthController {
         return request.getRemoteAddr();
     }
 
-    /** Returns the currently authenticated user (protected). */
+    /**
+     * Returns the currently authenticated user. Protected: requires a valid JWT.
+     * Returns 401 when no (or an invalid) token is presented.
+     */
     @GetMapping("/me")
     public UserDto me(@AuthenticationPrincipal UserPrincipal principal) {
+        if (principal == null) {
+            throw new org.springframework.security.access.AccessDeniedException(
+                    "Authentication required");
+        }
         return UserDto.from(principal.user());
     }
 }
