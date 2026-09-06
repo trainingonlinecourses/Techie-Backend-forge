@@ -199,7 +199,7 @@ export default function LabPage() {
                 setMinutesLeft(null);
                 setExpired(false);
                 sessionIdRef.current = null;
-              }}}>
+              })}>
                 End session
               </button>
             </div>
