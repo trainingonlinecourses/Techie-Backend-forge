@@ -37,16 +37,43 @@ export default function App() {
   const location = window.location.pathname;
   useEffect(() => setDrawerOpen(false), [location]);
 
-  // Probe the API once: if it's unreachable (e.g. static-only deployment without a
-  // backend), show a banner so login/lessons/AI-tutor being unavailable is clear.
+  // Probe the API once so a static-only deployment (no backend configured) can show a
+  // clear banner. We use a long timeout so a sleeping backend (Render free tier) does
+  // not trigger a false "API not connected" banner during development.
   useEffect(() => {
+    let cancelled = false;
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 8000);
     api
-      .get('/content/stats')
+      .get('/content/stats', { signal: controller.signal, timeout: 8000 })
       .then((res) => {
+        if (cancelled) return;
         if (typeof res.data !== 'object' || res.data === null) throw new Error('not an API');
         setApiDown(false);
       })
-      .catch(() => setApiDown(true));
+      .catch((err) => {
+        if (cancelled) return;
+        // A network error or timeout in development (e.g. the Render free tier is
+        // asleep) is NOT the same as "no API configured at all" — the proxy is
+        // working, the backend just needs a wake-up ping. Only show the static-only
+        // banner when the response is actually HTML (Vercel rewrote /api/* to
+        // index.html) or the request was a clear 404 from a static deploy.
+        const isClearlyStatic =
+          err?.response?.data != null &&
+          typeof err.response.data === 'string' &&
+          err.response.data.startsWith('<!DOCTYPE');
+        if (isClearlyStatic) {
+          setApiDown(true);
+        } else {
+          // Leave apiDown false (no banner) — the backend may just be asleep or
+          // slow; the login/lesson pages already show their own graceful errors.
+          setApiDown(false);
+        }
+      });
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
   }, []);
 
   return (
