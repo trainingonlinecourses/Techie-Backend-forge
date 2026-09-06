@@ -83,7 +83,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(a -> a
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers("/api/auth/**", "/api/content/**", "/api/labs/**",
-                        "/actuator/health", "/error").permitAll()
+                        "/api/version", "/actuator/health", "/actuator/info", "/error").permitAll()
                 .anyRequest().authenticated())
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
