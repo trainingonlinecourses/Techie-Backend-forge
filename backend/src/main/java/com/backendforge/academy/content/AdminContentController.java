@@ -27,19 +27,35 @@ public class AdminContentController {
      *
      * <p>Request body: { "lessonIds": ["lesson-a", "lesson-b", "lesson-c"] }
      * The first ID gets orderIndex 1, second gets 2, etc.
+     *
+     * <p>The submitted list must be a complete permutation of the module's lessons — a
+     * partial list would silently drop lessons from the ordering, which is almost always
+     * a client bug rather than intent.
      */
     @PutMapping("/modules/{moduleId}/reorder")
     public Map<String, Object> reorder(@PathVariable String moduleId,
                                        @RequestBody ReorderRequest req) {
         List<Lesson> moduleLessons = lessons.findByModuleIdOrderByOrderIndexAsc(moduleId);
 
-        // Validate all IDs belong to this module
-        var validIds = moduleLessons.stream().map(Lesson::getId).toList();
+        var moduleIds = moduleLessons.stream().map(Lesson::getId).toList();
+
+        // Defensive checks: reject confused-client / buggy UI submissions.
+        if (moduleLessons.isEmpty()) {
+            throw new IllegalArgumentException("Module " + moduleId + " has no lessons");
+        }
+        if (req.lessonIds().size() != moduleLessons.size()) {
+            throw new IllegalArgumentException(
+                    "Expected " + moduleLessons.size() + " lesson ids, got " + req.lessonIds().size());
+        }
         for (String id : req.lessonIds()) {
-            if (!validIds.contains(id)) {
+            if (!moduleIds.contains(id)) {
                 throw new IllegalArgumentException(
                         "Lesson " + id + " does not belong to module " + moduleId);
             }
+        }
+        // Every id present exactly once.
+        if (req.lessonIds().stream().distinct().count() != req.lessonIds().size()) {
+            throw new IllegalArgumentException("Duplicate lesson ids in reorder request");
         }
 
         // Assign new order indices

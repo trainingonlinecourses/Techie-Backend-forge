@@ -13,6 +13,7 @@ import DocsPage from './pages/DocsPage.jsx';
 import ChatPage from './pages/ChatPage.jsx';
 import LoginPage from './pages/LoginPage.jsx';
 import RegisterPage from './pages/RegisterPage.jsx';
+import LabPage from './pages/LabPage.jsx';
 import NotFound from './pages/NotFound.jsx';
 import QuizPage from './pages/QuizPage.jsx';
 import CertificatePage from './pages/CertificatePage.jsx';

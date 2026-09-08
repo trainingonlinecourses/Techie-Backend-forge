@@ -1585,5 +1585,95 @@
       "GitHub Flow"
     ],
     "docsUrl": "https://git-scm.com/doc"
+  },
+  {
+    "id": "java-lang-fundamentals",
+    "title": "Java Language Fundamentals in Depth",
+    "subtitle": "JVM, JRE, JDK architecture, the 50 Java keywords with real meaning, Hello World from the bytecode level, variables, operators, and control flow — explained from the ground up.",
+    "order": 110,
+    "color": "#f39c12",
+    "tech": [
+      "JVM",
+      "JRE",
+      "JDK",
+      "Keywords",
+      "Bytecode"
+    ],
+    "docsUrl": "https://docs.oracle.com/javase/specs/jvms/se21/html/"
+  },
+  {
+    "id": "java-modern-collections-deep",
+    "title": "Java Collections — Specialized Implementations Deep",
+    "subtitle": "WeakHashMap, IdentityHashMap, EnumSet, EnumMap, CopyOnWriteArrayList, CopyOnWriteArraySet, Deque, BlockingQueue — the concurrency-safe collections real systems rely on, when to use each and why the defaults bite you.",
+    "order": 111,
+    "color": "#27ae60",
+    "tech": [
+      "Collections",
+      "WeakHashMap",
+      "EnumSet",
+      "CopyOnWrite",
+      "BlockingQueue"
+    ],
+    "docsUrl": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/package-summary.html"
+  },
+  {
+    "id": "java-modern-language-features-deep",
+    "title": "Java Modern Language Features Deep",
+    "subtitle": "Text Blocks, Switch Pattern Matching, Record Patterns, Sealed Classes, SequencedCollection, ScopedValues, Reactive Streams (java.util.concurrent.Flow), String.repeat(), and var-in-lambda — every Java 15-21 feature, explained for beginners with working code.",
+    "order": 112,
+    "color": "#8e44ad",
+    "tech": [
+      "Text Blocks",
+      "Pattern Matching",
+      "SequencedCollection",
+      "ScopedValues",
+      "Reactive Streams"
+    ],
+    "docsUrl": "https://docs.oracle.com/en/java/javase/21/language/"
+  },
+  {
+    "id": "java-io-zip-directory-operations",
+    "title": "Java I/O — ZIP, Compression & Directory Operations",
+    "subtitle": "Compress and decompress ZIP, GZIP, and deflate streams. Create, delete, list, walk, and check directories. Traverse a file tree with FileVisitor — the operations real batch jobs and deploy tools use.",
+    "order": 113,
+    "color": "#16a085",
+    "tech": [
+      "ZIP",
+      "GZIP",
+      "Deflater",
+      "FileVisitor",
+      "NIO.2"
+    ],
+    "docsUrl": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/zip/package-summary.html"
+  },
+  {
+    "id": "java-concurrency-lifecycle-deep",
+    "title": "Java Thread Lifecycle & ThreadGroup Deep",
+    "subtitle": "Thread states and transitions, isAlive vs interrupted, ThreadGroup hierarchy, thread pools from scratch, daemon vs user threads, thread lifecycle in a web server — the threading model behind every Spring Boot app.",
+    "order": 114,
+    "color": "#c0392b",
+    "tech": [
+      "Thread",
+      "ThreadGroup",
+      "ThreadLocal",
+      "Executor",
+      "Lifecycle"
+    ],
+    "docsUrl": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Thread.html"
+  },
+  {
+    "id": "java-conversions-and-utilities",
+    "title": "Java Conversions, String Utilities & Patterns",
+    "subtitle": "Byte array to char array and back, Timestamp to LocalDateTime and back, LinkedHashMap sorting by keys and values, first non-null from a chain, String iteration techniques, isEmpty vs isBlank, Entity vs DTO — the everyday conversions every developer writes.",
+    "order": 115,
+    "color": "#2980b9",
+    "tech": [
+      "Conversions",
+      "Strings",
+      "LinkedHashMap",
+      "DTO",
+      "Records"
+    ],
+    "docsUrl": "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html"
   }
 ]
