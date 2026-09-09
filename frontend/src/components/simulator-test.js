@@ -208,7 +208,7 @@ test('text block',
     }
     """;
 System.out.println(json.trim());`,
-/^\{\n\s+"name": "Alice",\n\s+"age": 30\n\s+\}$/m);
+/^\{\n\s+"name": "Alice",\n\s+"age": 30\n\s*\}$/m);
 
 console.log('\n=== Nested class access ===');
 // Anonymous class usage (simplified)
