@@ -1,0 +1,14 @@
+# Local runtime data — never deploy
+data/
+backend/data/
+backend/target/
+*.mv.db
+*.trace.db
+*.log
+
+# Local tooling / workspace metadata
+.freebuff/
+.kilo/
+.github/
+.github
+*.pid
