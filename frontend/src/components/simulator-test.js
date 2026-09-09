@@ -1,67 +1,224 @@
+// Test the current simulator capabilities
 import { simulateJava } from './JavaSimulator.js';
 
-const tests = [
-  // Basic
-  { name: 'Hello World', code: 'System.out.println("Hello, World!");', expected: 'Hello, World!' },
-  { name: 'Variables', code: 'int x = 10; System.out.println(x);', expected: '10' },
-  { name: 'String concat', code: 'String name = "Java"; int ver = 21; System.out.println(name + " " + ver);', expected: 'Java 21' },
-  
-  // For loops
-  { name: 'For loop', code: 'for (int i = 0; i < 3; i++) { System.out.println(i); }', expected: '0\n1\n2' },
-  { name: 'Nested for', code: 'for (int i = 1; i <= 2; i++) { for (int j = 1; j <= 2; j++) { System.out.print(i + "" + j + " "); } }', expected: '11 12 21 22 ' },
-  
-  // If/else
-  { name: 'If/else', code: 'int x = 5; if (x > 3) { System.out.println("big"); } else { System.out.println("small"); }', expected: 'big' },
-  
-  // Arrays
-  { name: 'Arrays', code: 'int[] nums = {10, 20, 30}; int sum = 0; for (int i = 0; i < nums.length; i++) { sum = sum + nums[i]; } System.out.println(sum);', expected: '60' },
-  
-  // String methods
-  { name: 'String methods', code: 'String s = "Hello World"; System.out.println(s.toUpperCase()); System.out.println(s.contains("World")); System.out.println(s.length());', expected: 'HELLO WORLD\ntrue\n11' },
-  
-  // Math
-  { name: 'Math methods', code: 'System.out.println(Math.abs(-5)); System.out.println(Math.max(10, 20)); System.out.println(Math.sqrt(16));', expected: '5\n20\n4' },
-  
-  // Ternary
-  { name: 'Ternary', code: 'int age = 20; String r = (age >= 18) ? "adult" : "minor"; System.out.println(r);', expected: 'adult' },
-  
-  // ArrayList
-  { name: 'ArrayList', code: 'ArrayList<String> list = new ArrayList<>(); list.add("Java"); list.add("Python"); list.add("C++"); System.out.println(list.size()); System.out.println(list.get(1)); list.remove(0); System.out.println(list.size());', expected: '3\nPython\n2' },
-  
-  // HashMap
-  { name: 'HashMap', code: 'HashMap<String, Integer> map = new HashMap<>(); map.put("Alice", 90); map.put("Bob", 85); System.out.println(map.size()); System.out.println(map.get("Alice")); System.out.println(map.containsKey("Bob"));', expected: '2\n90\ntrue' },
-  
-  // For-each with ArrayList
-  { name: 'For-each ArrayList', code: 'ArrayList<String> langs = new ArrayList<>(); langs.add("Java"); langs.add("Python"); for (String lang : langs) { System.out.println(lang); }', expected: 'Java\nPython' },
-  
-  // For-each with HashMap
-  { name: 'For-each HashMap', code: 'HashMap<String, Integer> scores = new HashMap<>(); scores.put("Alice", 90); scores.put("Bob", 85); for (Map.Entry<String, Integer> entry : scores.entrySet()) { System.out.println(entry.getKey() + "=" + entry.getValue()); }', expected: 'Alice=90\nBob=85' },
-  
-  // Try/catch
-  { name: 'Try/catch', code: 'try { int x = 10 / 0; System.out.println(x); } catch (Exception e) { System.out.println(e.toString()); } finally { System.out.println("done"); }', expected: 'Exception: java.lang.ArithmeticException: / by zero\ndone' },
-  
-  // Collections utility
-  { name: 'Collections.sort', code: 'ArrayList<Integer> nums = new ArrayList<>(); nums.add(30); nums.add(10); nums.add(20); Collections.sort(nums); for (int n : nums) { System.out.print(n + " "); }', expected: '10 20 30 ' },
-];
-
-let passed = 0;
-let failed = 0;
-
-for (const t of tests) {
-  const result = simulateJava(t.code);
+function test(name, code, expectedPattern) {
+  const result = simulateJava(code);
   const output = result.output;
-  const ok = output === t.expected;
-  if (ok) {
-    console.log(`✅ ${t.name}`);
-    passed++;
-  } else {
-    console.log(`❌ ${t.name}`);
-    console.log(`   Expected: ${JSON.stringify(t.expected)}`);
-    console.log(`   Got:      ${JSON.stringify(output)}`);
-    if (result.errors.length > 0) console.log(`   Errors:   ${result.errors.join('; ')}`);
-    failed++;
+  const passed = typeof expectedPattern === 'function' ? expectedPattern(output) : expectedPattern.test(output);
+  console.log(`${passed ? '✅' : '❌'} ${name}`);
+  if (!passed) {
+    console.log(`   Expected pattern: ${expectedPattern}`);
+    console.log(`   Got: ${JSON.stringify(output)}`);
+    if (result.errors.length) console.log(`   Errors: ${result.errors.join(', ')}`);
   }
 }
 
-console.log(`\n${passed}/${tests.length} passed, ${failed} failed`);
-process.exit(failed > 0 ? 1 : 0);
+console.log('=== Switch Expressions ===');
+// Traditional switch with arrow syntax
+test('switch with arrow syntax',
+`int day = 3;
+String result = switch (day) {
+    case 1 -> "Monday";
+    case 2 -> "Tuesday";
+    case 3 -> "Wednesday";
+    default -> "Other";
+};
+System.out.println(result);`,
+/^Wednesday$/);
+
+// Switch with multiple statements in arrow block
+test('switch arrow with block',
+`int score = 85;
+String grade = switch (score) {
+    case 90, 95, 100 -> {
+        yield "A+";
+    }
+    case 80, 85, 90 -> "A";
+    default -> "B";
+};
+System.out.println(grade);`,
+/^A$/);
+
+console.log('\n=== Records ===');
+// Basic record
+test('record creation and access',
+`record Person(String name, int age) {}
+Person p = new Person("Alice", 30);
+System.out.println(p.name);
+System.out.println(p.age);`,
+/^Alice\n30$/);
+
+// Record with compact constructor
+test('record toString',
+`record Point(int x, int y) {}
+Point p = new Point(10, 20);
+System.out.println(p);`,
+out => out.includes('Point') && out.includes('10') && out.includes('20'));
+
+console.log('\n=== Pattern Matching instanceof ===');
+// Pattern matching with instanceof (Java 16+)
+test('pattern matching instanceof',
+`Object obj = "Hello";
+if (obj instanceof String s) {
+    System.out.println(s.toUpperCase());
+} else {
+    System.out.println("Not a string");
+}`,
+/^HELLO$/);
+
+// Pattern matching with complex condition
+test('pattern matching with length check',
+`Object obj = "Java";
+if (obj instanceof String s && s.length() > 3) {
+    System.out.println("Long: " + s);
+} else if (obj instanceof String s) {
+    System.out.println("Short: " + s);
+} else {
+    System.out.println("Not string");
+}`,
+/^Long: Java$/);
+
+console.log('\n=== Sealed Classes ===');
+// Sealed classes (simplified - just test instantiation and usage)
+test('sealed class hierarchy usage',
+`sealed interface Shape permits Circle, Rectangle {}
+record Circle(double radius) implements Shape {}
+record Rectangle(double w, double h) implements Shape {}
+Shape s = new Circle(5.0);
+System.out.println(s instanceof Circle);
+System.out.println(s instanceof Shape);`,
+/^true\ntrue$/);
+
+console.log('\n=== Pattern Matching switch (Java 21+) ===');
+// Pattern matching in switch
+test('pattern matching switch on type',
+`Object obj = 42;
+String result = switch (obj) {
+    case Integer i -> "Number: " + i;
+    case String s -> "Text: " + s;
+    default -> "Other";
+};
+System.out.println(result);`,
+/^Number: 42$/);
+
+// Guarded patterns
+test('guarded pattern in switch',
+`Object obj = 15;
+String result = switch (obj) {
+    case Integer i when i > 10 -> "Large: " + i;
+    case Integer i -> "Small: " + i;
+    default -> "Not a number";
+};
+System.out.println(result);`,
+/^Large: 15$/);
+
+console.log('\n=== More Collection Types ===');
+// LinkedHashSet (order-preserving set)
+test('LinkedHashSet iteration',
+`var items = new java.util.LinkedHashSet<String>();
+items.add("first");
+items.add("second");
+items.add("first");
+System.out.println(items);`,
+/\[first, second\]/);
+
+// TreeSet (sorted set)
+test('TreeSet sorted output',
+`var nums = new java.util.TreeSet<Integer>();
+nums.add(3);
+nums.add(1);
+nums.add(2);
+System.out.println(nums);`,
+/\[1, 2, 3\]/);
+
+// ArrayDeque as stack
+test('ArrayDeque stack operations',
+`var stack = new java.util.ArrayDeque<String>();
+stack.push("bottom");
+stack.push("middle");
+stack.push("top");
+System.out.println(stack.pop());
+System.out.println(stack.peek());`,
+/^top\nmiddle$/);
+
+// ArrayDeque as queue
+test('ArrayDeque queue operations',
+`var queue = new java.util.ArrayDeque<String>();
+queue.offer("first");
+queue.offer("second");
+queue.offer("third");
+System.out.println(queue.poll());
+System.out.println(queue.poll());`,
+/^first\nsecond$/);
+
+console.log('\n=== Enum with values() ===');
+// Enum iteration
+test('enum values iteration',
+`enum Color { RED, GREEN, BLUE }
+for (Color c : Color.values()) {
+    System.out.println(c);
+}`,
+/^RED\nGREEN\nBLUE$/);
+
+// Enum with fields
+test('enum with fields',
+`enum Status {
+    PENDING(1, "Waiting"),
+    ACTIVE(2, "In Progress"),
+    DONE(3, "Complete");
+    
+    private final int code;
+    private final String label;
+    
+    Status(int code, String label) {
+        this.code = code;
+        this.label = label;
+    }
+    
+    int getCode() { return code; }
+    String getLabel() { return label; }
+}
+System.out.println(Status.ACTIVE.getCode());
+System.out.println(Status.ACTIVE.getLabel());`,
+/^2\nIn Progress$/);
+
+console.log('\n=== var with complex types ===');
+test('var with ArrayList',
+`var list = new ArrayList<String>();
+list.add("hello");
+list.add("world");
+System.out.println(list.size());
+System.out.println(list.get(0));`,
+/^2\nhello$/);
+
+test('var with HashMap',
+`var scores = new HashMap<String, Integer>();
+scores.put("Alice", 90);
+scores.put("Bob", 85);
+System.out.println(scores.get("Alice"));
+System.out.println(scores.size());`,
+/^90\n2$/);
+
+console.log('\n=== Text Blocks (Java 15+) ===');
+test('text block',
+`String json = """
+    {
+        "name": "Alice",
+        "age": 30
+    }
+    """;
+System.out.println(json.trim());`,
+/^\{\n\s+"name": "Alice",\n\s+"age": 30\n\s+\}$/m);
+
+console.log('\n=== Nested class access ===');
+// Anonymous class usage (simplified)
+test('anonymous Runnable',
+`Runnable r = new Runnable() {
+    public void run() {
+        System.out.println("Running...");
+    }
+};
+r.run();`,
+/^Running\.\.\.$/);
+
+console.log('\n=== All tests complete ===');

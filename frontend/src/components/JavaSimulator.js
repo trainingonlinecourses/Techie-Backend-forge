@@ -57,30 +57,114 @@ function runBlock(code, errors, parentVars, parentArrays) {
     const stmt = stmts[i].trim().replace(/\)\s+\./g, ').').replace(/\s*\n\s*/g, ' ');
     if (!stmt || stmt === '{' || stmt === '}') { i++; continue; }
 
-    // Skip class/method/record declarations
-    if (stmt.startsWith('public') && !stmt.includes('public static void main')) {
-      // Check for record declarations: record Name(Type field, ...) { ... }
-      const recordMatch = /^(public\s+)?record\s+(\w+)\(([^)]*)\)/.exec(stmt);
-      if (recordMatch) {
-        i++; continue; // skip record declarations for now
-      }
-      if (stmt.includes('{')) {
-        let depth = 1;
-        i++;
-        while (i < stmts.length && depth > 0) {
-          if (stmts[i] === '{') depth++;
-          if (stmts[i] === '}') depth--;
-          i++;
-        }
-      } else {
-        i++;
+      // --- switch expression or statement (Java 14+) ---
+    // Match switch expression anywhere in the statement (after splitStatements collapses newlines)
+    const switchExprMatch = /switch\s*\(([^)]+)\)/.exec(stmt);
+    if (switchExprMatch) {
+    
+      const swExpr = switchExprMatch[1];
+      i = executeSwitch(i, stmts, swExpr, vars, arrays, output, errors);
+      // Capture switch result for variable declarations
+      const declAssign = stmt.match(/^(\w+)\s*=\s*/);
+      if (declAssign) {
+        const declVar = declAssign[1];
+        const result = vars['__switchResult__'];
+        vars[declVar] = { type: typeof result === 'string' ? 'String' : typeof result === 'number' ? 'int' : 'Object', value: result !== undefined ? result : '' };
       }
       continue;
     }
 
-    // --- Record declaration (non-public) ---
-    const recordDeclMatch = /^record\s+(\w+)\(([^)]*)\)/.exec(stmt);
+    // --- Pattern matching instanceof (Java 16+) ---
+    const patternInstanceofMatch = /^(\w+)\s+instanceof\s+(\w+)\s+(\w+)\s*(?:&&|\|\|)?$/i.exec(stmt);
+    if (patternInstanceofMatch && stmt.includes('instanceof') && !stmt.includes(';') && !stmt.includes('{')) {
+      // This is a standalone instanceof pattern binding — handled inside executeIfElse
+      // Fall through to check if it's actually an if statement
+      const ifWithPatternMatch = /^if\s*\((.+)\)\s*\{?$/.exec(stmt);
+      if (ifWithPatternMatch) {
+        i = executeIfElse(i, stmts, ifWithPatternMatch[1], vars, arrays, output, errors);
+        continue;
+      }
+    }
+
+    // --- Enhanced for-each with pattern (Java 21+) ---
+    // for (String s : list) where pattern binding happens — handled via regular for-each
+
+    // --- Record declaration (skip, but track the name for later field access) ---
+    const recordDeclMatch = /^(?:public\s+)?record\s+(\w+)\s*<?([^>]*)?>?\s*\(([^)]*)\)\s*(?:implements\s+[\w,.\s]+)?\s*\{?$/.exec(stmt);
     if (recordDeclMatch) {
+      const recordName = recordDeclMatch[1];
+      const fieldList = recordDeclMatch[3];
+      // Parse field types and names: String name, int age
+      const fields = {};
+      if (fieldList.trim()) {
+        fieldList.split(',').forEach(fld => {
+          const parts = fld.trim().split(/\s+/);
+          if (parts.length >= 2) {
+            fields[parts[parts.length - 1]] = { type: parts.slice(0, -1).join(' '), name: parts[parts.length - 1] };
+          }
+        });
+      }
+      vars['__records__'] = vars['__records__'] || {};
+      vars['__records__'][recordName] = { fields, name: recordName };
+      // Skip the body if it has one
+      if (stmt.includes('{')) {
+        let depth = 1;
+        i++;
+        while (i < stmts.length && depth > 0) {
+          if (stmts[i] === '{') depth++;
+          if (stmts[i] === '}') depth--;
+          i++;
+        }
+      } else {
+        // Single-line record declaration — skip it
+        i++;
+      }
+      continue;
+    }
+
+    // --- Enum declaration (skip body, track name) ---
+    const enumDeclMatch = /^(?:public\s+)?enum\s+(\w+)\s*\{?$/.exec(stmt);
+    if (enumDeclMatch) {
+      const enumName = enumDeclMatch[1];
+      // Collect enum constants and body
+      let depth = 1;
+      let bodyContent = '';
+      if (stmt.endsWith('{')) {
+        i++;
+        let bodyStmts = [];
+        while (i < stmts.length && depth > 0) {
+          const bs = stmts[i].trim();
+          if (bs === '{') { depth++; bodyStmts.push(bs); i++; continue; }
+          if (bs === '}') { depth--; if (depth === 0) { i++; break; } bodyStmts.push(bs); i++; continue; }
+          bodyStmts.push(bs);
+          i++;
+        }
+        bodyContent = bodyStmts.join('; ');
+      } else {
+        i++;
+      }
+      vars['__records__'] = vars['__records__'] || {};
+      vars['__records__'][enumName] = { fields, name: enumName, isEnum: true, body: bodyContent, constants: [], constantFields: {} };
+      continue;
+    }
+
+    // --- Enum constant declaration: CONSTANT_NAME or CONSTANT_NAME(value1, value2) ---
+    // These appear inside the enum body as separate statements after the enum declaration
+    const enumConstMatch = /^(?:public\s+)?(static\s+)?(final\s+)?(\w+)\s+(\w+)\s*=\s*(.+);?$/.exec(stmt);
+    if (enumConstMatch && vars['__records__'] && vars['__records__'][enumConstMatch[4]]) {
+      const enumInfo = vars['__records__'][enumConstMatch[4]];
+      if (enumInfo && enumInfo.isEnum) {
+        const constName = enumConstMatch[3];
+        const constValue = evaluateExpr(enumConstMatch[5].replace(/;$/, ''), vars, arrays);
+        enumInfo.constants.push(constName);
+        enumInfo.constantFields[constName] = { ...enumInfo.constantFields[constName], [enumConstMatch[3]]: constValue };
+      }
+      i++; continue;
+    }
+
+    // --- Sealed class/interface declaration (skip) ---
+    const sealedMatch = /^(?:public\s+)?(?:sealed\s+)?(class|interface)\s+(\w+)\s*(?:permits\s+[^;]+)?\s*\{?$/i.exec(stmt);
+    if (sealedMatch) {
       if (stmt.includes('{')) {
         let depth = 1;
         i++;
@@ -95,19 +179,37 @@ function runBlock(code, errors, parentVars, parentArrays) {
       continue;
     }
 
-    // --- switch expression (Java 14+ arrow syntax) ---
-    const switchMatch = /^switch\s*\((.+)\)\s*\{?$/.exec(stmt);
-    if (switchMatch) {
-      i = executeSwitch(i, stmts, switchMatch[1], vars, arrays, output, errors);
-      continue;
-    }
+    // --- Variable declaration (primitives, String, collections, generic types, java.util.* types) ---
+    const declMatch = /^(int|long|double|float|boolean|char|byte|short|String|var|Integer|Long|Double|Float|Boolean|Character|Object|ArrayList<[^>]+>|HashMap<[^>]+>|HashSet<[^>]+>|LinkedHashSet<[^>]+>|TreeSet<[^>]+>|LinkedList<[^>]+>|ArrayDeque<[^>]+>|List<[^>]+>|Map<[^>]+>|Set<[^>]+>|Collection<[^>]+>|Optional<[^>]+>|\w+(?:<[^>]+>)?|java\.util\.\w+(?:<[^>]+>)?)\s+(\w+)\s*=\s*(.+);?$/.exec(stmt);
+      if (declMatch) {
+        const [, type, name, expr] = declMatch;
+        const exprClean = expr.replace(/;$/, '');
+        // Check if the RHS contains a switch expression
+        const swMatch = /switch\s*\(([^)]+)\)\s*\{?$/i.exec(exprClean);
+        if (swMatch && i + 1 < stmts.length && stmts[i + 1].trim() === '{') {          // Switch expression as RHS — executeSwitch handles the switch body
+          const newI = executeSwitch(i, stmts, swMatch[1], vars, arrays, output, errors);
+          const sv = vars['__switchResult__'];
+          vars[name] = { type: typeof sv === 'string' ? 'String' : typeof sv === 'number' ? 'int' : type, value: sv !== undefined ? sv : '' };
+          i = newI;
+          continue;
+        }
+        const val = evaluateExpr(exprClean, vars, arrays);
+        vars[name] = { type, value: val };
+        i++; continue;
+      }
 
-    // --- Variable declaration (primitives, String, collections, generic types) ---
-    const declMatch = /^(int|long|double|float|boolean|char|byte|short|String|var|Integer|Long|Double|Float|Boolean|Character|Object|ArrayList<[^>]+>|HashMap<[^>]+>|HashSet<[^>]+>|LinkedList<[^>]+>|List<[^>]+>|Map<[^>]+>|Set<[^>]+>|Collection<[^>]+>|Optional<[^>]+>|\w+(?:<[^>]+>)?)\s+(\w+)\s*=\s*(.+);?$/.exec(stmt);
-    if (declMatch) {
-      const [, type, name, expr] = declMatch;
-      const val = evaluateExpr(expr.replace(/;$/, ''), vars, arrays);
-      vars[name] = { type, value: val };
+    // --- Record instantiation: new RecordType(value1, value2) ---
+    const recordNewMatch = /^new\s+(\w+)\(([^)]*)\)\s*\.?(\w+)?\s*$/i.exec(stmt);
+    if (recordNewMatch && vars['__records__'] && vars['__records__'][recordNewMatch[1]]) {
+      const recordName = recordNewMatch[1];
+      const recordInfo = vars['__records__'][recordName];
+      const fieldNames = Object.keys(recordInfo.fields);
+      const argValues = recordNewMatch[2] ? recordNewMatch[2].split(',').map(a => evaluateExpr(a.trim(), vars, arrays)) : [];
+      const recordObj = { _type: 'Record', _name: recordName, _fields: {} };
+      fieldNames.forEach((fn, idx) => {
+        recordObj._fields[fn] = argValues[idx] !== undefined ? argValues[idx] : null;
+      });
+      vars[name] = { type: recordName, value: recordObj };
       i++; continue;
     }
 
@@ -492,10 +594,14 @@ function executeStatement(stmt, vars, arrays, output, errors) {
   const reassignMatch = /^(\w+)\s*=\s*(.+);?$/.exec(stmt);
   if (reassignMatch) {
     const [, name, expr] = reassignMatch;
+    const val = evaluateExpr(expr.replace(/;$/, ''), vars, arrays);
     if (vars[name]) {
-      vars[name].value = evaluateExpr(expr.replace(/;$/, ''), vars, arrays);
+      vars[name].value = val;
     } else if (arrays[name]) {
-      arrays[name].values = evaluateExpr(expr.replace(/;$/, ''), vars, arrays);
+      arrays[name].values = val;
+    } else {
+      // Variable not yet declared — create it
+      vars[name] = { type: typeof val === 'string' ? 'String' : typeof val === 'number' ? 'int' : 'Object', value: val };
     }
     return;
   }
@@ -524,7 +630,8 @@ function splitStatements(code) {
   let current = '';
   let inString = false;
   let parenDepth = 0;
-  let curlyDepth = 0; // tracks {} depth within the current statement
+  let curlyDepth = 0;
+  let switchDepth = 0;
 
   for (let i = 0; i < code.length; i++) {
     const ch = code[i];
@@ -538,8 +645,13 @@ function splitStatements(code) {
       if (parenDepth === 0) {
         if (ch === '{') {
           if (curlyDepth === 0) {
-            // Block-level { — only if it follows ) or is standalone
             const trimmed = current.trim();
+            const isSwitchHeader = /switch\s*\([^)]+\)\s*$/.test(trimmed);
+            if (isSwitchHeader) {
+              current += ch;
+              switchDepth = 1;
+              continue;
+            }
             if (!trimmed || trimmed.endsWith(')') || trimmed.endsWith('else') || trimmed.endsWith('do') || trimmed === 'finally' || trimmed === 'try') {
               if (trimmed) stmts.push(trimmed);
               current = '';
@@ -550,32 +662,41 @@ function splitStatements(code) {
           curlyDepth++;
         }
         if (ch === '}') {
+          if (switchDepth > 0) {
+            current += ch;
+            if (curlyDepth === 0) {
+              switchDepth--;
+              if (switchDepth === 0) {
+                stmts.push(current.trim());
+                current = '';
+                continue;
+              }
+            } else {
+              curlyDepth--;
+            }
+            continue;
+          }
           if (curlyDepth > 0) {
             curlyDepth--;
           } else {
-            // Block-level }
             if (current.trim()) stmts.push(current.trim());
             current = '';
             stmts.push(ch);
             continue;
           }
-        }
-        if (ch === ';' && curlyDepth === 0) {
+        }      if (ch === ';' && curlyDepth === 0 && switchDepth === 0) {
           stmts.push(current.trim());
           current = '';
           continue;
         }
       }
     }
-
     current += ch;
   }
 
   if (current.trim()) stmts.push(current.trim());
   return stmts;
 }
-
-// ==================== EXPRESSION EVALUATOR ====================
 
 function evaluateExpr(expr, vars, arrays) {
   expr = expr.trim().replace(/;$/, '');
@@ -649,13 +770,47 @@ function evaluateExpr(expr, vars, arrays) {
       const vals = arr.values || arr.value || [];
       return vals[idx];
     }
-  }
-
-  // --- Array.length ---
+  }  // --- Array.length ---
   const lenMatch = /^(\w+)\.length$/.exec(expr);
   if (lenMatch) {
     const arr = arrays[lenMatch[1]] || vars[lenMatch[1]];
     if (arr) return (arr.values || arr.value || []).length;
+  }
+
+  // --- Record field access via property: p.name, p.age ---
+  const recPropMatch = /^(\w+)\.(\w+)$/.exec(expr);
+  if (recPropMatch) {
+    const recordObj = vars[recPropMatch[1]];
+    if (recordObj && recordObj.value && recordObj.value._type === 'Record' && recordObj.value._fields) {
+      const fieldVal = recordObj.value._fields[recPropMatch[2]];
+      if (fieldVal !== undefined) return fieldVal;
+    }
+    // Enum constant access: Color.RED, Status.ACTIVE
+    const enumInfo = vars['__records__'] && vars['__records__'][recPropMatch[1]];
+    if (enumInfo && enumInfo.isEnum && enumInfo.constants && enumInfo.constants.includes(recPropMatch[2])) {
+      return { _type: 'Enum', _name: recPropMatch[1], _nameConst: recPropMatch[2], _ordinal: enumInfo.constants.indexOf(recPropMatch[2]), _fields: enumInfo.constantFields ? enumInfo.constantFields[recPropMatch[2]] || {} : {} };
+    }
+  }
+
+  // --- Enum.values(): returns array of enum constants ---
+  const evam = /^(\w+)\.values\(\)$/.exec(expr);
+  if (evam) {
+    const enumInfo = vars['__records__'] && vars['__records__'][evam[1]];
+    if (enumInfo && enumInfo.isEnum && enumInfo.constants) {
+      return enumInfo.constants.map((c, idx) => ({ _type: 'Enum', _name: evam[1], _nameConst: c, _ordinal: idx, _fields: enumInfo.constantFields ? enumInfo.constantFields[c] || {} : {} }));
+    }
+  }
+
+  // --- Enum.valueOf(String): returns enum constant by name ---
+  const evvm = /^(\w+)\.valueOf\("(.*?)"\)$/.exec(expr);
+  if (evvm) {
+    const enumInfo = vars['__records__'] && vars['__records__'][evvm[1]];
+    if (enumInfo && enumInfo.isEnum && enumInfo.constants) {
+      const found = enumInfo.constants.find(c => c === evvm[2]);
+      if (found) {
+        return { _type: 'Enum', _name: evvm[1], _nameConst: found, _ordinal: enumInfo.constants.indexOf(found), _fields: enumInfo.constantFields ? enumInfo.constantFields[found] || {} : {} };
+      }
+    }
   }
 
   // --- Parenthesized expression ---
@@ -1222,6 +1377,133 @@ function tryMethodCall(expr, vars, arrays) {
         case 'clear': set.length = 0; return undefined;
         case 'toString': return '[' + set.join(', ') + ']';
         case 'stream': return { _type: 'Stream', _data: [...set] };
+        case 'first': return set.length > 0 ? set[0] : undefined;
+        case 'last': return set.length > 0 ? set[set.length - 1] : undefined;
+        default: return undefined;
+      }
+    }
+
+    // --- LinkedHashSet methods (same as HashSet but preserves insertion order) ---
+    if (val && val._type === 'LinkedHashSet') {
+      const set = val._data;
+      switch (method) {
+        case 'add': {
+          const arg = argsStr ? evaluateExpr(argsStr.trim(), vars, arrays) : undefined;
+          if (!set.includes(arg)) { set.push(arg); return true; }
+          return false;
+        }
+        case 'contains': {
+          const arg = argsStr ? evaluateExpr(argsStr.trim(), vars, arrays) : undefined;
+          return set.includes(arg);
+        }
+        case 'remove': {
+          const arg = argsStr ? evaluateExpr(argsStr.trim(), vars, arrays) : undefined;
+          const i = set.indexOf(arg);
+          if (i >= 0) { set.splice(i, 1); return true; }
+          return false;
+        }
+        case 'size': return set.length;
+        case 'isEmpty': return set.length === 0;
+        case 'clear': set.length = 0; return undefined;
+        case 'toString': return '[' + set.join(', ') + ']';
+        case 'stream': return { _type: 'Stream', _data: [...set] };
+        default: return undefined;
+      }
+    }
+
+    // --- TreeSet methods (sorted order) ---
+    if (val && val._type === 'TreeSet') {
+      const set = val._data;
+      switch (method) {
+        case 'add': {
+          const arg = argsStr ? evaluateExpr(argsStr.trim(), vars, arrays) : undefined;
+          if (!set.includes(arg)) {
+            set.push(arg);
+            set.sort((a, b) => typeof a === 'string' ? a.localeCompare(b) : a - b);
+            return true;
+          }
+          return false;
+        }
+        case 'contains': {
+          const arg = argsStr ? evaluateExpr(argsStr.trim(), vars, arrays) : undefined;
+          return set.includes(arg);
+        }
+        case 'remove': {
+          const arg = argsStr ? evaluateExpr(argsStr.trim(), vars, arrays) : undefined;
+          const i = set.indexOf(arg);
+          if (i >= 0) { set.splice(i, 1); return true; }
+          return false;
+        }
+        case 'size': return set.length;
+        case 'isEmpty': return set.length === 0;
+        case 'clear': set.length = 0; return undefined;
+        case 'toString': return '[' + set.join(', ') + ']';
+        case 'stream': return { _type: 'Stream', _data: [...set] };
+        case 'first': return set.length > 0 ? set[0] : undefined;
+        case 'last': return set.length > 0 ? set[set.length - 1] : undefined;
+        default: return undefined;
+      }
+    }
+
+    // --- ArrayDeque methods (double-ended queue / stack) ---
+    if (val && val._type === 'ArrayDeque') {
+      const deque = val._data;
+      switch (method) {
+        case 'push': {
+          const arg = argsStr ? evaluateExpr(argsStr.trim(), vars, arrays) : undefined;
+          deque.unshift(arg);
+          return undefined;
+        }
+        case 'pop': {
+          return deque.shift();
+        }
+        case 'peek': {
+          return deque.length > 0 ? deque[0] : undefined;
+        }
+        case 'offer': {
+          const arg = argsStr ? evaluateExpr(argsStr.trim(), vars, arrays) : undefined;
+          deque.push(arg);
+          return true;
+        }
+        case 'poll': {
+          return deque.shift();
+        }
+        case 'add': {
+          const arg = argsStr ? evaluateExpr(argsStr.trim(), vars, arrays) : undefined;
+          deque.push(arg);
+          return true;
+        }
+        case 'addFirst': {
+          const arg = argsStr ? evaluateExpr(argsStr.trim(), vars, arrays) : undefined;
+          deque.unshift(arg);
+          return true;
+        }
+        case 'addLast': {
+          const arg = argsStr ? evaluateExpr(argsStr.trim(), vars, arrays) : undefined;
+          deque.push(arg);
+          return true;
+        }
+        case 'getFirst': {
+          return deque.length > 0 ? deque[0] : undefined;
+        }
+        case 'getLast': {
+          return deque.length > 0 ? deque[deque.length - 1] : undefined;
+        }
+        case 'removeFirst': {
+          return deque.shift();
+        }
+        case 'removeLast': {
+          return deque.pop();
+        }
+        case 'size': return deque.length;
+        case 'isEmpty': return deque.length === 0;
+        case 'clear': deque.length = 0; return undefined;
+        case 'contains': {
+          const arg = argsStr ? evaluateExpr(argsStr.trim(), vars, arrays) : undefined;
+          return deque.includes(arg);
+        }
+        case 'toArray': return [...deque];
+        case 'toString': return '[' + deque.join(', ') + ']';
         default: return undefined;
       }
     }
@@ -1236,6 +1518,7 @@ function tryMethodCall(expr, vars, arrays) {
           val.value = arg;
           return arg;
         }
+        case 'toString': return val.key + '=' + val.value;
         default: return undefined;
       }
     }
@@ -1251,14 +1534,59 @@ function tryMethodCall(expr, vars, arrays) {
       }
     }
 
-    // --- Lambda methods ---
-    if (val && val._type === 'Lambda') {
+    // --- Enum constant methods ---
+    if (val && val._type === 'Enum' && val._nameConst) {
       switch (method) {
-        case 'apply': {
-          const args = argsStr ? smartSplit(argsStr).map(a => evaluateExpr(a.trim(), vars, arrays)) : [];
-          return val.apply(args).value;
-        }
-        case 'toString': return val.toString();
+        case 'name': return val._nameConst;
+        case 'toString': return val._nameConst;
+        case 'ordinal': return val._ordinal || 0;
+        default: return undefined;
+      }
+    }
+
+    // --- Lambda methods ---
+  if (val && val._type === 'Lambda') {
+    switch (method) {
+      case 'apply': {
+        const args = argsStr ? smartSplit(argsStr).map(a => evaluateExpr(a.trim(), vars, arrays)) : [];
+        return val.apply(args).value;
+      }
+      case 'toString': return val.toString();
+      default: return undefined;
+    }
+  }
+
+  // --- Enum type static method: Color.valueOf("RED") ---
+  // Handles both quoted and unquoted args: Color.valueOf("RED") and Color.valueOf(val)
+  const evof = /^(\w+)\.valueOf\((.+)\)$/.exec(expr);
+  if (evof) {
+    const enumInfo = vars['__records__'] && vars['__records__'][evof[1]];
+    if (enumInfo && enumInfo.isEnum && enumInfo.constants) {
+      const arg = evaluateExpr(evof[2], vars, arrays);
+      const argStr = String(arg);
+      const found = enumInfo.constants.find(c => c === argStr);
+      if (found) {
+        return { _type: 'Enum', _name: evof[1], _nameConst: found, _ordinal: enumInfo.constants.indexOf(found), _fields: enumInfo.constantFields ? (enumInfo.constantFields[found] || {}) : {} };
+      }
+    }
+  }
+
+  // --- java.util.* prefixed constructors ---
+  const javaUtilPrefix = /^new\s+java\.util\.(.+)$/.exec(expr);
+  if (javaUtilPrefix) {
+    const inner = javaUtilPrefix[1];
+    // Delegate to the non-prefixed handler
+    const fakeExpr = 'new ' + inner;
+    const result = tryStaticCall(fakeExpr, vars, arrays);
+    if (result !== undefined) return result;
+  }
+
+    // --- Enum constant methods ---
+    if (val && val._type === 'Enum' && val._nameConst) {
+      switch (method) {
+        case 'name': return val._nameConst;
+        case 'toString': return val._nameConst;
+        case 'ordinal': return val._ordinal || 0;
         default: return undefined;
       }
     }
@@ -1315,6 +1643,14 @@ function tryMethodCall(expr, vars, arrays) {
     const [, objName, prop] = propMatch;
     const obj = vars[objName] || arrays[objName];
     if (!obj) return undefined;
+    // Record field access: p.name, p.age
+    if (obj.value && obj.value._type === 'Record' && obj.value._fields && obj.value._fields[prop] !== undefined) {
+      return obj.value._fields[prop];
+    }
+    // Enum constant field access: Status.ACTIVE.getCode()
+    if (obj.value && obj.value._type === 'Enum' && obj.value._fields && obj.value._fields[prop] !== undefined) {
+      return obj.value._fields[prop];
+    }
     if (obj.value && obj.value._type === 'HashMap' && prop === 'size') return Object.keys(obj.value._data).length;
     if (obj.value && obj.value._type === 'ArrayList' && prop === 'size') return obj.value._data.length;
     if (obj.value && obj.value._type === 'HashSet' && prop === 'size') return obj.value._data.length;
@@ -1431,6 +1767,38 @@ function tryStaticCall(expr, vars, arrays) {
       data[key] = val;
     }
     return { _type: 'HashMap', _data: data };
+  }
+
+  // === NEW COLLECTION TYPES ===
+
+  // new ArrayDeque<>()
+  const arrayDequeMatch = /^new\s+ArrayDeque<(?:\w*)?>\(\)$/.exec(expr);
+  if (arrayDequeMatch) return { _type: 'ArrayDeque', _data: [] };
+
+  // new LinkedHashSet<>()
+  const linkedHashSetMatch = /^new\s+LinkedHashSet<(?:\w*)?>\(\)$/.exec(expr);
+  if (linkedHashSetMatch) return { _type: 'LinkedHashSet', _data: [] };
+
+  // new TreeSet<>()
+  const treeSetMatch = /^new\s+TreeSet<(?:\w*)?>\(\)$/.exec(expr);
+  if (treeSetMatch) return { _type: 'TreeSet', _data: [] };
+
+  // new ArrayDeque<>(collection)
+  const arrayDequeColMatch = /^new\s+ArrayDeque<(?:\w*)?>\((.+)\)$/.exec(expr);
+  if (arrayDequeColMatch) {
+    const inner = evaluateExpr(arrayDequeColMatch[1].trim(), vars, arrays);
+    if (inner && inner._data) return { _type: 'ArrayDeque', _data: [...inner._data] };
+    if (Array.isArray(inner)) return { _type: 'ArrayDeque', _data: [...inner] };
+    return { _type: 'ArrayDeque', _data: [] };
+  }
+
+  // new TreeSet<>(collection) - simplified
+  const treeSetColMatch = /^new\s+TreeSet<(?:\w*)?>\((.+)\)$/.exec(expr);
+  if (treeSetColMatch) {
+    const inner = evaluateExpr(treeSetColMatch[1].trim(), vars, arrays);
+    if (inner && inner._data) return { _type: 'TreeSet', _data: [...inner._data].sort((a,b) => a < b ? -1 : a > b ? 1 : 0) };
+    if (Array.isArray(inner)) return { _type: 'TreeSet', _data: [...inner].sort((a,b) => a < b ? -1 : a > b ? 1 : 0) };
+    return { _type: 'TreeSet', _data: [] };
   }
 
   const atsMatch = /^Arrays\.toString\((\w+)\)$/.exec(expr);
@@ -1599,92 +1967,180 @@ function resolveLambda(lambda, args) {
 
 // ==================== SWITCH EXPRESSION SUPPORT ====================
 
+// Find the end of a switch body (past the closing })
+function findEndOfSwitchBody(startIndex, stmts) {
+  let depth = 0;
+  for (let i = startIndex; i < stmts.length; i++) {
+    const s = stmts[i].trim();
+    if (s === '{') depth++;
+    if (s === '}') {
+      depth--;
+      if (depth <= 0) return i + 1;
+    }
+  }
+  return stmts.length;
+}
+
 function executeSwitch(i, stmts, switchExpr, vars, arrays, output, errors) {
   const switchVal = evaluateExpr(switchExpr, vars, arrays);
-
-  // Collect switch body
-  i++;
-  if (i < stmts.length && stmts[i].trim() === '{') i++;
-
+  const switchStmt = stmts[i];
+  const bodyStart = switchStmt.indexOf('{');
+  const bodyEnd = switchStmt.lastIndexOf('}');
+  if (bodyStart === -1 || bodyEnd === -1) { i++; return i; }
+  const bodyContent = switchStmt.slice(bodyStart + 1, bodyEnd).trim();
+        const bodyStmts = [];
+        let depth = 0, inStr = false, inChar = false, cur = '';
+        for (let j = 0; j < bodyContent.length; j++) {
+          const ch = bodyContent[j];
+          if (ch === '"' && !inChar) { inStr = !inStr; cur += ch; continue; }
+          if (ch === "'" && !inStr) { inChar = !inChar; cur += ch; continue; }
+          if (inStr || inChar) { cur += ch; continue; }            if (ch === '{') { depth++; if (depth < 0) depth = 0; }
+            if (ch === '}') { depth--; if (depth < 0) depth = 0; }
+          if (ch === ';' && depth === 0) { if (cur.trim()) bodyStmts.push(cur.trim()); cur = ''; continue; }
+          cur += ch;
+        }
+        if (cur.trim()) bodyStmts.push(cur.trim());
   const cases = [];
   let defaultBody = null;
-  let depth = 1;
   let currentCase = null;
   let currentBody = [];
+  let currentCaseTypePattern = null;
+  let currentYieldExpr = null;
 
-  while (i < stmts.length && depth > 0) {
-    const bs = stmts[i].trim();
-    if (bs === '{') { depth++; if (depth > 1) { currentBody.push(bs); } i++; continue; }
-    if (bs === '}') {
-      depth--;
-      if (depth === 0) {
-        // Save last case
-        if (currentCase !== null && currentBody.length > 0) {
-          cases.push({ value: currentCase, body: currentBody });
-        } else if (currentCase === null && currentBody.length > 0) {
-          defaultBody = currentBody;
-        }
-        i++; continue;
-      }
-      currentBody.push(bs); i++; continue;
-    }
-
-    // case X: or case X -> ...
-    const caseMatch = /^case\s+(.+?)\s*:\s*$/.exec(bs);
-    const caseArrowMatch = /^case\s+(.+?)\s*->\s*(.*)$/.exec(bs);
-    const defaultMatch = /^default\s*:\s*$/.exec(bs);
+  for (const bs of bodyStmts) {
+    const multiCaseArrowMatch = /^case\s+(.+?)\s*->\s*(.*)$/.exec(bs);
+    const multiCaseColonMatch = /^case\s+(.+?)\s*:\s*$/.exec(bs);
+    const typePatternArrowMatch = /^case\s+(\w+)\s+(\w+)(?:\s+when\s+(.+?))?\s*->\s*(.*)$/.exec(bs);
+    const typePatternColonMatch = /^case\s+(\w+)\s+(\w+)(?:\s+when\s+(.+?))?\s*:\s*$/.exec(bs);
     const defaultArrowMatch = /^default\s*->\s*(.*)$/.exec(bs);
+    const defaultMatch = /^default\s*:\s*$/.exec(bs);
+    const yieldMatch = /^yield\s*\((.+?)\)$/.exec(bs);
 
-    if (caseMatch || caseArrowMatch) {
-      // Save previous case
+    if (multiCaseArrowMatch || multiCaseColonMatch) {
       if (currentCase !== null && currentBody.length > 0) {
-        cases.push({ value: currentCase, body: currentBody });
+        cases.push({ value: currentCase, body: currentBody, typePattern: null, yieldExpr: currentYieldExpr });
       }
-      currentCase = caseArrowMatch ? caseArrowMatch[1].trim() : caseMatch[1].trim();
-      currentBody = caseArrowMatch && caseArrowMatch[2].trim() ? [caseArrowMatch[2].trim()] : [];
-    } else if (defaultMatch || defaultArrowMatch) {
+      currentCase = multiCaseArrowMatch ? multiCaseArrowMatch[1].trim() : multiCaseColonMatch[1].trim();
+      currentCase = currentCase.split(',').map(s => s.trim()).join(' || ');
+      currentBody = multiCaseArrowMatch && multiCaseArrowMatch[2].trim() ? [multiCaseArrowMatch[2].trim()] : [];
+      currentCaseTypePattern = null;
+      currentYieldExpr = null;
+    } else if (typePatternArrowMatch || typePatternColonMatch) {
       if (currentCase !== null && currentBody.length > 0) {
-        cases.push({ value: currentCase, body: currentBody });
+        cases.push({ value: currentCase, body: currentBody, typePattern: currentCaseTypePattern, yieldExpr: currentYieldExpr });
+      }
+      const m = typePatternArrowMatch || typePatternColonMatch;
+      currentCaseTypePattern = { type: m[1], var: m[2], guard: m[3] || null };
+      currentBody = m[4] ? [m[4].trim()] : [];
+      currentCase = null;
+      currentYieldExpr = null;
+      if (m[4] && !currentBody[0].startsWith('{') && !currentBody[0].includes(';')) {
+        currentYieldExpr = currentBody[0];
+      }
+    } else if (defaultArrowMatch || defaultMatch) {
+      if (currentCase !== null && currentBody.length > 0) {
+        cases.push({ value: currentCase, body: currentBody, typePattern: null, yieldExpr: currentYieldExpr });
       }
       currentCase = null;
+      currentCaseTypePattern = null;
       currentBody = defaultArrowMatch && defaultArrowMatch[1].trim() ? [defaultArrowMatch[1].trim()] : [];
+      currentYieldExpr = defaultArrowMatch && !defaultArrowMatch[1].trim().startsWith('{') ? defaultArrowMatch[1].trim() : null;
+    } else if (yieldMatch && currentCase === null) {
+      currentBody.push(yieldMatch[1]);
+      currentYieldExpr = yieldMatch[1];
     } else {
       currentBody.push(bs);
     }
-    i++;
   }
-
-  // Save last case
   if (currentCase !== null && currentBody.length > 0) {
-    cases.push({ value: currentCase, body: currentBody });
+    cases.push({ value: currentCase, body: currentBody, typePattern: null, yieldExpr: currentYieldExpr });
   } else if (currentCase === null && currentBody.length > 0) {
-    defaultBody = currentBody;
+    defaultBody = { body: currentBody, typePattern: null };
   }
 
-  // Execute matching case
   let matched = false;
-  for (const { value: caseVal, body: caseBody } of cases) {
-    const cv = evaluateExpr(caseVal, vars, arrays);
-    if (cv == switchVal || String(cv) === String(switchVal)) {
-      const caseCode = caseBody.join('; ');
-      const result = runBlock(caseCode, errors, vars, arrays);
-      if (result.output.length > 0) {
-        output.push(...result.output);
+  let lastMatchResult = undefined;
+  for (const c of cases) {
+    if (c.typePattern) {
+      const tp = c.typePattern;
+      const targetVal = switchVal;
+      let typeMatches = false;
+      if (tp.type === 'Object') {
+        typeMatches = true;
+      } else if (targetVal && targetVal._type === tp.type) {
+        typeMatches = true;
+      } else if (typeof targetVal === 'string' && (tp.type === 'String' || tp.type === 'Object')) {
+        typeMatches = true;
+      } else if (typeof targetVal === 'number' && (tp.type === 'Integer' || tp.type === 'int' || tp.type === 'Long' || tp.type === 'Double' || tp.type === 'Object')) {
+        typeMatches = true;
+      } else if (targetVal && targetVal._type === 'ArrayList' && (tp.type === 'ArrayList' || tp.type === 'List' || tp.type === 'Object')) {
+        typeMatches = true;
+      } else if (targetVal && targetVal._type === 'HashMap' && (tp.type === 'HashMap' || tp.type === 'Map' || tp.type === 'Object')) {
+        typeMatches = true;
+      } else if (targetVal && targetVal._type === 'Record' && tp.type === targetVal._name) {
+        typeMatches = true;
       }
-      if (result._pending) output.push(result._pending);
-      matched = true;
-      break;
+      if (typeMatches && tp.guard) {
+        if (targetVal && targetVal._type === 'Record') {
+          vars[tp.var] = { type: tp.type, value: targetVal._fields };
+        } else {
+          vars[tp.var] = { type: tp.type, value: targetVal };
+        }
+        const guardResult = evaluateExpr(tp.guard, vars, arrays);
+        delete vars[tp.var];
+        if (!isTruthy(guardResult)) typeMatches = false;
+      }
+      if (typeMatches) {
+        if (targetVal && targetVal._type === 'Record') {
+          vars[tp.var] = { type: tp.type, value: targetVal._fields };
+        } else {
+          vars[tp.var] = { type: tp.type, value: targetVal };
+        }
+        if (c.yieldExpr) {
+          lastMatchResult = evaluateExpr(c.yieldExpr, vars, arrays);
+          const r = runBlock(c.yieldExpr, errors, vars, arrays);
+          if (r.output.length > 0) output.push(...r.output);
+          if (r._pending) output.push(r._pending);
+        } else {
+          const bodyToRun = c.body.join('; ');
+          const result = runBlock(bodyToRun, errors, vars, arrays);
+          if (result.output.length > 0) output.push(...result.output);
+          if (result._pending) output.push(result._pending);
+          if (c.body.length === 1) {
+            lastMatchResult = evaluateExpr(c.body[0], vars, arrays);
+          }
+        }
+        delete vars[tp.var];
+        matched = true;
+        break;
+      }
+    }
+    if (!c.typePattern) {
+      const cv = evaluateExpr(c.value, vars, arrays);
+      if (cv == switchVal || String(cv) === String(switchVal)) {
+        if (c.yieldExpr) {
+          lastMatchResult = evaluateExpr(c.yieldExpr, vars, arrays);
+          const r = runBlock(c.yieldExpr, errors, vars, arrays);
+          if (r.output.length > 0) output.push(...r.output);
+          if (r._pending) output.push(r._pending);
+        } else {
+          const bodyToRun = c.body.join('; ');
+          const result = runBlock(bodyToRun, errors, vars, arrays);
+          if (result.output.length > 0) output.push(...result.output);
+          if (result._pending) output.push(result._pending);
+          if (c.body.length === 1) {
+            lastMatchResult = evaluateExpr(c.body[0], vars, arrays);
+          }
+        }
+        matched = true;
+        break;
+      }
     }
   }
 
-  if (!matched && defaultBody) {
-    const defCode = defaultBody.join('; ');
-    const result = runBlock(defCode, errors, vars, arrays);
-    if (result.output.length > 0) {
-      output.push(...result.output);
-    }
-    if (result._pending) output.push(result._pending);
-  }
-
-  return i;
+  vars['__switchResult__'] = matched ? (lastMatchResult !== undefined ? lastMatchResult : '') : (defaultBody ? '' : undefined);
+  console.log('ES DONE: matched=' + matched + ' lr=' + JSON.stringify(lastMatchResult) + ' rs=' + JSON.stringify(vars['__switchResult__']) + ' i=' + i + ' returning ' + (i + 1));
+  return i + 1;
 }
+
+// ==================== EXECUTE STATEMENT ====================
