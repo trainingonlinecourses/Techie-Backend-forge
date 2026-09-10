@@ -137,3 +137,7 @@ public class UserRepository {
 
 Custom exceptions convert failures into typed, queryable domain concepts. Create one when callers must distinguish the failure by type; carry relevant data as fields, not just messages; support a `cause` constructor for wrapping across layers; and let each architectural layer speak its own failure vocabulary via wrap-and-rethrow. The reward is `catch` blocks that read like business rules, compiler-enforced handling for checked failures, and debugging sessions that start at the root cause instead of at a swallowed exception. Keep the set small, the names precise, and the causes always attached.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/essential/exceptions/index.html)

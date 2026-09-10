@@ -113,3 +113,7 @@ The error message carries the original message in its headers (`ErrorMessage` wr
 
 Official docs: [Spring Integration Reference](https://docs.spring.io/spring-integration/reference/) · [EIP book](https://www.enterpriseintegrationpatterns.com/)
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-batch/reference](https://docs.spring.io/spring-batch/reference/)

@@ -187,3 +187,7 @@ The pipeline itself enforces the gate: no metrics comparison, no promotion.
 
 Release strategy is risk management: how fast can you recover, and how much traffic do you expose to the unknown? Start with rolling + flags; add blue-green and canary where the blast radius justifies the complexity.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.github.com/en/actions](https://docs.github.com/en/actions)

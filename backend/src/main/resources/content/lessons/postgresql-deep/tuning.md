@@ -203,3 +203,7 @@ Plus Spring Boot Actuator's `db` health indicator and HikariCP metrics — conne
 
 Performance tuning is a loop of measurement and targeted fixes: EXPLAIN ANALYZE shows the plan, the five killers explain most slowness, and pg_stat_statements finds what's actually slow in production. Index first, fetch less, and let the numbers — not intuition — drive the changes.
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [postgresql.org/docs/current](https://www.postgresql.org/docs/current/)

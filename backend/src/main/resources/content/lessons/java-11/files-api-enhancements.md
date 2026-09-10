@@ -164,3 +164,7 @@ public void migrateConfig(Path oldConfig, Path newConfig) throws IOException {
 | Reading huge files with `readString()` | Loads entire file into memory | Use `Files.lines()` for large files |
 | Not handling `IOException` | Checked exception | Use `throws IOException` or try-catch |
 
+## References
+
+- [dev.java — the official OpenJDK site](https://dev.java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/11/docs/api/)

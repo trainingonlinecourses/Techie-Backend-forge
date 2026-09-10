@@ -192,3 +192,7 @@ This chain is why the same jar runs locally, in tests, and in production: **code
 - Prefer records (constructor binding) for immutable configuration objects.
 - Defaults live in code; files override; env vars rule in production.
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-boot/reference](https://docs.spring.io/spring-boot/reference/)

@@ -97,3 +97,7 @@ business transaction (order + outbox row, one commit)
 
 Change Data Capture reads the database's transaction log (WAL/binlog) and publishes every committed change as an event — making *any* database-backed system an event producer with zero application changes. The events carry operation, before/after data, and source — perfect for read models, search indexing, and downstream reactions. The operational realities are real: the log is a lease (falling behind forces a re-snapshot), initial loads are heavy, and at-least-once means idempotent consumers. The two canonical uses: **legacy integration** (a monolith's DB becomes an event source) and **the outbox relay** (Debezium publishing the outbox table — the modern production pattern). CDC is the bridge that lets event-driven architecture grow out of systems that were never built for it.
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [microservices.io/patterns/data/event-driven.html](https://microservices.io/patterns/data/event-driven.html)

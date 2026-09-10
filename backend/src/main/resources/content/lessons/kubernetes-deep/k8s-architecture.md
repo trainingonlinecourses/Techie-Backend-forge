@@ -131,3 +131,7 @@ Other pods call `http://payments:80` — the service name resolves via cluster D
 
 Kubernetes is an operating system for container clusters: the **control plane** (API server, etcd, scheduler, controllers) holds and drives the desired state, while **worker nodes** (kubelet + runtime + kube-proxy) execute it. The **pod** is the atomic scheduling unit — ephemeral, labeled, reachable via **Services** that never change. You interact by *declaring* state (`kubectl apply` a Deployment: "3 replicas of payments:2.1"), and controllers converge the cluster to match — replacing dead pods, scaling, rolling updates. The mental shift is the deepest one: from "operate processes" to "declare desired state and let the system converge." Master pods, deployments, services, and the convergence loop, and everything else in Kubernetes is detail.
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [kubernetes.io/docs/home](https://kubernetes.io/docs/home/)

@@ -371,3 +371,7 @@ Spring projects release together on a cadence:
 
 **Official docs:** [Spring projects](https://spring.io/projects) · [Framework overview](https://docs.spring.io/spring-framework/reference/overview.html)
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [docs.spring.io/spring-framework/reference](https://docs.spring.io/spring-framework/reference/)

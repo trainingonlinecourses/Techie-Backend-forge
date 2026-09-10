@@ -437,3 +437,7 @@ class TaskControllerTest {
 | Storing passwords in plain text | Security breach | Always use `BCryptPasswordEncoder` |
 | N+1 queries in JPA | Performance disaster | Use `@EntityGraph` or `JOIN FETCH` |
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [spring.io/guides](https://spring.io/guides)

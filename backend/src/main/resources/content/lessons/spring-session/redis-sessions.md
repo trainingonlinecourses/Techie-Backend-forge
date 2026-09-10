@@ -176,3 +176,7 @@ spring:
 | Storing large objects in session | Redis memory explosion, slow serialization | Store entity IDs, fetch full objects in service |
 | Redis single point of failure | All sessions lost if Redis crashes | Use Redis Sentinel or Cluster |
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [spring.io/projects/spring-session](https://spring.io/projects/spring-session)

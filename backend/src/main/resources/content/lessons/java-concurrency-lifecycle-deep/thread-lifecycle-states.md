@@ -411,3 +411,7 @@ In the lab, you will start with a program that creates several threads and print
 
 A Java thread passes through six states — `NEW`, `RUNNABLE`, `BLOCKED`, `WAITING`, `TIMED_WAITING`, `TERMINATED` — and every concurrency bug is a thread in the wrong state. Only `start()` creates a new thread of execution; `run()` is just a method call on the current thread. `sleep()` does not release locks; `wait()` does — this is the most important distinction in the lifecycle. Threads block on monitor locks (`BLOCKED`), wait for notifications or joins (`WAITING`/`TIMED_WAITING`), and terminate when `run()` returns. Interrupts are cooperative: set the flag, let the thread check it and exit. Daemon threads do not keep the JVM alive; user threads do. Thread dumps are the diagnostic artifact — read the state, the lock, and the stack to find what each thread is doing and why.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Thread.html)

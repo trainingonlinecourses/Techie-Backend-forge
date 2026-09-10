@@ -153,3 +153,7 @@ The smell test: if a test needs a mock of a mock, or stubs three layers deep to 
 
 Mockito creates test doubles — programmable stand-ins that answer stubs (`when(...).thenReturn(...)`) and record calls for verification (`verify(...).times(...)`). `@ExtendWith(MockitoExtension.class)` + `@Mock` wires them into JUnit 5 with strict-stubbing hygiene. The craft is knowing *what* to mock — external boundaries and collaborators, never your own logic or the real database — and stubbing deliberately (matchers, `do*` for voids, safe defaults) while verifying only the interactions that matter. A well-mocked unit test is fast, deterministic, and precisely documents the contract between the class and its collaborators — the base of the testing pyramid.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [javadoc.io/doc/org.mockito/mockito-core/latest/org/mockito/Mockito.html](https://javadoc.io/doc/org.mockito/mockito-core/latest/org/mockito/Mockito.html)

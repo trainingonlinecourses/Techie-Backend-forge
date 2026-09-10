@@ -167,3 +167,7 @@ This uses the OS's native file-watch facility (inotify on Linux, ReadDirectoryCh
 - Globs (`*.log`) beat regex for filename filtering.
 - WatchService gives native, event-driven directory watching.
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/io/package-summary.html)

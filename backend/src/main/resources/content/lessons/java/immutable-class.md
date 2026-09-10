@@ -326,3 +326,7 @@ HttpRequest request = new HttpRequest.Builder("https://api.example.com/users")
 | Using `this.field = field` without validation | Null or invalid values locked in forever |
 | Making everything immutable when mutability is needed | Unnecessary object creation in hot loops |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

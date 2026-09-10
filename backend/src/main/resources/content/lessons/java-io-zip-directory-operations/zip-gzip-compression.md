@@ -466,3 +466,7 @@ In the lab, you will see a workspace with two text files and a broken ZIP creati
 
 Java's `java.util.zip` package provides `ZipOutputStream` and `ZipInputStream` for ZIP archives (multi-file containers) and `GZIPOutputStream` and `GZIPInputStream` for single-file GZIP compression. Both use the DEFLATE algorithm internally, via `Deflater` and `Inflater`. To create a ZIP archive, open a `ZipOutputStream`, call `putNextEntry` for each entry, write the data, and call `closeEntry` — forgetting `closeEntry` corrupts the archive. To read a ZIP, open a `ZipInputStream`, call `getNextEntry` in a loop, read each entry's data, and close the entry. To compress with GZIP, wrap an output stream with `GZIPOutputStream` and write; to decompress, wrap an input stream with `GZIPInputStream` and read. GZIP verifies a CRC-32 checksum on decompression; for ZIP and raw compression, you can use `CheckedOutputStream` and `CheckedInputStream` for explicit checksums. Use ZIP for multi-file archives, GZIP for single-file compression, and `Deflater`/`Inflater` for low-level control over compression level and strategy.
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/zip/package-summary.html)

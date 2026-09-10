@@ -113,3 +113,7 @@ try (var scope = new StructuredTaskScope.ShutdownOnSuccess<Data>()) {
 - Use structured concurrency instead of CompletableFuture when you need parallel execution with guaranteed lifecycle management.
 - Still in preview in Java 21 — use `--enable-preview` and be aware the API may evolve.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

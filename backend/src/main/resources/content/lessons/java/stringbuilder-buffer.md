@@ -109,3 +109,7 @@ if (from != null)   where.append(" AND created_at >= ?");
 - Pre-size builders when you know the target size; convert to String once at the end.
 - Parameterized logging beats string concatenation in log statements.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

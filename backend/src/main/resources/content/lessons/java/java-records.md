@@ -524,3 +524,7 @@ public record Money(BigDecimal amount, Currency currency) {
 | Using records for mutable entities | Records are immutable by design | Use regular classes for JPA entities |
 | Forgetting compact constructor validation | Invalid data gets through | Always validate in the compact constructor |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

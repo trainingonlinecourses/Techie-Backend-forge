@@ -195,3 +195,7 @@ Slices are the middle tier: fast enough to run constantly, real enough to catch 
 
 Test slices give you the speed of unit tests with the confidence of integration tests — boot exactly what you're testing, mock the rest, and your suite stays fast enough to run on every commit.
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-boot/reference/testing/spring-boot-applications.html](https://docs.spring.io/spring-boot/reference/testing/spring-boot-applications.html)

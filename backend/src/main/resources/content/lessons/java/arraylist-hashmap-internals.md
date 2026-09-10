@@ -161,3 +161,7 @@ When the map exceeds `maxSize`, it automatically evicts the *least recently acce
 | Modifying a key after `put()` | Entry is "lost" — hash bucket is wrong |
 | Default capacity 16 for 100K entries | ~15 resize operations, each rehashing everything |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

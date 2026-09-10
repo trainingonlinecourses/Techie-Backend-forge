@@ -95,3 +95,7 @@ A remember-me cookie without `Secure` is transmitted over HTTP; without `HttpOnl
 - Cookie must be Secure + HttpOnly + SameSite; externalize the signing key.
 - Invalidate all tokens on password change; step-up auth for sensitive actions; for APIs, use revocable refresh tokens.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-security/reference](https://docs.spring.io/spring-security/reference/)

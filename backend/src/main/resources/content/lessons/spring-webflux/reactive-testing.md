@@ -398,3 +398,7 @@ void shouldTimeoutWhenServiceIsSlow() {
 
 Official docs: [Testing (Reactor)](https://projectreactor.io/docs/core/release/reference/#testing) · [WebTestClient (Spring)](https://docs.spring.io/spring-framework/reference/web/webflux-webfn.html)
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-framework/reference/web/webflux.html](https://docs.spring.io/spring-framework/reference/web/webflux.html)

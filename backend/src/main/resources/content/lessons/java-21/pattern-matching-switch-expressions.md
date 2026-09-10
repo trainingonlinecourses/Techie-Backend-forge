@@ -223,3 +223,7 @@ public double evaluate(Expr expr) {
 | Complex patterns in one case | Hard to read | Break into multiple cases |
 | Using `when` with side effects | May not execute | Keep guards pure |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/21/docs/api/)

@@ -154,3 +154,7 @@ For simple rules, the interface can even be a functional interface and callers s
 - Adding a rule = one new class; existing code untouched (open/closed principle).
 - `Comparator` is the Strategy pattern in the JDK; lambdas can implement simple strategies directly.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [refactoring.guru/design-patterns](https://refactoring.guru/design-patterns)

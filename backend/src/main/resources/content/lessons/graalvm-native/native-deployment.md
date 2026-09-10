@@ -127,3 +127,7 @@ logging.pattern.console={"timestamp":"%d","level":"%p","logger":"%c","message":"
 
 Deploying native images is a new operational model: **small immutable containers** (buildpacks or distroless — no JVM, environment-only config), **CI architected for minute-scale builds** (cache the toolchain, gate natively only on deploy candidates, use beefy runners), **environment-as-configuration** (profiles and values at build time; DB URLs, secrets, and flags at runtime — never secrets in the build), and **app-level observability that carries over unchanged** (Actuator, Micrometer, JSON logs — only the JVM-internal diagnostics are gone). The shifts are deliberate, not surprising: the image is the immutable application, the environment is the configuration surface, and instant startup makes scaling and rollback feel different from the JVM world. Follow the checklist and native deployment becomes the *routine* — fast, small, and boring — rather than the special project.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [graalvm.org/latest/docs](https://www.graalvm.org/latest/docs/)

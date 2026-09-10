@@ -171,3 +171,7 @@ The engineering rule: **the database is authoritative; the index is a derived, e
 
 Spring Data Elasticsearch gives you repository-style CRUD (`ElasticsearchRepository` with derived methods) and full query power (`ElasticsearchOperations` with `Criteria`, `NativeQuery`, and `SearchHits` carrying scores). `@Document`/`@Field` annotations declare the mapping — including the `text`+`keyword` sub-field pattern — and `IndexOperations` manages the index lifecycle. The two habits to take away: use repositories for standard access and the search template for relevance search; and treat the index as a **derived, eventually-consistent projection of the database** — synced deliberately (dual-write, outbox, or CDC), rebuilt from the source of truth when it drifts. Search is a feature you add to your data, not a second database you must keep perfectly in lockstep.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [elastic.co/guide/en/elasticsearch/reference/current/index.html](https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html)

@@ -108,3 +108,7 @@ Every line in that request then carries the same ID — the field that makes log
 
 Official docs: [Spring Boot Logging](https://docs.spring.io/spring-boot/reference/features/logging.html) · [Logback](https://logback.qos.ch/documentation.html)
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-boot/reference](https://docs.spring.io/spring-boot/reference/)

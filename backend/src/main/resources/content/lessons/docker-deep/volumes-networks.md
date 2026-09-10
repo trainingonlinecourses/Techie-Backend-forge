@@ -141,3 +141,7 @@ volumes:
 - Data survives `down` but not `down -v` — treat `-v` with respect.
 - Inside a network, reach services by name, not `localhost`.
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [docs.docker.com](https://docs.docker.com/)

@@ -195,3 +195,7 @@ scheduler.setRemoveOnCancelPolicy(true);
 
 `TaskScheduler` is the programmatic counterpart to `@Scheduled` — when schedules are data, not annotations, this abstraction is what keeps your application flexible and your scheduling logic testable.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-framework/reference/integration/scheduling.html](https://docs.spring.io/spring-framework/reference/integration/scheduling.html)

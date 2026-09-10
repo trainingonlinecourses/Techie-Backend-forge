@@ -138,3 +138,7 @@ The two dangerous ones: `LocalDateTime` and `ZonedDateTime` misuse. `LocalDateTi
 - `Duration` = elapsed seconds; `Period` = calendar years/months/days.
 - Never store "3:30 PM" without knowing *where* — that's where the bugs live.
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/time/package-summary.html)

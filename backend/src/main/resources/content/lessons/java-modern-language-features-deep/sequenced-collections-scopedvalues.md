@@ -352,3 +352,7 @@ In the lab, you will see a helper that prints the first and last elements of a c
 
 Java 21 added sequenced collections — `SequencedCollection`, `SequencedSet`, and `SequencedMap` — that give every ordered collection a uniform set of first/last accessors and a `reversed()` view. A `List` is a `SequencedCollection`, a `LinkedHashSet` is a `SequencedSet`, and a `LinkedHashMap` is a `SequencedMap`. These interfaces make it easier to write uniform code over ordered collections and to access first and last elements without remembering which interface provides which method. Separately, scoped values (`ScopedValue`) give you a way to share immutable data within a thread and its subtasks without the problems of `ThreadLocal`. You bind a value with `ScopedValue.where(value).run(...)`, and any code in the scope reads it with `get()`. In a `StructuredTaskScope`, subtasks inherit the bindings. Scoped values avoid the leak and cleanup issues of `ThreadLocal` and are the preferred choice for per-call-tree context data in new code on Java 21+. The common mistakes are reading a scoped value outside its scope and treating `reversed()` as a copy.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/21/language/)

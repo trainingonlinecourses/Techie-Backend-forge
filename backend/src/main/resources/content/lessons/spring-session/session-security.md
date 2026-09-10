@@ -176,3 +176,7 @@ public class SessionHijackPrevention {
 | Missing `Secure` flag on cookies | Session ID sent over HTTP | Always set `Secure=true` |
 | Storing sensitive data in session | Session data readable in Redis | Store IDs only, fetch data in service |
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [spring.io/projects/spring-session](https://spring.io/projects/spring-session)

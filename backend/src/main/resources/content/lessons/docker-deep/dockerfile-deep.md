@@ -143,3 +143,7 @@ The build context is sent to the Docker daemon — a `target/` directory full of
 - `.dockerignore` keeps the build context lean and safe.
 - The image is the machine — that's why "works on my machine" dies.
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.docker.com](https://docs.docker.com/)

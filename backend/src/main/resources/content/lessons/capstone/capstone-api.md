@@ -156,3 +156,7 @@ Every failure — validation, not-found, insufficient funds, duplicate idempoten
 
 **Official docs:** [Spring Boot web](https://docs.spring.io/spring-boot/reference/web/index.html)
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [docs.spring.io/spring-boot/reference](https://docs.spring.io/spring-boot/reference/)

@@ -132,3 +132,7 @@ A legitimate case: a domain where the set of distinct string values is small and
 - `intern()` manually pools a runtime string, but it's rarely worth it.
 - Always compare string content with `.equals()`, never `==`.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html)

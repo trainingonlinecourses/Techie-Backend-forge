@@ -379,3 +379,7 @@ In the lab, you will see a starter with a faulty cache that uses `WeakHashMap` i
 
 `WeakHashMap` and `IdentityHashMap` are specialised `Map` implementations for specific problems. `WeakHashMap` holds keys with weak references so entries can be garbage-collected when no one else uses the key — useful for metadata caches tied to object lifetime, but not a real-time cache and not one you can rely on for correctness. `IdentityHashMap` uses reference identity (`==`) instead of `equals()` for key comparison — useful for object-graph algorithms and tools that track actual instances, but almost never the right choice for application data. For general-purpose maps, use `HashMap` (single-threaded) or `ConcurrentHashMap` (thread-safe). The three maps differ in how they compare keys and how they hold references to them — and choosing the wrong one is a common source of subtle bugs.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/package-summary.html)

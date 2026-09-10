@@ -191,3 +191,7 @@ docker run -d -p 8080:8080 myregistry/academy-api:latest
 
 **Official docs:** [Docker Get Started](https://docs.docker.com/get-started/) · [Dockerfile Reference](https://docs.docker.com/engine/reference/builder/)
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [kubernetes.io/docs/concepts](https://kubernetes.io/docs/concepts/)

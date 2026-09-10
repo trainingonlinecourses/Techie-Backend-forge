@@ -96,3 +96,7 @@ The cursor is the *last seen* (`createdAt`, `id`) pair — the composite key mus
 - Clamp `size`, whitelist sort keys, keep sort columns indexed.
 - Choose per scenario: admin lists → `Page`; feeds/exports → `Slice` or keyset.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-data/jpa/reference](https://docs.spring.io/spring-data/jpa/reference/)

@@ -241,3 +241,7 @@ Pattern matching replaces verbose `instanceof` + cast chains with readable, comp
 | Calling overridden method from constructor | Subclass fields not yet initialized — NPE |
 | Returning a broader type in override | Compile error — covariant only narrows |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

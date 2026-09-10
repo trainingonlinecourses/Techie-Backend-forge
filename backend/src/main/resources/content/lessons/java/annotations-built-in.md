@@ -311,3 +311,7 @@ retryPolicy.execute(() -> callExternalApi(), RetryPolicy.exponentialBackoff(3));
 | `@SafeVarargs` | Generic varargs that don't store the array | Compiler warns about unsafe varargs |
 | `@FunctionalInterface` | Interfaces with exactly one abstract method | Accidentally adding a method breaks all lambdas |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

@@ -165,3 +165,7 @@ In the lab, you will start with an insertion-ordered `LinkedHashMap` of city →
 
 `LinkedHashMap` is a `HashMap` with predictable iteration order — insertion-order by default, access-order when you request it. It gives O(1) lookups and a stable order, which makes it the right choice for JSON serialization, configuration display, and LRU caches. When you need to sort by key or value, build a new `LinkedHashMap` from the original entries sorted with a `Comparator` — the original map keeps its order, and the sorted copy is a separate view. `TreeMap` sorts by key only and is O(log n); it cannot sort by value, so a sorted stream into a `LinkedHashMap` is the standard pattern for value-sorted maps. Always add a tie-breaker when values can be equal, and never assume any `Map` is thread-safe without synchronization.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html)

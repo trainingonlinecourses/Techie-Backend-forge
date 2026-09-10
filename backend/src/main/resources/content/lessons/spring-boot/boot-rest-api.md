@@ -444,3 +444,7 @@ public class RequestLoggingInterceptor implements HandlerInterceptor {
 | Catching exceptions in controller | Duplicated error handling | Use @ControllerAdvice |
 | No CORS configuration | Frontend can't call API from different origin | Configure CORS for frontend origin |
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-boot/reference](https://docs.spring.io/spring-boot/reference/)

@@ -175,3 +175,7 @@ public IntegrationFlow kafkaOutbound() {
 
 Adapters are the doors between the flow and the outside world: **inbound** (file polls, HTTP endpoints, JDBC row-polls, Kafka/JMS/AMQP consumption) bring external events in as messages; **outbound** (file writes, HTTP calls, JDBC inserts, broker publishes) ship messages out. The flow grammar stays identical regardless of the door — swap adapters to change what you integrate with. The production discipline is uniform across all of them: claim-then-process for idempotency, bounded batches, temp-file writes, header context, and error channels. Master the adapters and Spring Integration becomes the universal integrator — one grammar, every system.
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [docs.spring.io/spring-integration/reference](https://docs.spring.io/spring-integration/reference/)

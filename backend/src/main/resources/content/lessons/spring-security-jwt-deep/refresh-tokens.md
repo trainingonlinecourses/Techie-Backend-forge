@@ -169,3 +169,7 @@ Even with refresh tokens, the access token itself is stateless: **its `exp` is t
 - Cap absolute session lifetime; detect reuse; rate-limit the refresh endpoint.
 - This is the standard session model behind most modern auth — and the pattern Spring Security's OAuth2 login (and the login in this academy app) builds on.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [datatracker.ietf.org/doc/html/rfc7519](https://datatracker.ietf.org/doc/html/rfc7519)

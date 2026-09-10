@@ -267,3 +267,7 @@ spec:
 
 **Official docs:** [Actuator Endpoints](https://docs.spring.io/spring-boot/reference/actuator/endpoints.html) · [Graceful Shutdown](https://docs.spring.io/spring-boot/reference/web/graceful-shutdown.html)
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [kubernetes.io/docs/concepts](https://kubernetes.io/docs/concepts/)

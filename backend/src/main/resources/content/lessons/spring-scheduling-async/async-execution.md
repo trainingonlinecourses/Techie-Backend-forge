@@ -162,3 +162,7 @@ Now the single scheduler thread stays free to fire other jobs, while the report 
 
 `@Async` is the simplest way to parallelize and decouple work in Spring — but only correct when paired with a bounded executor, proxy-aware call patterns, and an explicit exception strategy. Combined with `@Scheduled` it gives you the two core primitives of background processing: *when* to run and *where* to run.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-framework/reference/integration/scheduling.html](https://docs.spring.io/spring-framework/reference/integration/scheduling.html)

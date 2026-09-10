@@ -158,3 +158,7 @@ Fix: cast to the target type (`handle((Function<String,Integer>) s -> s.length()
 - `@FunctionalInterface` turns the rule into a compile-time check.
 - Lambdas take their type from context — the interface, not the lambda, has the name.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/java/javaOO/lambdaexpressions.html)

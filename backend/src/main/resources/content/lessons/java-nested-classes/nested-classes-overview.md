@@ -218,3 +218,7 @@ public class Main {
 | Using anonymous class for complex logic | Hard to read and test | Extract to a named class or lambda |
 | Accessing non-effectively-final variables | Compilation error in local/anonymous | Don't reassign captured variables |
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/java/javaOO/index.html)

@@ -106,3 +106,7 @@ If the only way to "fix" a cycle is field injection, the cycle is telling you so
 - Model bidirectional needs as events (one-way) rather than mutual method calls.
 - Treat every cycle as a design review item, not a configuration puzzle.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-framework/reference](https://docs.spring.io/spring-framework/reference/)

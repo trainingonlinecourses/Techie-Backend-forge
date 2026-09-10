@@ -366,3 +366,7 @@ public class SecureWebSocketHandler implements WebSocketHandler {
 
 Official docs: [Reactive Security](https://docs.spring.io/spring-security/reference/reactive/index.html) · [WebFlux Security](https://docs.spring.io/spring-security/reference/reactive/configuration/webflux-security.html)
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [docs.spring.io/spring-framework/reference/web/webflux.html](https://docs.spring.io/spring-framework/reference/web/webflux.html)

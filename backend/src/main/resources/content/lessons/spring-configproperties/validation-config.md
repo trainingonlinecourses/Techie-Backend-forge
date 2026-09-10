@@ -114,3 +114,7 @@ app:
 | Not validating nested objects | Inner properties not checked | Add @Valid on nested fields |
 | Validation too strict for dev | App won't start in dev | Use profile-specific config |
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-boot/reference/features/external-config.html](https://docs.spring.io/spring-boot/reference/features/external-config.html)

@@ -417,3 +417,7 @@ docker compose up -d                    # Only app + db
 docker compose --profile debug up -d    # App + db + debug-tools
 ```
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.docker.com/compose](https://docs.docker.com/compose/)

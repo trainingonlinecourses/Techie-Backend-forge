@@ -104,3 +104,7 @@ public class User {
 - ManyToMany → `Set` + join table; add an entity when the link carries attributes.
 - Relationship design (ownership, cascade, fetch) is the N+1 and data-loss prevention system.
 
+## References
+
+- [dev.java — the official OpenJDK site](https://dev.java/)
+- [docs.spring.io/spring-data/jpa/reference](https://docs.spring.io/spring-data/jpa/reference/)

@@ -280,3 +280,7 @@ public Flux<String> analyzeStream(@RequestBody AnalysisRequest request) {
 
 Official docs: [Streaming (Spring AI)](https://docs.spring.io/spring-ai/reference/api/chatclient-streaming.html) · [SSE (Spring)](https://docs.spring.io/spring-framework/reference/web/webflux-webfn.html)
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-ai/reference](https://docs.spring.io/spring-ai/reference/)

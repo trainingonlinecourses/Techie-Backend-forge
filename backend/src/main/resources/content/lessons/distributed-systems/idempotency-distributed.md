@@ -193,3 +193,7 @@ void concurrentRetriesProcessOnce() throws Exception {
 
 Idempotency is the distributed-system superpower: it turns retries from a hazard into a convenience. Design operations to be naturally idempotent, add keys where creation is involved, let unique constraints dedup, and let state machines absorb replays — then every retry, replay, and redelivery is a no-op instead of a bug.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [microservices.io/patterns/index.html](https://microservices.io/patterns/index.html)

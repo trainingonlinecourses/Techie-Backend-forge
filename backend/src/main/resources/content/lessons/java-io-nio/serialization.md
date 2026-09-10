@@ -138,3 +138,7 @@ Java deserialization has a notorious history: `readObject` will happily instanti
 - Compatible field additions keep the UID; incompatible changes require a bump + migration.
 - Never deserialize untrusted data without a filter — prefer JSON for cross-boundary data.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/io/package-summary.html)

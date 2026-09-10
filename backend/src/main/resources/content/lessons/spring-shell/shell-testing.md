@@ -112,3 +112,7 @@ void testAdminCommandUnavailable() {
 | Not testing edge cases | Missing validation | Test empty inputs, invalid values |
 | Mocking everything | Tests don't catch real bugs | Use real dependencies where possible |
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [spring.io/projects/spring-shell](https://spring.io/projects/spring-shell)

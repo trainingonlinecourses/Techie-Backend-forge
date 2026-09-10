@@ -189,3 +189,7 @@ jobs:
 
 The image is your unit of deployment — the same artifact from CI goes to staging and production, byte-identical. Get the Dockerfile right and the rest of the platform (Kubernetes, probes, rollouts) becomes straightforward.
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.github.com/en/actions](https://docs.github.com/en/actions)

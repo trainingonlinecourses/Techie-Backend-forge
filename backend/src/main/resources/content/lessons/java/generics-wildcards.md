@@ -199,3 +199,7 @@ This means you CANNOT do:
 | Ignoring that `List<Dog>` is not `List<Animal>` | Compile error when trying to assign |
 | Using `?` when you should use `<T>` | Over-constrained or under-constrained APIs |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

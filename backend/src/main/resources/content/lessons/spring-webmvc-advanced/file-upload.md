@@ -100,3 +100,7 @@ For real progress bars you need chunked upload or a signed-URL pattern (client u
 - Production: store in object storage; keep the app stateless.
 - Serve downloads with `Content-Disposition` (attachment vs inline) and server-generated keys.
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-framework/reference/web/webmvc.html](https://docs.spring.io/spring-framework/reference/web/webmvc.html)

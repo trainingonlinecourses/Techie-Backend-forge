@@ -169,3 +169,7 @@ When you see a Spring controller with 40 endpoints across four domains, that's S
 - Refactor by Extract Class: split concerns, inject the new collaborators.
 - Testability is the canary: hard-to-test classes are usually multi-responsibility classes.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [en.wikipedia.org/wiki/SOLID](https://en.wikipedia.org/wiki/SOLID)

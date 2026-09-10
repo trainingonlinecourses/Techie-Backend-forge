@@ -145,3 +145,7 @@ For multi-instance deployments (like this academy's backend), **in-memory sessio
 - Multi-instance production needs a shared session store (Redis) or stateless tokens.
 - Defend: HttpOnly (XSS), SameSite (CSRF), Secure (sniffing), session rotation (fixation).
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [datatracker.ietf.org/doc/html/rfc9110](https://datatracker.ietf.org/doc/html/rfc9110)

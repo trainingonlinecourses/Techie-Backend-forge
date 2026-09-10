@@ -161,3 +161,7 @@ The industry pattern is **short access tokens + refresh tokens** (next lesson): 
 - Always set `exp`; prefer short access tokens + refresh tokens.
 - Same generic error for unknown user vs wrong password (anti-enumeration).
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [datatracker.ietf.org/doc/html/rfc7519](https://datatracker.ietf.org/doc/html/rfc7519)

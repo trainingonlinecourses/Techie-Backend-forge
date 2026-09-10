@@ -425,3 +425,7 @@ public class ProductController {
 - **PRG (Post-Redirect-Get)** prevents duplicate form submissions
 - **Service layer** handles business logic; **Controller** handles HTTP; **Repository** handles data
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [spring.io/guides](https://spring.io/guides)

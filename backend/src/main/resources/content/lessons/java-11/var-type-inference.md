@@ -188,3 +188,7 @@ public Map<String, Double> calculateCategoryRevenue(List<Order> orders) {
 | Overusing `var` | Reduces readability | Only use when type is obvious |
 | `var` with method params | Not allowed in Java 11 | Use explicit types for parameters |
 
+## References
+
+- [dev.java — the official OpenJDK site](https://dev.java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/11/docs/api/)

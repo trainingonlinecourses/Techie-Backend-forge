@@ -156,3 +156,7 @@ A request-reply flow can hang: the answer never comes (consumer down, message lo
 - The same pattern crosses transports: RabbitMQ `reply_to`/`correlation_id` RPC, Kafka header correlation.
 - Always bound timeouts; expire stale requests; complete futures with errors on failure.
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-integration/reference](https://docs.spring.io/spring-integration/reference/)

@@ -310,3 +310,7 @@ public class FileSyncTasklet implements Tasklet {
 | Not handling exceptions | Job fails silently | Wrap in try-catch, log errors properly |
 | Mixing Tasklet and Chunk in same step | Won't compile | Use separate steps |
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-batch/reference](https://docs.spring.io/spring-batch/reference/)

@@ -692,3 +692,7 @@ public class AppConfig {
 }
 ```
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [projectlombok.org/features/all](https://projectlombok.org/features/all)

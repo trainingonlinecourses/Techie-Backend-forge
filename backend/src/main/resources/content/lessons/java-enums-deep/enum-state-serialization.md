@@ -308,3 +308,7 @@ public enum AIState {
 | `ordinal()` for storage | Breaks if enum order changes | Use `name()` or explicit ID field |
 | Enum in switch without all cases | Might miss new constants | Add `default` case or use abstract method pattern |
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/java/javaOO/enum.html)

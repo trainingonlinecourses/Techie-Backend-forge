@@ -221,3 +221,7 @@ public Mono<ExternalConfig> fetchConfig() {
 | Swallowing HTTP errors | Silent data corruption |
 | Not using circuit breaker for external calls | Cascading failures |
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-boot/reference](https://docs.spring.io/spring-boot/reference/)

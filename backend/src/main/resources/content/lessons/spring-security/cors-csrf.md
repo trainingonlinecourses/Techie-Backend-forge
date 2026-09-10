@@ -99,3 +99,7 @@ Also: lock accounts after N failed logins (or back off), validate input at the b
 
 **Official docs:** [CORS](https://docs.spring.io/spring-security/reference/servlet/exploits/cors.html) · [CSRF](https://docs.spring.io/spring-security/reference/servlet/exploits/csrf.html)
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-security/reference](https://docs.spring.io/spring-security/reference/)

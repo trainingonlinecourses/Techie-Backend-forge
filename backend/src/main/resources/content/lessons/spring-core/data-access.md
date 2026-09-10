@@ -113,3 +113,7 @@ Exception translation: `@Repository` beans get persistence exceptions translated
 
 **Official docs:** [Data access](https://docs.spring.io/spring-framework/reference/data-access.html) · [Transaction management](https://docs.spring.io/spring-framework/reference/data-access/transaction.html)
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-framework/reference](https://docs.spring.io/spring-framework/reference/)

@@ -218,3 +218,7 @@ for (int i = 0; i < original2D.length; i++) {
 | Assuming `==` compares contents | It compares references | Use `Arrays.equals(a, b)` for content comparison |
 | `new int[3][4]` creates 12 objects | Actually 4 objects (1 outer + 3 inner) | That's fine — JVM optimizes this |
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Arrays.html)

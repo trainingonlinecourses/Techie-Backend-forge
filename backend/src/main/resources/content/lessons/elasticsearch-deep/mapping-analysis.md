@@ -156,3 +156,7 @@ Every one of these is a mapping/analysis misunderstanding — which is why "chec
 
 The mapping is Elasticsearch's per-field schema: `text` fields get analyzed for word matching, `keyword` fields stay verbatim for filters/sorting/aggregations, and numeric/date/geo types enable their specialized queries. Analyzers — char filters, tokenizer, token filters — transform raw text into the terms that actually enter the inverted index, and index-time and query-time analysis must agree for matching to work. Dynamic mapping is convenient and treacherous: the first document fixes the types, so production indices get explicit mappings (with `text` + `keyword` sub-fields for the sortable-and-searchable pattern) and evolution goes through aliases + reindex. The mapping isn't an afterthought — it *is* the search behavior, decided before the first document lands.
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [elastic.co/guide/en/elasticsearch/reference/current/index.html](https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html)

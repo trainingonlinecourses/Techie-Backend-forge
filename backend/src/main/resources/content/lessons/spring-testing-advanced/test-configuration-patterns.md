@@ -215,3 +215,7 @@ Slow lane (pre-release):
 
 Test configuration is where suites are won or lost: shared contexts keep them fast, fixed clocks keep them deterministic, and disabled background work keeps them stable. Get these patterns right and your tests become something you *trust*.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [docs.spring.io/spring-boot/reference/testing/spring-boot-applications.html](https://docs.spring.io/spring-boot/reference/testing/spring-boot-applications.html)

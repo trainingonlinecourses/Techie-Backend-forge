@@ -113,3 +113,7 @@ The enhanced for-loop hides the iterator; calling `list.remove` while iterating 
 
 Arrays store elements contiguously, giving O(1) random access and cache-friendly traversal at the cost of shifting on middle inserts; linked lists scatter nodes connected by pointers, giving O(1) pointer rewiring but O(n) access and poor cache behavior. In Java, `ArrayList` is the default because its O(1) amortized appends and O(1) indexed access match how most code actually uses lists — `LinkedList`'s theoretical advantages rarely materialize outside iterator-based middle operations. Understand the two memory models, the amortized-growth trick, and the cache-locality constant factor, and the "which list?" question answers itself.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [algs4.cs.princeton.edu/home](https://algs4.cs.princeton.edu/home/)

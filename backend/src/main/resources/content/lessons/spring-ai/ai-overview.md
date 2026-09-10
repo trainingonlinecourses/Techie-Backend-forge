@@ -279,3 +279,7 @@ public List<String> generateQuizQuestions(String topic, int count) {
 
 Official docs: [Spring AI](https://docs.spring.io/spring-ai/reference/) · [Spring AI Project](https://spring.io/projects/spring-ai)
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [docs.spring.io/spring-ai/reference](https://docs.spring.io/spring-ai/reference/)

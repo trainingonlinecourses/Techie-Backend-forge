@@ -127,3 +127,7 @@ public class MockPaymentGateway implements PaymentGateway {
 | Using `!` for negation when you need AND | Wrong logic | Use `!dev & !test` not `!dev !test` |
 | Profile name with spaces | Doesn't match | Use hyphens: `my-feature` not `my feature` |
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-boot/reference/features/profiles.html](https://docs.spring.io/spring-boot/reference/features/profiles.html)

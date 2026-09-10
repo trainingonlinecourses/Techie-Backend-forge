@@ -125,3 +125,7 @@ public abstract class ReportGenerator {
 | Marking helpers `public` "just in case" | Bloated, unchangeable API | Default to most restrictive access |
 | Confusing default access with `protected` in subclasses across packages | Subclass can't see the member | Remember: default ≠ inherited by subclasses in other packages |
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

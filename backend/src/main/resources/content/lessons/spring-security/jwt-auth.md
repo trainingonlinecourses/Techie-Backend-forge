@@ -141,3 +141,7 @@ http
 
 **Official docs:** [Bearer tokens](https://docs.spring.io/spring-security/reference/servlet/authentication/index.html#servlet-authentication-bearer) · [JWT resource server](https://docs.spring.io/spring-security/reference/servlet/oauth2/resource-server/jwt.html)
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-security/reference](https://docs.spring.io/spring-security/reference/)

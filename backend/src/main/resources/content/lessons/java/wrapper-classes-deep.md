@@ -424,3 +424,7 @@ public class Main {
 | `Integer i = 128; Integer j = 128; i == j` | false — cache miss | Use `.equals()` or `valueOf()` |
 | `long l = Integer.MAX_VALUE + 1` | Silent overflow! | Use `long` throughout: `(long) Integer.MAX_VALUE + 1` |
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

@@ -111,3 +111,7 @@ GraphQL's costs: no HTTP caching out of the box, harder observability (every que
 
 Official docs: [Spring for GraphQL](https://docs.spring.io/spring-graphql/reference/) · [GraphQL spec & learn](https://graphql.org/learn/)
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [docs.spring.io/spring-graphql/reference](https://docs.spring.io/spring-graphql/reference/)

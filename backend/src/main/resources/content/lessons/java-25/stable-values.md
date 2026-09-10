@@ -91,3 +91,7 @@ public boolean isFeatureEnabled() {
 4. **Use for truly immutable values** — once set, it can never change
 5. **Preview feature** — may change based on feedback
 
+## References
+
+- [dev.java — the official OpenJDK site](https://dev.java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/25/docs/api/)

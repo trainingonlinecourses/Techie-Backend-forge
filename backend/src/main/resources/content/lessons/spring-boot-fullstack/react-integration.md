@@ -88,3 +88,7 @@ export default defineConfig({
 4. **axios/fetch** — use baseURL to keep API calls portable
 5. **Spring CORS annotation** — @CrossOrigin for development flexibility
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [spring.io/guides](https://spring.io/guides)

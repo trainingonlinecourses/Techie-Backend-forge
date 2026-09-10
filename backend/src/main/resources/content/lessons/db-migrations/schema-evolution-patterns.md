@@ -85,3 +85,7 @@ ALTER COLUMN x SET NOT NULL;            -- then tighten, once verified
 
 Official docs: [Parallel Change (Fowler)](https://martinfowler.com/bliki/ParallelChange.html) · [Expand-Contract (microservices.io)](https://microservices.io/patterns/data/expand-contract.html)
 
+## References
+
+- [dev.java — the official OpenJDK site](https://dev.java/)
+- [documentation.red-gate.com/fd](https://documentation.red-gate.com/fd/)

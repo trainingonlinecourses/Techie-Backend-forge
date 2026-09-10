@@ -106,3 +106,7 @@ The rest of this module covers the big three:
 
 Event-driven architecture replaces "do this" calls with "this happened" facts: producers publish events (in the past tense, with no knowledge of consumers), consumers subscribe independently, and a broker (Kafka first among equals) transports them. The payoff is total decoupling — features attach by subscribing, services scale and fail independently. The costs are the distributed-systems homework: eventual consistency (design for it), at-least-once delivery (idempotent consumers), ordering (key by entity), schema evolution (registries), and observability (tracing and lag). The patterns — event sourcing, the outbox, CDC — build on the same foundation. Choose EDA at the boundaries where decoupling pays, and keep the simple flows simple.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [microservices.io/patterns/data/event-driven.html](https://microservices.io/patterns/data/event-driven.html)

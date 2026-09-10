@@ -183,3 +183,7 @@ void classifyHandlesAllCases() {
 
 The modern switch is a full pattern-matching expression: exhaustive, null-safe, value-returning, and guard-capable. It replaces the if/else-if chains and old switch statements that cluttered domain code — and it's the natural companion to the records and sealed classes from the previous lesson.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/21/language/java-language-changes.html)

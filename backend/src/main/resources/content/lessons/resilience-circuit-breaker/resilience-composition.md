@@ -161,3 +161,7 @@ Annotations compose on one method; Resilience4j wraps them in the declared order
 - Annotations compose in Spring; config stays tunable in properties.
 - Fault-injection testing proves the stack works when it matters.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [resilience4j.readme.io](https://resilience4j.readme.io/)

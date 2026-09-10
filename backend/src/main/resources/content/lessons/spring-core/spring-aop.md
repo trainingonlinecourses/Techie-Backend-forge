@@ -106,3 +106,7 @@ public class OrderService {
 
 **Official docs:** [AOP](https://docs.spring.io/spring-framework/reference/core/aop.html) · [Pointcuts](https://docs.spring.io/spring-framework/reference/core/aop/pointcuts.html)
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-framework/reference](https://docs.spring.io/spring-framework/reference/)

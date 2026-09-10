@@ -141,3 +141,7 @@ A **raw type** is a generic class used without any type argument: `Box box = new
 
 Generics are compile-time type parameters: they let one class definition serve many types while the compiler verifies every use. Type erasure means the JVM sees plain `Object`-based classes with inserted casts, which explains why you can't reflect on `T`, instantiate `T`, or use `T` in statics. The payoff is code that fails at compile time instead of production, needs no casts, and documents itself. Master this foundation and the wildcard rules, generic methods, and bounded parameters in the following lessons will feel natural rather than mysterious.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/java/generics/index.html)

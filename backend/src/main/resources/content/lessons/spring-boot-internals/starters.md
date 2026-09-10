@@ -162,3 +162,7 @@ For multi-module enterprise builds with a company parent POM, teams import the B
 - Starters + auto-configuration = "add a dependency, it just works".
 - Check `mvn dependency:tree` to see what your starters actually pulled in.
 
+## References
+
+- [dev.java — the official OpenJDK site](https://dev.java/)
+- [docs.spring.io/spring-boot/reference](https://docs.spring.io/spring-boot/reference/)

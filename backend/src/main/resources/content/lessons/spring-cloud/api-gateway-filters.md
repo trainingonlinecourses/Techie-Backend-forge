@@ -312,3 +312,7 @@ public class ResponseTransformationFilter implements GlobalFilter, Ordered {
 | No request timeout | Requests hang forever | Configure per-route timeouts |
 | Logging everything | Performance impact | Log selectively, use structured logging |
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [docs.spring.io/spring-cloud/reference](https://docs.spring.io/spring-cloud/reference/)

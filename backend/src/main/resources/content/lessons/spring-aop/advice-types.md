@@ -761,3 +761,8 @@ Choose the right advice type for your use case:
 - **@AfterReturning** for success handling
 - **@AfterThrowing** for exception handling
 - **@Around** when you need full control (prefer this for complex scenarios)
+
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-framework/reference/core/aop.html](https://docs.spring.io/spring-framework/reference/core/aop.html)

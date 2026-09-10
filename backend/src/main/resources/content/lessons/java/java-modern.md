@@ -457,3 +457,7 @@ public class UserRepository {
 | Not using `yield` in switch expression blocks | Compile error | Always `yield` a value from `{}` blocks |
 | Sealing with `non-sealed` when not needed | Opens hierarchy unexpectedly | Use `final` unless you need extensibility |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

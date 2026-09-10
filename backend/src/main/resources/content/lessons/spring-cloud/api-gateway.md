@@ -161,3 +161,7 @@ Every Eureka service becomes reachable at `/service-id/**`. Great for dev; expli
 
 **Official docs:** [Spring Cloud Gateway](https://docs.spring.io/spring-cloud-gateway/reference/) · [Gateway routing](https://docs.spring.io/spring-cloud-gateway/reference/spring-cloud-gateway.html)
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-cloud/reference](https://docs.spring.io/spring-cloud/reference/)

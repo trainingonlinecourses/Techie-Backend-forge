@@ -98,3 +98,7 @@ curl localhost:8081/api/accounts -H "Authorization: Bearer $TOKEN"
 
 **Official docs:** [Spring Boot reference](https://docs.spring.io/spring-boot/reference/)
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [docs.spring.io/spring-boot/reference](https://docs.spring.io/spring-boot/reference/)

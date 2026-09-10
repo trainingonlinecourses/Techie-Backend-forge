@@ -204,3 +204,7 @@ server.verify(0, requestTo("/y"));  // never called /y
 
 `MockRestServiceServer` + `@RestClientTest` give you request-level assertions with zero network. `MockWebServer` gives raw control for WebClient/raw clients. Together they test the whole client contract: what you send, how you handle every response, and whether retries and circuit breakers behave — deterministically, in milliseconds.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [docs.spring.io/spring-boot/reference/testing/spring-boot-applications.html](https://docs.spring.io/spring-boot/reference/testing/spring-boot-applications.html)

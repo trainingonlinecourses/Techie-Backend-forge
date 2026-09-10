@@ -286,3 +286,7 @@ public class AuthService {
 
 **Official docs:** [Password storage](https://docs.spring.io/spring-security/reference/features/authentication/password-storage.html) · [Architecture](https://docs.spring.io/spring-security/reference/servlet/architecture.html)
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [docs.spring.io/spring-security/reference](https://docs.spring.io/spring-security/reference/)

@@ -535,3 +535,7 @@ public String describeState(OrderState state) {
 | Exposing mutable internal collections | External code modifies your private state | Return `List.copyOf()` or unmodifiable views |
 | Using `==` to compare objects | Compares references, not values | Use `.equals()` (records generate it for you) |
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

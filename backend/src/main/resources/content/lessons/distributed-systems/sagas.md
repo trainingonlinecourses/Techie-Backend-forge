@@ -257,3 +257,7 @@ class OrderSagaTest {
 
 A saga is a sequence of local transactions with compensating actions — the distributed replacement for the transaction you can't have. Start with choreography for simple flows, graduate to a persisted orchestrator when the flow gets complex, make every compensation idempotent, and pair it with the outbox for atomic step commands.
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [microservices.io/patterns/index.html](https://microservices.io/patterns/index.html)

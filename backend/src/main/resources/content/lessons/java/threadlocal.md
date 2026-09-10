@@ -274,3 +274,7 @@ public class Main {
 | Using InheritableThreadLocal with complex objects | Child sees reference to parent's mutable object — potential race |
 | ThreadLocal in static fields without remove | Values persist across requests in pooled threads |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

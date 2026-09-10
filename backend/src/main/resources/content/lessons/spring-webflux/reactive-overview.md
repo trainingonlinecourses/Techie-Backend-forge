@@ -225,3 +225,7 @@ public class GatewayController {
 
 **Official docs:** [Spring WebFlux Reference](https://docs.spring.io/spring-framework/reference/web/webflux.html) · [Project Reactor](https://projectreactor.io/docs/core/release/reference/) · [Reactive Streams](https://www.reactive-streams.org)
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [docs.spring.io/spring-framework/reference/web/webflux.html](https://docs.spring.io/spring-framework/reference/web/webflux.html)

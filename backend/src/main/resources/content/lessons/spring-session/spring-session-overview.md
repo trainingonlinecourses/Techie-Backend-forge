@@ -307,3 +307,7 @@ public class SessionAdminService {
 | Single-page apps | Access tokens with refresh rotation |
 | Serverless | No session state — use a database directly |
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [spring.io/projects/spring-session](https://spring.io/projects/spring-session)

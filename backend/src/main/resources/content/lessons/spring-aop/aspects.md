@@ -704,3 +704,8 @@ void method() { ... }
 | **Testing** | Unit and integration testing patterns |
 
 Aspects are powerful but should be used judiciously. Keep them focused, well-organized, and properly tested. Remember that AOP adds a layer of indirection that can make debugging more challenging.
+
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [docs.spring.io/spring-framework/reference/core/aop.html](https://docs.spring.io/spring-framework/reference/core/aop.html)

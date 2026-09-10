@@ -231,3 +231,7 @@ public @interface Generated {
 | Forgetting @Target | Annotation can be placed anywhere | Always specify valid targets |
 | Putting RUNTIME annotation on local var | JVM doesn't store local var annotations in class file | Use FIELD or PARAMETER |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/java/annotations/)

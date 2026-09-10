@@ -139,3 +139,7 @@ Stream.of("a", "b", "a", "c", "b", "d")
 4. **Return false from integrator** to short-circuit (like takeWhile)
 5. **Works with parallel streams** when the state is thread-safe
 
+## References
+
+- [dev.java — the official OpenJDK site](https://dev.java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/25/docs/api/)

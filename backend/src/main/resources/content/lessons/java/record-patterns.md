@@ -168,3 +168,7 @@ String validate(ServerConfig config) {
 - Deep nesting (`case Order(_, Customer(String name, Address(String city)), _)`) handles complex data in one expression.
 - Use sealed interfaces + records + pattern matching for domain models that need exhaustive handling.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

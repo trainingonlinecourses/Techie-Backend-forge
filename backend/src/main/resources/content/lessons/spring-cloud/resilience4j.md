@@ -156,3 +156,7 @@ management:
 
 **Official docs:** [Spring Cloud Circuit Breaker](https://docs.spring.io/spring-cloud-circuitbreaker/reference/) · [Resilience4j docs](https://resilience4j.readme.io/)
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-cloud/reference](https://docs.spring.io/spring-cloud/reference/)

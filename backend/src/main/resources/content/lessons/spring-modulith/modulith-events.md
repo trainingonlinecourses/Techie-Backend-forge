@@ -108,3 +108,7 @@ The decision rule: **in-process events for module coupling inside the monolith; 
 
 Official docs: [Spring Modulith — Events](https://docs.spring.io/spring-modulith/reference/events.html)
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-modulith/reference](https://docs.spring.io/spring-modulith/reference/)

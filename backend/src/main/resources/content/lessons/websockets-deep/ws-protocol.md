@@ -167,3 +167,7 @@ ws.onmessage = (event) => console.log('server pushed:', event.data);
 - Server-push-only needs → SSE; two-way needs → WebSocket.
 - Sessions are in-memory per instance — multi-instance scaling needs a broker.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-framework/reference/web/websocket.html](https://docs.spring.io/spring-framework/reference/web/websocket.html)

@@ -124,3 +124,7 @@ Every stage has a builder method mirroring the shell operator: `match`, `unwind`
 
 The aggregation framework is MongoDB's answer to reporting and analytics: a pipeline of stages (`$match` → `$unwind` → `$project` → `$group` → `$sort`), each transforming the document stream. `$match` filters early, `$unwind` flattens arrays into rows, `$project` shapes and computes, `$group` aggregates with accumulators, and `$lookup` joins collections. The performance rules are filter-early, index-your-match, and beware memory-heavy stages. Spring Data MongoDB mirrors every stage with builder methods, so the pipeline you prototype in `mongosh` ports directly into `MongoTemplate` code. Master the pipeline and "can MongoDB do this report?" stops being a question — it becomes a sequence of stages.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [mongodb.com/docs/manual](https://www.mongodb.com/docs/manual/)

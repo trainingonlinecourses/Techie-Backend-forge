@@ -122,3 +122,7 @@ When a value surprises you, this endpoint tells you exactly which source won.
 - `/actuator/env` shows the winning source for any property — the debugging tool.
 - Defaults in code; files override; env rules in production.
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [docs.spring.io/spring-boot/reference/features/external-config.html](https://docs.spring.io/spring-boot/reference/features/external-config.html)

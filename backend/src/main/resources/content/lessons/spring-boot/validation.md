@@ -301,3 +301,7 @@ public record CreateUserRequest(
 
 A healthcare platform validates patient data with 20+ custom constraints: `@ValidPatientId`, `@ValidDosage`, `@ValidDateOfBirth`. They use validation groups to enforce different rules for `Admission` vs `Discharge` vs `Update` operations. The global exception handler returns structured error messages that the frontend displays inline next to each form field.
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-boot/reference](https://docs.spring.io/spring-boot/reference/)

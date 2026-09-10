@@ -296,3 +296,7 @@ public class VirtualThreadDemo {
 
 A SaaS platform handles 50,000 concurrent WebSocket connections. With platform threads, they needed 50,000 threads (~50GB RAM). Switching to virtual threads reduced memory to ~50GB → ~50MB, and the server now handles 500,000 connections on the same hardware. The key change: replacing `synchronized` blocks with `ReentrantLock` to avoid pinning.
 
+## References
+
+- [dev.java — the official OpenJDK site](https://dev.java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/21/docs/api/)

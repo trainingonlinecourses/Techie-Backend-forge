@@ -157,3 +157,7 @@ Every tool in one test: mocks for collaborators, a captor to inspect what was sa
 
 The Mockito injection toolbox completes the mocking story: **`@InjectMocks`** auto-wires `@Mock` collaborators into a real class under test (constructor-first, by type — with the caveat that type-ambiguous or constructor-changed wiring fails silently, so keep constructors visible); **`@Captor`** captures the exact arguments passed so you can assert on an object's fields (`verify(mock).method(captor.capture())`); and **`@Spy`** gives a real object with individually mockable parts — using `doReturn`/`doThrow`, never `when()` — for retry loops and legacy seams. The decision rule: mock collaborators, spy the class under test only when necessary, and never mock the behavior you're actually verifying. With these three plus the basics, the full mock-based unit-testing workflow is in your hands.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [javadoc.io/doc/org.mockito/mockito-core/latest/org/mockito/Mockito.html](https://javadoc.io/doc/org.mockito/mockito-core/latest/org/mockito/Mockito.html)

@@ -131,3 +131,7 @@ try (BufferedReader r = new BufferedReader(
 - `Files.readString`/`writeString`/`newBufferedReader` are the modern text I/O APIs.
 - Mojibake means an encoding mismatch — fix the charset, not the data.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/io/package-summary.html)

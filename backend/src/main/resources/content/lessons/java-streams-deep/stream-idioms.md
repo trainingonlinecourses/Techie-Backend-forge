@@ -171,3 +171,7 @@ void skipsEmptyOptionals() {
 
 Streams aren't just loops with nicer syntax — they're a *declarative vocabulary*: `flatMap` for structure, `Optional::stream` for presence, `groupingBy` for aggregation, `reduce` for folds. Once these idioms are second nature, stream code gets shorter, safer (no mutable state), and more honest about intent. The next lesson covers the cases where streams *aren't* the answer — and what to use instead.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/stream/package-summary.html)

@@ -152,3 +152,7 @@ public class TenantFileStorage implements FileStorage {
 | Hardcoding storage path | Breaks in production | Use configurable path or S3 |
 | Not handling cleanup on delete | Orphaned files accumulate | Implement lifecycle policies |
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-boot/reference/web/servlet.html](https://docs.spring.io/spring-boot/reference/web/servlet.html)

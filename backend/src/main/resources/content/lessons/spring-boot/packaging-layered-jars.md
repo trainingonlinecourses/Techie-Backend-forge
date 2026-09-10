@@ -112,3 +112,7 @@ Buildpacks detect the app (Java), pick a runtime (Temurin JRE), apply layers (de
 - Buildpacks (`spring-boot:build-image`) build images without a Dockerfile — hardened, layered defaults.
 - Pin base-image tags, prefer JAR packaging, and keep layers enabled for CI speed.
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-boot/reference](https://docs.spring.io/spring-boot/reference/)

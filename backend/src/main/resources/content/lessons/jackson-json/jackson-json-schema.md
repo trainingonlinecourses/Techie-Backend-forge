@@ -165,3 +165,7 @@ The full JSON contract stack in a Spring Boot API:
 
 The contract layer sits between deserialization and business logic: **Bean Validation** (`@NotBlank`, `@Min`, `@Email`, `@Pattern` + `@Valid` at the boundary) rejects invalid requests with clean 400s before services run, and **JSON Schema** expresses the same rules as a machine-readable, publishable contract — enforced pre-deserialization via networknt's validator and generatable from DTOs. The integration stack — DTOs for shape, annotations for rules, `@RestControllerAdvice` for consistent errors, OpenAPI for docs, JSON Schema for cross-language contracts — is how a production API makes its JSON contract explicit at every layer. The discipline: validate at the boundary, keep shape-rules in DTOs and business-rules in services, and make the error response as deliberate as the success one.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [github.com/FasterXML/jackson-docs](https://github.com/FasterXML/jackson-docs)

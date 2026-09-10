@@ -118,3 +118,7 @@ Acknowledge modes, from naive to robust:
 | Forgetting the MessageConverter config | Receiver gets bytes it can't parse, or wrong type | Configure Jackson converter on both sides |
 | Assuming exactly-once delivery | Rare duplicates treated as bugs in design | Design for at-least-once from day one |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [docs.spring.io/spring-boot/reference](https://docs.spring.io/spring-boot/reference/)

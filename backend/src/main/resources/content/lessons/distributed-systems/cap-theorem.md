@@ -149,3 +149,7 @@ The fix is a *decision*, not code: the DB is the source of truth (strong), the c
 
 CAP isn't a pick-two menu at design time — it's a per-operation decision at runtime: which data must be strong, which can lag, and what happens during a partition. Decide the consistency budget for each feature, write it down, and let the DB anchor strong consistency while caches and replicas converge.
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [microservices.io/patterns/index.html](https://microservices.io/patterns/index.html)

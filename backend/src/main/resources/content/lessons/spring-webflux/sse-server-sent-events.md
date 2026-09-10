@@ -297,3 +297,7 @@ public class ChatService {
 | Broadcasting to dead connections | IOException spam | Clean up dead emitters in broadcast loop |
 | Using SSE for bidirectional | SSE is one-way only | Use WebSocket for bidirectional communication |
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-framework/reference/web/webflux.html](https://docs.spring.io/spring-framework/reference/web/webflux.html)

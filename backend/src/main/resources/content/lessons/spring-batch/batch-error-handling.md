@@ -87,3 +87,7 @@ Assert on `jobExecution.getExitStatus()` and `stepExecution.getSkipCount()` — 
 
 Official docs: [Fault Tolerance](https://docs.spring.io/spring-batch/reference/step/fault-tolerant.html)
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-batch/reference](https://docs.spring.io/spring-batch/reference/)

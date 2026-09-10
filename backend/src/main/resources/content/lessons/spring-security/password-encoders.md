@@ -112,3 +112,7 @@ public User authenticate(String email, String raw) {
 - Re-hash on successful login to drain legacy formats; delete `{noop}` encoders once migrated.
 - Hash at the service boundary, verify with `matches`, and rate-limit login attempts.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-security/reference](https://docs.spring.io/spring-security/reference/)

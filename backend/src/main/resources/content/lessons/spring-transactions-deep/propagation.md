@@ -195,3 +195,7 @@ class PropagationTest {
 
 Propagation is the atomicity contract between collaborating beans: join for "all or nothing," suspend for "must survive," savepoint for "keep the rest." Pick deliberately, avoid self-invocation, and test the rollback semantics — the propagation table is small, but each row is a different guarantee.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-framework/reference/data-access/transaction.html](https://docs.spring.io/spring-framework/reference/data-access/transaction.html)

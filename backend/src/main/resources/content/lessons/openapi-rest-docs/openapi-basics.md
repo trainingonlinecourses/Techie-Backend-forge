@@ -126,3 +126,7 @@ This produces a typed client for the frontend — matching models, methods, and 
 - Swagger UI = browsable, executable docs; the spec feeds code generation.
 - Protect the UI in production; document auth and error codes.
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [spec.openapis.org/oas/v3.1.0](https://spec.openapis.org/oas/v3.1.0)

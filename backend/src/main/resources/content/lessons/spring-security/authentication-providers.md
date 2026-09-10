@@ -124,3 +124,7 @@ return new ProviderManager(List.of(
 - `supports()` decides routing; provider order decides priority.
 - Share one `AuthenticationManager`; erase credentials; populate authorities.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-security/reference](https://docs.spring.io/spring-security/reference/)

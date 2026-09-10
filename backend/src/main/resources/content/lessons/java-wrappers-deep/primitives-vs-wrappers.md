@@ -110,3 +110,7 @@ public class PrimitivesVsWrappers {
 | Default int field is 0 not null | Can't distinguish "not set" from "set to 0" | Use Integer if null matters |
 | Using Long for IDs in JPA | Huge memory overhead for millions of records | Consider long primitive for simple entities |
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/package-summary.html)

@@ -114,3 +114,7 @@ http.oauth2Login(oauth -> oauth
 
 Official docs: [OAuth2 Login](https://docs.spring.io/spring-security/reference/servlet/oauth2/login/index.html) · [OAuth2 Client](https://docs.spring.io/spring-security/reference/servlet/oauth2/client/index.html)
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [docs.spring.io/spring-security/reference](https://docs.spring.io/spring-security/reference/)

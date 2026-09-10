@@ -178,3 +178,7 @@ This gives you local restart capability while the app runs on a remote server.
 | Ignoring `quiet-period` | Rapid saves cause multiple restarts | Set `quiet-period: 500ms` for stability |
 | Using DevTools with dev profile | DevTools runs regardless of profile | It's classpath-based, not profile-based |
 
+## References
+
+- [dev.java — the official OpenJDK site](https://dev.java/)
+- [docs.spring.io/spring-boot/reference/using/devtools.html](https://docs.spring.io/spring-boot/reference/using/devtools.html)

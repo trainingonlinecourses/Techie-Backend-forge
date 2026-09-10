@@ -167,3 +167,7 @@ One interface = one third-party integration's whole surface, discoverable and ty
 - Test with a mock; configure timeouts/retries once on the backing client.
 - Use for stable, JSON-based integrations; use RestClient for ad-hoc or dynamic calls.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-framework/reference/integration/rest-clients.html](https://docs.spring.io/spring-framework/reference/integration/rest-clients.html)

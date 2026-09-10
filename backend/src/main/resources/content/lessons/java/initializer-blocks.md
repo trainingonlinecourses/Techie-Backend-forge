@@ -145,3 +145,7 @@ Modern replacements teams prefer:
 | Instance blocks used for constructor sharing | Hard-to-trace setup flow | Prefer a private helper method invoked explicitly |
 | Forward-referencing fields in initializers | Compile error ("illegal forward reference") | Declare before you initialize |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

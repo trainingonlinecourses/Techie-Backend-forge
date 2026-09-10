@@ -185,3 +185,7 @@ Add `@Async` to the listener method (plus `@EnableAsync`) to handle it on anothe
 - Spring gives you the pattern free: `ApplicationEventPublisher.publishEvent` + `@EventListener`.
 - Pub-sub (Kafka/RabbitMQ) is the cross-process sibling; events stay immutable; watch sync cost and exceptions.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [refactoring.guru/design-patterns](https://refactoring.guru/design-patterns)

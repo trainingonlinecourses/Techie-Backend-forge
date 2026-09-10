@@ -191,3 +191,7 @@ The overlap to remember: **factory picks *which* type**; **builder assembles *on
 - Factory chooses the *type*; Builder assembles the *instance*.
 - Lombok's `@Builder` generates the pattern; `StringBuilder` is a builder you already use.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [refactoring.guru/design-patterns](https://refactoring.guru/design-patterns)

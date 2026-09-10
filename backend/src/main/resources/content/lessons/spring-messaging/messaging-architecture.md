@@ -153,3 +153,7 @@ The academy's own backend uses this split: `@Async`/`@EventListener` for in-proc
 - Spring Integration: `@MessagingGateway` → channels → `@ServiceActivator` pipelines.
 - In-process channels for internal async; brokers for cross-service integration.
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-integration/reference](https://docs.spring.io/spring-integration/reference/)

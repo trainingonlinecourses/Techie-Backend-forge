@@ -155,3 +155,7 @@ The `{0}`, `{1}` placeholders inject the invocation arguments into the display n
 
 `assertAll` aggregates every assertion failure into one report — the difference between fixing one bug per run and seeing the whole failure picture at once. Parameterized tests (`@ValueSource`, `@CsvSource`, `@MethodSource`, `@EnumSource`) run one test body against many inputs, each invocation reported as its own named case — collapsing copy-pasted tests into data-driven coverage with self-documenting names. The craft: parameterize same-logic-different-data, include boundaries, name with placeholders, and keep sources next to their tests. Combined, these two features are what make a JUnit suite a *diagnostic instrument* rather than a checkbox.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [junit.org/junit5/docs/current/user-guide](https://junit.org/junit5/docs/current/user-guide/)

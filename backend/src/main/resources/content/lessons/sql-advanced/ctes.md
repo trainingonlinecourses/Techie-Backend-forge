@@ -127,3 +127,7 @@ A CTE is *not* necessarily executed once — modern PostgreSQL (12+) inlines sim
 
 CTEs (`WITH name AS (query)`) are named subqueries that turn nested SQL into readable, top-down steps — and they unlock recursion, the only way to walk hierarchical data in plain SQL. Chain them for multi-stage pipelines (clean → aggregate → rank → filter), use `WITH RECURSIVE` with an anchor plus a `UNION ALL` recursive term for org charts and category trees, and choose views over CTEs only when the logic genuinely spans many queries. The readability win alone justifies the habit — and the recursion capability is one of those skills that suddenly makes a whole category of "impossible in SQL" questions trivial.
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [postgresql.org/docs/current](https://www.postgresql.org/docs/current/)

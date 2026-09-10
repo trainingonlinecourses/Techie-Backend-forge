@@ -92,3 +92,7 @@ This is how you get "exactly-once-ish" side effects: write the side effect as da
 
 **Official docs:** [Scheduling & async](https://docs.spring.io/spring-framework/reference/integration/scheduling.html)
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [docs.spring.io/spring-boot/reference](https://docs.spring.io/spring-boot/reference/)

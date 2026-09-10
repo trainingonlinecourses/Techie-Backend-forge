@@ -97,3 +97,7 @@ public class Bm25Search implements SearchAlgorithm { }
 | Overusing profiles for config | Profiles should be env-specific, not per-feature | Use @ConditionalOnProperty for features |
 | Forgetting default | Feature off when flag missing | Use `matchIfMissing = true` for safe defaults |
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-boot/reference/features/profiles.html](https://docs.spring.io/spring-boot/reference/features/profiles.html)

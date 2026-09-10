@@ -163,3 +163,7 @@ UserProfile profile = new UserProfile(
 - `@Async` exceptions are swallowed — return `CompletableFuture` and handle failures in the caller.
 - Use `CallerRunsPolicy` for backpressure — when the pool is full, the caller thread runs the task.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-boot/reference](https://docs.spring.io/spring-boot/reference/)

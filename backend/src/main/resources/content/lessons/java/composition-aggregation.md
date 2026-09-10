@@ -631,3 +631,7 @@ google = null;
 | Mixing up aggregation and composition | Lifecycle bugs | Ask: "If the parent dies, does the child die?" |
 | Using Association when Aggregation is needed | Loose design, no ownership | Use aggregation when there's a clear "has-a" |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

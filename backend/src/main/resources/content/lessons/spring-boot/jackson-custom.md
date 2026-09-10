@@ -157,3 +157,7 @@ public record UserResponse(
 - `@JsonValue` and `@JsonCreator` control how enums and custom types serialize/deserialize.
 - Set naming strategies and inclusion rules globally in `application.yml` for consistent API contracts.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-boot/reference](https://docs.spring.io/spring-boot/reference/)

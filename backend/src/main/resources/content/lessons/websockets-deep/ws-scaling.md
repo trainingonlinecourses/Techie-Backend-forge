@@ -174,3 +174,7 @@ Each client holds an open socket on *one* instance. As instances scale, the dist
 - Clients must reconnect with backoff; instances are ephemeral.
 - Sockets are memory-heavy — size instances by sockets, and test at scale.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [docs.spring.io/spring-framework/reference/web/websocket.html](https://docs.spring.io/spring-framework/reference/web/websocket.html)

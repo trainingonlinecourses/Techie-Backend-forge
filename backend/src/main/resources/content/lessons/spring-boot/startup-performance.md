@@ -94,3 +94,7 @@ Native is the biggest win for serverless cold starts, at the cost of longer buil
 - Spring AOT + GraalVM native = millisecond starts for serverless.
 - Async non-critical runners so the port opens before the warmup finishes.
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-boot/reference](https://docs.spring.io/spring-boot/reference/)

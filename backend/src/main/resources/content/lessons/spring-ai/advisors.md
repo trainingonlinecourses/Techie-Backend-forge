@@ -105,3 +105,7 @@ One builder, one coherent behavior — the org-standard way to assemble an assis
 
 **Official docs:** [Advisors](https://docs.spring.io/spring-ai/reference/api/advisors.html)
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-ai/reference](https://docs.spring.io/spring-ai/reference/)

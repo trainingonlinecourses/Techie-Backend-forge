@@ -121,3 +121,7 @@ For user input validation, `isBlank()` is usually what you meant when you wrote 
 | `replaceAll` thinking it's literal | Dots match everything unexpectedly | `replace` for literals; `replaceAll` is regex |
 | Chained substring math without bounds checks | StringIndexOutOfBoundsException on odd inputs | Guard with length checks before slicing |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

@@ -307,3 +307,7 @@ public class Main {
 }
 ```
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/java/javaOO/index.html)

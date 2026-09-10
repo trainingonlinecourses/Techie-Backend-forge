@@ -153,3 +153,7 @@ void cronFiresAtThreeAm() {
 
 Master the six fields, the three "which day" characters (`?`, `L`, `W`, `#`), and timezone control, and cron becomes precise rather than guesswork. The highest-value habits: always include seconds, always set `zone` explicitly for business-time jobs, and verify every expression with `CronExpression.parse(...)` in a unit test before it ships.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-framework/reference/integration/scheduling.html](https://docs.spring.io/spring-framework/reference/integration/scheduling.html)

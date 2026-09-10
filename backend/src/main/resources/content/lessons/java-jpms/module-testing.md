@@ -86,3 +86,7 @@ java --module-path libs/ \
 | Forgetting --add-reads for test modules | Test can't access production code | Add requires and --add-reads |
 | Ignoring split package warnings | Runtime failures | Fix before deploying |
 
+## References
+
+- [dev.java — the official OpenJDK site](https://dev.java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/17/language/java-module-system.htm)

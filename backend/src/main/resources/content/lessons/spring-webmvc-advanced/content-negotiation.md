@@ -201,3 +201,7 @@ void returnsCsvWhenRequested() throws Exception {
 
 Content negotiation is the part of REST that makes one endpoint serve many clients. Jackson for JSON, JAXB for XML, a 30-line converter for CSV — and your API is suddenly consumable by dashboards, spreadsheets, and browsers alike.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-framework/reference/web/webmvc.html](https://docs.spring.io/spring-framework/reference/web/webmvc.html)

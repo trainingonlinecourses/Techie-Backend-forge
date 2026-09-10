@@ -107,3 +107,7 @@ class ApiIntegrationTest {
 
 **Official docs:** [Security testing](https://docs.spring.io/spring-security/reference/servlet/test/index.html) · [OWASP Top 10](https://owasp.org/www-project-top-ten/)
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-security/reference](https://docs.spring.io/spring-security/reference/)

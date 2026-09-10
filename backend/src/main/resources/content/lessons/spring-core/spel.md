@@ -243,3 +243,7 @@ app.cache.type: redis
 
 Official docs: [SpEL Reference](https://docs.spring.io/spring-framework/reference/core/expressions.html) · [Spring Expression Language](https://docs.spring.io/spring-framework/reference/core/expressions.html)
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [docs.spring.io/spring-framework/reference](https://docs.spring.io/spring-framework/reference/)

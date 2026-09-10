@@ -327,3 +327,7 @@ if (userPerms.contains(Permission.DELETE)) { /* denied */ }
 
 **Official docs:** [Enum tutorial](https://docs.oracle.com/javase/tutorial/java/javaOO/enum.html) · [EnumSet API](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/EnumSet.html) · [EnumMap API](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/EnumMap.html)
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

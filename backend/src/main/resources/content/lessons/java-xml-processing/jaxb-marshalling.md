@@ -324,3 +324,7 @@ public class UnifiedUser {
 - **`@XmlElementWrapper` + `@XmlElement`** for collections — wraps list in a container element
 - **`@XmlTransient`** excludes fields from serialization — essential for security
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/jaxp/)

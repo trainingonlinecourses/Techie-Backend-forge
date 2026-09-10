@@ -84,3 +84,7 @@ public class AuthController {
 4. **TTL policies** — set timeout based on security requirements
 5. **Sticky sessions are not needed** — any instance can handle any request
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [spring.io/projects/spring-session](https://spring.io/projects/spring-session)

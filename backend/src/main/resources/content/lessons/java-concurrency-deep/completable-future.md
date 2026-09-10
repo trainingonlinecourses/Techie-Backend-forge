@@ -310,3 +310,7 @@ public class FutureComposition {
 
 A microservices dashboard makes 5 parallel API calls (user profile, orders, notifications, recommendations, billing). Using CompletableFuture.allOf(), all 5 calls run simultaneously. The total response time is the slowest call (200ms) instead of the sum (800ms). If any call fails, exceptionally() returns a graceful fallback. The dashboard loads 4x faster than the sequential version.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/21/core/concurrency.html)

@@ -142,3 +142,7 @@ Before reaching for DataLoader: **measure** (the observability module's tools). 
 - Audit query count per execution — that's the metric that matters.
 - Measure first, batch second, re-measure after.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [graphql.org/learn](https://graphql.org/learn/)

@@ -246,3 +246,7 @@ An e-commerce platform has 20+ repositories. They use:
 
 Each query is tested with `@DataJpaTest` and Testcontainers to ensure correctness across environments.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-data/jpa/reference](https://docs.spring.io/spring-data/jpa/reference/)

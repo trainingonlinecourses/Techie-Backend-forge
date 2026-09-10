@@ -137,3 +137,7 @@ Set `healthcheck.enabled` so Eureka marks an instance *down* (not just absent) w
 
 **Official docs:** [Spring Cloud Netflix](https://docs.spring.io/spring-cloud-netflix/reference/) · [LoadBalancer](https://docs.spring.io/spring-cloud-commons/reference/spring-cloud-commons.html)
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-cloud/reference](https://docs.spring.io/spring-cloud/reference/)

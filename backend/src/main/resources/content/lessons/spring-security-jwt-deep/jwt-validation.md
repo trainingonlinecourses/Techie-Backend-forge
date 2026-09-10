@@ -164,3 +164,7 @@ The honest limitation: **JWT validation is stateless, so it can't see account ch
 - Failed validation = anonymous request → 401 at authorization.
 - Stateless tokens can't see account changes — bounded staleness is the accepted trade-off.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [datatracker.ietf.org/doc/html/rfc7519](https://datatracker.ietf.org/doc/html/rfc7519)

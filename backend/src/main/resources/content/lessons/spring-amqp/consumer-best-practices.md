@@ -176,3 +176,7 @@ Alert on:
 
 Consumer tuning is a balance: threads for parallelism, prefetch for memory and backpressure, partitioning for ordering, and idempotency so the rest can fail safely. Measure, tune, and re-measure — the broker will tell you the truth.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [docs.spring.io/spring-amqp/reference](https://docs.spring.io/spring-amqp/reference/)

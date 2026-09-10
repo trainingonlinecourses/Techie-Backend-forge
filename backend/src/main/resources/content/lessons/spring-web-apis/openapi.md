@@ -90,3 +90,7 @@ Swagger UI in production is a choice: it's a read-only documentation surface (no
 
 Official docs: [springdoc-openapi](https://springdoc.org/) · [OpenAPI Specification](https://swagger.io/specification/)
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-graphql/reference](https://docs.spring.io/spring-graphql/reference/)

@@ -357,3 +357,7 @@ public class MultiAgentOrchestrator {
 
 Official docs: [Function Calling (Spring AI)](https://docs.spring.io/spring-ai/reference/api/chat/functions/openai-chat-functions.html) · [Agents (Spring AI)](https://docs.spring.io/spring-ai/reference/api/agents.html)
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-ai/reference](https://docs.spring.io/spring-ai/reference/)

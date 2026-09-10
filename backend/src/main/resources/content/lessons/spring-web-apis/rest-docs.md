@@ -97,3 +97,7 @@ The bridge: **`spring-restdocs-openapi`** converts REST Docs snippets into an Op
 
 Official docs: [Spring REST Docs](https://docs.spring.io/spring-restdocs/reference/)
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-graphql/reference](https://docs.spring.io/spring-graphql/reference/)

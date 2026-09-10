@@ -107,3 +107,7 @@ Production rules: **explicit allow-list** (never `*` for credentialed requests),
 - Allow-list origins explicitly; never combine `*` with credentials; scoped to `/api/**`.
 - Webhooks are protected by signatures, not CSRF; same-origin proxying avoids CORS entirely.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-security/reference](https://docs.spring.io/spring-security/reference/)

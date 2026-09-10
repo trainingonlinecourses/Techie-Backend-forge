@@ -211,3 +211,7 @@ Better: assert spans reached a test Zipkin receiver, or use `TestObservationRegi
 
 Distributed tracing turns "the API is slow" from a mystery into a tree you can read: which hop added 900ms, which DB query blew the budget, which service dropped the context. It's the third pillar that makes the other two (logs, metrics) actually connectable.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [docs.spring.io/spring-boot/reference/actuator/metrics.html](https://docs.spring.io/spring-boot/reference/actuator/metrics.html)

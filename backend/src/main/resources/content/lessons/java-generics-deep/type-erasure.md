@@ -125,3 +125,7 @@ This is how libraries like Jackson, Gson, and Spring's `ParameterizedTypeReferen
 
 Type erasure means generics exist only at compile time: `T` becomes `Object` (or its bound), and casts are inserted at read sites. This explains every generics restriction — no `instanceof T`, no `new T[]`, no static `T`, no generic exceptions. It also explains unchecked warnings, which are the compiler telling you it could not verify safety and heap pollution is possible. Bridge methods keep polymorphism intact across erasure, and the generic-supertype metadata gives reflection a narrow back door that frameworks exploit. Internalize erasure and the rest of generics — including the error messages — becomes predictable.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/java/generics/index.html)

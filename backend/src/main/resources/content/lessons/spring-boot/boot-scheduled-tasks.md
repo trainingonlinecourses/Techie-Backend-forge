@@ -233,3 +233,7 @@ public class CleanupScheduler {
 | Doing I/O in scheduler thread pool | Blocks other scheduled tasks |
 | Forgetting `@EnableScheduling` | `@Scheduled` silently ignored |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [docs.spring.io/spring-boot/reference](https://docs.spring.io/spring-boot/reference/)

@@ -222,3 +222,7 @@ public class ThreadPoolFactory {
 | Daemon threads for critical work | Silently killed on JVM shutdown |
 | Using `Thread.sleep()` for timing | Imprecise, blocks the thread entirely |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

@@ -134,3 +134,7 @@ Fall-back: the first Sunday of November, 1:00 AM occurs **twice**. `java.time` r
 - Store `Instant`/UTC; display in the user's zone.
 - DST creates gaps (nonexistent times) and overlaps (times that occur twice) — `java.time` resolves them deterministically.
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/time/package-summary.html)

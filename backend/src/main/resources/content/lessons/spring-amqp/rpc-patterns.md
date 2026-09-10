@@ -183,3 +183,7 @@ class RpcFlowTest {
 
 Request-reply turns RabbitMQ from a queue into a distributed function call — with the broker's reliability guarantees and the two sides deployed independently. Keep it internal, keep it time-boxed, and correlate explicitly.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [docs.spring.io/spring-amqp/reference](https://docs.spring.io/spring-amqp/reference/)

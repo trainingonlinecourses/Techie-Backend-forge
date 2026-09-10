@@ -139,3 +139,7 @@ That `Z` suffix means UTC and makes every log line comparable across servers in 
 - `Duration` for seconds/timeouts; `Period` for calendar months/years.
 - Convert instants to human zones only at the display boundary.
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/time/package-summary.html)

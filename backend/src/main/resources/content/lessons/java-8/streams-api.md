@@ -329,3 +329,7 @@ public List<EnrichedOrder> enrichOrders(List<RawOrder> rawOrders) {
 | Forgetting terminal operation | `stream.filter(...)` does nothing | Always end with a terminal op |
 | Parallel for small data | More overhead than sequential | Use `parallelStream()` only for large datasets |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/javase/8/docs/api/)

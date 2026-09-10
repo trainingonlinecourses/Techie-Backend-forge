@@ -174,3 +174,7 @@ The flows are Spring beans — the *entire* pipeline is testable in isolation: f
 
 Spring Integration implements the Enterprise Integration Patterns as a message-based Spring framework: **messages** flow through **channels** (direct = sync, queue = async, publish-subscribe = broadcast) and **endpoints** (filter, transformer, router, splitter, aggregator, service activator) — composed declaratively with the **IntegrationFlow DSL**. It's the structured vocabulary for connecting your Spring Boot services to files, queues, APIs, and databases — with transactions, retries, error channels, and idempotency built into the components. The mental model: every integration is a pipeline of named stations, and the framework's grammar (`from...transform...route...handle`) makes integrations readable, testable, and composed from battle-tested patterns rather than hand-rolled loops.
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-integration/reference](https://docs.spring.io/spring-integration/reference/)

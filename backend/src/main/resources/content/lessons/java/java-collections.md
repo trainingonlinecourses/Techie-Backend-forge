@@ -592,3 +592,7 @@ public class ServiceDeploymentOrder {
 | Using `==` on Map keys (String) | May fail for non-pooled strings | Use immutable keys (Integer, Long, records) |
 | Not checking null in HashMap.get | Returns null (easy to forget) | Use getOrDefault() or Optional.ofNullable() |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

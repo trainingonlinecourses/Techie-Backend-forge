@@ -88,3 +88,7 @@ public class ArrayPerformance {
 4. **Use ArrayList** for general-purpose, dynamic-size collections
 5. **Avoid Integer[] in performance-critical code** — use int[] instead
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Arrays.html)

@@ -309,3 +309,7 @@ public class Message {
 
 Official docs: [Spring Data MongoDB](https://docs.spring.io/spring-data/mongodb/docs/current/reference/html/) · [MongoDB CRUD](https://www.mongodb.com/docs/manual/crud/)
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [mongodb.com/docs/manual](https://www.mongodb.com/docs/manual/)

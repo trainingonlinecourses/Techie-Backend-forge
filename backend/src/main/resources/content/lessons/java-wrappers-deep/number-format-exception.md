@@ -127,3 +127,7 @@ public class NumberParsingDemo {
 | Ignoring locale | "1,234" fails in US locale | Use locale-aware parsing |
 | Parsing user input without validation | Security risk (injection) | Validate range after parsing |
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/package-summary.html)

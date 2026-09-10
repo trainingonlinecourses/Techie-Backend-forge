@@ -99,3 +99,7 @@ CompletableFuture.allOf(callA, callB, callC)
 - Set timeouts and cleanup on every deferred/emitter; know your thread-local propagation.
 - Use async where slow I/O meets concurrency — not as a default for every endpoint.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [docs.spring.io/spring-framework/reference/web/webmvc.html](https://docs.spring.io/spring-framework/reference/web/webmvc.html)

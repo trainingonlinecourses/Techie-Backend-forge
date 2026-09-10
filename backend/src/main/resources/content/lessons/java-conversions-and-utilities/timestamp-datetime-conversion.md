@@ -175,3 +175,7 @@ In the lab, you will start with a `Timestamp` representing "now" (UTC). You will
 
 `Timestamp`, `Instant`, and `LocalDateTime` are three distinct types: `Timestamp` and `Instant` represent UTC instants (absolute moments), while `LocalDateTime` is a date-time without a zone (ambiguous). Converting between them requires an explicit zone — `Instant → LocalDateTime` uses `atZone(zone).toLocalDateTime()`, and `LocalDateTime → Instant` uses `atZone(zone).toInstant()`. `LocalDateTime` has no `toInstant()` — the API forces you to pick a zone, which is the safety mechanism. Always know what your database column means (UTC instant vs local without zone) and use the matching Java type. When in doubt, store and transmit `Instant` (or ISO-8601 with zone), and convert to local time only at the display boundary.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html)

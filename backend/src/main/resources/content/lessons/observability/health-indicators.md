@@ -218,3 +218,7 @@ class HealthTest {
 
 An accurate health endpoint is cheap to build and priceless in production: it's the difference between a platform that self-heals and one that restarts healthy pods forever.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [docs.spring.io/spring-boot/reference/actuator/metrics.html](https://docs.spring.io/spring-boot/reference/actuator/metrics.html)

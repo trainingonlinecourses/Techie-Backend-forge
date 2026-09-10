@@ -194,3 +194,7 @@ void mandatoryReturnsUndeliverableMessage() {
 
 Reliability is a chain: confirms tell you the broker accepted, returns tell you routing failed, acks tell you the consumer finished, and idempotency makes every retry harmless. Build all four and "at-least-once" becomes "effectively exactly-once".
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [docs.spring.io/spring-amqp/reference](https://docs.spring.io/spring-amqp/reference/)

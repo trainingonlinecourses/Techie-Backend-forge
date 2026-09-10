@@ -106,3 +106,7 @@ Version prompts, log which version produced which answer, and A/B before shippin
 
 **Official docs:** [Observability](https://docs.spring.io/spring-ai/reference/observability/index.html) · [Testing](https://docs.spring.io/spring-ai/reference/testing.html)
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-ai/reference](https://docs.spring.io/spring-ai/reference/)

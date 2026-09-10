@@ -169,3 +169,7 @@ String b = """
 
 Text blocks are the boring productivity win: the same strings you already write, but readable. Combine with the records/sealed/pattern-matching trio and Java stops being a language you fight and starts being one you compose in.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/21/language/java-language-changes.html)

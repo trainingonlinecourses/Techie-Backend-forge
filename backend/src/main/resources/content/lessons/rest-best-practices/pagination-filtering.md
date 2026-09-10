@@ -227,3 +227,7 @@ class CourseControllerPaginationTest {
 
 Pagination isn't just about the endpoint — it's about protecting your database and giving clients a predictable paging contract they can build UI on.
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [docs.spring.io/spring-framework/reference/web/webmvc.html](https://docs.spring.io/spring-framework/reference/web/webmvc.html)

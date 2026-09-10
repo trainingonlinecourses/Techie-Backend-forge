@@ -111,3 +111,7 @@ Why teams migrate to package-by-feature: each feature is self-contained, you can
 | Wildcard + duplicate names | Ambiguous-class compile errors | Use explicit imports |
 | Deep packages like `com.x.y.z.a.b.Helper` | Navigation nightmare | Keep hierarchy shallow and feature-oriented |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

@@ -89,3 +89,7 @@ Spring creates beans **lazily on first use by default** (eager for singletons at
 - `@Lazy`, `@Primary`, `@Qualifier`, aliases, and init/destroy methods are all definition-level features.
 - Express real dependencies through constructors; `@DependsOn` only for side-effect ordering.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [docs.spring.io/spring-framework/reference](https://docs.spring.io/spring-framework/reference/)

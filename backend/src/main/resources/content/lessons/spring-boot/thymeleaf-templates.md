@@ -161,3 +161,7 @@ Fragments are how template projects get a shared navbar/footer without a JS fram
 | Forgetting the no-arg constructor on form DTOs | Cryptic binding 500s | Forms need default construction (or records with matching binder) |
 | Rendering after POST without redirect | Refresh resubmits the form | POST-redirect-GET pattern |
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-boot/reference](https://docs.spring.io/spring-boot/reference/)

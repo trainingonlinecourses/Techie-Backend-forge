@@ -341,3 +341,7 @@ public class Outer {
 
 **Rule of thumb:** If the inner class doesn't use any instance members of the outer class, make it `static nested` to avoid the hidden reference and potential memory leaks.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/java/javaOO/index.html)

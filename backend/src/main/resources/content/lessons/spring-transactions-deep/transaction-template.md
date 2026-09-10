@@ -196,3 +196,7 @@ class ImportServiceTest {
 
 TransactionTemplate is the escape hatch for every transaction shape `@Transactional` can't express: per-chunk boundaries, conditional transactions, rollback-with-value, and proxy-free control. Keep `@Transactional` for the common case, reach for the template when the boundary logic gets interesting.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-framework/reference/data-access/transaction.html](https://docs.spring.io/spring-framework/reference/data-access/transaction.html)

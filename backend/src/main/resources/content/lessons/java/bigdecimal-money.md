@@ -93,3 +93,7 @@ BigDecimal ratio = gross.divide(total, 6, RoundingMode.HALF_UP); // keep 6 digit
 - Compare with `compareTo`, never `equals`; persist as `NUMERIC`; serialize as strings.
 - Round at one consistent point and scale across every code path touching the same money.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

@@ -106,3 +106,7 @@ Both should be enabled — defense in depth. A service method with `@PreAuthoriz
 - URL rules protect the perimeter; method rules enforce business authorization — run both.
 - Compile with `-parameters`, avoid self-invocation, delegate complex logic to testable beans.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-security/reference](https://docs.spring.io/spring-security/reference/)

@@ -170,3 +170,7 @@ public List<Order> exportOrders(
 | Ignoring the Accept header | Client gets wrong format, integration breaks |
 | Using `@ResponseBody` with view resolution | Conflict between content negotiation and view |
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-boot/reference](https://docs.spring.io/spring-boot/reference/)

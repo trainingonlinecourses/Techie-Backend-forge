@@ -156,3 +156,7 @@ public class CourseGraphqlController {
 - Nullability discipline: start nullable, tighten later; add fields, don't remove.
 - Use enums and input types; return changed objects from mutations.
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [graphql.org/learn](https://graphql.org/learn/)

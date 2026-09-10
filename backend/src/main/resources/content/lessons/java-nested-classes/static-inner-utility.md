@@ -93,3 +93,7 @@ public class LinkedList<T> {
 4. **Builder pattern** uses static nested class to avoid holding outer reference
 5. **Enum constants** are implicitly static nested classes
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/java/javaOO/index.html)

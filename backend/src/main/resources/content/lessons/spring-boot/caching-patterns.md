@@ -194,3 +194,7 @@ Keys must be unique, deterministic, and compact:
 | Caching method with side effects | Side effects skipped on cache hit |
 | Using `@Cacheable` on void methods | Cache stores null, never re-calls |
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-boot/reference](https://docs.spring.io/spring-boot/reference/)

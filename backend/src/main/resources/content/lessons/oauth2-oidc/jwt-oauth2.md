@@ -124,3 +124,7 @@ public class SecurityConfig {
 
 A JWT is a signed, self-contained token: header (algorithm), payload (claims — `iss`, `sub`, `aud`, `exp`, `scope`), and signature. The resource server validates it *locally*: signature via the issuer's public key (from JWKS, rotation-aware), `exp` (freshness), `iss` (right issuer), and `aud` (right audience) — rejecting forgery, expiry, and token confusion. Asymmetric signing (RS256) keeps the private key at the auth server while resource servers verify with public keys; short expiries plus refresh tokens compensate for the statelessness that makes JWTs hard to revoke. Spring Security wires the whole validation from `issuer-uri` — but the checklist (signature, exp, iss, aud, algorithm whitelist) is what you must understand to trust it and to debug when it fails.
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [datatracker.ietf.org/doc/html/rfc6749](https://datatracker.ietf.org/doc/html/rfc6749)

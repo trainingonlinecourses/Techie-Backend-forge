@@ -119,3 +119,7 @@ private long timeoutMs;                          // static-method SpEL
 - `@Value` for one-offs; `@ConfigurationProperties` for typed, validated groups.
 - Mind the `${}` vs `#{}` distinction and property-source precedence.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-framework/reference](https://docs.spring.io/spring-framework/reference/)

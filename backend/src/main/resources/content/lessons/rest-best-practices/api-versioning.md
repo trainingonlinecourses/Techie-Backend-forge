@@ -189,3 +189,7 @@ void v1DeclaresDeprecation() throws Exception {
 
 Versioning is a promise to your consumers: *your code keeps working while we improve ours*. The cheapest correct system is URI versioning plus a real deprecation schedule.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-framework/reference/web/webmvc.html](https://docs.spring.io/spring-framework/reference/web/webmvc.html)

@@ -115,3 +115,7 @@ Developers get a one-command reproducible stack (`docker compose up` or just run
 - Docker Compose integration gives reproducible dev/CI stacks.
 - Modernize incrementally: migrate namespace/properties first, then adopt features per service.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [docs.spring.io/spring-boot/reference](https://docs.spring.io/spring-boot/reference/)

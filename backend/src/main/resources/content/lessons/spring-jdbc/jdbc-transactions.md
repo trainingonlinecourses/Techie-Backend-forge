@@ -218,3 +218,7 @@ With `@JdbcTest` + `@Transactional`, each test runs in a rollback-only transacti
 
 JdbcTemplate + Spring transactions = exact SQL with production-grade atomicity. Pick declarative transactions for whole-method boundaries, `TransactionTemplate` for fine-grained control, and remember the connection-propagation rule that makes it all work: one thread, one transactional connection, one commit point.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-framework/reference/data-access/jdbc.html](https://docs.spring.io/spring-framework/reference/data-access/jdbc.html)

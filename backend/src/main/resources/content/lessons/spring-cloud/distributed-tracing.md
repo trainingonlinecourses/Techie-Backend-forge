@@ -145,3 +145,7 @@ A trace id is the *join key*: alert on metrics → read logs with that trace id 
 
 **Official docs:** [Boot tracing](https://docs.spring.io/spring-boot/reference/actuator/tracing.html) · [Micrometer Tracing](https://micrometer.io/docs/tracing) · [OpenTelemetry](https://opentelemetry.io/docs/)
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [docs.spring.io/spring-cloud/reference](https://docs.spring.io/spring-cloud/reference/)

@@ -122,3 +122,7 @@ public class ApiExceptionHandler {
 - [WebFlux — Functional Endpoints](https://docs.spring.io/spring-framework/reference/web/webflux-functional.html)
 - [WebFlux — HTTP Streaming](https://docs.spring.io/spring-framework/reference/web/webflux.html#webflux-codecs-streaming)
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [docs.spring.io/spring-framework/reference/web/webflux.html](https://docs.spring.io/spring-framework/reference/web/webflux.html)

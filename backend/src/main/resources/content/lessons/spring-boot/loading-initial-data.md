@@ -313,3 +313,7 @@ public class FeatureFlagLoader implements CommandLineRunner {
 | Not using profiles | Same data in all environments | Use `@Profile` for environment-specific data |
 | Hardcoding passwords in seed data | Security risk | Use environment variables or config |
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-boot/reference](https://docs.spring.io/spring-boot/reference/)

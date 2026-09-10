@@ -244,3 +244,7 @@ If active profiles are `dev,prod`, the value is `300` (prod wins because it was 
 | Not activating profiles in tests | Tests run with default config, not environment-specific |
 | Storing secrets in profile YAML files | Secrets in source control — use env vars instead |
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-boot/reference](https://docs.spring.io/spring-boot/reference/)

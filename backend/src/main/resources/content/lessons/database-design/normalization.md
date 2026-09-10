@@ -175,3 +175,7 @@ The tension: **joins cost** — a heavily normalized schema means more joins per
 - Joins are the cost of normalization; denormalize deliberately on the read path.
 - Enforce relationships with real foreign keys — not just naming.
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [postgresql.org/docs/current/ddl.html](https://www.postgresql.org/docs/current/ddl.html)

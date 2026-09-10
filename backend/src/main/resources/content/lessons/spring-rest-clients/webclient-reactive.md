@@ -152,3 +152,7 @@ Never call `block()` inside a reactive pipeline (it blocks an event-loop thread 
 - In WebFlux apps, WebClient is mandatory; in MVC apps, prefer RestClient.
 - Always bound timeouts; never `block()` inside a reactive pipeline.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-framework/reference/integration/rest-clients.html](https://docs.spring.io/spring-framework/reference/integration/rest-clients.html)

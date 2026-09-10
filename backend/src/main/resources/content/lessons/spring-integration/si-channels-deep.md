@@ -125,3 +125,7 @@ public IntegrationFlow processEmail() {
 
 Message channels are the pipes that define the integration's semantics: **direct** (synchronous, transactional, in-thread — the default), **queue** (async buffered — bounded, with a poller as the consumer engine), **publish-subscribe** (every subscriber gets everything, independently), plus priority, executor, and rendezvous flavors. The production discipline: use direct for transactional chains, bounded queues/executors where speed must decouple, pub-sub for fan-out — and remember that in-memory channels serve in-process integration, while durable cross-restart messaging belongs to a real broker through an adapter. The channel you choose *is* the behavior you get: blocking vs buffering, one receiver vs many, FIFO vs priority.
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-integration/reference](https://docs.spring.io/spring-integration/reference/)

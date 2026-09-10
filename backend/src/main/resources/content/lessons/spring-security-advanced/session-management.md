@@ -86,3 +86,7 @@ Rule of thumb: **server-rendered/HTMX app or tight server control → sessions; 
 
 Official docs: [Spring Session](https://docs.spring.io/spring-session/reference/) · [Session Management](https://docs.spring.io/spring-security/reference/servlet/authentication/session-management.html)
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-security/reference](https://docs.spring.io/spring-security/reference/)

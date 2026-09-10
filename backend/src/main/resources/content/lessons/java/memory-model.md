@@ -101,3 +101,7 @@ Volatile guarantees **visibility**, not **atomicity**. For read-modify-write you
 - `final` fields give safe publication of immutable objects with zero locking.
 - A data race may work locally and fail in prod — always establish the edge explicitly.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

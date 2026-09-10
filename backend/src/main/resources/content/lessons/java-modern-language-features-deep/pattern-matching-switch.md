@@ -394,3 +394,7 @@ In the lab, you will see a starter with a chain of `instanceof` checks that clas
 
 Pattern matching in switch, standardised in Java 21, lets a `case` label match on the type or shape of the selector value. A type pattern (`Type name`) matches an instance of that type and binds the value to a variable of that type, with no explicit cast. A guard (`when` condition) refines the match with a boolean condition. A switch expression must be exhaustive — every value must be covered — and the compiler enforces this. For sealed hierarchies, the compiler knows all the permitted subtypes and checks exhaustiveness automatically; if you add a new subtype, the compiler tells you. `null` does not match a type pattern — you must handle it explicitly with `case null`, or the switch throws. Record patterns let you match the components of a record and bind them to variables, and they can be nested for deep structural matching. The result is cleaner, safer code for branching on type and structure, especially when combined with sealed classes and records.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/21/language/)

@@ -232,3 +232,7 @@ public String nextState(String current, String event) {
 | Not handling all cases | Compilation error for expressions | Add `default` or ensure exhaustiveness |
 | Using `->` with old fall-through semantics | Confusing | Use `:` syntax if you need fall-through |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/17/docs/api/)

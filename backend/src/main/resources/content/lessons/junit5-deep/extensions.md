@@ -159,3 +159,7 @@ The realization that makes this lesson click: **you've been using extensions all
 
 JUnit 5 is an extension pipeline: lifecycle callbacks (`BeforeEachCallback`, `BeforeAllCallback`, `TestWatcher`), **`ParameterResolver`** (inventing test arguments — the mechanism behind Mockito's `@Mock` injection and Spring's `@Autowired` params), `ExecutionCondition` (conditional skipping), and `@RegisterExtension` — all plugged in via `@ExtendWith` or composed annotations. The `ExtensionContext` is the extension's window into the test. Everything you thought was "framework magic" — Spring Boot tests, Mockito injection, `@TempDir` — is an extension, and the model is open for your own: timing, retries, environment gating, custom parameter injection. Master the extension points and you can make JUnit do almost anything — because the framework is explicitly designed to let you.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [junit.org/junit5/docs/current/user-guide](https://junit.org/junit5/docs/current/user-guide/)

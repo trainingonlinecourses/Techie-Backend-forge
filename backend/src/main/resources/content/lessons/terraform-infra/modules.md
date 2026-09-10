@@ -161,3 +161,7 @@ Modules are shared code — they deserve the same treatment:
 
 Modules are the function abstraction of Terraform: a directory of resources with an input contract (variables), an output contract (outputs), and a source (local path, registry, or versioned Git). The same module called with different arguments builds staging and prod identically — eliminating copy-paste drift, standardizing tagging and safety settings, and turning "a database stack" into a one-line call. The discipline: module when something repeats or needs standardization; keep modules small and composable; version them; and treat outputs as the only interface. Terraform at scale is, in large part, a library of well-made modules — the infrastructure equivalent of clean, reusable functions.
 
+## References
+
+- [dev.java — the official OpenJDK site](https://dev.java/)
+- [developer.hashicorp.com/terraform/docs](https://developer.hashicorp.com/terraform/docs)

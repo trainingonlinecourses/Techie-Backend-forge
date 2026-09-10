@@ -133,3 +133,7 @@ Parameterization is the primary defense; real systems layer more:
 
 Injection is untrusted input that becomes interpreter grammar — SQL, NoSQL, or OS — and it's caused by string-building instructions instead of binding values. The fix is **parameterization**: prepared statements and named parameters put input in the value slot where it can never alter the sentence, `?`-style, in every layer (JdbcTemplate, JPA, Criteria). Identifiers (table/column names) can't be parameterized — whitelist them. NoSQL and command injection are the same idea in different syntaxes, with the same cure: build with operators/APIs, never strings/shells. Defense in depth — validation, least privilege, encoding, scanning — layers on top, but parameterization is the load-bearing wall: get it right once, and an entire category of catastrophe is closed.
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [owasp.org/Top10](https://owasp.org/Top10/)

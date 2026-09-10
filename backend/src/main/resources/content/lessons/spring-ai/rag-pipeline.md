@@ -123,3 +123,7 @@ Users (and auditors) can verify: *the assistant says X, citing lesson Y.* This a
 
 **Official docs:** [RAG](https://docs.spring.io/spring-ai/reference/api/rag.html) · [QuestionAnswerAdvisor](https://docs.spring.io/spring-ai/reference/api/advisors.html)
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-ai/reference](https://docs.spring.io/spring-ai/reference/)

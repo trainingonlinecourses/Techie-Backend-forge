@@ -139,3 +139,7 @@ JDK dynamic proxies are the pure-reflection path — but they only do interfaces
 
 A dynamic proxy is a runtime-generated stand-in for an interface that routes every call through an `InvocationHandler`, letting you add before/after behavior — logging, transactions, caching, security — without touching the business class. It's the engine of Spring AOP: `@Transactional`, `@Async`, and `@Cacheable` are all proxies. The trade-offs to respect: interfaces only (for JDK proxies), self-invocation bypasses the proxy, final/private methods are invisible to it, and identity shifts. Understand the proxy and Spring's "magic" becomes a concrete, debuggable mechanism — and the classic `@Transactional`-not-working bugs become predictable.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/reflect/index.html)

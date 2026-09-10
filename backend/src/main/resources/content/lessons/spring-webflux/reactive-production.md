@@ -102,3 +102,7 @@ The pragmatic org pattern: **reactive only where it pays** — gateway, streamin
 - [Spring WebFlux — Thread Model](https://docs.spring.io/spring-framework/reference/web/webflux.html#webflux-thread-model)
 - [Spring Boot — Actuator metrics (Micrometer)](https://docs.spring.io/spring-boot/reference/actuator/metrics.html)
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-framework/reference/web/webflux.html](https://docs.spring.io/spring-framework/reference/web/webflux.html)

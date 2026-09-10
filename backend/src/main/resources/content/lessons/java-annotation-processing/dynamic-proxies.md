@@ -287,3 +287,7 @@ class RemoteHandler implements InvocationHandler {
 | Catching all exceptions | Proxy hides errors from caller | Only catch exceptions you can handle |
 | Using proxy for simple delegation | Adds complexity for no benefit | Only proxy when you need cross-cutting concerns |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/java/annotations/)

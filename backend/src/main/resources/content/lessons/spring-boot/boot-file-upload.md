@@ -243,3 +243,7 @@ The client uploads directly to S3 using the presigned URL — the file never tou
 | Reading entire file into `byte[]` | OOM for large files |
 | Not checking `file.isEmpty()` | Stores empty files |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [docs.spring.io/spring-boot/reference](https://docs.spring.io/spring-boot/reference/)

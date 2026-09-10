@@ -136,3 +136,7 @@ docker compose build             # rebuild images
 - Externalize secrets with `${VAR:-default}` and a gitignored `.env`.
 - Compose for dev is the standard; production uses the same model through managed platforms.
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.docker.com](https://docs.docker.com/)

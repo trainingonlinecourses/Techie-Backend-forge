@@ -171,3 +171,7 @@ A fintech company uses records extensively:
 
 Every record validates in its compact constructor, making it impossible to create invalid objects. The immutable nature means they're safe to share across threads without synchronization.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/21/docs/api/)

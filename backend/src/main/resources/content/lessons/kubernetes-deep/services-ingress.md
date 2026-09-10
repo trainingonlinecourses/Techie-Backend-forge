@@ -148,3 +148,7 @@ This says: only pods labeled `app: users` may reach payments pods on port 8080. 
 
 Services give stable names and load balancing over ephemeral pods — `ClusterIP` for internal calls (the default, resolved by cluster DNS), `NodePort` and `LoadBalancer` for outward exposure. Ingress is the single smart front door: one controller routes external HTTP(S) by host and path to different services, terminates TLS at the edge, and rewrites paths. Services are discovered by DNS name (`payments` or `payments.prod.svc`), and NetworkPolicy provides the cluster firewall. The three habits: select by label carefully (check `kubectl get endpoints`), configure *service names* not pod IPs, and treat Ingress as the edge (TLS there, plain HTTP inside). Master services + ingress and your services become reachable, stable, and secure — the plumbing of every real deployment.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [kubernetes.io/docs/home](https://kubernetes.io/docs/home/)

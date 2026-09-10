@@ -161,3 +161,7 @@ X-RateLimit-Reset: 45
 | In-memory only in multi-instance deployment | Each instance has independent limits |
 | No rate limit on login endpoint | Brute-force attacks succeed |
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-boot/reference](https://docs.spring.io/spring-boot/reference/)

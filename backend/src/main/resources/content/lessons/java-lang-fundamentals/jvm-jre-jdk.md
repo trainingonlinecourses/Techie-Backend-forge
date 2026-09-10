@@ -294,3 +294,7 @@ In the lab, you will inspect a compiled class file with `javap -c` to read the b
 
 The JDK is the development kit (compiler + tools + runtime), the JRE is the runtime environment (JVM + core libraries), and the JVM is the virtual machine that loads bytecode, verifies it, executes it (interpreting and JIT-compiling hot methods to native code), and manages memory (heap, stack, method area, PC registers). The heap holds objects and is managed by the garbage collector, usually split into young and old generations; each thread has its own stack of method frames and a PC register; the method area (Metaspace) holds class metadata and static variables. Classes are loaded on demand by a hierarchy of classloaders that delegate to parents, which is why you cannot shadow core JDK classes and why the same class loaded by two different classloaders is two different types. The bytecode verifier ensures loaded bytecode is safe before execution. "Write once, run anywhere" means the same bytecode runs on any platform with a JVM — but only if you avoid platform-specific APIs. Understanding this architecture is the foundation for everything that follows: GC tuning, classloader debugging, reflection, dynamic proxies, and native image compilation.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/javase/specs/jvms/se21/html/)

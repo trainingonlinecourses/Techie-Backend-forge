@@ -107,3 +107,7 @@ class OrderBindingsTest {
 
 Official docs: [Spring Cloud Stream](https://docs.spring.io/spring-cloud-stream/reference/) · [Kafka binder reference](https://docs.spring.io/spring-cloud-stream/reference/kafka/)
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-cloud/reference](https://docs.spring.io/spring-cloud/reference/)

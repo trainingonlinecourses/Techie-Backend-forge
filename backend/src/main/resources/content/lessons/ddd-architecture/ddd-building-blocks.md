@@ -244,3 +244,7 @@ Domain tests run in milliseconds — no context, no DB — and they *are* the bu
 
 The building blocks are a discipline: entities guard their invariants, value objects validate themselves, aggregates bound consistency, repositories store aggregates, and services orchestrate. Put the rules in the domain and the service layer becomes a thin translation layer — which is exactly where it belongs.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [martinfowler.com/tags/domain%20driven%20design.html](https://martinfowler.com/tags/domain%20driven%20design.html)

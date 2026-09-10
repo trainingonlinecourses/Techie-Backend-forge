@@ -165,3 +165,7 @@ public class WebConfig implements WebMvcConfigurer {
 | Not handling exceptions in afterCompletion | Silent failures |
 | Forgetting to register the interceptor | Code never runs |
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-boot/reference](https://docs.spring.io/spring-boot/reference/)

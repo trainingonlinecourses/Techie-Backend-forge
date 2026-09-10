@@ -424,3 +424,7 @@ In the lab, you will see a starter `VariablesExercise.java` with several deliber
 
 Java has eight primitive types: `byte`, `short`, `int`, `long` (integers), `float`, `double` (floating-point), `char` (16-bit Unicode), and `boolean` (true/false). They are not objects and hold their values directly. Fields get default values (0, 0.0, false, '\u0000'); local variables do not and must be assigned before use. Integer arithmetic wraps on overflow silently unless you use `Math.addExact`; floating-point arithmetic is not exact for many decimal values, so money belongs in `BigDecimal`. The `char` type is a 16-bit Unicode code unit, not a small integer, and a `String`'s `length()` counts `char` values, not visible characters. The choice of primitive is a choice about range, precision, memory, and correctness — and getting it wrong is how subtle production bugs happen.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/javase/specs/jvms/se21/html/)

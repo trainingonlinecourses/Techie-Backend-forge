@@ -162,3 +162,7 @@ This is the skeleton of how frameworks dispatch to handler methods (controllers,
 
 Method handles are typed, immutable, JIT-friendly pointers to methods, obtained from a `MethodHandles.Lookup` and described by precise `MethodType` signatures. They're faster than classic reflection (the JIT can inline them like direct calls), safer in the module system (access checked once at lookup), and they power modern Java's own machinery — lambdas and `invokedynamic` compile down to them. Use reflection for introspection, handles for invocation; look up once and cache; and prefer `invokeExact` on hot paths. That's the toolkit modern frameworks use to stay fast and modular — and now it's in yours.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/reflect/index.html)

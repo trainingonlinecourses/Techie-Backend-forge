@@ -223,3 +223,7 @@ In the lab, you will see a starter `HelloWorld.java` with deliberate mistakes �
 
 Running a Hello World program exercises the entire Java startup sequence: the compiler turns source into bytecode, the launcher starts a JVM process, the classloader loads the class, the JVM verifies and prepares it, static initialisers run, the launcher finds and calls `main`, and the execution engine runs the bytecode. The `main` method is not special to the language — it is special to the launcher, which looks for a method with that exact signature. `System.out` is a `PrintStream` the JVM sets up during startup. Understanding these steps is what turns the ritual of typing `javac` and `java` into a mental model of how Java actually runs.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/javase/specs/jvms/se21/html/)

@@ -220,3 +220,7 @@ public class AcademyCli implements CommandLineRunner {
 
 Official docs: [GraalVM](https://www.graalvm.org/latest/docs/getting-started/) · [Spring Boot Native](https://docs.spring.io/spring-boot/reference/packaging/native-image/introducing-graalvm-native-images.html)
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [graalvm.org/latest/docs](https://www.graalvm.org/latest/docs/)

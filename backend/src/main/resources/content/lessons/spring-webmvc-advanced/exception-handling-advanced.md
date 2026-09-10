@@ -205,3 +205,7 @@ class ExceptionHandlingTest {
 
 The chain is predictable: advice → controller handlers → status resolvers → defaults → error page. Know the order, keep the catch-all last, and every error in your API — expected or not — leaves the same well-formed envelope.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-framework/reference/web/webmvc.html](https://docs.spring.io/spring-framework/reference/web/webmvc.html)

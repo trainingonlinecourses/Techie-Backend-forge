@@ -122,3 +122,7 @@ For *new* projects: start with Spring Data JDBC; escalate to JPA only when the d
 - Hybrid stacks are normal: JPA for the rich core, JDBC/JdbcTemplate for hot read paths.
 - Know which philosophy you're in — the failure modes are entirely different.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-data/jdbc/reference](https://docs.spring.io/spring-data/jdbc/reference/)

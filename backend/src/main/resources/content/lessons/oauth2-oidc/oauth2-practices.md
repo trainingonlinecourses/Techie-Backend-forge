@@ -123,3 +123,7 @@ Spring Security configures both sides from properties: the *client* gets tokens 
 
 Production OAuth2 is token lifecycle management: short-lived access tokens (minutes) refreshed via long-lived **refresh tokens** — which modern practice makes **single-use with rotation**, converting theft from permanent into detectable. The **client-credentials flow** serves server-to-server calls (one client identity per service, secrets in the vault, cached short-lived tokens). The security checklist — short tokens, rotating refresh tokens, secrets in stores, state/nonce, exact redirect allowlists, JWKS rotation, full claim validation — is the consensus that makes delegation safe at scale. Spring Security configures the client and resource-server sides from properties; this module's lessons are the model that makes those properties comprehensible and debuggable when the tokens misbehave.
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [datatracker.ietf.org/doc/html/rfc6749](https://datatracker.ietf.org/doc/html/rfc6749)

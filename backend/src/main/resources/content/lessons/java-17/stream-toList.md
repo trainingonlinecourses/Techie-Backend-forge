@@ -173,3 +173,7 @@ public List<String> getHighValueOrderIds(List<Order> orders) {
 | Using `toList()` when order matters | `toList()` preserves encounter order | Add `.sorted()` if needed |
 | Confusing with `collect(toList())` | Different mutability | `toList()` = unmodifiable; `collect(toList())` = mutable |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/17/docs/api/)

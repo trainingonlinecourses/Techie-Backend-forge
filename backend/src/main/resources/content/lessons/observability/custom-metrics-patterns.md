@@ -180,3 +180,7 @@ void placingOrderIncrementsBusinessMetric() {
 
 Custom metrics are how your operations team answers "is the new deploy actually better?" — instrument the business outcomes and the infrastructure, keep cardinality bounded, and your dashboards will tell the truth.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [docs.spring.io/spring-boot/reference/actuator/metrics.html](https://docs.spring.io/spring-boot/reference/actuator/metrics.html)

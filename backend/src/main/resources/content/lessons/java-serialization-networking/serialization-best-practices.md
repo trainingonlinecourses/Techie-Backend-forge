@@ -294,3 +294,7 @@ The same code, clean:
 | Forgetting no-arg constructor | `Externalizable` fails | Always add no-arg constructor |
 | Overriding `readObject` incorrectly | Data corruption | Call `defaultReadObject()` first |
 
+## References
+
+- [dev.java — the official OpenJDK site](https://dev.java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/essential/io/serializing.html)

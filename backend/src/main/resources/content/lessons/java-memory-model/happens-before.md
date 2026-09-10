@@ -231,3 +231,7 @@ public class Singleton {
 | Forgetting happens-before with `volatile` | Race conditions | Understand the JMM rules |
 | Relying on execution order for visibility | CPU/JVM can reorder | Use explicit synchronization |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/javase/specs/jls/se17/html/jls-17.html)

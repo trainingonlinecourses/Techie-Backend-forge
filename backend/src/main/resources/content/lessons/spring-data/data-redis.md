@@ -90,3 +90,7 @@ Product find(Long id) { ... }   // first call hits DB, rest hit Redis
 
 Official docs: [Spring Data Redis](https://docs.spring.io/spring-data/redis/reference/)
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-data/reference](https://docs.spring.io/spring-data/reference/)

@@ -111,3 +111,7 @@ public record BookingRequest(Instant start, Instant end) {
 - `@ModelAttribute` + `BindingResult` gives the form-flow control; `@RequestBody` delegates to the advice.
 - Handle cross-field rules with class-level constraints or `@AssertTrue` methods.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-framework/reference/web/webmvc.html](https://docs.spring.io/spring-framework/reference/web/webmvc.html)

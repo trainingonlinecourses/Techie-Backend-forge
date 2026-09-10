@@ -185,3 +185,7 @@ jstat -gcutil <pid> 1000 10
 | Leaving `-ea` on in production | Slight performance cost, confusing `AssertionError` in logs |
 | Ignoring assertion failures in tests | Tests pass but logic is broken |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

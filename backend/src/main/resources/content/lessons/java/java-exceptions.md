@@ -495,3 +495,7 @@ try {
 | Not closing resources in finally/try-with-resources | Resource leaks — file handles, DB connections | Always use try-with-resources |
 | Catching Exception after specific exceptions | Specific catch blocks become unreachable | Order from most specific to most general |
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

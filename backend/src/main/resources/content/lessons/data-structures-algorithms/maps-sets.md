@@ -171,3 +171,7 @@ Range queries (`ceilingKey`, `subMap`) are the reason `TreeMap` exists. The trad
 
 Hash tables turn lookup into computation: a good hash function spreads keys across buckets, giving O(1) average get/put, with chaining (and bucket-to-tree upgrades) handling collisions and resizing keeping load low. Sets are maps without values. The two laws to live by: honor the equals/hashCode contract and use immutable keys, or lookups silently break; and know that `HashMap` promises speed, not order — reach for `LinkedHashMap` for insertion order or `TreeMap` for sorted keys and ranges. Master these and the "constant-time lookup" claims of every framework become something you can verify and rely on.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [algs4.cs.princeton.edu/home](https://algs4.cs.princeton.edu/home/)

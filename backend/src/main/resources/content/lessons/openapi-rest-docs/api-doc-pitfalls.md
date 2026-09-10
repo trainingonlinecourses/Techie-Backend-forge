@@ -148,3 +148,7 @@ Deprecation is documentation's way of saying "this still works, but stop using i
 - Deprecation + versioned specs = honest, non-breaking evolution.
 - Run the scorecard above before calling your docs done.
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [spec.openapis.org/oas/v3.1.0](https://spec.openapis.org/oas/v3.1.0)

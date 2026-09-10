@@ -113,3 +113,7 @@ This is the classic source of "I overrode it but the wrong method ran" bugs: ove
 - Chain convenience overloads to one full implementation; don't duplicate logic.
 - Always `@Override`; watch null-ambiguity and generic-array varargs.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

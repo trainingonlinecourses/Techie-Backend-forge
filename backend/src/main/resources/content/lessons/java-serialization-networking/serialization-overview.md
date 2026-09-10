@@ -236,3 +236,7 @@ public class User implements Serializable {
 | Using Java serialization for APIs | Security vulnerabilities | Use JSON/Protobuf instead |
 | Circular references | StackOverflow during serialization | Break cycles with transient |
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/essential/io/serializing.html)

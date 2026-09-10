@@ -97,3 +97,7 @@ If your project is on Boot 3.4+, write new tests with `@MockitoBean`; the behavi
 - `@MockitoBean`/`@MockitoSpyBean` are the Boot 3.4+ replacements — prefer them in new code.
 - Use `verify` to assert side effects, not just stub returns.
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-boot/reference/testing/spring-boot-applications.html](https://docs.spring.io/spring-boot/reference/testing/spring-boot-applications.html)

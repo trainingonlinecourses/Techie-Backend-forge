@@ -102,3 +102,7 @@ Behind the scenes, the planner picks an execution strategy per join — and know
 
 Joins are a family of set operations: `SELF JOIN` (aliases, for manager/employee and friends), `ANTI JOIN` (`NOT EXISTS` — the modern spelling for "no match"), `CROSS JOIN` (all pairs), and `LATERAL` (a per-row subquery — the "top N per group" and per-row computation tool). The optimizer picks nested-loop, hash, or merge strategies, chosen by indexes and size — visible in `EXPLAIN ANALYZE`. The discipline: join on keys, choose LEFT vs INNER by "must every row appear?", avoid fan-out, and never filter the preserved side in WHERE. Name the set you want, and the join writes itself.
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [postgresql.org/docs/current](https://www.postgresql.org/docs/current/)

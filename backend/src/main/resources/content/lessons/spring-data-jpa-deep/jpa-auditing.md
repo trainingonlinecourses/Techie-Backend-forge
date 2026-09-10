@@ -103,3 +103,7 @@ The auditor comes from the **current security context** — the logged-in user (
 - It works through the persistence layer (even bulk saves) — but not through native SQL.
 - Enable it explicitly, freeze `createdAt`/`createdBy`, use UTC `Instant`, and handle the no-user case.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-data/jpa/reference](https://docs.spring.io/spring-data/jpa/reference/)

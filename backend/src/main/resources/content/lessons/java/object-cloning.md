@@ -108,3 +108,7 @@ if (approver.ok(working)) orderRepo.save(working);
 - Defensive-copy at boundaries: copy input and output so callers can't corrupt your state.
 - Immutable objects (records, strings, enums) can be shared safely — don't copy them needlessly.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

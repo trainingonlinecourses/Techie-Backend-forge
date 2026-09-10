@@ -250,3 +250,7 @@ module my.legacy.app {
 | Using `requires` without knowing transitivity | Missing dependencies | Add `requires transitive` for API dependencies |
 | Not handling optional modules | ClassNotFoundException at runtime | Use `requires static` for optional dependencies |
 
+## References
+
+- [dev.java — the official OpenJDK site](https://dev.java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/17/language/java-module-system.htm)

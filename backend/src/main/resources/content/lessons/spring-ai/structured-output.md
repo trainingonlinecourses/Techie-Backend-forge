@@ -105,3 +105,7 @@ Spring AI handles steps 2–4 for you via `ToolCallbacks`.
 
 **Official docs:** [Structured output](https://docs.spring.io/spring-ai/reference/api/structured-output-converter.html) · [Function calling](https://docs.spring.io/spring-ai/reference/api/functions.html)
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-ai/reference](https://docs.spring.io/spring-ai/reference/)

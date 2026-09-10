@@ -225,3 +225,7 @@ Content-Security-Policy: script-src 'self'
 
 Official docs: [Security Headers (Spring)](https://docs.spring.io/spring-security/reference/servlet/exploits/headers.html) · [OWASP Secure Headers](https://owasp.org/www-project-secure-headers/)
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-security/reference](https://docs.spring.io/spring-security/reference/)

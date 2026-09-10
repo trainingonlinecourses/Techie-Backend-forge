@@ -103,3 +103,7 @@ The rollout **pauses if readiness never passes** (maxUnavailable: 0 means the ol
 
 Official docs: [Spring Boot on Kubernetes](https://docs.spring.io/spring-boot/reference/deployment/kubernetes.html) · [Resource management](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [kubernetes.io/docs/concepts](https://kubernetes.io/docs/concepts/)

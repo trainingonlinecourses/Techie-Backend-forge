@@ -102,3 +102,7 @@ Most teams write post-processors only for cross-cutting, container-wide concerns
 - Always return the bean; use `@Order` to control sequence.
 - AOP, transactions, `@Async`, method security — all are post-processor-created proxies.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [docs.spring.io/spring-framework/reference](https://docs.spring.io/spring-framework/reference/)

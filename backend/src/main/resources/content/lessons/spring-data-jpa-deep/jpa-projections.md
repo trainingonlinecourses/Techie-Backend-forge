@@ -105,3 +105,7 @@ Nested projections compose into a single query with joins — the correct fix wh
 - Nested projections produce joined single queries for related data.
 - Return projections from list/report endpoints — keep entities for writes and complex domain logic.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-data/jpa/reference](https://docs.spring.io/spring-data/jpa/reference/)

@@ -158,3 +158,7 @@ This is how Spring Cloud Config works: the config client registers a remote-back
 - Custom `PropertySource`s (DB, config server, vault) plug into the same abstraction.
 - Precedence ladder rules everything: env > system props > profile files > base files > defaults.
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-boot/reference/features/external-config.html](https://docs.spring.io/spring-boot/reference/features/external-config.html)

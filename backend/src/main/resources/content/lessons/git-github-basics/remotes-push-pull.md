@@ -110,3 +110,7 @@ git push origin main
 - Never force-push shared branches; check for secrets before pushing.
 - The rhythm: pull → branch → work → commit → push → pull request.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [git-scm.com/doc](https://git-scm.com/doc)

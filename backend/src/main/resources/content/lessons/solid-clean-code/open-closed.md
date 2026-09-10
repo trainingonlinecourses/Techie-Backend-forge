@@ -164,3 +164,7 @@ Also: OCP shouldn't be applied to *every* future possibility — you can't abstr
 - The Strategy pattern is the canonical OCP implementation.
 - Don't abstract prematurely — introduce the interface at the second/third variant, not the first.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [en.wikipedia.org/wiki/SOLID](https://en.wikipedia.org/wiki/SOLID)

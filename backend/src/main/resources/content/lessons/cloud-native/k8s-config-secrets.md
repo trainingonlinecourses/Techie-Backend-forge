@@ -111,3 +111,7 @@ Mark long-lived config **immutable** — k8s skips watch/update overhead and, mo
 
 Official docs: [ConfigMaps](https://kubernetes.io/docs/concepts/configuration/configmap/) · [Secrets](https://kubernetes.io/docs/concepts/configuration/secret/)
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [kubernetes.io/docs/concepts](https://kubernetes.io/docs/concepts/)

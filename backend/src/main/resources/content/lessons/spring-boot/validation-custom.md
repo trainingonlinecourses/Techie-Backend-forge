@@ -223,3 +223,7 @@ public class ValidationExceptionHandler {
 | Validating everything at the API layer only | Invalid data reaches the database |
 | Over-validating (too many annotations) | Hard to maintain, confusing error messages |
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-boot/reference](https://docs.spring.io/spring-boot/reference/)

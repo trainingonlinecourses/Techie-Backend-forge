@@ -121,3 +121,7 @@ public class DownloadController {
 | Not setting Content-Length | No progress bar for client | Calculate and set size |
 | Not flushing output stream | Client hangs waiting | Flush after each chunk |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [docs.spring.io/spring-boot/reference/web/servlet.html](https://docs.spring.io/spring-boot/reference/web/servlet.html)

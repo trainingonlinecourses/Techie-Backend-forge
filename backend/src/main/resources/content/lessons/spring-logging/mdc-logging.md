@@ -132,3 +132,7 @@ public class ContextCopyingDecorator implements TaskDecorator {
 | Using MDC.put() in loops | Performance overhead | Set once per request, not per iteration |
 | Using MDC.remove() instead of clear() | Leftover keys from previous request | Use clear() in filter finally block |
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-boot/reference/features/logging.html](https://docs.spring.io/spring-boot/reference/features/logging.html)

@@ -180,3 +180,7 @@ public class OrderControllerV2 {
 | Exposing internal DTOs in API | Internal implementation leaks |
 | Not versioning the API spec | Breaking changes break frontend |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [docs.spring.io/spring-boot/reference](https://docs.spring.io/spring-boot/reference/)

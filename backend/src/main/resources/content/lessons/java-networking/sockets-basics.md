@@ -148,3 +148,7 @@ Now the accept loop never blocks on a conversation. This is exactly how the firs
 
 Sockets are the two endpoints of a network conversation — the server listens (`ServerSocket.accept()` blocks for callers), the client dials (`new Socket(host, port)`), and once connected both sides exchange bytes through layered streams. TCP gives reliability and ordering; UDP trades them for speed. The `accept → handle → repeat` loop with a thread per client is the classic server architecture, and its scalability limits drive the virtual-thread and NIO approaches in the next lessons. Master this foundation and everything above it — HTTP, databases, messaging — becomes a protocol layered on the same mechanism you just built.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/networking/index.html)

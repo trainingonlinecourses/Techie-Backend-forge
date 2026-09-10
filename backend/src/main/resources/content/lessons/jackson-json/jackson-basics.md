@@ -132,3 +132,7 @@ class LessonController {
 
 Jackson is the Java↔JSON bridge: `ObjectMapper.writeValueAsString` serializes (getters/accessors → keys), `readValue` deserializes (constructor/setters ← keys), and collections need `TypeReference` for their element types. The configuration dials — `FAIL_ON_UNKNOWN_PROPERTIES`, date formats, the JavaTimeModule — are what make the bridge behave like a REST API expects. Spring Boot wires an auto-configured mapper into `@RequestBody`/`@ResponseBody`, so your DTOs and records flow across the wire with zero ceremony. Master the core two operations and the dials, and the JSON layer of your API becomes invisible — until you need `@JsonProperty`, custom serializers, or the polymorphic features of the next lessons.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [github.com/FasterXML/jackson-docs](https://github.com/FasterXML/jackson-docs)

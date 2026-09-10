@@ -252,3 +252,7 @@ public class SecurityExceptionHandler {
 
 Official docs: [Exception Handling (Spring)](https://docs.spring.io/spring-security/reference/servlet/configuration/architecture.html) · [AuthenticationEntryPoint](https://docs.spring.io/spring-security/reference/api/org/springframework/security/web/AuthenticationEntryPoint.html)
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-security/reference](https://docs.spring.io/spring-security/reference/)

@@ -215,3 +215,7 @@ class ViewTest {
 
 View resolution is the classic MVC tail: controller computes, resolver renders. Keep views thin, keep redirects honest, and the server-rendered part of your app stays as maintainable as the REST half.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-framework/reference/web/webmvc.html](https://docs.spring.io/spring-framework/reference/web/webmvc.html)

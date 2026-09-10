@@ -165,3 +165,7 @@ Because the client sends STOMP frames over the socket (not browser-form submissi
 - Use `wss://` in production; heartbeat idle connections; rate-limit SEND.
 - Topic design is a security decision — not everyone should see every channel.
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-framework/reference/web/websocket.html](https://docs.spring.io/spring-framework/reference/web/websocket.html)

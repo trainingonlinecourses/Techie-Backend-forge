@@ -162,3 +162,7 @@ Before writing any SQL, sanity-check the model:
 - Verify the model against the requirement queries before writing SQL.
 - The blueprint phase is where design errors cost nothing — use it.
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [postgresql.org/docs/current/ddl.html](https://www.postgresql.org/docs/current/ddl.html)

@@ -124,3 +124,7 @@ Topics have **retention**, not deletion-on-read: by size or time (`log.retention
 
 Kafka is a distributed commit log: append-only, ordered-per-partition, replicated, and replayable. Topics hold events; partitions provide parallelism and per-key ordering; offsets track each consumer group's position; brokers replicate partitions for fault tolerance. Producers write with configurable durability (`acks=all`), and consumers in groups divide partitions among themselves, polling for events and committing offsets. The three shifts in thinking Kafka demands: events are stored facts, not one-shot messages; ordering is per-partition (so key by entity); and consumers replay history rather than draining queues. Internalize those and the whole ecosystem — consumer groups, stream processing, Spring Kafka — becomes predictable.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [kafka.apache.org/documentation](https://kafka.apache.org/documentation/)

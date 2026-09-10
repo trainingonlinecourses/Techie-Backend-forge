@@ -212,3 +212,7 @@ class JsonbTest {
 
 JSONB is how Postgres absorbed the document database: ACID, SQL, joins, and flexible JSON in one engine. Model deliberately — queried fields as columns, flexible data as jsonb, GIN-index the paths you filter — and you get the best of both worlds without a second database.
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [postgresql.org/docs/current](https://www.postgresql.org/docs/current/)

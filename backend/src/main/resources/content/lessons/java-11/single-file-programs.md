@@ -198,3 +198,7 @@ java Fibonacci.java 30
 | File name mismatch | Can't find main class | Ensure filename matches public class name |
 | Using `--source` without version | `--source 11` required for shebang | Include version in shebang line |
 
+## References
+
+- [dev.java — the official OpenJDK site](https://dev.java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/11/docs/api/)

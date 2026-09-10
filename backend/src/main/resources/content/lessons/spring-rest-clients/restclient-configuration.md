@@ -149,3 +149,7 @@ The `X-Correlation-Id` (or `traceparent`) header is how you **correlate logs acr
 - Propagate correlation IDs so multi-service failures are traceable.
 - Configure per-client, not one-size-fits-all.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-framework/reference/integration/rest-clients.html](https://docs.spring.io/spring-framework/reference/integration/rest-clients.html)

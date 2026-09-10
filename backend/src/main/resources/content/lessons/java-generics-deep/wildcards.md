@@ -157,3 +157,7 @@ Reading signatures with PECS in mind turns cryptic API types into plain English:
 
 Wildcards exist to let one method serve many instantiations while preserving safety. The rule to memorize: **PECS — Producer extends, Consumer super.** If your code only reads values from a structure, bound with `extends`; if it only writes values, bound with `super`; if it does neither, use `?`. Whenever the compiler rejects a wildcard use, ask yourself which direction the data flows — the answer will tell you which bound you actually need, and the error message will make sense instead of feeling like a wall.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/java/generics/index.html)

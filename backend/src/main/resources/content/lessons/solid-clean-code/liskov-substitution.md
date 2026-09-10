@@ -175,3 +175,7 @@ Also worth remembering: **prefer interfaces over inheritance for behavior sharin
 - Prefer interfaces + composition + immutable types over fragile inheritance.
 - The "is-a" test is about *behavior*, not real-world analogy.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [en.wikipedia.org/wiki/SOLID](https://en.wikipedia.org/wiki/SOLID)

@@ -140,3 +140,7 @@ That's why the rule is: **in a loop, write the `StringBuilder` yourself, outside
 - Convert to `String` once with `toString()` when done.
 - Prefer `StringBuilder` over `StringBuffer` (no locking).
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html)

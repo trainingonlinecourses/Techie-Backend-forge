@@ -171,3 +171,7 @@ audit:
 - Register auto-configurations in `META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports` (Boot 3+) or `spring.factories` (Boot 2).
 - Always use `@ConditionalOnMissingBean` so users can override any bean your starter provides.
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-boot/reference](https://docs.spring.io/spring-boot/reference/)

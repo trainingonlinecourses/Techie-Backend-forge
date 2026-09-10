@@ -331,3 +331,7 @@ In the lab, you will see a buggy event bus that uses a plain `ArrayList` and suf
 
 `CopyOnWriteArrayList` and `CopyOnWriteArraySet` are thread-safe collections that copy their underlying data on every write, giving lock-free reads and safe iteration over a snapshot. They are ideal for read-heavy, write-rare workloads — the classic example is a list of listeners or callbacks that is registered and unregistered occasionally but notified frequently. The cost is that every write copies the entire underlying array, so they are slow for write-heavy workloads and for large collections. `CopyOnWriteArraySet` is backed by a list, so its containment checks are O(n), making it unsuitable for large sets where fast containment checks are needed. Use `ConcurrentHashMap` and `ConcurrentHashMap.newKeySet()` for write-heavy or larger concurrent collections. Match the collection to the workload: copy-on-write for many reads and few writes, other concurrent collections for the rest.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/package-summary.html)

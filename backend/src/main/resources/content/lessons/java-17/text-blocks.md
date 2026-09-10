@@ -356,3 +356,7 @@ A backend team is building a microservices platform. They need:
 
 Before text blocks, each of these required ugly string concatenation or external files. With text blocks, they embed multi-line templates directly in Java code — readable, maintainable, and type-safe.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/17/docs/api/)

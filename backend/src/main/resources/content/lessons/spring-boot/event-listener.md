@@ -236,3 +236,7 @@ public class OrderService {
 | Event classes with mutable state | Race conditions in async listeners |
 | Circular event chains (A→B→A) | Stack overflow or infinite loop |
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-boot/reference](https://docs.spring.io/spring-boot/reference/)

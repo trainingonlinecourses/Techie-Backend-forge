@@ -115,3 +115,7 @@ The proxy stands in at injection time and resolves the actual request-scoped bea
 - `@Lookup` and `Supplier<T>` are lighter alternatives; request/session scope uses scoped proxies.
 - Use prototypes for genuinely short-lived, injectable workers — not as a general "new object" habit.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-framework/reference](https://docs.spring.io/spring-framework/reference/)

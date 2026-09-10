@@ -127,3 +127,7 @@ Production hardening: delete or archive outbox rows after publish (retention), a
 - [Spring Kafka — Transactions](https://docs.spring.io/spring-kafka/reference/kafka/transactions.html)
 - [Debezium — transaction-based outbox](https://debezium.io/documentation/reference/stable/transformations/outbox-event-router.html)
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-kafka/reference](https://docs.spring.io/spring-kafka/reference/)

@@ -181,3 +181,7 @@ class RollbackRuleTest {
 
 Transactions are a contract: everything in the boundary commits or rolls back together. The three mistakes — checked exceptions committing, boundaries in the controller, side effects inside the transaction — are all preventable with deliberate `rollbackFor`, service-layer boundaries, and after-commit hooks for side effects.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-framework/reference/data-access/transaction.html](https://docs.spring.io/spring-framework/reference/data-access/transaction.html)

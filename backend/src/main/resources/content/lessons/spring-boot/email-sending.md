@@ -231,3 +231,7 @@ public void sendWeeklyDigest() {
 | Using `reply-to` as `from` | Confusing sender address |
 | Not verifying email addresses | Bounced emails, spam complaints |
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-boot/reference](https://docs.spring.io/spring-boot/reference/)

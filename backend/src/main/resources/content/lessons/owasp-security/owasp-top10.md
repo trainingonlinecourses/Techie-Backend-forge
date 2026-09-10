@@ -325,3 +325,7 @@ private boolean isAllowedUrl(String url) {
 
 **Official docs:** [OWASP Top 10](https://owasp.org/Top10/) · [Spring Security Reference](https://docs.spring.io/spring-security/reference/)
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [owasp.org/Top10](https://owasp.org/Top10/)

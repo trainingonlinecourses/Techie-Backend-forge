@@ -239,3 +239,7 @@ public <T> T withRetry(Supplier<T> call, int maxAttempts) {
 
 Idempotency makes retries *safe*; rate limiting makes the API *available*. Together they're what turns an API from a prototype into a service other teams can depend on.
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [docs.spring.io/spring-framework/reference/web/webmvc.html](https://docs.spring.io/spring-framework/reference/web/webmvc.html)

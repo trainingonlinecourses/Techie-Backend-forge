@@ -129,3 +129,7 @@ SearchResponse<Product> aggResponse = es.search(s -> s
 
 The Query DSL has two clause families: scored *query* clauses (`match`, `match_phrase`, `multi_match` — the search intent, ranked by BM25 relevance) and unscored *filter* clauses (`term`, `range` — exact constraints, cacheable). The `bool` query composes them: `must` (required + scored), `filter` (required, unscored, cached), `should` (optional boosts), `must_not` (excluded). Relevance comes from term frequency and inverse document frequency, tuned with field boosts. And the operational extras — sorting, pagination (shallow), and aggregations on `keyword` fields — complete the toolbox. Read a query as "search intent + constraints," and the DSL stops being a wall of JSON and becomes a sentence.
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [elastic.co/guide/en/elasticsearch/reference/current/index.html](https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html)

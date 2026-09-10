@@ -102,3 +102,7 @@ The loop that makes it stick: **write the module → test it in isolation → ve
 
 Official docs: [Spring Modulith — Testing](https://docs.spring.io/spring-modulith/reference/testing.html) · [Documentation](https://docs.spring.io/spring-modulith/reference/documentation.html)
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-modulith/reference](https://docs.spring.io/spring-modulith/reference/)

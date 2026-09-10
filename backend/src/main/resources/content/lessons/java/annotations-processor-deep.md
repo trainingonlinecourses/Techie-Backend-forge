@@ -245,3 +245,7 @@ java.lang.annotation.Annotation (root)
 | Using annotations to replace all if/else logic | Runtime reflection makes code hard to follow |
 | Not testing annotation processors | Generated code breaks silently |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

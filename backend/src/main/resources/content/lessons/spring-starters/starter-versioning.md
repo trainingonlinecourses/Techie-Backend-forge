@@ -133,3 +133,7 @@ my-starter/
 | Not following SemVer | Confusing upgrade path | Use MAJOR.MINOR.PATCH |
 | Hardcoding dependency versions | Version conflicts | Use properties + dependency management |
 
+## References
+
+- [dev.java — the official OpenJDK site](https://dev.java/)
+- [docs.spring.io/spring-boot/reference/features/developing-auto-configuration.html](https://docs.spring.io/spring-boot/reference/features/developing-auto-configuration.html)

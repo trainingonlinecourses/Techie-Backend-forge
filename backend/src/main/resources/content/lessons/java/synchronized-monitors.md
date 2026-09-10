@@ -238,3 +238,7 @@ public T dequeue() throws InterruptedException {
 | Nested `synchronized` blocks in wrong order | Deadlock — two threads hold the other's lock |
 | Using `notify()` when multiple threads wait | Only one wakes — use `notifyAll()` for correctness |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

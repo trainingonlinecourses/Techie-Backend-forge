@@ -192,3 +192,7 @@ class FetchStrategyTest {
 
 N+1 is the difference between "works in dev" and "melts in prod" — every parent-child list is a hidden query explosion. Set batch fetching as the baseline, use EntityGraphs for the hot paths, keep lazy access inside transactions, and verify with query-count tests. The database will thank you.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-data/jpa/reference](https://docs.spring.io/spring-data/jpa/reference/)

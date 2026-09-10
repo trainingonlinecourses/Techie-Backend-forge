@@ -76,3 +76,7 @@ class UserProfile extends BaseUser {
 4. **Preview in Java 26** — may change based on feedback
 5. **Only simple expressions** — you can't call instance methods before super()
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/26/docs/api/)

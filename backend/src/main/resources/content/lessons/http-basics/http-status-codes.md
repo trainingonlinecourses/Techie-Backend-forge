@@ -153,3 +153,7 @@ Stable fields: `code` (clients switch on it), `message` (humans read it), `statu
 - Retry semantics: 4xx rarely retryable; 5xx sometimes; 503/504 yes.
 - Pair codes with a stable error body (`code`, `message`) documented in the spec.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [datatracker.ietf.org/doc/html/rfc9110](https://datatracker.ietf.org/doc/html/rfc9110)

@@ -125,3 +125,7 @@ Lower order value runs first. Use `@Order` when the sequence matters (check depe
 - Use `@Order` when sequence matters; fail fast for critical checks, swallow non-critical warmups.
 - Runners delay the port opening — keep them quick and profile-guarded.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-boot/reference](https://docs.spring.io/spring-boot/reference/)

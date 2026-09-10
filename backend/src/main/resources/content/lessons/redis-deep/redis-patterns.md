@@ -158,3 +158,7 @@ Set<String> top = redis.zrevrange("leaderboard", 0, 9);
 
 The Redis patterns are recipes over its structures: cache-aside for reads (with TTL-bounded staleness and a correct DB fallback), delete-on-write for invalidation, atomic `INCR` with TTL for rate limiting, `BLPOP` lists (or Streams) for queues, `SET NX EX` + tokenized compare-and-delete for distributed locks, and atomic counters for rankings. Each pattern exists because a naive version fails under concurrency or crashes — the Redis commands are atomic precisely so the patterns can be. Apply them with TTLs, blocking calls, and the DB-as-truth discipline, and you have the production Redis playbook.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [redis.io/docs/latest](https://redis.io/docs/latest/)

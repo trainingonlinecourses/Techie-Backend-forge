@@ -186,3 +186,7 @@ The biggest real-world Mockito problem is **over-stubbing**: stubbing everything
 
 Advanced Mockito is the middle tier between basics and desperation: **argument matchers** (`any`, `eq`, `argThat` — all-or-nothing per call) describe which calls count; **`doAnswer`** computes answers from the arguments (ID generation, callbacks); the **`do*` family** handles voids and spies where `when()` can't; **verify modes** (`times`, `never`, `atLeastOnce`, `verifyNoInteractions`, `inOrder`) provide the full accounting of interactions; and **`timeout()`** tames async verification. The discipline that ties it together: stub only what the path uses, verify what you care about, and when a test demands elaborate mocking, question the design before adding another layer of stubs.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [javadoc.io/doc/org.mockito/mockito-core/latest/org/mockito/Mockito.html](https://javadoc.io/doc/org.mockito/mockito-core/latest/org/mockito/Mockito.html)

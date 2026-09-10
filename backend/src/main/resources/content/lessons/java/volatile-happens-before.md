@@ -221,3 +221,7 @@ This is expensive relative to a normal read/write (roughly 5-10x slower on x86),
 | Making every field volatile | Performance degradation — unnecessary memory barriers |
 | Assuming volatile is faster than synchronized | For single flags yes, for compound operations no |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

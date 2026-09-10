@@ -179,3 +179,7 @@ class IsolationTest {
 
 Postgres's concurrency model is MVCC + row locks: reads are always consistent snapshots, writes serialize on row locks, and SERIALIZABLE enforces full serialization by aborting races. Match your isolation level to the anomaly you actually face, use FOR UPDATE for read-then-write, and build retry into SERIALIZABLE paths.
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [postgresql.org/docs/current](https://www.postgresql.org/docs/current/)

@@ -109,3 +109,7 @@ future.whenComplete((res, ex) -> {
 - [Receiving Messages (@KafkaListener)](https://docs.spring.io/spring-kafka/reference/kafka/receiving-messages/receiving-messages.html)
 - [Apache Kafka Producer/Consumer docs](https://kafka.apache.org/documentation/#producerapi)
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-kafka/reference](https://docs.spring.io/spring-kafka/reference/)

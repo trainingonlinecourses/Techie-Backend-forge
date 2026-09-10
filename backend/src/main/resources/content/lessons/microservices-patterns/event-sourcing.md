@@ -377,3 +377,7 @@ Event sourcing includes CQRS naturally (you need projections), and typically use
 
 Official docs: [Event Sourcing (Fowler)](https://martinfowler.com/eaaDev/EventSourcing.html) · [Event Sourcing (microservices.io)](https://microservices.io/patterns/data/event-sourcing.html)
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [microservices.io/patterns/index.html](https://microservices.io/patterns/index.html)

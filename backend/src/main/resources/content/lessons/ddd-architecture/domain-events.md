@@ -201,3 +201,7 @@ Or add `eventVersion` and keep the parser tolerant — consumers must handle old
 
 Domain events are the connective tissue of DDD: aggregates stay small and consistent while the rest of the system reacts to what happened. When the events themselves become the storage (event sourcing) and the queries split off (CQRS), you've graduated from event-driven DDD to a full event-driven architecture — powerful, and worth it only when the requirements demand the audit trail, replay, or read/write separation.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [martinfowler.com/tags/domain%20driven%20design.html](https://martinfowler.com/tags/domain%20driven%20design.html)

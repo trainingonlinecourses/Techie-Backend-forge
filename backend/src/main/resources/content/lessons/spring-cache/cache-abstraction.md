@@ -205,3 +205,7 @@ class CourseServiceTest {
 
 The annotation is the easy part — the design (what to cache, for how long, how to invalidate) is the hard part. The next lessons cover eviction, Redis, and cache manager configuration in depth.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-framework/reference/integration/cache.html](https://docs.spring.io/spring-framework/reference/integration/cache.html)

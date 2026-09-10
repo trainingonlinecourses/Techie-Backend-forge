@@ -147,3 +147,7 @@ The three signals every service dashboard must have: **RED** (Rate of requests, 
 
 The professional layer around Kubernetes is tooling and discipline: **Helm** packages and versions your manifests (one chart, per-environment values, instant rollbacks); the **HPA** autoscales on CPU (with **KEDA** for queue-depth signals on event-driven services); the **kubectl** ladder (get → describe → logs → exec) is the daily diagnostic path; and **Prometheus/Grafana/Loki** provide the observability without which a cluster is a black box. The operating model that ties it together is **GitOps** — Git as the single source of truth, synced by Argo CD or Flux — turning every cluster change into a reviewable, revertible commit. Master the concepts and the tooling, and "running Kubernetes" stops being heroics and becomes a boring, repeatable process.
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [kubernetes.io/docs/home](https://kubernetes.io/docs/home/)

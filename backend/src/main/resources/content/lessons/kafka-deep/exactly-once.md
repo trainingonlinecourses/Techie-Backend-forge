@@ -118,3 +118,7 @@ Here's the engineering judgment the books skip: **most real systems don't need K
 
 Exactly-once semantics break into three promises — at-most-once (loss possible), at-least-once (duplicates possible), exactly-once (neither). Kafka provides the building blocks: idempotent producers (no duplicates into the log), transactions (atomic multi-partition writes with fencing), and the transactional consume-process-produce cycle (results and offsets committed atomically — the closest thing to true EOS). But the engineering wisdom is that **at-least-once + idempotence usually delivers the observable behavior you need at a fraction of the cost and complexity** — reserve Kafka transactions for the narrow cases where outputs genuinely can't tolerate duplicates. Know the semantics dial, know the idempotence shortcut, and choose deliberately.
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [kafka.apache.org/documentation](https://kafka.apache.org/documentation/)

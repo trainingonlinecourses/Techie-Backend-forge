@@ -158,3 +158,7 @@ The master rule: **keep a normalized source of truth; denormalize only the read 
 - Keep a normalized source of truth; denormalize only the read path.
 - Measure before denormalizing; monitor staleness after.
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [postgresql.org/docs/current/ddl.html](https://www.postgresql.org/docs/current/ddl.html)

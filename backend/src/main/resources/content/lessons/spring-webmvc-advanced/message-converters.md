@@ -104,3 +104,7 @@ public class FixedWidthConverter extends AbstractHttpMessageConverter<LedgerEntr
 - Custom converters extend the chain for niche formats — register as beans.
 - Content type/accept drive converter selection (415/406); test the wire format, not just the object.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-framework/reference/web/webmvc.html](https://docs.spring.io/spring-framework/reference/web/webmvc.html)

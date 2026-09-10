@@ -101,3 +101,7 @@ One MCP server can expose your org's tools (search, ticketing, docs) to *any* MC
 
 **Official docs:** [MCP support](https://docs.spring.io/spring-ai/reference/api/tools/mcp.html) · [Spring AI reference](https://docs.spring.io/spring-ai/reference/)
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-ai/reference](https://docs.spring.io/spring-ai/reference/)

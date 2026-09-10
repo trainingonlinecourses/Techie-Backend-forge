@@ -162,3 +162,7 @@ http.securityMatcher("/actuator/**")
 - Expose only what you need; protect the rest; never expose `/env` publicly.
 - In Spring Security setups, permit `/actuator/health/**` explicitly for platform checks.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [docs.spring.io/spring-boot/reference](https://docs.spring.io/spring-boot/reference/)

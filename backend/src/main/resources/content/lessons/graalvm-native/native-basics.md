@@ -148,3 +148,7 @@ public class NativeHints implements RuntimeHintsRegistrar {
 
 GraalVM Native Image compiles the whole application ahead of time into a standalone executable: instant startup (milliseconds), low memory, no JVM — bought with the **closed-world trade**: everything dynamic (reflection, resources, proxies, serialization) must be declared at build time via metadata, which Spring Boot and the ecosystem increasingly generate automatically through hints. The modern Spring Boot path is largely declarative (`-Pnative native:compile`, `RuntimeHintsRegistrar` for your custom edges), with the real costs being build time (minutes) and the loss of runtime dynamism. Choose native for serverless and cold-start-sensitive workloads; keep the JVM where peak throughput and dynamic freedom rule. Understand the closed-world model, and native image stops being magic — it becomes a compile-time contract you participate in.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [graalvm.org/latest/docs](https://www.graalvm.org/latest/docs/)

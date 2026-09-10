@@ -98,3 +98,7 @@ while (m.find()) {
 - Guard against catastrophic backtracking on untrusted input.
 - Regex for patterns, not for parsing structured formats.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

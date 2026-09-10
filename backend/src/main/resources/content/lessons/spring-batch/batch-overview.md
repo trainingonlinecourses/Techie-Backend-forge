@@ -98,3 +98,7 @@ JobExecution ex = jobLauncher.run(statementJob,
 
 Official docs: [Spring Batch Reference](https://docs.spring.io/spring-batch/reference/) · [Spring Boot Batch](https://docs.spring.io/spring-boot/reference/features/batch.html)
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-batch/reference](https://docs.spring.io/spring-batch/reference/)

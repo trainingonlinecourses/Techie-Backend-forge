@@ -329,3 +329,7 @@ In the lab, you will see a helper that builds an HTML email body using string co
 
 A text block is a multiline string literal delimited by `"""`. It is cleaner than concatenation and escaping for JSON, HTML, SQL, and other structured multiline text. The compiler strips incidental leading whitespace based on the minimum indentation across all lines, including the closing delimiter — so the position of the closing `"""` controls the result. Escape sequences still apply: `\\` for a backslash, `\n` for a newline, `\"` for a quote (usually optional inside a text block but needed for three consecutive quotes), and `\s` to preserve trailing whitespace. Text blocks are standard in Java 15 and later. Use them for static structured text; use `String.formatted()` or a template engine for dynamic content.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/21/language/)

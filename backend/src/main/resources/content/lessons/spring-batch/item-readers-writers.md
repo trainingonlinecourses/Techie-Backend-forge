@@ -93,3 +93,7 @@ new FlatFileItemWriterBuilder<Order>()
 
 Official docs: [Readers & Writers](https://docs.spring.io/spring-batch/reference/readers-and-writers.html)
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-batch/reference](https://docs.spring.io/spring-batch/reference/)

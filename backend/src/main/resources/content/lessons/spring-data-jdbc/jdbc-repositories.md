@@ -145,3 +145,7 @@ The famous quote attributed to the Spring team: *"Spring Data JDBC is the right 
 - Choose JDBC-style for straightforward domains; JPA for complex object graphs.
 - "What you write is what the database runs" — the debugging story is clean.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-data/jdbc/reference](https://docs.spring.io/spring-data/jdbc/reference/)

@@ -225,3 +225,7 @@ Or with a GitOps tool (ArgoCD/Flux): CI pushes the image tag into a git repo; th
 
 Kubernetes rewards precision: accurate probes and limits are what make rolling updates actually zero-downtime. The next lesson covers blue-green and canary strategies that go beyond the built-in rolling update.
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [docs.github.com/en/actions](https://docs.github.com/en/actions)

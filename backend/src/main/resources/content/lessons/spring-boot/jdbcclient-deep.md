@@ -385,3 +385,7 @@ public class SearchRepository {
 | Ignoring return values of `update()` | Can't verify success | Check the returned row count |
 | Using `queryForObject` for optional data | Throws EmptyResultDataAccessException | Use `query().stream().findFirst()` |
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-boot/reference](https://docs.spring.io/spring-boot/reference/)

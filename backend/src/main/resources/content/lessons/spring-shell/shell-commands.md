@@ -133,3 +133,7 @@ public class DeployCommands {
 | Forgetting availability checks | Unauthorized commands exposed | Always check permissions |
 | Using interactive input | Breaks scripting | Use @ShellOption for all params |
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [spring.io/projects/spring-shell](https://spring.io/projects/spring-shell)

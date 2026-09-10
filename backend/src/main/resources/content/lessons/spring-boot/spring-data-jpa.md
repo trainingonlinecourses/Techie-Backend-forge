@@ -120,3 +120,7 @@ Each repository method runs in a transaction. For multi-step operations, annotat
 
 **Official docs:** [Spring Data JPA](https://docs.spring.io/spring-data/jpa/reference/) · [Query methods](https://docs.spring.io/spring-data/jpa/reference/jpa/query-methods.html)
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-boot/reference](https://docs.spring.io/spring-boot/reference/)

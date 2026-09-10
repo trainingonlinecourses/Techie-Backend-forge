@@ -133,3 +133,7 @@ The discipline: **mock at the architecture boundary** (I/O: repos, HTTP, clock),
 
 Official docs: [Mockito](https://site.mockito.org/) · [Mockito API](https://javadoc.io/doc/org.mockito/mockito-core/latest/org/mockito/Mockito.html)
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [junit.org/junit5/docs/current/user-guide](https://junit.org/junit5/docs/current/user-guide/)

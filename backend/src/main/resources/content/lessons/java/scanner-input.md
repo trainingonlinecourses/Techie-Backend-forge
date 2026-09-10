@@ -148,3 +148,7 @@ try (Scanner fileScanner = new Scanner(new File("data.txt"))) {
 | Never closing Scanner wrapping System.in | Warning; closing can also kill stdin for the JVM | Fine to leave open for System.in; close file-based scanners |
 | Assuming `hasNextInt()` consumed anything | Double-read bugs | It only peeks — pair with an actual read |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

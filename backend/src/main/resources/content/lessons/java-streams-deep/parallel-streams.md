@@ -177,3 +177,7 @@ Blocking I/O on the common pool is an anti-pattern: 8 blocked threads = 8 dead c
 
 Parallel streams are a tool, not a default: they pay off only past the overhead threshold, with independent elements, and off the common pool for blocking work. Measure the speedup, keep lambdas pure, and reach for `CompletableFuture` + your own executor when the work blocks.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/stream/package-summary.html)

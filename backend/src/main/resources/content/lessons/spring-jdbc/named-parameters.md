@@ -171,3 +171,7 @@ class CourseRepositoryTest {
 
 Named parameters are strictly more readable and less error-prone than positional placeholders. Make them your default for anything beyond a one-liner — the code reads like the SQL, and refactors stop breaking silently.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-framework/reference/data-access/jdbc.html](https://docs.spring.io/spring-framework/reference/data-access/jdbc.html)

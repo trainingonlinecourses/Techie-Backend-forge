@@ -155,3 +155,7 @@ public class Main {
 4. **Timeouts are critical** — always set connectTimeout and request timeout
 5. **try-with-resources** ensures sockets and streams are properly closed
 
+## References
+
+- [dev.java — the official OpenJDK site](https://dev.java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/essential/io/serializing.html)

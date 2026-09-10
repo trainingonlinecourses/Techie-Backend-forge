@@ -134,3 +134,7 @@ Same application code, different server — the servlet API (`jakarta.servlet`) 
 - Swap Tomcat for Jetty/Undertow by changing the starter dependency.
 - Set `forward-headers-strategy=framework` behind a proxy that terminates TLS.
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [docs.spring.io/spring-boot/reference](https://docs.spring.io/spring-boot/reference/)

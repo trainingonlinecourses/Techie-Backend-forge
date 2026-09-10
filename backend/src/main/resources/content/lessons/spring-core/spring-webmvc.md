@@ -111,3 +111,7 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
 
 **Official docs:** [Web MVC](https://docs.spring.io/spring-framework/reference/web/webmvc.html) · [Controllers](https://docs.spring.io/spring-framework/reference/web/webmvc/mvc-controller.html)
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-framework/reference](https://docs.spring.io/spring-framework/reference/)

@@ -181,3 +181,7 @@ public class DependencyHealthTask {
 
 `@Scheduled` gives you three timing models — `fixedRate` (start-to-start), `fixedDelay` (finish-to-start, no overlap), and `cron` (calendar-aligned). The defaults are deliberately minimal; production systems must configure a thread pool, use property-driven intervals, handle graceful shutdown, and coordinate across cluster nodes. That last concern — distributed scheduling — is covered in depth in the final lesson of this module.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-framework/reference/integration/scheduling.html](https://docs.spring.io/spring-framework/reference/integration/scheduling.html)

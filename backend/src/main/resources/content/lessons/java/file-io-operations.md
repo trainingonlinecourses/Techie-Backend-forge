@@ -400,3 +400,7 @@ public class FileUploadValidator {
 | Hardcoding paths with `/` or `\\` | Breaks on other OS — use `Path.of("a", "b")` instead |
 | Not checking `Files.exists()` before operations | Unnecessary exceptions — check first or use `deleteIfExists()` |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

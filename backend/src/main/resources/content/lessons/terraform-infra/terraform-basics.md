@@ -159,3 +159,7 @@ State is what lets Terraform know the difference between "create" and "update": 
 
 Terraform turns infrastructure into reviewable, versionable code: HCL declarations of cloud resources (providers translate them to each platform's API), a dependency graph wires ordering, and the plan/apply workflow shows the exact diff before any change. The core objects: `provider` (the platform), `resource` (the infrastructure), `variable` (the tunables), `output` (the results), and `state` (the record of reality — remote and locked for teams). The golden rules: **never commit secrets, review every plan like code, and make all changes through Terraform** so state never drifts. This is the "deploy" half of your pipeline made deliberate — and the patterns (plan/apply, variables, state) carry straight into the next lessons on HCL depth and modules.
 
+## References
+
+- [dev.java — the official OpenJDK site](https://dev.java/)
+- [developer.hashicorp.com/terraform/docs](https://developer.hashicorp.com/terraform/docs)

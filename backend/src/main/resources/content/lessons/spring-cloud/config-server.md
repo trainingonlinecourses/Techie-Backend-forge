@@ -136,3 +136,7 @@ Config server can encrypt values (symmetric key via `encrypt.key`) but the moder
 
 **Official docs:** [Config reference](https://docs.spring.io/spring-cloud-config/reference/) · [Server](https://docs.spring.io/spring-cloud-config/reference/server.html) · [Client](https://docs.spring.io/spring-cloud-config/reference/client.html)
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-cloud/reference](https://docs.spring.io/spring-cloud/reference/)

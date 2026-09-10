@@ -526,3 +526,7 @@ public class Main {
 | Forgetting that filter/map are lazy | Unexpected execution order | Terminal operation triggers everything |
 | Creating huge intermediate lists | Memory waste | Chain operations directly on the stream |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

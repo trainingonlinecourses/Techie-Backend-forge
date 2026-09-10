@@ -106,3 +106,7 @@ public class MyAutoConfiguration {
 | Too many required dependencies | Starter bloats classpath | Make optional deps optional |
 | Not version-managing dependencies | Version conflicts | Use BOM or dependency management |
 
+## References
+
+- [dev.java — the official OpenJDK site](https://dev.java/)
+- [docs.spring.io/spring-boot/reference/features/developing-auto-configuration.html](https://docs.spring.io/spring-boot/reference/features/developing-auto-configuration.html)

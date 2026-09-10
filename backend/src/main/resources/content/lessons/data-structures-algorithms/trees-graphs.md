@@ -192,3 +192,7 @@ Graphs are stored two ways, and the choice matters:
 
 Trees are rooted hierarchies with one parent per node and no cycles; binary search trees impose ordering (left < node < right) to get O(log n) search and sorted in-order traversal — provided they stay balanced (that's what red-black trees and B-trees do). Graphs are unrestricted networks explored by BFS (queue, shortest paths, O(V+E)) or DFS (stack/recursion, path existence, cycles), represented as adjacency lists or matrices. Every "dependency", "route", and "hierarchy" problem in software is one of these two shapes — and choosing the right traversal and representation is most of the battle.
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [algs4.cs.princeton.edu/home](https://algs4.cs.princeton.edu/home/)

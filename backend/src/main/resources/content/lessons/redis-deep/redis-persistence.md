@@ -102,3 +102,7 @@ On a corrupted AOF, Redis 7 auto-repairs via the truncated-tail heuristic (you c
 
 Redis persistence answers "what survives a restart?" RDB saves full point-in-time snapshots — compact, fast to load, but loses writes since the last snapshot. AOF journals every command — fine-grained durability dialed by `appendfsync` (`everysec` is the production default), kept compact by rewrites. Running both gives the best of each. But persistence is not a database replacement: keep the authoritative copy in Postgres, add replication for node failures, and back up externally for disasters. Know your loss window — it's the number-one Redis production question — and configure it deliberately.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [redis.io/docs/latest](https://redis.io/docs/latest/)

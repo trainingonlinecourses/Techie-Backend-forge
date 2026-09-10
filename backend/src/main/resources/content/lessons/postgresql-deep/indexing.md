@@ -148,3 +148,7 @@ public class Course { ... }
 
 Indexes are the difference between a database that responds and one that times out — but they cost writes and space. `EXPLAIN ANALYZE` before and after, follow the leftmost-prefix rule, cover your hottest queries, and prune redundant indexes.
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [postgresql.org/docs/current](https://www.postgresql.org/docs/current/)

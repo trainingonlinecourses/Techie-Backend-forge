@@ -179,3 +179,7 @@ public void download(@PathVariable String key, HttpServletResponse response) thr
 | Not setting Content-Type | Files download incorrectly | Set contentType on upload |
 | Ignoring lifecycle policies | Storage costs grow forever | Set expiration rules |
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-boot/reference/web/servlet.html](https://docs.spring.io/spring-boot/reference/web/servlet.html)

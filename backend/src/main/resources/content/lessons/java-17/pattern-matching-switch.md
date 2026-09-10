@@ -308,3 +308,7 @@ public class PatternMatchingDemo {
 
 A fintech company processes different transaction types. Each transaction type has different fields and validation rules. Using pattern matching for switch with sealed classes, they eliminate 40 lines of instanceof chains, making the code compile-time safe and immediately readable. Adding a new transaction type forces them to handle it in every switch — impossible to forget.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/17/docs/api/)

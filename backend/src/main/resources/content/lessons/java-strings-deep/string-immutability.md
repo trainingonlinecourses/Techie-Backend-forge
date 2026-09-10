@@ -129,3 +129,7 @@ Each `+` creates a new `String`. For one-off concatenations that's fine; inside 
 - The original object is never modified — variables are just re-pointed.
 - Use `.equals()` for content comparison, never `==`.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html)

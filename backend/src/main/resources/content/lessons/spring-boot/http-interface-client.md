@@ -194,3 +194,7 @@ public class ClientErrorHandler implements ClientHttpResponseErrorHandler {
 | Large request/response bodies without streaming | Memory explosion |
 | Creating new WebClient per request | Socket leak, connection pool exhaustion |
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-boot/reference](https://docs.spring.io/spring-boot/reference/)

@@ -476,3 +476,7 @@ for (int i = 0; i < 1_000_000; i++) {
 | Not handling checked exceptions from reflection | Compilation errors | Wrap in try-catch or throw RuntimeException |
 | Using reflection to bypass encapsulation in production | Fragile — breaks if internals change | Use public APIs instead |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

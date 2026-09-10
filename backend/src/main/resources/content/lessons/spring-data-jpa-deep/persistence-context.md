@@ -166,3 +166,7 @@ public CourseDto getCourse(Long id) {
 
 The persistence context is the engine under JPA's declarative surface: entities are tracked, changes detected, and flushes scheduled. Work *with* it — load, mutate, rely on dirty checking, keep lazy access inside the transaction — and JPA feels like magic in the good way.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-data/jpa/reference](https://docs.spring.io/spring-data/jpa/reference/)

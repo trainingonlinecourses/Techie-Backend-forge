@@ -169,3 +169,7 @@ Primitive streams are both faster (no boxing) and have the numeric ops you need.
 
 Streams are a *pull-based pipeline*, not a loop with method syntax. Think in stages: what does each element pass through, what buffers, what stops early. Master the model and every pipeline you write becomes predictable — including the ones you debug at 2 AM.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/stream/package-summary.html)

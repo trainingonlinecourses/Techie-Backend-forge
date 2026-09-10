@@ -249,3 +249,7 @@ TenantRouter.withTenant("acme-corp", () -> {
 | Forgetting `run()` returns a value | Can't chain results | Use `.run(() -> result)` or `.call(() -> result)` |
 | Confusing with ThreadLocal | Different semantics | ScopedValue = scope-bound; ThreadLocal = thread-bound |
 
+## References
+
+- [dev.java — the official OpenJDK site](https://dev.java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/26/docs/api/)

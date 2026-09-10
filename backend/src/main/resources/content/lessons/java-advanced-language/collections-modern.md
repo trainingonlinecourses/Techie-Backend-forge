@@ -170,3 +170,7 @@ void copyOfIsolatesFromSource() {
 
 Modern collection code defaults to immutable, uses factory methods for literals, and copies defensively at boundaries. The result: fewer aliasing bugs, easier concurrency, and code that states its contract in the type system.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/21/language/java-language-changes.html)

@@ -198,3 +198,7 @@ byte[] encrypted = cipher.doFinal(data.getBytes());
 
 **Official docs:** [JCA Reference Guide](https://docs.oracle.com/en/java/javase/21/security/java-cryptography-architecture-jca-reference-guide.html) · [Standard Names](https://docs.oracle.com/en/java/javase/21/docs/specs/security/standard-names.html)
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

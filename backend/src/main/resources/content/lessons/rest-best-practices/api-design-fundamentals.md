@@ -182,3 +182,7 @@ public ResponseEntity<CourseDto> get(@PathVariable Long id) {
 
 These fundamentals are the contract your API's consumers depend on. The next lessons build on them: error handling, pagination, versioning, and rate limiting.
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [docs.spring.io/spring-framework/reference/web/webmvc.html](https://docs.spring.io/spring-framework/reference/web/webmvc.html)

@@ -176,3 +176,7 @@ public class GlobalExceptionHandler {
 
 Isolation is a consistency/concurrency trade with a correct default: READ_COMMITTED plus `@Version` covers almost everything. Reach for FOR UPDATE and SERIALIZABLE only when the anomalies actually bite — and when you do, remember Postgres punishes conflicts with aborts, so retry handling is part of the design.
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-framework/reference/data-access/transaction.html](https://docs.spring.io/spring-framework/reference/data-access/transaction.html)

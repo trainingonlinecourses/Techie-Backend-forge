@@ -143,3 +143,7 @@ public enum OrderStatus {
 
 Jackson annotations are the per-type instruction manual: `@JsonProperty` (renaming — the snake_case and wire-contract tool), `@JsonIgnore`/`@JsonIgnoreProperties` (the security-critical "never serialize this" and the recursion fix), `@JsonAlias` (input-only aliases for forward compatibility), `@JsonFormat` (per-field date/enum formats), `@JsonInclude` (lean output by omitting nulls), `@JsonCreator` (building immutable classes), `Access.READ_ONLY`/`WRITE_ONLY` (direction control — passwords in, never out), and `@JsonValue`/`@JsonCreator` for enums. The discipline: prefer DTOs over raw entities, use `@JsonIgnore` for anything sensitive, and keep the annotations as the explicit contract between your Java types and the JSON your API promises.
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [github.com/FasterXML/jackson-docs](https://github.com/FasterXML/jackson-docs)

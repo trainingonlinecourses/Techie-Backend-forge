@@ -458,3 +458,7 @@ mergeLists(numbers, moreIntegers);
 | Checking `instanceof List<String>` | Compile error — generic type erased at runtime | Check raw type `instanceof List` |
 | Creating `new T[10]` | Compile error — can't create generic arrays | Use `Object[]` and cast, or `List<T>` |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

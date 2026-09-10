@@ -149,3 +149,7 @@ public class SecureFileController {
 
 A document management platform handles 10,000 file uploads/day. They use multipart upload to S3, virus scanning via ClamAV, and streaming downloads. Each upload: validates type → scans virus → stores in S3 → creates metadata record. Downloads stream directly from S3 without loading into server memory. The system handles files up to 100MB without issues.
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-boot/reference/web/servlet.html](https://docs.spring.io/spring-boot/reference/web/servlet.html)

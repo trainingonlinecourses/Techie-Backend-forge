@@ -114,3 +114,7 @@ The integration test replaces the transport: call the function, or use the Sprin
 
 Official docs: [Spring Cloud Function](https://docs.spring.io/spring-cloud-function/reference/)
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-cloud/reference](https://docs.spring.io/spring-cloud/reference/)

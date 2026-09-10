@@ -112,3 +112,7 @@ The read model is a **query shape**, not an entity graph — which is exactly th
 
 Official docs: [CQRS (Fowler)](https://martinfowler.com/bliki/CQRS.html) · [CQRS (microservices.io)](https://microservices.io/patterns/data/cqrs.html)
 
+## References
+
+- [dev.java — the official OpenJDK site](https://dev.java/)
+- [microservices.io/patterns/index.html](https://microservices.io/patterns/index.html)

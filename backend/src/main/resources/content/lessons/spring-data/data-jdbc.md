@@ -284,3 +284,7 @@ public interface OrderRepository extends CrudRepository<Order, Long> {
 
 **Official docs:** [Spring Data JDBC](https://docs.spring.io/spring-data/jdbc/reference/) · [Spring JDBC](https://docs.spring.io/spring-framework/reference/data-access/jdbc.html)
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [docs.spring.io/spring-data/reference](https://docs.spring.io/spring-data/reference/)

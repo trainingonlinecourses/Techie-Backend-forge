@@ -149,3 +149,7 @@ An e-commerce platform uses Optional throughout the codebase:
 
 Every method chain uses map/flatMap/orElse — no null checks, no NPEs. The codebase went from 50+ NPEs per week to zero.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

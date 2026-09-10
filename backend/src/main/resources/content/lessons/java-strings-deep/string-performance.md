@@ -137,3 +137,7 @@ java -XX:+UseStringDeduplication -jar app.jar
 - Modern `substring` copies — slice sparingly.
 - Compact strings (Java 9+) halve memory for Latin-1 text automatically; `-XX:+UseStringDeduplication` is a free win.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html)

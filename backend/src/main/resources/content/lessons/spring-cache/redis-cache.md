@@ -163,3 +163,7 @@ L1 gives sub-microsecond hits; L2 gives cluster consistency with a 30s lag. The 
 
 Redis turns Spring's cache abstraction into a cluster-wide facility with TTLs, distributed locks, and predictable failure modes — the production-grade answer to "which cache should I use?"
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-framework/reference/integration/cache.html](https://docs.spring.io/spring-framework/reference/integration/cache.html)

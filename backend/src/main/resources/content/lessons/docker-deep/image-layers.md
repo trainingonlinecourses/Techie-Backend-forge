@@ -108,3 +108,7 @@ RUN mvn package
 - Containers start fast because they don't copy the image.
 - Rebuild from the recipe; never `docker commit` ad-hoc state.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [docs.docker.com](https://docs.docker.com/)

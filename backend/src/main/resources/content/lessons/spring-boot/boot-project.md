@@ -272,3 +272,7 @@ parent-pom/
 
 Official docs: [Using Spring Boot](https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#using.spring-boot) · [Code Structure](https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#structuring.your.code)
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [docs.spring.io/spring-boot/reference](https://docs.spring.io/spring-boot/reference/)

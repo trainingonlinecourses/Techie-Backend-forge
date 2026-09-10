@@ -313,3 +313,7 @@ public class ExternalDataService {
 | Not using `allOf` for parallel | Sequential when parallel is possible | Use `allOf()` to wait for multiple futures |
 | Ignoring `join()` exceptions | `CompletionException` not caught | Wrap in try-catch or use `.exceptionally()` |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/21/core/concurrency.html)

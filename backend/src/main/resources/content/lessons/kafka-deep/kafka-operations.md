@@ -116,3 +116,7 @@ For most of Kafka's life, a ZooKeeper ensemble managed cluster metadata (broker 
 
 Operating Kafka means controlling it programmatically (the `AdminClient` for topic creation and cluster introspection), watching the metrics that predict failure (consumer **lag** first, then under-replicated partitions and disk), and setting the production configs that define your guarantees (replication 3 + `min.insync.replicas=2` + `acks=all` for durability; `unclean.leader.election.enable=false` against data loss; no auto-created topics). KRaft removes ZooKeeper from the stack, and security (TLS + SASL + ACLs) is non-negotiable outside trusted networks. The operational truth is the same as for any distributed system: the clients are easy, the running is the craft — and the lag metric is your honesty check.
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [kafka.apache.org/documentation](https://kafka.apache.org/documentation/)

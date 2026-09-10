@@ -457,3 +457,7 @@ In the lab, you will see a producer-consumer demo with an unbounded queue and a 
 
 Java's queue families solve different problems. `Queue` (FIFO) is the basic ordered collection — `ArrayDeque` is the recommended simple implementation, not `LinkedList`. `Deque` is a double-ended queue you can use as a FIFO queue or a LIFO stack — `ArrayDeque` is the usual choice. `BlockingQueue` is the backbone of the producer-consumer pattern — `ArrayBlockingQueue` for a bounded queue with a single lock, `LinkedBlockingQueue` for an optionally bounded queue with two locks, `PriorityBlockingQueue` for priority-ordered tasks, and `SynchronousQueue` for direct handoff. `ConcurrentLinkedQueue` and `ConcurrentLinkedDeque` are non-blocking, high-throughput concurrent queues for cases where you do not need blocking semantics. The most common production mistake is using an unbounded queue without backpressure, which lets a fast producer overwhelm a slow consumer and eventually run out of memory. The fix is a bounded blocking queue — the queue itself applies backpressure by blocking the producer when full.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/package-summary.html)

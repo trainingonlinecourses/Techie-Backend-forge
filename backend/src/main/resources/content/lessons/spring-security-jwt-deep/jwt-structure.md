@@ -168,3 +168,7 @@ For auth, JWS is correct: you *want* the server to read the claims (subject, rol
 - HS256 = one shared secret; RS256 = private/public key pair (better for multi-service).
 - Never use `alg: none`, never trust tokens without verification, always set `exp`.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [datatracker.ietf.org/doc/html/rfc7519](https://datatracker.ietf.org/doc/html/rfc7519)

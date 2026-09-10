@@ -116,3 +116,7 @@ for (int i = 0; i < 1000; i++) {
 | Creating wrapper with new | Bypasses cache, wastes memory | Use valueOf() or autoboxing |
 | Comparing Long == Long | Fails for values outside cache | Use .equals() |
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/package-summary.html)

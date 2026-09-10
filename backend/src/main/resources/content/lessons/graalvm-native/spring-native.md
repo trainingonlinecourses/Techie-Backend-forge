@@ -160,3 +160,7 @@ This is the ConfigMap/Secrets lesson's spirit taken to its logical end: the imag
 
 Spring Boot 3's native support automates the GraalVM path: the **AOT engine** analyzes your application during the build, generates bean definitions and GraalVM metadata for the whole framework stack, and hands everything to native-image — so `-Pnative native:compile` (or the buildpacks `spring-boot:build-image`) produces a milliseconds-starting executable. Your responsibility shrinks to the dynamic edges: **hints** (`@RegisterReflectionForBinding`, `RuntimeHintsRegistrar`) for custom reflection/resources/serialization, profile-config inclusion at build time, and third-party native compatibility. The mental shift is the whole game: Spring Boot native isn't a faster JVM — it's a *build-time-wired application* whose runtime configuration is the environment. Master the AOT model and the hint surface, and native deployment becomes a routine — albeit slow-building — workflow.
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [graalvm.org/latest/docs](https://www.graalvm.org/latest/docs/)

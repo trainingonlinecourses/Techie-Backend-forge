@@ -162,3 +162,7 @@ The fixes: extract intermediate steps into **named methods**, or convert to a lo
 - `parallel()` is an optimization you earn with measurement, not a default.
 - If the pipeline is hard to read, refactor to named methods — clarity wins.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/java/javaOO/lambdaexpressions.html)

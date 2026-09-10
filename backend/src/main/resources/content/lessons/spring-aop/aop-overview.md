@@ -405,3 +405,8 @@ class LoggingAspectTest {
 | **Proxy** | Runtime object wrapping the target (JDK or CGLIB) |
 
 AOP is a powerful tool for keeping cross-cutting concerns separate from business logic. When used judiciously, it leads to cleaner, more maintainable code. The key is balance — use AOP for truly cross-cutting concerns, not as a replacement for good object-oriented design.
+
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-framework/reference/core/aop.html](https://docs.spring.io/spring-framework/reference/core/aop.html)

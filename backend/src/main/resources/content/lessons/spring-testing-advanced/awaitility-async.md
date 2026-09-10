@@ -230,3 +230,7 @@ void shouldReadFromReplicaAfterWrite() {
 
 Official docs: [Awaitility](https://www.awaitility.org/) · [Documentation](https://www.awaitility.org/documentation.html)
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [docs.spring.io/spring-boot/reference/testing/spring-boot-applications.html](https://docs.spring.io/spring-boot/reference/testing/spring-boot-applications.html)

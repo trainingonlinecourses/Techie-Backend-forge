@@ -134,3 +134,7 @@ Neither is "always better". Loops win for: early `break`, `continue`, index acce
 - Captured variables must be effectively final.
 - Lambdas are the building block for the Stream API and functional interfaces (next lesson).
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/java/javaOO/lambdaexpressions.html)

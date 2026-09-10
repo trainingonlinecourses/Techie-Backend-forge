@@ -340,3 +340,7 @@ docker compose top
 | No SSL termination | Data in transit is plaintext | Use Nginx with SSL certificates |
 | Default bridge network | No service discovery | Create explicit named networks |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [docs.docker.com/compose](https://docs.docker.com/compose/)

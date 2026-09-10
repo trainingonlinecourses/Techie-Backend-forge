@@ -178,3 +178,7 @@ public String getApiKey() {
 | Using Optional with collections | Confusing semantics | Use `Collections.emptyList()` instead |
 | Optional.equals() | Compares by value, not identity | Use `.isPresent()` + `.get()` for comparison |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/javase/8/docs/api/)

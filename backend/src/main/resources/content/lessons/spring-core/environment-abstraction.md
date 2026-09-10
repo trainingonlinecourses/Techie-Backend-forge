@@ -97,3 +97,7 @@ If you register your own `@PropertySource`, remember **file order and later-decl
 - Prefer `@ConfigurationProperties` with validation over scattered `@Value` for groups of settings.
 - Typos fail silently — validate configuration at startup.
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-framework/reference](https://docs.spring.io/spring-framework/reference/)

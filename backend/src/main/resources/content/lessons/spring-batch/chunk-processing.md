@@ -192,3 +192,7 @@ The same code, clean:
 
 **Official docs:** [Chunk-Oriented Processing](https://docs.spring.io/spring-batch/reference/core/chunk-container.html) · [Item Readers](https://docs.spring.io/spring-batch/reference/core/itemreaders.html)
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [docs.spring.io/spring-batch/reference](https://docs.spring.io/spring-batch/reference/)

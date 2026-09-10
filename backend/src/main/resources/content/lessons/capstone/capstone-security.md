@@ -218,3 +218,7 @@ curl -i localhost:8081/api/accounts
 
 **Official docs:** [Spring Security auth](https://docs.spring.io/spring-security/reference/servlet/authentication/index.html)
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [docs.spring.io/spring-boot/reference](https://docs.spring.io/spring-boot/reference/)

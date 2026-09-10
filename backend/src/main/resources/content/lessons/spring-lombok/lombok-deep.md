@@ -157,3 +157,7 @@ public class User {
 
 A team of 15 Java developers was writing 50+ entity classes. Each entity had 20+ fields, requiring ~100 lines of boilerplate per class. After adopting Lombok, each class dropped to ~25 lines. Total codebase reduction: 3,750 lines. The team now uses `@Data` for entities, `@Builder` for complex construction, and Java Records for DTOs.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [projectlombok.org/features/all](https://projectlombok.org/features/all)

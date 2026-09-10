@@ -219,3 +219,7 @@ public class MessageConsumer {
 | Mixing reactive and blocking | Backpressure doesn't work with blocking calls | Use R2DBC, never JDBC in reactive chain |
 | Not monitoring buffer size | Can't detect backpressure issues | Add metrics for buffer size, drop count |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [docs.spring.io/spring-framework/reference/web/webflux.html](https://docs.spring.io/spring-framework/reference/web/webflux.html)

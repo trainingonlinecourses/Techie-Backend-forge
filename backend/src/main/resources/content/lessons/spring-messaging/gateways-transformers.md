@@ -155,3 +155,7 @@ If the release strategy is wrong, the aggregator waits forever (messages sit un-
 - Read a pipeline top-to-bottom — that readability is the design goal.
 - Set aggregator timeouts and route to defaults; keep components single-purpose.
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-integration/reference](https://docs.spring.io/spring-integration/reference/)

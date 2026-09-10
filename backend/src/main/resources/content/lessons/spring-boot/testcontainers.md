@@ -93,3 +93,7 @@ The same pattern covers MongoDB, Elasticsearch, RabbitMQ, MySQL, even **`LocalSt
 
 Official docs: [Spring Boot + Testcontainers](https://docs.spring.io/spring-boot/reference/testing/testcontainers.html) · [Testcontainers for Java](https://java.testcontainers.org/)
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-boot/reference](https://docs.spring.io/spring-boot/reference/)

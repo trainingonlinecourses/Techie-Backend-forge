@@ -217,3 +217,7 @@ public class AdminSecurityConfig {
 | Too many endpoints exposed | Performance overhead, security surface |
 | No notification configuration | Ops not alerted when app goes down |
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-boot/reference](https://docs.spring.io/spring-boot/reference/)

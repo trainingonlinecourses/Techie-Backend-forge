@@ -201,3 +201,7 @@ A DLQ rate > 0 is normal (transient storms happen); a **rising** DLQ rate is a d
 
 The recovery ladder turns "a message failed" from a silent data-loss event into a visible, replayable, alertable condition. Retry the transient, reject the permanent, park the poison, and reprocess deliberately.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-amqp/reference](https://docs.spring.io/spring-amqp/reference/)

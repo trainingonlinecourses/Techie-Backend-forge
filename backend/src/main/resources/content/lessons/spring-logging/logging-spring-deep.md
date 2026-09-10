@@ -154,3 +154,7 @@ public class OrderController {
 
 A microservices platform processes 1M requests/day. When a customer reports "my order disappeared," support uses the `requestId` from MDC to trace the request across 8 services. Each service logs the same `requestId`, making it possible to reconstruct the entire flow in seconds. Without MDC, debugging would take hours of searching across different log files.
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-boot/reference/features/logging.html](https://docs.spring.io/spring-boot/reference/features/logging.html)

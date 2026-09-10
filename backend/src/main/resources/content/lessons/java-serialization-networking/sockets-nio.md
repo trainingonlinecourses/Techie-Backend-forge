@@ -417,3 +417,7 @@ One thread per connection
 
 **Use NIO when:** You need to handle thousands of concurrent connections (chat servers, proxies, game servers).
 
+## References
+
+- [dev.java — the official OpenJDK site](https://dev.java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/essential/io/serializing.html)

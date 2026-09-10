@@ -143,3 +143,7 @@ Learning the channel vocabulary once pays off twice: you already understand the 
 - The channel vocabulary transfers to brokers (queue ≈ QueueChannel, topic ≈ pub-sub).
 - Design the channels deliberately — they *are* the architecture.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-integration/reference](https://docs.spring.io/spring-integration/reference/)

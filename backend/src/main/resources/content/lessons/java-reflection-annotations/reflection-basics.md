@@ -205,3 +205,7 @@ Frameworks do the heavy lifting so you rarely write raw reflection — but when 
 
 Reflection lets a running program inspect and manipulate its own classes: `Class<?>` objects describe types, `getMethods()`/`getDeclaredFields()` reveal their members, `invoke()` calls methods by name, and constructors can be instantiated dynamically. It powers Spring, Jackson, ORMs, and test frameworks — everything that must work with classes it never compiled against. The trade-offs are real: names become runtime strings (no compile check), `setAccessible` breaks encapsulation, and per-call reflection is slower than direct calls. Use it at boundaries and initialization, cache your lookups, and let frameworks mediate — that's how the whole ecosystem gets dynamism without chaos.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/reflect/index.html)

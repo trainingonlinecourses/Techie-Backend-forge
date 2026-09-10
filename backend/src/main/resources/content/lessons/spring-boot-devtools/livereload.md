@@ -86,3 +86,7 @@ The same code, clean:
 | Using in production | Security risk + performance | DevTools only activates in dev |
 | Conflicting with other tools | Port 35729 occupied | Change port in config |
 
+## References
+
+- [dev.java — the official OpenJDK site](https://dev.java/)
+- [docs.spring.io/spring-boot/reference/using/devtools.html](https://docs.spring.io/spring-boot/reference/using/devtools.html)

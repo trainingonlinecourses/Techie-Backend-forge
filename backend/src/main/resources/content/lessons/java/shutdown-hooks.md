@@ -199,3 +199,7 @@ public class MyService {
 | Not registering hooks for external resources | Leaked connections, corrupted files |
 | Relying on hooks for data durability | No guarantee on force-kill |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

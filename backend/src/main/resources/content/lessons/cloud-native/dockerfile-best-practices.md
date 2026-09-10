@@ -98,3 +98,7 @@ The `ENTRYPOINT` exec-form note matters for Kubernetes: exec form runs java as P
 
 Official docs: [Dockerfile best practices](https://docs.docker.com/build/building/best-practices/) · [Spring Boot container images](https://docs.spring.io/spring-boot/reference/packaging/container-images.html)
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [kubernetes.io/docs/concepts](https://kubernetes.io/docs/concepts/)

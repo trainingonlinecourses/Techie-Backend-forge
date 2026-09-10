@@ -228,3 +228,7 @@ class OutboxTest {
 
 Distributed transactions aren't about making the impossible possible — they're about **making partial failure safe**: the outbox makes the DB+broker boundary atomic, sagas make multi-service failures recoverable, and idempotency makes retries harmless. Every pattern trades global atomicity for reliability + eventual consistency, which is the right trade in distributed systems.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [docs.spring.io/spring-framework/reference/data-access/transaction.html](https://docs.spring.io/spring-framework/reference/data-access/transaction.html)

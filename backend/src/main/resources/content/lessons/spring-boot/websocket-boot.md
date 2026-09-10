@@ -190,3 +190,7 @@ public class DocumentHandler {
 | Using raw WebSocket instead of STOMP | No built-in topic/queue semantics |
 | Missing SockJS fallback | Incompatible with corporate proxies |
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-boot/reference](https://docs.spring.io/spring-boot/reference/)

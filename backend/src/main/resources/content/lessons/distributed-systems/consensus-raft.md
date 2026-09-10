@@ -171,3 +171,7 @@ void writeFailsWithoutQuorum() {
 
 Consensus is how distributed systems get a single source of truth: a leader, a replicated log, and a majority rule that survives partitions and failures. Use etcd or ZooKeeper for leadership, locks, and config — and remember every consensus write costs a quorum round-trip, which is the price of the guarantee.
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [microservices.io/patterns/index.html](https://microservices.io/patterns/index.html)

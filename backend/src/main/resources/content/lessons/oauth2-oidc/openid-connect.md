@@ -136,3 +136,7 @@ Spring Security's OAuth2 *client* support (with `spring-boot-starter-oauth2-clie
 
 OpenID Connect layers authentication on OAuth2: the **ID token** (a JWT whose *audience is the client*, asserting the user's identity via `sub`, `email`, `name`) plus **discovery** (one well-known URL exposing every endpoint) and the **UserInfo** endpoint. The `openid` scope is the switch that activates it; the ID token's validation (signature, `iss`, `aud` = your client id, `exp`, **nonce**) is what makes the identity trustworthy. Spring Security's OAuth2 client runs the whole flow from an issuer URI, handing you an `OidcUser` with the claims. The mental model to keep: **access token = what the app may do (OAuth2); ID token = who the user is (OIDC)** — two tokens, one login, complementary jobs.
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [datatracker.ietf.org/doc/html/rfc6749](https://datatracker.ietf.org/doc/html/rfc6749)

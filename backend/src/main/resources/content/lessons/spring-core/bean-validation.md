@@ -109,3 +109,7 @@ For `ConstraintViolationException` use `ex.getConstraintViolations()` — the AP
 
 Official docs: [Spring Validation](https://docs.spring.io/spring-framework/reference/core/validation.html) · [Spring Boot Validation](https://docs.spring.io/spring-boot/reference/io/validation.html)
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [docs.spring.io/spring-framework/reference](https://docs.spring.io/spring-framework/reference/)

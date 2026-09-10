@@ -152,3 +152,7 @@ This is clean for config files and templates. But it loads everything into memor
 - The `while ((n = read(buf)) != -1)` loop is the universal read idiom.
 - Always close with try-with-resources — it flushes and frees OS handles.
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/io/package-summary.html)

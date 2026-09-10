@@ -310,3 +310,7 @@ public class ErrorLoggingAdvice {
 | Throwing exceptions for control flow | Slow (exception creation is expensive) | Use if/else for expected cases |
 | Catching all exceptions with one handler | Loses specific error information | Handle specific exceptions first |
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-boot/reference](https://docs.spring.io/spring-boot/reference/)

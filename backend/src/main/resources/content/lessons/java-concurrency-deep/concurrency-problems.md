@@ -171,3 +171,7 @@ Real production detection: **Chaos/load tests** with high concurrency + randomiz
 
 All five failures share one cure: **respect the happens-before rules and make check-then-act atomic**. Recognize the symptom (stuck? spinning? stale? wrong?), apply the matching fix, and prove it with stress tests — because a race that "never happens" is just one you haven't reproduced yet.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/21/core/concurrency.html)

@@ -169,3 +169,7 @@ IntegrationFlow aggregateFlow() {
 
 The pipeline verbs shape the flow: **transformers** convert payloads (built-ins, SpEL, or bean methods — the testable general form); **routers** send each message to one channel by content or header (with a `defaultOutputChannel` safety net) or fan out via recipient lists; **enrichers** look up and attach data from other sources through request-reply subflows; and **splitters + aggregators** implement scatter-gather — one batch into independent per-item messages and back into a combined result via correlation and release strategies. The craft is composing them in the right order (normalize early, route on normalized values) and giving every junction an explicit default and a timeout. Learn these five verbs and the pipeline grammar is complete — any integration becomes a sequence of named, testable stations.
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [docs.spring.io/spring-integration/reference](https://docs.spring.io/spring-integration/reference/)

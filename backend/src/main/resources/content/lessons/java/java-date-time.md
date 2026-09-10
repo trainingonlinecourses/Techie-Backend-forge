@@ -456,3 +456,7 @@ public class BusinessDayCalculator {
 | Formatting without specifying Locale | Month names in wrong language | Always specify `Locale` in formatters |
 | Parsing dates without DateTimeFormatter | Relying on default format — breaks across JVMs | Always use explicit formatters |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

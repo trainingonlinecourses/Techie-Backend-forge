@@ -159,3 +159,7 @@ public void process(ConsumerRecord<String, String> record) {
 
 Producer and consumer configuration is a set of guarantee dials. Producers: `acks=all` + `retries` + `enable.idempotence=true` gives exactly-once *into* the log — the production baseline; never ignore a `send` result for critical events. Consumers: `auto.offset.reset` controls where a fresh group starts; manual commit-after-processing gives at-least-once (no loss, possible duplicates — solved by making consumers idempotent); Kafka transactions give exactly-once end-to-end at real complexity cost. Consumer groups scale by splitting partitions and rebalance when members change — so write partition-agnostic, idempotent consumers and size partitions for the parallelism you need. Internalize the semantics dial and Kafka's guarantees stop being mysterious — they become settings you chose.
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [kafka.apache.org/documentation](https://kafka.apache.org/documentation/)

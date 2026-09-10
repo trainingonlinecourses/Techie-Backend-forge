@@ -142,3 +142,7 @@ public class Main {
 - Streams are composition in practice — each stage a small pure function.
 - Purity (no hidden state, no side effects) is what makes composition safe and testable.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/java/javaOO/lambdaexpressions.html)

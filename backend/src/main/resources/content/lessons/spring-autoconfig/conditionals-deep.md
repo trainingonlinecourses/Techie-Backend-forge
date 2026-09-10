@@ -235,3 +235,7 @@ debug: true
 #       - @ConditionalOnMissingBean (types: org.springframework.cache.CacheManager; DefaultSearch: all)
 ```
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-boot/reference/features/auto-configuration.html](https://docs.spring.io/spring-boot/reference/features/auto-configuration.html)

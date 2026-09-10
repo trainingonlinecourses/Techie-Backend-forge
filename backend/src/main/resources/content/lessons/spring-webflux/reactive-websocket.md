@@ -331,3 +331,7 @@ public class CollaborativeEditorHandler implements WebSocketHandler {
 
 Official docs: [WebSocket (Spring WebFlux)](https://docs.spring.io/spring-framework/reference/web/webflux-websocket.html)
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [docs.spring.io/spring-framework/reference/web/webflux.html](https://docs.spring.io/spring-framework/reference/web/webflux.html)

@@ -350,3 +350,7 @@ public class EventStreamService {
 
 Official docs: [Error Handling (Reactor)](https://projectreactor.io/docs/core/release/reference/#error-handling) · [WebFlux (Spring)](https://docs.spring.io/spring-framework/reference/web/webflux-webfn.html)
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [docs.spring.io/spring-framework/reference/web/webflux.html](https://docs.spring.io/spring-framework/reference/web/webflux.html)

@@ -214,3 +214,7 @@ log.atDebug().log(() -> "User details: " + expensiveToJson(user));
 | Too many DEBUG logs in production | Disk fills, performance degrades, signal lost in noise |
 | Catching exceptions and not logging them | Silent failures, impossible to debug |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

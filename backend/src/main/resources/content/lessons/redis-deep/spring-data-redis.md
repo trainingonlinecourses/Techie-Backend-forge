@@ -176,3 +176,7 @@ With `spring.cache.type=redis` and `spring.cache.redis.time-to-live=10m` in prop
 
 Spring Data Redis connects your beans to Redis through configured templates: `StringRedisTemplate` for JSON-string workflows, `RedisTemplate` with explicit serializers for typed objects, `opsFor*` views mapping one-to-one onto Redis structures, and optional `@RedisHash` repositories for entity-style access. The two habits that separate clean integrations from disasters: **choose your serializers deliberately** (JSON over JDK serialization) and **use the cache abstraction** (`@Cacheable` with Redis) for the common cache-behind-database pattern. One starter, one config block, and Redis becomes a first-class citizen of your Spring application.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [redis.io/docs/latest](https://redis.io/docs/latest/)

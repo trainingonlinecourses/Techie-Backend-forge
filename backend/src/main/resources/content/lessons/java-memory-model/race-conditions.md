@@ -211,3 +211,7 @@ public class Config {
 | Double-checked locking without volatile | Partially constructed object visible | Always use volatile |
 | Assuming synchronized is optional | Works sometimes, fails under load | Always synchronize shared state |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/javase/specs/jls/se17/html/jls-17.html)

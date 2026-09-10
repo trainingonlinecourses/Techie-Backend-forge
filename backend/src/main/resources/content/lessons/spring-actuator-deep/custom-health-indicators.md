@@ -131,3 +131,7 @@ readinessProbe:
 4. **Always include latency** in health details for monitoring dashboards
 5. **Kubernetes uses both probes** to decide restart vs traffic routing
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [docs.spring.io/spring-boot/reference/features/actuator.html](https://docs.spring.io/spring-boot/reference/features/actuator.html)

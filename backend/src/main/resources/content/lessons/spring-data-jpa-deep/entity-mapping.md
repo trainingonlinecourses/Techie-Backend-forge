@@ -202,3 +202,7 @@ public class Course {
 
 Mapping is where JPA's magic becomes predictable: choose sequences for batchability, keep associations lazy, own the cascade semantics, and sync both sides. Get these right and the object-relational bridge stops leaking; get them wrong and every query becomes a debugging session.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-data/jpa/reference](https://docs.spring.io/spring-data/jpa/reference/)

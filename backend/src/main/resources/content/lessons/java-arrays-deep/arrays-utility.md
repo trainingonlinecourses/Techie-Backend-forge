@@ -206,3 +206,7 @@ if (data.length < 8192) {
 | Sorting primitives | Can't use `Comparator` with `int[]` | Use wrapper types (`Integer[]`) for custom comparators |
 | `Arrays.fill(data, data)` | Fills with reference, not copies | Use `Arrays.copyOf()` to copy |
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Arrays.html)

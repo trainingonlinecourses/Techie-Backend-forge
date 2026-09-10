@@ -118,3 +118,7 @@ Teams sometimes overuse filters to "prepare" things that belong in resolvers —
 - Resolvers turn requests into parameters; filters/interceptors handle the rest — use the right tool.
 - Unit-test the two methods directly; register via `WebMvcConfigurer.addArgumentResolvers`.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-framework/reference/web/webmvc.html](https://docs.spring.io/spring-framework/reference/web/webmvc.html)

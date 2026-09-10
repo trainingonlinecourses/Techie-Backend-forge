@@ -144,3 +144,7 @@ public class Main {
 | Not having module-info.java | Module not recognized | Create module-info.java |
 | Forgetting `requires` on service API module | Compilation error | Add `requires service.api` |
 
+## References
+
+- [dev.java — the official OpenJDK site](https://dev.java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/17/language/java-module-system.htm)

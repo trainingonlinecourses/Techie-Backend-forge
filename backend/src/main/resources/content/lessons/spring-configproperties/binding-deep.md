@@ -199,3 +199,7 @@ APP_PAYMENT_API_KEY=abc123
 | Using `@Component` instead of `@EnableConfigurationProperties` | Less control over activation | Use `@EnableConfigurationProperties` on a `@Configuration` class |
 | Deep nesting (>3 levels) | Configuration becomes hard to understand | Flatten: use dot-separated property names |
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-boot/reference/features/external-config.html](https://docs.spring.io/spring-boot/reference/features/external-config.html)

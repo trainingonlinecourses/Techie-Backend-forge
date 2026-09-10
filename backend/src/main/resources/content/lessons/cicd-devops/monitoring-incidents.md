@@ -150,3 +150,7 @@ Production is a system of systems; the only way to trust the failure modes is to
 
 Operations is engineering: the systems you build, the runbooks you write, and the culture you set decide how fast you recover when (not if) production misbehaves. The goal isn't zero incidents — it's fast, safe recovery every time.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [docs.github.com/en/actions](https://docs.github.com/en/actions)

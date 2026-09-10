@@ -207,3 +207,7 @@ This is the money-movement pattern: **one transaction, row-level mutations, idem
 
 **Official docs:** [Spring Data JPA](https://docs.spring.io/spring-data/jpa/reference/)
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [docs.spring.io/spring-boot/reference](https://docs.spring.io/spring-boot/reference/)

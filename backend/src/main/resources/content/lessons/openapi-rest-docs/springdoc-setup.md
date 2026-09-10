@@ -154,3 +154,7 @@ The generated spec is also your **contract** for tests:
 - Protect the UI in production: disable by profile or secure with Spring Security.
 - The spec doubles as a contract for tests and client generation.
 
+## References
+
+- [dev.java — the official OpenJDK site](https://dev.java/)
+- [spec.openapis.org/oas/v3.1.0](https://spec.openapis.org/oas/v3.1.0)

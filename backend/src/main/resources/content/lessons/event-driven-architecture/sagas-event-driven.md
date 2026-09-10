@@ -150,3 +150,7 @@ The layering to notice: sagas are built *on* the event-driven fundamentals — e
 
 Sagas are the distributed-transaction substitute for multi-service business operations: a sequence of local transactions, each in its own database, with **compensating actions** that unwind the completed steps when a later one fails. **Choreographed sagas** are pure events (each step publishes, failures cascade compensations — simple but implicit); **orchestrated sagas** use a central state-machine coordinator (explicit, traceable, better for complex flows). The reliability requirements are strict: local transactions per step, idempotency everywhere, compensations designed in advance, persistent saga state, and retryable-vs-terminal failure distinction. Sagas aren't magic — they're the disciplined acceptance that cross-service operations are eventually consistent and deliberately unwindable, and that's the honest, production-grade answer to the question ACID can't answer across services.
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [microservices.io/patterns/data/event-driven.html](https://microservices.io/patterns/data/event-driven.html)

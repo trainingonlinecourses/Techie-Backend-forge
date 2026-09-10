@@ -139,3 +139,7 @@ The same code, clean:
 
 Authentication (who you are) and authorization (what you may do) are separate jobs with separate failure modes. **Broken access control** — the #1 risk — is almost always **IDOR**: trusting a client-supplied id without checking ownership. The fix is defense in depth: deny-by-default routing, `@PreAuthorize` at the resource, and ownership checks for every object reference — with roles coming from the server, never the client. **Authentication failures** are weak credential handling (bcrypt/Argon2, never plaintext), credential stuffing (rate limits, MFA), and weak sessions (HttpOnly/Secure/SameSite, rotation, timeouts — Spring's defaults). The habit that prevents the whole class: **after every authentication check, ask the authorization question — "and should THIS caller do THIS thing to THIS object?" — and let the code answer explicitly.**
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [owasp.org/Top10](https://owasp.org/Top10/)

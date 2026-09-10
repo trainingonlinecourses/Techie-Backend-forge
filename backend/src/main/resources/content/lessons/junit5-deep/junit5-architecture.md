@@ -198,3 +198,7 @@ class StackTest {
 
 JUnit 5's architecture is Platform (the runner) + Jupiter (the new API) + Vintage (JUnit 4 compat) — which explains both how tests run and why the ecosystem (Surefire, Gradle, IDEs) all speak one language. The lifecycle — per-test instances, `@BeforeAll` once, `@BeforeEach`/`@AfterEach` per test — is the isolation contract; the annotations (`@Test`, `@Disabled`, `@DisplayName`, `@Tag`, `@Timeout`, `@Nested`) structure and describe tests; and assertions (`assertEquals`, `assertThrows`, lazy messages, delta-based doubles) are the verification vocabulary. Master these and you have the *foundation* — the next lessons build parameterized tests and extensions on top.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [junit.org/junit5/docs/current/user-guide](https://junit.org/junit5/docs/current/user-guide/)

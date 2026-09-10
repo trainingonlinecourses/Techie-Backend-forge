@@ -100,3 +100,7 @@ The warning sign to take seriously: a plan that proposes destroying resources yo
 
 State is Terraform's memory: the record mapping your config to real resources, consulted on every plan and apply. Local state fails teams (no sharing, no locking, no history) — the fix is a **remote backend** (S3/GCS + DynamoDB lock, or Terraform Cloud): remote, locked, versioned, one key per environment. The daily commands (`state list`, `import`, `state rm/mv`) manage the records; **drift** — reality diverging from config — is detected every plan and resolved by deciding which side is intentional. The rules: never edit state by hand, never let two applies race, and review any plan that proposes unexpected destruction. State managed well is invisible; state managed poorly is how infrastructure disasters start.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [developer.hashicorp.com/terraform/docs](https://developer.hashicorp.com/terraform/docs)

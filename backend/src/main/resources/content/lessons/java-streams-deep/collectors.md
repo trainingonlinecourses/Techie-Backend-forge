@@ -233,3 +233,7 @@ void partitionsByPublished() {
 
 Collectors turn stream pipelines into the exact data structures you need — and `groupingBy` with downstream collectors replaces the ugliest loops in Java. Compose them, handle duplicates explicitly, and your aggregation code reads like a spec.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/stream/package-summary.html)

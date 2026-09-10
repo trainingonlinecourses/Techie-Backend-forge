@@ -226,3 +226,7 @@ open module com.myapp.test {
 
 Official docs: [JPMS Tutorial](https://docs.oracle.com/en/java/javase/21/language/java-platform-module-system.html) · [Project Jigsaw](https://openjdk.org/projects/jigsaw/)
 
+## References
+
+- [dev.java — the official OpenJDK site](https://dev.java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

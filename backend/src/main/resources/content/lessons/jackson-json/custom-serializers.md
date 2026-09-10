@@ -177,3 +177,7 @@ public UserDto get(@PathVariable Long id) { ... }
 
 Custom serializers and deserializers open Jackson's pipeline to code: a `JsonSerializer<T>` writes the exact wire format (`gen.writeString(...)`), a `JsonDeserializer<T>` reads it back, registered per-field (`@JsonSerialize(using=...)`) or globally via `Jackson2ObjectMapperBuilderCustomizer`. `JsonNode` is the tree model for dynamic/partial JSON; `@JsonTypeInfo` + `@JsonSubTypes` (with an *allowlist* — never `Id.CLASS` on untrusted input) handles polymorphism; and `@JsonView` shapes one object per context. The craft is choosing the right layer — annotations for the 95%, custom code for the wire formats annotations can't express, and DTOs or views for context-dependent shapes — so the JSON contract stays explicit, precise, and safe.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [github.com/FasterXML/jackson-docs](https://github.com/FasterXML/jackson-docs)

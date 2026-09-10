@@ -170,3 +170,7 @@ The pragmatic signal: **would you ever have a second implementation (or a test f
 - Spring is DIP made operational — beans implement interfaces, the container wires them.
 - Don't abstract everything — only what varies or needs faking.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [en.wikipedia.org/wiki/SOLID](https://en.wikipedia.org/wiki/SOLID)

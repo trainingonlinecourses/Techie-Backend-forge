@@ -251,3 +251,7 @@ wrk -t4 -c1000 -d30s http://localhost:8080/orders/123
 
 **Official docs:** [Virtual threads (Oracle)](https://docs.oracle.com/en/java/javase/21/core/virtual-threads.html) · [Spring Boot 3.2 + virtual threads](https://spring.io/blog/2023/10/16/spring-boot-3-2-virtual-threads)
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

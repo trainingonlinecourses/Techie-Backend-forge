@@ -297,3 +297,7 @@ class QueueHealthEndpointTest {
     }
 }
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-boot/reference/features/actuator.html](https://docs.spring.io/spring-boot/reference/features/actuator.html)

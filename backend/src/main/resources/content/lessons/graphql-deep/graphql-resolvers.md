@@ -122,3 +122,7 @@ The discipline: **keep the entity lean; resolve on demand.** Don't preload every
 - Fetch the root, resolve children on demand — don't preload everything.
 - The N+1 trap is the resolver's classic pitfall — batched resolution is the fix (next lesson).
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [graphql.org/learn](https://graphql.org/learn/)

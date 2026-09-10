@@ -230,3 +230,7 @@ Each service is independent. If the Payment Service is down, orders queue up and
 
 **Official docs:** [Spring Kafka Reference](https://docs.spring.io/spring-kafka/reference/) · [Apache Kafka Introduction](https://kafka.apache.org/intro)
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [docs.spring.io/spring-kafka/reference](https://docs.spring.io/spring-kafka/reference/)

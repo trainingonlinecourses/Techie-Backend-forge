@@ -118,3 +118,7 @@ kubectl rollout status deployment/payments
 
 Workload controllers manage pods: the **Deployment** (stateless replicas, rolling updates, rollbacks — the default for Spring Boot), **StatefulSet** (stable identity for databases), **DaemonSet**, **Job**, and **CronJob**. The production essentials are **resource requests/limits** (scheduling contract + hard caps), **readiness probes** (dependencies — route traffic only to ready pods), **liveness probes** (JVM health — restart when dead), and the **startup probe** for slow warmups. Rolling updates advance only when new pods pass readiness — so correct probes are what turn a bad deploy into a caught rollout instead of an outage. Pin images, size requests from baseline usage, and the Deployment becomes the boring, reliable home for your services.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [kubernetes.io/docs/home](https://kubernetes.io/docs/home/)

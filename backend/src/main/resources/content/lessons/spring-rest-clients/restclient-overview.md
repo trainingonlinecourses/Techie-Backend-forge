@@ -150,3 +150,7 @@ Rule: **new code in a Spring MVC app → `RestClient`.** If your stack is WebFlu
 - 4xx/5xx throw by default — catch or map with `onStatus`.
 - Choose `RestClient` for MVC apps, `WebClient` for reactive ones, never `RestTemplate` for new code.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-framework/reference/integration/rest-clients.html](https://docs.spring.io/spring-framework/reference/integration/rest-clients.html)

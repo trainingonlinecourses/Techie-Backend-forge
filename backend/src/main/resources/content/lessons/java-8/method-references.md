@@ -155,3 +155,7 @@ public class Main {
 | Overusing constructor references | Less readable | Use when creating new instances in a pipeline |
 | Forgetting `this` context | `this::method` binds to current instance | Understand the binding |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/javase/8/docs/api/)

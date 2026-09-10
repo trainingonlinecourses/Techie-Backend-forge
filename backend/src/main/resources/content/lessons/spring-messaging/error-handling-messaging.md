@@ -159,3 +159,7 @@ The broker DLQ (covered in the AMQP/Kafka modules) is the durable version: faile
 - At-least-once delivery means consumers must be idempotent — dedupe by message key.
 - Alert on DLQ depth: an unread dead-letter queue is silent data loss.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-integration/reference](https://docs.spring.io/spring-integration/reference/)

@@ -100,3 +100,7 @@ Page<Order> list(Pageable pageable) { return repo.findAll(pageable); }
 
 Official docs: [Query Methods](https://docs.spring.io/spring-data/data-commons/reference/repositories/query-methods-details.html) · [JPA Query Methods](https://docs.spring.io/spring-data/jpa/reference/jpa/query-methods.html)
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-data/reference](https://docs.spring.io/spring-data/reference/)

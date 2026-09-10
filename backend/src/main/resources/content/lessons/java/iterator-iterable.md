@@ -177,3 +177,7 @@ List<String> filtered = names.stream()
 | Not implementing `remove()` in custom iterator | Default throws `UnsupportedOperationException` |
 | Using `for-each` on a very large `Iterable` | Entire sequence loaded — use `Spliterator` or manual paging |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

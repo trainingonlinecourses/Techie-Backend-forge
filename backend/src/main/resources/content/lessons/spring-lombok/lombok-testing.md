@@ -180,3 +180,7 @@ public class User {
 | @ToString on password field | Password in logs | Use @ToString.Exclude |
 | Using @Builder on entity without @NoArgsConstructor | JPA proxy creation fails | Always add @NoArgsConstructor |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [projectlombok.org/features/all](https://projectlombok.org/features/all)

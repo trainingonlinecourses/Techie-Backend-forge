@@ -312,3 +312,7 @@ public String generateMultilingual(String content, String targetLanguage) {
 
 Official docs: [ChatClient (Spring AI)](https://docs.spring.io/spring-ai/reference/api/chatclient.html) · [Prompt Templates](https://docs.spring.io/spring-ai/reference/api/prompt-template.html)
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [docs.spring.io/spring-ai/reference](https://docs.spring.io/spring-ai/reference/)

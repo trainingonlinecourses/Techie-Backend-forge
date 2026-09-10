@@ -225,3 +225,7 @@ class QueryTest {
 
 SQL is a declarative language with a fixed execution order — master the order, the four joins, and window functions, and you can write every query a backend needs. The next lessons go deeper: indexes, transactions/isolation, and JSONB.
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [postgresql.org/docs/current](https://www.postgresql.org/docs/current/)

@@ -226,3 +226,7 @@ class GrpcClientTest {
 
 gRPC clients are typed end to end: stubs generated from the contract, streaming via observers, deadlines as a first-class concept. Master the stub selection, reuse channels, set deadlines, and translate Status codes — and your services speak gRPC fluently.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [grpc.io/docs](https://grpc.io/docs/)

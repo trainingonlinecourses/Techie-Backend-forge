@@ -109,3 +109,7 @@ DataLoader coalesces all loads in a tick into a single batch call. In Spring for
 
 Official docs: [Spring for GraphQL](https://docs.spring.io/spring-graphql/reference/) · [GraphQL queries](https://graphql.org/learn/queries/)
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-graphql/reference](https://docs.spring.io/spring-graphql/reference/)

@@ -232,3 +232,7 @@ public class AfterTransactionAspect { ... }
 
 Official docs: [Advice Ordering](https://docs.spring.io/spring-framework/reference/core/aop/ataspectj/advice.html) · [AOP](https://docs.spring.io/spring-framework/reference/core/aop.html)
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [docs.spring.io/spring-framework/reference/core/aop.html](https://docs.spring.io/spring-framework/reference/core/aop.html)

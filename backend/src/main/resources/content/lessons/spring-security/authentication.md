@@ -111,3 +111,7 @@ public AuthResponse register(RegisterRequest req) {
 
 **Official docs:** [Authentication](https://docs.spring.io/spring-security/reference/servlet/authentication/index.html) · [Passwords](https://docs.spring.io/spring-security/reference/servlet/authentication/passwords/index.html)
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-security/reference](https://docs.spring.io/spring-security/reference/)

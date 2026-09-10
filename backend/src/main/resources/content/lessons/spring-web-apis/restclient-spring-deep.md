@@ -230,3 +230,7 @@ A platform calls 12 external services (payment, email, shipping, etc.). Each ser
 
 When a service is slow, the timeout kicks in and the circuit breaker opens. The RestClient is configured once per service and injected into the business logic.
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-graphql/reference](https://docs.spring.io/spring-graphql/reference/)

@@ -205,3 +205,7 @@ Because shallow-copy surprises cause real bugs, modern teams prefer:
 | Mutating hash-relevant fields after adding to a Set | `contains()` returns false forever | Hash only immutable fields |
 | Relying on default `toString()` in logs | Unreadable logs during incidents | Override or use records/Lombok `@ToString` |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

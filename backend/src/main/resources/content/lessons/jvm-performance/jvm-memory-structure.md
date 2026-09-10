@@ -197,3 +197,7 @@ java -Xmx2g -Xms2g \
 
 Official docs: [java tool](https://docs.oracle.com/en/java/javase/21/docs/specs/man/java.html) · [JVM Spec — runtime data areas](https://docs.oracle.com/javase/specs/jvms/se21/html/jvms-2.html)
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/21/gctuning/)

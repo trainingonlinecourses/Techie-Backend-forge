@@ -112,3 +112,7 @@ The review rule: **use `@Configuration` for wiring that references other beans; 
 - Wire lifecycle (`initMethod`/`destroyMethod`), scope, and `@Primary` at the `@Bean` level.
 - Use `@Configuration` for interlinked wiring; `@Component`+`@Bean` only for standalone factories.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-framework/reference](https://docs.spring.io/spring-framework/reference/)

@@ -180,3 +180,7 @@ public List<Order> filterOrders(List<Order> orders, OrderStatus status) {
 | Don't ban `final` locals | Readability and lambda capture safety |
 | Don't overuse `final` on class-level | `final` class prevents mocking; consider package-private constructors instead |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

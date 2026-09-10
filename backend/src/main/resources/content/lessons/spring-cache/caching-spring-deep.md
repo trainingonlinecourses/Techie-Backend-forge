@@ -313,3 +313,7 @@ An e-commerce platform serves 100,000 requests/second. Product catalog queries h
 - Redis handles cache invalidation across 20 server instances
 - Caffeine handles in-memory caching with 95% hit rate
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-framework/reference/integration/cache.html](https://docs.spring.io/spring-framework/reference/integration/cache.html)

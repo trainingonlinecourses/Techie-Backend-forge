@@ -189,3 +189,7 @@ public abstract class BaseRepository<T> {
 - Program to interfaces for polymorphism and testability; use abstract classes when you need shared state or constructors.
 - Interfaces can extend multiple other interfaces; abstract classes can only extend one.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

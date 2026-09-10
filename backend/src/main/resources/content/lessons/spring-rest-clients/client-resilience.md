@@ -160,3 +160,7 @@ When the catalog is slow, at most 10 threads wait on it; the other 190 threads s
 - Bulkheads isolate slow dependencies from the rest of your app.
 - Compose the layers: breaker decides whether, retry decides how many times, fallback decides what to serve.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-framework/reference/integration/rest-clients.html](https://docs.spring.io/spring-framework/reference/integration/rest-clients.html)

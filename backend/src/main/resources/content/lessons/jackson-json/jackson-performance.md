@@ -128,3 +128,7 @@ Lesson l = lessonReader.readValue(messageJson);
 
 Jackson performance is mostly *habits*: one reused `ObjectMapper` (Spring's bean — thread-safe, never recreate), compact output with `NON_NULL` inclusion, and ISO dates. For bulk work, **stream** with `JsonGenerator` (O(1) memory per record) and cache **`ObjectReader`**s per type for hot deserialization loops. The wins are large (often 2–10×) and nearly free — they come from configuration and reuse, not exotic tricks. And the discipline matters too: measure first, fix the database when JSON isn't the bottleneck, and reserve protobuf-style alternatives for the pipelines where Jackson's easy wins are already exhausted.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [github.com/FasterXML/jackson-docs](https://github.com/FasterXML/jackson-docs)

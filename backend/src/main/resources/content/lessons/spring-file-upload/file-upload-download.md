@@ -226,3 +226,7 @@ public ResponseEntity<?> importCsv(@RequestParam("file") MultipartFile file) {
 | Not validating content type | Security risk | Validate against allowed types |
 | Storing files in classpath | Lost on redeploy | Use external storage |
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-boot/reference/web/servlet.html](https://docs.spring.io/spring-boot/reference/web/servlet.html)

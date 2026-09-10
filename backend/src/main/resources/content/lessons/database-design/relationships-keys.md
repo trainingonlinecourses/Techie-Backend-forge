@@ -154,3 +154,7 @@ The database automatically indexes primary keys and unique constraints — looku
 - Choose `ON DELETE` policies per relationship; cascade deliberately.
 - Index FK columns you join/filter on.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [postgresql.org/docs/current/ddl.html](https://www.postgresql.org/docs/current/ddl.html)

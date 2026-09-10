@@ -129,3 +129,7 @@ The full-context tests with heavy mocking can become *detached from reality*: th
 
 Mockito meets Spring through **`@MockBean`/`@MockitoBean`**: a Mockito mock dropped into the application context in place of a real bean — the mechanism behind `@WebMvcTest` slice tests, where the web layer runs real and the service below is stubbed. MockMvc then drives real HTTP and asserts on status, `jsonPath` bodies, and headers. The discipline: use `@MockBean` for *boundaries the test targets* (controller tests, service tests against mocked repos); use real infrastructure (`@DataJpaTest` + Testcontainers) for *contracts* with the data layer; and watch the context-caching cost — group tests by mock set and prefer slices over full-context mocking. The result is tests that are fast, real where it matters, and controlled where it counts.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [javadoc.io/doc/org.mockito/mockito-core/latest/org/mockito/Mockito.html](https://javadoc.io/doc/org.mockito/mockito-core/latest/org/mockito/Mockito.html)

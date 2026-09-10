@@ -101,3 +101,7 @@ Caching without metrics is theater: track **hit ratio** per cache (Actuator expo
 
 Official docs: [Spring Cache Abstraction](https://docs.spring.io/spring-framework/reference/integration/cache.html) · [Spring Boot Caching](https://docs.spring.io/spring-boot/reference/io/caching.html)
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-data/reference](https://docs.spring.io/spring-data/reference/)

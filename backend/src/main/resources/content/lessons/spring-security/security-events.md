@@ -107,3 +107,7 @@ public void onDenied(AuthorizationDeniedEvent<?> event) {
 - Success events build the "who logged in when" trail; denial events surface access probing.
 - Audit logs are append-only, structured, and off the login hot path — and never contain credentials.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-security/reference](https://docs.spring.io/spring-security/reference/)

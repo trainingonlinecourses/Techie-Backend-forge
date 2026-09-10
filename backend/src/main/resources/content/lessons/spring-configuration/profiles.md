@@ -160,3 +160,7 @@ void devBehavior() { ... }
 - `@ActiveProfiles` in tests picks the environment per test.
 - The same jar + different profiles = dev, test, and prod behavior from one build.
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-boot/reference/features/external-config.html](https://docs.spring.io/spring-boot/reference/features/external-config.html)

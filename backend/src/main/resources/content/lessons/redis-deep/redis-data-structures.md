@@ -126,3 +126,7 @@ p.sync();   // all 1000 sent together
 
 Redis is an in-memory data-structure server: typed values under string keys, manipulated by atomic commands with sub-millisecond latency. Strings (with `incr` and TTL) power counters and caches; lists build queues; sets do membership and set algebra; hashes model objects; sorted sets run leaderboards and rankings. The colon-namespace is your schema, TTLs keep caches fresh, and pipelining/transactions get throughput. Master these five structures and you can build caching, sessions, rate limiting, and queues — the pillars of every production Spring Boot app — without a single custom data structure of your own.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [redis.io/docs/latest](https://redis.io/docs/latest/)

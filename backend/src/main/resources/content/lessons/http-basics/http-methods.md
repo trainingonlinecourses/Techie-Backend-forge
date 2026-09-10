@@ -143,3 +143,7 @@ The classic beginner question: "should I use POST or PUT to update?" — Update-
 - Choose the verb for the intent; the framework annotations map one-to-one.
 - Never put side effects in GET; never send partial bodies to PUT.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [datatracker.ietf.org/doc/html/rfc9110](https://datatracker.ietf.org/doc/html/rfc9110)

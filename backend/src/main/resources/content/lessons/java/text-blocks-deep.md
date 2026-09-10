@@ -422,3 +422,7 @@ public class AuditLogger {
 | Text block with only one line | Just use a regular string | Reserve text blocks for multi-line content |
 | Forgetting `.formatted()` for dynamic content | Placeholder strings appear literally | Always call `.formatted()` or `String.format()` |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

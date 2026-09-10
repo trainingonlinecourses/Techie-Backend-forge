@@ -157,3 +157,7 @@ public void on(MoneyDeposited e) {
 
 Event sourcing stores the history, not the state: commands validate and produce events, the event store appends them immutably, and aggregates reconstruct their state by replay. Snapshots accelerate long replays; projections (read models) make the events queryable — leading naturally to CQRS with the event store as the write side. The gains are profound — complete audit, temporal queries, no lost-update races, events-as-integration — and the costs are real: eventual consistency, event-store infrastructure, schema evolution via upcasting, and genuine complexity. Choose it for the ledger-like cores where history *is* the product, and keep the rest of the system conventionally simple.
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [microservices.io/patterns/data/event-driven.html](https://microservices.io/patterns/data/event-driven.html)

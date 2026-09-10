@@ -99,3 +99,7 @@ module com.example.util {
 | Forgetting --add-opens for frameworks | Frameworks can't work | Use --add-opens as bridge |
 | Modularizing too aggressively | Breaks everything | Do it incrementally |
 
+## References
+
+- [dev.java — the official OpenJDK site](https://dev.java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/17/language/java-module-system.htm)

@@ -141,3 +141,7 @@ This is why most new Java code uses records for data carriers. The boilerplate i
 | Missing @Override on equals | New method instead of override — compile succeeds, runtime broken | Always annotate |
 | Using `==` instead of `.equals()` for objects | Compares memory addresses, not data | Always `.equals()` for value objects |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

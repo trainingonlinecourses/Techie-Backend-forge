@@ -302,3 +302,7 @@ Consumer D joins (4 consumers, 3 partitions):
 
 Official docs: [Kafka Producer Config](https://kafka.apache.org/documentation/#producerconfigs) · [Spring Kafka](https://docs.spring.io/spring-kafka/reference/html/)
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [docs.spring.io/spring-kafka/reference](https://docs.spring.io/spring-kafka/reference/)

@@ -120,3 +120,7 @@ The general rule teams teach: **optimistic by default; pessimistic only where th
 - Optimistic by default; pessimistic for short, high-stakes writes; retry at the operation boundary.
 - Understand lock scope (transaction) and detached-entity version semantics.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-data/jpa/reference](https://docs.spring.io/spring-data/jpa/reference/)

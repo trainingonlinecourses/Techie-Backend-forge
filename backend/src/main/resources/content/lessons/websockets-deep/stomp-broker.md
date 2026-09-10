@@ -166,3 +166,7 @@ The browser subscribes and sends through one connection; the server routes via d
 - Multi-instance production needs a real broker, not the in-memory simple broker.
 - Secure subscriptions: not every client should see every topic.
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-framework/reference/web/websocket.html](https://docs.spring.io/spring-framework/reference/web/websocket.html)

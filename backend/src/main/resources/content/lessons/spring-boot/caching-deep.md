@@ -212,3 +212,7 @@ public class MultiLevelCacheConfig {
 | Caching in cluster without distributed cache | Each node has its own cache — inconsistent |
 | `allEntries = true` without reason | Evicts everything on every call — defeats caching |
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-boot/reference](https://docs.spring.io/spring-boot/reference/)

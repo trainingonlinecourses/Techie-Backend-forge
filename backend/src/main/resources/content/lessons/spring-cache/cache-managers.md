@@ -182,3 +182,7 @@ public class CacheAdminService {
 
 The abstraction exists so this decision is a configuration choice, not a rewrite. Pick Caffeine for single-node, Redis for scale-out, and Composite when both workloads coexist.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-framework/reference/integration/cache.html](https://docs.spring.io/spring-framework/reference/integration/cache.html)

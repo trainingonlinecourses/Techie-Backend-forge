@@ -137,3 +137,7 @@ method.process(order.getTotal());
 4. **EnumSet for flags** — O(1) union, intersection, and subset checks
 5. **Each constant is a class** — with fields, methods, and constructors
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/java/javaOO/enum.html)

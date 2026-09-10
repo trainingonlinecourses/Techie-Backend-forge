@@ -148,3 +148,7 @@ Order matters: breaker-outside means an open breaker prevents even the first att
 - After max attempts, surface the failure — fallback, log, alert.
 - The discipline is what makes retry resilience instead of amplification.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [resilience4j.readme.io](https://resilience4j.readme.io/)

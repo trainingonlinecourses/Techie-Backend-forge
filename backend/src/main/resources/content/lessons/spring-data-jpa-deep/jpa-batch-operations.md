@@ -116,3 +116,7 @@ public void archiveOldOrders() {
 - `@Modifying` bulk queries do one DB statement — always `clear()` after, and know they skip callbacks.
 - Match the tool to the job: entity loop for per-row logic, bulk query for set-wide changes.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-data/jpa/reference](https://docs.spring.io/spring-data/jpa/reference/)

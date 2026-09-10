@@ -212,3 +212,7 @@ In the lab, you will start with a multiline string that includes emoji, CJK char
 
 Iterate a `String` the way that matches your purpose: `charAt` + for-loop for legacy code or when you need indices; `codePoints()` for real Unicode character iteration (emoji, CJK safe); `lines()` for multiline text processing (handles all line separators). `isEmpty()` only catches the empty string; `isBlank()` catches empty **and** whitespace-only — use `isBlank()` for input validation to reject space-only submissions. Beware off-by-one errors with `charAt` and `<= length()`. Use `strip()` (Java 11) for Unicode-aware trimming, and `codePointCount` for user-facing character counts. When working with text that may contain emoji or supplementary characters, `codePoints()` is the correct tool — `charAt` and `length()` work at the UTF-16 code-unit level and can misrepresent real characters.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html)

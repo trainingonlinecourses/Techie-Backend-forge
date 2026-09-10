@@ -104,3 +104,7 @@ assertThat(Path.of("target/test.csv")).exists().isRegularFile().hasSizeGreaterTh
 
 Official docs: [AssertJ](https://assertj.github.io/doc/) · [AssertJ features](https://www.assertj.org/assertj-core-features-highlight.html)
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [junit.org/junit5/docs/current/user-guide](https://junit.org/junit5/docs/current/user-guide/)

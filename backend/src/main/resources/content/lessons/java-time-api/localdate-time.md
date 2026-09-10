@@ -138,3 +138,7 @@ dates.stream().sorted().toList();   // sorts chronologically
 - `ChronoUnit.DAYS.between(a, b)` is the standard "days between" idiom.
 - Combine with `LocalDateTime.of(date, time)` when you need both but no zone.
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/time/package-summary.html)

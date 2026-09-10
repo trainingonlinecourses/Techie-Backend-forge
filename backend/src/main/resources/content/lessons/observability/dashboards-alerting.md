@@ -217,3 +217,7 @@ tests:
 
 Observability is a loop: dashboards tell you what's happening, alerts tell you when to act, and postmortems turn incidents into improvements. Instrument early, alert on burn rate, and let the platform metrics do the heavy lifting.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [docs.spring.io/spring-boot/reference/actuator/metrics.html](https://docs.spring.io/spring-boot/reference/actuator/metrics.html)

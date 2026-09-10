@@ -218,3 +218,7 @@ public class ToStringProcessor extends AbstractProcessor { }
 | Forgetting `@SupportedAnnotationTypes` | Processor never runs | Always declare supported annotations |
 | Using RUNTIME retention | Unnecessary, processor runs at compile time | Use SOURCE retention |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/java/annotations/)

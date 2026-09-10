@@ -145,3 +145,7 @@ class PrinterAdapter implements Printer {
 - Small role interfaces make dependencies honest, testing trivial, and evolution safe.
 - The Adapter pattern bridges from fat framework interfaces to the narrow role you need.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [en.wikipedia.org/wiki/SOLID](https://en.wikipedia.org/wiki/SOLID)

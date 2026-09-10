@@ -132,3 +132,7 @@ Watch: `BulkheadFullException` rate (is the limit being hit?), call duration (is
 - Fast-fail must be *handled* — pair bulkheads with fallbacks.
 - Monitor fullness and duration per dependency.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [resilience4j.readme.io](https://resilience4j.readme.io/)

@@ -198,3 +198,7 @@ public class MultiDatabaseAutoConfiguration {
 | Not excluding unwanted auto-config | Unnecessary beans created | Use `spring.autoconfigure.exclude` |
 | Circular dependencies | Startup fails | Use `@Lazy` or restructure beans |
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-boot/reference/features/auto-configuration.html](https://docs.spring.io/spring-boot/reference/features/auto-configuration.html)

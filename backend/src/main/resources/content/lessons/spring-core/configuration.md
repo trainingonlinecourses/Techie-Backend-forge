@@ -290,3 +290,7 @@ public class ProdConfig {
 
 Official docs: [@Configuration (Spring)](https://docs.spring.io/spring-framework/reference/core/beans/java/configuration-annotation.html) · [External Config (Boot)](https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#features.external-config)
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-framework/reference](https://docs.spring.io/spring-framework/reference/)

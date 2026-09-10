@@ -202,3 +202,7 @@ This is the fastest way to find a **memory leak** (something that grows continuo
 
 Official docs: [jcmd GC.heap_dump](https://docs.oracle.com/en/java/javase/21/docs/specs/man/jcmd.html) · [Eclipse MAT](https://eclipse.dev/mat/)
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/21/gctuning/)

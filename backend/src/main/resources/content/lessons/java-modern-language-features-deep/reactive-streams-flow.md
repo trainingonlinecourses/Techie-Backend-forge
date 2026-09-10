@@ -459,3 +459,7 @@ In the lab, you will see a starter with a `SubmissionPublisher` that subscribes 
 
 Java 9 introduced `java.util.concurrent.Flow`, a standard API for reactive streams — asynchronous streams with backpressure. The four interfaces are `Publisher` (produces items), `Subscriber` (consumes items and requests them via a `Subscription`), `Subscription` (the link between publisher and subscriber, with `request(n)` for backpressure and `cancel()` to stop), and `Processor` (both a subscriber and a publisher, for transformation stages). The JDK provides `SubmissionPublisher` as a concrete publisher. Backpressure is the subscriber's way of controlling the pace — by calling `subscription.request(n)`, the subscriber tells the publisher how many more items it can handle. Requesting `Long.MAX_VALUE` disables backpressure. The JDK's `Flow` is the base standard that libraries like Project Reactor implement, but it does not provide rich operators — for a full reactive programming model, use a library like Project Reactor (the basis of Spring WebFlux) or RxJava. Understanding the JDK's `Flow` interfaces is the foundation for understanding reactive streams in Java.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/21/language/)

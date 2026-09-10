@@ -171,3 +171,7 @@ In the lab, you will start with a byte array that encodes "cafétière" in UTF-8
 
 Bytes and chars are different types with different purposes — bytes are binary data (files, network, crypto), chars are UTF-16 text code units for in-memory manipulation. Converting between them requires an explicit charset; `UTF-8` is the modern default. Always pass the charset to `getBytes(charset)` and `new String(bytes, charset)` — never use the platform-default versions, because the default differs between machines. A `char` is not one visible character; supplementary characters (emoji, rare CJK) take two `char`s (a surrogate pair). Use `codePoints()` to iterate real Unicode characters. The wrong charset turns "café" into "cafÃ©" — and that bug is entirely preventable by always naming the charset.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html)

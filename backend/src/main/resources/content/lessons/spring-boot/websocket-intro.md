@@ -254,3 +254,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
 A stock trading platform uses WebSockets to push real-time price updates to 50,000 traders. Each trader subscribes to their watched stocks via `/topic/prices/AAPL`, `/topic/prices/GOOGL`. The server pushes updates every 100ms. Without WebSockets, they'd need 50,000 HTTP polls per second. With WebSockets, they maintain 50,000 persistent connections and push only when prices change.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-boot/reference](https://docs.spring.io/spring-boot/reference/)

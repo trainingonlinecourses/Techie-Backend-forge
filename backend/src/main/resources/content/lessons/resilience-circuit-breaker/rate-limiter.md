@@ -156,3 +156,7 @@ Different axes: time-based (limiter), concurrency-based (bulkhead), health-based
 - Rate limiter (time) + bulkhead (concurrency) + breaker (health) compose.
 - Monitor rejection rates — sustained 429s are a signal, not noise.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [resilience4j.readme.io](https://resilience4j.readme.io/)

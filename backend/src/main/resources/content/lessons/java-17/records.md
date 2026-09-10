@@ -265,3 +265,7 @@ String describeEvent(OrderEvent event) {
 | Using `this.field =` in compact constructor | Can only assign (not `this.field =` for primitives) | Use `this.field = value;` in compact constructor |
 | Records with only one field | Valid but unusual | Consider if a simple class is better |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/17/docs/api/)

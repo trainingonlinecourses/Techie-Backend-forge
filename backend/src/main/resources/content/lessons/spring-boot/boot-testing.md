@@ -425,3 +425,7 @@ void shouldUpgradePremiumUser() {
 | Catching exceptions in tests | Hides test failures | Let exceptions propagate, use assertThrows |
 | Using @Autowired for everything in tests | Slow, loads unnecessary context | Use @MockBean for dependencies you don't need |
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [docs.spring.io/spring-boot/reference](https://docs.spring.io/spring-boot/reference/)

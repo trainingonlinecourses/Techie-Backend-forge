@@ -125,3 +125,7 @@ app:
 | Forgetting @Data on nested class | Getters/setters missing | Add @Data to all nested classes |
 | Using lists without defaults | Empty list, not null | Initialize with `new ArrayList<>()` |
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-boot/reference/features/external-config.html](https://docs.spring.io/spring-boot/reference/features/external-config.html)

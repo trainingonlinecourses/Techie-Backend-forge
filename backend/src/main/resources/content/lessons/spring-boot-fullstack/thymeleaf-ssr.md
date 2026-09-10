@@ -351,3 +351,7 @@ public class SecurityConfig {
 | JavaScript in templates | Thymeleaf may escape it | Use `th:inline="javascript"` |
 | Modifying data in GET | Violates HTTP semantics, bookmark issues | Only read in GET, write in POST/PUT/DELETE |
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [spring.io/guides](https://spring.io/guides)

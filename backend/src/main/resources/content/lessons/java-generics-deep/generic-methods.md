@@ -132,3 +132,7 @@ But a static method can declare **its own** type parameter: `static <T> Box<T> o
 
 Generic methods put a type parameter on a single method, connecting input and output types so callers get exact types back without casts. The declaration sits before the return type, bounds (`<T extends Comparable<T>>`) grant the method access to capabilities of `T`, and type inference makes call sites clean. Use a generic method whenever the relationship between parameter types and return type matters; use wildcards when you only need to accept a range of types. Combined, they give you the full expressive power of the generics system.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/java/generics/index.html)

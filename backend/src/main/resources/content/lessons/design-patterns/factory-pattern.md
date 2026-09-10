@@ -151,3 +151,7 @@ When you see `SomethingFactory` in a codebase, the pattern is telling you: "this
 - Factory Method: one method creating one product; Abstract Factory: a family of products.
 - Spring's `@Bean` methods and `getBean` are factories in disguise.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [refactoring.guru/design-patterns](https://refactoring.guru/design-patterns)

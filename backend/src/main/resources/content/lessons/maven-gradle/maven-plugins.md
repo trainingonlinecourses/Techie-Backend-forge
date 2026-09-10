@@ -221,3 +221,7 @@ mvn verify -Dskip.unit.tests=true   # per-run override
 
 `mvn verify` with quality gates is the difference between "the build passes" and "the build is trustworthy": tests prove behavior, coverage proves the tests touched the code, checkstyle/spotless keep it readable, and spotbugs catches what tests miss. Configure them once, enforce them in CI, and let the build be the gatekeeper.
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [maven.apache.org/guides](https://maven.apache.org/guides/)

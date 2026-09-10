@@ -181,3 +181,7 @@ WHERE c.region = 'US';
 
 Official docs: [EXPLAIN (PostgreSQL)](https://www.postgresql.org/docs/current/using-explain.html) · [Use The Index, Luke](https://use-the-index-luke.com/)
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [postgresql.org/docs/current](https://www.postgresql.org/docs/current/)

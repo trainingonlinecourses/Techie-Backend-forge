@@ -183,3 +183,7 @@ Memorize the pattern: **statics first (parent→child), then per-instance: paren
 | Forgetting `super(args)` when parent lacks no-arg | Compile error in child constructor | Add explicit `super(parentArgs)` first |
 | Exposing mutable collections from constructor params | Caller mutates list after construction, object state corrupts | Defensive-copy with `new ArrayList<>(param)` |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

@@ -108,3 +108,7 @@ For numeric-heavy code (analytics, aggregations), prefer primitive arrays and `I
 - Boxing allocates: use primitive arrays/streams in hot numeric paths.
 - Let Jackson/JPA nullability drive the choice at boundaries; keep internals primitive.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

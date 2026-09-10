@@ -207,3 +207,7 @@ Gradle's incremental builds shine here — unchanged modules are UP-TO-DATE inst
 
 Multi-module builds make architecture mechanical: the compiler enforces what the diagram claims. Split by ownership and direction of dependency, keep the graph acyclic, and the build itself becomes the architecture review.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [maven.apache.org/guides](https://maven.apache.org/guides/)

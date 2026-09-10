@@ -145,3 +145,7 @@ Every image you pull is software you're trusting: base images, apt packages, dep
 - Pin versions and trust your supply chain; the base image is your software too.
 - Defense in depth: isolation alone is not security.
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.docker.com](https://docs.docker.com/)

@@ -138,3 +138,7 @@ class PaymentApiIntegrationTest {
 
 Test organization is strategy, not housekeeping: the **testing pyramid** — many fast unit tests, fewer integration tests, a handful of E2E tests — encodes the speed/confidence trade-off that keeps suites alive. Naming tests as behavior sentences and structuring them as given-when-then makes the suite executable documentation. Files follow the one-class-per-test convention; Spring Boot's **test slices** (`@WebMvcTest`, `@DataJpaTest`, `@SpringBootTest`) make each layer's tests as fast as the layer allows. The habits — mock only what the layer needs, use real infrastructure at boundaries, keep the base fast — are what separate a suite that protects a codebase from a pile of tests that nobody runs.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [junit.org/junit5/docs/current/user-guide](https://junit.org/junit5/docs/current/user-guide/)

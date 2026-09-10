@@ -210,3 +210,7 @@ Set it on both sides (producer + consumer factory) and POJOs round-trip as JSON 
 
 RabbitMQ's model is small and precise: exchanges route, queues buffer, listeners consume. Spring AMQP wraps it so the entire topology is beans and annotations — the next lessons cover reliability, retries/DLQs, and request/reply patterns.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [docs.spring.io/spring-amqp/reference](https://docs.spring.io/spring-amqp/reference/)

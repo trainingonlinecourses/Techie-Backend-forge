@@ -101,3 +101,7 @@ Spring Security's OAuth2 client implements the entire authorization-code flow (s
 
 The authorization code flow is the standard behind every social login: the user authenticates at the auth server (password never touches your app), receives a single-use **code** via redirect (guarded by `state` against CSRF), and only the client's backend — holding the **client secret** — exchanges it for tokens. **PKCE** extends the flow to public clients (SPAs/mobile) by replacing the secret with a verifier/challenge hash pair, defeating code interception. The three disciplines: verify `state` always, keep redirect URIs an exact-match allowlist, and let the secret live only server-to-server. Spring Security configures the entire ceremony from properties — but understanding the steps is what lets you debug it when it doesn't work.
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [datatracker.ietf.org/doc/html/rfc6749](https://datatracker.ietf.org/doc/html/rfc6749)

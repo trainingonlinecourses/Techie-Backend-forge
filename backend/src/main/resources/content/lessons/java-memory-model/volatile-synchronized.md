@@ -169,3 +169,7 @@ public class VolatileVsSynchronized {
 | Forgetting volatile in double-checked locking | May see partially constructed object | Always use volatile |
 | Synchronizing on `this` | External code can lock on same monitor | Use private final lock object |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/javase/specs/jls/se17/html/jls-17.html)

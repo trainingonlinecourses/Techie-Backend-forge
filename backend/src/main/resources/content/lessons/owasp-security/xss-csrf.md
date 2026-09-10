@@ -141,3 +141,7 @@ public class CorsConfig {
 
 XSS and CSRF are browser-trust attacks: XSS makes your page *execute attacker JavaScript* (reflected, stored, or DOM) — prevented by output escaping at the framework level, with CSP and HttpOnly cookies as the safety net. CSRF makes the victim's browser *send authenticated requests* the victim never intended — prevented by Spring Security's CSRF tokens (default), SameSite cookies, and Origin checks; token-based APIs are inherently resistant. CORS is the separate rule about cross-origin *reads*, configured as an exact allowlist and never as a credentials-bearing wildcard. The mental model to keep: **the browser trusts your origin and auto-sends your cookies — your defenses must ensure that trust can only be used by your page, for your user's intent.**
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [owasp.org/Top10](https://owasp.org/Top10/)

@@ -126,3 +126,7 @@ TreeSet<Incident> bySeverity = new TreeSet<>(
 | Modifying objects while in a TreeSet | Element becomes "lost" — can't find it anymore | Don't mutate fields used in the sort |
 | Expecting `compareTo() == 0` to mean `.equals()` | Different objects with same sort key coexist in a TreeSet | They're different concepts; a TreeSet uses compareTo to avoid duplicates, which can hide equals-different objects |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

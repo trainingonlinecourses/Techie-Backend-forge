@@ -120,3 +120,7 @@ catch (IOException e) {
 
 All Java failures are `Throwable` objects in a strict hierarchy: `Error` for platform catastrophes (don't catch), `Exception` for program failures, with `RuntimeException` and its subclasses unchecked (bugs — don't force handling) and everything else checked (environmental failures — the compiler forces planning). The hierarchy isn't bureaucracy: it encodes *what kind of failure this is and who is responsible for responding to it*. Master the three branches, respect the checked/unchecked contract, wrap-and-rethrow across layers, and never swallow — and exception handling stops being boilerplate and starts being the safety net of your design.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/essential/exceptions/index.html)

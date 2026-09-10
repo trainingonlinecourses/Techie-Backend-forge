@@ -265,3 +265,7 @@ public List<String> validateCompliance(String invoiceXml) throws Exception {
 | `string(//element)` | Text content as string |
 | `sum(//element)` | Sum of numeric text values |
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/jaxp/)

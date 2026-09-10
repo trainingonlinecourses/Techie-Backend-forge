@@ -219,3 +219,7 @@ class RegistrationFormTest {
 
 The form lifecycle is a loop: bind, validate, re-render on error, redirect on success. Get the loop right — including the `BindingResult` ordering rule — and forms become one of the most reliable parts of the app.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-framework/reference/web/webmvc.html](https://docs.spring.io/spring-framework/reference/web/webmvc.html)

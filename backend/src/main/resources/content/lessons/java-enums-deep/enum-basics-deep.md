@@ -347,3 +347,7 @@ public enum ColumnType {
 - **Enum singleton** is the safest singleton pattern in Java
 - **Never use `==` for non-enum comparisons**; for enums, `==` is fine and preferred
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/java/javaOO/enum.html)

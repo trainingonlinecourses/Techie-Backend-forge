@@ -151,3 +151,7 @@ Resilience4j publishes Micrometer metrics (`resilience4j.circuitbreaker.state`);
 - Monitor breaker state — an OPEN breaker is an alert-worthy signal.
 - Fail fast, fall back gracefully, alert loudly.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [resilience4j.readme.io](https://resilience4j.readme.io/)

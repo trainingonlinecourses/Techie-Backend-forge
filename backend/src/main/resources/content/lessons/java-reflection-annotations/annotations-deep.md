@@ -170,3 +170,7 @@ An annotation *type* (`@interface`) looks like an interface but isn't: its membe
 
 Annotations are metadata labels that do nothing by themselves — their power is in the readers: the compiler (`@Override`, `@SuppressWarnings`), annotation processors (Lombok's code generation), and runtime frameworks (Spring's entire wiring model). Three decisions define your annotation: **retention** (SOURCE/CLASS/RUNTIME — must be RUNTIME for frameworks), **target** (where it can sit), and its **elements** (parameters with defaults). Reading them is a simple reflection pattern: `isAnnotationPresent` + `getAnnotation`. Master annotations and you stop seeing Spring as magic and start seeing it as a metadata reader — your `@Service`, `@Transactional`, and `@GetMapping` labels are just data, and the framework is the machinery that acts on them.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/reflect/index.html)

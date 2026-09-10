@@ -104,3 +104,7 @@ Custom constraint `message()` values are keys too — your `@StrongPassword(mess
 
 Official docs: [MessageSource in the Spring context](https://docs.spring.io/spring-framework/reference/core/beans/context-introduction.html#context-functionality-messagesource)
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-framework/reference](https://docs.spring.io/spring-framework/reference/)

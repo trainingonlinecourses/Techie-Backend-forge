@@ -139,3 +139,7 @@ The guidance: **merge for shared branches** (main), **rebase for local/feature w
 - Merge preserves history; rebase linearizes it; never rebase shared branches.
 - Conflicts are routine — resolve calmly, test after.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [git-scm.com/doc](https://git-scm.com/doc)

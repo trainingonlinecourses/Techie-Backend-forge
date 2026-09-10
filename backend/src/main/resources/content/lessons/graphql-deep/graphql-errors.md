@@ -195,3 +195,7 @@ Clients map `fieldErrors` onto form fields — the GraphQL equivalent of REST's 
 - Never leak internals; log them instead.
 - Partial success is the design — not a bug to paper over.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [graphql.org/learn](https://graphql.org/learn/)

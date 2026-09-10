@@ -158,3 +158,7 @@ Both can coexist on one Spring Boot app (Tomcat on 8080, gRPC on 9090).
 
 There's no universal winner — there's a per-boundary choice. REST stays for the edges (browsers, partners); gRPC shines inside the mesh (typed, fast, streaming, polyglot). Most mature systems end up with a REST gateway in front of gRPC services — the strengths of both, the weaknesses of neither.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [grpc.io/docs](https://grpc.io/docs/)

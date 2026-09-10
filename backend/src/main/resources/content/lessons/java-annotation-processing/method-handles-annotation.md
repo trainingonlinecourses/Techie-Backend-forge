@@ -247,3 +247,7 @@ public Object invokeService(Object service, String methodName, Object... args) t
 | Not binding parameters | Syntax is verbose | Use `bindTo()` for partial application |
 | Creating MH in a loop | Lookup is expensive | Cache MethodHandles as fields or constants |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/java/annotations/)

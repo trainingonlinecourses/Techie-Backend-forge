@@ -278,3 +278,7 @@ public class ConnectionPool {
 | Modifying values directly | Not thread-safe — only the map operations are atomic | Always use `compute()`, `merge()`, or `replace()` |
 | Not considering memory overhead | ConcurrentHashMap uses more memory | For single-writer scenarios, consider `Collections.synchronizedMap` |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/21/core/concurrency.html)

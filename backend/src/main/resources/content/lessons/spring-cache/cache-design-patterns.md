@@ -172,3 +172,7 @@ Is the read expensive (query, external call, aggregation)?
 
 Caching is a **staleness trade**, not a speed hack. Every cacheable decision should answer: *how stale can this data be, what happens when it's stale, and what does a stampede cost?* Answer those three and the annotations take care of themselves.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-framework/reference/integration/cache.html](https://docs.spring.io/spring-framework/reference/integration/cache.html)

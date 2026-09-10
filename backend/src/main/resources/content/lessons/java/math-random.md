@@ -117,3 +117,7 @@ String token = Base64.getUrlEncoder().withoutPadding().encodeToString(tokenBytes
 | Sharing one Random across threads | Contention, skewed sequences | ThreadLocalRandom.current() |
 | Floating-point money rounding via Math.round | Cents drift in reports | BigDecimal with explicit RoundingMode |
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

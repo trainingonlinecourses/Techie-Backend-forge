@@ -177,3 +177,7 @@ public class CorsConfig implements WebMvcConfigurer {
 - CORS is server-side policy: the API must allow the frontend's origin.
 - Set `Cache-Control` explicitly; keep secrets out of headers.
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [datatracker.ietf.org/doc/html/rfc9110](https://datatracker.ietf.org/doc/html/rfc9110)

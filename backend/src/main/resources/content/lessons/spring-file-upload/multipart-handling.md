@@ -175,3 +175,7 @@ public ResponseEntity<?> uploadLarge(@RequestParam("file") MultipartFile file) t
 | Not validating file type | Security risk — could upload executable | Validate MIME type + extension |
 | Using original filename directly | Path traversal attacks | Use UUID-based filenames |
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-boot/reference/web/servlet.html](https://docs.spring.io/spring-boot/reference/web/servlet.html)

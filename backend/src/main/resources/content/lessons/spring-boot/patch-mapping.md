@@ -291,3 +291,7 @@ public ResponseEntity<ProductResponse> updatePrice(
 | Mixing PATCH and PUT semantics | Confusing API behavior | Keep PUT for full replacement, PATCH for partial |
 | Forgetting to handle `null` vs "not sent" | Different semantics | Use a wrapper type or check key existence |
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-boot/reference](https://docs.spring.io/spring-boot/reference/)

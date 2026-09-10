@@ -152,3 +152,7 @@ Signs your aggregate is mis-designed:
 - One repository per aggregate root — the service composes aggregates.
 - Smaller aggregates load faster, contend less, and stay honest.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-data/jdbc/reference](https://docs.spring.io/spring-data/jdbc/reference/)

@@ -114,3 +114,7 @@ Keycloak (open source) sits between: self-hosted, full OIDC, but pre-built — m
 
 Official docs: [Spring Authorization Server](https://docs.spring.io/spring-authorization-server/reference/) · [OAuth2.net](https://oauth.net/2/)
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [docs.spring.io/spring-security/reference](https://docs.spring.io/spring-security/reference/)

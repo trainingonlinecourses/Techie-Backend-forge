@@ -162,3 +162,7 @@ Skip levels deliberately: if your derived query has never run against Postgres, 
 - Run Flyway migrations in tests so migrations are validated pre-production.
 - Pyramid: unit (mocked) → slice (`@DataJdbcTest`) → integration (`@SpringBootTest`).
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-data/jdbc/reference](https://docs.spring.io/spring-data/jdbc/reference/)

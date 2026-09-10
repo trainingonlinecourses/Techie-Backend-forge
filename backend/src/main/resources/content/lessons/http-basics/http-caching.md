@@ -160,3 +160,7 @@ public class ContentController {
 - Fingerprint static assets so long caches are safe.
 - The web is a cache — declare the policy, or the infrastructure will guess.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [datatracker.ietf.org/doc/html/rfc9110](https://datatracker.ietf.org/doc/html/rfc9110)

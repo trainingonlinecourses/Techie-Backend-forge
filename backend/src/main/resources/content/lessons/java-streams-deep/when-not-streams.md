@@ -169,3 +169,7 @@ This is the most common real-world pattern: streams for shape, loops for flow.
 
 Streams and loops are complementary tools, not rivals. Use streams when the pipeline is a pure, readable transformation; use loops when control flow, exceptions, or debugging dominate. The best codebases mix both — each where it's honest.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/stream/package-summary.html)

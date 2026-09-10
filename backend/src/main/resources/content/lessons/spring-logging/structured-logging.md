@@ -151,3 +151,7 @@ public class RequestContextFilter implements Filter {
 | Not including request ID | Can't trace requests across services | Always add requestId to MDC |
 | Forgetting to clear MDC | Memory leak, wrong context | Always clear in finally |
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-boot/reference/features/logging.html](https://docs.spring.io/spring-boot/reference/features/logging.html)

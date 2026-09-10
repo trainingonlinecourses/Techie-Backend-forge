@@ -210,3 +210,7 @@ public interface AuditedEntity extends Auditable {
 | Calling `this.method()` in default | Calls the implementing class method | Use `InterfaceName.super.method()` |
 | Forgetting static methods aren't inherited | Can't call `obj.staticMethod()` | Call via `Interface.staticMethod()` |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/javase/8/docs/api/)

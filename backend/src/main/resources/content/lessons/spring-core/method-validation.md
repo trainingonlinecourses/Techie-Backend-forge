@@ -110,3 +110,7 @@ Both are used in production: **controller validation** gives clean 400s with fie
 - Map `ConstraintViolationException` to 400 in a `@RestControllerAdvice`.
 - Controller validation for clean API errors; method validation as the contract for every caller.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-framework/reference](https://docs.spring.io/spring-framework/reference/)

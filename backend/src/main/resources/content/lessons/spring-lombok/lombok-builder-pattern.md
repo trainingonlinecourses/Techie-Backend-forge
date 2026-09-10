@@ -150,3 +150,7 @@ Dog dog = Dog.builder()
 | Using builder for simple DTOs | Over-engineering | Use records or @Data for simple POJOs |
 | Not using toBuilder() | Can't modify existing objects | Add toBuilder = true |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [projectlombok.org/features/all](https://projectlombok.org/features/all)

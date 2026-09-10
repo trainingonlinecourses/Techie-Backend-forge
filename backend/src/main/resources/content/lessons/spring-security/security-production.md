@@ -248,3 +248,7 @@ public record UserRequest(
 
 Official docs: [Spring Security Production](https://docs.spring.io/spring-security/reference/servlet/exploits/headers.html) · [OWASP Top 10](https://owasp.org/www-project-top-ten/)
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-security/reference](https://docs.spring.io/spring-security/reference/)

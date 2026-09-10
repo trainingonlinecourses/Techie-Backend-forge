@@ -215,3 +215,7 @@ key.attach(clientState);
 | Allocating buffers inside the selector loop | GC pressure, poor performance |
 | Not handling partial writes | Data corruption or connection drops |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

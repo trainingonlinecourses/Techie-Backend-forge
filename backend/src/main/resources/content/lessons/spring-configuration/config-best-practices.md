@@ -162,3 +162,7 @@ Before you call config "done", verify:
 - `/actuator/env` and `/actuator/configprops` are the production debuggers.
 - Config is code: document it, review it, treat it with the same rigor.
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-boot/reference/features/external-config.html](https://docs.spring.io/spring-boot/reference/features/external-config.html)

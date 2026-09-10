@@ -228,3 +228,7 @@ public class FlywayConfig {
 
 **Official docs:** [Flyway Documentation](https://flywaydb.org/documentation/) · [Spring Boot Flyway](https://docs.spring.io/spring-boot/reference/howto/data-initialization.html#howto.data-initialization.migration-tool.flyway)
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [documentation.red-gate.com/fd](https://documentation.red-gate.com/fd/)

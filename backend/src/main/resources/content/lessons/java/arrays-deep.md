@@ -105,3 +105,7 @@ This is why **generic types can't be arrays**: `new T[10]` is illegal. Collectio
 - Array covariance + generics don't mix (`new T[]` illegal); `ArrayStoreException` guards the hole.
 - Prefer arrays for raw numeric hot paths; collections for typed, growable APIs.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

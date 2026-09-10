@@ -117,3 +117,7 @@ Because a lambda's `this` is the enclosing object, a lambda can accidentally cap
 - Lambdas capture the enclosing `this`; anonymous classes have their own `this`.
 - Prefer static nesting for helpers — no hidden references, no retention surprises.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

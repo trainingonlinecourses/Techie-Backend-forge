@@ -95,3 +95,7 @@ The selling point is no-migration schema evolution (add a field, old docs just l
 
 Official docs: [Spring Data MongoDB](https://docs.spring.io/spring-data/mongodb/reference/) · [MongoDB Manual](https://www.mongodb.com/docs/manual/)
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-data/reference](https://docs.spring.io/spring-data/reference/)

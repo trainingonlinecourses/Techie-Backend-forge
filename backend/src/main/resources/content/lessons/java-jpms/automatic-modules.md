@@ -111,3 +111,7 @@ module com.my.library {
 | Automatic module name conflicts | Two JARs with same derived name | Use `Automatic-Module-Name` in MANIFEST.MF |
 | Not testing on module path | Classpath works but module path breaks | Test with `--module-path` during migration |
 
+## References
+
+- [dev.java — the official OpenJDK site](https://dev.java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/17/language/java-module-system.htm)

@@ -114,3 +114,7 @@ The `execution(...)` pointcut scoped to a package is the maintainable form — a
 - Avoid aspects for single-use or business logic — implicit behavior is a maintainability cost.
 - Watch self-invocation, exception transparency, and hot-path overhead.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-framework/reference/core/aop.html](https://docs.spring.io/spring-framework/reference/core/aop.html)

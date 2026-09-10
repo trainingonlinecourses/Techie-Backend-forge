@@ -181,3 +181,7 @@ The practical rule: **when in doubt, add parentheses**. Precedence bugs are invi
 | Forgetting operator precedence | Subtle logic bugs | Add explicit parentheses |
 | `a - b` for integer comparison in `compareTo` | Overflow for large values | Use `Integer.compare(a, b)` |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

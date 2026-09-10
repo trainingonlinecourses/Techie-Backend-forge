@@ -336,3 +336,7 @@ public class BankAccount {
 | Not checking `tryConvertToWriteLock` return | 0L means upgrade failed | Always check the return value |
 | Over-optimizing with optimistic reads | Validation cost may exceed read lock cost | Profile before choosing |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/21/core/concurrency.html)

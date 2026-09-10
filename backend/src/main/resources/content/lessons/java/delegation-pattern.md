@@ -245,3 +245,7 @@ public class UserRepository {
 
 Official docs: [Delegation Pattern](https://en.wikipedia.org/wiki/Delegation_pattern) · [Java Guides](https://www.javaguides.net/2019/09/delegation-pattern-in-java.html)
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

@@ -114,3 +114,7 @@ Calling another service is where production incidents start:
 
 Official docs: [REST Clients](https://docs.spring.io/spring-framework/reference/integration/rest-clients.html) · [WebClient](https://docs.spring.io/spring-framework/reference/web/webflux-webclient.html)
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-graphql/reference](https://docs.spring.io/spring-graphql/reference/)

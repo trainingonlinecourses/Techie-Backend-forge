@@ -181,3 +181,7 @@ public static final DateTimeFormatter API_DATE = DateTimeFormatter.ISO_LOCAL_DAT
 - `DateTimeFormatter` is immutable and thread-safe; make it `static final`.
 - Pass a `Locale` for any human-facing month/day names.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/time/package-summary.html)

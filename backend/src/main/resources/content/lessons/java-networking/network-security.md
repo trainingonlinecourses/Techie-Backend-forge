@@ -134,3 +134,7 @@ public class TlsClient {
 
 TLS is the encrypted envelope over the socket: a certificate-verified handshake followed by symmetric encryption, providing confidentiality, integrity, and server authentication. Java handles it automatically for HTTPS — your main job is to *not break the defaults*: never install trust-all `TrustManager`s or hostname-verifier bypasses in production, keep modern protocols (TLS 1.2/1.3), and solve real certificate problems with a proper CA or a scoped custom trust store. When you must write TLS code directly, use the default `SSLContext`, verify via the handshake's exceptions, and treat every "just skip the check" snippet as the security hole it is. Encryption you can't authenticate is just encryption to the attacker.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/networking/index.html)

@@ -207,3 +207,7 @@ public class UndoRedoStack<T> {
 | Using `Collections.reverse()` | Mutates the original | Use `.reversed()` for a non-mutating view |
 | Confusing `addFirst()` with `add(0, ...)` | Semantically different | `addFirst()` is clearer and works on all SequencedCollections |
 
+## References
+
+- [dev.java — the official OpenJDK site](https://dev.java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/21/docs/api/)

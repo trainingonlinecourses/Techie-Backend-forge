@@ -313,3 +313,7 @@ public class CompositeHealthIndicator implements HealthIndicator {
 | Not monitoring metrics | Blind in production | Set up Prometheus + Grafana |
 | Forgetting custom health indicators | Dependencies not checked | Add health indicators for external services |
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [docs.spring.io/spring-boot/reference/features/actuator.html](https://docs.spring.io/spring-boot/reference/features/actuator.html)

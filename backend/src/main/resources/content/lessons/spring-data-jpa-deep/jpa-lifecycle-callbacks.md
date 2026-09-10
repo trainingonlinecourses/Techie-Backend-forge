@@ -115,3 +115,7 @@ Also: `@PrePersist`/`@PreUpdate` changes made to the entity are **included in th
 - Changes in `@Pre*` join the same flush; `@Post*` see database-generated values.
 - Native SQL and no-op flushes bypass callbacks — know the boundaries.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-data/jpa/reference](https://docs.spring.io/spring-data/jpa/reference/)

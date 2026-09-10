@@ -207,3 +207,7 @@ class DevToolsActivationTest {
 | Forgetting remote secret | Anyone can connect to remote server | Always set a strong secret |
 | Including DevTools in fat JAR | DevTools runs in production | Use `<optional>true</optional>` |
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-boot/reference/using/devtools.html](https://docs.spring.io/spring-boot/reference/using/devtools.html)

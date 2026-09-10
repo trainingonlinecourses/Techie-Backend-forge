@@ -224,3 +224,7 @@ void counterIsCorrectUnderContention() throws Exception {
 
 Atomicity, visibility, and ordering are the entire game. Pick the *smallest* tool that gives the guarantee you need — volatile for flags, atomics for counters, synchronized/locks for compound operations — and remember every tool is really a happens-before edge. The next lessons extend this to CompletableFuture composition and virtual threads.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/21/core/concurrency.html)

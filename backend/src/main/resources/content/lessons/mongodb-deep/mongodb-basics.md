@@ -129,3 +129,7 @@ public interface ProductRepository extends MongoRepository<Product, String> {
 
 MongoDB is a document database: self-contained BSON documents in collections, with `_id` keys, rich types, nested structures, and no enforced table schema. The document model shines for hierarchical, object-shaped data read as a whole — and demands schema discipline from the application layer since the DB won't enforce it. The CRUD vocabulary (`find`, `$set`, `$push`, `$lt`) maps directly onto Spring Data MongoDB's repositories and query methods. Choose it for the datasets that are naturally documents; keep relational databases for the join-heavy, integrity-critical core. And remember the design principle that shapes everything else in this module: **the document is the unit of atomicity** — model data so that what you update together lives together.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [mongodb.com/docs/manual](https://www.mongodb.com/docs/manual/)

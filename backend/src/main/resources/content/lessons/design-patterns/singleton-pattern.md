@@ -147,3 +147,7 @@ This is why **dependency injection** (Spring) largely replaces the pattern: inst
 - Singletons hide dependencies and hurt testability — prefer DI/Spring beans, which are singletons by default.
 - Use singletons for shared stateless infrastructure, never for per-user state.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [refactoring.guru/design-patterns](https://refactoring.guru/design-patterns)

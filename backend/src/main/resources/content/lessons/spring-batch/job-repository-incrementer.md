@@ -211,3 +211,7 @@ public class DataMigrationConfig {
 | Using same parameters for different jobs | Confusing job instances | Use incrementer to differentiate runs |
 | Not monitoring job repository | Can't debug failures | Query metadata tables for execution history |
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-batch/reference](https://docs.spring.io/spring-batch/reference/)

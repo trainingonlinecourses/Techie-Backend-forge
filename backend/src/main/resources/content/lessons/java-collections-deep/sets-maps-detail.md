@@ -189,3 +189,7 @@ void hashCodeStableInCollections() {
 
 Every set/map is a *contract* plus a *strategy*. Respect `equals`/`hashCode`, pick the strategy by access pattern, and the collections do the rest — violate the contract and they fail silently, which is the worst kind of failure.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/21/core/collections.html)

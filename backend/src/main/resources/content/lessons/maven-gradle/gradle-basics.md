@@ -222,3 +222,7 @@ tasks.bootRun {
 
 Gradle is Maven's programmable, incremental successor: a task graph instead of a lifecycle, code instead of XML, and build speed that compounds daily. Choose it for new projects with complex builds or large multi-module codebases; Maven stays a perfectly good default when conventions and familiarity matter more.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [maven.apache.org/guides](https://maven.apache.org/guides/)

@@ -178,3 +178,7 @@ public class FlywayAutoConfiguration {
 | Bundling too many dependencies | Classpath bloat | Keep starters focused |
 | Not testing starter in isolation | Works in your app, breaks elsewhere | Test with minimal dependencies |
 
+## References
+
+- [dev.java — the official OpenJDK site](https://dev.java/)
+- [docs.spring.io/spring-boot/reference/features/developing-auto-configuration.html](https://docs.spring.io/spring-boot/reference/features/developing-auto-configuration.html)

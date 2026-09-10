@@ -117,3 +117,7 @@ Pattern: `%d{HH:mm:ss.SSS} %-5level [%thread] [%X{requestId}] %logger - %msg%n`
 | Not abbreviating logger | Lines too long | Use `%logger{36}` |
 | Colors in file appender | ANSI codes in log file | Only use colors in CONSOLE |
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [docs.spring.io/spring-boot/reference/features/logging.html](https://docs.spring.io/spring-boot/reference/features/logging.html)

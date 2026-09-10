@@ -109,3 +109,7 @@ The test of good HATEOAS: **every link a client actually uses, and every action 
 
 Official docs: [Spring HATEOAS](https://docs.spring.io/spring-hateoas/reference/)
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [docs.spring.io/spring-graphql/reference](https://docs.spring.io/spring-graphql/reference/)

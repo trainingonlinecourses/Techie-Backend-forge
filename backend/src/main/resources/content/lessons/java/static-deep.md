@@ -228,3 +228,7 @@ public class FeatureFlags {
 | Static import of non-constant | Reduced readability, ambiguous references |
 | Forgetting initialization order | NullPointerException in static fields |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

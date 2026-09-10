@@ -336,3 +336,7 @@ com.backendforge.metrics.MetricsAutoConfiguration
 | Using @ComponentScan on a different base package | Misses beans or scans too much | Keep @ComponentScan in the root package |
 | Not using profiles | Dev config leaks into production | Always use profile-specific properties |
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-boot/reference](https://docs.spring.io/spring-boot/reference/)

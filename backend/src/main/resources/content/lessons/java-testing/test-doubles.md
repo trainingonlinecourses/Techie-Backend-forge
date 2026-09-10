@@ -301,3 +301,7 @@ void shouldSendCorrectEmailContent() {
 
 Official docs: [Mockito](https://site.mockito.org/) · [Spring Testing](https://docs.spring.io/spring-framework/reference/testing.html)
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [junit.org/junit5/docs/current/user-guide](https://junit.org/junit5/docs/current/user-guide/)

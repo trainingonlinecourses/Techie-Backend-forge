@@ -202,3 +202,7 @@ void prometheusEndpointExposesMetrics() throws Exception {
 
 Metrics answer *"what's happening right now, at scale"* — is latency creeping up, are errors spiking, is the queue growing? The next lessons cover health indicators, custom metrics wiring, dashboards, and distributed tracing.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [docs.spring.io/spring-boot/reference/actuator/metrics.html](https://docs.spring.io/spring-boot/reference/actuator/metrics.html)

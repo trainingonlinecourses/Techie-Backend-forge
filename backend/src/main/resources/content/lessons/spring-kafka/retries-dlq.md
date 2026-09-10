@@ -109,3 +109,7 @@ public void onPaymentCaptured(PaymentCaptured event) {
 - [Spring Kafka — Error Handling](https://docs.spring.io/spring-kafka/reference/kafka/error-handling.html)
 - [Apache Kafka — Dead Letter Queues](https://kafka.apache.org/documentation/#basic_ops_consumer_lag)
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-kafka/reference](https://docs.spring.io/spring-kafka/reference/)

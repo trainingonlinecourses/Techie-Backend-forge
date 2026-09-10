@@ -223,3 +223,7 @@ public class ProductCacheService {
 
 **Official docs:** [Redis Scaling](https://redis.io/docs/manual/scaling/) · [Spring Data Redis Clustering](https://docs.spring.io/spring-data/redis/reference/redis/clustering.html)
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [redis.io/docs/latest](https://redis.io/docs/latest/)

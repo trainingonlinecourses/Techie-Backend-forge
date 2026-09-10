@@ -581,3 +581,7 @@ curl -X POST http://localhost:8080/api/orders \
 docker-compose run order-service mvn test
 ```
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-boot/reference](https://docs.spring.io/spring-boot/reference/)

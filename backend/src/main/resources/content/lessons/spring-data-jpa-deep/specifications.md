@@ -211,3 +211,7 @@ class SpecificationTest {
 
 Specifications turn dynamic filters from 32 hand-written methods into a composable algebra: one predicate per filter, combined at runtime, type-checked by the compiler. They're the standard solution for search forms and admin filters — and they play perfectly with the pagination and sorting you already use.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-data/jpa/reference](https://docs.spring.io/spring-data/jpa/reference/)

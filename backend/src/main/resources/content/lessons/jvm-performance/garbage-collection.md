@@ -238,3 +238,7 @@ ZGC: ░░░░░░░░░░░░░░░░░░░░░░░░░
 
 Official docs: [GC Tuning Guide](https://www.oracle.com/java/technologies/gctuning.html) · [java tool](https://docs.oracle.com/en/java/javase/21/docs/specs/man/java.html)
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/21/gctuning/)

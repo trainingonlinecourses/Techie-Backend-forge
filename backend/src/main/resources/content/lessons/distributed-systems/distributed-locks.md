@@ -141,3 +141,7 @@ public void runNightly() { ... }
 
 Distributed locks are a lease, not a guarantee: TTLs make them crash-safe, renewals keep long jobs covered, and fencing tokens make stale holders harmless. For job scheduling, use ShedLock; for critical coordination, use a consensus system — and when you can, prefer idempotency, which makes the lock's failure mode irrelevant.
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [microservices.io/patterns/index.html](https://microservices.io/patterns/index.html)

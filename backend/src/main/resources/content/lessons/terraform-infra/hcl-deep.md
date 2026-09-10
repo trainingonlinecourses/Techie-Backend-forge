@@ -163,3 +163,7 @@ HCL's power comes with a warning that every Terraform team learns: **abstraction
 
 HCL is a real expression language: interpolation and operators compose values; `locals` compute once and reuse (the anti-repetition tool); `count` (positional) and `for_each` (keyed — preferred) generate many resources; functions (`join`, `file`, `lookup`, `merge`, `sha256`) form the standard library; and `for` expressions plus splat syntax (`[*]`) transform collections compactly. The craft is using the power to remove duplication while keeping plans readable — variables and locals for tunables, `for_each` for keyed repetition, and modules (next) as the boundary where complexity lives.
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [developer.hashicorp.com/terraform/docs](https://developer.hashicorp.com/terraform/docs)

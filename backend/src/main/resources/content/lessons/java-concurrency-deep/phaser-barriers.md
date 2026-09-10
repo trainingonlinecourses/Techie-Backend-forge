@@ -407,3 +407,7 @@ public class WaveProcessor {
 | Not registering all parties in Phaser | Phaser completes prematurely | Register all parties before they start |
 | Creating too many barriers | Complex, hard to maintain | Use a single barrier per synchronization point |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/21/core/concurrency.html)

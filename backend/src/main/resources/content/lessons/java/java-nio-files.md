@@ -101,3 +101,7 @@ Use async channels when a **single thread** must juggle many I/O operations (hig
 
 Official docs: [java.nio.file package](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/nio/file/package-summary.html) · [File I/O tutorial](https://docs.oracle.com/javase/tutorial/essential/io/fileio.html)
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

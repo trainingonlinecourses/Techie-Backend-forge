@@ -106,3 +106,7 @@ Flux<CustomerOrders> enriched = customerIds
 - [Spring Boot — WebClient](https://docs.spring.io/spring-boot/reference/io/webclient.html)
 - [WebClient Exchange vs Retrieve](https://docs.spring.io/spring-framework/reference/web/webflux-webclient.html#webflux-client-builder)
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [docs.spring.io/spring-framework/reference/web/webflux.html](https://docs.spring.io/spring-framework/reference/web/webflux.html)

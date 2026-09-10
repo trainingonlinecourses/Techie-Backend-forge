@@ -103,3 +103,7 @@ A common mistake: using `@ConditionalOnMissingBean` where a plain `@Primary`/`@Q
 - Conditionals decide at startup only — runtime toggles need feature flags.
 - `@ConditionalOnMissingBean` is the backstop pattern for defaults, not a general "either/or" tool.
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-framework/reference](https://docs.spring.io/spring-framework/reference/)

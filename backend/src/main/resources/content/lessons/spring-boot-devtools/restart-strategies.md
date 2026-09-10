@@ -136,3 +136,7 @@ public class DatabaseMigration {
 | Forgetting @RestartScope | State lost on restart | Annotate expensive beans |
 | Not excluding static resources | Browser refresh instead of restart | Add static/** to excludes |
 
+## References
+
+- [dev.java — the official OpenJDK site](https://dev.java/)
+- [docs.spring.io/spring-boot/reference/using/devtools.html](https://docs.spring.io/spring-boot/reference/using/devtools.html)

@@ -337,3 +337,7 @@ com.acme/
 
 **Official docs:** [Classpath scanning](https://docs.spring.io/spring-framework/reference/core/beans/classpath-scanning.html) · [@Import](https://docs.spring.io/spring-framework/reference/core/beans/java/import.html)
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [docs.spring.io/spring-framework/reference](https://docs.spring.io/spring-framework/reference/)

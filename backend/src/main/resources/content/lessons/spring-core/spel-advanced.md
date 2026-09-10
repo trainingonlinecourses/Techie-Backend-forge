@@ -105,3 +105,7 @@ public void onLargePayment(PaymentEvent event) { ... }
 - Expressions are unchecked strings — test every security/cache expression you write.
 - Parse once and reuse for performance; scope contexts to the minimum capability.
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-framework/reference](https://docs.spring.io/spring-framework/reference/)

@@ -263,3 +263,7 @@ public class UserService {
 | Forgetting that `"a" + "b"` creates a new literal, not interned | Works fine (compiler optimizes), but `new String("ab")` wouldn't be |
 | Switching from `==` to `.equals()` on enums | Wasteful `.equals()` when `==` is correct and faster |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

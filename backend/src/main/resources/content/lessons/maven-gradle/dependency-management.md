@@ -191,3 +191,7 @@ mvn versions:display-dependency-updates   # newer versions available
 
 Dependency management is governance: scopes say where a jar lives, the BOM says what version, exclusions trim what leaks in, and the tree shows what actually arrived. Run `dependency:tree` before every upgrade — the graph tells you more than the docs.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [maven.apache.org/guides](https://maven.apache.org/guides/)

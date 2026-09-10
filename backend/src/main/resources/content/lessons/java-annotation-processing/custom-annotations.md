@@ -325,3 +325,7 @@ public class AuditAspect {
 | Over-annotating | Code becomes noisy | Only annotate where it adds value |
 | Using annotations for logic | Annotations are metadata, not code | Process annotations in frameworks/tools |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/java/annotations/)

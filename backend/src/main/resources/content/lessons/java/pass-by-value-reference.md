@@ -349,3 +349,7 @@ clearList(names);
 | Thinking `final` prevents modification | `final` prevents reassignment, not field modification | `final` means you can't do `u = new User(...)`, but you CAN do `u.name = "Bob"` |
 | Modifying a String parameter | Strings are immutable — `s = s + "x"` creates a new String | Use StringBuilder instead |
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

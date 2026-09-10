@@ -196,3 +196,7 @@ class OrderEventFlowTest {
 
 Testcontainers turns "the tests pass but prod breaks" into "the tests run against prod's actual dependencies". The cost — a few seconds of container startup — is repaid the first time a Postgres-only SQL bug is caught in CI instead of production.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-boot/reference/testing/spring-boot-applications.html](https://docs.spring.io/spring-boot/reference/testing/spring-boot-applications.html)

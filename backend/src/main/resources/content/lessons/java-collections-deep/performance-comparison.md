@@ -152,3 +152,7 @@ Need order-preserving dedupe?        → LinkedHashSet
 
 Performance in collections is mostly *avoiding the wrong structure*: don't scan lists for membership, don't box millions of primitives, don't let ArrayLists grow 13 times. Pick the structure by access pattern, size it up front, and measure when it matters.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/21/core/collections.html)

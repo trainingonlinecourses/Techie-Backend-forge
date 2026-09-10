@@ -462,3 +462,7 @@ public class ResilientService {
 
 Official docs: [Operator Decision Tree](https://projectreactor.io/docs/core/release/reference/#which-operator) · [Reactor Core](https://projectreactor.io/docs/core/release/reference/#producing)
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-framework/reference/web/webflux.html](https://docs.spring.io/spring-framework/reference/web/webflux.html)

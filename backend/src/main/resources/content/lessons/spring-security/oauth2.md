@@ -118,3 +118,7 @@ public class ServiceClientConfig {
 
 **Official docs:** [OAuth2](https://docs.spring.io/spring-security/reference/servlet/oauth2/index.html) · [JWT resource server](https://docs.spring.io/spring-security/reference/servlet/oauth2/resource-server/jwt.html)
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-security/reference](https://docs.spring.io/spring-security/reference/)

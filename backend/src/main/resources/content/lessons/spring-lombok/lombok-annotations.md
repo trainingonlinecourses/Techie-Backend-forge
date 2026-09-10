@@ -197,3 +197,7 @@ public class Order {
 | @ToString logging sensitive data | Passwords in logs | Use @ToString.Exclude |
 | @Data on records | Records already generate everything | Don't use Lombok with records |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [projectlombok.org/features/all](https://projectlombok.org/features/all)

@@ -117,3 +117,7 @@ Test both sides of the coin: valid-scope success and missing/invalid-token rejec
 
 Official docs: [OAuth2 Resource Server](https://docs.spring.io/spring-security/reference/servlet/oauth2/resource-server/index.html) · [JWT specifics](https://docs.spring.io/spring-security/reference/servlet/oauth2/resource-server/jwt.html)
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-security/reference](https://docs.spring.io/spring-security/reference/)

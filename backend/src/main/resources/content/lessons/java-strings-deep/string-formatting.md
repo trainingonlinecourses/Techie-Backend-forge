@@ -149,3 +149,7 @@ public class Main {
 - Always pass an explicit `Locale` for locale-sensitive output.
 - Use `MessageFormat` (`{0}` style) for user-facing internationalized text.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html)

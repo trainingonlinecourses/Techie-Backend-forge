@@ -112,3 +112,7 @@ ALTER TABLE enrollments
 - Name your constraints; handle NULLs in CHECKs; pick `ON DELETE` policies.
 - Constraints surface data corruption at migration time instead of hiding it.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [postgresql.org/docs/current/ddl.html](https://www.postgresql.org/docs/current/ddl.html)

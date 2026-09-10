@@ -220,3 +220,7 @@ public class AuditLogWriter {
 | Memory-mapping a file larger than 2GB (32-bit JVM) | `OutOfMemoryError` — use FileChannel instead |
 | Forgetting `buffer.flip()` after write | Reads garbage or nothing from buffer |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

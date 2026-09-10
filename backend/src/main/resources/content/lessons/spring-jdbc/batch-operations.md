@@ -173,3 +173,7 @@ public void importWithSkip(List<Course> courses) {
 
 Batch operations are the difference between an import that works and one that melts the database. Chunk the data, batch the statements, flip `rewriteBatchedStatements`, and measure — 10× is the baseline, not the ceiling.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-framework/reference/data-access/jdbc.html](https://docs.spring.io/spring-framework/reference/data-access/jdbc.html)

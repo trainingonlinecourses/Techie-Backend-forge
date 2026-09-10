@@ -118,3 +118,7 @@ Sagas don't replace the outbox — **they run on top of it**: the outbox guarant
 
 Official docs: [Saga (microservices.io)](https://microservices.io/patterns/data/saga.html)
 
+## References
+
+- [dev.java — the official OpenJDK site](https://dev.java/)
+- [microservices.io/patterns/index.html](https://microservices.io/patterns/index.html)

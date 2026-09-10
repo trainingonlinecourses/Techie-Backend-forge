@@ -226,3 +226,7 @@ class GrpcServerTest {
 
 gRPC servers are typed and contract-first: the .proto is the API, the generated base class is the implementation skeleton, and Status codes give clients a precise error vocabulary. The next lesson covers the client side, streaming, and production hardening.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [grpc.io/docs](https://grpc.io/docs/)

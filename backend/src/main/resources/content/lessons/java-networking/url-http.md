@@ -176,3 +176,7 @@ public class PostDemo {
 
 `URL` parses web addresses into components; `HttpURLConnection` performs HTTP requests over the underlying sockets. The flow is always the same: open → configure (method, timeouts, headers) → send → check status → read the success or error stream → disconnect. The two gotchas that trip everyone are the **error-stream split** (error bodies come from `getErrorStream()`) and **missing timeouts** (hanging threads). Modern production code prefers `java.net.http.HttpClient` for its cleaner API, HTTP/2 support, and async modes — which is the next lesson — but the mechanics you just learned are exactly what that client automates.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/networking/index.html)

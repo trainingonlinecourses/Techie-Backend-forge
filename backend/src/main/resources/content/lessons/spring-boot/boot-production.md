@@ -102,3 +102,7 @@ Liveness = "restart me"; readiness = "stop routing to me". Boot provides both gr
 
 **Official docs:** [Deployment](https://docs.spring.io/spring-boot/reference/deployment/index.html) · [12-factor](https://12factor.net)
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-boot/reference](https://docs.spring.io/spring-boot/reference/)

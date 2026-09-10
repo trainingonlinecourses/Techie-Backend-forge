@@ -127,3 +127,7 @@ dist/
 - `.gitignore` keeps generated files and secrets out of history.
 - Small, coherent, well-messaged commits make the history readable and the time machine useful.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [git-scm.com/doc](https://git-scm.com/doc)

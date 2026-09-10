@@ -343,3 +343,7 @@ public void addDependency(Document pomDoc, String groupId, String artifactId, St
 | Complex conditional processing | **StAX** | Pull-based, most control |
 | JSON-like data | **Jackson/Gson** | XML is overkill for key-value data |
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/jaxp/)

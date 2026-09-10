@@ -204,3 +204,7 @@ public Optional<String> extractValue(Object response) {
 | Using `||` with pattern variables | Variable might not be assigned | Only use `&&` with pattern variables |
 | Forgetting null is rejected | Pattern matching automatically handles null | No null check needed |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/17/docs/api/)

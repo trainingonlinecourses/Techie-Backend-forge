@@ -237,3 +237,7 @@ jobs:
 | No health check | Orchestrator cannot detect unhealthy containers |
 | `COPY . .` before `pom.xml` | Breaks layer caching — rebuilds everything |
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-boot/reference](https://docs.spring.io/spring-boot/reference/)

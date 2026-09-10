@@ -163,3 +163,7 @@ This academy's repo demonstrates the pattern: CI builds and tests on every push;
 - Protect main: require reviews, CI, and up-to-date branches.
 - Start with GitHub Flow; add ceremony only when releases demand it.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [git-scm.com/doc](https://git-scm.com/doc)

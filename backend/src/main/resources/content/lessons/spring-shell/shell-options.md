@@ -101,3 +101,7 @@ public class AdvancedCommands {
 | Naming conflicts between commands | Ambiguous parsing | Use unique option names per command |
 | Not validating input | Runtime errors | Check constraints before processing |
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [spring.io/projects/spring-shell](https://spring.io/projects/spring-shell)

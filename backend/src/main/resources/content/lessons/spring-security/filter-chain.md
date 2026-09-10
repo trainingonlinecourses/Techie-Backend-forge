@@ -95,3 +95,7 @@ You can register several `SecurityFilterChain` beans, matched by path — e.g. a
 
 **Official docs:** [SecurityFilterChain](https://docs.spring.io/spring-security/reference/servlet/architecture.html#servlet-securityfilterchain) · [Filters](https://docs.spring.io/spring-security/reference/servlet/architecture.html#servlet-filters-review)
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-security/reference](https://docs.spring.io/spring-security/reference/)

@@ -160,3 +160,7 @@ Both erase to `void handle(List)`. If you genuinely need to dispatch on the elem
 
 Every generics pitfall reduces to erasure: raw types disable checking, arrays conflict with erasure (so generic arrays are banned), varargs arrays carry the same risk (so `@SafeVarargs` is a promise), and "mystery" `ClassCastException`s are erased casts on polluted data. The remedies are equally principled: never use raw types, prefer `List<T>`, isolate unchecked casts, and pass type tokens when runtime type information matters. Follow these rules and the compiler becomes an ally that catches whole categories of bugs before your code ever ships.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/java/generics/index.html)

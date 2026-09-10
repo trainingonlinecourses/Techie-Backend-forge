@@ -207,3 +207,7 @@ mockMvc.perform(get("/api/profile").cookie(session))
 
 MockMvc is the fastest way to verify your HTTP contract: status codes, headers, JSON shape, validation, security, redirects, uploads, and async flows. Master the request/response DSL — `perform`, `andExpect`, `jsonPath`, `print` — and your controller tests become precise, fast, and readable.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-boot/reference/testing/spring-boot-applications.html](https://docs.spring.io/spring-boot/reference/testing/spring-boot-applications.html)

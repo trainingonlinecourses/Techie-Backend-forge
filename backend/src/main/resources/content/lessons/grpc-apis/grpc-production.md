@@ -204,3 +204,7 @@ grpcurl -plaintext -d '{"id": 1}' localhost:9090 academy.v1.CourseService/GetCou
 
 gRPC is production-ready out of the box — but only with the hardening layer: TLS, real load balancing (the HTTP/2 trap), deadlines, observability interceptors, and the health service. Add these and gRPC becomes your fastest, most reliable service-to-service protocol.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [grpc.io/docs](https://grpc.io/docs/)

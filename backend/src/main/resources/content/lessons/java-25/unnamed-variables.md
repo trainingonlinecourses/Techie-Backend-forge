@@ -249,3 +249,7 @@ public void copyFile(String from, String to) throws IOException {
 | Multiple `_` in same scope | Confusing | Use `_` only for clearly independent variables |
 | Using `_` in old-style for loops | May not work in all contexts | Test in your JDK version |
 
+## References
+
+- [dev.java — the official OpenJDK site](https://dev.java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/25/docs/api/)

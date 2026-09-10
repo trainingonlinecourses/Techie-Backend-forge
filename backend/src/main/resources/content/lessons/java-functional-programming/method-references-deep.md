@@ -156,3 +156,7 @@ The compiler selects the overload whose parameter types match the target signatu
 - Use `::` for direct calls, lambdas for anything with added logic.
 - `Comparator.comparing(KeyExtractor::extract)` and `.map(Obj::getField)` are the canonical uses.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/java/javaOO/lambdaexpressions.html)

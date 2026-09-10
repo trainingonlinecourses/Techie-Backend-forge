@@ -171,3 +171,7 @@ Rule of thumb: **write your app code with blocking I/O**; let the frameworks (To
 - Selectors let one thread serve thousands of sockets (the reactor pattern).
 - For everyday app code, prefer `java.io` + `Files.*`; NIO is the substrate under high-performance frameworks.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/io/package-summary.html)

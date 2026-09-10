@@ -107,3 +107,7 @@ Unit tests mock it; boundary tests use a real stub server (WireMock/MockWebServe
 
 Official docs: [Spring Cloud OpenFeign](https://docs.spring.io/spring-cloud-openfeign/reference/)
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-cloud/reference](https://docs.spring.io/spring-cloud/reference/)

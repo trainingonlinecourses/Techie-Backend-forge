@@ -232,3 +232,7 @@ static String describe(Payment payment) {
 
 A banking platform models account types as a sealed hierarchy. When they add a new account type (e.g., `SavingsAccount`), the compiler forces them to handle it in every switch expression across the codebase. No forgotten cases, no runtime surprises. The sealed hierarchy also helps the JVM optimize dispatch — it knows there are exactly 4 account types, so it can use a faster lookup table instead of virtual dispatch.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/17/docs/api/)

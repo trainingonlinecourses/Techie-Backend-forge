@@ -184,3 +184,7 @@ For plain Java, `HttpClient` is the standard. In a Spring Boot app you'll often 
 
 `java.net.http.HttpClient` is the modern, built-in HTTP client: configure one client (timeouts, redirects, HTTP/2), build fluent requests, and send them synchronously (`send`) or asynchronously (`sendAsync` returning `CompletableFuture`). Body handlers give typed results (`ofString`, `ofFile`, custom), and the API covers POST bodies, WebSockets, and concurrency composition. The two habits to internalize: **network failures throw, HTTP errors don't** — check `statusCode()` — and async + `allOf`/`thenApply` turns N sequential requests into one concurrent batch. Master this client and you have the JDK's full HTTP story in one clean API.
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/networking/index.html)

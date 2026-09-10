@@ -175,3 +175,7 @@ For dynamic queries (filters built at runtime), `Querydsl` support (`QuerydslPre
 - `@Modifying` + `@Transactional` for writes; parameterize everything against injection.
 - Inspect generated SQL for hot queries — predictability is the module's whole point.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-data/jdbc/reference](https://docs.spring.io/spring-data/jdbc/reference/)

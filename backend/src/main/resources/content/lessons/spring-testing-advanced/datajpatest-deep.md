@@ -115,3 +115,7 @@ assertThat(orderRepo.findByStatus("PAID")).hasSize(1);
 - The slice covers repositories/mappings/JPQL — not services or the HTTP stack.
 - Import auditing config explicitly when testing `@CreatedDate`/`@LastModifiedDate`.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-boot/reference/testing/spring-boot-applications.html](https://docs.spring.io/spring-boot/reference/testing/spring-boot-applications.html)

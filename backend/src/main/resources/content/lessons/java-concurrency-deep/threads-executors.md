@@ -215,3 +215,7 @@ pool.execute(() -> {
 
 Threads are a finite, expensive resource — the pool is the discipline. Size it for the workload, bound the queue, time-box the waits, and shut it down gracefully. The next lessons build on this: locks and atomicity, CompletableFuture, and virtual threads.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/21/core/concurrency.html)

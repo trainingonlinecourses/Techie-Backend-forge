@@ -248,3 +248,7 @@ class InterceptorTest {
 
 Compose them deliberately: filters for the raw plumbing, interceptors for MVC concerns, resolvers for ergonomics. Each layer doing one job keeps the request pipeline readable and the controllers thin.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-framework/reference/web/webmvc.html](https://docs.spring.io/spring-framework/reference/web/webmvc.html)

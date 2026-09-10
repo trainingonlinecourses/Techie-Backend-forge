@@ -155,3 +155,7 @@ Both formats are equivalent to Spring — **choose one per project and be consis
 - YAML and properties are interchangeable to Spring; pick one, stay consistent.
 - Same secret rules apply: `${VAR}` placeholders, never committed credentials.
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-boot/reference/features/external-config.html](https://docs.spring.io/spring-boot/reference/features/external-config.html)

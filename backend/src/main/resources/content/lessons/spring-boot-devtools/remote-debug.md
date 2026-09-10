@@ -108,3 +108,7 @@ spring:
 | Forgetting suspend=n | App hangs waiting for debugger | Use suspend=n unless you need early breakpoints |
 | Not disabling in production | Performance + security risk | DevTools auto-disables in production (JAR packaging) |
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [docs.spring.io/spring-boot/reference/using/devtools.html](https://docs.spring.io/spring-boot/reference/using/devtools.html)

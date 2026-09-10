@@ -315,3 +315,7 @@ A fintech startup exposes a REST API for account management. Initially, they ret
 
 The API contract is now independent of the database schema — they can refactor entities without breaking clients.
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [docs.spring.io/spring-boot/reference](https://docs.spring.io/spring-boot/reference/)

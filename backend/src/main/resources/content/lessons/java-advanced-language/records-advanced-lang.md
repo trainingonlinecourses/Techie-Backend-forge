@@ -198,3 +198,7 @@ No annotations needed for the common case — records' canonical constructor mat
 
 Records make data immutable and terse; sealed classes make hierarchies exhaustive; pattern matching makes handling them elegant and compiler-checked. This trio is the foundation of modern Java domain modeling — and it composes perfectly with the next lesson's switch expressions and richer language features.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/21/language/java-language-changes.html)

@@ -178,3 +178,7 @@ class StateToolkit {
 
 Reliable tests are isolated tests, and JUnit 5's defaults enforce it: **fresh instances per method** (instance fields are per-test state), with `@TempDir` for per-test files and `@BeforeEach` for resetting shared resources. **PER_CLASS** shares an instance for expensive *immutable* setup — a deliberate trade that reintroduces coupling if abused. **Ordering** (`@Order`, `MethodOrderer`) exists for intentional sequences, not as a fix for shared state. And **parallel execution** — the speed feature — is really the isolation audit: if tests can't run concurrently, they aren't independent. The rule that ties it together: make every test a self-contained experiment, and the suite becomes fast, deterministic, and trustworthy.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [junit.org/junit5/docs/current/user-guide](https://junit.org/junit5/docs/current/user-guide/)

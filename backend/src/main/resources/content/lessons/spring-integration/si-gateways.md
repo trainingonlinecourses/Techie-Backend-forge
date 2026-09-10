@@ -156,3 +156,7 @@ The gateway's contract: errors in the flow surface to the caller (the method thr
 
 Messaging gateways give application code a plain synchronous (or `CompletableFuture`) interface over message-based flows: a `@MessagingGateway` interface is proxied so each method sends into a request channel, waits for the reply channel, and returns the result — or fire-and-forgets, or returns a future. The **service activator** (`@ServiceActivator`) is the receiving side: a plain bean method that takes the payload and returns the reply. The result is the best of both worlds — normal Spring code with clean interfaces and exception semantics, backed by declarative, testable EIP flows. Gateways are the front desk; the flow is the office; your code never sees the mail system.
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-integration/reference](https://docs.spring.io/spring-integration/reference/)

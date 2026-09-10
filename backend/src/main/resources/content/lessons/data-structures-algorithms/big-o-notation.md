@@ -128,3 +128,7 @@ Before you write an algorithm, *predict* its complexity; after you write it, *ve
 
 Big-O describes how work grows with input, stripped of machine and constant factors: O(1) flat, O(log n) halving, O(n) linear, O(n log n) sorting, O(n²) nested loops, O(2ⁿ) and beyond explosive. To derive it: count operations, keep the dominant term, drop constants, multiply nested blocks. Apply it to space as well as time. And remember its limits — it's about growth and worst cases, not real seconds or small inputs. Mastered, it turns "will this scale?" from a guess into a calculation you can do on the back of an envelope.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [algs4.cs.princeton.edu/home](https://algs4.cs.princeton.edu/home/)

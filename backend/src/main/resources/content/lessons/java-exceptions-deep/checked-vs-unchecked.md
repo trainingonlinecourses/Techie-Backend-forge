@@ -136,3 +136,7 @@ public class Config {
 
 Checked exceptions are the compiler enforcing "plan for this failure": they must be caught or declared, and they suit failures the immediate caller can act on. Unchecked exceptions are bugs or far-up-the-stack failures that no local handler should own. Modern frameworks — Spring first among them — have drifted toward unchecked for infrastructure failures, translating at boundaries, which is why `JdbcTemplate` throws `DataAccessException` with no `throws` clause. Decide by asking *who handles this and can they meaningfully respond*; set `rollbackFor` explicitly around `@Transactional`; and never let the compiler's enforcement become an excuse to swallow. The checked/unchecked split isn't bureaucracy — it's the language giving you a tool to encode failure responsibility, and the skill is choosing the right tool per failure.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/essential/exceptions/index.html)

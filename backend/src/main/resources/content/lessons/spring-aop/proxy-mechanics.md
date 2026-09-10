@@ -94,3 +94,7 @@ One subtle JDK-proxy limitation: **only interface methods are intercepted**. If 
 - `final` classes/methods can't be proxied — advice silently doesn't apply.
 - Expect proxies in logs/reflection; test `isAopProxy` when interception is critical.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-framework/reference/core/aop.html](https://docs.spring.io/spring-framework/reference/core/aop.html)

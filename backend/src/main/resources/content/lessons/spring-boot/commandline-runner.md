@@ -357,3 +357,7 @@ public class HealthChecker implements CommandLineRunner {
 | Running blocking operations | Delays startup | Keep runners fast or run them async |
 | Forgetting `@Component` | Runner never gets picked up | Always annotate with `@Component` |
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-boot/reference](https://docs.spring.io/spring-boot/reference/)

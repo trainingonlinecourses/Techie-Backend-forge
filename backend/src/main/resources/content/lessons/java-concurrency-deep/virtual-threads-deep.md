@@ -175,3 +175,7 @@ For most backend services, virtual threads make reactive unnecessary: same scala
 
 Virtual threads make blocking I/O scalable again — millions of cheap threads, plain code, one property in Spring Boot. They're the pragmatic alternative to reactive complexity for the vast majority of backend workloads: same concurrency, dramatically simpler code.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/21/core/concurrency.html)

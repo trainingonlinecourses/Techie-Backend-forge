@@ -221,3 +221,7 @@ For everything else, use JSON, Protocol Buffers, or Avro.
 | Deserializing untrusted data | Remote code execution vulnerability |
 | Forgetting `readResolve()` for singletons | Deserialization creates duplicate instances |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

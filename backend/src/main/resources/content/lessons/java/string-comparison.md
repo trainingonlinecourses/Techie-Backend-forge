@@ -116,3 +116,7 @@ if (normalized.equals("admin")) { ... }
 - Human-language ordering needs `Collator`; code/identifier ordering uses `compareTo`.
 - Normalize at the boundary with `Locale.ROOT` to avoid locale bugs.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

@@ -105,3 +105,7 @@ public ChatAnswer ask(@RequestBody ChatRequest req) {
 
 **Official docs:** [ChatClient](https://docs.spring.io/spring-ai/reference/api/chatclient.html) · [ChatModel](https://docs.spring.io/spring-ai/reference/api/chatmodel.html)
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-ai/reference](https://docs.spring.io/spring-ai/reference/)

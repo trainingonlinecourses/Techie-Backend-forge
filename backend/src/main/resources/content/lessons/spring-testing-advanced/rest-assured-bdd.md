@@ -109,3 +109,7 @@ Choose one style per codebase: `TestRestTemplate` (no extra dependency, explicit
 - Keep the E2E layer thin and critical; unit + slice tests carry the bulk of coverage.
 - Stub external systems (WireMock), reset shared state, and never hardcode ports.
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-boot/reference/testing/spring-boot-applications.html](https://docs.spring.io/spring-boot/reference/testing/spring-boot-applications.html)

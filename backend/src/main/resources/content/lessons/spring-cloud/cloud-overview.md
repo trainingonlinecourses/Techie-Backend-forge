@@ -106,3 +106,7 @@ Mismatched Boot/Cloud versions are the #1 cause of "Spring Cloud doesn't start" 
 
 **Official docs:** [Spring Cloud reference](https://docs.spring.io/spring-cloud/reference/) · [12-factor](https://12factor.net)
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [docs.spring.io/spring-cloud/reference](https://docs.spring.io/spring-cloud/reference/)

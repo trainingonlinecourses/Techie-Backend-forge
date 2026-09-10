@@ -152,3 +152,7 @@ The same code, clean:
 
 **Official docs:** [Spring Boot DevTools](https://docs.spring.io/spring-boot/reference/using/devtools.html)
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [docs.spring.io/spring-boot/reference](https://docs.spring.io/spring-boot/reference/)

@@ -252,3 +252,7 @@ void oneofSetsExactlyOneField() {
 
 Protobuf is the contract layer: schema-first, versioned, compiled, and 6× smaller than JSON. It's the substrate for gRPC — the next lessons put these messages on the wire with typed RPCs, streaming, and error codes.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [grpc.io/docs](https://grpc.io/docs/)

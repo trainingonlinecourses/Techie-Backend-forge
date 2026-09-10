@@ -111,3 +111,7 @@ public class FeatureFlagEndpoint {
 - Keep probes cheap and fast; secure sensitive endpoints; hide details by default.
 - Health indicators are the source of truth for Kubernetes probes and ops dashboards alike.
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-boot/reference](https://docs.spring.io/spring-boot/reference/)

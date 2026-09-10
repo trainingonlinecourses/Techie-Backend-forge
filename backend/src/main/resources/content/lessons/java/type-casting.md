@@ -220,3 +220,7 @@ public static <E extends Enum<E>> E fromOrdinal(Class<E> enumType, int ordinal) 
 - Never use `==` on wrapper types; always `.equals()`. The Integer cache (-128 to 127) makes `==` unreliable.
 - Cast `byte` values to `int` with `& 0xFF` when treating them as unsigned.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

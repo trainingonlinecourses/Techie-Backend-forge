@@ -118,3 +118,7 @@ kafka-consumer-groups.sh --bootstrap-server localhost:9092 \
 
 Consumer groups are Kafka's parallel-processing and fault-tolerance mechanism: members split the topic's partitions (exactly one consumer per partition at a time), the coordinator manages membership and assignments, and the poll loop doubles as the heartbeat. Rebalancing — triggered by joins, leaves, crashes, or slow processing — pauses the group and reassigns partitions, so you must commit on revoke and tolerate reprocessing. The three timers (heartbeat, session timeout, max.poll.interval) define "alive" and "keeping up," and **lag** is the metric that reveals the truth about your pipeline's health. Design groups per logical consumer, size for partition count, and treat rebalances as normal events — because in a healthy Kafka deployment, they are.
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [kafka.apache.org/documentation](https://kafka.apache.org/documentation/)

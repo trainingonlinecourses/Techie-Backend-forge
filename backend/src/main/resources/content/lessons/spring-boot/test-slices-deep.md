@@ -179,3 +179,7 @@ mockMvc.perform(post("/api/orders").contentType(APPLICATION_JSON).content(json))
 - Create custom test slices with `@TypeExclude` or `@ImportAutoConfiguration` for your specific layer.
 - Prefer verifying output (HTTP status, response body) over verifying internal interactions.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-boot/reference](https://docs.spring.io/spring-boot/reference/)

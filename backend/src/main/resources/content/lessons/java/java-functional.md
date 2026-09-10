@@ -435,3 +435,7 @@ List<String> result = names.stream()
 | Creating functional interfaces when one exists | Redundant code | Check java.util.function first |
 | Chaining too many andThen calls | Unreadable pipeline | Break into named intermediate functions |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

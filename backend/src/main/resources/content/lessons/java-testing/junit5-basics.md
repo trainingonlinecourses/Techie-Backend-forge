@@ -140,3 +140,7 @@ Surefire (unit, `*Test`) and Failsafe (integration, `*IT`) are the two gates: `m
 
 Official docs: [JUnit 5 User Guide](https://junit.org/junit5/docs/current/user-guide/) · [Spring Boot Testing](https://docs.spring.io/spring-boot/reference/testing/index.html)
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [junit.org/junit5/docs/current/user-guide](https://junit.org/junit5/docs/current/user-guide/)

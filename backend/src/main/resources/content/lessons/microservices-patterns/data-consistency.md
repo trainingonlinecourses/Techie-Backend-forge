@@ -299,3 +299,7 @@ The same code, clean:
 
 Official docs: [Data patterns (microservices.io)](https://microservices.io/patterns/data/index.html) · [Patterns of Distributed Systems (Fowler)](https://martinfowler.com/articles/patterns-of-distributed-systems/)
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [microservices.io/patterns/index.html](https://microservices.io/patterns/index.html)

@@ -234,3 +234,7 @@ The `@Scheduled` annotation keeps the Spring context alive (the task scheduler t
 
 Official docs: [Application Arguments](https://docs.spring.io/spring-boot/reference/using/application-arguments.html) · [Scheduling](https://docs.spring.io/spring-boot/reference/io/scheduling.html)
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [docs.spring.io/spring-boot/reference](https://docs.spring.io/spring-boot/reference/)

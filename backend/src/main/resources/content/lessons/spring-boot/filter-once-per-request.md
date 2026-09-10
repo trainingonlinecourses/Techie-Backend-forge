@@ -205,3 +205,7 @@ public FilterRegistrationBean<BodyLoggingFilter> bodyFilter() {
 | Modifying the request body without wrapping | Body consumed, controller sees empty body |
 | Filter registered too broadly (/*) | Filter runs for static resources, health checks |
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-boot/reference](https://docs.spring.io/spring-boot/reference/)

@@ -356,3 +356,7 @@ public class WebhookService {
 | Not setting timeouts | Requests hang forever | Configure connect/read timeouts |
 | Returning raw entities | Exposes internal data | Map to DTOs before returning |
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-boot/reference](https://docs.spring.io/spring-boot/reference/)

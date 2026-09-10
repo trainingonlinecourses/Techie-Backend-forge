@@ -230,3 +230,7 @@ class ArchitectureTest {
 
 Clean architecture is the dependency rule enforced as a discipline: inner circles pure, outer circles swappable, boundaries translated. The tests that enforce it (ArchUnit) are cheap insurance — they make the architecture a checked contract instead of an aspiration.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [martinfowler.com/tags/domain%20driven%20design.html](https://martinfowler.com/tags/domain%20driven%20design.html)

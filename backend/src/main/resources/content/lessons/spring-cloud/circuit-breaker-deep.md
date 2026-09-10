@@ -249,3 +249,7 @@ public class DashboardAggregator {
 | Threshold too sensitive | Unnecessary circuit opens | Set reasonable `minimumNumberOfCalls` |
 | Threshold too loose | Cascade failure not prevented | Set appropriate `failureRateThreshold` |
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-cloud/reference](https://docs.spring.io/spring-cloud/reference/)

@@ -268,3 +268,7 @@ public class OrderService {
 
 **Official docs:** [Optional (Oracle)](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Optional.html)
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

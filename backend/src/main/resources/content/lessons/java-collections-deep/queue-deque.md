@@ -185,3 +185,7 @@ void arrayDequeWorksAsStack() {
 
 Queues are simple to name and subtle to choose: `ArrayDeque` for plain FIFO/LIFO, `PriorityQueue` when priority matters, blocking variants for producer-consumer. The failure modes are equally subtle — mutate a queued object's priority and your "priority" queue quietly becomes random order.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/21/core/collections.html)

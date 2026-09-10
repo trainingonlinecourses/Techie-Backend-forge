@@ -215,3 +215,7 @@ public static Optional<Integer> safeAdd(int a, int b) {
 | Using `new Integer(42)` | Deprecated, wastes memory | Use `Integer.valueOf(42)` or autoboxing |
 | Cache surprises with `==` | `128 == 128` is false | Always use `.equals()` |
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/package-summary.html)

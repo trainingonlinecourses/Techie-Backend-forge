@@ -221,3 +221,7 @@ The hierarchy (via `SQLErrorCodeSQLExceptionTranslator`) maps vendor codes to Sp
 
 JdbcTemplate is your escape hatch: exact SQL, full control, parameterized safety, and Spring's exception translation. The next lessons cover named parameters, `SimpleJdbcInsert`, and the transaction integration.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-framework/reference/data-access/jdbc.html](https://docs.spring.io/spring-framework/reference/data-access/jdbc.html)

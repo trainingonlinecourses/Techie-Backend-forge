@@ -286,3 +286,7 @@ jobs:
 
 CI is the contract between the repo and production: *every push is verified the same way*. The next lessons cover the Docker pipeline, Kubernetes deployment, and zero-downtime release strategies.
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [docs.github.com/en/actions](https://docs.github.com/en/actions)

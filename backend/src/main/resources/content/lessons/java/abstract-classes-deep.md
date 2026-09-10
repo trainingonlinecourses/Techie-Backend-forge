@@ -184,3 +184,7 @@ This is rare in practice because well-designed interfaces avoid overlapping defa
 3. **Putting utility methods in an interface with no fields** — works, but if the method needs state, an abstract class is the right tool.
 4. **Ignoring the diamond problem** — adding `default` methods to two interfaces in different modules can break consumers at compile time.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

@@ -162,3 +162,7 @@ Spring maps `@Transactional` onto MongoDB's session-based transactions. Still, t
 
 Spring Data MongoDB gives JPA-style development on documents: `@Document` classes, `MongoRepository` interfaces with derived query methods (`findByPriceLessThan`, `findByTagsContaining`), `@Query`/`@Aggregation` for complex pipelines, and `MongoTemplate` for imperative atomic operations. The mapping annotations (`@Id`, `@Field`, `@Indexed`, `@Version`) bring the schema discipline the database doesn't enforce, and `@Transactional` bridges multi-document transactions. The skill transfer from JPA is nearly free — the differences (nested property paths, array operators, atomic `$inc` updates, optimistic locking) come from the document model itself. Choose repositories for standard CRUD, `MongoTemplate` for dynamic or atomic operations, and keep modeling around single-document atomicity.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [mongodb.com/docs/manual](https://www.mongodb.com/docs/manual/)

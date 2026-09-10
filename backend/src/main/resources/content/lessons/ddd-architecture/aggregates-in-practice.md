@@ -212,3 +212,7 @@ public interface OrderRepository extends JpaRepository<OrderEntity, Long> {
 
 The aggregate is where DDD meets the database: size it by *invariant*, reference by *id*, communicate by *events*, and transact by *one*. Teams that respect the boundary get clean concurrency and testable domain logic; teams that blur it get fat transactions and lock contention.
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [martinfowler.com/tags/domain%20driven%20design.html](https://martinfowler.com/tags/domain%20driven%20design.html)

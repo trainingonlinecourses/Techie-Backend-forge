@@ -253,3 +253,7 @@ public class PluginClassLoader extends URLClassLoader {
 | Ignoring GC logs | Can't diagnose latency spikes | Enable GC logging and monitor |
 | Using default Serial GC in production | Long GC pauses on large heaps | Use G1 or ZGC |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

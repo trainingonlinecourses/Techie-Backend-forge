@@ -95,3 +95,7 @@ Both return JSON in an API app (see jwt-auth lesson). The distinction matters to
 
 **Official docs:** [Authorization](https://docs.spring.io/spring-security/reference/servlet/authorization/index.html) · [Method security](https://docs.spring.io/spring-security/reference/servlet/authorization/method-security.html)
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-security/reference](https://docs.spring.io/spring-security/reference/)

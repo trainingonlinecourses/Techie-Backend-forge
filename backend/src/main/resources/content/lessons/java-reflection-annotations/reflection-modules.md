@@ -105,3 +105,7 @@ Learning reflection on modern Java means learning these too: the language keeps 
 
 Java 9's module system upgraded encapsulation from convention to enforcement: modules declare `exports` (compile-time visibility) and `opens` (deep-reflection permission), and reflection into anything else throws `InaccessibleObjectException`. Most applications live in the unnamed module on the classpath and only meet the wall when frameworks reflect into JDK internals — solved with `--add-opens` flags, one package at a time. Modern frameworks minimize the need via `privateLookupIn`, and records/sealed classes integrate cleanly with reflection. The practical takeaways: if you write a module, `opens` only what frameworks need; if you run on the classpath, keep the documented `--add-opens` set handy; and remember that `setAccessible(true)` is now a permission question, not a technique.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/reflect/index.html)

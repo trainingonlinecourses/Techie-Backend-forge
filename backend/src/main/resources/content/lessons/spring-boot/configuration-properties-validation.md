@@ -112,3 +112,7 @@ public @interface ConsistentTimeouts { String message() default "backoff must be
 - `@Valid` on nested groups for recursive validation; custom constraints for cross-field rules.
 - Validation guards static config — runtime toggles need their own checks.
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-boot/reference](https://docs.spring.io/spring-boot/reference/)

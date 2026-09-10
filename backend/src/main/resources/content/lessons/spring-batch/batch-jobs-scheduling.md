@@ -89,3 +89,7 @@ JobExecutionListener metrics() {
 
 Official docs: [Running Batch Jobs](https://docs.spring.io/spring-batch/reference/batch-running.html) · [Spring Scheduling](https://docs.spring.io/spring-boot/reference/io/scheduling.html)
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-batch/reference](https://docs.spring.io/spring-batch/reference/)

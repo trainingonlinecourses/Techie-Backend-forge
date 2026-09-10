@@ -223,3 +223,7 @@ void nullInputRejected() {
 
 Null safety is a contract you enforce at boundaries: repositories return `Optional`, services throw domain exceptions, controllers translate to HTTP. Follow the pattern and "it's null somewhere" stops being a debugging mystery — it becomes a compile-time or contract-level signal.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/21/language/java-language-changes.html)

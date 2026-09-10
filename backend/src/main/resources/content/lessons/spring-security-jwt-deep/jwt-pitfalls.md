@@ -145,3 +145,7 @@ if (repository.findByToken(value).isEmpty()
 - Use a maintained JWT library; hand-rolling is where the bugs live.
 - The complete hardening checklist above is the production baseline.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [datatracker.ietf.org/doc/html/rfc7519](https://datatracker.ietf.org/doc/html/rfc7519)

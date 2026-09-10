@@ -186,3 +186,7 @@ Every PR runs: compile → unit tests → integration tests → dependency scan.
 
 **Official docs:** [Testing](https://docs.spring.io/spring-boot/reference/testing/index.html) · [Deployment](https://docs.spring.io/spring-boot/reference/deployment/index.html)
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [docs.spring.io/spring-boot/reference](https://docs.spring.io/spring-boot/reference/)

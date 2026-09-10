@@ -107,3 +107,7 @@ Soft delete is a tool, not a default — teams weigh query complexity and retent
 - Pair soft delete with a purge job for legal erasure; consider status columns and archive tables as alternatives.
 - Weigh the query complexity cost per table — soft delete is a decision, not a default.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-data/jpa/reference](https://docs.spring.io/spring-data/jpa/reference/)

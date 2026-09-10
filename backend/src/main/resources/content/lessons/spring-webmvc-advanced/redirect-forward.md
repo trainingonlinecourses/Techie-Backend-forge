@@ -119,3 +119,7 @@ In a React/Vue SPA, navigation is client-side — the "redirect" is `router.push
 - 301 permanent / 302 temporary / 303 PRG; validate external redirect targets.
 - SPAs handle "redirects" client-side from API data — redirects belong to server-rendered and legacy flows.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-framework/reference/web/webmvc.html](https://docs.spring.io/spring-framework/reference/web/webmvc.html)

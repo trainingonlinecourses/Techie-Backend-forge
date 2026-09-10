@@ -153,3 +153,7 @@ public Course saveCourse(Course course) {
 
 `@CachePut` writes through; `@CacheEvict` invalidates; `@Caching` combines them. The robust default is invalidate-on-write plus TTL, with `@CachePut` reserved for hot single-entity reads where the write result is exactly what readers need. Never annotate writes with `@Cacheable`, and always think about what happens when the DB write and the cache operation disagree.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-framework/reference/integration/cache.html](https://docs.spring.io/spring-framework/reference/integration/cache.html)

@@ -127,3 +127,7 @@ In practice you rarely write this — databases and HTTP clients apply backpress
 - [Project Reactor — Which Operator Do I Need?](https://projectreactor.io/docs/core/release/reference/#which-operator)
 - [Project Reactor — Error Handling](https://projectreactor.io/docs/core/release/reference/#error.handling)
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [docs.spring.io/spring-framework/reference/web/webflux.html](https://docs.spring.io/spring-framework/reference/web/webflux.html)

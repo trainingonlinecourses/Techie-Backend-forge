@@ -271,3 +271,7 @@ After credit cards are migrated, migrate PayPal the same way. Then the legacy pa
 
 Official docs: [Strangler Fig (Fowler)](https://martinfowler.com/bliki/StranglerFigApplication.html) · [Strangler Fig (microservices.io)](https://microservices.io/patterns/migration/strangler-fig.html)
 
+## References
+
+- [dev.java — the official OpenJDK site](https://dev.java/)
+- [microservices.io/patterns/index.html](https://microservices.io/patterns/index.html)

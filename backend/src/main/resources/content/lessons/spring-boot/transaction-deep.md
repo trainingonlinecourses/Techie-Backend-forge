@@ -231,3 +231,7 @@ public class AccountService {
 | `@Transactional` on read queries without `readOnly` | Unnecessary dirty checking — slower |
 | Mixing programmatic and declarative | Confusing transaction boundaries |
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-boot/reference](https://docs.spring.io/spring-boot/reference/)

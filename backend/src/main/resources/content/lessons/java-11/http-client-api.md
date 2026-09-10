@@ -250,3 +250,7 @@ public CompletableFuture<Void> processWebhook(String payload) {
 | Not reusing clients | Creates new connections each time | Create one `HttpClient` and reuse it |
 | Ignoring HTTP status codes | Silent failures | Always check `response.statusCode()` |
 
+## References
+
+- [dev.java — the official OpenJDK site](https://dev.java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/11/docs/api/)

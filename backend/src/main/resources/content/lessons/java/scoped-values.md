@@ -392,3 +392,7 @@ public class UserService {
 | Using ScopedValue for simple caching | ScopedValue doesn't persist across requests | Use a regular cache or Spring's `@Cacheable` |
 | Forgetting to set the ScopedValue | `NotSetException` at runtime | Ensure the filter/interceptor sets it before downstream code |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

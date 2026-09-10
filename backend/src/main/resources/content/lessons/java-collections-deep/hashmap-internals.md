@@ -152,3 +152,7 @@ A healthy map uses 40–60% of buckets at load factor 0.75. Below ~30% after hea
 
 HashMap is O(1) *when you respect its contract*: immutable keys, proper sizing, and no concurrent mutation. Respect the contract and it's the fastest general-purpose structure in the JDK; break it and you get silent nulls, corrupted data, or a CPU on fire.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/21/core/collections.html)

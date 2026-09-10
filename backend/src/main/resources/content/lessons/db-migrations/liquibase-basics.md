@@ -96,3 +96,7 @@ Both are excellent and both beat hand-run scripts by a mile. The choice is cultu
 
 Official docs: [Liquibase](https://docs.liquibase.com/) · [Boot data initialization](https://docs.spring.io/spring-boot/reference/how-to/data-initialization.html)
 
+## References
+
+- [dev.java — the official OpenJDK site](https://dev.java/)
+- [documentation.red-gate.com/fd](https://documentation.red-gate.com/fd/)

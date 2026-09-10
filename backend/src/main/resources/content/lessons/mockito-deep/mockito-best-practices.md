@@ -156,3 +156,7 @@ If a test needs mocks for *everything* and asserts on *nothing real* (all outcom
 
 Mockito best practices are really design practices: **constructor injection** creates the seams that make mocking trivial; **strict stubs** act as a linter against dead expectations; **verify contracts not implementation** keeps tests refactor-proof; and **mock only boundaries** — never value objects, never your own logic, never the database when you're testing queries. Keep tests mostly real and thinly mocked, inject clocks and executors instead of mocking time, and treat elaborate mocking as a design signal. The professional insight: a test suite that mocks gracefully isn't a suite with good Mockito skills — it's a suite whose *code* was designed for testing, and Mockito is simply the tool that makes the seams pay off.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [javadoc.io/doc/org.mockito/mockito-core/latest/org/mockito/Mockito.html](https://javadoc.io/doc/org.mockito/mockito-core/latest/org/mockito/Mockito.html)

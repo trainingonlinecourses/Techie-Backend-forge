@@ -143,3 +143,7 @@ The reflog means **almost nothing is unrecoverable** — even a botched `--hard`
 - The reflog is the safety net — almost every rewrite mistake is recoverable.
 - Work messily, publish cleanly: commit for checkpoints, squash for the pull request.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [git-scm.com/doc](https://git-scm.com/doc)

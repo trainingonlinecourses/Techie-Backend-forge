@@ -109,3 +109,7 @@ Spring Modulith wraps Spring's event infrastructure with **publication tracking*
 
 Official docs: [Spring Modulith — Application Modules](https://docs.spring.io/spring-modulith/reference/application-modules.html)
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-modulith/reference](https://docs.spring.io/spring-modulith/reference/)

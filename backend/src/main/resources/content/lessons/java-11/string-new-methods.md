@@ -246,3 +246,7 @@ public String formatTable(List<String[]> rows, int[] columnWidths) {
 | Using `isEmpty()` where `isBlank()` is needed | `"  ".isEmpty()` is false | Use `isBlank()` for whitespace check |
 | Splitting with `split("\n")` | Misses `\r\n` on Windows | Use `lines()` which handles all line endings |
 
+## References
+
+- [dev.java — the official OpenJDK site](https://dev.java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/11/docs/api/)

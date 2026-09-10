@@ -269,3 +269,7 @@ public class OrderWriter implements ItemWriter<ProcessedOrder> {
 | Retrying in writer without transaction | Partial writes | Ensure writer handles transactions properly |
 | Not testing fault tolerance | Failures only found in production | Test with fault injection |
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-batch/reference](https://docs.spring.io/spring-batch/reference/)

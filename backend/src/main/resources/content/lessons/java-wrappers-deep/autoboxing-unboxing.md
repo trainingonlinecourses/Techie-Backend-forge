@@ -128,3 +128,7 @@ public class AutoboxingDemo {
 | Using wrappers in tight loops | Performance overhead from boxing | Use primitives |
 | Autoboxing in collection type inference | `var` infers Integer, not int | Explicit type declaration |
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/package-summary.html)

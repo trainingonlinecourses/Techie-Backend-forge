@@ -326,3 +326,7 @@ public static int longestCommonSubsequence(String text1, String text2) {
 | Off-by-one: `i <= matrix.length` instead of `i < matrix.length` | ArrayIndexOutOfBoundsException on the last row |
 | Not checking `matrix[row].length` before accessing `matrix[row][col]` | Crash on jagged arrays where rows differ |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

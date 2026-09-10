@@ -127,3 +127,7 @@ The framework choice is secondary: the *pattern* — write the event in the busi
 
 The outbox pattern solves the dual-write problem — "change the database AND publish an event, atomically" — by writing the event into an `outbox_events` table *in the same transaction* as the business change, then having a relay publish pending events afterward (a scheduled poller or Debezium's CDC) and mark them done only on broker acknowledgment. The guarantees: no lost events, no phantom events, duplicates possible but harmless with idempotent consumers. It's the pragmatic substitute for distributed transactions — a single local transaction plus a relay — and it's the pattern every reliable event-driven system is built on. The discipline: keep the event in the business transaction, relay with acknowledgment, order by creation, and consume idempotently.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [microservices.io/patterns/data/event-driven.html](https://microservices.io/patterns/data/event-driven.html)

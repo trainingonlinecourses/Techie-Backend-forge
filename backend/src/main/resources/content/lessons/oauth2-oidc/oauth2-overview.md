@@ -108,3 +108,7 @@ OAuth2 is *authorization* — "what can this app do?" **OpenID Connect (OIDC)** 
 
 OAuth2 is delegated authorization: a resource owner grants a client limited, revocable, scoped access to a resource server's data through a trusted authorization server — without ever sharing a password. The four roles (owner, client, auth server, resource server) and the token (with its scopes, expiry, and audience) are the vocabulary; the grant types (authorization code, client credentials, refresh, PKCE) are the flows suited to each client type; and the protocol's genius is keeping credentials at the auth server while everything downstream works with tokens. Master the roles and the flows, and Spring Security's OAuth2 support — and the "sign in with Google" everywhere — becomes a protocol you can read, not a black box.
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [datatracker.ietf.org/doc/html/rfc6749](https://datatracker.ietf.org/doc/html/rfc6749)

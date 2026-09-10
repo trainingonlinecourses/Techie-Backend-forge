@@ -279,3 +279,7 @@ public class DashboardService {
 | Creating Flux in a loop | Inefficient, confusing | Use `Flux.fromIterable()` or `Flux.range()` |
 | Not using connection pooling | Connection exhaustion | Configure R2DBC pool properly |
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [docs.spring.io/spring-framework/reference/web/webflux.html](https://docs.spring.io/spring-framework/reference/web/webflux.html)

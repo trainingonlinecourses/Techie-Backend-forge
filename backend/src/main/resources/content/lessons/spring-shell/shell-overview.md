@@ -269,3 +269,7 @@ public class ConversionExamples {
 | Missing availability checks | Commands fail at runtime | Add `availability` parameter to `@ShellMethod` |
 | Not implementing `toString()` | Output shows object reference | Override `toString()` in domain objects |
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [spring.io/projects/spring-shell](https://spring.io/projects/spring-shell)

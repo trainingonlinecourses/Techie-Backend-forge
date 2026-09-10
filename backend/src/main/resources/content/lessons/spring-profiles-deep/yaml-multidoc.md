@@ -125,3 +125,7 @@ spring:
 | Wrong `on-profile` syntax | Profile never activates | Use `spring.config.activate.on-profile` |
 | Property override order confusion | Wrong value wins | Remember: later profiles override defaults |
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-boot/reference/features/profiles.html](https://docs.spring.io/spring-boot/reference/features/profiles.html)

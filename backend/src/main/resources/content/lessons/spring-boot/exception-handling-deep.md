@@ -228,3 +228,7 @@ A fintech API has 50+ endpoints. Instead of scattering try-catch blocks everywhe
 
 Every error response follows RFC 7807 Problem Details format. The frontend team can parse errors uniformly and display them inline next to form fields.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-boot/reference](https://docs.spring.io/spring-boot/reference/)

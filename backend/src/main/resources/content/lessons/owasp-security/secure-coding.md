@@ -138,3 +138,7 @@ The meta-pattern behind every lesson in this module:
 
 Beyond the headline vulnerabilities: **deserialization** must never reconstruct arbitrary classes from untrusted input (JSON/typed formats over Java serialization; allowlists over denylists); **SSRF** means no server-side fetch of user-chosen URLs (allowlist destinations, block private/metadata addresses); **secure logging** records who/when/from-where for incident response while never leaking credentials; and **secrets** live in deploy-time environment stores, never in repos or logs. The mindset uniting them — deny by default, least privilege, fail closed, validate at the boundary, defend in depth — is what makes a codebase *secure by design* rather than secure by patching. Run every feature through the audit checklist, and the quiet vulnerabilities stop being quiet surprises.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [owasp.org/Top10](https://owasp.org/Top10/)

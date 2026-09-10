@@ -222,3 +222,7 @@ Sorting is O(n log n) — not free. Alternatives worth knowing:
 
 Sorting (O(n log n)) unlocks logarithmic searching (binary search, O(log n)) and a cascade of efficient operations. Merge sort guarantees O(n log n) with a merge step and O(n) space; quicksort sorts in place with O(log n) space but needs good pivot selection to avoid O(n²); Java ships both plus TimSort's run detection. Sort your own objects via `Comparable` (natural order) or `Comparator` (per-call strategy, keep it consistent with `equals`). The mastery is knowing what's *under* the library calls — so you can trust `Arrays.sort` in production, explain its O(n log n), and reach for a hash map or heap when sorting isn't the right tool at all.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [algs4.cs.princeton.edu/home](https://algs4.cs.princeton.edu/home/)

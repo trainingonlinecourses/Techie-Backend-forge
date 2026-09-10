@@ -94,3 +94,7 @@ So: events decouple *code*, not *systems*. If a side effect must survive a crash
 
 **Official docs:** [Events](https://docs.spring.io/spring-framework/reference/core/beans/context-introduction.html#context-functionality-events) · [Transactional events](https://docs.spring.io/spring-framework/reference/data-access/transaction/event.html)
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [docs.spring.io/spring-framework/reference](https://docs.spring.io/spring-framework/reference/)

@@ -106,3 +106,7 @@ logger.setLevel(Level.DEBUG);
 | Logging to /dev/stdout only | Lost on restart | Also log to file |
 | Not monitoring log volume | Unexpected costs in cloud | Set up log volume alerts |
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-boot/reference/features/logging.html](https://docs.spring.io/spring-boot/reference/features/logging.html)

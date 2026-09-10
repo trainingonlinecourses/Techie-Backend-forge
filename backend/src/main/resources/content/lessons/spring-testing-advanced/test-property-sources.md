@@ -210,3 +210,7 @@ spring:
 
 Official docs: [Test Properties (Spring)](https://docs.spring.io/spring-framework/reference/testing.html) · [Testcontainers (Spring Boot)](https://docs.spring.io/spring-boot/reference/testing/spring-boot-tests.html#autoconfigured-tests)
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [docs.spring.io/spring-boot/reference/testing/spring-boot-applications.html](https://docs.spring.io/spring-boot/reference/testing/spring-boot-applications.html)

@@ -124,3 +124,7 @@ class InventoryContractTest {
 
 **Official docs:** [Transactional outbox](https://microservices.io/patterns/data/transactional-outbox.html) · [Spring Cloud reference](https://docs.spring.io/spring-cloud-reference/reference/)
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [docs.spring.io/spring-cloud/reference](https://docs.spring.io/spring-cloud/reference/)

@@ -262,3 +262,7 @@ class PlaceOrderServiceTest {
 
 Hexagonal architecture is the discipline of *depending on abstractions you own*: the domain defines its ports, adapters implement them, and nothing leaks across. The payoff is a domain you can test without Spring and swap without rewrites — the architecture that makes DDD actually sustainable.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [martinfowler.com/tags/domain%20driven%20design.html](https://martinfowler.com/tags/domain%20driven%20design.html)

@@ -109,3 +109,7 @@ Set `server.shutdown=graceful`, keep the lifecycle timeout (say 30s) *under* the
 - Drain custom workers with flag + `shutdown()` + `awaitTermination` in `@PreDestroy`.
 - Graceful shutdown is a cap, not a guarantee — design idempotent consumers so interrupted work can resume.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-boot/reference](https://docs.spring.io/spring-boot/reference/)

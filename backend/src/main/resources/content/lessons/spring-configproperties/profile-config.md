@@ -124,3 +124,7 @@ public class RedisCacheConfig {
 | Wrong key casing | Properties not bound | Use kebab-case in YAML |
 | Not testing profile switching | Wrong values in prod | Test each profile explicitly |
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-boot/reference/features/external-config.html](https://docs.spring.io/spring-boot/reference/features/external-config.html)

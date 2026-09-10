@@ -187,3 +187,7 @@ Line-by-line:
 | Calling `values()` in a hot loop | Unnecessary garbage allocation each time | Cache in a static final array |
 | Using int constants instead of enums | `sendEmail(3)` compiles with no safety | Enums = compile-time type safety |
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

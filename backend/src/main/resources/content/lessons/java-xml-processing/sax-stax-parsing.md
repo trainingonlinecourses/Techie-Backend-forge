@@ -355,3 +355,7 @@ Without these settings, an attacker could inject `<!ENTITY xxe SYSTEM "file:///e
 | Skip subtree | Manual depth counter | Just call `next()` until depth=0 |
 | Close | Not needed (parser manages) | `reader.close()` |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/jaxp/)

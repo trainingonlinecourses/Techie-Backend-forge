@@ -315,3 +315,7 @@ public interface OrderRepository extends JpaRepository<Order, Long>, OrderReposi
 
 Official docs: [Spring Data JPA](https://spring.io/projects/spring-data-jpa) · [Query Methods](https://docs.spring.io/spring-data/jpa/docs/current/reference/html/#repositories.query-methods)
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [docs.spring.io/spring-data/reference](https://docs.spring.io/spring-data/reference/)

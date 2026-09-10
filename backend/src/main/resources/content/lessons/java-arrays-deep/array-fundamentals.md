@@ -194,3 +194,7 @@ public static int binarySearch(int[] arr, int target) {
 | Modifying during iteration | ConcurrentModificationException | Use index-based for loop or streams |
 | Using arrays when List needed | No dynamic resizing | Use `ArrayList` for dynamic size |
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Arrays.html)

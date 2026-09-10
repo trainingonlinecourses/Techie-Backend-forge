@@ -120,3 +120,7 @@ A security regression suite isn't exotic — it's five `MockMvc` tests: anonymou
 
 Official docs: [OWASP Top 10](https://owasp.org/Top10/) · [Spring Security](https://docs.spring.io/spring-security/reference/)
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-security/reference](https://docs.spring.io/spring-security/reference/)

@@ -433,3 +433,7 @@ public class HealthChecker {
 | Not shutting down ExecutorService | Thread leak — threads run forever | Always call shutdown() in @PreDestroy |
 | Using `future.get()` without timeout | Potential infinite hang | Always use `get(timeout, unit)` |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

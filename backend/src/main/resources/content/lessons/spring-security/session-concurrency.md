@@ -190,3 +190,7 @@ User logs in on phone → laptop → tablet → oldest phone session is invalida
 
 Official docs: [Session Management (Spring)](https://docs.spring.io/spring-security/reference/servlet/authentication/session-management.html)
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-security/reference](https://docs.spring.io/spring-security/reference/)

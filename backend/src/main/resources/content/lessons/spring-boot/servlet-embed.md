@@ -186,3 +186,7 @@ public class ShutdownHook {
 | Using default maxPostSize for file uploads | Upload failures over 2MB |
 | Not setting accept-count | 503 errors during traffic spikes |
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-boot/reference](https://docs.spring.io/spring-boot/reference/)

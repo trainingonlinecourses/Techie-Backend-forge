@@ -426,3 +426,7 @@ public class TransferService {
 | Not closing ResultSets in finally | Memory leak — ResultSet holds DB cursor | Use try-with-resources |
 | Executing individual inserts in a loop | N round trips to database | Use batch operations |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

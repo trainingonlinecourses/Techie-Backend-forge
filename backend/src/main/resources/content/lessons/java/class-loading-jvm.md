@@ -169,3 +169,7 @@ public class ApplicationStartup {
 
 **Official docs:** [java tool](https://docs.oracle.com/en/java/javase/21/docs/specs/man/java.html) · [JVM Spec — class loading](https://docs.oracle.com/javase/specs/jvms/se21/html/jvms-5.html)
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

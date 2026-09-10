@@ -141,3 +141,7 @@ The build order: tests run (producing snippets) → Asciidoctor assembles docs �
 - The build integrates: tests → snippets → docs → package.
 - Docs as tests means every documented endpoint is a tested endpoint.
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [spec.openapis.org/oas/v3.1.0](https://spec.openapis.org/oas/v3.1.0)

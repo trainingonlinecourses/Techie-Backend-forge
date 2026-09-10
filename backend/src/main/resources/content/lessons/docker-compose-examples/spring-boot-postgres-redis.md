@@ -151,3 +151,7 @@ docker-compose down -v
 4. **Alpine images** save 90%+ disk space compared to full images
 5. **Environment variables** configure the app without hardcoding connection strings
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.docker.com/compose](https://docs.docker.com/compose/)

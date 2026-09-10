@@ -219,3 +219,7 @@ class ErrorHandlingTest {
 
 Consistent errors are a feature — they cut support cost, enable good client SDKs, and make your API pleasant to integrate against. Spend the 30 minutes on the advice class; it pays back on every endpoint.
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [docs.spring.io/spring-framework/reference/web/webmvc.html](https://docs.spring.io/spring-framework/reference/web/webmvc.html)

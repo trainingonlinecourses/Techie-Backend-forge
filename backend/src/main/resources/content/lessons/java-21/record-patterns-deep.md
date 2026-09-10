@@ -243,3 +243,7 @@ void compile(Stmt stmt) {
 | Using `var` in patterns | Not supported yet | Use explicit types in patterns |
 | Destructuring with wrong component count | Compilation error | Match exact number of components |
 
+## References
+
+- [dev.java — the official OpenJDK site](https://dev.java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/21/docs/api/)

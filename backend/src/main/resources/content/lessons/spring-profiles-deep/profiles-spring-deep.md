@@ -206,3 +206,7 @@ public class AcademyApplication {
 
 A SaaS company runs the same Spring Boot app in 4 environments: local dev, staging, production-us, production-eu. Each profile configures database URLs, cache TTLs, email providers, and feature flags. Developers use `dev` profile with H2 and mock services. Staging uses real services but with test data. Production profiles use real databases with proper credentials (injected via Kubernetes secrets).
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-boot/reference/features/profiles.html](https://docs.spring.io/spring-boot/reference/features/profiles.html)

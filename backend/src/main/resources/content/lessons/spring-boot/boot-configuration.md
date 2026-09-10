@@ -344,3 +344,7 @@ app:
 | Ignoring property override order | Unexpected values at runtime | Understand the priority chain |
 | Using application.properties AND application.yml | Confusing conflicts | Pick one and stick with it |
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-boot/reference](https://docs.spring.io/spring-boot/reference/)

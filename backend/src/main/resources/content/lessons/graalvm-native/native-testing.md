@@ -112,3 +112,7 @@ Native testing has its own integration-test realities:
 
 Native testing is two-tier discipline: the **JVM tier** (`mvn test` — fast iteration, optionally with `-Dspring.aot=true` for AOT verification) catches logic and many reachability issues in seconds; the **native tier** (`mvn -Pnative test` — the same suite compiled AOT and run against the native binary) verifies the *production runtime*: missing reflection hints, absent resources, dynamic-loading gaps — everything the closed-world analysis must have captured. The gap between the tiers *is* the native-image risk surface, and the native test run is the only honest measurement of it. Develop fast on the JVM, gate deliberately on native, and never ship a native binary that hasn't run its own test suite.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [graalvm.org/latest/docs](https://www.graalvm.org/latest/docs/)

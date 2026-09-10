@@ -106,3 +106,7 @@ registry.enableStompBrokerRelay("/topic", "/queue")
 
 Official docs: [WebSocket support](https://docs.spring.io/spring-framework/reference/web/websocket.html) · [STOMP](https://docs.spring.io/spring-framework/reference/web/websocket/stomp.html)
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-graphql/reference](https://docs.spring.io/spring-graphql/reference/)

@@ -178,3 +178,7 @@ public record ExternalApisProperties(
 | Using mutable properties | Thread safety issues | Use records or immutable objects |
 | Not providing defaults | Configuration required for every env | Add `@DefaultValue` |
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-boot/reference/features/external-config.html](https://docs.spring.io/spring-boot/reference/features/external-config.html)

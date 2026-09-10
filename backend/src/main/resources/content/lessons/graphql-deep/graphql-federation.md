@@ -137,3 +137,7 @@ The router: asks `courses` service for the courses → gets ids → asks `progre
 - Federation pays off with real team/service boundaries — not for single-service apps.
 - Pin tooling versions, test the supergraph contract, and design `@key`s as stable identity.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [graphql.org/learn](https://graphql.org/learn/)

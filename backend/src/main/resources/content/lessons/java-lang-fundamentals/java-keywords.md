@@ -841,3 +841,7 @@ In the lab version of this lesson, you will see a starter file `KeywordDemo.java
 
 Java's 50 keywords are the language's reserved vocabulary. They fall into five groups: declaration keywords (`class`, `interface`, `enum`, `abstract`, `final`, `static`, `strictfp`, `native`, `volatile`, `transient`, `synchronized`, `const`, `goto`), control-flow keywords (`if`, `else`, `switch`, `case`, `default`, `for`, `while`, `do`, `break`, `continue`, `return`), class and object keywords (`extends`, `implements`, `instanceof`, `new`, `super`, `this`, `sealed`, `non-sealed`, `permits`), error-handling keywords (`try`, `catch`, `finally`, `throw`, `throws`, `assert`), and the type and modifier keywords (`boolean`, `byte`, `char`, `short`, `int`, `long`, `float`, `double`, `void`, `package`, `import`, `private`, `protected`, `public`). Two reserved words — `const` and `goto` — are unused today. Three literals — `null`, `true`, `false` — behave like keywords but are technically not part of the 50. Every Java program you write is built from these words, so knowing what each one does is the foundation of reading and writing Java confidently.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/javase/specs/jvms/se21/html/)

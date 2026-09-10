@@ -328,3 +328,7 @@ tenant_active_users{tenant="acme-corp"} 47
 | Uber | Ride completion rate, driver availability | Prometheus + Grafana |
 | Shopify | Cart conversion, checkout funnel | Datadog |
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-boot/reference/features/actuator.html](https://docs.spring.io/spring-boot/reference/features/actuator.html)

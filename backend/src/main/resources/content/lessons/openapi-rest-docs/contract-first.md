@@ -173,3 +173,7 @@ Contract tests sit between unit and end-to-end: they verify the *shape* matches 
 - Contract tests verify the running API matches the agreed schema.
 - Author the spec by hand once; treat generated code as build output.
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [spec.openapis.org/oas/v3.1.0](https://spec.openapis.org/oas/v3.1.0)

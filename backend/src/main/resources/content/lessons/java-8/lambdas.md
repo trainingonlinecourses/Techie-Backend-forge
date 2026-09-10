@@ -267,3 +267,7 @@ Order order = retryWithBackoff(() -> orderService.findById(orderId), 3);
 | Confusing `=` with `->` | `Predicate<String> p = s == "hello"` | Use `s -> s.equals("hello")` |
 | Forgetting type inference | `Consumer<String> c = (s) -> { ... }` | Types are inferred; omit when obvious |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/javase/8/docs/api/)

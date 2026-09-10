@@ -121,3 +121,7 @@ Track these per service: **latency** (p50/p95/p99), **traffic** (requests/sec), 
 
 **Official docs:** [Actuator](https://docs.spring.io/spring-boot/reference/actuator/index.html) · [Endpoints](https://docs.spring.io/spring-boot/reference/actuator/endpoints.html)
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [docs.spring.io/spring-boot/reference](https://docs.spring.io/spring-boot/reference/)

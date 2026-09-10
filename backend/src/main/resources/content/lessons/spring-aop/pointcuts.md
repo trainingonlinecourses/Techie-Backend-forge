@@ -524,3 +524,8 @@ Complex pointcut expressions can impact performance. Keep them simple and specif
 | `bean` | Bean names | `bean(*Service)` |
 
 Mastering pointcuts is the foundation of effective AOP. Start with `execution` and `@annotation` for most cases, and add other designators as needed.
+
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-framework/reference/core/aop.html](https://docs.spring.io/spring-framework/reference/core/aop.html)

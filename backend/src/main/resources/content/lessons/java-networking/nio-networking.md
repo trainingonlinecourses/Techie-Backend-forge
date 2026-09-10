@@ -135,3 +135,7 @@ Mastering `flip`/`clear` is the NIO rite of passage — get them backwards and y
 
 NIO networking replaces "a thread per client" with a single selector thread watching many non-blocking channels: register channels for interest (`OP_ACCEPT`, `OP_READ`), call `select()` to block until events arrive, and handle each ready channel without blocking. It's the reactor pattern behind Netty, Node.js, and WebFlux, and it scales to tens of thousands of connections on one thread. The cost is complexity — partial reads, state across callbacks, buffer management — which is why you should *understand* NIO but *use* the frameworks built on it. And remember the alternatives: NIO.2's async channels and Java 21's virtual threads solve the same scaling problem in different ways, each with its own sweet spot.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/networking/index.html)

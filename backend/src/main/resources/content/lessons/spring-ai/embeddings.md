@@ -123,3 +123,7 @@ List<Document> chunks = new TokenTextSplitter().apply(originalDocs);
 
 **Official docs:** [Embeddings](https://docs.spring.io/spring-ai/reference/api/embeddings.html) · [Vector databases](https://docs.spring.io/spring-ai/reference/api/vectordbs.html)
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-ai/reference](https://docs.spring.io/spring-ai/reference/)

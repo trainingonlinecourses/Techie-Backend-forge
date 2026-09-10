@@ -177,3 +177,7 @@ class CourseInsertTest {
 
 `SimpleJdbcInsert` is the least-known JDBC convenience: metadata-driven SQL, generated keys for free, and a clear column contract. Use it for the straightforward inserts, keep plain SQL for the interesting ones.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-framework/reference/data-access/jdbc.html](https://docs.spring.io/spring-framework/reference/data-access/jdbc.html)

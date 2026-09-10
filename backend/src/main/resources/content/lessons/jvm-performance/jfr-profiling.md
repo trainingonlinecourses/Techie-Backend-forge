@@ -266,3 +266,7 @@ jfr print --json profile.jfr | jq '.events[] | select(.eventType == "jdk.Garbage
 
 Official docs: [jfr tool](https://docs.oracle.com/en/java/javase/21/docs/specs/man/jfr.html) · [JFR API](https://docs.oracle.com/javase/8/docs/platform/jdk/jfr/)
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/21/gctuning/)

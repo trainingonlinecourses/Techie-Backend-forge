@@ -134,3 +134,7 @@ Starter + auto-config = "add one dependency, get a working subsystem." `spring-b
 - Starters bundle dependencies; auto-configuration reacts to them.
 - The conditions evaluation report (`--debug`) explains every "matched"/"not matched" decision — use it when behavior surprises you.
 
+## References
+
+- [dev.java — the official OpenJDK site](https://dev.java/)
+- [docs.spring.io/spring-boot/reference](https://docs.spring.io/spring-boot/reference/)

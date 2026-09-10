@@ -611,3 +611,7 @@ long safeTotal = (long) priceInCents * quantity;
 | Autoboxing in tight loops | Hidden object creation, GC pressure | Use primitives directly |
 | `Integer` == comparison for values > 127 | Returns false even for equal values | Use `.equals()` |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

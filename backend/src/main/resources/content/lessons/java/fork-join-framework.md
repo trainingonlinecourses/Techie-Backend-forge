@@ -155,3 +155,7 @@ protected NodeCount compute() {
 - Never do I/O inside `compute()` — it starves the work-stealing mechanism. Use `CompletableFuture` for I/O.
 - `invokeAll()` forks both children and waits — cleaner than manual `fork()` + `join()`.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

@@ -99,3 +99,7 @@ public class MyAutoConfigurationTest {
 | Not testing property binding | Config values ignored | Test with withPropertyValues |
 | Testing with @SpringBootTest | Overkill for starter tests | Use ApplicationContextRunner |
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-boot/reference/features/developing-auto-configuration.html](https://docs.spring.io/spring-boot/reference/features/developing-auto-configuration.html)

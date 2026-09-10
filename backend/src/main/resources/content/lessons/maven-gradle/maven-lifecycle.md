@@ -208,3 +208,7 @@ mvn -pl module-a -am package # build module + its dependencies
 
 Maven is a lifecycle engine with a plugin system: pick the prefix (`test`, `package`, `verify`), let the plugins bind, and the build is deterministic. The next lessons cover dependency management, plugins, and the Gradle alternative.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [maven.apache.org/guides](https://maven.apache.org/guides/)

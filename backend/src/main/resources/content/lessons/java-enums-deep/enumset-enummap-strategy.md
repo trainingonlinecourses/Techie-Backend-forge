@@ -352,3 +352,7 @@ public class MetricsCollector {
 | Enum constructor with side effects | Enums are singletons — constructor runs at class load | Keep constructors pure |
 | Forgetting enum is a class | Can't extend classes, limited inheritance | Use composition if needed |
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/java/javaOO/enum.html)

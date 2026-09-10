@@ -174,3 +174,7 @@ The controller above catches `OrderCreationFailedException` and returns 503 (ser
 
 Professional exception handling is design: fail fast at boundaries, catch at the layer that can respond, preserve root causes through every wrap, never swallow without logging, catch specific types, keep exceptions out of normal control flow, and log the exception object itself. Applied consistently, these rules turn exception handling from boilerplate into the system's diagnostic backbone — and they're the exact patterns Spring Boot's `@RestControllerAdvice` machinery is built to support. Write your `throws` clauses like API documentation, and your catch blocks like business rules.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/essential/exceptions/index.html)

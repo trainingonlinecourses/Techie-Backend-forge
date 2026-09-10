@@ -130,3 +130,7 @@ networks:
 4. **Multiple networks** create security boundaries between service tiers
 5. **Secrets** avoid hardcoding passwords in compose files
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [docs.docker.com/compose](https://docs.docker.com/compose/)

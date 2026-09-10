@@ -104,3 +104,7 @@ kubectl rollout undo deploy/academy-api       # instant rollback to the previous
 
 Official docs: [Kubernetes Concepts](https://kubernetes.io/docs/concepts/) · [Kubernetes Basics tutorial](https://kubernetes.io/docs/tutorials/kubernetes-basics/)
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [kubernetes.io/docs/concepts](https://kubernetes.io/docs/concepts/)

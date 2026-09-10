@@ -316,3 +316,7 @@ public class OrderService {
 
 **Official docs:** [IoC container](https://docs.spring.io/spring-framework/reference/core/beans.html) · [Bean basics](https://docs.spring.io/spring-framework/reference/core/beans/basics.html)
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [docs.spring.io/spring-framework/reference](https://docs.spring.io/spring-framework/reference/)

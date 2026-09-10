@@ -170,3 +170,7 @@ public class AuditLoggingAspect {
 | Logging sensitive data | Security risk | Sanitize before logging |
 | Too verbose in production | Disk fills up | Set WARN/ERROR for production |
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-boot/reference/features/logging.html](https://docs.spring.io/spring-boot/reference/features/logging.html)

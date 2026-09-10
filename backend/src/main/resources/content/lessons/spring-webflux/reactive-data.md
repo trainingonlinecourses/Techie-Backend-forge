@@ -119,3 +119,7 @@ CREATE TABLE IF NOT EXISTS customers (
 - [R2DBC](https://r2dbc.io)
 - [Spring Data MongoDB — Reactive](https://docs.spring.io/spring-data/mongodb/reference/)
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [docs.spring.io/spring-framework/reference/web/webflux.html](https://docs.spring.io/spring-framework/reference/web/webflux.html)

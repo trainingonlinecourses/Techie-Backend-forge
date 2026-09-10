@@ -297,3 +297,7 @@ class UserRepositoryTest {
 | Profile-specific beans overriding wrong | Wrong bean loaded | Check profile activation order |
 | Using `@Profile("!prod")` carelessly | Unintended beans in test | Be explicit about profile conditions |
 
+## References
+
+- [Learn Java Online — interactive exercises](https://www.learnjavaonline.org/)
+- [docs.spring.io/spring-boot/reference/features/profiles.html](https://docs.spring.io/spring-boot/reference/features/profiles.html)

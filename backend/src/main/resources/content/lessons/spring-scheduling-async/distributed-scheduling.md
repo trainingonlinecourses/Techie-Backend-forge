@@ -185,3 +185,7 @@ public void reconcile() {
 
 Distributed scheduling is one lock, one expiry, and one idempotency guarantee away from safe. Start with ShedLock + claim-based processing; graduate to Quartz or K8s leader election only when the requirements actually demand them.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-framework/reference/integration/scheduling.html](https://docs.spring.io/spring-framework/reference/integration/scheduling.html)

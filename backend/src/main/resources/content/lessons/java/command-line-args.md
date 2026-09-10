@@ -128,3 +128,7 @@ class ReconCommand implements Runnable {
 | Treating args as null-checkable | Dead code / wrong assumption | It's empty array, never null, under normal launches |
 | Silently ignoring unknown flags | Typos activate defaults mysteriously | Reject unknown options with clear errors |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

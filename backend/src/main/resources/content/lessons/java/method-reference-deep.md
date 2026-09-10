@@ -114,3 +114,7 @@ Map<Long, Order> byId = orders.stream()
 | Checked exceptions inside referenced methods | Streams can't throw IOException from map() | Wrap, or move I/O out of pipelines |
 | Overusing refs where logic is nontrivial | Dense unreadable chains | Rule of thumb: only when it reads like English |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/)

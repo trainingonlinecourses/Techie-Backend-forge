@@ -300,3 +300,7 @@ public class RWCache<K, V> {
 | Not handling interrupted exceptions | tryLock throws InterruptedException | Catch and handle or rethrow |
 | Using StampedLock with virtual threads | Not compatible | Use ReentrantLock with virtual threads |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/javase/specs/jls/se17/html/jls-17.html)

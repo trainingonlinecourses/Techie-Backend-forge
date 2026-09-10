@@ -178,3 +178,7 @@ Note the guard inside `close()` — it makes close idempotent (safe to call twic
 
 Resources are scarce kernel-level things, and leaking them is the classic invisible production bug. try-with-resources makes the compiler generate correct closing for you: declare `AutoCloseable` resources in the parentheses, and `close()` runs automatically — normally and on exceptions — in reverse declaration order. When both the body and `close()` throw, the body's exception propagates and the close failure is preserved as a *suppressed* exception instead of destroying the original. Prefer it over manual try/finally for every closable resource, and implement `AutoCloseable` in your own classes that own external resources. The result is shorter code that is also *more* correct — the best kind of refactoring.
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [Oracle — The Java™ Tutorials](https://docs.oracle.com/javase/tutorial/essential/exceptions/index.html)

@@ -268,3 +268,7 @@ A real-time analytics platform processes 50,000 events/second. They use:
 
 The result: thread-safe operations without any `synchronized` blocks, achieving sub-millisecond latency per event.
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/21/core/collections.html)

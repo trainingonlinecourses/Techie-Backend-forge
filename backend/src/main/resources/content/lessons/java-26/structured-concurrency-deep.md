@@ -257,3 +257,7 @@ public <T> T withTimeout(Callable<T> task, Duration timeout) throws Exception {
 | Long-running tasks in scope | Blocks the scope | Use virtual threads for I/O |
 | Nested scopes | Can get confusing | Keep nesting shallow |
 
+## References
+
+- [dev.java — the official OpenJDK site](https://dev.java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/en/java/javase/26/docs/api/)

@@ -230,3 +230,7 @@ List<String> errors = validator.validate(user);
 | Forgetting composition | Writing nested lambdas | Use `.andThen()` / `.compose()` |
 | Boxing overhead | `Function<Integer, Integer>` uses autoboxing | Use `IntFunction`, `IntUnaryOperator` for primitives |
 
+## References
+
+- [GeeksforGeeks — Java](https://www.geeksforgeeks.org/java/java/)
+- [Oracle — official JDK documentation](https://docs.oracle.com/javase/8/docs/api/)

@@ -100,3 +100,7 @@ services:
 | Forgetting to include profile in tests | Tests use wrong beans | Always use `@ActiveProfiles` |
 | Profile name with uppercase | Doesn't match | Spring profiles are case-sensitive |
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-boot/reference/features/profiles.html](https://docs.spring.io/spring-boot/reference/features/profiles.html)

@@ -99,3 +99,7 @@ Raising partitions later is a **breaking change** (ordering for existing keys sh
 - [Spring Kafka — Receiving Messages](https://docs.spring.io/spring-kafka/reference/kafka/receiving-messages/receiving-messages.html)
 - [Kafka rebalancing & cooperative sticky assignor](https://kafka.apache.org/34/documentation/#consumer_rebalance)
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [docs.spring.io/spring-kafka/reference](https://docs.spring.io/spring-kafka/reference/)

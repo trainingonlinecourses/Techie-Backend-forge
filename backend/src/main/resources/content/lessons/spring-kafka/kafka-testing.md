@@ -115,3 +115,7 @@ The trade-off: Docker required, slower, but catches real-broker bugs (serde head
 - [Spring Boot — Testcontainers](https://docs.spring.io/spring-boot/reference/testing/testcontainers.html)
 - [Awaitility](https://github.com/awaitility/awaitility)
 
+## References
+
+- [W3Schools — Java Tutorial](https://www.w3schools.com/java/)
+- [docs.spring.io/spring-kafka/reference](https://docs.spring.io/spring-kafka/reference/)

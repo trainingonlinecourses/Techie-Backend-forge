@@ -241,3 +241,7 @@ Content-Type: application/json
 
 **Official docs:** [Spring Data REST Reference](https://docs.spring.io/spring-data/rest/reference/)
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [docs.spring.io/spring-graphql/reference](https://docs.spring.io/spring-graphql/reference/)

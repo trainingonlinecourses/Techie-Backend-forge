@@ -170,3 +170,7 @@ SockJS (from the STOMP lesson) bundles *some* of this: it provides HTTP fallback
 - Re-subscribe after reconnect; treat messages as at-least-once (idempotent handlers).
 - Surface connection state to the UI — "connected" should be true.
 
+## References
+
+- [Codecademy — Learn Java course](https://www.codecademy.com/learn/learn-java)
+- [docs.spring.io/spring-framework/reference/web/websocket.html](https://docs.spring.io/spring-framework/reference/web/websocket.html)
