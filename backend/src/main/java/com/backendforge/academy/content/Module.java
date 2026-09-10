@@ -28,6 +28,15 @@ public class Module {
     @Column(nullable = false)
     private String docsUrl;
 
+    /**
+     * Learning-path level: foundation, intermediate, advanced or expert.
+     * Named path_level because "level" is a reserved word in H2, and nullable
+     * because Hibernate's ddl-auto=update cannot add a NOT NULL column to a
+     * table that already has rows — the seeder fills it in moments after boot.
+     */
+    @Column(name = "path_level")
+    private String level = "foundation";
+
     @ElementCollection(fetch = FetchType.EAGER)   // tiny metadata list — safe to load eagerly
     private List<String> tech = new ArrayList<>();
 
@@ -47,6 +56,8 @@ public class Module {
     public void setColor(String color) { this.color = color; }
     public String getDocsUrl() { return docsUrl; }
     public void setDocsUrl(String docsUrl) { this.docsUrl = docsUrl; }
+    public String getLevel() { return level; }
+    public void setLevel(String level) { this.level = level; }
     public List<String> getTech() { return tech; }
     public String getContentHash() { return contentHash; }
     public void setContentHash(String contentHash) { this.contentHash = contentHash; }

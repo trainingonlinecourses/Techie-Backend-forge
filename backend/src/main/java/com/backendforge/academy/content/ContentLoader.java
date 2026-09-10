@@ -174,6 +174,8 @@ public class ContentLoader implements CommandLineRunner {
         module.setOrderIndex((Integer) m.get("order"));
         module.setColor((String) m.get("color"));
         module.setDocsUrl((String) m.get("docsUrl"));
+        Object level = m.get("level");
+        module.setLevel(level != null ? level.toString() : "foundation");
         module.getTech().addAll(castStringList(m.get("tech")));
         module.setContentHash(moduleHash(m));
         return module;
