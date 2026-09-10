@@ -113,10 +113,13 @@ public class ContentLoader implements CommandLineRunner {
         Resource[] resources = new PathMatchingResourcePatternResolver()
                 .getResources("classpath:content/lessons/*/*.md");
         List<SeedLesson> result = new ArrayList<>(resources.length);
-        // Lesson ids are the file slug (globally unique in the DB). A slug repeated
-        // across two module folders collapses to one row (last file wins — the same
-        // semantics save() gives us), so dedupe here to keep counts comparable.
+        // Lesson ids are the file slug and are globally unique in the DB. A slug
+        // repeated across two module folders would silently overwrite one lesson
+        // with another — so treat that as a hard error instead of last-wins.
+        // (CI runs scripts/verify-content.mjs as a required check; this is the
+        // runtime backstop for anything that bypasses it.)
         Map<String, SeedLesson> bySlug = new LinkedHashMap<>();
+        List<String> allSlugs = new ArrayList<>(resources.length);
         for (Resource resource : resources) {
             String url = resource.getURL().toString(); // .../content/lessons/<module>/<slug>.md
             int idx = url.indexOf("/content/lessons/");
@@ -124,6 +127,7 @@ public class ContentLoader implements CommandLineRunner {
             String[] parts = rel.split("/");
             String moduleId = parts[parts.length - 2];
             String slug = parts[parts.length - 1].replaceAll("\\.md$", "");
+            allSlugs.add(slug);
             String text = resource.getContentAsString(StandardCharsets.UTF_8)
                     .replace("\r\n", "\n"); // normalize CRLF (Windows checkouts) so front matter parses and hashes are platform-stable
 
@@ -131,8 +135,33 @@ public class ContentLoader implements CommandLineRunner {
             bySlug.put(slug, new SeedLesson(moduleId, slug, text, parsed.meta(), parsed.body(),
                     sha256(text)));
         }
+        assertNoDuplicateSlugs(allSlugs);
         result.addAll(bySlug.values());
         return result;
+    }
+
+    /**
+     * Lesson ids are the file slug and are globally unique — a repeated slug means
+     * one lesson would silently overwrite another. CI runs scripts/verify-content.mjs
+     * as a required check; this is the runtime backstop.
+     *
+     * Tip for local development: if you see this right after renaming lesson files,
+     * stale copies likely remain in {@code target/classes} — run {@code mvn clean}.
+     */
+    static void assertNoDuplicateSlugs(List<String> slugs) {
+        Set<String> seen = new HashSet<>();
+        Set<String> dupes = new TreeSet<>();
+        for (String s : slugs) {
+            if (!seen.add(s)) dupes.add(s);
+        }
+        if (!dupes.isEmpty()) {
+            throw new IllegalStateException(
+                    "Duplicate lesson slugs detected (lesson ids are global — one file would "
+                            + "silently overwrite the other): " + String.join(", ", dupes)
+                            + ". Rename one of the files so every lesson slug is unique. "
+                            + "If this appears right after renaming files locally, stale copies may "
+                            + "remain in target/classes — run 'mvn clean'.");
+        }
     }
 
     // ---- change detection ----------------------------------------------------
