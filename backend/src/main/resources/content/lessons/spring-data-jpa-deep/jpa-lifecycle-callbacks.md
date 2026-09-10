@@ -1,7 +1,7 @@
 ---
 title: Entity Lifecycle Callbacks — @PrePersist, @PostLoad and @EntityListeners
 summary: The persist/load/update/remove lifecycle, callback annotations, entity listeners vs callbacks, and the production patterns (hashing, defaults, timestamps).
-order: 10
+order: 4
 minutes: 17
 topics: [lifecycle, prepersist, postload, entitylisteners, callback, preupdate, postpersist]
 docs:
@@ -23,7 +23,6 @@ JPA defines a **lifecycle**: new → managed → detached → removed. At each t
 - `@PostRemove` — after the delete.
 - `@PostLoad` — after the entity is loaded from the database (and after every refresh/merge).
 
-```java
 @Entity
 public class Customer {
     @Id @GeneratedValue private Long id;
@@ -45,7 +44,6 @@ public class Customer {
         // Derived, denormalized view — computed for every read, not stored
     }
 }
-```
 
 Because callbacks fire inside the persistence provider, they run for **every** save path — service method, bulk save, test fixture — which is exactly why teams use them for invariants that must never be missed.
 
@@ -53,7 +51,6 @@ Because callbacks fire inside the persistence provider, they run for **every** s
 
 Rather than annotating every entity, a **listener class** can be shared via `@EntityListeners`:
 
-```java
 public class AuditListener {
     @PrePersist
     void beforePersist(Object entity) {
@@ -72,7 +69,6 @@ public class AuditListener {
 @MappedSuperclass
 @EntityListeners(AuditListener.class)
 public abstract class Auditable { /* createdAt, updatedAt, setters */ }
-```
 
 `@EntityListeners` on a `@MappedSuperclass` is inherited by every subclass — this is how Spring Data's auditing (`@CreatedDate`) works under the hood (its `AuditingEntityListener` is exactly this pattern). Listeners take the entity as a parameter; callbacks inside the entity take none.
 
@@ -82,7 +78,6 @@ public abstract class Auditable { /* createdAt, updatedAt, setters */ }
 
 **Scenario 2 — hash sensitive fields before writing.** A token or secret that must never be stored raw:
 
-```java
 @PrePersist @PreUpdate
 void hashSecret() {
     if (rawSecret != null && !rawSecret.equals(storedHash)) {
@@ -90,7 +85,6 @@ void hashSecret() {
         rawSecret = null;
     }
 }
-```
 
 **Scenario 3 — default/derived values at load.** `@PostLoad` computes transient fields (age from birth date, a display label) so reads always see current values without recomputing in every endpoint.
 
@@ -120,3 +114,4 @@ Also: `@PrePersist`/`@PreUpdate` changes made to the entity are **included in th
 - They can't inject services — keep them dependency-free; domain orchestration lives in the service layer.
 - Changes in `@Pre*` join the same flush; `@Post*` see database-generated values.
 - Native SQL and no-op flushes bypass callbacks — know the boundaries.
+

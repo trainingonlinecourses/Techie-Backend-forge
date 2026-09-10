@@ -1,7 +1,7 @@
 ---
 title: Event-Driven Architecture — The Shift From Calls to Facts
 module: event-driven-architecture
-order: 1
+order: 2
 minutes: 27
 topics: ["event-driven architecture", "events", "event sourcing", "decoupling", "message brokers", "Kafka"]
 summary: Traditional (requestdriven) architecture is built on commands: service A calls service B and waits — "please create the invoice, here's the order."...
@@ -32,7 +32,6 @@ Traditional (request-driven) architecture is built on *commands*: service A *cal
 
 ## A Concrete Example: Order Placement
 
-```java
 // PRODUCER — the order service publishes a fact, then moves on:
 @Service
 public class OrderService {
@@ -50,9 +49,7 @@ public class OrderService {
         // The method returns immediately — publishing is async.
     }
 }
-```
 
-```java
 // CONSUMER 1 — email service reacts independently:
 @KafkaListener(topics = "orders")
 public void onOrderPlaced(OrderPlaced event) {
@@ -70,7 +67,6 @@ public void reserveStock(OrderPlaced event) {
 public void recordSale(OrderPlaced event) {
     analytics.record(event);
 }
-```
 
 **Walking through the decoupling:** the order service publishes `OrderPlaced` — one line, no knowledge of email, inventory, or analytics. Three consumers (and any future ones) react independently. If the email service is down, orders still flow (the event waits in Kafka); if analytics is slow, nothing blocks. **Adding a feature = adding a consumer**, not editing the producer. That's the entire value proposition in one example.
 
@@ -109,3 +105,4 @@ The rest of this module covers the big three:
 ## Recap
 
 Event-driven architecture replaces "do this" calls with "this happened" facts: producers publish events (in the past tense, with no knowledge of consumers), consumers subscribe independently, and a broker (Kafka first among equals) transports them. The payoff is total decoupling — features attach by subscribing, services scale and fail independently. The costs are the distributed-systems homework: eventual consistency (design for it), at-least-once delivery (idempotent consumers), ordering (key by entity), schema evolution (registries), and observability (tracing and lag). The patterns — event sourcing, the outbox, CDC — build on the same foundation. Choose EDA at the boundaries where decoupling pays, and keep the simple flows simple.
+

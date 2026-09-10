@@ -1,7 +1,7 @@
 ---
 title: @Value Injection — Property Placeholders and SpEL in Fields
 summary: ${...} vs #{...}, defaults, constructor injection of values, and the scenarios where @Value is right and where @ConfigurationProperties is better.
-order: 20
+order: 24
 minutes: 18
 topics: [value, placeholder, spel, property-injection, defaults, constructor-injection]
 docs:
@@ -22,22 +22,33 @@ They compose: `${...}` can appear *inside* a SpEL string. Most code uses `${...}
 
 ## The essentials: defaults and types
 
+
+**What this code does — step by step:**
+
+1. `@Value("${app.mail.host}")` — required — startup fails if missing
+2. `@Value("${app.mail.port:587}")` — default 587 if property absent
+3. `@Value("${app.features.beta:false}")` — boolean default
+4. `@Value("${app.retry.max:3}")` — numeric default
+5. `@Value("#{${app.retry.max:3} * 1000}")` — SpEL arithmetic on a property
+
+The same code, clean:
+
 ```java
 @Service
 public class EmailSender {
-    @Value("${app.mail.host}")                    // required — startup fails if missing
+    @Value("${app.mail.host}")
     private String host;
 
-    @Value("${app.mail.port:587}")                // default 587 if property absent
+    @Value("${app.mail.port:587}")
     private int port;
 
-    @Value("${app.features.beta:false}")          // boolean default
+    @Value("${app.features.beta:false}")
     private boolean betaEnabled;
 
-    @Value("${app.retry.max:3}")                  // numeric default
+    @Value("${app.retry.max:3}")
     private int maxRetries;
 
-    @Value("#{${app.retry.max:3} * 1000}")        // SpEL arithmetic on a property
+    @Value("#{${app.retry.max:3} * 1000}")
     private long backoffMs;
 }
 ```
@@ -48,7 +59,6 @@ Spring converts the string to the field type (int, boolean, `Duration` via `@Val
 
 Field `@Value` is convenient but hides dependencies (same critique as field injection). The modern pattern — especially with records — is constructor injection:
 
-```java
 @Service
 public class Mailer {
     private final String host;
@@ -60,7 +70,6 @@ public class Mailer {
         this.port = port;
     }
 }
-```
 
 Immutable `final` fields, testable constructor, no hidden wiring. Record-based config properties with `@ConfigurationProperties` go one step further and drop the `@Value` boilerplate entirely (see the configuration-properties lesson).
 
@@ -68,21 +77,17 @@ Immutable `final` fields, testable constructor, no hidden wiring. Record-based c
 
 **Scenario 1 — wiring env-specific values into a component.** The deployment sets env vars; the code reads them via `@Value`:
 
-```java
 @Value("${cloud.region:us-east-1}")
 private String region;
 // locally defaults to us-east-1; in prod the env var CLOUD_REGION wins
-```
 
 **Scenario 2 — SpEL for bean-derived values.** A value computed from another bean:
 
-```java
 @Value("#{threadPoolCoreSize}")                  // a bean property
 private int poolSize;
 
 @Value("#{T(java.util.concurrent.TimeUnit).SECONDS.toMillis(30)}")
 private long timeoutMs;                          // static-method SpEL
-```
 
 **Scenario 3 — test overrides.** `@SpringBootTest(properties = "app.mail.host=localhost:2525")` overrides the `@Value` resolution for tests — the property source stack handles it without touching prod config.
 
@@ -113,3 +118,4 @@ private long timeoutMs;                          // static-method SpEL
 - Prefer constructor injection for testable, immutable wiring.
 - `@Value` for one-offs; `@ConfigurationProperties` for typed, validated groups.
 - Mind the `${}` vs `#{}` distinction and property-source precedence.
+

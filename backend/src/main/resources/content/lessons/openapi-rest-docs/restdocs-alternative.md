@@ -1,7 +1,7 @@
 ---
 title: Spring REST Docs — Test-Driven Documentation
 module: openapi-rest-docs
-order: 3
+order: 4
 minutes: 24
 topics: ["REST Docs", "asciidoctor", "test-driven docs", "snippets", "MockMvc"]
 summary: Springdoc generates documentation from code. Spring REST Docs goes further: it generates documentation from tests. Every endpoint's documentation i...
@@ -40,7 +40,6 @@ Because the snippets come from real, passing test executions, **the docs are alw
 
 ## The Code Walkthrough
 
-```java
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
@@ -80,7 +79,6 @@ class CourseControllerDocsTest {
                                 fieldWithPath("totalPages").description("Total pages"))));
     }
 }
-```
 
 ### Walking Through Each Part
 
@@ -142,3 +140,4 @@ The build order: tests run (producing snippets) → Asciidoctor assembles docs �
 - Choose springdoc for machine-readable specs + UI; REST Docs for tested, narrative docs.
 - The build integrates: tests → snippets → docs → package.
 - Docs as tests means every documented endpoint is a tested endpoint.
+

@@ -1,7 +1,7 @@
 ---
 title: Feature Flags with Spring Profiles
 summary: Using profiles as feature flags, conditional beans, @ConditionalOnProperty, and gradual rollout strategies.
-order: 5
+order: 1
 minutes: 15
 topics: [feature-flags, conditional-beans, conditional-on-property, gradual-rollout, a-b-testing]
 docs:
@@ -20,17 +20,14 @@ app:
     dark-mode: false
 ```
 
-```java
 @Component
 @ConditionalOnProperty(name = "app.features.new-search", havingValue = "true")
 public class NewSearchService { ... }
-```
 
 ---
 
 ## Profile-Based Feature Flags
 
-```java
 @Component
 @Profile("feature-checkout-v2")
 public class CheckoutV2Service implements CheckoutService { ... }
@@ -38,7 +35,6 @@ public class CheckoutV2Service implements CheckoutService { ... }
 @Component
 @Profile("!feature-checkout-v2")
 public class CheckoutV1Service implements CheckoutService { ... }
-```
 
 ```yaml
 # Enable in production
@@ -58,7 +54,6 @@ app:
 
 More fine-grained than profiles:
 
-```java
 @Component
 @ConditionalOnProperty(
     name = "app.features.cache.enabled",
@@ -66,7 +61,6 @@ More fine-grained than profiles:
     matchIfMissing = true  // default to enabled
 )
 public class CacheService { ... }
-```
 
 ---
 
@@ -85,7 +79,6 @@ app:
 
 ### Scenario 2: A/B testing
 
-```java
 @Component
 @ConditionalOnProperty(name = "app.experiment.search-algo", havingValue = "tfidf")
 public class TfIdfSearch implements SearchAlgorithm { }
@@ -93,7 +86,6 @@ public class TfIdfSearch implements SearchAlgorithm { }
 @Component
 @ConditionalOnProperty(name = "app.experiment.search-algo", havingValue = "bm25")
 public class Bm25Search implements SearchAlgorithm { }
-```
 
 ---
 
@@ -104,3 +96,4 @@ public class Bm25Search implements SearchAlgorithm { }
 | Profile flags never cleaned up | Technical debt accumulates | Remove old feature profiles after rollout |
 | Overusing profiles for config | Profiles should be env-specific, not per-feature | Use @ConditionalOnProperty for features |
 | Forgetting default | Feature off when flag missing | Use `matchIfMissing = true` for safe defaults |
+

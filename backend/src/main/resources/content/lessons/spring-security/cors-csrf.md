@@ -1,7 +1,7 @@
 ---
 title: CORS, CSRF & API Hardening
 summary: Why browsers enforce same-origin, when CSRF protection matters, security headers, and rate limiting.
-order: 7
+order: 5
 minutes: 15
 topics: [cors, csrf, headers, hardening, rate-limiting]
 docs:
@@ -15,7 +15,6 @@ docs:
 
 A browser enforces the **same-origin policy**: `https://app.example.com` cannot read responses from `https://api.example.com` unless the API explicitly allows it via CORS headers. It's not an attack blocker — it's a browser rule for *who may read*.
 
-```java
 @Bean
 CorsConfigurationSource corsConfigurationSource(AppProperties props) {
     CorsConfiguration cfg = new CorsConfiguration();
@@ -27,7 +26,6 @@ CorsConfigurationSource corsConfigurationSource(AppProperties props) {
     source.registerCorsConfiguration("/**", cfg);
     return source;
 }
-```
 
 Rules: allowlist exact origins (no `*` with credentials), match methods/headers to what you actually use, and know that **CORS is enforced by the browser, not the server** — curl can always call you.
 
@@ -35,11 +33,9 @@ Rules: allowlist exact origins (no `*` with credentials), match methods/headers 
 
 CSRF attacks exploit **cookies**: an attacker's page makes your browser send a request *with your session cookie* to your app. Classic defenses: a CSRF token the server verifies, or **no cookies at all**.
 
-```java
 // Stateless JWT API: token in the Authorization header, no cookies →
 // there is nothing for the attacker's page to carry → CSRF is a non-issue.
 http.csrf(AbstractHttpConfigurer::disable);
-```
 
 **When CSRF protection matters**: session/cookie-based auth (classic form login, server-rendered apps). Then enable it and serve the token. The decision rule:
 
@@ -57,13 +53,11 @@ server:
   forward-headers-strategy: framework
 ```
 
-```java
 http.headers(h -> h
     .contentSecurityPolicy(csp -> csp.policyDirectives(
         "default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:"))
     .httpStrictTransportSecurity(hsts -> hsts.includeSubDomains(true).maxAgeInSeconds(31536000))
     .frameOptions(f -> f.sameOrigin()));
-```
 
 | Header | Blocks |
 |---|---|
@@ -74,7 +68,6 @@ http.headers(h -> h
 
 ## Rate limiting & brute-force defense
 
-```java
 @Component
 public class RateLimitFilter extends OncePerRequestFilter {
     private final Cache<String, AtomicInteger> attempts = Caffeine.newBuilder()
@@ -92,7 +85,6 @@ public class RateLimitFilter extends OncePerRequestFilter {
         chain.doFilter(req, res);
     }
 }
-```
 
 Also: lock accounts after N failed logins (or back off), validate input at the boundary, and never trust client-supplied identity.
 
@@ -106,3 +98,4 @@ Also: lock accounts after N failed logins (or back off), validate input at the b
 - Rate-limit login and public endpoints; 429 on abuse.
 
 **Official docs:** [CORS](https://docs.spring.io/spring-security/reference/servlet/exploits/cors.html) · [CSRF](https://docs.spring.io/spring-security/reference/servlet/exploits/csrf.html)
+

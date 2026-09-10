@@ -1,7 +1,7 @@
 ---
 title: Java Operators — Beyond the Basics That Trip Up Production Code
 summary: Bitwise operators, instanceof pattern matching, the ternary operator pitfalls, string concatenation in loops, and operator precedence mistakes organizations catch in code review.
-order: 21
+order: 60
 minutes: 20
 topics: [operators, bitwise, instanceof, ternary, precedence, string-concat]
 docs:
@@ -21,15 +21,27 @@ Most backend developers never use bitwise operators directly. But you WILL see t
 - **Network protocols** (packing/unpacking binary data)
 - **Performance-critical code** (bit manipulation for speed)
 
-```java
-// Bitmask permissions — common in Spring Security roles
-final int READ    = 0b0001;    // 1 in binary: bit 0 is set
-final int WRITE   = 0b0010;    // 2 in binary: bit 1 is set
-final int EXECUTE = 0b0100;    // 4 in binary: bit 2 is set
 
-int userPerms = READ | WRITE;               // 0011 — user has READ and WRITE
-boolean canWrite = (userPerms & WRITE) != 0; // 0011 & 0010 = 0010 → true
-boolean canExec  = (userPerms & EXECUTE) != 0; // 0011 & 0100 = 0000 → false
+**What this code does — step by step:**
+
+1. Bitmask permissions — common in Spring Security roles
+2. `final int READ    = 0b0001;` — 1 in binary: bit 0 is set
+3. `final int WRITE   = 0b0010;` — 2 in binary: bit 1 is set
+4. `final int EXECUTE = 0b0100;` — 4 in binary: bit 2 is set
+5. `int userPerms = READ | WRITE;` — 0011 — user has READ and WRITE
+6. `boolean canWrite = (userPerms & WRITE) != 0;` — 0011 & 0010 = 0010 → true
+7. `boolean canExec  = (userPerms & EXECUTE) != 0;` — 0011 & 0100 = 0000 → false
+
+The same code, clean:
+
+```java
+final int READ    = 0b0001;
+final int WRITE   = 0b0010;
+final int EXECUTE = 0b0100;
+
+int userPerms = READ | WRITE;
+boolean canWrite = (userPerms & WRITE) != 0;
+boolean canExec  = (userPerms & EXECUTE) != 0;
 ```
 
 Line-by-line:
@@ -45,21 +57,36 @@ Line-by-line:
 
 ## instanceof — Modern Pattern Matching
 
+
+**What this code does — step by step:**
+
+1. Old way (pre-Java 16):
+2. `String s = (String) obj;` — cast required — manual and error-prone
+3. Modern way (Java 16+):
+4. `if (obj instanceof String s) {` — pattern variable 's' declared and cast in one step
+5. `System.out.println(s.length());` — s is already the right type
+6. With guards (Java 17+):
+7. `if (obj instanceof String s && s.length() > 5) {` — null-safe AND condition
+
+The same code, clean:
+
 ```java
-// Old way (pre-Java 16):
-if (obj instanceof String) {
-    String s = (String) obj;                    // cast required — manual and error-prone
-    System.out.println(s.length());
-}
+public class Main {
 
-// Modern way (Java 16+):
-if (obj instanceof String s) {                  // pattern variable 's' declared and cast in one step
-    System.out.println(s.length());             // s is already the right type
-}
+    public static void main(String[] args) {
+        if (obj instanceof String) {
+            String s = (String) obj;
+            System.out.println(s.length());
+        }
 
-// With guards (Java 17+):
-if (obj instanceof String s && s.length() > 5) {  // null-safe AND condition
-    process(s);
+        if (obj instanceof String s) {
+            System.out.println(s.length());
+        }
+
+        if (obj instanceof String s && s.length() > 5) {
+            process(s);
+        }
+    }
 }
 ```
 
@@ -73,20 +100,17 @@ Line-by-line:
 
 ## The Ternary Operator — Useful but Dangerous
 
-```java
 // Simple case — fine:
 String label = (age >= 18) ? "Adult" : "Minor";
 
 // Nested ternary — NEVER DO THIS:
 // String result = (x > 0) ? "positive" : (x == 0) ? "zero" : "negative";
 // This is unreadable and error-prone. Use an if/else or switch expression instead.
-```
 
 **Org rule:** Most style guides cap ternaries at one level of nesting. Beyond that, use `if/else` or `switch` expressions — readability wins over cleverness.
 
 ## String Concatenation in Loops — The Hidden N² Problem
 
-```java
 // ❌ BAD — creates a new String object on every iteration (O(n²) time)
 String result = "";
 for (int i = 0; i < 100000; i++) {
@@ -99,7 +123,6 @@ for (int i = 0; i < 100000; i++) {
     sb.append("item-").append(i).append("\n");
 }
 String result = sb.toString();
-```
 
 Line-by-line:
 
@@ -114,19 +137,27 @@ Line-by-line:
 
 ## Operator Precedence Gotchas
 
+
+**What this code does — step by step:**
+
+1. Is this 0 or 1?
+2. `int result = 1 + 2 * 3;` — 7 — multiplication before addition (PEMDAS)
+3. Which branch runs?
+4. `boolean r = a || b && !a;` — true — && binds tighter than ||, ! binds tightest
+5. Equivalent to: a || (b && (!a)). NOT: (a || b) && (!a)
+6. The classic interview trap:
+7. `boolean r2 = x > 3 && x < 10;` — true — && short-circuits: if left is false, right isn't evaluated
+
+The same code, clean:
+
 ```java
-// Is this 0 or 1?
-int result = 1 + 2 * 3;   // 7 — multiplication before addition (PEMDAS)
+int result = 1 + 2 * 3;
 
-// Which branch runs?
 boolean a = true, b = false;
-boolean r = a || b && !a;  // true — && binds tighter than ||, ! binds tightest
-// Equivalent to: a || (b && (!a))
-// NOT: (a || b) && (!a)
+boolean r = a || b && !a;
 
-// The classic interview trap:
 int x = 5;
-boolean r2 = x > 3 && x < 10;  // true — && short-circuits: if left is false, right isn't evaluated
+boolean r2 = x > 3 && x < 10;
 ```
 
 The practical rule: **when in doubt, add parentheses**. Precedence bugs are invisible and never caught by the compiler.
@@ -149,3 +180,4 @@ The practical rule: **when in doubt, add parentheses**. Precedence bugs are invi
 | String `+=` in loops | O(n²) performance | Use StringBuilder |
 | Forgetting operator precedence | Subtle logic bugs | Add explicit parentheses |
 | `a - b` for integer comparison in `compareTo` | Overflow for large values | Use `Integer.compare(a, b)` |
+

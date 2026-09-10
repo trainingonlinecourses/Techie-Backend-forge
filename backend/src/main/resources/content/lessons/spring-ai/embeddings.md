@@ -1,7 +1,7 @@
 ---
 title: Embeddings & Vector Stores
 summary: Turning text into vectors, similarity search, and storing embeddings in SimpleVectorStore or a real vector database.
-order: 4
+order: 7
 minutes: 16
 topics: [embeddings, vector-store, similarity, simplevectorstore]
 docs:
@@ -23,15 +23,12 @@ An **embedding** is a list of numbers (a vector, e.g. 1536 dimensions) that capt
 
 ## EmbeddingModel: text → vector
 
-```java
 @Configuration
 public class AiConfig {
     @Bean
     EmbeddingModel embeddingModel(EmbeddingModel builder) { return builder; }
 }
-```
 
-```java
 @Service
 public class EmbeddingService {
 
@@ -42,45 +39,36 @@ public class EmbeddingService {
         return response.getResult().getOutput();    // float[] of N dimensions
     }
 }
-```
 
 Spring AI provides `embeddingModel.embed(String)` returning `float[]` — and batches:
 
-```java
 List<float[]> vectors = embeddingModel.embed(List.of(doc1, doc2, doc3));
-```
 
 ## VectorStore: store + retrieve
 
-```java
 @Bean
 VectorStore vectorStore(EmbeddingModel embeddingModel) {
     return SimpleVectorStore.builder(embeddingModel).build();   // in-memory, dev/CI
     // production: new PgVectorStore(...), RedisVectorStore, Milvus, Chroma, Weaviate, ...
 }
-```
 
 Store documents with metadata:
 
-```java
 vectorStore.add(List.of(
         new Document("spring-boot-starter-web pulls in Tomcat, MVC and Jackson",
                 Map.of("lesson", "boot-philosophy", "module", "spring-boot")),
         new Document("Auto-configuration registers beans conditionally",
                 Map.of("lesson", "boot-philosophy", "module", "spring-boot"))
 ));
-```
 
 Retrieve by similarity — the heart of RAG:
 
-```java
 List<Document> matches = vectorStore.similaritySearch(
         SearchRequest.builder()
                 .query("what does the web starter include?")
                 .topK(3)                       // top 3 most similar
                 .similarityThreshold(0.5)      // ignore weak matches
                 .build());
-```
 
 ## Vector databases for production
 
@@ -103,7 +91,6 @@ Each has a Spring AI starter — the `VectorStore` interface stays the same:
 
 ## The ingestion pattern
 
-```java
 @Component
 public class DocumentIngester {
 
@@ -120,13 +107,10 @@ public class DocumentIngester {
         };
     }
 }
-```
 
 **Chunking matters**: split long docs into ~500–1000 token chunks with overlap, so retrieval finds the *relevant* piece, not a wall of text. Spring AI provides `TokenTextSplitter`/`DocumentSplitter`:
 
-```java
 List<Document> chunks = new TokenTextSplitter().apply(originalDocs);
-```
 
 > **Why it matters (organizational view)** — Embeddings are the "search" layer of AI features: FAQ answers, docs assistants, semantic search over tickets. The org pattern: one embedding provider (dimensions must match the vector store), chunked ingestion pipelines with versioned documents, and pgvector first (you already run Postgres) before adding a dedicated vector DB.
 
@@ -138,3 +122,4 @@ List<Document> chunks = new TokenTextSplitter().apply(originalDocs);
 - Chunk documents (~500-1000 tokens, overlap) before embedding.
 
 **Official docs:** [Embeddings](https://docs.spring.io/spring-ai/reference/api/embeddings.html) · [Vector databases](https://docs.spring.io/spring-ai/reference/api/vectordbs.html)
+

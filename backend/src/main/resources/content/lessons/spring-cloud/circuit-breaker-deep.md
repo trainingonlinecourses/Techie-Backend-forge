@@ -1,7 +1,7 @@
 ---
 title: Circuit Breaker — Preventing Cascade Failures
 summary: Resilience4j circuit breaker in depth, state transitions, fallback strategies, monitoring, and why microservices need circuit breakers.
-order: 11
+order: 3
 minutes: 20
 topics: [circuit-breaker, resilience4j, fault-tolerance, fallback, cascade-failure, microservices-resilience]
 docs:
@@ -89,7 +89,6 @@ resilience4j:
 
 ### Usage with @CircuitBreaker
 
-```java
 @Service
 public class OrderService {
 
@@ -108,23 +107,19 @@ public class OrderService {
             .orElse(new User(userId, "Unknown User", "unknown@example.com"));
     }
 }
-```
 
 ### Retry + Circuit Breaker
 
-```java
 @CircuitBreaker(name = "userService", fallbackMethod = "getUserFallback")
 @Retry(name = "userService")  // Retry before circuit breaker trips
 public User getUser(String userId) {
     return userClient.getUser(userId);
 }
-```
 
 ---
 
 ## Monitoring Circuit Breaker
 
-```java
 @Component
 public class CircuitBreakerMetrics {
 
@@ -148,7 +143,6 @@ public class CircuitBreakerMetrics {
         });
     }
 }
-```
 
 ---
 
@@ -156,7 +150,6 @@ public class CircuitBreakerMetrics {
 
 ### Scenario 1: Payment Gateway Circuit Breaker
 
-```java
 @Service
 public class PaymentService {
 
@@ -180,11 +173,9 @@ public class PaymentService {
             "Payment queued for processing. Gateway temporarily unavailable.");
     }
 }
-```
 
 ### Scenario 2: User Profile with Cache Fallback
 
-```java
 @Service
 public class UserProfileService {
 
@@ -210,11 +201,9 @@ public class UserProfileService {
         return UserProfile.unknown(userId);
     }
 }
-```
 
 ### Scenario 3: Multi-Service Aggregation with Fallbacks
 
-```java
 @Service
 public class DashboardAggregator {
 
@@ -246,7 +235,6 @@ public class DashboardAggregator {
         return List.of();  // Skip notifications — not critical
     }
 }
-```
 
 ---
 
@@ -260,3 +248,4 @@ public class DashboardAggregator {
 | Not monitoring circuit state | Can't detect issues | Export metrics to Prometheus/Grafana |
 | Threshold too sensitive | Unnecessary circuit opens | Set reasonable `minimumNumberOfCalls` |
 | Threshold too loose | Cascade failure not prevented | Set appropriate `failureRateThreshold` |
+

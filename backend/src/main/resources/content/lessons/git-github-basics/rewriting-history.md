@@ -1,7 +1,7 @@
 ---
 title: Rewriting History — Amend, Squash, and Rebase -i
 module: git-github-basics
-order: 4
+order: 5
 minutes: 25
 topics: ["git amend", "squash", "interactive rebase", "history rewriting", "reflog"]
 summary: Your published history (on the remote, shared with the team) is set in stone. But your local, unpublished history is still clay — you can reshape i...
@@ -142,3 +142,4 @@ The reflog means **almost nothing is unrecoverable** — even a botched `--hard`
 - The golden rule: never rewrite history others have — push your clean story, then it's stone.
 - The reflog is the safety net — almost every rewrite mistake is recoverable.
 - Work messily, publish cleanly: commit for checkpoints, squash for the pull request.
+

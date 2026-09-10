@@ -1,7 +1,7 @@
 ---
 title: Tasklet Steps — Simple Batch Operations
 summary: When to use Tasklet instead of chunk processing, file operations, system commands, and database maintenance in Spring Batch.
-order: 7
+order: 9
 minutes: 14
 topics: [tasklet, batch-steps, simple-operations, file-management, system-commands]
 docs:
@@ -32,7 +32,6 @@ In Spring Batch, a **Step** is a unit of work. Most steps use **chunk processing
 
 ## Basic Tasklet
 
-```java
 @Component
 public class CleanupTasklet implements Tasklet {
 
@@ -61,11 +60,9 @@ public class CleanupTasklet implements Tasklet {
         return RepeatStatus.FINISHED;  // FINISHED = done, CONTINUABLE = run again
     }
 }
-```
 
 ### Using Tasklet in a Step
 
-```java
 @Configuration
 public class BatchConfig {
 
@@ -83,7 +80,6 @@ public class BatchConfig {
             .build();
     }
 }
-```
 
 ---
 
@@ -91,7 +87,6 @@ public class BatchConfig {
 
 ### File Operations
 
-```java
 @Component
 public class FileMoveTasklet implements Tasklet {
 
@@ -122,11 +117,9 @@ public class FileMoveTasklet implements Tasklet {
         return RepeatStatus.FINISHED;
     }
 }
-```
 
 ### Database Maintenance
 
-```java
 @Component
 public class DatabaseMaintenanceTasklet implements Tasklet {
 
@@ -157,11 +150,9 @@ public class DatabaseMaintenanceTasklet implements Tasklet {
         return RepeatStatus.FINISHED;
     }
 }
-```
 
 ### System Command Execution
 
-```java
 @Component
 public class SystemCommandTasklet implements Tasklet {
 
@@ -187,11 +178,9 @@ public class SystemCommandTasklet implements Tasklet {
         return RepeatStatus.FINISHED;
     }
 }
-```
 
 ### Conditional Execution
 
-```java
 @Component
 public class ConditionalTasklet implements Tasklet {
 
@@ -216,13 +205,11 @@ public class ConditionalTasklet implements Tasklet {
         return RepeatStatus.FINISHED;
     }
 }
-```
 
 ---
 
 ## Tasklet vs Chunk Processing
 
-```java
 // TASKLET: Simple, one-time operation
 @Bean
 public Step deleteOldFilesStep(JobRepository jobRepository, PlatformTransactionManager txManager) {
@@ -241,7 +228,6 @@ public Step processOrdersStep(JobRepository jobRepository, PlatformTransactionMa
         .writer(orderWriter(null))
         .build();
 }
-```
 
 ---
 
@@ -249,7 +235,6 @@ public Step processOrdersStep(JobRepository jobRepository, PlatformTransactionMa
 
 ### Scenario 1: Nightly Data Cleanup
 
-```java
 @Component
 @StepScope
 public class NightlyCleanupTasklet implements Tasklet {
@@ -277,11 +262,9 @@ public class NightlyCleanupTasklet implements Tasklet {
         return RepeatStatus.FINISHED;
     }
 }
-```
 
 ### Scenario 2: File Sync Between Systems
 
-```java
 @Component
 public class FileSyncTasklet implements Tasklet {
 
@@ -313,7 +296,6 @@ public class FileSyncTasklet implements Tasklet {
         return RepeatStatus.FINISHED;
     }
 }
-```
 
 ---
 
@@ -327,3 +309,4 @@ public class FileSyncTasklet implements Tasklet {
 | Blocking in Tasklet thread | Thread starvation | Use `@Async` or reactive if needed |
 | Not handling exceptions | Job fails silently | Wrap in try-catch, log errors properly |
 | Mixing Tasklet and Chunk in same step | Won't compile | Use separate steps |
+

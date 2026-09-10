@@ -1,7 +1,7 @@
 ---
 title: SQL Fundamentals for Backend Developers
 module: postgresql-deep
-order: 1
+order: 3
 minutes: 25
 topics: ["SQL", "joins", "aggregations", "window functions", "CTEs", "query structure"]
 summary: SQL is the most important language most backend developers write least well. This lesson covers the parts that actually matter in production Spring...
@@ -193,7 +193,6 @@ SELECT DISTINCT ON (level) * FROM courses ORDER BY level, minutes DESC;
 
 ## Testing Queries in Spring
 
-```java
 @DataJpaTest
 class QueryTest {
 
@@ -211,7 +210,6 @@ class QueryTest {
         assertEquals(1, ranked.get(0).rnk());   // longest course
     }
 }
-```
 
 ## Summary
 
@@ -226,3 +224,4 @@ class QueryTest {
 | Upsert | ON CONFLICT DO UPDATE |
 
 SQL is a declarative language with a fixed execution order — master the order, the four joins, and window functions, and you can write every query a backend needs. The next lessons go deeper: indexes, transactions/isolation, and JSONB.
+

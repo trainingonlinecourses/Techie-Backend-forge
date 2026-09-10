@@ -18,7 +18,6 @@ When you add `spring-boot-starter-data-jpa` to your project, Spring Boot automat
 
 You didn't write any configuration. That's **auto-configuration** — Spring Boot configures your application based on what's on the classpath.
 
-```java
 @SpringBootApplication  // includes @EnableAutoConfiguration
 public class MyApp {
     public static void main(String[] args) {
@@ -27,27 +26,32 @@ public class MyApp {
 }
 
 // @SpringBootApplication = @Configuration + @EnableAutoConfiguration + @ComponentScan
-```
 
 ---
 
 ## How It Works
 
-```java
-// Spring Boot checks the classpath for classes
-// If certain classes exist, it configures beans automatically
 
-// Example: DataSourceAutoConfiguration
+**What this code does — step by step:**
+
+1. Spring Boot checks the classpath for classes. If certain classes exist, it configures beans automatically
+2. Example: DataSourceAutoConfiguration
+3. `@ConditionalOnClass(DataSource.class)` — Only if DataSource class exists
+4. `@ConditionalOnMissingBean(DataSource.class)` — Only if no DataSource bean defined
+5. Create and configure DataSource from application.yml
+
+The same code, clean:
+
+```java
 @AutoConfiguration
-@ConditionalOnClass(DataSource.class)           // Only if DataSource class exists
-@ConditionalOnMissingBean(DataSource.class)      // Only if no DataSource bean defined
+@ConditionalOnClass(DataSource.class)
+@ConditionalOnMissingBean(DataSource.class)
 @EnableConfigurationProperties(DataSourceProperties.class)
 public class DataSourceAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
     public DataSource dataSource(DataSourceProperties properties) {
-        // Create and configure DataSource from application.yml
         return properties.initializeDataSourceBuilder().build();
     }
 }
@@ -57,30 +61,40 @@ public class DataSourceAutoConfiguration {
 
 ## Line-by-Line Walkthrough
 
+
+**What this code does — step by step:**
+
+1. Line 1: Understanding @SpringBootApplication
+2. Equivalent to: @Configuration — marks this as a configuration class. @EnableAutoConfiguration — enables auto-configuration. @ComponentScan — scans for @Component, @Service, etc.
+3. Line 2: Conditional beans — only created when conditions met
+4. `@ConditionalOnClass(name = "com.mysql.cj.jdbc.Driver")` — MySQL on classpath
+5. `@ConditionalOnMissingBean(CacheManager.class)` — Only if no CacheManager exists
+6. Line 3: Custom auto-configuration
+7. Line 4: Exclude auto-configuration
+8. DataSource and Redis beans won't be created
+9. Line 5: Debug auto-configuration. Add to application.yml: debug: true. This prints which auto-configurations were applied and why
+10. Line 6: List all auto-configuration classes. Check META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports. Or META-INF/spring.factories (older versions)
+
+The same code, clean:
+
 ```java
 import org.springframework.boot.autoconfigure.*;
 import org.springframework.boot.autoconfigure.condition.*;
 import org.springframework.context.annotation.*;
 import org.springframework.core.env.Environment;
 
-// Line 1: Understanding @SpringBootApplication
 @SpringBootApplication
-// Equivalent to:
-// @Configuration          — marks this as a configuration class
-// @EnableAutoConfiguration — enables auto-configuration
-// @ComponentScan          — scans for @Component, @Service, etc.
 public class Application {
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
     }
 }
 
-// Line 2: Conditional beans — only created when conditions met
 @Configuration
 public class MyConfig {
 
     @Bean
-    @ConditionalOnClass(name = "com.mysql.cj.jdbc.Driver")  // MySQL on classpath
+    @ConditionalOnClass(name = "com.mysql.cj.jdbc.Driver")
     public DataSource mysqlDataSource() {
         return new MysqlDataSource();
     }
@@ -92,13 +106,12 @@ public class MyConfig {
     }
 
     @Bean
-    @ConditionalOnMissingBean(CacheManager.class)  // Only if no CacheManager exists
+    @ConditionalOnMissingBean(CacheManager.class)
     public CacheManager defaultCacheManager() {
         return new ConcurrentMapCacheManager();
     }
 }
 
-// Line 3: Custom auto-configuration
 @AutoConfiguration
 @ConditionalOnClass(RedisOperations.class)
 @ConditionalOnProperty(name = "app.redis.enabled", havingValue = "true", matchIfMissing = true)
@@ -115,23 +128,12 @@ public class RedisAutoConfiguration {
     }
 }
 
-// Line 4: Exclude auto-configuration
 @SpringBootApplication(exclude = {
     DataSourceAutoConfiguration.class,
     RedisAutoConfiguration.class
 })
 public class AppWithoutDatabase {
-    // DataSource and Redis beans won't be created
 }
-
-// Line 5: Debug auto-configuration
-// Add to application.yml:
-// debug: true
-// This prints which auto-configurations were applied and why
-
-// Line 6: List all auto-configuration classes
-// Check META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports
-// or META-INF/spring.factories (older versions)
 ```
 
 ---
@@ -139,6 +141,13 @@ public class AppWithoutDatabase {
 ## Real-World Scenarios
 
 ### Scenario 1: Feature toggle with auto-configuration
+
+
+**What this code does — step by step:**
+
+1. application.yml. App: features: metrics: enabled: true. App-name: my-service
+
+The same code, clean:
 
 ```java
 @AutoConfiguration
@@ -155,18 +164,10 @@ public class MetricsAutoConfiguration {
         };
     }
 }
-
-// application.yml
-// app:
-//   features:
-//     metrics:
-//       enabled: true
-//       app-name: my-service
 ```
 
 ### Scenario 2: Database auto-configuration with multiple databases
 
-```java
 @AutoConfiguration
 @ConditionalOnClass(JdbcTemplate.class)
 public class MultiDatabaseAutoConfiguration {
@@ -184,7 +185,6 @@ public class MultiDatabaseAutoConfiguration {
         // MySQL for secondary
     }
 }
-```
 
 ---
 
@@ -197,3 +197,4 @@ public class MultiDatabaseAutoConfiguration {
 | Forgetting `@AutoConfiguration` | Not processed as auto-config | Add `@AutoConfiguration` annotation |
 | Not excluding unwanted auto-config | Unnecessary beans created | Use `spring.autoconfigure.exclude` |
 | Circular dependencies | Startup fails | Use `@Lazy` or restructure beans |
+

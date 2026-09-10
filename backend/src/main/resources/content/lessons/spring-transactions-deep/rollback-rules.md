@@ -1,7 +1,7 @@
 ---
 title: Rollback Rules and the Transaction Boundary
 module: spring-transactions-deep
-order: 5
+order: 4
 minutes: 20
 topics: ["rollbackFor", "noRollbackFor", "checked exceptions", "transaction boundary", "readOnly", "transaction listeners"]
 summary: @Transactional rolls back on RuntimeException — and not on checked exceptions. That one default causes more "committed when it should have rolled b...
@@ -22,20 +22,17 @@ docs:
 | Error | Rollback |
 | Checked exception | **Commit** (!!) |
 
-```java
 // ❌ Surprise: a checked failure COMMITS
 @Transactional
 public void createCourse(CourseDto dto) throws IOException {
     courseRepository.save(...);
     fileService.upload(dto.coverArt());   // throws IOException → the save COMMITS
 }
-```
 
 Spring's philosophy: checked exceptions signal "handle me, maybe it's fine"; runtime exceptions signal "something is broken, roll back." Production code usually disagrees with this default.
 
 ## Explicit Rollback Rules
 
-```java
 // Roll back on specific exceptions
 @Transactional(rollbackFor = {IOException.class, FileUploadException.class})
 public void createCourse(CourseDto dto) throws IOException { ... }
@@ -47,7 +44,6 @@ public void fragileOperation() throws Exception { ... }
 // Never roll back on this one
 @Transactional(noRollbackFor = OptimisticLockException.class)
 public void updateWithRetryHandled() { ... }
-```
 
 **The rule**: declare `rollbackFor` explicitly whenever a checked exception can fail the operation — otherwise the default commits a half-done write.
 
@@ -78,25 +74,21 @@ public class CourseService {
 
 ### Repository-Level Transactions
 
-```java
 @Repository
 public interface CourseRepository extends JpaRepository<Course, Long> {
     // Each repository method participates in the caller's tx (REQUIRED)
     // — no @Transactional needed on the repository itself
 }
-```
 
 Spring Data repositories are already transactional (each method joins or creates one). Don't add `@Transactional` to repository methods — the service owns the boundary.
 
 ## readOnly = true: The Contract
 
-```java
 @Transactional(readOnly = true)
 public CourseDto getCourse(Long id) {
     Course course = courseRepository.findById(id).orElseThrow();
     return CourseDto.from(course);
 }
-```
 
 What `readOnly` really does:
 
@@ -104,12 +96,10 @@ What `readOnly` really does:
 - **JPA flush mode set to MANUAL** — no dirty-checking flushes (performance)
 - **Does NOT prevent writes** — a readOnly tx can still insert if you try (JPA throws on flush of new entities in some providers, but it's not a hard guarantee)
 
-```java
 @Transactional(readOnly = true)
 public void sneaky() {
     repository.save(entity);   // ⚠️ not prevented by readOnly in all providers
 }
-```
 
 Treat `readOnly` as documentation + optimization hint, not a write guard. For hard write-prevention, use a read-only datasource/user.
 
@@ -117,7 +107,6 @@ Treat `readOnly` as documentation + optimization hint, not a write guard. For ha
 
 Run code after commit — safely outside the transaction:
 
-```java
 @Transactional
 public CourseDto createCourse(CourseDto dto) {
     Course saved = courseRepository.save(toEntity(dto));
@@ -134,13 +123,11 @@ public CourseDto createCourse(CourseDto dto) {
 
     return CourseDto.from(saved);
 }
-```
 
 **Why this pattern matters**: sending an email or publishing an event *inside* the transaction means it fires even if the tx later rolls back — a phantom notification. `afterCommit` guarantees the message only goes out when the data is durable.
 
 ## The Event-Transaction Pattern
 
-```java
 @Transactional
 public void placeOrder(OrderDto dto) {
     Order order = orderRepository.save(toEntity(dto));
@@ -154,13 +141,11 @@ public void placeOrder(OrderDto dto) {
 public void onOrderPlaced(OrderPlaced event) {
     emailService.sendConfirmation(event.order());   // only after commit
 }
-```
 
 `@TransactionalEventListener(AFTER_COMMIT)` is the declarative version of the synchronization pattern — the event listener runs only after the transaction commits.
 
 ## Testing Rollback Rules
 
-```java
 @SpringBootTest
 class RollbackRuleTest {
 
@@ -182,7 +167,6 @@ class RollbackRuleTest {
         assertEquals(1, courseRepository.count());   // COMMITTED — the trap
     }
 }
-```
 
 ## Summary
 
@@ -196,3 +180,4 @@ class RollbackRuleTest {
 | After commit | `TransactionSynchronization.afterCommit` / `@TransactionalEventListener` |
 
 Transactions are a contract: everything in the boundary commits or rolls back together. The three mistakes — checked exceptions committing, boundaries in the controller, side effects inside the transaction — are all preventable with deliberate `rollbackFor`, service-layer boundaries, and after-commit hooks for side effects.
+

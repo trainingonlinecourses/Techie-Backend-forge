@@ -1,7 +1,7 @@
 ---
 title: Custom Metrics That Matter
 module: observability
-order: 3
+order: 1
 minutes: 22
 topics: ["business metrics", "metric naming", "cardinality", "@Timed", "meter filters", "red metrics"]
 summary: Platform metrics (JVM, HTTP, connection pools) come free. Business metrics — the numbers your product team asks about — must be added by you. This ...
@@ -34,7 +34,6 @@ Apply RED to every service you own; USE to every resource (DB, queue, thread poo
 
 Instrument the numbers that answer "is the product working?":
 
-```java
 @Service
 public class CheckoutService {
 
@@ -59,7 +58,6 @@ public class CheckoutService {
         return order;
     }
 }
-```
 
 These become the dashboard your stakeholders actually read: conversion, average order value, abandonment.
 
@@ -74,7 +72,6 @@ Micrometer ships a Spring AOP integration — annotate instead of wrapping:
 </dependency>
 ```
 
-```java
 @Configuration
 public class MetricsConfig {
     @Bean
@@ -82,9 +79,7 @@ public class MetricsConfig {
         return new TimedAspect(registry);
     }
 }
-```
 
-```java
 @Service
 public class SearchService {
 
@@ -93,7 +88,6 @@ public class SearchService {
         return searchClient.query(query, index);
     }
 }
-```
 
 `@Timed` produces count, sum, max, and percentiles for every invocation of the method — including failures (unless `@Timed(exception = ...)` filters).
 
@@ -117,7 +111,6 @@ Rules:
 
 **Never** tag with unbounded values:
 
-```java
 // ❌ Cardinality explosion: one series per user!
 Counter.builder("api.requests")
     .tag("userId", userId)      // 1M users = 1M time series
@@ -127,7 +120,6 @@ Counter.builder("api.requests")
 Counter.builder("api.requests")
     .tag("requestId", UUID.randomUUID().toString())
     .register(registry);
-```
 
 Every unique tag combination is a **time series**. Prometheus chokes past ~100k series per instance. Rule of thumb: tags should have < 100 stable values. `userId`, `requestId`, `email` are metrics poison.
 
@@ -135,27 +127,21 @@ Every unique tag combination is a **time series**. Prometheus chokes past ~100k 
 
 Trim and rename metrics centrally with `MeterFilter`:
 
-```java
 @Bean
 public MeterFilter meterFilter() {
     return MeterFilter.denyNameStartsWith("jvm.buffer");          // drop noisy
 }
-```
 
-```java
 @Bean
 public MeterFilter renameFilter() {
     return MeterFilter.renameTag("http.server.requests", "uri", "endpoint");
 }
-```
 
-```java
 @Bean
 public MeterFilter cardinalityGuard() {
     return MeterFilter.maximumAllowableTags("http.server.requests", "uri", 500,
         MeterFilter.deny());
 }
-```
 
 The cardinality guard is a production lifesaver: unbounded URI tags (from user-supplied paths) get dropped past a threshold instead of flooding the backend.
 
@@ -172,7 +158,6 @@ The cardinality guard is a production lifesaver: unbounded URI tags (from user-s
 
 ## Testing Custom Metrics
 
-```java
 @Test
 void placingOrderIncrementsBusinessMetric() {
     checkoutService.placeOrder(cart(100.00));
@@ -183,7 +168,6 @@ void placingOrderIncrementsBusinessMetric() {
     DistributionSummary value = registry.find("checkout.order.value").summary();
     assertEquals(100.0, value.takeSnapshot().max(), 0.001);
 }
-```
 
 ## Summary
 
@@ -195,3 +179,4 @@ void placingOrderIncrementsBusinessMetric() {
 | Business | Orders, conversions, AOV, signups — the product's pulse |
 
 Custom metrics are how your operations team answers "is the new deploy actually better?" — instrument the business outcomes and the infrastructure, keep cardinality bounded, and your dashboards will tell the truth.
+

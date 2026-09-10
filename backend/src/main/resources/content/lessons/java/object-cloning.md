@@ -1,7 +1,7 @@
 ---
 title: Cloning & Copying — clone(), Copy Constructors and Defensive Copies
 summary: Why Object.clone is broken, copy constructors and factories, shallow vs deep copies, and the defensive-copy patterns that prevent mutation bugs.
-order: 35
+order: 59
 minutes: 18
 topics: [clone, copy-constructor, shallow-copy, deep-copy, defensive-copy, immutability, record-copy]
 docs:
@@ -13,11 +13,9 @@ docs:
 
 ## The concept: reference copies vs value copies
 
-```java
 Order a = new Order(1, "PAID");
 Order b = a;              // NOT a copy — a and b are the SAME object
 b.setStatus("REFUNDED");  // a.status is now REFUNDED too!
-```
 
 Copying an object has two depths:
 
@@ -37,26 +35,33 @@ Whether shallow is enough depends on whether the nested objects are immutable. F
 
 Effective Java's verdict: **prefer copy constructors and copy factories over `clone()`**. The modern idioms:
 
+
+**What this code does — step by step:**
+
+1. Copy constructor
+2. `this.items = new ArrayList<>(other.items);` — deep for mutable parts
+3. Copy factory
+4. Records give you a copy via with... (Java 21+):
+5. `Order updated = order.withStatus("REFUNDED");` — a NEW record — originals untouched
+
+The same code, clean:
+
 ```java
-// Copy constructor
 public Order(Order other) {
     this.id = other.id;
     this.status = other.status;
-    this.items = new ArrayList<>(other.items);   // deep for mutable parts
+    this.items = new ArrayList<>(other.items);
 }
 
-// Copy factory
 public static Order copyOf(Order other) { return new Order(other); }
 
-// Records give you a copy via with... (Java 21+):
-Order updated = order.withStatus("REFUNDED");    // a NEW record — originals untouched
+Order updated = order.withStatus("REFUNDED");
 ```
 
 ## How we use it in an organization: the scenarios
 
 **Scenario 1 — defensive copies at API boundaries.** The #1 org pattern: **never expose your internal mutable state**. If you return the internal list, callers can mutate your object; if you store the caller's list, callers can corrupt you:
 
-```java
 public final class Order {
     private final List<OrderItem> items;         // mutable internally
 
@@ -69,17 +74,14 @@ public final class Order {
         // or: return items.stream().toList(); — an immutable copy
     }
 }
-```
 
 `List.copyOf(...)` (Java 10+) returns an immutable copy in one call — the modern tool for this exact pattern. The rule: **immutable inside, immutable at the boundary** — the internal list is never handed out by reference.
 
 **Scenario 2 — versioned domain objects (the "edit draft" pattern).** A change request starts as a copy of the current state so the original stays intact until approval:
 
-```java
 Order working = Order.copyOf(original);     // independent working copy
 working.applyChanges(edit);                 // mutate the copy freely
 if (approver.ok(working)) orderRepo.save(working);
-```
 
 **Scenario 3 — deep copy for cache or messaging.** When an object crosses a trust boundary (put into a cache, sent to a queue, handed to a plugin), a deep copy prevents aliasing bugs — the receiver can't corrupt the sender's object.
 
@@ -105,3 +107,4 @@ if (approver.ok(working)) orderRepo.save(working);
 - Prefer copy constructors/factories and `List.copyOf` over `Object.clone()`.
 - Defensive-copy at boundaries: copy input and output so callers can't corrupt your state.
 - Immutable objects (records, strings, enums) can be shared safely — don't copy them needlessly.
+

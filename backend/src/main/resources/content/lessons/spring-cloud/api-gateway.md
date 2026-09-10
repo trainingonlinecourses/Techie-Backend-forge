@@ -1,7 +1,7 @@
 ---
 title: Spring Cloud Gateway — Routing & Edge Filters
 summary: Routes, predicates, filters, path rewriting, auth at the edge, circuit breaking on routes and CORS.
-order: 4
+order: 2
 minutes: 20
 topics: [gateway, routes, predicates, filters, edge]
 docs:
@@ -83,7 +83,6 @@ filters:
 
 ## 5. A custom global filter (auth at the edge)
 
-```java
 @Component
 public class AuthHeaderFilter implements GlobalFilter, Ordered {
 
@@ -106,7 +105,6 @@ public class AuthHeaderFilter implements GlobalFilter, Ordered {
         return -100;   // run early in the filter chain
     }
 }
-```
 
 Edge auth options: (a) validate JWTs in a GlobalFilter, (b) `spring-cloud-starter-oauth2-resource-server` on the gateway, (c) let an external gateway (Kong, Istio, cloud LB) do it. The org standard: **authenticate at the edge, propagate identity via headers, authorize per-service with method security**.
 
@@ -127,7 +125,6 @@ spring:
                 fallbackUri: forward:/fallback/orders
 ```
 
-```java
 @RestController
 public class FallbackController {
     @GetMapping("/fallback/orders")
@@ -136,7 +133,6 @@ public class FallbackController {
                       "message", "Orders service is busy right now — try again shortly.");
     }
 }
-```
 
 When the breaker opens, the gateway returns the fallback **without the client ever seeing a 500** — graceful degradation at the front door.
 
@@ -164,3 +160,4 @@ Every Eureka service becomes reachable at `/service-id/**`. Great for dev; expli
 - `CircuitBreaker` filter + fallback URI = graceful degradation at the door.
 
 **Official docs:** [Spring Cloud Gateway](https://docs.spring.io/spring-cloud-gateway/reference/) · [Gateway routing](https://docs.spring.io/spring-cloud-gateway/reference/spring-cloud-gateway.html)
+

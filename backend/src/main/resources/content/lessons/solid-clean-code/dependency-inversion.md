@@ -1,7 +1,7 @@
 ---
 title: DIP — Dependency Inversion Principle
 module: solid-clean-code
-order: 5
+order: 1
 minutes: 25
 topics: ["DIP", "dependency injection", "abstractions", "high-level vs low-level", "Spring IoC"]
 summary: The Dependency Inversion Principle (the D in SOLID) has two rules:
@@ -25,7 +25,6 @@ The payoff: swap the database, the email provider, or the payment gateway **with
 
 ## The Violation — Business Logic Glued to Infrastructure
 
-```java
 // HIGH-LEVEL business logic, tightly coupled to a LOW-LEVEL detail:
 class UserService {
     // Direct dependency on a concrete class — and its constructor!
@@ -36,7 +35,6 @@ class UserService {
         repository.save(new User(email));
     }
 }
-```
 
 Problems:
 
@@ -47,16 +45,29 @@ Problems:
 
 ## The Fix — Depend on an Abstraction the Business Defines
 
+
+**What this code does — step by step:**
+
+1. 1. The abstraction — defined by the HIGH-LEVEL module's need:
+2. 2. A low-level implementation — depends UP on the interface:
+3. `private final DataSource dataSource;` — injected, not constructed inside
+4. 3. Business logic — depends on the abstraction, receives it:
+5. `private final UserRepository repository;` — interface, injected
+6. 4. Wiring happens at ONE place (composition root) — not inside business code:
+7. `DataSource ds = createProdDataSource();` — infra setup
+8. `UserRepository repo = new PostgresUserRepository(ds);` — concrete choice
+9. `UserService service = new UserService(repo);` — business gets abstraction
+
+The same code, clean:
+
 ```java
-// 1. The abstraction — defined by the HIGH-LEVEL module's need:
 interface UserRepository {
     void save(User user);
     User findById(long id);
 }
 
-// 2. A low-level implementation — depends UP on the interface:
 class PostgresUserRepository implements UserRepository {
-    private final DataSource dataSource;      // injected, not constructed inside
+    private final DataSource dataSource;
 
     PostgresUserRepository(DataSource ds) { this.dataSource = ds; }
 
@@ -64,9 +75,8 @@ class PostgresUserRepository implements UserRepository {
     public User findById(long id) { /* ... */ }
 }
 
-// 3. Business logic — depends on the abstraction, receives it:
 class UserService {
-    private final UserRepository repository;    // interface, injected
+    private final UserRepository repository;
 
     UserService(UserRepository repository) { this.repository = repository; }
 
@@ -75,12 +85,11 @@ class UserService {
     }
 }
 
-// 4. Wiring happens at ONE place (composition root) — not inside business code:
 public class App {
     public static void main(String[] args) {
-        DataSource ds = createProdDataSource();                  // infra setup
-        UserRepository repo = new PostgresUserRepository(ds);    // concrete choice
-        UserService service = new UserService(repo);             // business gets abstraction
+        DataSource ds = createProdDataSource();
+        UserRepository repo = new PostgresUserRepository(ds);
+        UserService service = new UserService(repo);
         service.register("student@example.com");
     }
 }
@@ -92,13 +101,11 @@ public class App {
 - **The concrete choice lives in the composition root** — the one place that knows "we use Postgres" is `App.main` (in Spring: the container/`@Configuration`). Business logic is database-agnostic.
 - **Testing is trivial** — supply an in-memory fake:
 
-```java
 UserRepository fake = new UserRepository() {
     public void save(User u) { saved.add(u); }
     public User findById(long id) { return null; }
 };
 UserService service = new UserService(fake);   // test the rules, no DB
-```
 
 - **Swapping infrastructure** (Postgres → MongoDB, SMTP → SendGrid, file storage → S3) = new implementation class + new wiring line. `UserService` never changes.
 
@@ -111,20 +118,27 @@ You can do DI without DIP (injecting a concrete class still couples you) and DIP
 
 ## DIP in Spring — The Whole Point of the Container
 
+
+**What this code does — step by step:**
+
+1. Business logic depends on the interface:
+2. `UserService(UserRepository repository) { this.repository = repository; }` — constructor injection
+3. Implementation is a bean — Spring wires it in:
+4. `interface UserRepository extends JpaRepository<User, Long> { }` — or a class implementing the interface
+5. In tests, swap the implementation with @MockBean/@TestConfiguration — business code untouched.
+
+The same code, clean:
+
 ```java
-// Business logic depends on the interface:
 @Service
 class UserService {
     private final UserRepository repository;
 
-    UserService(UserRepository repository) { this.repository = repository; }   // constructor injection
+    UserService(UserRepository repository) { this.repository = repository; }
 }
 
-// Implementation is a bean — Spring wires it in:
 @Repository
-interface UserRepository extends JpaRepository<User, Long> { }   // or a class implementing the interface
-
-// In tests, swap the implementation with @MockBean/@TestConfiguration — business code untouched.
+interface UserRepository extends JpaRepository<User, Long> { }
 ```
 
 Spring *is* the composition root: `@Configuration`/component scanning decides which concrete bean fills which interface, and constructor injection hands it to the business code. Changing the implementation = changing a bean definition (or a profile), never editing services. This is DIP made operational, at scale.
@@ -155,3 +169,4 @@ The pragmatic signal: **would you ever have a second implementation (or a test f
 - Testing becomes trivial with fakes; swapping infrastructure never touches business logic.
 - Spring is DIP made operational — beans implement interfaces, the container wires them.
 - Don't abstract everything — only what varies or needs faking.
+

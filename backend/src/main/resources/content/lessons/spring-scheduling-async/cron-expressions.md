@@ -1,7 +1,7 @@
 ---
 title: Cron Expressions Deep Dive
 module: spring-scheduling-async
-order: 4
+order: 2
 minutes: 20
 topics: ["cron fields", "special characters", "timezones", "cron testing", "common patterns"]
 summary: Cron is the de facto language for calendarbased scheduling. Spring's variant has six fields — seconds first — which differs from the fivefield Unix...
@@ -39,98 +39,95 @@ Cron is the de facto language for calendar-based scheduling. Spring's variant ha
 ## Special Characters
 
 ### Asterisk — every value
-```java
 "* * * * * *"   // every second (be careful!)
-```
 
 ### Comma — list
-```java
 "0 0 6,18 * * *"   // 6 AM and 6 PM daily
-```
 
 ### Hyphen — range
-```java
 "0 30 9-17 * * MON-FRI"   // 9:30 through 17:30, weekdays
-```
 
 ### Slash — step
-```java
 "0 */10 * * * *"     // every 10 minutes
 "0 0/15 * * * *"     // every 15 minutes starting at minute 0
 "0 30/45 * * * *"    // minute 30, then minute 75→15 of next hour
-```
 
 ### Question mark — no specific value
 Only legal in day-of-month or day-of-week. Use `?` when you want the *other* field to do the work:
 
-```java
 "0 0 9 ? * MON"      // 9 AM on Mondays (day-of-week drives it)
 "0 0 9 1 * ?"        // 9 AM on the 1st of every month
-```
 
 Using `*` in both day fields is ambiguous — Spring treats `* *` as "every day of month AND every day of week," which effectively means every day, but `?` is the explicit, intent-revealing choice.
 
 ### L — last
-```java
 "0 0 9 L * ?"        // 9 AM on the last day of the month
 "0 0 9 ? * L"        // 9 AM on the last day of the week (Saturday)
-```
 
 ### W — nearest weekday (day-of-month only)
-```java
 "0 0 9 15W * ?"      // 9 AM on the weekday nearest the 15th
-```
 If the 15th is a Saturday, this fires Friday the 14th; if Sunday, Monday the 16th.
 
 ### # — nth weekday (day-of-week only)
-```java
 "0 0 9 ? * 2#1"      // 9 AM on the first Monday of the month
 "0 0 9 ? * 5#3"      // 9 AM on the third Friday
-```
 
 ## Common Production Patterns
 
+
+**What this code does — step by step:**
+
+1. `"0 0 3 * * *"` — daily 3 AM (batch, report generation)
+2. `"0 */5 * * * *"` — every 5 minutes (heartbeat, health)
+3. `"0 0 8-18 * * MON-FRI"` — hourly 8 AM–6 PM weekdays
+4. `"0 0 12 * * MON"` — Monday noon
+5. `"0 0 0 1 * ?"` — midnight on the 1st of each month
+6. `"0 0 2 ? * 6#1"` — 2 AM first Saturday
+7. `"0 15 10 ? * 6L"` — 10:15 AM last Friday of month
+8. `"0 0 9 * * MON-FRI"` — 9 AM weekdays
+9. `"0 0 0/2 * * *"` — every 2 hours
+
+The same code, clean:
+
 ```java
-"0 0 3 * * *"            // daily 3 AM (batch, report generation)
-"0 */5 * * * *"          // every 5 minutes (heartbeat, health)
-"0 0 8-18 * * MON-FRI"   // hourly 8 AM–6 PM weekdays
-"0 0 12 * * MON"         // Monday noon
-"0 0 0 1 * ?"            // midnight on the 1st of each month
-"0 0 2 ? * 6#1"          // 2 AM first Saturday
-"0 15 10 ? * 6L"         // 10:15 AM last Friday of month
-"0 0 9 * * MON-FRI"      // 9 AM weekdays
-"0 0 0/2 * * *"          // every 2 hours
+"0 0 3 * * *"
+"0 */5 * * * *"
+"0 0 8-18 * * MON-FRI"
+"0 0 12 * * MON"
+"0 0 0 1 * ?"
+"0 0 2 ? * 6#1"
+"0 15 10 ? * 6L"
+"0 0 9 * * MON-FRI"
+"0 0 0/2 * * *"
 ```
 
 ## Timezone Awareness
 
 By default, cron expressions evaluate in the JVM's default timezone — which is the **server's** timezone. A 3 AM job on a server in UTC runs at 3 AM UTC, not 3 AM your time. Fix it explicitly:
 
-```java
 @Scheduled(cron = "0 0 3 * * *", zone = "Asia/Kolkata")
 public void nightlyReport() { ... }
-```
 
 The `zone` attribute accepts any `java.time.ZoneId` string. For schedules from configuration:
 
-```java
 @Scheduled(cron = "${app.jobs.cron}", zone = "${app.jobs.zone}")
 public void job() { ... }
-```
 
 ## Testing Cron Expressions
 
 Never trust a cron string by eye. Options:
 
 1. **Spring's `CronExpression`** (available since Spring 5.3):
-```java
-CronExpression expression = CronExpression.parse("0 0 3 * * *");
-Instant next = expression.next(Instant.now());
-System.out.println("Next run: " + next);
-```
+public class Main {
+
+    public static void main(String[] args) {
+        CronExpression expression = CronExpression.parse("0 0 3 * * *");
+        Instant next = expression.next(Instant.now());
+        System.out.println("Next run: " + next);
+    }
+}
 
 2. **Unit test the next-fire times**:
-```java
 @Test
 void cronFiresAtThreeAm() {
     CronExpression cron = CronExpression.parse("0 0 3 * * *");
@@ -138,7 +135,6 @@ void cronFiresAtThreeAm() {
     Instant next = cron.next(base);
     assertEquals(Instant.parse("2026-08-19T03:00:00Z"), next);
 }
-```
 
 3. **Online validators** (crontab.guru etc.) for quick sanity — but remember they assume 5-field Unix cron; mentally add the seconds field.
 
@@ -156,3 +152,4 @@ void cronFiresAtThreeAm() {
 ## Summary
 
 Master the six fields, the three "which day" characters (`?`, `L`, `W`, `#`), and timezone control, and cron becomes precise rather than guesswork. The highest-value habits: always include seconds, always set `zone` explicitly for business-time jobs, and verify every expression with `CronExpression.parse(...)` in a unit test before it ships.
+

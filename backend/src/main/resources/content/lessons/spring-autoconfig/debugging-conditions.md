@@ -90,6 +90,17 @@ curl http://localhost:8080/actuator/beans
 
 ## Line-by-Line Walkthrough
 
+
+**What this code does — step by step:**
+
+1. Line 1: Enable debug mode via command line. Java -jar app.jar --debug
+2. Line 2: Or via application.yml. Debug: true
+3. Line 3: Or programmatically
+4. Line 4: Check conditions in logs. 2024-01-15 10:30:15 DEBUG - DataSourceAutoConfiguration: Did not match: - @ConditionalOnClass did not find required class 'javax.sql.DataSource'. Matched: - @ConditionalOnProperty (spring.datasource.url having value jdbc:...)
+5. Line 5: Use Actuator to inspect beans. Curl http://localhost:8080/actuator/beans | jq '.contexts.application.beans'
+
+The same code, clean:
+
 ```java
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -98,30 +109,15 @@ import org.springframework.boot.actuate.autoconfigure.endpoint.EndpointPropertie
 
 @SpringBootApplication
 public class DebuggingDemo {
-    
+
     public static void main(String[] args) {
-        // Line 1: Enable debug mode via command line
-        // java -jar app.jar --debug
-        
-        // Line 2: Or via application.yml
-        // debug: true
-        
-        // Line 3: Or programmatically
+
+
         System.setProperty("debug", "true");
-        
+
         SpringApplication.run(DebuggingDemo.class, args);
     }
 }
-
-// Line 4: Check conditions in logs
-// 2024-01-15 10:30:15 DEBUG - DataSourceAutoConfiguration:
-//   Did not match:
-//     - @ConditionalOnClass did not find required class 'javax.sql.DataSource'
-//   Matched:
-//     - @ConditionalOnProperty (spring.datasource.url having value jdbc:...)
-
-// Line 5: Use Actuator to inspect beans
-// curl http://localhost:8080/actuator/beans | jq '.contexts.application.beans'
 ```
 
 ---
@@ -152,7 +148,6 @@ spring:
 
 ### Scenario 2: Override auto-configuration
 
-```java
 // If auto-configuration creates a bean you don't want:
 @SpringBootApplication(exclude = {
     DataSourceAutoConfiguration.class,
@@ -168,7 +163,6 @@ public class MyApp {
 public CacheManager customCacheManager() {
     return new MyCustomCacheManager();  // Overrides default
 }
-```
 
 ### Scenario 3: Log auto-configuration details
 
@@ -180,7 +174,6 @@ logging:
     org.springframework.context.annotation: DEBUG
 ```
 
-```java
 // Custom logger for specific auto-configuration
 @Configuration
 @ConditionalOnClass(CustomService.class)
@@ -195,7 +188,6 @@ public class CustomAutoConfiguration {
         return new CustomService();
     }
 }
-```
 
 ---
 
@@ -228,3 +220,4 @@ logging.level.org.springframework.boot.autoconfigure=DEBUG
 # Exclude auto-configuration
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
 ```
+

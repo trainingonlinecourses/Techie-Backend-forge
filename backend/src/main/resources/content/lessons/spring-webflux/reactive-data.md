@@ -28,15 +28,12 @@ Key mental shift: **R2DBC is a driver, not an ORM**. No lazy loading, no first-l
 
 ## Reactive repository
 
-```java
 public interface CustomerRepository extends ReactiveCrudRepository<Customer, Long> {
 
     Flux<Customer> findByLastName(String lastName);          // derived query → Flux
     Mono<Customer> findByEmail(String email);                // single → Mono
 }
-```
 
-```java
 @Service
 public class CustomerService {
 
@@ -51,7 +48,6 @@ public class CustomerService {
 
     public Mono<Customer> create(Customer c) { return repo.save(c); }
 }
-```
 
 Each repository method returns `Mono`/`Flux` and never blocks: the connection is released back to the pool while the DB works.
 
@@ -59,11 +55,9 @@ Each repository method returns `Mono`/`Flux` and never blocks: the connection is
 
 Mongo's document model maps perfectly onto reactive streams, and `spring-boot-starter-data-mongodb-reactive` is one of the most-used reactive stacks:
 
-```java
 public interface OrderRepository extends ReactiveMongoRepository<Order, String> {
     Flux<Order> findByCustomerId(String customerId);
 }
-```
 
 Same repository style, zero SQL. Reactive Mongo is often the pragmatic first reactive database for teams migrating servlet→WebFlux.
 
@@ -71,7 +65,6 @@ Same repository style, zero SQL. Reactive Mongo is often the pragmatic first rea
 
 `@Transactional` binds a connection to the *calling thread* — that doesn't exist in reactive. Use **`TransactionalOperator`**:
 
-```java
 @Service
 public class AccountService {
 
@@ -86,7 +79,6 @@ public class AccountService {
         return tx.transactional(work);   // commit/rollback around the whole reactive chain
     }
 }
-```
 
 `TransactionalOperator.transactional(publisher)` wraps the stream: commit on complete, rollback on error. You lose the magic of `@Transactional` — explicit is the price of non-blocking.
 
@@ -126,3 +118,4 @@ CREATE TABLE IF NOT EXISTS customers (
 - [Spring Data R2DBC Reference](https://docs.spring.io/spring-data/r2dbc/reference/)
 - [R2DBC](https://r2dbc.io)
 - [Spring Data MongoDB — Reactive](https://docs.spring.io/spring-data/mongodb/reference/)
+

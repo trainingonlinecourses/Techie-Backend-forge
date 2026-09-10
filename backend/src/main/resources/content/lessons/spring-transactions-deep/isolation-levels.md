@@ -31,38 +31,31 @@ Isolation controls **what a transaction sees of other transactions' uncommitted 
 | REPEATABLE_READ | Prevented | Prevented | Possible | Snapshot per transaction |
 | SERIALIZABLE | Prevented | Prevented | Prevented | Serializes conflicting tx |
 
-```java
 @Transactional(isolation = Isolation.REPEATABLE_READ)
 public Balance getBalance(Long accountId) {
     // two reads of the same row return the same value — guaranteed
     ...
 }
-```
 
 **Key Postgres fact**: READ_COMMITTED gives a *per-statement* snapshot, REPEATABLE_READ a *per-transaction* snapshot. The choice is about how long your view of the DB stays fixed — not about locks (PG uses MVCC, not read locks).
 
 ## The Default Is Almost Always Right
 
-```java
 // Spring default: the DB's default (READ_COMMITTED on Postgres)
 @Transactional
 public void updateOrder(Long id, OrderDto dto) { ... }
-```
 
 READ_COMMITTED is correct for ~95% of workloads: each statement sees a consistent snapshot, writes are protected by row locks, and concurrency stays high. **Raise isolation only when you have a demonstrated anomaly**, never preemptively.
 
 ## The SERIALIZABLE Trade
 
-```java
 @Transactional(isolation = Isolation.SERIALIZABLE)
 public void reconcileBalances() { ... }
-```
 
 - Guarantees the strongest consistency (the result equals some serial order of the transactions)
 - **Cost**: Postgres aborts conflicting transactions with `40001 serialization_failure` — your code must **retry**
 - Use for financial reconciliation, unique-constraint races, complex invariants
 
-```java
 // SERIALIZABLE requires retry handling
 public void reconcileWithRetry() {
     for (int attempt = 0; attempt < 3; attempt++) {
@@ -75,13 +68,11 @@ public void reconcileWithRetry() {
     }
     throw new ReconcileFailedException();
 }
-```
 
 ## Pessimistic Locking: Lock Now, Read Later
 
 Locks the row(s) at read time — no one else can modify them until commit:
 
-```java
 @Repository
 public interface AccountRepository extends JpaRepository<Account, Long> {
 
@@ -89,9 +80,7 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
     @Query("select a from Account a where a.id = :id")
     Optional<Account> findByIdForUpdate(@Param("id") Long id);
 }
-```
 
-```java
 @Transactional
 public void transfer(Long fromId, Long toId, BigDecimal amount) {
     Account from = accountRepository.findByIdForUpdate(fromId);   // LOCKED
@@ -100,7 +89,6 @@ public void transfer(Long fromId, Long toId, BigDecimal amount) {
     from.debit(amount);     // safe: no concurrent modification possible
     to.credit(amount);
 }
-```
 
 - `PESSIMISTIC_WRITE` → `SELECT ... FOR UPDATE`
 - `PESSIMISTIC_READ` → `SELECT ... FOR SHARE`
@@ -112,7 +100,6 @@ public void transfer(Long fromId, Long toId, BigDecimal amount) {
 
 No locks — just a version check at write time:
 
-```java
 @Entity
 public class Course {
 
@@ -121,28 +108,26 @@ public class Course {
     @Version
     private long version;     // incremented on every update
 }
-```
+
+
+**What this code does — step by step:**
+
+1. Two concurrent updates: Tx A reads version=1. Tx B reads version=1. Tx A updates → version=2, commits. Tx B updates WHERE version=1 → 0 rows → OptimisticLockException
+
+The same code, clean:
 
 ```java
-// Two concurrent updates:
-//   Tx A reads version=1
-//   Tx B reads version=1
-//   Tx A updates → version=2, commits
-//   Tx B updates WHERE version=1 → 0 rows → OptimisticLockException
 ```
 
-```java
 @Transactional
 public void updateTitle(Long id, String title) {
     Course course = courseRepository.findById(id).orElseThrow();
     course.setTitle(title);                    // version bumps on flush
     // if another tx committed first → OptimisticLockException here
 }
-```
 
 Handle the conflict at the boundary:
 
-```java
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -153,7 +138,6 @@ public class GlobalExceptionHandler {
             "Resource was modified by another user — refresh and retry");
     }
 }
-```
 
 ## Pessimistic vs. Optimistic
 
@@ -191,3 +175,4 @@ public class GlobalExceptionHandler {
 | Deadlock risk | Lock ordering, short transactions |
 
 Isolation is a consistency/concurrency trade with a correct default: READ_COMMITTED plus `@Version` covers almost everything. Reach for FOR UPDATE and SERIALIZABLE only when the anomalies actually bite — and when you do, remember Postgres punishes conflicts with aborts, so retry handling is part of the design.
+

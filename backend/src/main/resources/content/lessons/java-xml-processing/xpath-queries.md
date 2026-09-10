@@ -1,7 +1,7 @@
 ---
 title: XPath Queries — Finding Needles in XML Haystacks
 summary: The XPath language for navigating XML documents with precision — from simple paths to complex predicates, functions, and namespaces.
-order: 3
+order: 4
 minutes: 20
 topics: [xpath, xml-query, predicates, xpath-functions, namespaces]
 docs:
@@ -66,67 +66,80 @@ self::employee               → The current node itself
 
 ### Step 1: Compile and Evaluate XPath
 
-```java
-// Create an XPath instance — this is the query engine
-XPathFactory xpathFactory = XPathFactory.newInstance();
-XPath xpath = xpathFactory.newXPath();
+public class Main {
 
-// Compile an XPath expression into a reusable, thread-safe object
-XPathExpression expr = xpath.compile("//employee[@department='Engineering']");
+    public static void main(String[] args) {
+        // Create an XPath instance — this is the query engine
+        XPathFactory xpathFactory = XPathFactory.newInstance();
+        XPath xpath = xpathFactory.newXPath();
 
-// Evaluate against a DOM Document
-NodeList results = (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
+        // Compile an XPath expression into a reusable, thread-safe object
+        XPathExpression expr = xpath.compile("//employee[@department='Engineering']");
 
-// Iterate over results
-for (int i = 0; i < results.getLength(); i++) {
-    Element emp = (Element) results.item(i);
-    System.out.println(emp.getElementsByTagName("name").item(0).getTextContent());
+        // Evaluate against a DOM Document
+        NodeList results = (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
+
+        // Iterate over results
+        for (int i = 0; i < results.getLength(); i++) {
+            Element emp = (Element) results.item(i);
+            System.out.println(emp.getElementsByTagName("name").item(0).getTextContent());
+        }
+    }
 }
-```
 
 ### Step 2: Different Return Types
 
+
+**What this code does — step by step:**
+
+1. NODESET — returns multiple nodes (most common)
+2. NODE — returns a single node (or null)
+3. STRING — returns the text content of the first matching node
+4. NUMBER — returns a numeric value
+5. BOOLEAN — returns true/false
+
+The same code, clean:
+
 ```java
-// NODESET — returns multiple nodes (most common)
 NodeList nodes = (NodeList) xpath.compile("//employee").evaluate(doc, XPathConstants.NODESET);
 
-// NODE — returns a single node (or null)
 Node node = (Node) xpath.compile("//employee[1]").evaluate(doc, XPathConstants.NODE);
 
-// STRING — returns the text content of the first matching node
 String name = (String) xpath.compile("//employee[1]/name").evaluate(doc, XPathConstants.STRING);
 
-// NUMBER — returns a numeric value
 Double count = (Double) xpath.compile("count(//employee)").evaluate(doc, XPathConstants.NUMBER);
 
-// BOOLEAN — returns true/false
 Boolean exists = (Boolean) xpath.compile("//employee[@id='1']").evaluate(doc, XPathConstants.BOOLEAN);
 ```
 
 ### Step 3: Complex Queries
 
+
+**What this code does — step by step:**
+
+1. Find employees with salary above average. This uses XPath's built-in aggregate functions
+2. Find departments with more than 5 employees
+3. String operations
+4. Date-like filtering (lexicographic comparison works for ISO dates)
+
+The same code, clean:
+
 ```java
-// Find employees with salary above average
-// This uses XPath's built-in aggregate functions
 String avgSalary = "number(//employee/salary) div count(//employee)";
 String aboveAvg = "//employee[number(salary) > " + avgSalary + "]";
 NodeList highEarners = (NodeList) xpath.compile(aboveAvg).evaluate(doc, XPathConstants.NODESET);
 
-// Find departments with more than 5 employees
 String bigDepts = "//department[count(employee) > 5]";
 NodeList depts = (NodeList) xpath.compile(bigDepts).evaluate(doc, XPathConstants.NODESET);
 
-// String operations
 String startsWithA = "//employee[name[starts-with(.,'A')]]";
 String containsDev = "//employee[role[contains(.,'Developer')]]";
 
-// Date-like filtering (lexicographic comparison works for ISO dates)
 String recentHires = "//employee[hireDate > '2024-01-01']";
 ```
 
 ### Step 4: Namespace Handling
 
-```java
 // XML with namespaces: <emp:employee xmlns:emp="http://example.com/hr">
 // You need to register a namespace context
 
@@ -150,7 +163,6 @@ xpath.setNamespaceContext(new NamespaceContext() {
 // Now use the prefix in queries
 NodeList results = (NodeList) xpath.compile("//emp:employee[emp:department='HR']")
     .evaluate(doc, XPathConstants.NODESET);
-```
 
 ---
 
@@ -159,7 +171,6 @@ NodeList results = (NodeList) xpath.compile("//emp:employee[emp:department='HR']
 ### Scenario 1: Log File Analysis
 XML-formatted logs from enterprise systems:
 
-```java
 public List<String> findErrorMessages(String logXml) throws Exception {
     Document doc = parseXml(logXml);
     XPath xpath = XPathFactory.newInstance().newXPath();
@@ -175,12 +186,10 @@ public List<String> findErrorMessages(String logXml) throws Exception {
     }
     return messages;
 }
-```
 
 ### Scenario 2: CI/CD Pipeline Configuration
 Extracting build stages from a Jenkins/Maven XML config:
 
-```java
 public Map<String, String> extractBuildConfig(String pomXml) throws Exception {
     Document doc = parseXml(pomXml);
     XPath xpath = XPathFactory.newInstance().newXPath();
@@ -198,12 +207,10 @@ public Map<String, String> extractBuildConfig(String pomXml) throws Exception {
     
     return config;
 }
-```
 
 ### Scenario 3: Compliance Validation
 Checking XML documents against business rules:
 
-```java
 public List<String> validateCompliance(String invoiceXml) throws Exception {
     Document doc = parseXml(invoiceXml);
     XPath xpath = XPathFactory.newInstance().newXPath();
@@ -228,7 +235,6 @@ public List<String> validateCompliance(String invoiceXml) throws Exception {
     
     return violations;
 }
-```
 
 ---
 
@@ -258,3 +264,4 @@ public List<String> validateCompliance(String invoiceXml) throws Exception {
 | `count(//element)` | Count matching elements |
 | `string(//element)` | Text content as string |
 | `sum(//element)` | Sum of numeric text values |
+

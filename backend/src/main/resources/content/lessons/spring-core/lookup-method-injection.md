@@ -1,7 +1,7 @@
 ---
 title: Method Injection & ObjectProvider — Prototype Beans Inside Singletons
 summary: The prototype-in-singleton trap, @Lookup, ObjectProvider and Supplier injection, and the scenarios that genuinely need per-call beans.
-order: 16
+order: 15
 minutes: 20
 topics: [lookup, objectprovider, prototype-scope, method-injection, provider, scoped-proxy]
 docs:
@@ -15,7 +15,6 @@ docs:
 
 A singleton bean is created **once**; its dependencies are injected **once** at startup. If you inject a **prototype**-scoped bean into a singleton, you get *one* instance, captured at startup — every call after that reuses the same object, which defeats the whole point of prototype scope:
 
-```java
 @Component
 @Scope("prototype")
 public class AuditEvent { private final String id = UUID.randomUUID().toString(); }
@@ -25,13 +24,11 @@ public class AuditService {
     @Autowired private AuditEvent event;   // WRONG — captured ONCE, same id forever
     public void record(String action) { log.info("{} {}", action, event.id()); }
 }
-```
 
 Every `record()` call logs the *same* event id. The fix isn't a new annotation — it's **deferring the lookup to call time**. Spring gives you three mechanisms, from simplest to most powerful.
 
 ## ObjectProvider — the cleanest modern answer
 
-```java
 @Service
 public class AuditService {
     private final ObjectProvider<AuditEvent> eventProvider;
@@ -45,7 +42,6 @@ public class AuditService {
         log.info("{} {}", action, event.id());
     }
 }
-```
 
 `ObjectProvider` is a lazy, injectable **lookup handle**: `getObject()` performs the bean lookup at call time, honoring scope. It also adds useful APIs:
 
@@ -58,7 +54,6 @@ This is also how **optional** or **multiple** dependencies are expressed idiomat
 
 ## @Lookup — abstract method injection
 
-```java
 @Service
 public abstract class AuditService {
     public void record(String action) {
@@ -69,20 +64,17 @@ public abstract class AuditService {
     @Lookup
     protected abstract AuditEvent createEvent();   // Spring implements this method
 }
-```
 
 Spring generates a subclass that overrides `createEvent()` to perform a prototype lookup. It's the classic approach (works back to Spring 2.x), but modern code prefers `ObjectProvider` or `Supplier` — the abstract-class requirement is awkward with constructor injection, and `ObjectProvider` is more explicit.
 
 ## Supplier injection — the terse variant
 
-```java
 @Service
 public class AuditService {
     private final Supplier<AuditEvent> eventFactory;
     public AuditService(Supplier<AuditEvent> eventFactory) { this.eventFactory = eventFactory; }
     // Spring injects a Supplier that resolves the bean per call — same effect as ObjectProvider
 }
-```
 
 `Supplier<T>` injection is concise but loses the `getIfAvailable`/`stream` helpers. Use it when you only need "a fresh bean per call" and nothing else.
 
@@ -90,7 +82,6 @@ public class AuditService {
 
 For web-scoped beans (`request`, `session`) inside singletons, the idiomatic fix is a **scoped proxy**:
 
-```java
 @Component
 @Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class RequestContext { private String tenantId; /* getters/setters */ }
@@ -100,7 +91,6 @@ public class TenantService {
     private final RequestContext ctx;   // injected PROXY — resolves the real request bean per call
     ...
 }
-```
 
 The proxy stands in at injection time and resolves the actual request-scoped bean on each method call. For prototypes specifically, `ObjectProvider`/`@Lookup` are preferred over proxies (a proxy for a prototype is a foot-gun — every injected copy is a different instance anyway).
 
@@ -124,3 +114,4 @@ The proxy stands in at injection time and resolves the actual request-scoped bea
 - `ObjectProvider` is the modern default: per-call resolution plus `getIfAvailable`/`stream`.
 - `@Lookup` and `Supplier<T>` are lighter alternatives; request/session scope uses scoped proxies.
 - Use prototypes for genuinely short-lived, injectable workers — not as a general "new object" habit.
+

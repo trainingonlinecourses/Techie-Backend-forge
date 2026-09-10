@@ -1,7 +1,7 @@
 ---
 title: Spring HATEOAS — Hypermedia APIs
 summary: Linking resources so clients navigate the API — EntityModel/CollectionModel, link builders, and the affordances that make an API self-describing.
-order: 8
+order: 4
 minutes: 13
 topics: [hateoas, hypermedia, entitymodel, link builder, rest api design]
 docs:
@@ -31,7 +31,6 @@ The links are **affordances**: what the caller may do *now* (a PENDING order has
 
 ## Building links with Spring HATEOAS
 
-```java
 @RestController
 @RequestMapping("/orders")
 public class OrderController {
@@ -48,7 +47,6 @@ public class OrderController {
                 : null);
     }
 }
-```
 
 - **`EntityModel<T>`** — one resource + its links; **`CollectionModel<T>`** — a collection + pagination links.
 - **`linkTo(methodOn(...))`** is the safety net: links are built from the controller's mappings, so renaming a path or a method updates every link automatically — no string URLs to rot.
@@ -56,21 +54,21 @@ public class OrderController {
 
 ## Affordances vs. hard-coded clients
 
-```java
-// "Hypermedia as the engine of application state" (HATEOAS, Fielding):
-// the client asks "what may I do?" and the server answers with links.
 
-// The honest middle ground — most teams:
-// 1. Links for navigation (self, related aggregates) — followed by the client.
-// 2. Links for *actions* as a contract signal — the client still knows the workflow,
-//    but the server controls when it's available (conditional affordances).
+**What this code does — step by step:**
+
+1. "Hypermedia as the engine of application state" (HATEOAS, Fielding): the client asks "what may I do?" and the server answers with links.
+2. The honest middle ground — most teams: 1. Links for navigation (self, related aggregates) — followed by the client. 2. Links for *actions* as a contract signal — the client still knows the workflow,. But the server controls when it's available (conditional affordances).
+
+The same code, clean:
+
+```java
 ```
 
 Pure HATEOAS (clients that know *nothing* about the API shape) is elegant and rarely achieved in practice; the pragmatic value is **navigation links that can't rot** + **state-conditional actions**.
 
 ## Pagination with CollectionModel
 
-```java
 @GetMapping
 public CollectionModel<OrderDto> list(Pageable pageable) {
     Page<OrderDto> page = orderService.page(pageable);
@@ -82,7 +80,6 @@ public CollectionModel<OrderDto> list(Pageable pageable) {
         page.hasNext() ? linkTo(methodOn(OrderController.class)
             .list(pageable.next())).withRel("next") : null);
 }
-```
 
 The paging links (`prev`/`next`) are the same idea as the OpenAPI pagination conventions — expressed as navigable links the client just follows.
 
@@ -111,3 +108,4 @@ The test of good HATEOAS: **every link a client actually uses, and every action 
 - Keep links in the web layer, give them stable names, document with OpenAPI — and only add links clients use.
 
 Official docs: [Spring HATEOAS](https://docs.spring.io/spring-hateoas/reference/)
+

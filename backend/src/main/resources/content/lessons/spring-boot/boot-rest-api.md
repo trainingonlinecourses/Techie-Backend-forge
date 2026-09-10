@@ -1,7 +1,7 @@
 ---
 title: Building REST APIs with Spring Boot — Controllers, DTOs, and Error Handling
 summary: @RestController explained line by line, @GetMapping/@PostMapping/@PutMapping/@DeleteMapping, @PathVariable vs @RequestBody vs @RequestParam, ResponseEntity for status codes, DTO pattern for API responses, global exception handling with @ControllerAdvice, and CORS configuration with line-by-line walkthroughs.
-order: 3
+order: 11
 minutes: 35
 topics: [rest-controller, get-mapping, post-mapping, path-variable, request-body, response-entity, dto, exception-handling, cors]
 docs:
@@ -25,129 +25,181 @@ docs:
 
 ## @RestController — the entry point
 
+
+**What this code does — step by step:**
+
+1. `@RestController` — marks this class as a REST API controller
+2. `@RequestMapping("/api/users")` — base path for ALL endpoints in this class
+3. Constructor injection — Spring creates the controller and injects UserService
+4. `this.userService = userService;` — stored for use in handler methods
+5. `@GetMapping` — GET /api/users
+6. `return userService.findAll();` — returns JSON automatically (Jackson). Spring serializes the List<UserResponse> to JSON: [{"name":"Alice","email":"alice@example.com"}, ...]
+7. `@GetMapping("/{id}")` — GET /api/users/42
+8. @PathVariable extracts 42 from the URL path
+9. `@PostMapping` — POST /api/users
+10. @RequestBody reads the JSON from the request body and converts to CreateUserRequest. @Valid triggers Bean Validation (checks @NotBlank, @Email, etc.)
+11. `.status(HttpStatus.CREATED)` — HTTP 201 Created
+12. `.body(created);` — the response body
+13. `@PutMapping("/{id}")` — PUT /api/users/42
+14. `@DeleteMapping("/{id}")` — DELETE /api/users/42
+15. `return ResponseEntity.noContent().build();` — HTTP 204 No Content
+
+The same code, clean:
+
 ```java
-@RestController                        // marks this class as a REST API controller
-@RequestMapping("/api/users")          // base path for ALL endpoints in this class
+@RestController
+@RequestMapping("/api/users")
 public class UserController {
 
     private final UserService userService;
 
-    // Constructor injection — Spring creates the controller and injects UserService
     public UserController(UserService userService) {
-        this.userService = userService;    // stored for use in handler methods
+        this.userService = userService;
     }
 
-    @GetMapping                          // GET /api/users
+    @GetMapping
     public List<UserResponse> getAllUsers() {
-        return userService.findAll();     // returns JSON automatically (Jackson)
-        // Spring serializes the List<UserResponse> to JSON:
-        // [{"name":"Alice","email":"alice@example.com"}, ...]
+        return userService.findAll();
     }
 
-    @GetMapping("/{id}")                 // GET /api/users/42
+    @GetMapping("/{id}")
     public UserResponse getUser(@PathVariable Long id) {
-        // @PathVariable extracts 42 from the URL path
         return userService.findById(id);
     }
 
-    @PostMapping                         // POST /api/users
+    @PostMapping
     public ResponseEntity<UserResponse> createUser(@RequestBody @Valid CreateUserRequest req) {
-        // @RequestBody reads the JSON from the request body and converts to CreateUserRequest
-        // @Valid triggers Bean Validation (checks @NotBlank, @Email, etc.)
         UserResponse created = userService.create(req);
         return ResponseEntity
-            .status(HttpStatus.CREATED)   // HTTP 201 Created
-            .body(created);               // the response body
+            .status(HttpStatus.CREATED)
+            .body(created);
     }
 
-    @PutMapping("/{id}")                 // PUT /api/users/42
+    @PutMapping("/{id}")
     public UserResponse updateUser(@PathVariable Long id,
                                     @RequestBody @Valid UpdateUserRequest req) {
         return userService.update(id, req);
     }
 
-    @DeleteMapping("/{id}")              // DELETE /api/users/42
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         userService.delete(id);
-        return ResponseEntity.noContent().build();  // HTTP 204 No Content
+        return ResponseEntity.noContent().build();
     }
 }
 ```
 
 ## @PathVariable vs @RequestParam vs @RequestBody
 
+
+**What this code does — step by step:**
+
+1. @PathVariable — extract from URL path
+2. GET /api/users/42 → id = 42
+3. @RequestParam — extract from query string
+4. `@RequestParam String name,` — GET /api/users?name=Alice → name = "Alice"
+5. `@RequestParam(defaultValue = "0") int page,` — optional, defaults to 0
+6. `@RequestParam(defaultValue = "20") int size` — optional, defaults to 20
+7. GET /api/users?name=Alice&page=0&size=10
+8. @RequestBody — extract from request body (JSON)
+9. POST /api/users with body {"name":"Alice","email":"alice@example.com"}. Spring converts JSON to CreateUserRequest using Jackson
+
+The same code, clean:
+
 ```java
-// @PathVariable — extract from URL path
 @GetMapping("/users/{id}")
 public User getUser(@PathVariable Long id) { ... }
-// GET /api/users/42 → id = 42
 
-// @RequestParam — extract from query string
 @GetMapping("/users")
 public List<User> searchUsers(
-        @RequestParam String name,           // GET /api/users?name=Alice → name = "Alice"
-        @RequestParam(defaultValue = "0") int page,  // optional, defaults to 0
-        @RequestParam(defaultValue = "20") int size   // optional, defaults to 20
+        @RequestParam String name,
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "20") int size
 ) { ... }
-// GET /api/users?name=Alice&page=0&size=10
 
-// @RequestBody — extract from request body (JSON)
 @PostMapping("/users")
 public User createUser(@RequestBody CreateUserRequest req) { ... }
-// POST /api/users with body {"name":"Alice","email":"alice@example.com"}
-// Spring converts JSON to CreateUserRequest using Jackson
 ```
 
 ## ResponseEntity — controlling the HTTP response
 
+
+**What this code does — step by step:**
+
+1. ResponseEntity lets you control status code, headers, and body
+2. `return ResponseEntity.ok(user.get());` — HTTP 200 with the user
+3. `return ResponseEntity.notFound().build();` — HTTP 404 with no body
+4. With custom headers
+5. `.status(HttpStatus.CREATED)` — HTTP 201
+6. `.header("X-User-Id", created.id().toString())` — custom header
+7. `.body(created);` — response body
+8. Common response patterns
+9. `ResponseEntity.ok(body)` — 200 OK with body
+10. `ResponseEntity.status(201).body(body)` — 201 Created
+11. `ResponseEntity.noContent().build()` — 204 No Content (no body)
+12. `ResponseEntity.badRequest().body(error)` — 400 Bad Request
+13. `ResponseEntity.notFound().build()` — 404 Not Found
+14. `ResponseEntity.status(500).body(error)` — 500 Internal Server Error
+
+The same code, clean:
+
 ```java
-// ResponseEntity lets you control status code, headers, and body
 @GetMapping("/users/{id}")
 public ResponseEntity<UserResponse> getUser(@PathVariable Long id) {
     Optional<UserResponse> user = userService.findById(id);
 
     if (user.isPresent()) {
-        return ResponseEntity.ok(user.get());        // HTTP 200 with the user
+        return ResponseEntity.ok(user.get());
     } else {
-        return ResponseEntity.notFound().build();     // HTTP 404 with no body
+        return ResponseEntity.notFound().build();
     }
 }
 
-// With custom headers
 @PostMapping("/users")
 public ResponseEntity<UserResponse> createUser(@RequestBody @Valid CreateUserRequest req) {
     UserResponse created = userService.create(req);
     return ResponseEntity
-        .status(HttpStatus.CREATED)                    // HTTP 201
-        .header("X-User-Id", created.id().toString())  // custom header
-        .body(created);                                // response body
+        .status(HttpStatus.CREATED)
+        .header("X-User-Id", created.id().toString())
+        .body(created);
 }
 
-// Common response patterns
-ResponseEntity.ok(body)                    // 200 OK with body
-ResponseEntity.status(201).body(body)      // 201 Created
-ResponseEntity.noContent().build()         // 204 No Content (no body)
-ResponseEntity.badRequest().body(error)    // 400 Bad Request
-ResponseEntity.notFound().build()          // 404 Not Found
-ResponseEntity.status(500).body(error)     // 500 Internal Server Error
+ResponseEntity.ok(body)
+ResponseEntity.status(201).body(body)
+ResponseEntity.noContent().build()
+ResponseEntity.badRequest().body(error)
+ResponseEntity.notFound().build()
+ResponseEntity.status(500).body(error)
 ```
 
 ## DTOs — never expose your entity directly
 
+
+**What this code does — step by step:**
+
+1. BAD: returning the entity directly exposes internal fields
+2. `private String passwordHash;` — NEVER expose this!
+3. `private String resetToken;` — NEVER expose this!
+4. `private Instant lastLoginIp;` — sensitive!
+5. GOOD: DTO controls exactly what the API exposes
+6. Mapper — converts between entity and DTO
+7. passwordHash, resetToken, lastLoginIp — NOT included!
+8. `user.setPasswordHash(hashPassword(req.password()));` — hash before storing
+
+The same code, clean:
+
 ```java
-// BAD: returning the entity directly exposes internal fields
 @Entity
 public class User {
     private Long id;
     private String name;
     private String email;
-    private String passwordHash;     // NEVER expose this!
-    private String resetToken;       // NEVER expose this!
+    private String passwordHash;
+    private String resetToken;
     private Instant createdAt;
-    private Instant lastLoginIp;     // sensitive!
+    private Instant lastLoginIp;
 }
 
-// GOOD: DTO controls exactly what the API exposes
 public record UserResponse(
     Long id,
     String name,
@@ -161,7 +213,6 @@ public record CreateUserRequest(
     @NotBlank @Size(min = 8) String password
 ) {}
 
-// Mapper — converts between entity and DTO
 public class UserMapper {
     public static UserResponse toResponse(User user) {
         return new UserResponse(
@@ -169,7 +220,6 @@ public class UserMapper {
             user.getName(),
             user.getEmail(),
             user.getCreatedAt()
-            // passwordHash, resetToken, lastLoginIp — NOT included!
         );
     }
 
@@ -177,7 +227,7 @@ public class UserMapper {
         User user = new User();
         user.setName(req.name());
         user.setEmail(req.email());
-        user.setPasswordHash(hashPassword(req.password()));  // hash before storing
+        user.setPasswordHash(hashPassword(req.password()));
         return user;
     }
 }
@@ -185,11 +235,23 @@ public class UserMapper {
 
 ## Global exception handling with @ControllerAdvice
 
+
+**What this code does — step by step:**
+
+1. `@RestControllerAdvice` — catches exceptions from ALL @RestController classes
+2. `@ExceptionHandler(UserNotFoundException.class)` — catch specific exception
+3. `@ExceptionHandler(MethodArgumentNotValidException.class)` — validation errors
+4. `@ExceptionHandler(Exception.class)` — catch-all for unexpected errors
+5. `log.error("Unexpected error", ex);` — log the full stack trace
+6. `"An unexpected error occurred",` — DON'T expose internal details
+
+The same code, clean:
+
 ```java
-@RestControllerAdvice    // catches exceptions from ALL @RestController classes
+@RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(UserNotFoundException.class)  // catch specific exception
+    @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleNotFound(UserNotFoundException ex) {
         ErrorResponse error = new ErrorResponse(
             404,
@@ -200,7 +262,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(404).body(error);
     }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)  // validation errors
+    @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidation(MethodArgumentNotValidException ex) {
         List<String> fieldErrors = ex.getBindingResult()
             .getFieldErrors()
@@ -217,13 +279,13 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(error);
     }
 
-    @ExceptionHandler(Exception.class)  // catch-all for unexpected errors
+    @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGeneric(Exception ex) {
-        log.error("Unexpected error", ex);  // log the full stack trace
+        log.error("Unexpected error", ex);
         ErrorResponse error = new ErrorResponse(
             500,
             "Internal server error",
-            "An unexpected error occurred",  // DON'T expose internal details
+            "An unexpected error occurred",
             Instant.now()
         );
         return ResponseEntity.status(500).body(error);
@@ -233,18 +295,30 @@ public class GlobalExceptionHandler {
 
 ## CORS configuration — allowing cross-origin requests
 
+
+**What this code does — step by step:**
+
+1. `registry.addMapping("/api/**")` — apply to all /api/ endpoints
+2. `.allowedOrigins("https://techie-backend-forge.vercel.app")` — only allow your frontend
+3. `.allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")` — allowed HTTP methods
+4. `.allowedHeaders("*")` — allow any headers
+5. `.allowCredentials(true)` — allow cookies/auth
+6. `.maxAge(3600);` — cache preflight response for 1 hour
+
+The same code, clean:
+
 ```java
 @Configuration
 public class CorsConfig implements WebMvcConfigurer {
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/api/**")           // apply to all /api/ endpoints
-            .allowedOrigins("https://techie-backend-forge.vercel.app")  // only allow your frontend
-            .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")  // allowed HTTP methods
-            .allowedHeaders("*")                 // allow any headers
-            .allowCredentials(true)              // allow cookies/auth
-            .maxAge(3600);                       // cache preflight response for 1 hour
+        registry.addMapping("/api/**")
+            .allowedOrigins("https://techie-backend-forge.vercel.app")
+            .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+            .allowedHeaders("*")
+            .allowCredentials(true)
+            .maxAge(3600);
     }
 }
 ```
@@ -253,7 +327,6 @@ public class CorsConfig implements WebMvcConfigurer {
 
 ### Scenario 1: Complete CRUD API for an order management system
 
-```java
 @RestController
 @RequestMapping("/api/orders")
 public class OrderController {
@@ -299,11 +372,9 @@ public class OrderController {
         orderService.cancel(id);
     }
 }
-```
 
 ### Scenario 2: API versioning with content negotiation
 
-```java
 // Version 1: /api/v1/users
 @RestController
 @RequestMapping("/api/v1/users")
@@ -321,11 +392,9 @@ public class UserControllerV2 {
 }
 
 // Clients migrate from v1 to v2 at their own pace
-```
 
 ### Scenario 3: Request/Response logging with interceptor
 
-```java
 @Component
 public class RequestLoggingInterceptor implements HandlerInterceptor {
 
@@ -353,7 +422,6 @@ public class RequestLoggingInterceptor implements HandlerInterceptor {
             duration);
     }
 }
-```
 
 ## HTTP methods — when to use which
 
@@ -375,3 +443,4 @@ public class RequestLoggingInterceptor implements HandlerInterceptor {
 | Returning 200 for creation | Violates REST conventions | Return 201 Created |
 | Catching exceptions in controller | Duplicated error handling | Use @ControllerAdvice |
 | No CORS configuration | Frontend can't call API from different origin | Configure CORS for frontend origin |
+

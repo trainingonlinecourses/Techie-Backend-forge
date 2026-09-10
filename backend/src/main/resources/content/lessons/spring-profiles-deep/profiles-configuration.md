@@ -1,7 +1,7 @@
 ---
 title: Spring Profiles — Environment-Specific Configuration
 summary: What profiles are, activating profiles, profile-specific properties, @Profile annotation, YAML multi-document, and how organizations manage dev/test/prod configurations.
-order: 1
+order: 4
 minutes: 25
 topics: [profiles, configuration, environment, yaml, @profile, application-properties]
 docs:
@@ -67,19 +67,31 @@ spring:
 
 ## Line-by-Line Walkthrough
 
+
+**What this code does — step by step:**
+
+1. Line 1: Profile-specific beans
+2. H2 in-memory database for development
+3. Real PostgreSQL for production
+4. `@Profile("!prod")` — Everything except prod
+5. Line 2: Profile-specific service implementations
+6. Real SMTP implementation
+7. Line 3: Profile-specific properties. Application.yml
+8. Line 4: Checking active profiles
+
+The same code, clean:
+
 ```java
 import org.springframework.context.annotation.*;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.stereotype.Service;
 
-// Line 1: Profile-specific beans
 @Configuration
 public class AppConfig {
 
     @Bean
     @Profile("dev")
     public DataSource devDataSource() {
-        // H2 in-memory database for development
         return new EmbeddedDatabaseBuilder()
             .setType(EmbeddedDatabaseType.H2)
             .addScript("schema.sql")
@@ -89,7 +101,6 @@ public class AppConfig {
     @Bean
     @Profile("prod")
     public DataSource prodDataSource() {
-        // Real PostgreSQL for production
         HikariConfig config = new HikariConfig();
         config.setJdbcUrl(System.getenv("DB_URL"));
         config.setUsername(System.getenv("DB_USER"));
@@ -98,7 +109,7 @@ public class AppConfig {
     }
 
     @Bean
-    @Profile("!prod")  // Everything except prod
+    @Profile("!prod")
     public DataSource testDataSource() {
         return new EmbeddedDatabaseBuilder()
             .setType(EmbeddedDatabaseType.H2)
@@ -106,7 +117,6 @@ public class AppConfig {
     }
 }
 
-// Line 2: Profile-specific service implementations
 @Service
 @Profile("dev")
 public class MockEmailService implements EmailService {
@@ -121,13 +131,10 @@ public class MockEmailService implements EmailService {
 public class SmtpEmailService implements EmailService {
     @Override
     public void send(String to, String subject, String body) {
-        // Real SMTP implementation
         mailSender.send(to, subject, body);
     }
 }
 
-// Line 3: Profile-specific properties
-// application.yml
 spring:
   profiles:
     active: dev
@@ -165,7 +172,6 @@ spring:
   datasource:
     url: jdbc:h2:mem:testdb
 
-// Line 4: Checking active profiles
 @Service
 public class ProfileChecker {
     private final ConfigurableEnvironment environment;
@@ -246,7 +252,6 @@ features:
   new-checkout: true
 ```
 
-```java
 @Component
 public class FeatureFlags {
     @Value("${features.new-checkout:false}")
@@ -259,11 +264,9 @@ public class FeatureFlags {
         return newCheckoutEnabled;
     }
 }
-```
 
 ### Scenario 3: Test profile with embedded database
 
-```java
 @SpringBootTest
 @ActiveProfiles("test")
 class UserRepositoryTest {
@@ -281,7 +284,6 @@ class UserRepositoryTest {
         assertThat(found.get().getName()).isEqualTo("Test User");
     }
 }
-```
 
 ---
 
@@ -294,3 +296,4 @@ class UserRepositoryTest {
 | Not having a default profile | Missing configuration | Always provide default `application.yml` |
 | Profile-specific beans overriding wrong | Wrong bean loaded | Check profile activation order |
 | Using `@Profile("!prod")` carelessly | Unintended beans in test | Be explicit about profile conditions |
+

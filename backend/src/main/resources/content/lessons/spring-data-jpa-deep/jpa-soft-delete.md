@@ -1,7 +1,7 @@
 ---
 title: Soft Delete — @SQLDelete, Filters and Deleted-At Columns
 summary: Why teams soft-delete, the @SQLDelete/@SQLRestriction pattern, the deleted_at column conventions, and the query/complexity trade-offs.
-order: 13
+order: 9
 minutes: 17
 topics: [soft-delete, sqldelete, sqlrestriction, deleted-at, audit, data-retention]
 docs:
@@ -23,7 +23,6 @@ The cost: **every query and every constraint must be soft-delete-aware** — a d
 
 ## The classic implementation — @SQLDelete + @SQLRestriction
 
-```java
 @Entity
 @SQLDelete(sql = "UPDATE orders SET deleted_at = now(), deleted_by = current_user() WHERE id = ?")
 @SQLRestriction("deleted_at IS NULL")     // every SELECT adds this filter automatically
@@ -36,7 +35,6 @@ public class Order {
     @Column(name = "deleted_by")
     private String deletedBy;
 }
-```
 
 - **`@SQLDelete`** — overrides the DELETE statement: instead of removing the row, it sets the tombstone columns. (Hibernate 6.3+: `@SoftDelete` does this with less boilerplate.)
 - **`@SQLRestriction`** — appends `deleted_at IS NULL` to every query on this entity, so `findAll`, derived queries, and JPQL automatically exclude deleted rows. (Hibernate 6.3+: `@SoftDelete` also applies this automatically.)
@@ -45,7 +43,6 @@ With both, the *application* just calls `orderRepo.delete(order)` and everything
 
 ## Unique constraints — the soft-delete trap
 
-```java
 @Entity
 @SQLDelete(...)
 @SQLRestriction("deleted_at IS NULL")
@@ -53,7 +50,6 @@ public class Customer {
     @Column(nullable = false, unique = true)
     private String email;                  // ⚠️ unique across ALL rows — deleted ones too!
 }
-```
 
 Soft-deleting a customer with email `a@x.com` then creating a new one with the same email **violates the unique constraint** — the tombstoned row still holds the old email. The fix: make the unique constraint **partial** (Postgres):
 
@@ -110,3 +106,4 @@ Soft delete is a tool, not a default — teams weigh query complexity and retent
 - Partial unique indexes (`WHERE deleted_at IS NULL`) fix the re-use-unique-value problem.
 - Pair soft delete with a purge job for legal erasure; consider status columns and archive tables as alternatives.
 - Weigh the query complexity cost per table — soft delete is a decision, not a default.
+

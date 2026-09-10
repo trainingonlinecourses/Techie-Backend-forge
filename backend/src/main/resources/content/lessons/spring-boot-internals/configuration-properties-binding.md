@@ -1,7 +1,7 @@
 ---
 title: Configuration Properties — Typed, Bound Configuration
 module: spring-boot-internals
-order: 4
+order: 3
 minutes: 25
 topics: ["@ConfigurationProperties", "property binding", "relaxed binding", "validation", "profiles"]
 summary: The naive way to read configuration in Spring is @Value:
@@ -16,7 +16,6 @@ docs:
 
 The naive way to read configuration in Spring is `@Value`:
 
-```java
 @Service
 class EmailService {
 
@@ -29,7 +28,6 @@ class EmailService {
 
     void send() { /* use the five fields */ }
 }
-```
 
 Problems:
 
@@ -40,7 +38,6 @@ Problems:
 
 **`@ConfigurationProperties`** binds a *namespace* of properties into one **typed, immutable-friendly object**:
 
-```java
 @ConfigurationProperties(prefix = "mail")
 public class MailProperties {
     private String host;
@@ -51,18 +48,15 @@ public class MailProperties {
     private Duration timeout = Duration.ofSeconds(10);
     // getters & setters (or Java records in Boot 3)
 }
-```
 
 Then inject the whole thing:
 
-```java
 @Service
 class EmailService {
     private final MailProperties props;
 
     EmailService(MailProperties props) { this.props = props; }   // one dependency, typed
 }
-```
 
 ## Relaxed Binding — "mail.host" Means Many Things
 
@@ -79,6 +73,20 @@ This is why environment variables work without extra config: `MAIL_HOST=smtp.exa
 
 ## The Code Walkthrough
 
+
+**What this code does — step by step:**
+
+1. `@Validated` — turn on validation for this binding
+2. `private String host;` — required — binding fails if missing
+3. `private String from;` — must look like an email
+4. `private List<String> allowedDomains = List.of();` — collections bind too
+5. ---- nested objects ----
+6. `private final Retry retry = new Retry();` — mail.retry.max-attempts, mail.retry.delay
+7. getters/setters...
+8. getters & setters for every field...
+
+The same code, clean:
+
 ```java
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -89,32 +97,29 @@ import org.springframework.validation.annotation.Validated;
 
 @Component
 @ConfigurationProperties(prefix = "mail")
-@Validated                      // turn on validation for this binding
+@Validated
 public class MailProperties {
 
     @NotBlank
-    private String host;                    // required — binding fails if missing
+    private String host;
 
     @Min(1) @Max(65535)
     private int port = 25;
 
     @Email
-    private String from;                    // must look like an email
+    private String from;
 
     private boolean tls = true;
     private Duration timeout = Duration.ofSeconds(10);
-    private List<String> allowedDomains = List.of();   // collections bind too
+    private List<String> allowedDomains = List.of();
 
-    // ---- nested objects ----
-    private final Retry retry = new Retry();   // mail.retry.max-attempts, mail.retry.delay
+    private final Retry retry = new Retry();
 
     public static class Retry {
         private int maxAttempts = 3;
         private Duration delay = Duration.ofSeconds(1);
-        // getters/setters...
     }
 
-    // getters & setters for every field...
 }
 ```
 
@@ -142,7 +147,6 @@ mail.allowed-domains=example.com,example.org
 
 **Records (Boot 3+)** — with constructor binding, you can make the properties a **record** — immutable configuration:
 
-```java
 @ConfigurationProperties(prefix = "mail")
 public record MailProperties(
         String host,
@@ -150,7 +154,6 @@ public record MailProperties(
         String from,
         boolean tls,
         Duration timeout) {}
-```
 
 Bind via `@EnableConfigurationProperties` and constructor injection; no setters needed. Records make config objects immutable and trivially testable.
 
@@ -188,3 +191,4 @@ This chain is why the same jar runs locally, in tests, and in production: **code
 - Nested objects, collections, and `Duration` bind automatically.
 - Prefer records (constructor binding) for immutable configuration objects.
 - Defaults live in code; files override; env vars rule in production.
+

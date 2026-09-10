@@ -1,7 +1,7 @@
 ---
 title: Adapters — Connecting to Files, HTTP, JDBC, and Messaging Systems
 module: spring-integration
-order: 5
+order: 1
 minutes: 26
 topics: ["adapters", "inbound adapters", "outbound adapters", "file integration", "HTTP integration", "JDBC integration", "Kafka integration"]
 summary: Everything so far has been inprocess: messages flowing through channels and stations inside your JVM. The real world is outside: files on disk, HTT...
@@ -22,22 +22,32 @@ Everything so far has been *in-process*: messages flowing through channels and s
 
 ## File Adapters: The Classic Integration
 
+
+**What this code does — step by step:**
+
+1. INBOUND — watch a directory, emit each new file as a message:
+2. `.patternFilter("*.csv")` — only CSV
+3. `.preventDuplicates(true),` — track processed files
+4. `.maxMessagesPerPoll(10)))` — poll every 5s
+5. `.transform(Transformers.fileToString())` — File -> String
+6. OUTBOUND — write each message's payload to a file:
+
+The same code, clean:
+
 ```java
-// INBOUND — watch a directory, emit each new file as a message:
 @Bean
 public IntegrationFlow fileInbound() {
     return IntegrationFlow
             .from(Files.inboundAdapter(new File("/data/inbox"))
-                    .patternFilter("*.csv")            // only CSV
-                    .preventDuplicates(true),          // track processed files
+                    .patternFilter("*.csv")
+                    .preventDuplicates(true),
                 e -> e.poller(Pollers.fixedDelay(5000)
-                        .maxMessagesPerPoll(10)))      // poll every 5s
-            .transform(Transformers.fileToString())    // File -> String
+                        .maxMessagesPerPoll(10)))
+            .transform(Transformers.fileToString())
             .handle("csvParser", "parse")
             .get();
 }
 
-// OUTBOUND — write each message's payload to a file:
 @Bean
 public IntegrationFlow fileOutbound() {
     return IntegrationFlow
@@ -54,19 +64,28 @@ public IntegrationFlow fileOutbound() {
 
 ## HTTP Adapters: Calling and Exposing APIs
 
+
+**What this code does — step by step:**
+
+1. INBOUND — expose a flow as an HTTP endpoint:
+2. `.handle("ingestService", "process")` — payload = the request body
+3. `.get();` — the return value becomes the HTTP response body
+4. OUTBOUND — call an external API from the flow:
+5. `.headerMapper(httpHeadersMapper()))` — pass auth headers
+
+The same code, clean:
+
 ```java
-// INBOUND — expose a flow as an HTTP endpoint:
 @Bean
 public IntegrationFlow httpInbound() {
     return IntegrationFlow
             .from(Http.inboundChannelAdapter("/api/ingest")
                     .requestMapping(r -> r.methods(HttpMethod.POST))
                     .requestPayloadType(String.class))
-            .handle("ingestService", "process")     // payload = the request body
-            .get();   // the return value becomes the HTTP response body
+            .handle("ingestService", "process")
+            .get();
 }
 
-// OUTBOUND — call an external API from the flow:
 @Bean
 public IntegrationFlow httpOutbound() {
     return IntegrationFlow
@@ -74,7 +93,7 @@ public IntegrationFlow httpOutbound() {
             .handle(Http.outboundChannelAdapter("https://api.academy.com/orders")
                     .httpMethod(HttpMethod.POST)
                     .expectedResponseType(String.class)
-                    .headerMapper(httpHeadersMapper()))   // pass auth headers
+                    .headerMapper(httpHeadersMapper()))
             .get();
 }
 ```
@@ -83,23 +102,29 @@ public IntegrationFlow httpOutbound() {
 
 ## JDBC Adapters: The Database as Endpoint
 
+
+**What this code does — step by step:**
+
+1. INBOUND — poll the database for new rows:
+2. `.maxRowsPerPoll(50),` — batch size
+3. Each returned row becomes a message; the updateSql marks it done —. The polling-with-claim pattern, atomic per row.
+4. OUTBOUND — insert/update per message:
+
+The same code, clean:
+
 ```java
-// INBOUND — poll the database for new rows:
 @Bean
 public IntegrationFlow jdbcInbound() {
     return IntegrationFlow
             .from(Jdbc.inboundChannelAdapter(dataSource,
                     "SELECT * FROM pending_emails WHERE sent = false")
                 .updateSql("UPDATE pending_emails SET sent = true WHERE id = :id")
-                .maxRowsPerPoll(50),                      // batch size
+                .maxRowsPerPoll(50),
                 e -> e.poller(Pollers.fixedDelay(10000)))
             .handle("emailService", "send")
             .get();
 }
-// Each returned row becomes a message; the updateSql marks it done —
-// the polling-with-claim pattern, atomic per row.
 
-// OUTBOUND — insert/update per message:
 @Bean
 public IntegrationFlow jdbcOutbound() {
     return IntegrationFlow
@@ -115,7 +140,6 @@ public IntegrationFlow jdbcOutbound() {
 
 ## Kafka, JMS, and AMQP Adapters: The Messaging Doors
 
-```java
 // INBOUND — consume Kafka records into a flow:
 @Bean
 public IntegrationFlow kafkaInbound() {
@@ -135,7 +159,6 @@ public IntegrationFlow kafkaOutbound() {
                     .topic("orders"))
             .get();
 }
-```
 
 **The pattern repeats for every broker** — Kafka, JMS, AMQP (RabbitMQ): an inbound adapter consumes into the flow (with the broker's consumer semantics — acknowledgments, redelivery — handled by the adapter), an outbound adapter publishes from the flow. The same flow grammar works against a file, a database, or a broker — **the adapters are interchangeable doors, and the pipeline logic never changes.** This is the framework's true value: learn the flow grammar once, integrate with anything.
 
@@ -151,3 +174,4 @@ public IntegrationFlow kafkaOutbound() {
 ## Recap
 
 Adapters are the doors between the flow and the outside world: **inbound** (file polls, HTTP endpoints, JDBC row-polls, Kafka/JMS/AMQP consumption) bring external events in as messages; **outbound** (file writes, HTTP calls, JDBC inserts, broker publishes) ship messages out. The flow grammar stays identical regardless of the door — swap adapters to change what you integrate with. The production discipline is uniform across all of them: claim-then-process for idempotency, bounded batches, temp-file writes, header context, and error channels. Master the adapters and Spring Integration becomes the universal integrator — one grammar, every system.
+

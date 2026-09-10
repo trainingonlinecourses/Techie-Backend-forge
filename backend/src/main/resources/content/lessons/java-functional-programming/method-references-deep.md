@@ -1,7 +1,7 @@
 ---
 title: Method References — Lambdas That Just Call Something
 module: java-functional-programming
-order: 3
+order: 5
 minutes: 22
 topics: ["method references", "ClassName::method", "instance::method", "constructor references", "shorthand"]
 summary: Many lambdas are nothing but a forwarding call:
@@ -16,15 +16,11 @@ docs:
 
 Many lambdas are nothing but a forwarding call:
 
-```java
 names.forEach(name -> System.out.println(name));
-```
 
 The lambda exists *only* to call `System.out.println(name)`. Writing the `name ->` wrapper adds noise without adding meaning. Java gives you a shorthand — the **method reference**:
 
-```java
 names.forEach(System.out::println);
-```
 
 The `::` operator (pronounced "double colon") means: *"use the method named `println` on `System.out` as the implementation of this functional interface."* Same behavior, less ceremony, and — for some readers — clearer intent: "for each name, println it."
 
@@ -43,6 +39,29 @@ The unbound form (row 3) is the one that trips people up: `String::toUpperCase` 
 
 ## The Code Walkthrough
 
+
+**What this code does — step by step:**
+
+1. ---- 1. Static method reference ----. Comparator.comparing needs "extract the sort key" — here, a String -> String
+2. `names.sort(Comparator.comparing(String::toLowerCase));` — unbound instance method
+3. `System.out.println(names);` — [aisha, bob, sateesh]
+4. ---- 2. Bound instance method (specific object) ----
+5. `names.forEach(System.out::println);` — x -> System.out.println(x)
+6. ---- 3. Unbound instance method ----. Predicate<String> — the argument becomes the receiver
+7. `Predicate<String> isEmpty = String::isEmpty;` — s -> s.isEmpty()
+8. `System.out.println(isEmpty.test(""));` — true
+9. ---- 4. Static method in a stream ----
+10. `int max = nums.stream().reduce(0, Math::max);` — (a, b) -> Math.max(a, b)
+11. `System.out.println(max);` — 9
+12. ---- 5. Constructor reference ----
+13. `Supplier<List<String>> listFactory = ArrayList::new;` — () -> new ArrayList<>()
+14. `System.out.println(fresh.getClass().getSimpleName());` — ArrayList
+15. ---- 6. With Stream mapping — the common real-world use ----
+16. `.map(String::length)` — name -> name.length()
+17. `System.out.println(lengths);` — [5, 4, 3]
+
+The same code, clean:
+
 ```java
 import java.util.*;
 import java.util.function.*;
@@ -53,34 +72,26 @@ public class MethodRefDemo {
     public static void main(String[] args) {
         List<String> names = new ArrayList<>(List.of("sateesh", "aisha", "bob"));
 
-        // ---- 1. Static method reference ----
-        // Comparator.comparing needs "extract the sort key" — here, a String -> String
-        names.sort(Comparator.comparing(String::toLowerCase));    // unbound instance method
-        System.out.println(names);   // [aisha, bob, sateesh]
+        names.sort(Comparator.comparing(String::toLowerCase));
+        System.out.println(names);
 
-        // ---- 2. Bound instance method (specific object) ----
-        names.forEach(System.out::println);     // x -> System.out.println(x)
+        names.forEach(System.out::println);
 
-        // ---- 3. Unbound instance method ----
-        // Predicate<String> — the argument becomes the receiver
-        Predicate<String> isEmpty = String::isEmpty;   // s -> s.isEmpty()
-        System.out.println(isEmpty.test(""));          // true
+        Predicate<String> isEmpty = String::isEmpty;
+        System.out.println(isEmpty.test(""));
 
-        // ---- 4. Static method in a stream ----
         List<Integer> nums = List.of(3, 7, 2, 9);
-        int max = nums.stream().reduce(0, Math::max);  // (a, b) -> Math.max(a, b)
-        System.out.println(max);                       // 9
+        int max = nums.stream().reduce(0, Math::max);
+        System.out.println(max);
 
-        // ---- 5. Constructor reference ----
-        Supplier<List<String>> listFactory = ArrayList::new;   // () -> new ArrayList<>()
+        Supplier<List<String>> listFactory = ArrayList::new;
         List<String> fresh = listFactory.get();
-        System.out.println(fresh.getClass().getSimpleName());  // ArrayList
+        System.out.println(fresh.getClass().getSimpleName());
 
-        // ---- 6. With Stream mapping — the common real-world use ----
         List<Integer> lengths = names.stream()
-                .map(String::length)         // name -> name.length()
+                .map(String::length)
                 .toList();
-        System.out.println(lengths);         // [5, 4, 3]
+        System.out.println(lengths);
     }
 }
 ```
@@ -103,23 +114,19 @@ public class MethodRefDemo {
 
 Prefer the reference when it's a **direct forwarding call**:
 
-```java
 // GOOD — reference, matches intent
 items.stream().map(Item::getPrice).toList();
 
 // OK but noisier — lambda
 items.stream().map(item -> item.getPrice()).toList();
-```
 
 Prefer the lambda when you're **adding logic** around the call:
 
-```java
 // GOOD — lambda, there's extra work
 items.stream().map(item -> item.getPrice() * (1 - discount)).toList();
 
 // Bad — a reference can't express this
 items.stream().map(Item::getPrice)  // (can't apply the discount)
-```
 
 Rule of thumb: if the body is *exactly* one method call, use `::`. If there's arithmetic, conditions, or multiple calls, use a lambda.
 
@@ -127,11 +134,9 @@ Rule of thumb: if the body is *exactly* one method call, use `::`. If there's ar
 
 If a method is overloaded, the functional interface's signature picks the right overload:
 
-```java
 // String has valueOf(int), valueOf(double), valueOf(Object), ...
 Function<Integer, String> f = String::valueOf;    // picks valueOf(int) — Integer unboxes
 System.out.println(f.apply(42).getClass().getSimpleName());   // String
-```
 
 The compiler selects the overload whose parameter types match the target signature. Ambiguity is possible with `null`-tolerant overloads (`valueOf(Object)` vs primitives), but the compiler resolves by target typing in most cases.
 
@@ -150,3 +155,4 @@ The compiler selects the overload whose parameter types match the target signatu
 - Unbound instance references: the first argument becomes the receiver.
 - Use `::` for direct calls, lambdas for anything with added logic.
 - `Comparator.comparing(KeyExtractor::extract)` and `.map(Obj::getField)` are the canonical uses.
+

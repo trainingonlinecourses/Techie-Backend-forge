@@ -15,25 +15,21 @@ docs:
 
 Before Java 17, writing multi-line strings was painful. You had to use `+` concatenation and escape characters everywhere:
 
-```java
 String old = "SELECT u.id, u.name, u.email\n" +
              "FROM users u\n" +
              "WHERE u.active = true\n" +
              "ORDER BY u.name";
-```
 
 **The problem:** Every `\n` is an escape code. Every `"` inside the string needs `\"`. Every `\` needs `\\`. It's ugly, error-prone, and hard to read.
 
 **Text Blocks fix this.** Introduced in Java 13 as a preview and finalized in Java 17 (JEP 378), a text block is a multi-line string literal that starts with `"""` (three double quotes) and ends with `"""`:
 
-```java
 String modern = """
         SELECT u.id, u.name, u.email
         FROM users u
         WHERE u.active = true
         ORDER BY u.name
         """;
-```
 
 **Same result, dramatically cleaner code.** No escape characters. No concatenation. Just write what you mean.
 
@@ -49,7 +45,6 @@ Text blocks solve three specific problems:
 
 A text block starts with `"""` followed by a mandatory newline:
 
-```java
 // CORRECT — newline after opening """
 String good = """
     Hello World
@@ -58,22 +53,18 @@ String good = """
 // WRONG — no newline after opening """
 // This is actually NOT a text block, it's regular concatenation
 // String bad = """Hello World""";
-```
 
 The closing `"""` must be on its own line and determines the **indentation stripping**:
 
-```java
 String s = """
         This line is indented by 8 spaces
         This line is also indented by 8 spaces
     """;  // The closing """ at column 4 strips 4 spaces from every line
-```
 
 **The rule:** The closing `"""` position defines the left margin. All leading whitespace up to that column is stripped from every line.
 
 ### The Basics — How to Create a Text Block
 
-```java
 public class TextBlockBasics {
     public static void main(String[] args) {
         // A simple text block
@@ -88,7 +79,6 @@ public class TextBlockBasics {
         // Welcome to Java Text Blocks.
     }
 }
-```
 
 **What happened here?**
 1. `"""` opens the text block
@@ -98,7 +88,6 @@ public class TextBlockBasics {
 
 ### Text Blocks vs Regular Strings
 
-```java
 public class Comparison {
     public static void main(String[] args) {
         // Regular string — ugly escaping
@@ -121,13 +110,11 @@ public class Comparison {
         System.out.println(html1.equals(html2)); // true
     }
 }
-```
 
 ### Incidental White Space Stripping
 
 This is the most confusing part of text blocks. The closing `"""` position determines indentation:
 
-```java
 public class IndentationDemo {
     public static void main(String[] args) {
         // Closing """ at column 0 — no stripping
@@ -149,7 +136,6 @@ Hello
         System.out.println("---b---");
     }
 }
-```
 
 **Output:**
 ```
@@ -169,7 +155,6 @@ Hello
 
 Text blocks preserve line terminators (`\n`) exactly as written:
 
-```java
 public class LineEndings {
     public static void main(String[] args) {
         // Trailing spaces are preserved (but invisible)
@@ -185,13 +170,11 @@ public class LineEndings {
         // Result: "line1line2" — no newline between them!
     }
 }
-```
 
 **The `\` at end of line** is a line terminator escape — it joins lines without a newline character.
 
 ### JSON Example
 
-```java
 public class JsonExample {
     public static void main(String[] args) {
         String json = """
@@ -207,11 +190,9 @@ public class JsonExample {
         // Valid JSON — ready to parse or send to an API
     }
 }
-```
 
 ### SQL Example
 
-```java
 public class SqlExample {
     public static void main(String[] args) {
         String query = """
@@ -233,11 +214,9 @@ public class SqlExample {
         // Clean, readable SQL — no string concatenation mess
     }
 }
-```
 
 ### HTML Template Example
 
-```java
 public class HtmlTemplate {
     public static void main(String[] args) {
         String name = "Alice";
@@ -256,12 +235,10 @@ public class HtmlTemplate {
         System.out.println(html);
     }
 }
-```
 
 ### Organization Use Cases
 
 **1. API Response Templates**
-```java
 public class ApiResponseTemplate {
     public String errorResponse(String code, String message) {
         return """
@@ -274,10 +251,8 @@ public class ApiResponseTemplate {
                 """.formatted(code, message, java.time.Instant.now());
     }
 }
-```
 
 **2. Flyway SQL Migrations**
-```java
 public class MigrationV2 {
     public String up() {
         return """
@@ -294,10 +269,8 @@ public class MigrationV2 {
                 """;
     }
 }
-```
 
 **3. Code Generation**
-```java
 public class DtoGenerator {
     public String generateDto(String className, List<String> fields) {
         StringBuilder sb = new StringBuilder();
@@ -314,7 +287,6 @@ public class DtoGenerator {
         return sb.toString();
     }
 }
-```
 
 ### Common Mistakes
 
@@ -328,36 +300,39 @@ public class DtoGenerator {
 
 ### Line-by-Line Code Explanation
 
+
+**What this code does — step by step:**
+
+1. ↑ Public class — the text block demo
+2. ↑ Standard main method entry point
+3. ↑ Triple quotes OPEN the text block. ↑ Mandatory newline after opening """
+4. ↑ First line of content — will have indentation stripped
+5. ↑ Second line — same indentation stripping
+6. ↑ Third line — SQL is readable and clean
+7. ↑ Triple quotes CLOSE the text block. ↑ The closing position determines indentation stripping
+8. ↑ formatted() with no args — just validates the string. ↑ In Java 17, this is equivalent to just using sql directly
+9. ↑ Prints the clean SQL — no escape characters visible
+
+The same code, clean:
+
 ```java
 public class TextBlockDemo {
-    // ↑ Public class — the text block demo
-    
+
     public static void main(String[] args) {
-        // ↑ Standard main method entry point
-        
+
         String sql = """
-                // ↑ Triple quotes OPEN the text block
-                // ↑ Mandatory newline after opening """
-                
+
                 SELECT id, name, email
-                // ↑ First line of content — will have indentation stripped
-                
+
                 FROM users
-                // ↑ Second line — same indentation stripping
-                
+
                 WHERE active = true
-                // ↑ Third line — SQL is readable and clean
-                
+
                 """;
-                // ↑ Triple quotes CLOSE the text block
-                // ↑ The closing position determines indentation stripping
-        
+
         String formatted = sql.formatted();
-        // ↑ formatted() with no args — just validates the string
-        // ↑ In Java 17, this is equivalent to just using sql directly
-        
+
         System.out.println(formatted);
-        // ↑ Prints the clean SQL — no escape characters visible
     }
 }
 ```
@@ -380,3 +355,4 @@ A backend team is building a microservices platform. They need:
 - Configuration files
 
 Before text blocks, each of these required ugly string concatenation or external files. With text blocks, they embed multi-line templates directly in Java code — readable, maintainable, and type-safe.
+

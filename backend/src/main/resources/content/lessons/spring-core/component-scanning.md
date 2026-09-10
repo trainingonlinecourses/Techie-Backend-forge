@@ -1,7 +1,7 @@
 ---
 title: Component Scanning & @Import — Complete Beginner's Guide
 summary: How Spring finds your beans, why package structure matters, @Import for third-party libraries, and the debugging tricks that save hours.
-order: 17
+order: 6
 minutes: 22
 topics: [componentscan, import, stereotypes, filters, bean-discovery, package-structure]
 docs:
@@ -32,14 +32,21 @@ com.acme/                          ← Main class lives here (GPS starting point
 
 **Line-by-line code example:**
 
+
+**What this code does — step by step:**
+
+1. The main class — this is where Spring starts scanning
+2. `@SpringBootApplication` — Line 1: Combines @Configuration + @ComponentScan + @EnableAutoConfiguration. Line 2: By default, scans THIS package and all sub-packages
+3. `public class AcademyApplication {` — Line 3: Must be at the TOP of your package tree. Line 4: If this class is in com.acme, it scans com.acme.**
+4. `SpringApplication.run(AcademyApplication.class, args);` — Line 5: Starts the app
+
+The same code, clean:
+
 ```java
-// The main class — this is where Spring starts scanning
-@SpringBootApplication                     // Line 1: Combines @Configuration + @ComponentScan + @EnableAutoConfiguration
-                                           // Line 2: By default, scans THIS package and all sub-packages
-public class AcademyApplication {          // Line 3: Must be at the TOP of your package tree
-                                           // Line 4: If this class is in com.acme, it scans com.acme.**
+@SpringBootApplication
+public class AcademyApplication {
     public static void main(String[] args) {
-        SpringApplication.run(AcademyApplication.class, args);  // Line 5: Starts the app
+        SpringApplication.run(AcademyApplication.class, args);
     }
 }
 ```
@@ -57,32 +64,54 @@ Spring beans come from exactly **two places**:
 
 ### 1. Component scanning (automatic)
 
+
+**What this code does — step by step:**
+
+1. `@Service` — Line 1: Spring finds this class during scanning
+2. `public class OrderService {` — Line 2: Becomes a bean automatically
+3. `private final OrderRepository repo;` — Line 3: Spring injects the repository bean
+4. `public OrderService(OrderRepository repo) {` — Line 4: Constructor injection
+5. `this.repo = repo;` — Line 5: Spring passes the repository here
+
+The same code, clean:
+
 ```java
-@Service                              // Line 1: Spring finds this class during scanning
-public class OrderService {           // Line 2: Becomes a bean automatically
-    
-    private final OrderRepository repo;  // Line 3: Spring injects the repository bean
-    
-    public OrderService(OrderRepository repo) {  // Line 4: Constructor injection
-        this.repo = repo;              // Line 5: Spring passes the repository here
+@Service
+public class OrderService {
+
+    private final OrderRepository repo;
+
+    public OrderService(OrderRepository repo) {
+        this.repo = repo;
     }
 }
 ```
 
 ### 2. Explicit registration (manual)
 
+
+**What this code does — step by step:**
+
+1. `@Configuration` — Line 1: This class defines beans manually
+2. `@Bean` — Line 2: This method creates a bean
+3. `return new RestTemplate();` — Line 3: Spring calls this method and stores the result as a bean
+4. `@Bean` — Line 4: Another bean definition
+5. `return Clock.systemUTC();` — Line 5: Returns a Clock bean
+
+The same code, clean:
+
 ```java
-@Configuration                         // Line 1: This class defines beans manually
+@Configuration
 public class AppConfig {
-    
-    @Bean                              // Line 2: This method creates a bean
+
+    @Bean
     public RestTemplate restTemplate() {
-        return new RestTemplate();      // Line 3: Spring calls this method and stores the result as a bean
+        return new RestTemplate();
     }
-    
-    @Bean                              // Line 4: Another bean definition
+
+    @Bean
     public Clock clock() {
-        return Clock.systemUTC();       // Line 5: Returns a Clock bean
+        return Clock.systemUTC();
     }
 }
 ```
@@ -95,30 +124,41 @@ public class AppConfig {
 
 ### Basic scanning — the default behavior
 
-```java
 // This is what @SpringBootApplication does under the hood
 @ComponentScan(
     basePackages = "com.acme"           // Line 1: Start scanning from this package
     // Line 2: By default, includes ALL stereotype annotations
     // Line 3: @Component, @Service, @Repository, @Controller, @Configuration
 )
-```
 
 **The rule:** Spring scans `basePackages` and ALL sub-packages. If your main class is at `com.acme`, it scans `com.acme.*`, `com.acme.orders.*`, `com.acme.payments.*`, etc.
 
 ### Custom scanning — when the default isn't enough
 
+
+**What this code does — step by step:**
+
+1. `basePackages = "com.acme.orders",` — Line 1: Only scan this package tree
+2. `includeFilters = @ComponentScan.Filter(` — Line 2: Only include classes matching this filter
+3. `type = FilterType.REGEX,` — Line 3: Use regex matching
+4. `pattern = ".*Service"` — Line 4: Only classes ending with "Service"
+5. `excludeFilters = @ComponentScan.Filter(` — Line 5: Exclude classes matching this filter
+6. `type = FilterType.ASSIGNABLE_TYPE,` — Line 6: Match by class type
+7. `classes = LegacyService.class` — Line 7: Exclude this specific class
+
+The same code, clean:
+
 ```java
 @Configuration
 @ComponentScan(
-    basePackages = "com.acme.orders",   // Line 1: Only scan this package tree
-    includeFilters = @ComponentScan.Filter(  // Line 2: Only include classes matching this filter
-        type = FilterType.REGEX,        // Line 3: Use regex matching
-        pattern = ".*Service"           // Line 4: Only classes ending with "Service"
+    basePackages = "com.acme.orders",
+    includeFilters = @ComponentScan.Filter(
+        type = FilterType.REGEX,
+        pattern = ".*Service"
     ),
-    excludeFilters = @ComponentScan.Filter(  // Line 5: Exclude classes matching this filter
-        type = FilterType.ASSIGNABLE_TYPE,   // Line 6: Match by class type
-        classes = LegacyService.class   // Line 7: Exclude this specific class
+    excludeFilters = @ComponentScan.Filter(
+        type = FilterType.ASSIGNABLE_TYPE,
+        classes = LegacyService.class
     )
 )
 public class OrdersConfig { }
@@ -139,27 +179,41 @@ public class OrdersConfig { }
 
 Sometimes you need to register beans that aren't in your scan path:
 
-```java
-// Scenario: A third-party library ships a config class
-// You can't scan its packages (it's a dependency, not your code)
-// @Import is the solution:
 
+**What this code does — step by step:**
+
+1. Scenario: A third-party library ships a config class. You can't scan its packages (it's a dependency, not your code). @Import is the solution:
+2. `@Import({ DataSourceConfig.class, SecurityConfig.class })` — Line 1: Explicitly register these classes
+3. `public class AppConfig {` — Line 2: Now their beans are available
+
+The same code, clean:
+
+```java
 @Configuration
-@Import({ DataSourceConfig.class, SecurityConfig.class })  // Line 1: Explicitly register these classes
-public class AppConfig {                                    // Line 2: Now their beans are available
+@Import({ DataSourceConfig.class, SecurityConfig.class })
+public class AppConfig {
 }
 ```
 
 **How @Enable* annotations work (the hidden pattern):**
 
+
+**What this code does — step by step:**
+
+1. When you write @EnableScheduling, Spring does this:
+2. `@EnableScheduling` — Line 1: This annotation exists
+3. Under the hood, @EnableScheduling is:
+4. `@Import(SchedulingConfiguration.class)` — Line 2: It imports a configuration class
+5. `public @interface EnableScheduling { }` — Line 3: That's all @Enable* annotations do!
+
+The same code, clean:
+
 ```java
-// When you write @EnableScheduling, Spring does this:
-@EnableScheduling                        // Line 1: This annotation exists
+@EnableScheduling
 public class AppConfig { }
 
-// Under the hood, @EnableScheduling is:
-@Import(SchedulingConfiguration.class)    // Line 2: It imports a configuration class
-public @interface EnableScheduling { }   // Line 3: That's all @Enable* annotations do!
+@Import(SchedulingConfiguration.class)
+public @interface EnableScheduling { }
 ```
 
 **Every `@Enable*` annotation is an `@Import` in disguise:**
@@ -189,7 +243,6 @@ com.acme/
 
 ### Scenario 2 — excluding a bean in tests
 
-```java
 @SpringBootTest
 @ComponentScan(
     excludeFilters = @ComponentScan.Filter(
@@ -200,11 +253,9 @@ com.acme/
 class OrderServiceTest {
     // KafkaIngestService is not created here — no need to mock it
 }
-```
 
 ### Scenario 3 — importing a third-party module
 
-```java
 // The payment module is a JAR dependency — you can't scan its packages
 // @Import registers its configuration:
 @Configuration
@@ -212,11 +263,9 @@ class OrderServiceTest {
 public class AppConfig {
     // Line 2: Now PaymentService, PaymentRepository, etc. are beans
 }
-```
 
 ### Scenario 4 — duplicate beans (the fail-fast feature)
 
-```java
 // If two classes have the same name, Spring fails fast:
 @Component("paymentService")
 class V1PaymentService { }
@@ -228,7 +277,6 @@ class V2PaymentService { }
 @Component("paymentService")
 @Primary                                    // This one wins when there's a conflict
 class V1PaymentService { }
-```
 
 ## Debugging component scanning
 
@@ -243,7 +291,6 @@ logging:
 
 ### Check if your bean is being created
 
-```java
 @Component
 public class MyBean implements CommandLineRunner {
     @Override
@@ -251,11 +298,9 @@ public class MyBean implements CommandLineRunner {
         System.out.println("MyBean is alive!");  // If you see this, the bean was created
     }
 }
-```
 
 ### The classic "bean not found" bug
 
-```java
 // WRONG — main class is in a sub-package
 com.acme.orders/
 ├── AcademyApplication.java          ← Main class HERE
@@ -271,7 +316,6 @@ com.acme/
 │   ├── OrderController.java         ← Scanned ✓
 │   ├── OrderService.java            ← Scanned ✓
 │   └── OrderRepository.java         ← Scanned ✓
-```
 
 ## Common mistakes
 
@@ -292,3 +336,4 @@ com.acme/
 - Duplicate bean names fail fast by design — resolve with `@Primary`/`@Qualifier`, not suppression
 
 **Official docs:** [Classpath scanning](https://docs.spring.io/spring-framework/reference/core/beans/classpath-scanning.html) · [@Import](https://docs.spring.io/spring-framework/reference/core/beans/java/import.html)
+

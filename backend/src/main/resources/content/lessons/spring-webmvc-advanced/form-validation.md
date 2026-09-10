@@ -1,7 +1,7 @@
 ---
 title: Forms, Validation and Data Binding
 module: spring-webmvc-advanced
-order: 3
+order: 6
 minutes: 20
 topics: ["@ModelAttribute", "form binding", "@Valid", "BindingResult", "custom validators", "error rendering"]
 summary: REST APIs validate @RequestBody. Classic MVC apps bind form data to model objects with @ModelAttribute and render validation errors back to the use...
@@ -24,7 +24,6 @@ REST APIs validate `@RequestBody`. Classic MVC apps bind **form data** to model 
 </form>
 ```
 
-```java
 @PostMapping("/register")
 public String register(@Valid @ModelAttribute RegistrationForm form,
                        BindingResult bindingResult,
@@ -35,7 +34,6 @@ public String register(@Valid @ModelAttribute RegistrationForm form,
     userService.register(form);
     return "redirect:/welcome";
 }
-```
 
 Spring binds `request.getParameter("email")` → `form.email`, runs validation, and populates `BindingResult`. The order matters: **`BindingResult` must immediately follow the `@Valid` parameter**, or Spring throws a 500 instead of binding errors.
 
@@ -45,7 +43,6 @@ Spring binds `request.getParameter("email")` → `form.email`, runs validation, 
 - `getFieldErrors("email")` — per-field errors with codes/messages.
 - `rejectValue("email", "error.email")` — programmatic errors (e.g., duplicate email).
 
-```java
 @PostMapping("/register")
 public String register(@Valid @ModelAttribute RegistrationForm form,
                        BindingResult bindingResult, Model model) {
@@ -60,18 +57,15 @@ public String register(@Valid @ModelAttribute RegistrationForm form,
     userService.register(form);
     return "redirect:/welcome";
 }
-```
 
 ## Bean Validation on the Form
 
-```java
 public record RegistrationForm(
     @NotBlank @Email String email,
     @NotBlank @Size(min = 8, max = 64) String password,
     @NotBlank String firstName,
     @NotNull @Min(13) Integer age
 ) {}
-```
 
 Full constraint toolbox:
 
@@ -88,7 +82,6 @@ Full constraint toolbox:
 
 ## Custom Constraint Validator
 
-```java
 @Target({ElementType.FIELD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = PhoneNumberValidator.class)
@@ -97,9 +90,7 @@ public @interface ValidPhone {
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }
-```
 
-```java
 public class PhoneNumberValidator
         implements ConstraintValidator<ValidPhone, String> {
 
@@ -112,13 +103,11 @@ public class PhoneNumberValidator
         return PHONE.matcher(value).matches();
     }
 }
-```
 
 ## Grouped Validation
 
 Different rules per operation on the same form:
 
-```java
 public class AccountForm {
     public interface Create {}
     public interface Update {}
@@ -130,13 +119,10 @@ public class AccountForm {
     @NotBlank(groups = Create.class)
     private String password;
 }
-```
 
-```java
 @PostMapping("/accounts")
 public String create(@Validated(AccountForm.Create.class) @ModelAttribute AccountForm form,
                      BindingResult bindingResult) { ... }
-```
 
 Registration requires the password; an update doesn't touch it.
 
@@ -144,7 +130,6 @@ Registration requires the password; an update doesn't touch it.
 
 Client-side validation is UX; server-side validation is **security**. Never trust the browser:
 
-```java
 // ❌ Trusting client input
 public void register(RegistrationForm form) { ... }
 
@@ -154,7 +139,6 @@ public String register(@Valid @ModelAttribute RegistrationForm form,
                        BindingResult bindingResult) {
     ...
 }
-```
 
 ## Rendering Errors in Thymeleaf
 
@@ -174,7 +158,6 @@ Thymeleaf's `th:errors` renders the first error message; `th:field` re-populates
 
 Validation isn't only in controllers — validate anywhere:
 
-```java
 @Service
 public class RegistrationService {
 
@@ -190,11 +173,9 @@ public class RegistrationService {
         // ...
     }
 }
-```
 
 ## Testing Form Binding
 
-```java
 @SpringBootTest
 @AutoConfigureMockMvc
 class RegistrationFormTest {
@@ -222,7 +203,6 @@ class RegistrationFormTest {
             .andExpect(model().attributeHasFieldErrors("form", "password"));
     }
 }
-```
 
 ## Summary
 
@@ -238,3 +218,4 @@ class RegistrationFormTest {
 | Security | Server-side validation always |
 
 The form lifecycle is a loop: bind, validate, re-render on error, redirect on success. Get the loop right — including the `BindingResult` ordering rule — and forms become one of the most reliable parts of the app.
+

@@ -1,7 +1,7 @@
 ---
 title: Sets, Maps and the equals/hashCode Contract
 module: java-collections-deep
-order: 3
+order: 5
 minutes: 22
 topics: ["HashSet", "LinkedHashSet", "TreeSet", "equals hashCode", "LinkedHashMap", "EnumMap"]
 summary: Sets and maps are their contracts: equals/hashCode decide membership, compareTo decides order, and the concrete class decides the strategy. This le...
@@ -16,7 +16,6 @@ Sets and maps *are* their contracts: `equals`/`hashCode` decide membership, `com
 
 ## The Contract That Everything Depends On
 
-```java
 public class Course {
     private String slug;
 
@@ -32,7 +31,6 @@ public class Course {
         return Objects.hash(slug);
     }
 }
-```
 
 The three laws:
 1. `a.equals(b)` → `a.hashCode() == b.hashCode()` (equal objects, equal hashes)
@@ -49,7 +47,6 @@ Break law 3 (mutate the slug after insertion) and the set/map silently loses the
 | `LinkedHashSet` | LinkedHashMap | Insertion order | Ordered dedupe |
 | `TreeSet` | TreeMap (red-black) | Sorted (Comparable/Comparator) | Sorted unique |
 
-```java
 Set<String> tags = new HashSet<>(List.of("java", "spring", "java"));
 // → {"java", "spring"} — dedupe
 
@@ -58,18 +55,15 @@ Set<String> ordered = new LinkedHashSet<>(List.of("b", "a", "c"));
 
 Set<String> sorted = new TreeSet<>(List.of("b", "a", "c"));
 // → [a, b, c] — sorted
-```
 
 ### TreeSet With a Comparator
 
-```java
 // By minutes, then title
 Set<Course> byLength = new TreeSet<>(
     Comparator.comparingInt(Course::minutes).thenComparing(Course::title));
 
 byLength.addAll(courses);
 // iterate: shortest first
-```
 
 ## The Map Family
 
@@ -83,7 +77,6 @@ byLength.addAll(courses);
 
 ### LinkedHashMap: The LRU Cache
 
-```java
 class LruCache<K, V> extends LinkedHashMap<K, V> {
 
     private final int maxSize;
@@ -98,31 +91,26 @@ class LruCache<K, V> extends LinkedHashMap<K, V> {
         return size() > maxSize;   // evict the least-recently-used on overflow
     }
 }
-```
 
 `accessOrder = true` reorders on `get` — the map becomes a real LRU cache in ~10 lines.
 
 ### EnumMap: The Forgotten Speed King
 
-```java
 enum Status { NEW, PROCESSING, PAID, CANCELLED }
 
 Map<Status, Integer> counts = new EnumMap<>(Status.class);
 counts.merge(Status.PAID, 1, Integer::sum);
 
 // Backed by a plain array indexed by ordinal — O(1), tiny memory, no hashing
-```
 
 `EnumMap` is faster than HashMap for enum keys (array lookup, no hashing, no boxing) — use it whenever the key space is an enum.
 
 ### IdentityHashMap
 
-```java
 // Reference-equality semantics: "same object", not "equal"
 IdentityHashMap<Object, String> registry = new IdentityHashMap<>();
 registry.put(c1, "instance-1");
 registry.put(new Course("same-slug"), "instance-2");   // different object, different key
-```
 
 Rarely needed — but essential for object-identity tracking (profiling, proxy caches) where `equals` is the wrong semantic.
 
@@ -142,7 +130,6 @@ Rarely needed — but essential for object-identity tracking (profiling, proxy c
 
 All non-concurrent collections throw `ConcurrentModificationException` on structural change during iteration. Remove safely:
 
-```java
 // ❌ CME
 for (String tag : tags) {
     if (tag.startsWith("x")) tags.remove(tag);
@@ -156,7 +143,6 @@ while (it.hasNext()) {
 
 // ✅ removeIf (Java 8+)
 tags.removeIf(t -> t.startsWith("x"));
-```
 
 ## Choosing the Right Map
 
@@ -171,7 +157,6 @@ Everything else?                   → HashMap
 
 ## Testing the Contract
 
-```java
 @Test
 void equalObjectsHaveEqualHashes() {
     Course a = new Course("spring");
@@ -188,7 +173,6 @@ void hashCodeStableInCollections() {
     assertTrue(set.contains(c));   // passes
     // (mutating c.slug here would break this — the trap)
 }
-```
 
 ## Summary
 
@@ -204,3 +188,4 @@ void hashCodeStableInCollections() {
 | Reference equality | IdentityHashMap |
 
 Every set/map is a *contract* plus a *strategy*. Respect `equals`/`hashCode`, pick the strategy by access pattern, and the collections do the rest — violate the contract and they fail silently, which is the worst kind of failure.
+

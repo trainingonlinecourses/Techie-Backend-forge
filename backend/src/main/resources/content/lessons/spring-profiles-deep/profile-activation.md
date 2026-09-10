@@ -1,7 +1,7 @@
 ---
 title: Profile Activation Methods — Ways to Enable Profiles
 summary: Every method to activate Spring profiles: command line, environment variables, properties files, programmatic activation, and test annotations.
-order: 4
+order: 2
 minutes: 15
 topics: [profile-activation, command-line, environment, system-property, test-profile, spring-active-profiles]
 docs:
@@ -57,19 +57,15 @@ java -Dspring.profiles.active=dev -jar app.jar
 
 ### 5. Programmatic
 
-```java
 SpringApplicationBuilder app = new SpringApplicationBuilder(Application.class)
     .profiles("dev", "local")
     .build();
-```
 
 ### 6. Test Annotation
 
-```java
 @SpringBootTest
 @ActiveProfiles("test")
 class UserServiceTest { }
-```
 
 ---
 
@@ -103,3 +99,4 @@ services:
 | Setting profile in both yml and env | Confusion about which wins | Env vars override yml |
 | Forgetting to include profile in tests | Tests use wrong beans | Always use `@ActiveProfiles` |
 | Profile name with uppercase | Doesn't match | Spring profiles are case-sensitive |
+

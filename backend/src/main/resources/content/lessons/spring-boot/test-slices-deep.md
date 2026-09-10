@@ -1,7 +1,7 @@
 ---
 title: Test Slices Deep — @WebMvcTest, @DataJpaTest and Custom Slices
 summary: How test slices load a subset of the context, the difference between MockMvc and TestRestTemplate, writing your own custom slice, and avoiding the most common mistakes.
-order: 12
+order: 49
 minutes: 20
 topics: [test slices, @WebMvcTest, @DataJpaTest, MockMvc, @AutoConfigureMockMvc, custom slice, test context]
 docs:
@@ -17,7 +17,6 @@ docs:
 
 ## @WebMvcTest — controller testing with MockMvc
 
-```java
 @WebMvcTest(OrderController.class)
 class OrderControllerTest {
 
@@ -48,14 +47,12 @@ class OrderControllerTest {
             .andExpect(jsonPath("$.error").value("Order not found"));
     }
 }
-```
 
 **What loads:** `OrderController`, `@ControllerAdvice`, `WebMvcConfigurer`, `@Valid` infrastructure.  
 **What doesn't load:** repositories, services (unless `@MockBean`), database, security filters (unless configured).
 
 ## Security in @WebMvcTest
 
-```java
 @WebMvcTest(AdminController.class)
 class AdminControllerTest {
 
@@ -78,11 +75,9 @@ class AdminControllerTest {
             .andExpect(status().isUnauthorized());
     }
 }
-```
 
 ## @DataJpaTest — repository testing with embedded DB
 
-```java
 @DataJpaTest
 class OrderRepositoryTest {
 
@@ -110,7 +105,6 @@ class OrderRepositoryTest {
         assertThat(order.getId()).isNotNull();
     }
 }
-```
 
 **What loads:** JPA infrastructure, repositories, `TestEntityManager`, embedded H2.  
 **What doesn't load:** web layer, security, services, controllers.
@@ -119,7 +113,6 @@ class OrderRepositoryTest {
 
 Create your own slice to test a specific layer:
 
-```java
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
@@ -131,23 +124,19 @@ Create your own slice to test a specific layer:
 public @interface AuditTest {
     // Your custom annotation — loads only audit-related beans
 }
-```
 
 Or use `@ImportAutoConfiguration` to control exactly which auto-configurations load:
 
-```java
 @DataJpaTest
 @ImportAutoConfiguration(AuditAutoConfiguration.class)  // add just this one
 class AuditEventRepositoryTest {
     // Loads JPA + audit auto-config, nothing else
 }
-```
 
 ## Common mistakes
 
 **Mistake 1: loading too many beans**
 
-```java
 // WRONG: @SpringBootTest loads everything — slow and fragile
 @SpringBootTest
 class OrderControllerTest {
@@ -160,11 +149,9 @@ class OrderControllerTest {
 class OrderControllerTest {
     @Autowired private MockMvc mockMvc;
 }
-```
 
 **Mistake 2: forgetting @MockBean for dependencies**
 
-```java
 // WRONG: controller depends on OrderService — but @WebMvcTest doesn't load it
 // Results in UnsatisfiedDependencyException
 
@@ -173,11 +160,9 @@ class OrderControllerTest {
     @Autowired MockMvc mockMvc;
     // Missing: @MockBean OrderService orderService;
 }
-```
 
 **Mistake 3: testing implementation details**
 
-```java
 // WRONG: verifying internal method calls
 verify(orderService).processOrder(any());  // tests how, not what
 
@@ -185,7 +170,6 @@ verify(orderService).processOrder(any());  // tests how, not what
 mockMvc.perform(post("/api/orders").contentType(APPLICATION_JSON).content(json))
     .andExpect(status().isCreated())
     .andExpect(jsonPath("$.id").isNumber());
-```
 
 ## Key takeaways
 
@@ -194,3 +178,4 @@ mockMvc.perform(post("/api/orders").contentType(APPLICATION_JSON).content(json))
 - `@MockBean` replaces a bean in the test context — it's how you isolate the layer under test.
 - Create custom test slices with `@TypeExclude` or `@ImportAutoConfiguration` for your specific layer.
 - Prefer verifying output (HTTP status, response body) over verifying internal interactions.
+

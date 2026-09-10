@@ -1,7 +1,7 @@
 ---
 title: Request Mapping in Depth — Path Patterns, Params, Headers and Content Negotiation
 summary: @RequestMapping variants, path patterns and variables, params/headers/consumes/produces conditions, and the REST endpoint design rules orgs use.
-order: 6
+order: 10
 minutes: 17
 topics: [requestmapping, path-patterns, path-variables, consumes, produces, headers, params, rest-design]
 docs:
@@ -26,7 +26,6 @@ A handler matches only when every condition holds. This is content negotiation a
 
 ## Path patterns and variables
 
-```java
 @GetMapping("/api/orders/{orderId}")                        // one variable
 public Order getOrder(@PathVariable Long orderId) { ... }
 
@@ -38,27 +37,23 @@ public Order getNumericOrder(@PathVariable Long orderId) { ... }
 
 @GetMapping("/files/{path:.*}")                             // catch-all (matches slashes)
 public Resource getFile(@PathVariable String path) { ... }
-```
 
 Rules teams enforce: `@PathVariable` names match the `{}` names; path variables are **the resource id, never the query** (`/api/orders/123`, not `/api/orders?id=123`); regex constraints reject nonsense early (a `Long` variable with a non-numeric path still 400s on binding, but the regex makes it explicit).
 
 ## Consumes / Produces — the negotiation conditions
 
-```java
 @PostMapping(path = "/api/upload", consumes = "multipart/form-data")
 public UploadResult upload(@RequestParam("file") MultipartFile file) { ... }
 
 @GetMapping(path = "/api/report", produces = {MediaType.APPLICATION_JSON_VALUE,
                                                MediaType.APPLICATION_PDF_VALUE})
 public Report report() { ... }   // negotiated by the client's Accept header
-```
 
 - `consumes` rejects requests whose body isn't in the listed formats (415 Unsupported Media Type otherwise).
 - `produces` picks the handler whose output format matches the client's `Accept` — two handlers on the same path can differ only by `produces` (JSON vs XML vs PDF), and Spring negotiates.
 
 ## Params and headers as routing conditions
 
-```java
 @GetMapping("/api/search")
 public Result search(@RequestParam String q) { ... }
 
@@ -68,7 +63,6 @@ public List<Order> shippedOnly() { ... }
 
 @GetMapping(path = "/api/orders", headers = "X-API-Version=2")
 public List<Order> v2Orders() { ... }
-```
 
 Using `params`/`headers` to split handlers on the same path is a tool for versioning headers and special-casing — use sparingly; most teams find explicit paths or a single handler with a branch clearer.
 
@@ -97,3 +91,4 @@ Using `params`/`headers` to split handlers on the same path is a tool for versio
 - `consumes`/`produces` implement content negotiation at the routing layer.
 - Prefer resource-oriented, versioned paths; one mapping does one job.
 - Ambiguous mappings fail at startup by design — resolve them, don't suppress them.
+

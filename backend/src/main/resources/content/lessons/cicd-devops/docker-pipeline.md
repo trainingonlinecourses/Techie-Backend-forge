@@ -1,7 +1,7 @@
 ---
 title: The Docker Build Pipeline
 module: cicd-devops
-order: 2
+order: 1
 minutes: 22
 topics: ["Dockerfile", "multi-stage builds", "layers", "image size", "CI docker build", "registry"]
 summary: CI produces a jar; Docker turns it into a deployable unit. The Dockerfile you write decides build time, image size, attack surface, and how fast yo...
@@ -188,3 +188,4 @@ jobs:
 | gha cache | Fast CI across runs |
 
 The image is your unit of deployment — the same artifact from CI goes to staging and production, byte-identical. Get the Dockerfile right and the rest of the platform (Kubernetes, probes, rollouts) becomes straightforward.
+

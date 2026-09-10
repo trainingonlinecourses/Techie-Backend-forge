@@ -1,7 +1,7 @@
 ---
 title: The Spring Ecosystem — A Complete Beginner's Guide
 summary: Why Spring exists, the problems it solves, every project in the platform explained in depth, and how organizations standardize on it.
-order: 1
+order: 22
 minutes: 20
 topics: [spring, ecosystem, roadmap, dependency-injection, inversion-of-control]
 docs:
@@ -21,7 +21,6 @@ Before Spring, Java enterprise development used **J2EE** (now Jakarta EE). Build
 
 Imagine you're building a car. In the traditional approach, the car builds its own engine:
 
-```java
 // WITHOUT dependency injection — the car creates its own dependencies
 public class Car {
     // Problem: Car is responsible for creating AND using the engine
@@ -31,22 +30,30 @@ public class Car {
         // What if we want a different engine? We must modify Car's code!
     }
 }
-```
 
 With dependency injection, someone **gives** the car an engine:
 
+
+**What this code does — step by step:**
+
+1. WITH dependency injection — dependencies are injected from outside
+2. `private final Engine engine;` — Car doesn't care which engine — it just uses it
+3. The engine is PASSED IN (injected) by the Spring container
+4. `this.engine = engine;` — Car receives its dependency from outside
+5. `engine.start();` — Car just uses whatever engine it was given
+
+The same code, clean:
+
 ```java
-// WITH dependency injection — dependencies are injected from outside
 public class Car {
-    private final Engine engine;  // Car doesn't care which engine — it just uses it
-    
-    // The engine is PASSED IN (injected) by the Spring container
+    private final Engine engine;
+
     public Car(Engine engine) {
-        this.engine = engine;  // Car receives its dependency from outside
+        this.engine = engine;
     }
-    
+
     public void start() {
-        engine.start();  // Car just uses whatever engine it was given
+        engine.start();
     }
 }
 ```
@@ -92,22 +99,36 @@ Spring Framework is the core engine underneath everything. It provides:
 
 **Line-by-line code example:**
 
+
+**What this code does — step by step:**
+
+1. This is a Spring-managed bean — @Service tells Spring to create and manage this object
+2. `@Service` — Line 1: @Service is a stereotype annotation — Spring will instantiate this class
+3. `public class OrderService {` — Line 2: This class becomes a "bean" in Spring's container
+4. `private final OrderRepository repository;` — Line 3: This dependency will be injected by Spring
+5. Line 4: Spring sees this constructor and automatically injects the OrderRepository bean
+6. `public OrderService(OrderRepository repository) {` — Line 5: This is "constructor injection"
+7. `this.repository = repository;` — Line 6: Store the injected dependency
+8. Line 7: Now we can use the repository without ever creating it ourselves
+9. `public Order createOrder(OrderRequest request) {` — Line 8: Business method
+10. `Order order = new Order(request);` — Line 9: Create domain object
+11. `return repository.save(order);` — Line 10: Use injected dependency
+
+The same code, clean:
+
 ```java
-// This is a Spring-managed bean — @Service tells Spring to create and manage this object
-@Service                          // Line 1: @Service is a stereotype annotation — Spring will instantiate this class
-public class OrderService {       // Line 2: This class becomes a "bean" in Spring's container
-    
-    private final OrderRepository repository;  // Line 3: This dependency will be injected by Spring
-    
-    // Line 4: Spring sees this constructor and automatically injects the OrderRepository bean
-    public OrderService(OrderRepository repository) {  // Line 5: This is "constructor injection"
-        this.repository = repository;                  // Line 6: Store the injected dependency
+@Service
+public class OrderService {
+
+    private final OrderRepository repository;
+
+    public OrderService(OrderRepository repository) {
+        this.repository = repository;
     }
-    
-    // Line 7: Now we can use the repository without ever creating it ourselves
-    public Order createOrder(OrderRequest request) {   // Line 8: Business method
-        Order order = new Order(request);              // Line 9: Create domain object
-        return repository.save(order);                 // Line 10: Use injected dependency
+
+    public Order createOrder(OrderRequest request) {
+        Order order = new Order(request);
+        return repository.save(order);
     }
 }
 ```
@@ -123,47 +144,68 @@ public class OrderService {       // Line 2: This class becomes a "bean" in Spri
 
 Spring Boot is the "opinionated" layer on top of Spring Framework. It solves the "configuration hell" problem:
 
+
+**What this code does — step by step:**
+
+1. BEFORE Spring Boot — you had to configure everything manually
+2. `@Configuration` — Old way: many XML or Java config files
+3. `ds.setUrl("jdbc:postgresql://localhost:5432/mydb");` — Manual configuration
+4. ... 50 more @Bean methods for every library
+5. AFTER Spring Boot — one annotation, auto-configuration kicks in
+6. `@SpringBootApplication` — This single annotation does EVERYTHING above
+7. `SpringApplication.run(MyApplication.class, args);` — Starts the embedded server
+
+The same code, clean:
+
 ```java
-// BEFORE Spring Boot — you had to configure everything manually
-@Configuration                          // Old way: many XML or Java config files
+@Configuration
 @ComponentScan("com.acme")
 @EnableAutoConfiguration
 public class AppConfig {
     @Bean
     public DataSource dataSource() {
         HikariDataSource ds = new HikariDataSource();
-        ds.setUrl("jdbc:postgresql://localhost:5432/mydb");  // Manual configuration
+        ds.setUrl("jdbc:postgresql://localhost:5432/mydb");
         ds.setUsername("user");
         ds.setPassword("pass");
         return ds;
     }
-    // ... 50 more @Bean methods for every library
 }
 
-// AFTER Spring Boot — one annotation, auto-configuration kicks in
-@SpringBootApplication                   // This single annotation does EVERYTHING above
+@SpringBootApplication
 public class MyApplication {
     public static void main(String[] args) {
-        SpringApplication.run(MyApplication.class, args);  // Starts the embedded server
+        SpringApplication.run(MyApplication.class, args);
     }
 }
 ```
 
 **What `@SpringBootApplication` actually does (line by line):**
 
+
+**What this code does — step by step:**
+
+1. `@SpringBootApplication` — Line 1: Combines three annotations: @Configuration — marks this as a config class. @ComponentScan — scans for beans in this package and sub-packages. @EnableAutoConfiguration — automatically configures based on dependencies
+2. `public class MyApplication {` — Line 2: The main class — must be at the top of your package tree
+3. `public static void main(String[] args) {` — Line 3: Standard Java main method
+4. `SpringApplication.run(` — Line 4: Spring Boot's entry point
+5. `MyApplication.class,` — Line 5: The main application class
+6. `args` — Line 6: Command-line arguments (e.g., --server.port=8081)
+7. `);` — Line 7: Starts the embedded Tomcat server
+8. `}` — Line 8: Application is now running and accepting requests
+
+The same code, clean:
+
 ```java
-@SpringBootApplication              // Line 1: Combines three annotations:
-                                    //   @Configuration — marks this as a config class
-                                    //   @ComponentScan — scans for beans in this package and sub-packages
-                                    //   @EnableAutoConfiguration — automatically configures based on dependencies
-public class MyApplication {        // Line 2: The main class — must be at the top of your package tree
-    
-    public static void main(String[] args) {  // Line 3: Standard Java main method
-        SpringApplication.run(                 // Line 4: Spring Boot's entry point
-            MyApplication.class,               // Line 5: The main application class
-            args                               // Line 6: Command-line arguments (e.g., --server.port=8081)
-        );                                     // Line 7: Starts the embedded Tomcat server
-    }                                          // Line 8: Application is now running and accepting requests
+@SpringBootApplication
+public class MyApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(
+            MyApplication.class,
+            args
+        );
+    }
 }
 ```
 
@@ -178,20 +220,32 @@ public class MyApplication {        // Line 2: The main class — must be at the
 
 Spring Data provides a consistent way to access data from different stores (JPA, JDBC, MongoDB, Redis, etc.):
 
+
+**What this code does — step by step:**
+
+1. Just define the interface — Spring generates the implementation automatically!
+2. `@Repository` — Line 1: Marks this as a data access bean
+3. `public interface UserRepository extends JpaRepository<User, Long> {` — Line 2: Extends Spring Data's base repository
+4. Line 3: Spring Data auto-generates the query from the method name!
+5. `List<User> findByLastName(String lastName);` — Line 4: Generates: SELECT * FROM users WHERE last_name = ?
+6. Line 5: More complex queries — Spring Data parses the method name
+7. `Optional<User> findByEmailAndActiveTrue(String email);` — Line 6: SELECT * FROM users WHERE email = ? AND active = true
+8. Line 7: You can also use @Query for custom SQL
+9. `@Query("SELECT u FROM User u WHERE u.createdAt > :date")` — Line 8: JPQL query
+10. `List<User> findRecentUsers(@Param("date") LocalDateTime date);` — Line 9: Parameter binding
+
+The same code, clean:
+
 ```java
-// Just define the interface — Spring generates the implementation automatically!
-@Repository                              // Line 1: Marks this as a data access bean
-public interface UserRepository extends JpaRepository<User, Long> {  // Line 2: Extends Spring Data's base repository
-    
-    // Line 3: Spring Data auto-generates the query from the method name!
-    List<User> findByLastName(String lastName);  // Line 4: Generates: SELECT * FROM users WHERE last_name = ?
-    
-    // Line 5: More complex queries — Spring Data parses the method name
-    Optional<User> findByEmailAndActiveTrue(String email);  // Line 6: SELECT * FROM users WHERE email = ? AND active = true
-    
-    // Line 7: You can also use @Query for custom SQL
-    @Query("SELECT u FROM User u WHERE u.createdAt > :date")  // Line 8: JPQL query
-    List<User> findRecentUsers(@Param("date") LocalDateTime date);  // Line 9: Parameter binding
+@Repository
+public interface UserRepository extends JpaRepository<User, Long> {
+
+    List<User> findByLastName(String lastName);
+
+    Optional<User> findByEmailAndActiveTrue(String email);
+
+    @Query("SELECT u FROM User u WHERE u.createdAt > :date")
+    List<User> findRecentUsers(@Param("date") LocalDateTime date);
 }
 ```
 
@@ -201,21 +255,36 @@ public interface UserRepository extends JpaRepository<User, Long> {  // Line 2: 
 
 Spring Security handles who you are (authentication) and what you can do (authorization):
 
+
+**What this code does — step by step:**
+
+1. `@Configuration` — Line 1: Configuration class
+2. `@EnableWebSecurity` — Line 2: Enables Spring Security's web security support
+3. `@Bean` — Line 3: Defines the security filter chain
+4. `.authorizeHttpRequests(auth -> auth` — Line 4: Configure authorization rules
+5. `.requestMatchers("/api/public/**").permitAll()` — Line 5: Public endpoints — no auth needed
+6. `.requestMatchers("/api/admin/**").hasRole("ADMIN")` — Line 6: Admin endpoints — requires ADMIN role
+7. `.anyRequest().authenticated()` — Line 7: Everything else requires login
+8. `.oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))` — Line 8: JWT-based auth
+9. `.build();` — Line 9: Build the security configuration
+
+The same code, clean:
+
 ```java
-@Configuration                          // Line 1: Configuration class
-@EnableWebSecurity                      // Line 2: Enables Spring Security's web security support
+@Configuration
+@EnableWebSecurity
 public class SecurityConfig {
-    
-    @Bean                              // Line 3: Defines the security filter chain
+
+    @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
-            .authorizeHttpRequests(auth -> auth                   // Line 4: Configure authorization rules
-                .requestMatchers("/api/public/**").permitAll()    // Line 5: Public endpoints — no auth needed
-                .requestMatchers("/api/admin/**").hasRole("ADMIN")// Line 6: Admin endpoints — requires ADMIN role
-                .anyRequest().authenticated()                     // Line 7: Everything else requires login
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/api/public/**").permitAll()
+                .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                .anyRequest().authenticated()
             )
-            .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))  // Line 8: JWT-based auth
-            .build();                                             // Line 9: Build the security configuration
+            .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))
+            .build();
     }
 }
 ```
@@ -236,7 +305,6 @@ Spring Cloud adds tools for building microservices:
 
 Spring AI provides a unified API for working with Large Language Models:
 
-```java
 @Service
 public class AiTutorService {
     private final ChatClient chatClient;
@@ -252,7 +320,6 @@ public class AiTutorService {
             .content();                                          // Get response
     }
 }
-```
 
 ## The release train — versioning
 
@@ -303,3 +370,4 @@ Spring projects release together on a cadence:
 - The org view: the framework does the plumbing, teams write business code
 
 **Official docs:** [Spring projects](https://spring.io/projects) · [Framework overview](https://docs.spring.io/spring-framework/reference/overview.html)
+

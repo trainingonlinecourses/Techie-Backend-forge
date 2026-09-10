@@ -1,7 +1,7 @@
 ---
 title: Hello World — What Actually Happens When You Run It
 summary: A one-line program, but running it exercises the compiler, the classloader, the JVM startup, and the execution engine. This lesson follows a Hello World program from source to bytecode to running, so you understand the machinery behind three words.
-order: 2
+order: 1
 minutes: 18
 topics: [hello-world, classloading, bytecode, main-method, jvm-startup, javac, java-launcher]
 docs:
@@ -15,13 +15,11 @@ The Java Hello World program is the first thing almost every learner writes, and
 
 A Hello World program in Java is:
 
-```java
 public class HelloWorld {
     public static void main(String[] args) {
         System.out.println("Hello, World");
     }
 }
-```
 
 Three lines, but each line carries a piece of the contract between your code and the JVM.
 
@@ -124,35 +122,39 @@ When `main` returns, the JVM checks whether any other non-daemon threads are sti
 
 This version adds comments that explain what each part is doing, plus a few lines that reveal the machinery.
 
+
+**What this code does — step by step:**
+
+1. The filename must be HelloWorld.java — a public class must match its file
+2. A static block runs when the class is loaded and initialised,. BEFORE main is called — useful for one-time setup
+3. This runs during class initialisation, not when you create an object
+4. The entry point the JVM looks for
+5. args is the command-line arguments — never null, possibly empty
+6. Print the Java version the JVM is running
+7. The classic line
+8. Show that out is just a PrintStream — you can call its methods directly
+9. Exit code 0 = success; anything else means error. System.exit(0); // optional — main returning also exits with 0
+
+The same code, clean:
+
 ```java
-// The filename must be HelloWorld.java — a public class must match its file
 public class HelloWorld {
 
-    // A static block runs when the class is loaded and initialised,
-    // BEFORE main is called — useful for one-time setup
     static {
-        // This runs during class initialisation, not when you create an object
         System.out.println("[class loaded]");
     }
 
-    // The entry point the JVM looks for
     public static void main(String[] args) {
 
-        // args is the command-line arguments — never null, possibly empty
         System.out.println("arguments: " + args.length);
 
-        // Print the Java version the JVM is running
         System.out.println("java version: " +
             System.getProperty("java.version"));
 
-        // The classic line
         System.out.println("Hello, World");
 
-        // Show that out is just a PrintStream — you can call its methods directly
         System.out.printf("formatted: %d %s%n", 42, "answer");
 
-        // Exit code 0 = success; anything else means error
-        // System.exit(0);   // optional — main returning also exits with 0
     }
 }
 ```
@@ -220,3 +222,4 @@ In the lab, you will see a starter `HelloWorld.java` with deliberate mistakes �
 ## Summary
 
 Running a Hello World program exercises the entire Java startup sequence: the compiler turns source into bytecode, the launcher starts a JVM process, the classloader loads the class, the JVM verifies and prepares it, static initialisers run, the launcher finds and calls `main`, and the execution engine runs the bytecode. The `main` method is not special to the language — it is special to the launcher, which looks for a method with that exact signature. `System.out` is a `PrintStream` the JVM sets up during startup. Understanding these steps is what turns the ritual of typing `javac` and `java` into a mental model of how Java actually runs.
+

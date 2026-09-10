@@ -29,27 +29,44 @@ The result: a single Spring Boot application that serves both the API and the HT
 
 ### Step 1: The Domain Model
 
+
+**What this code does — step by step:**
+
+1. `@Entity` — (1) This is a JPA entity
+2. `@Table(name = "tasks")` — (2) Maps to "tasks" table
+3. `@Id` — (3) Primary key
+4. `@GeneratedValue(strategy = GenerationType.IDENTITY)` — (4) Auto-increment
+5. `@NotBlank(message = "Title is required")` — (5) Bean Validation
+6. `@Column(length = 500)` — (6) Column constraint
+7. `@Enumerated(EnumType.STRING)` — (7) Store enum as String, not ordinal
+8. No-arg constructor (required by JPA)
+9. All-args constructor for convenience
+10. Getters and setters
+11. Helper method for display
+
+The same code, clean:
+
 ```java
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import java.time.LocalDateTime;
 
-@Entity                                                    // (1) This is a JPA entity
-@Table(name = "tasks")                                     // (2) Maps to "tasks" table
+@Entity
+@Table(name = "tasks")
 public class Task {
 
-    @Id                                                    // (3) Primary key
-    @GeneratedValue(strategy = GenerationType.IDENTITY)    // (4) Auto-increment
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "Title is required")               // (5) Bean Validation
+    @NotBlank(message = "Title is required")
     @Size(max = 100, message = "Title must be under 100 characters")
     private String title;
 
-    @Column(length = 500)                                  // (6) Column constraint
+    @Column(length = 500)
     private String description;
 
-    @Enumerated(EnumType.STRING)                           // (7) Store enum as String, not ordinal
+    @Enumerated(EnumType.STRING)
     private Priority priority = Priority.MEDIUM;
 
     private boolean completed = false;
@@ -57,17 +74,14 @@ public class Task {
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    // No-arg constructor (required by JPA)
     protected Task() {}
 
-    // All-args constructor for convenience
     public Task(String title, String description, Priority priority) {
         this.title = title;
         this.description = description;
         this.priority = priority;
     }
 
-    // Getters and setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public String getTitle() { return title; }
@@ -80,7 +94,6 @@ public class Task {
     public void setCompleted(boolean completed) { this.completed = completed; }
     public LocalDateTime getCreatedAt() { return createdAt; }
 
-    // Helper method for display
     public String getPriorityColor() {
         return switch (priority) {
             case HIGH -> "danger";
@@ -107,25 +120,32 @@ public enum Priority {
 
 ### Step 2: The Repository (Data Access Layer)
 
+
+**What this code does — step by step:**
+
+1. `@Repository` — (1) Marks this as a Spring bean
+2. (2) Spring Data derives the query from the method name!
+3. (3) Custom JPQL query
+4. (4) Count by priority
+5. (5) Find top N recent tasks
+
+The same code, clean:
+
 ```java
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
-@Repository                                                 // (1) Marks this as a Spring bean
+@Repository
 public interface TaskRepository extends JpaRepository<Task, Long> {
 
-    // (2) Spring Data derives the query from the method name!
     List<Task> findByCompleted(boolean completed);
 
-    // (3) Custom JPQL query
     @Query("SELECT t FROM Task t WHERE t.title LIKE %:keyword% OR t.description LIKE %:keyword%")
     List<Task> search(String keyword);
 
-    // (4) Count by priority
     long countByPriority(Priority priority);
 
-    // (5) Find top N recent tasks
     List<Task> findTop5ByOrderByCreatedAtDesc();
 }
 ```
@@ -142,18 +162,32 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
 
 ### Step 3: The Service Layer
 
+
+**What this code does — step by step:**
+
+1. `@Service` — (1) Spring manages this bean
+2. `@Transactional` — (2) All methods run in a transaction
+3. (3) Constructor injection — Spring auto-wires the repository
+4. `return taskRepository.save(task);` — (4) save() handles INSERT
+5. `return taskRepository.save(existing);` — (5) save() handles UPDATE when id exists
+6. `@Transactional` — (6) Override class-level for specific behavior
+7. No explicit save() needed — dirty checking auto-saves
+8. `return taskRepository.count();` — (7) Simple count query
+9. Custom exception
+
+The same code, clean:
+
 ```java
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
-@Service                                                     // (1) Spring manages this bean
-@Transactional                                               // (2) All methods run in a transaction
+@Service
+@Transactional
 public class TaskService {
 
     private final TaskRepository taskRepository;
 
-    // (3) Constructor injection — Spring auto-wires the repository
     public TaskService(TaskRepository taskRepository) {
         this.taskRepository = taskRepository;
     }
@@ -168,7 +202,7 @@ public class TaskService {
     }
 
     public Task createTask(Task task) {
-        return taskRepository.save(task);                      // (4) save() handles INSERT
+        return taskRepository.save(task);
     }
 
     public Task updateTask(Long id, Task updated) {
@@ -176,14 +210,13 @@ public class TaskService {
         existing.setTitle(updated.getTitle());
         existing.setDescription(updated.getDescription());
         existing.setPriority(updated.getPriority());
-        return taskRepository.save(existing);                  // (5) save() handles UPDATE when id exists
+        return taskRepository.save(existing);
     }
 
-    @Transactional                                            // (6) Override class-level for specific behavior
+    @Transactional
     public void toggleComplete(Long id) {
         Task task = getById(id);
         task.setCompleted(!task.isCompleted());
-        // No explicit save() needed — dirty checking auto-saves
     }
 
     public void deleteTask(Long id) {
@@ -191,11 +224,10 @@ public class TaskService {
     }
 
     public long getStats() {
-        return taskRepository.count();                         // (7) Simple count query
+        return taskRepository.count();
     }
 }
 
-// Custom exception
 public class TaskNotFoundException extends RuntimeException {
     public TaskNotFoundException(Long id) {
         super("Task not found with id: " + id);
@@ -205,14 +237,32 @@ public class TaskNotFoundException extends RuntimeException {
 
 ### Step 4: The Controller (Web Layer)
 
+
+**What this code does — step by step:**
+
+1. `@Controller` — (1) Returns view names, not JSON
+2. `@RequestMapping("/tasks")` — (2) All routes start with /tasks
+3. `@GetMapping` — (3) GET /tasks → show list
+4. `model.addAttribute("tasks", taskService.getAllTasks());` — (4) Pass data to template
+5. `return "task-list";` — (5) Returns task-list.html
+6. `@GetMapping("/new")` — (6) GET /tasks/new → show form
+7. `model.addAttribute("task", new Task());` — (7) Empty task for form binding
+8. `model.addAttribute("priorities", Priority.values());` — (8) For dropdown options
+9. `@PostMapping` — (9) POST /tasks → save
+10. `if (result.hasErrors()) {` — (10) Validation failed → re-show form
+11. `return "redirect:/tasks";` — (11) PRG pattern — redirect after POST
+12. `return "task-form";` — (12) Reuse same form for edit
+
+The same code, clean:
+
 ```java
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-@Controller                                                   // (1) Returns view names, not JSON
-@RequestMapping("/tasks")                                     // (2) All routes start with /tasks
+@Controller
+@RequestMapping("/tasks")
 public class TaskController {
 
     private final TaskService taskService;
@@ -221,35 +271,35 @@ public class TaskController {
         this.taskService = taskService;
     }
 
-    @GetMapping                                                // (3) GET /tasks → show list
+    @GetMapping
     public String listTasks(Model model) {
-        model.addAttribute("tasks", taskService.getAllTasks());  // (4) Pass data to template
+        model.addAttribute("tasks", taskService.getAllTasks());
         model.addAttribute("stats", taskService.getStats());
-        return "task-list";                                     // (5) Returns task-list.html
+        return "task-list";
     }
 
-    @GetMapping("/new")                                        // (6) GET /tasks/new → show form
+    @GetMapping("/new")
     public String showCreateForm(Model model) {
-        model.addAttribute("task", new Task());                 // (7) Empty task for form binding
-        model.addAttribute("priorities", Priority.values());   // (8) For dropdown options
+        model.addAttribute("task", new Task());
+        model.addAttribute("priorities", Priority.values());
         return "task-form";
     }
 
-    @PostMapping                                               // (9) POST /tasks → save
+    @PostMapping
     public String createTask(@Valid @ModelAttribute Task task,
                              BindingResult result) {
-        if (result.hasErrors()) {                               // (10) Validation failed → re-show form
+        if (result.hasErrors()) {
             return "task-form";
         }
         taskService.createTask(task);
-        return "redirect:/tasks";                              // (11) PRG pattern — redirect after POST
+        return "redirect:/tasks";
     }
 
     @GetMapping("/{id}/edit")
     public String showEditForm(@PathVariable Long id, Model model) {
         model.addAttribute("task", taskService.getById(id));
         model.addAttribute("priorities", Priority.values());
-        return "task-form";                                    // (12) Reuse same form for edit
+        return "task-form";
     }
 
     @PostMapping("/{id}")
@@ -335,17 +385,14 @@ public class TaskController {
 ## Real-World Scenarios
 
 ### Scenario 1: Admin dashboard with user management
-```java
 @Controller
 @RequestMapping("/admin/users")
 @PreAuthorize("hasRole('ADMIN')")    // Only admins can access
 public class AdminUserController {
     // Only admin sees user list, can ban/unban, reset passwords
 }
-```
 
 ### Scenario 2: E-commerce product catalog
-```java
 @Controller
 @RequestMapping("/products")
 public class ProductController {
@@ -359,7 +406,6 @@ public class ProductController {
         return "product-list";
     }
 }
-```
 
 ## Common Beginner Pitfalls
 
@@ -378,3 +424,4 @@ public class ProductController {
 - **@Valid + BindingResult** validate inputs before saving
 - **PRG (Post-Redirect-Get)** prevents duplicate form submissions
 - **Service layer** handles business logic; **Controller** handles HTTP; **Repository** handles data
+

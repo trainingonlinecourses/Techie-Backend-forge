@@ -1,7 +1,7 @@
 ---
 title: Reactive WebSocket — Real-Time Communication with WebFlux
 summary: WebSocket endpoints in Spring WebFlux — handler functions, broadcast patterns, room-based messaging, heartbeat, and the patterns for scalable real-time applications. Beginner-friendly with line-by-line code.
-order: 14
+order: 11
 minutes: 22
 topics: [WebSocket, reactive WebSocket, real-time, broadcast, rooms, heartbeat, SSE vs WebSocket, WebSocket handler]
 docs:
@@ -28,33 +28,44 @@ HTTP is **request-response**: the client asks, the server answers, connection cl
 
 ### 1. WebSocket Handler (The Core)
 
+
+**What this code does — step by step:**
+
+1. Store all connected sessions (like a chat room)
+2. `sessions.put(sessionId, session);` — Track this connection
+3. Handle incoming messages from this client
+4. Parse the incoming message
+5. Broadcast to ALL connected clients
+6. Client disconnected
+7. `.then();` — Mono<Void>
+8. Send to ALL sessions except the sender
+9. `.filter(s -> !s.getId().equals(senderId))` — Don't echo back to sender
+10. `.filter(WebSocketSession::isOpen)` — Only open sessions
+
+The same code, clean:
+
 ```java
 @Component
 public class ChatWebSocketHandler implements WebSocketHandler {
 
-    // Store all connected sessions (like a chat room)
     private final ConcurrentHashMap<String, WebSocketSession> sessions = new ConcurrentHashMap<>();
 
     @Override
     public Mono<Void> handle(WebSocketSession session) {
         String sessionId = session.getId();
-        sessions.put(sessionId, session);                        // Track this connection
+        sessions.put(sessionId, session);
 
         log.info("User connected: {}", sessionId);
 
-        // Handle incoming messages from this client
         return session.receive()
             .map(message -> {
-                // Parse the incoming message
                 ChatMessage chatMessage = parseMessage(message.getPayloadAsText());
                 return chatMessage;
             })
             .doOnNext(msg -> {
-                // Broadcast to ALL connected clients
                 broadcastMessage(sessionId, msg);
             })
             .doOnComplete(() -> {
-                // Client disconnected
                 sessions.remove(sessionId);
                 log.info("User disconnected: {}", sessionId);
                 broadcastSystemMessage(sessionId + " left the chat");
@@ -63,16 +74,15 @@ public class ChatWebSocketHandler implements WebSocketHandler {
                 sessions.remove(sessionId);
                 log.error("WebSocket error for {}: {}", sessionId, e.getMessage());
             })
-            .then();                                            // Mono<Void>
+            .then();
     }
 
     private void broadcastMessage(String senderId, ChatMessage message) {
         String json = toJson(new ChatEvent("message", senderId, message.content(), Instant.now()));
 
-        // Send to ALL sessions except the sender
         sessions.values().stream()
-            .filter(s -> !s.getId().equals(senderId))           // Don't echo back to sender
-            .filter(WebSocketSession::isOpen)                   // Only open sessions
+            .filter(s -> !s.getId().equals(senderId))
+            .filter(WebSocketSession::isOpen)
             .forEach(session -> session.sendMany(
                 Mono.just(session.textMessage(json))
             ).subscribe());
@@ -97,7 +107,6 @@ public class ChatWebSocketHandler implements WebSocketHandler {
 
 ### 2. WebSocket Configuration
 
-```java
 @Configuration
 @EnableWebSocket
 public class WebSocketConfig implements WebSocketConfigurer {
@@ -110,11 +119,9 @@ public class WebSocketConfig implements WebSocketConfigurer {
                 .setAllowedOrigins("*");                         // Allow all origins (dev only!)
     }
 }
-```
 
 ### 3. Room-Based Chat (Multiple Chat Rooms)
 
-```java
 @Component
 public class RoomWebSocketHandler implements WebSocketHandler {
 
@@ -165,9 +172,20 @@ public class RoomWebSocketHandler implements WebSocketHandler {
 
 public record ChatEvent(String type, String sender, String content, Instant timestamp) {}
 public record ChatMessage(String type, String roomId, String content) {}
-```
 
 ### 4. WebSocket with Authentication
+
+
+**What this code does — step by step:**
+
+1. Extract JWT from query parameter or first message
+2. `.split("token=")[1];` — ?token=xxx
+3. Validate the token
+4. Token valid — attach user info to session
+5. `return handleAuthenticated(session, user);` — Process messages
+6. Token invalid — close the connection
+
+The same code, clean:
 
 ```java
 @Component
@@ -177,21 +195,17 @@ public class AuthenticatedWebSocketHandler implements WebSocketHandler {
 
     @Override
     public Mono<Void> handle(WebSocketSession session) {
-        // Extract JWT from query parameter or first message
         String token = session.getHandshakeInfo()
             .getURI()
             .getQuery()
-            .split("token=")[1];                                 // ?token=xxx
+            .split("token=")[1];
 
-        // Validate the token
         return tokenValidator.validate(token)
             .flatMap(user -> {
-                // Token valid — attach user info to session
                 session.getAttributes().put("user", user);
-                return handleAuthenticated(session, user);       // Process messages
+                return handleAuthenticated(session, user);
             })
             .switchIfEmpty(
-                // Token invalid — close the connection
                 session.close(CloseStatus.POLICY_VIOLATION)
                     .then(Mono.empty())
             );
@@ -212,7 +226,6 @@ public class AuthenticatedWebSocketHandler implements WebSocketHandler {
 
 ### Scenario 1: Live Notification System
 
-```java
 @Component
 public class NotificationWebSocketHandler implements WebSocketHandler {
 
@@ -239,11 +252,9 @@ public class NotificationWebSocketHandler implements WebSocketHandler {
             .then();
     }
 }
-```
 
 ### Scenario 2: Live Dashboard Updates
 
-```java
 @Component
 public class DashboardWebSocketHandler implements WebSocketHandler {
 
@@ -266,11 +277,9 @@ public class DashboardWebSocketHandler implements WebSocketHandler {
         ).then();
     }
 }
-```
 
 ### Scenario 3: Collaborative Editing
 
-```java
 @Component
 public class CollaborativeEditorHandler implements WebSocketHandler {
 
@@ -297,7 +306,6 @@ public class CollaborativeEditorHandler implements WebSocketHandler {
             .then();
     }
 }
-```
 
 ---
 
@@ -322,3 +330,4 @@ public class CollaborativeEditorHandler implements WebSocketHandler {
 - **Always handle disconnections** — clean up sessions in `doOnComplete` or `doFinally`.
 
 Official docs: [WebSocket (Spring WebFlux)](https://docs.spring.io/spring-framework/reference/web/webflux-websocket.html)
+

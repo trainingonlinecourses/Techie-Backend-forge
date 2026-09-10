@@ -1,7 +1,7 @@
 ---
 title: Jackson Customization — Serializers, Mixins and API Design
 summary: Custom serializers for Money and enums, Jackson mixins for third-party classes, global naming strategies, and the annotations that shape your JSON contract.
-order: 28
+order: 33
 minutes: 20
 topics: [Jackson, ObjectMapper, custom serializer, mixin, naming strategy, @JsonFormat, @JsonProperty]
 docs:
@@ -17,7 +17,6 @@ Jackson's `ObjectMapper` is the engine behind Spring Boot's JSON serialization. 
 
 ## Custom serializer for a domain type
 
-```java
 public class MoneySerializer extends StdSerializer<Money> {
     public MoneySerializer() { super(Money.class); }
 
@@ -40,7 +39,6 @@ public class JacksonConfig {
         return builder -> builder.serializerByType(Money.class, new MoneySerializer());
     }
 }
-```
 
 **Result:** every `Money` field serializes as `{"cents": 1999, "currency": "USD", "formatted": "$19.99"}`.
 
@@ -48,7 +46,6 @@ public class JacksonConfig {
 
 You can't annotate a class you don't own. Mixins let you add Jackson annotations to any class:
 
-```java
 public abstract class InetAddressMixin {
     @JsonProperty("address")
     @JsonGetter("address")
@@ -61,7 +58,6 @@ public Jackson2ObjectMapperBuilderCustomizer inetAddressMixin() {
     return builder -> builder.mixIn(InetAddress.class, InetAddressMixin.class);
 }
 // Now InetAddress serializes as {"address": "192.168.1.1"} instead of {}
-```
 
 ## Naming strategies — camelCase, snake_case, kebab-case
 
@@ -75,32 +71,35 @@ spring:
     time-zone: UTC
 ```
 
-```java
 // Or per-controller via annotation
 @JsonPropertyNaming(PropertyNamingStrategies.SnakeCase.class)
 @RestController
 public class UserController { }
-```
 
 ## Per-field control with annotations
 
+
+**What this code does — step by step:**
+
+1. `@JsonProperty("order_id") long id,` — rename field
+2. `@JsonFormat(pattern = "yyyy-MM-dd") LocalDate date,` — format date
+3. `@JsonInclude(Include.NON_NULL) String notes,` — omit if null
+4. `@JsonValue Money total` — serialize as just the value
+5. @JsonValue — the entire object serializes as a single value. @JsonIgnore — skip this field entirely. @JsonAlias — accept alternative names when deserializing. @JsonView — include/exclude fields based on the active view
+
+The same code, clean:
+
 ```java
 public record OrderDto(
-    @JsonProperty("order_id") long id,                    // rename field
-    @JsonFormat(pattern = "yyyy-MM-dd") LocalDate date,  // format date
-    @JsonInclude(Include.NON_NULL) String notes,          // omit if null
-    @JsonValue Money total                                 // serialize as just the value
+    @JsonProperty("order_id") long id,
+    @JsonFormat(pattern = "yyyy-MM-dd") LocalDate date,
+    @JsonInclude(Include.NON_NULL) String notes,
+    @JsonValue Money total
 ) {}
-
-// @JsonValue — the entire object serializes as a single value
-// @JsonIgnore — skip this field entirely
-// @JsonAlias — accept alternative names when deserializing
-// @JsonView — include/exclude fields based on the active view
 ```
 
 ## Global ObjectMapper customization
 
-```java
 @Configuration
 public class JacksonConfig {
     @Bean
@@ -119,13 +118,11 @@ public class JacksonConfig {
             .serializationInclusion(JsonInclude.Include.NON_NULL);
     }
 }
-```
 
 ## org scenarios
 
 **Enum as string in API:**
 
-```java
 public enum OrderStatus {
     @JsonProperty("pending") PENDING,
     @JsonProperty("shipped") SHIPPED,
@@ -142,18 +139,15 @@ public enum OrderStatus {
     }
 }
 // API sees: "pending", "shipped", "delivered" — not "PENDING"
-```
 
 **Hiding internal fields from the API:**
 
-```java
 public record UserResponse(
     long id,
     String displayName,
     @JsonIgnore String passwordHash,       // never serialize
     @JsonInclude(Include.NON_NULL) String email  // only if set
 ) {}
-```
 
 ## Key takeaways
 
@@ -162,3 +156,4 @@ public record UserResponse(
 - `@JsonProperty` renames fields; `@JsonFormat` formats dates; `@JsonInclude(NON_NULL)` omits nulls.
 - `@JsonValue` and `@JsonCreator` control how enums and custom types serialize/deserialize.
 - Set naming strategies and inclusion rules globally in `application.yml` for consistent API contracts.
+

@@ -1,7 +1,7 @@
 ---
 title: Blue-Green, Canary and Feature Flags
 module: cicd-devops
-order: 4
+order: 5
 minutes: 22
 topics: ["blue-green", "canary", "feature flags", "rollback", "traffic shifting", "release automation"]
 summary: Rolling updates are the baseline. But for critical systems you want more control: bluegreen (instant switch + instant rollback), canary (gradual tr...
@@ -102,7 +102,6 @@ spec:
 
 Deploy the code **dark** — the feature exists but is off — then flip it per environment or per user:
 
-```java
 @Component
 public class FeatureFlags {
 
@@ -112,9 +111,7 @@ public class FeatureFlags {
         return toggleClient.isEnabled(feature, user);
     }
 }
-```
 
-```java
 @Service
 public class CheckoutService {
 
@@ -125,7 +122,6 @@ public class CheckoutService {
         return checkoutV1(cart, user);
     }
 }
-```
 
 **The killer combination**: ship `checkout-v2` dark, run it for your own team (internal flag), ramp to 1% (canary by flag), then 100% — *without a redeploy*. Rollback is flipping a boolean.
 
@@ -133,11 +129,9 @@ public class CheckoutService {
 
 The most important flag is the **kill switch** — a global "everything off" for a subsystem:
 
-```java
 if (flags.killSwitch("payments")) {
     throw new PaymentsUnavailableException();
 }
-```
 
 When the payment gateway misbehaves, ops flips one flag instead of redeploying.
 
@@ -192,3 +186,4 @@ The pipeline itself enforces the gate: no metrics comparison, no promotion.
 | Schema changes | Expand/contract migrations always |
 
 Release strategy is risk management: how fast can you recover, and how much traffic do you expose to the unknown? Start with rolling + flags; add blue-green and canary where the blast radius justifies the complexity.
+

@@ -1,7 +1,7 @@
 ---
 title: Redis Clustering — Complete Beginner's Guide
 summary: How Redis scales from single instance to cluster, sharding, replication, and the Spring Boot configuration for high availability.
-order: 3
+order: 1
 minutes: 18
 topics: [redis cluster, sharding, replication, sentinel, high availability]
 docs:
@@ -38,7 +38,6 @@ Master ←──writes──→ Client
   └──replicates──→ Slave 2 (read-only copy)
 ```
 
-```java
 // Spring Boot — configure Redis with replicas
 spring:
   data:
@@ -46,7 +45,6 @@ spring:
       host: redis-master                    # Line 1: Master node
       port: 6379
       read-from: replica                    # Line 2: Read from replicas (spread read load)
-```
 
 **How replication works:**
 1. Client writes to master
@@ -69,14 +67,15 @@ Keys 10923-16383 → Master 3
 
 **How Redis Cluster distributes keys:**
 
-```java
-// Redis uses hash slots to distribute keys
-// HASH_SLOT = CRC16(key) mod 16384
 
-// Example:
-// "user:1001" → hash slot 2938 → Master 1
-// "user:1002" → hash slot 7182 → Master 2
-// "user:1003" → hash slot 12456 → Master 3
+**What this code does — step by step:**
+
+1. Redis uses hash slots to distribute keys. HASH_SLOT = CRC16(key) mod 16384
+2. Example: "user:1001" → hash slot 2938 → Master 1. "user:1002" → hash slot 7182 → Master 2. "user:1003" → hash slot 12456 → Master 3
+
+The same code, clean:
+
+```java
 ```
 
 **Spring Boot configuration for Redis Cluster:**
@@ -94,14 +93,24 @@ spring:
       read-from: replica                          # Line 3: Read from replicas
 ```
 
+
+**What this code does — step by step:**
+
+1. Spring Boot auto-configures RedisTemplate for clusters
+2. `RedisTemplate<String, Object> template = new RedisTemplate<>();` — Line 1: Create template
+3. `template.setConnectionFactory(factory);` — Line 2: Set connection
+4. `template.setKeySerializer(new StringRedisSerializer());` — Line 3: String keys
+5. `template.setValueSerializer(new GenericJackson2JsonRedisSerializer());` — Line 4: JSON values
+
+The same code, clean:
+
 ```java
-// Spring Boot auto-configures RedisTemplate for clusters
 @Bean
 public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory) {
-    RedisTemplate<String, Object> template = new RedisTemplate<>();  // Line 1: Create template
-    template.setConnectionFactory(factory);                          // Line 2: Set connection
-    template.setKeySerializer(new StringRedisSerializer());          // Line 3: String keys
-    template.setValueSerializer(new GenericJackson2JsonRedisSerializer());  // Line 4: JSON values
+    RedisTemplate<String, Object> template = new RedisTemplate<>();
+    template.setConnectionFactory(factory);
+    template.setKeySerializer(new StringRedisSerializer());
+    template.setValueSerializer(new GenericJackson2JsonRedisSerializer());
     return template;
 }
 ```
@@ -141,38 +150,56 @@ spring:
 
 ## Real-world scenario — caching for e-commerce
 
+
+**What this code does — step by step:**
+
+1. `private final RedisTemplate<String, Product> redisTemplate;` — Line 1: Redis connection
+2. Cache product with TTL (Time To Live)
+3. `String key = "product:" + product.getId();` — Line 1: Create cache key
+4. `redisTemplate.opsForValue().set(` — Line 2: Store in Redis
+5. `key,` — Line 3: Key
+6. `product,` — Line 4: Value (serialized)
+7. `Duration.ofMinutes(30)` — Line 5: Expire after 30 minutes
+8. Get product from cache
+9. `String key = "product:" + id;` — Line 1: Create cache key
+10. `return redisTemplate.opsForValue().get(key);` — Line 2: Get from Redis. Returns null if not in cache (cache miss)
+11. Cache-aside pattern
+12. `Product product = getProduct(id);` — Line 1: Check cache
+13. `if (product == null) {` — Line 2: Cache miss
+14. `product = productRepository.findById(id).orElse(null);` — Line 3: Get from DB
+15. `cacheProduct(product);` — Line 4: Populate cache
+16. `return product;` — Line 5: Return (from cache or DB)
+
+The same code, clean:
+
 ```java
 @Service
 public class ProductCacheService {
-    private final RedisTemplate<String, Product> redisTemplate;  // Line 1: Redis connection
-    
-    // Cache product with TTL (Time To Live)
+    private final RedisTemplate<String, Product> redisTemplate;
+
     public void cacheProduct(Product product) {
-        String key = "product:" + product.getId();               // Line 1: Create cache key
-        redisTemplate.opsForValue().set(                         // Line 2: Store in Redis
-            key,                                                 // Line 3: Key
-            product,                                             // Line 4: Value (serialized)
-            Duration.ofMinutes(30)                               // Line 5: Expire after 30 minutes
+        String key = "product:" + product.getId();
+        redisTemplate.opsForValue().set(
+            key,
+            product,
+            Duration.ofMinutes(30)
         );
     }
-    
-    // Get product from cache
+
     public Product getProduct(Long id) {
-        String key = "product:" + id;                            // Line 1: Create cache key
-        return redisTemplate.opsForValue().get(key);             // Line 2: Get from Redis
-        // Returns null if not in cache (cache miss)
+        String key = "product:" + id;
+        return redisTemplate.opsForValue().get(key);
     }
-    
-    // Cache-aside pattern
+
     public Product getProductWithCache(Long id) {
-        Product product = getProduct(id);                        // Line 1: Check cache
-        if (product == null) {                                   // Line 2: Cache miss
-            product = productRepository.findById(id).orElse(null);  // Line 3: Get from DB
+        Product product = getProduct(id);
+        if (product == null) {
+            product = productRepository.findById(id).orElse(null);
             if (product != null) {
-                cacheProduct(product);                           // Line 4: Populate cache
+                cacheProduct(product);
             }
         }
-        return product;                                          // Line 5: Return (from cache or DB)
+        return product;
     }
 }
 ```
@@ -195,3 +222,4 @@ public class ProductCacheService {
 - Cache-aside pattern: check cache → miss → get from DB → populate cache
 
 **Official docs:** [Redis Scaling](https://redis.io/docs/manual/scaling/) · [Spring Data Redis Clustering](https://docs.spring.io/spring-data/redis/reference/redis/clustering.html)
+

@@ -1,7 +1,7 @@
 ---
 title: The Modern HttpClient — HTTP/2, Async, and Clean APIs
 module: java-networking
-order: 3
+order: 1
 minutes: 26
 topics: ["HttpClient", "HttpRequest", "HttpResponse", "async", "HTTP/2", "WebSocket"]
 summary: For twenty years, Java's builtin HTTP story was HttpURLConnection — functional but clunky: verbose, no HTTP/2, awkward async, and easy to misuse. J...
@@ -22,6 +22,22 @@ For twenty years, Java's built-in HTTP story was `HttpURLConnection` — functio
 
 ## The Three Objects: HttpClient, HttpRequest, HttpResponse
 
+
+**What this code does — step by step:**
+
+1. 1. The CLIENT — configured once, reused for many requests.
+2. `.connectTimeout(Duration.ofSeconds(5))` — TCP handshake bound
+3. `.followRedirects(HttpClient.Redirect.NORMAL)` — follow 3xx
+4. `.version(HttpClient.Version.HTTP_2)` — prefer HTTP/2
+5. 2. The REQUEST — fluent builder, one per call.
+6. `.header("Accept", "application/json")` — any headers
+7. `.timeout(Duration.ofSeconds(10))` — whole-request bound
+8. 3. The RESPONSE — status, headers, and a typed body.
+9. `System.out.println("Status : " + response.statusCode());` — 200
+10. `System.out.println("Version: " + response.version());` — HTTP_2
+
+The same code, clean:
+
 ```java
 import java.net.URI;
 import java.net.http.*;
@@ -29,28 +45,25 @@ import java.time.Duration;
 
 public class HttpClientDemo {
     public static void main(String[] args) throws Exception {
-        // 1. The CLIENT — configured once, reused for many requests.
         HttpClient client = HttpClient.newBuilder()
-                .connectTimeout(Duration.ofSeconds(5))   // TCP handshake bound
-                .followRedirects(HttpClient.Redirect.NORMAL) // follow 3xx
-                .version(HttpClient.Version.HTTP_2)      // prefer HTTP/2
+                .connectTimeout(Duration.ofSeconds(5))
+                .followRedirects(HttpClient.Redirect.NORMAL)
+                .version(HttpClient.Version.HTTP_2)
                 .build();
 
-        // 2. The REQUEST — fluent builder, one per call.
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("https://api.example.com/users?page=1"))
-                .header("Accept", "application/json")    // any headers
-                .timeout(Duration.ofSeconds(10))         // whole-request bound
+                .header("Accept", "application/json")
+                .timeout(Duration.ofSeconds(10))
                 .GET()
                 .build();
 
-        // 3. The RESPONSE — status, headers, and a typed body.
         HttpResponse<String> response =
                 client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        System.out.println("Status : " + response.statusCode());   // 200
+        System.out.println("Status : " + response.statusCode());
         System.out.println("Body   : " + response.body());
-        System.out.println("Version: " + response.version());      // HTTP_2
+        System.out.println("Version: " + response.version());
     }
 }
 ```
@@ -61,7 +74,6 @@ public class HttpClientDemo {
 
 The client's superpower is `sendAsync`, which returns immediately with a **`CompletableFuture`** — a promise that completes when the response arrives:
 
-```java
 import java.net.URI;
 import java.net.http.*;
 import java.util.concurrent.CompletableFuture;
@@ -90,24 +102,26 @@ public class AsyncDemo {
         return HttpRequest.newBuilder(URI.create(url)).GET().build();
     }
 }
-```
 
 **Walking through it:** each `sendAsync` starts a request without blocking the caller — the three requests run *concurrently* (this is where HTTP/2 shines: one connection multiplexes them). `CompletableFuture.allOf(...)` waits for all three; `.thenApply` runs once everything completes and combines the bodies; `combined.get()` is the *only* blocking call, at the very end. The total time is roughly the slowest single request, not the sum — that's the concurrency win. This pattern (async composition) is what reactive frameworks build on, and it's available in plain Java.
 
 ## POST with a JSON Body
 
-```java
-HttpRequest request = HttpRequest.newBuilder()
-        .uri(URI.create("https://api.example.com/users"))
-        .header("Content-Type", "application/json")
-        .POST(HttpRequest.BodyPublishers.ofString(
-                "{\"name\":\"Ada\",\"role\":\"admin\"}"))
-        .build();
+public class Main {
 
-HttpResponse<String> response = client.send(request,
-        HttpResponse.BodyHandlers.ofString());
-System.out.println(response.statusCode());
-```
+    public static void main(String[] args) {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("https://api.example.com/users"))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(
+                        "{\"name\":\"Ada\",\"role\":\"admin\"}"))
+                .build();
+
+        HttpResponse<String> response = client.send(request,
+                HttpResponse.BodyHandlers.ofString());
+        System.out.println(response.statusCode());
+    }
+}
 
 `BodyPublishers` is the write-side mirror of `BodyHandlers`: `ofString`, `ofByteArray`, `ofFile`, `ofInputStream`, or `noBody()`. The symmetry is the design's elegance — you publish a request body and handle a response body with parallel APIs.
 
@@ -115,39 +129,40 @@ System.out.println(response.statusCode());
 
 The body handler decides *what to do with* the response bytes:
 
-```java
 HttpResponse<String>   asString  = client.send(req, HttpResponse.BodyHandlers.ofString());
 HttpResponse<byte[]>   asBytes   = client.send(req, HttpResponse.BodyHandlers.ofByteArray());
 HttpResponse<Path>     asFile    = client.send(req, HttpResponse.BodyHandlers.ofFile(
                                                Path.of("download.zip")));
 HttpResponse<Void>     asDiscard = client.send(req, HttpResponse.BodyHandlers.discarding());
-```
 
 `ofFile` streams the body straight to disk — perfect for downloads without loading the whole file into memory. `discarding()` keeps only status/headers. For custom needs, `ofInputStream()` hands you the raw stream, and you can implement `BodyHandler`/`BodySubscriber` for full control (that's how streaming/partial responses are built).
 
 ## Handling Errors and Timeouts Like a Pro
 
-```java
-HttpResponse<String> response;
-try {
-    response = client.send(request, HttpResponse.BodyHandlers.ofString());
-} catch (HttpTimeoutException e) {
-    System.out.println("Request timed out");
-    return;
-} catch (java.io.IOException e) {
-    System.out.println("Network failure: " + e.getMessage());
-    return;
-} catch (InterruptedException e) {
-    Thread.currentThread().interrupt();   // restore the flag
-    return;
-}
+public class Main {
 
-// An HTTP error STATUS is not an exception — check it explicitly:
-if (response.statusCode() >= 400) {
-    System.out.println("Server error " + response.statusCode() +
-                       ": " + response.body());
+    public static void main(String[] args) {
+        HttpResponse<String> response;
+        try {
+            response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        } catch (HttpTimeoutException e) {
+            System.out.println("Request timed out");
+            return;
+        } catch (java.io.IOException e) {
+            System.out.println("Network failure: " + e.getMessage());
+            return;
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();   // restore the flag
+            return;
+        }
+
+        // An HTTP error STATUS is not an exception — check it explicitly:
+        if (response.statusCode() >= 400) {
+            System.out.println("Server error " + response.statusCode() +
+                               ": " + response.body());
+        }
+    }
 }
-```
 
 **The critical distinction:** network *failures* (timeout, refused connection, DNS) throw exceptions; HTTP *error statuses* (404, 500) are returned as normal responses. The client doesn't throw for a 500 — you must inspect `statusCode()`. This catches many newcomers: they expect `send` to throw on 404, and it doesn't. Handle both halves deliberately.
 
@@ -155,11 +170,9 @@ if (response.statusCode() >= 400) {
 
 `HttpClient` also has a first-class WebSocket client — one connection, bidirectional, message-framed:
 
-```java
 WebSocket ws = client.newWebSocketBuilder()
         .buildAsync(URI.create("wss://example.com/chat"), listener).join();
 ws.sendText("hello", true);   // send a text frame
-```
 
 (With a `WebSocket.Listener` handling `onOpen`, `onText`, `onClose`.) For chat, live feeds, and push notifications, this removes the need for third-party WebSocket libraries.
 
@@ -170,3 +183,4 @@ For plain Java, `HttpClient` is the standard. In a Spring Boot app you'll often 
 ## Recap
 
 `java.net.http.HttpClient` is the modern, built-in HTTP client: configure one client (timeouts, redirects, HTTP/2), build fluent requests, and send them synchronously (`send`) or asynchronously (`sendAsync` returning `CompletableFuture`). Body handlers give typed results (`ofString`, `ofFile`, custom), and the API covers POST bodies, WebSockets, and concurrency composition. The two habits to internalize: **network failures throw, HTTP errors don't** — check `statusCode()` — and async + `allOf`/`thenApply` turns N sequential requests into one concurrent batch. Master this client and you have the JDK's full HTTP story in one clean API.
+

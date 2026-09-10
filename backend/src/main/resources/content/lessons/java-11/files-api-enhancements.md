@@ -1,7 +1,7 @@
 ---
 title: Files API Enhancements — Reading and Writing Made Simple
 summary: readString(), writeString(), and how they replace verbose pre-Java 11 file I/O patterns.
-order: 5
+order: 1
 minutes: 12
 topics: [files, readstring, writestring, file-io, java11]
 docs:
@@ -12,7 +12,6 @@ docs:
 
 Before Java 11, reading a file into a String required 4-5 lines of boilerplate. Java 11 added `readString()` and `writeString()` to `Files`:
 
-```java
 // PRE-JAVA 11: Reading a file
 String content = new String(Files.readAllBytes(Path.of("config.yml")));
 
@@ -24,32 +23,53 @@ Files.write(Path.of("output.txt"), "Hello".getBytes());
 
 // JAVA 11: One line
 Files.writeString(Path.of("output.txt"), "Hello");
-```
 
 ---
 
 ## The New Methods
 
+
+**What this code does — step by step:**
+
+1. readString — read entire file as String
+2. readString with charset
+3. writeString — write a String to a file
+4. writeString with options
+5. `StandardOpenOption.CREATE,` — create if doesn't exist
+6. `StandardOpenOption.APPEND` — append to existing content
+
+The same code, clean:
+
 ```java
-// readString — read entire file as String
 String content = Files.readString(Path.of("data.csv"));
 
-// readString with charset
 String content = Files.readString(Path.of("data.csv"), StandardCharsets.UTF_8);
 
-// writeString — write a String to a file
 Files.writeString(Path.of("output.txt"), "Hello, World!");
 
-// writeString with options
 Files.writeString(Path.of("log.txt"), "New log entry\n",
-    StandardOpenOption.CREATE,      // create if doesn't exist
-    StandardOpenOption.APPEND       // append to existing content
+    StandardOpenOption.CREATE,
+    StandardOpenOption.APPEND
 );
 ```
 
 ---
 
 ## Line-by-Line Walkthrough
+
+
+**What this code does — step by step:**
+
+1. Line 1: Write configuration file
+2. `database.url=jdbc:postgresql:` — localhost:5432/mydb
+3. Line 2: Read configuration file
+4. Line 3: Parse configuration into a Map
+5. {server.port=8080, server.host=localhost, ...}
+6. Line 4: Append to a log file
+7. Line 5: Read and transform
+8. Line 6: Write with charset
+
+The same code, clean:
 
 ```java
 import java.nio.file.*;
@@ -59,21 +79,18 @@ import java.util.stream.*;
 
 public class FilesApiDemo {
     public static void main(String[] args) throws Exception {
-        // Line 1: Write configuration file
         var config = """
             server.port=8080
             server.host=localhost
-            database.url=jdbc:postgresql://localhost:5432/mydb
+            database.url=jdbc:postgresql:
             database.pool.size=10
             """;
         Files.writeString(Path.of("application.properties"), config);
         System.out.println("Config written successfully");
 
-        // Line 2: Read configuration file
         String configContent = Files.readString(Path.of("application.properties"));
         System.out.println("Config content:\n" + configContent);
 
-        // Line 3: Parse configuration into a Map
         var properties = configContent.lines()
             .filter(line -> !line.isBlank() && !line.startsWith("#"))
             .collect(Collectors.toMap(
@@ -81,9 +98,7 @@ public class FilesApiDemo {
                 line -> line.substring(line.indexOf("=") + 1)
             ));
         System.out.println("Parsed: " + properties);
-        // {server.port=8080, server.host=localhost, ...}
 
-        // Line 4: Append to a log file
         for (int i = 0; i < 3; i++) {
             var logEntry = java.time.Instant.now() + " - Log entry " + i + "\n";
             Files.writeString(
@@ -94,7 +109,6 @@ public class FilesApiDemo {
             );
         }
 
-        // Line 5: Read and transform
         String transformed = Files.readString(Path.of("application.properties"))
             .lines()
             .filter(line -> line.startsWith("server."))
@@ -102,7 +116,6 @@ public class FilesApiDemo {
             .collect(Collectors.joining("\n"));
         System.out.println("Server config:\n" + transformed);
 
-        // Line 6: Write with charset
         var utf8Content = "Hello, 世界";
         Files.writeString(Path.of("unicode.txt"), utf8Content, StandardCharsets.UTF_8);
         String readBack = Files.readString(Path.of("unicode.txt"), StandardCharsets.UTF_8);
@@ -117,7 +130,6 @@ public class FilesApiDemo {
 
 ### Scenario 1: Template engine
 
-```java
 public class SimpleTemplateEngine {
     private final Path templateDir;
 
@@ -129,11 +141,9 @@ public class SimpleTemplateEngine {
         return template;
     }
 }
-```
 
 ### Scenario 2: Configuration migration
 
-```java
 public void migrateConfig(Path oldConfig, Path newConfig) throws IOException {
     var content = Files.readString(oldConfig);
     var migrated = content
@@ -142,7 +152,6 @@ public void migrateConfig(Path oldConfig, Path newConfig) throws IOException {
         .replace("db.pass", "spring.datasource.password");
     Files.writeString(newConfig, migrated);
 }
-```
 
 ---
 
@@ -154,3 +163,4 @@ public void migrateConfig(Path oldConfig, Path newConfig) throws IOException {
 | Forgetting `StandardOpenOption.CREATE` | File must already exist | Add `CREATE` or `CREATE_NEW` |
 | Reading huge files with `readString()` | Loads entire file into memory | Use `Files.lines()` for large files |
 | Not handling `IOException` | Checked exception | Use `throws IOException` or try-catch |
+

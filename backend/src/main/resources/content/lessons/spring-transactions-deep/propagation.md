@@ -1,7 +1,7 @@
 ---
 title: Transaction Propagation Explained
 module: spring-transactions-deep
-order: 1
+order: 3
 minutes: 25
 topics: ["propagation", "REQUIRED", "REQUIRES_NEW", "NESTED", "MANDATORY", "NOT_SUPPORTED", "join vs suspend"]
 summary: Propagation defines how a transactional method joins an existing transaction — join it, suspend it, or demand it. Getting this right is what makes ...
@@ -28,7 +28,6 @@ Propagation defines **how a transactional method joins an existing transaction**
 
 ## REQUIRED: The Default That Joins
 
-```java
 @Service
 public class OrderService {
 
@@ -39,13 +38,11 @@ public class OrderService {
         paymentService.authorize(dto.amount());  // joins the SAME transaction
     }
 }
-```
 
 All three writes are one transaction: any exception rolls back **everything** — order, inventory, and payment. This is the atomicity contract you want for a business operation spanning services.
 
 ## REQUIRES_NEW: The Independent Transaction
 
-```java
 @Service
 public class AuditService {
 
@@ -65,7 +62,6 @@ public class OrderService {
         // if the save above rolls back, the audit COMMITS anyway
     }
 }
-```
 
 **The audit pattern**: `REQUIRES_NEW` suspends the outer transaction, commits the inner one independently, then resumes. The audit entry survives an outer rollback — which is exactly what an audit trail must do.
 
@@ -73,7 +69,6 @@ public class OrderService {
 
 ## NESTED: Savepoint Semantics
 
-```java
 @Transactional(propagation = Propagation.NESTED)
 public void importRow(Row row) { ... }   // savepoint, not a real commit
 
@@ -88,7 +83,6 @@ public void importAll(List<Row> rows) {
         }
     }
 }
-```
 
 - **Same connection, savepoint markers** — cheaper than REQUIRES_NEW
 - Failure rolls back to the savepoint, **not** the whole outer transaction
@@ -97,7 +91,6 @@ public void importAll(List<Row> rows) {
 
 ## MANDATORY and NEVER: Enforcing the Contract
 
-```java
 // Must run INSIDE a caller transaction — throws if there is none
 @Transactional(propagation = Propagation.MANDATORY)
 public void debit(Long accountId, BigDecimal amount) { ... }
@@ -105,17 +98,14 @@ public void debit(Long accountId, BigDecimal amount) { ... }
 // Must run WITHOUT a transaction — throws if one exists
 @Transactional(propagation = Propagation.NEVER)
 public void runExternalProcess() { ... }
-```
 
 MANDATORY is the "inner helper" contract: a repository-level operation that must be part of the caller's transaction. NEVER guards long-running, non-transactional work from being accidentally wrapped.
 
 ## NOT_SUPPORTED: The Suspension
 
-```java
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
 public void callSlowExternalApi() { ... }
 // Suspends any current transaction while this runs — long I/O doesn't hold locks
-```
 
 Holding a DB transaction open during a 10-second external call holds locks for 10 seconds. `NOT_SUPPORTED` suspends the transaction for the duration — the classic fix for "I'm locking the table while calling an external API."
 
@@ -134,7 +124,6 @@ Must the inner work fail if the outer fails?
 
 ### Bug 1: Self-invocation → propagation silently ignored
 
-```java
 @Service
 public class OrderService {
 
@@ -145,35 +134,29 @@ public class OrderService {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void processPayment(OrderDto dto) { ... }
 }
-```
 
 Fix with self-injection:
 
-```java
 private final OrderService self;
 public OrderService(@Lazy OrderService self) { this.self = self; }
 
 public void placeOrder(OrderDto dto) {
     self.processPayment(dto);      // ✅ through the proxy — REQUIRES_NEW applies
 }
-```
 
 ### Bug 2: REQUIRED swallowing a REQUIRES_NEW rollback
 
-```java
 @Transactional
 public void placeOrder(OrderDto dto) {
     auditService.record("placed", dto.orderId());   // REQUIRES_NEW — commits
     orderRepository.save(...);                       // then this FAILS
     // outer rolls back, but the audit ALREADY committed — by design
 }
-```
 
 If the audit *shouldn't* exist without the order, use REQUIRED (join), not REQUIRES_NEW. The bug is choosing the wrong propagation, not the mechanism.
 
 ## Testing Propagation
 
-```java
 @SpringBootTest
 class PropagationTest {
 
@@ -197,7 +180,6 @@ class PropagationTest {
         assertEquals(0, orderRepository.count());   // everything rolled back
     }
 }
-```
 
 ## Summary
 
@@ -212,3 +194,4 @@ class PropagationTest {
 | NEVER | Forbid | Non-transactional operations |
 
 Propagation is the atomicity contract between collaborating beans: join for "all or nothing," suspend for "must survive," savepoint for "keep the rest." Pick deliberately, avoid self-invocation, and test the rollback semantics — the propagation table is small, but each row is a different guarantee.
+

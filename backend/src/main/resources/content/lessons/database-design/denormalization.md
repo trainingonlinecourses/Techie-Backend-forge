@@ -1,7 +1,7 @@
 ---
 title: Denormalization — The Deliberate Trade-Off
 module: database-design
-order: 5
+order: 2
 minutes: 25
 topics: ["denormalization", "read models", "materialized views", "redundancy", "performance trade-offs"]
 summary: Normalization says "store each fact once." Denormalization says "sometimes storing a fact twice — deliberately, with a synchronization strategy — i...
@@ -78,8 +78,20 @@ The DB itself stores the pre-computed result. Reads hit the materialized view; t
 
 The core engineering challenge: **keeping the redundant copy consistent.** Three strategies, in increasing sophistication:
 
+
+**What this code does — step by step:**
+
+1. ---- Strategy 1: update in the same transaction (strongest consistency) ----
+2. The denormalized total is updated IN THE SAME TRANSACTION:
+3. `order.setTotal(order.computeTotal());` — recompute + save together
+4. `return repo.save(order);` — line change + total change are atomic
+5. ---- Strategy 2: async projection (eventual consistency, faster writes) ----. On OrderLineChanged event:
+6. `repo.save(order);` — may lag a few ms behind the line change
+7. ---- Strategy 3: DB-maintained (materialized view / trigger) ----. REFRESH MATERIALIZED VIEW order_totals; (scheduled or on-change)
+
+The same code, clean:
+
 ```java
-// ---- Strategy 1: update in the same transaction (strongest consistency) ----
 @Service
 public class OrderService {
 
@@ -88,23 +100,17 @@ public class OrderService {
         Order order = repo.findById(orderId).orElseThrow();
         order.addLine(p, qty);
 
-        // The denormalized total is updated IN THE SAME TRANSACTION:
-        order.setTotal(order.computeTotal());    // recompute + save together
-        return repo.save(order);                 // line change + total change are atomic
+        order.setTotal(order.computeTotal());
+        return repo.save(order);
     }
 }
 
-// ---- Strategy 2: async projection (eventual consistency, faster writes) ----
-// On OrderLineChanged event:
 @EventListener
 public void onOrderChanged(OrderLineChanged event) {
     Order order = repo.findById(event.orderId()).orElseThrow();
     order.setTotal(order.computeTotal());
-    repo.save(order);           // may lag a few ms behind the line change
+    repo.save(order);
 }
-
-// ---- Strategy 3: DB-maintained (materialized view / trigger) ----
-// REFRESH MATERIALIZED VIEW order_totals;  (scheduled or on-change)
 ```
 
 ### Walking Through Each Part
@@ -151,3 +157,4 @@ The master rule: **keep a normalized source of truth; denormalize only the read 
 - Synchronization is the contract: same-transaction (strong), event-driven (eventual), or DB-maintained (materialized).
 - Keep a normalized source of truth; denormalize only the read path.
 - Measure before denormalizing; monitor staleness after.
+

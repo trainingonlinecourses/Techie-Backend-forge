@@ -1,7 +1,7 @@
 ---
 title: ConfigMaps & Secrets in Kubernetes
 summary: Configuration as first-class objects — ConfigMaps for non-secret config, Secrets for credentials, and the env/volume wiring patterns.
-order: 6
+order: 4
 minutes: 13
 topics: [configmap, secrets, kubernetes config, env injection, sealed secrets]
 docs:
@@ -110,3 +110,4 @@ Mark long-lived config **immutable** — k8s skips watch/update overhead and, mo
 - Mount ConfigMaps as volumes for file-based config; mark config immutable when it shouldn't change.
 
 Official docs: [ConfigMaps](https://kubernetes.io/docs/concepts/configuration/configmap/) · [Secrets](https://kubernetes.io/docs/concepts/configuration/secret/)
+

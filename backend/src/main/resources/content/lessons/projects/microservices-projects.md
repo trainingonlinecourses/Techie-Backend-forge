@@ -51,7 +51,6 @@ Microservices split a large application into small, independent services that co
 ### Order Service
 
 **Order.java**
-```java
 package com.backendforge.orderservice.entity;
 
 import jakarta.persistence.*;
@@ -95,9 +94,19 @@ public class Order {
     public BigDecimal getTotalAmount() { return totalAmount; }
     public void setTotalAmount(BigDecimal total) { this.totalAmount = total; }
 }
-```
 
 **OrderService.java**
+
+**What this code does — step by step:**
+
+1. 1. Check inventory
+2. 2. Calculate total
+3. 3. Save order
+4. 4. Process payment
+5. 5. Reduce inventory
+
+The same code, clean:
+
 ```java
 package com.backendforge.orderservice.service;
 
@@ -111,20 +120,19 @@ import java.math.BigDecimal;
 
 @Service
 public class OrderService {
-    
+
     private final OrderRepository repository;
     private final InventoryClient inventoryClient;
     private final PaymentClient paymentClient;
-    
+
     public OrderService(OrderRepository repo, InventoryClient inv, PaymentClient pay) {
         this.repository = repo;
         this.inventoryClient = inv;
         this.paymentClient = pay;
     }
-    
+
     @Transactional
     public Order createOrder(Order order) {
-        // 1. Check inventory
         for (var item : order.getItems()) {
             boolean available = inventoryClient.checkStock(
                 item.getProductId(), item.getQuantity());
@@ -132,28 +140,24 @@ public class OrderService {
                 throw new RuntimeException("Out of stock: " + item.getProductId());
             }
         }
-        
-        // 2. Calculate total
+
         order.setTotalAmount(order.getItems().stream()
             .map(i -> i.getPrice().multiply(BigDecimal.valueOf(i.getQuantity())))
             .reduce(BigDecimal.ZERO, BigDecimal::add));
-        
-        // 3. Save order
+
         order.setStatus(Order.OrderStatus.CREATED);
         Order saved = repository.save(order);
-        
-        // 4. Process payment
+
         paymentClient.processPayment(saved.getId(), saved.getTotalAmount());
         saved.setStatus(Order.OrderStatus.PAID);
-        
-        // 5. Reduce inventory
+
         for (var item : order.getItems()) {
             inventoryClient.reduceStock(item.getProductId(), item.getQuantity());
         }
-        
+
         return repository.save(saved);
     }
-    
+
     public Order getOrder(Long id) {
         return repository.findById(id)
             .orElseThrow(() -> new RuntimeException("Order not found"));
@@ -162,7 +166,6 @@ public class OrderService {
 ```
 
 **InventoryClient.java**
-```java
 package com.backendforge.orderservice.client;
 
 import org.springframework.cloud.openfeign.FeignClient;
@@ -177,12 +180,10 @@ public interface InventoryClient {
     @PostMapping("/api/inventory/{productId}/reduce")
     void reduceStock(@PathVariable Long productId, @RequestParam int quantity);
 }
-```
 
 ### Inventory Service
 
 **InventoryService.java**
-```java
 package com.backendforge.inventoryservice.service;
 
 import com.backendforge.inventoryservice.entity.Stock;
@@ -225,12 +226,10 @@ public class InventoryService {
         repository.save(stock);
     }
 }
-```
 
 ### Payment Service
 
 **PaymentService.java**
-```java
 package com.backendforge.paymentservice.service;
 
 import com.backendforge.paymentservice.entity.Payment;
@@ -263,7 +262,6 @@ public class PaymentService {
             .orElseThrow(() -> new RuntimeException("Payment not found"));
     }
 }
-```
 
 ### docker-compose.yml
 ```yaml
@@ -333,7 +331,6 @@ services:
 - OAuth2 integration (Google, GitHub)
 
 ### AuthController.java
-```java
 package com.backendforge.authservice.controller;
 
 import com.backendforge.authservice.dto.*;
@@ -375,10 +372,8 @@ public class AuthController {
         return ResponseEntity.unauthorized().build();
     }
 }
-```
 
 ### JwtService.java
-```java
 package com.backendforge.authservice.service;
 
 import io.jsonwebtoken.*;
@@ -448,7 +443,6 @@ public class JwtService {
         return extractClaims(token).getExpiration().before(new Date());
     }
 }
-```
 
 ---
 
@@ -476,7 +470,6 @@ public class JwtService {
 ```
 
 ### NotificationService.java
-```java
 package com.backendforge.notification.service;
 
 import com.backendforge.notification.entity.Notification;
@@ -521,7 +514,6 @@ public class NotificationService {
         repository.save(notification);
     }
 }
-```
 
 ---
 
@@ -588,3 +580,4 @@ curl -X POST http://localhost:8080/api/orders \
 # Run tests
 docker-compose run order-service mvn test
 ```
+

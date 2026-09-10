@@ -1,7 +1,7 @@
 ---
 title: Composing Functions — Building Pipelines from Small Pieces
 module: java-functional-programming
-order: 4
+order: 1
 minutes: 25
 topics: ["composition", "andThen", "compose", "currying", "partial application", "pipeline design"]
 summary: A Function<T,R is a single brick: "T in, R out." Real programs need multistep processing — clean, validate, transform, format. Two ways to do that:
@@ -25,13 +25,11 @@ The deeper idea: **a program is a data-flow graph.** By building small, pure fun
 
 ## andThen vs compose — Which Order?
 
-```java
 Function<Integer,Integer> doubleIt = x -> x * 2;
 Function<Integer,Integer> addOne   = x -> x + 1;
 
 doubleIt.andThen(addOne).apply(5);   // doubleIt FIRST, then addOne  -> 11
 doubleIt.compose(addOne).apply(5);   // addOne FIRST, then doubleIt  -> 12
-```
 
 - `f.andThen(g)`: do `f`, feed the result to `g`. Reads left-to-right — like writing steps in order.
 - `f.compose(g)`: do `g`, feed the result to `f`. Reads *right-to-left* — like nested math `f(g(x))`.
@@ -40,39 +38,49 @@ doubleIt.compose(addOne).apply(5);   // addOne FIRST, then doubleIt  -> 12
 
 ## The Code Walkthrough
 
+
+**What this code does — step by step:**
+
+1. ---- 1. A pipeline: trim -> lower -> count words ----
+2. `System.out.println(pipeline.apply("  Hello World  "));` — 2
+3. ---- 2. Currying: one function that makes functions ----. Multiply(x) returns a function that multiplies by x
+4. `Function<Integer, Integer> doubleIt = multiply.apply(2);` — partial application
+5. `System.out.println(doubleIt.apply(10));` — 20
+6. `System.out.println(tripleIt.apply(10));` — 30
+7. ---- 3. Composition in streams (the real world) ----
+8. `System.out.println(cleaned);` — [sateesh, aisha, bob]
+
+The same code, clean:
+
 ```java
 import java.util.function.*;
 
 public class ComposeDemo {
 
     public static void main(String[] args) {
-        // ---- 1. A pipeline: trim -> lower -> count words ----
         Function<String, String> trim      = String::trim;
         Function<String, String> lower     = String::toLowerCase;
         Function<String, Integer> wordCount = s -> s.split("\\s+").length;
 
         Function<String, Integer> pipeline = trim.andThen(lower).andThen(wordCount);
-        System.out.println(pipeline.apply("  Hello World  "));   // 2
+        System.out.println(pipeline.apply("  Hello World  "));
 
-        // ---- 2. Currying: one function that makes functions ----
-        // multiply(x) returns a function that multiplies by x
         Function<Integer, Function<Integer, Integer>> multiply =
                 x -> y -> x * y;
 
-        Function<Integer, Integer> doubleIt = multiply.apply(2);   // partial application
+        Function<Integer, Integer> doubleIt = multiply.apply(2);
         Function<Integer, Integer> tripleIt = multiply.apply(3);
 
-        System.out.println(doubleIt.apply(10));   // 20
-        System.out.println(tripleIt.apply(10));   // 30
+        System.out.println(doubleIt.apply(10));
+        System.out.println(tripleIt.apply(10));
 
-        // ---- 3. Composition in streams (the real world) ----
         var names = java.util.List.of("  sateesh ", "AISHA", "bob");
         var cleaned = names.stream()
                 .map(String::trim)
                 .map(String::toLowerCase)
                 .filter(s -> !s.isEmpty())
                 .toList();
-        System.out.println(cleaned);   // [sateesh, aisha, bob]
+        System.out.println(cleaned);
     }
 }
 ```
@@ -89,33 +97,32 @@ public class ComposeDemo {
 
 Composition only behaves predictably if the pieces are **pure**: same input → same output, no hidden state, no side effects (no printing, no mutating globals, no I/O inside). If `trim` secretly incremented a counter or depended on the time of day, composing it would be a minefield — order and timing would change results. This is why functional style pushes side effects to the *edges* of the program: pure core, impure boundary.
 
-```java
 // PURE — safe to compose, test, reuse
 Function<Order, Double> subtotal = o -> o.items().stream().mapToDouble(Item::price).sum();
 
 // IMPURE — cannot be safely composed or tested
 Function<Order, Double> withTax = o -> subtotal.apply(o) * (1 + taxRateService.fetchNow()); // DB call inside!
-```
 
 ## Practical Patterns
 
 **Chained validation:**
 
-```java
 Function<String, String> validate =
         s -> s.isBlank() ? "empty" : s;
 Function<String, String> normalize =
         s -> validate.apply(s).toLowerCase();
-```
 
 **Configurable factories (currying):**
 
-```java
-Function<Double, Function<Double, Double>> tax =
-        rate -> amount -> amount * rate;
-Function<Double, Double> gst = tax.apply(0.18);
-System.out.println(gst.apply(1000.0));   // 180.0
-```
+public class Main {
+
+    public static void main(String[] args) {
+        Function<Double, Function<Double, Double>> tax =
+                rate -> amount -> amount * rate;
+        Function<Double, Double> gst = tax.apply(0.18);
+        System.out.println(gst.apply(1000.0));   // 180.0
+    }
+}
 
 **Reuse in different pipelines:** the same `Function` bricks appear in multiple composed pipelines — the composition layer is where your program's flexibility lives.
 
@@ -134,3 +141,4 @@ System.out.println(gst.apply(1000.0));   // 180.0
 - Currying (`x -> y -> ...`) + partial application (`f.apply(2)`) makes configurable factories.
 - Streams are composition in practice — each stage a small pure function.
 - Purity (no hidden state, no side effects) is what makes composition safe and testable.
+

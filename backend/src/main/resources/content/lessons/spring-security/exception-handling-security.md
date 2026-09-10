@@ -1,7 +1,7 @@
 ---
 title: Security Exception Handling — Auth Errors Done Right
 summary: Handling authentication and authorization exceptions properly — custom entry points, access denied handlers, and the security pitfalls that leak information to attackers.
-order: 11
+order: 6
 minutes: 18
 topics: [exception handling, AuthenticationEntryPoint, AccessDeniedHandler, 401, 403, error responses, security exceptions]
 docs:
@@ -27,6 +27,16 @@ The default Spring Security behavior redirects to a login page — but in a REST
 
 ### Custom Authentication Entry Point (401)
 
+
+**What this code does — step by step:**
+
+1. Set the response status to 401 Unauthorized
+2. Build a clean error response
+3. Write JSON to response body
+4. DON'T include: stack trace, internal class names, SQL errors. These leak information to attackers
+
+The same code, clean:
+
 ```java
 @Component
 public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
@@ -39,11 +49,9 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
             HttpServletResponse response,
             AuthenticationException authException) throws IOException {
 
-        // Set the response status to 401 Unauthorized
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType("application/json");
 
-        // Build a clean error response
         Map<String, Object> error = new LinkedHashMap<>();
         error.put("timestamp", Instant.now().toString());
         error.put("status", 401);
@@ -51,11 +59,8 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
         error.put("message", "Authentication required — please log in");
         error.put("path", request.getRequestURI());
 
-        // Write JSON to response body
         objectMapper.writeValue(response.getOutputStream(), error);
 
-        // DON'T include: stack trace, internal class names, SQL errors
-        // These leak information to attackers
     }
 }
 ```
@@ -68,7 +73,6 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
 
 ### Custom Access Denied Handler (403)
 
-```java
 @Component
 public class CustomAccessDeniedHandler implements AccessDeniedHandler {
 
@@ -93,7 +97,6 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
         objectMapper.writeValue(response.getOutputStream(), error);
     }
 }
-```
 
 **Line-by-line explained:**
 - `AccessDeniedHandler` — Called when an **authenticated** user tries to access a resource they don't have permission for. This is the "you're logged in but not allowed" handler.
@@ -102,7 +105,6 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
 
 ### Wiring Up in SecurityConfig
 
-```java
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -129,7 +131,6 @@ public class SecurityConfig {
         return http.build();
     }
 }
-```
 
 **Line-by-line explained:**
 - `.authenticationEntryPoint(entryPoint)` — Register our custom 401 handler. Without this, Spring redirects to `/login`.
@@ -138,7 +139,6 @@ public class SecurityConfig {
 
 ### Global Exception Handler for Security Exceptions
 
-```java
 @RestControllerAdvice
 public class SecurityExceptionHandler {
 
@@ -179,7 +179,6 @@ public class SecurityExceptionHandler {
         return ResponseEntity.status(401).body(error);
     }
 }
-```
 
 ---
 
@@ -252,3 +251,4 @@ public class SecurityExceptionHandler {
 - **Handle every auth exception type**: BadCredentials, AccountExpired, Locked, Disabled — each needs a clear message.
 
 Official docs: [Exception Handling (Spring)](https://docs.spring.io/spring-security/reference/servlet/configuration/architecture.html) · [AuthenticationEntryPoint](https://docs.spring.io/spring-security/reference/api/org/springframework/security/web/AuthenticationEntryPoint.html)
+

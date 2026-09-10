@@ -1,7 +1,7 @@
 ---
 title: The Exception Hierarchy — Throwable, Error, and Exception
 module: java-exceptions-deep
-order: 1
+order: 4
 minutes: 23
 topics: ["exception hierarchy", "Throwable", "Error", "checked exceptions", "unchecked exceptions"]
 summary: When a program fails, the worst thing it can do is fail silently — corrupt data, skip a step, and pretend everything is fine. Java's answer to fail...
@@ -56,23 +56,30 @@ Throwable
 
 Let's see what this means with a tiny program that trips several of these:
 
+
+**What this code does — step by step:**
+
+1. 1. A RuntimeException: dereferencing null.
+2. `System.out.println(name.length());` — NullPointerException!
+3. 2. A checked exception: the compiler FORCES us to handle. InterruptedException (thrown by Thread.sleep).
+4. `Thread.sleep(10);` — throws InterruptedException
+5. Restore the interrupted status and give up politely.
+
+The same code, clean:
+
 ```java
 public class HierarchyDemo {
     public static void main(String[] args) {
-        // 1. A RuntimeException: dereferencing null.
         String name = null;
         try {
-            System.out.println(name.length());   // NullPointerException!
+            System.out.println(name.length());
         } catch (NullPointerException e) {
             System.out.println("Caught NPE: " + e.getMessage());
         }
 
-        // 2. A checked exception: the compiler FORCES us to handle
-        //    InterruptedException (thrown by Thread.sleep).
         try {
-            Thread.sleep(10);                    // throws InterruptedException
+            Thread.sleep(10);
         } catch (InterruptedException e) {
-            // Restore the interrupted status and give up politely.
             Thread.currentThread().interrupt();
             System.out.println("Interrupted while sleeping");
         }
@@ -99,13 +106,11 @@ Spring, notably, largely abandons checked exceptions for its own abstractions (`
 
 When you catch an exception, you hold an object with three useful pieces:
 
-```java
 catch (IOException e) {
     String message  = e.getMessage();      // human-readable description
     Throwable cause = e.getCause();        // the wrapped underlying failure
     e.printStackTrace();                   // full stack trace for logs
 }
-```
 
 - **`getMessage()`** — the short description ("File not found: config.yml").
 - **`getCause()`** — the *original* exception that this one wraps, enabling the chain `SQLException ← DataAccessException ← ServiceException` to be walked back to the root cause.
@@ -114,3 +119,4 @@ catch (IOException e) {
 ## Recap
 
 All Java failures are `Throwable` objects in a strict hierarchy: `Error` for platform catastrophes (don't catch), `Exception` for program failures, with `RuntimeException` and its subclasses unchecked (bugs — don't force handling) and everything else checked (environmental failures — the compiler forces planning). The hierarchy isn't bureaucracy: it encodes *what kind of failure this is and who is responsible for responding to it*. Master the three branches, respect the checked/unchecked contract, wrap-and-rethrow across layers, and never swallow — and exception handling stops being boilerplate and starts being the safety net of your design.
+

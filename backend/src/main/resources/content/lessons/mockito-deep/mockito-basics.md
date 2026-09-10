@@ -1,7 +1,7 @@
 ---
 title: Mockito Basics — Mocks, Stubs, and the Test Double
 module: mockito-deep
-order: 1
+order: 2
 minutes: 25
 topics: ["Mockito", "mocks", "stubbing", "test doubles", "when thenReturn", "verify"]
 summary: A unit test isolates one class. But real classes depend on other classes — repositories, web clients, clocks — and those dependencies bring their o...
@@ -24,6 +24,19 @@ A unit test isolates *one* class. But real classes depend on other classes — r
 
 ## Your First Mock
 
+
+**What this code does — step by step:**
+
+1. The Mockito JUnit 5 extension: initializes @Mock fields and enforces. Strict stubbing (unused stubs fail the test — a great hygiene rule).
+2. `PaymentRepository repo;` — the test double
+3. `PaymentService service;` — the REAL class under test
+4. A plain @BeforeEach wires the real service to the mock: (or use @InjectMocks — the next lesson)
+5. STUBBING: program the mock's answer.
+6. The real code runs against the mock.
+7. The result is exactly what we stubbed.
+
+The same code, clean:
+
 ```java
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,18 +45,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-// The Mockito JUnit 5 extension: initializes @Mock fields and enforces
-// strict stubbing (unused stubs fail the test — a great hygiene rule).
 @ExtendWith(MockitoExtension.class)
 class PaymentServiceTest {
 
     @Mock
-    PaymentRepository repo;              // the test double
+    PaymentRepository repo;
 
-    PaymentService service;              // the REAL class under test
+    PaymentService service;
 
-    // A plain @BeforeEach wires the real service to the mock:
-    // (or use @InjectMocks — the next lesson)
     @org.junit.jupiter.api.BeforeEach
     void setup() {
         service = new PaymentService(repo);
@@ -51,14 +60,11 @@ class PaymentServiceTest {
 
     @Test
     void findsPaymentById() {
-        // STUBBING: program the mock's answer.
         Payment p = new Payment("p1", 99.0);
         when(repo.findById("p1")).thenReturn(p);
 
-        // The real code runs against the mock.
         Payment result = service.getPayment("p1");
 
-        // The result is exactly what we stubbed.
         assertEquals(p, result);
     }
 }
@@ -68,27 +74,31 @@ class PaymentServiceTest {
 
 ## Stubbing: The Answer Machine
 
+
+**What this code does — step by step:**
+
+1. Basic: one argument, one answer.
+2. Argument MATCHERS — any argument:
+3. Different answers for different arguments:
+4. No match at all — the default for unstubbed methods: (null for objects, 0 for numbers, empty for collections)
+5. Multiple consecutive answers (first call, second call, ...):
+6. The modern alternative — doReturn/doThrow (works even on void and. On spies):
+
+The same code, clean:
+
 ```java
 @Test
 void stubbingStyles() {
-    // Basic: one argument, one answer.
     when(repo.findById("p1")).thenReturn(payment);
 
-    // Argument MATCHERS — any argument:
     when(repo.findById(anyString())).thenReturn(payment);
 
-    // Different answers for different arguments:
     when(repo.findById("p1")).thenReturn(payment);
     when(repo.findById("missing")).thenThrow(new PaymentNotFoundException("p-missing"));
 
-    // No match at all — the default for unstubbed methods:
-    // (null for objects, 0 for numbers, empty for collections)
 
-    // Multiple consecutive answers (first call, second call, ...):
     when(repo.count()).thenReturn(1, 2, 3);
 
-    // The modern alternative — doReturn/doThrow (works even on void and
-    // on spies):
     doThrow(new RuntimeException("db down")).when(repo).delete("p1");
 }
 ```
@@ -103,7 +113,6 @@ void stubbingStyles() {
 
 Stubbing controls the mock's *answers*; **verification** checks the code's *calls* — the interaction assertions:
 
-```java
 @Test
 void chargeDeductsBalanceAndSaves() {
     Account a = new Account(1000);
@@ -123,7 +132,6 @@ void chargeDeductsBalanceAndSaves() {
     // At least / at most:
     verify(repo, atLeastOnce()).findById(anyString());
 }
-```
 
 **The verification vocabulary:** `times(n)` (exactly n), `never()`, `atLeastOnce()`, `atMostOnce()`, `atLeast(n)`. The argument matcher `argThat(...)` asserts on the *arguments passed* — the strongest interaction check ("the service saved an account with balance 800"). The discipline: **verify what you care about and nothing more** — verifying every interaction makes tests brittle (any refactor breaks them); verifying none misses the point of mocking.
 
@@ -144,3 +152,4 @@ The smell test: if a test needs a mock of a mock, or stubs three layers deep to 
 ## Recap
 
 Mockito creates test doubles — programmable stand-ins that answer stubs (`when(...).thenReturn(...)`) and record calls for verification (`verify(...).times(...)`). `@ExtendWith(MockitoExtension.class)` + `@Mock` wires them into JUnit 5 with strict-stubbing hygiene. The craft is knowing *what* to mock — external boundaries and collaborators, never your own logic or the real database — and stubbing deliberately (matchers, `do*` for voids, safe defaults) while verifying only the interactions that matter. A well-mocked unit test is fast, deterministic, and precisely documents the contract between the class and its collaborators — the base of the testing pyramid.
+

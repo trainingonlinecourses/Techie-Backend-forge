@@ -1,7 +1,7 @@
 ---
 title: Strategy Pattern — Swapping Algorithms at Runtime
 module: design-patterns
-order: 4
+order: 5
 minutes: 25
 topics: ["strategy", "polymorphism", "composition over inheritance", "algorithm selection", "DIP"]
 summary: Your checkout needs discounts. Rules so far:
@@ -16,13 +16,11 @@ docs:
 
 Your checkout needs discounts. Rules so far:
 
-```java
 double price = base;
 if (member)            price *= 0.9;
 else if (holiday)      price *= 0.85;
 else if (newCustomer)  price *= 0.95;
 // ... and next month there's a coupon rule, a bulk rule, a VIP tier rule...
-```
 
 Every new rule means editing this method — which risks breaking existing rules, bloats the method, and makes the decision logic untestable in isolation. This is the classic **open/closed principle** violation: the code is *open* for modification (you keep editing it) instead of *open for extension* (you add new behavior without touching existing code).
 
@@ -40,13 +38,27 @@ The alternative — subclassing `Checkout` for every rule combination (MemberHol
 
 ## The Code Walkthrough
 
+
+**What this code does — step by step:**
+
+1. ---- 1. The strategy interface: the contract every rule honors ----
+2. ---- 2. Concrete strategies: one class per rule ----
+3. ---- 3. The context: holds a strategy and delegates ----
+4. `private DiscountStrategy strategy;` — pluggable — can change at runtime
+5. `void setStrategy(DiscountStrategy s) { this.strategy = s; }` — swap mid-flight
+6. `double discounted = strategy.apply(basePrice);` — delegate!
+7. `System.out.println(checkout.total(100));` — 108.0 (no discount)
+8. Swap the strategy at runtime — no code change, just a new object:
+9. `System.out.println(checkout.total(100));` — 97.2 (10% off + tax)
+10. `System.out.println(checkout.total(100));` — 91.8 (15% off + tax)
+
+The same code, clean:
+
 ```java
-// ---- 1. The strategy interface: the contract every rule honors ----
 interface DiscountStrategy {
     double apply(double basePrice);
 }
 
-// ---- 2. Concrete strategies: one class per rule ----
 class MemberDiscount implements DiscountStrategy {
     public double apply(double basePrice) { return basePrice * 0.90; }
 }
@@ -59,16 +71,15 @@ class NoDiscount implements DiscountStrategy {
     public double apply(double basePrice) { return basePrice; }
 }
 
-// ---- 3. The context: holds a strategy and delegates ----
 class Checkout {
-    private DiscountStrategy strategy;      // pluggable — can change at runtime
+    private DiscountStrategy strategy;
 
     Checkout(DiscountStrategy strategy) { this.strategy = strategy; }
 
-    void setStrategy(DiscountStrategy s) { this.strategy = s; }   // swap mid-flight
+    void setStrategy(DiscountStrategy s) { this.strategy = s; }
 
     double total(double basePrice) {
-        double discounted = strategy.apply(basePrice);            // delegate!
+        double discounted = strategy.apply(basePrice);
         return discounted + tax(discounted);
     }
 
@@ -79,14 +90,13 @@ public class StrategyDemo {
 
     public static void main(String[] args) {
         Checkout checkout = new Checkout(new NoDiscount());
-        System.out.println(checkout.total(100));     // 108.0  (no discount)
+        System.out.println(checkout.total(100));
 
-        // Swap the strategy at runtime — no code change, just a new object:
         checkout.setStrategy(new MemberDiscount());
-        System.out.println(checkout.total(100));     // 97.2   (10% off + tax)
+        System.out.println(checkout.total(100));
 
         checkout.setStrategy(new HolidayDiscount());
-        System.out.println(checkout.total(100));     // 91.8   (15% off + tax)
+        System.out.println(checkout.total(100));
     }
 }
 ```
@@ -105,11 +115,9 @@ public class StrategyDemo {
 
 Because a strategy is "one method with a signature", a **lambda** implements it directly:
 
-```java
 checkout.setStrategy(p -> p * 0.80);              // anonymous rule
 // or from a config value:
 checkout.setStrategy(price -> price * (1 - coupon.rate()));
-```
 
 For simple rules, the interface can even be a functional interface and callers supply lambdas. For *complex* multi-method strategies, keep real classes.
 
@@ -145,3 +153,4 @@ For simple rules, the interface can even be a functional interface and callers s
 - Composition over inheritance: assemble behavior from small objects instead of subclassing.
 - Adding a rule = one new class; existing code untouched (open/closed principle).
 - `Comparator` is the Strategy pattern in the JDK; lambdas can implement simple strategies directly.
+

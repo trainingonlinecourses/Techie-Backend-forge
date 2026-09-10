@@ -36,30 +36,36 @@ A `ZipOutputStream` writes a ZIP archive to an underlying output stream (usually
 
 A `ZipEntry` represents one entry in the ZIP archive — a file or directory. You create it with a name (which can include a path, like `dir/file.txt`). The `ZipEntry` stores metadata like the name, size, compressed size, modification time, and compression method.
 
+
+**What this code does — step by step:**
+
+1. Create a ZIP archive containing two text files
+2. Entry 1: a text file
+3. Entry 2: another text file
+4. You can also add directories explicitly (as entries with isDirectory=true)
+5. Entry 3: a file inside the directory
+
+The same code, clean:
+
 ```java
 import java.io.*;
 import java.util.zip.*;
 
 public class CreateZip {
     public static void main(String[] args) throws IOException {
-        // Create a ZIP archive containing two text files
         try (var out = new ZipOutputStream(new FileOutputStream("archive.zip"))) {
 
-            // Entry 1: a text file
             out.putNextEntry(new ZipEntry("hello.txt"));
             out.write("Hello, World!\n".getBytes());
             out.closeEntry();
 
-            // Entry 2: another text file
             out.putNextEntry(new ZipEntry("readme.txt"));
             out.write("This is a test archive.\n".getBytes());
             out.closeEntry();
 
-            // You can also add directories explicitly (as entries with isDirectory=true)
             out.putNextEntry(new ZipEntry("subdir/"));
             out.closeEntry();
 
-            // Entry 3: a file inside the directory
             out.putNextEntry(new ZipEntry("subdir/data.txt"));
             out.write("data inside subdir\n".getBytes());
             out.closeEntry();
@@ -81,7 +87,6 @@ Line by line:
 
 A common mistake is forgetting `closeEntry()`. If you call `putNextEntry()` without calling `closeEntry()` on the previous entry, the previous entry's data is not properly finished and the ZIP file may be malformed or missing entries.
 
-```java
 // BUG: forgetting closeEntry()
 out.putNextEntry(new ZipEntry("file1.txt"));
 out.write(data1);
@@ -91,16 +96,13 @@ out.write(data2);
 out.closeEntry();
 out.close();
 // The resulting ZIP is corrupt — file1 and file2 are merged
-```
 
 Another common mistake is writing data before `putNextEntry()`. The `ZipOutputStream` must have an active entry before you write anything. Writing before the first `putNextEntry()` writes data that has no entry and may corrupt the archive.
 
-```java
 // BUG: writing before putNextEntry
 out.write("data".getBytes());   // no active entry — corrupt
 out.putNextEntry(new ZipEntry("file.txt"));
 out.closeEntry();
-```
 
 ### Reading a ZIP Archive with ZipInputStream
 
@@ -112,7 +114,6 @@ A `ZipInputStream` reads a ZIP archive from an underlying input stream. To read 
 4. Call `closeEntry()` when done with the entry (optional for reading, but good practice).
 5. Repeat until `getNextEntry()` returns `null`.
 
-```java
 import java.io.*;
 import java.util.zip.*;
 
@@ -141,7 +142,6 @@ public class ReadZip {
         }
     }
 }
-```
 
 Line by line:
 
@@ -155,17 +155,14 @@ Line by line:
 
 A common mistake is reading from the `ZipInputStream` before calling `getNextEntry()` or after `closeEntry()`. The stream only has data when an entry is active. Reading before the first `getNextEntry()` returns nothing useful, and reading after `closeEntry()` skips to the next entry or returns end-of-file.
 
-```java
 // BUG: reading before getNextEntry
 in.read(buffer);   // no active entry — reads nothing useful
 ZipEntry entry = in.getNextEntry();   // now we have an entry
-```
 
 ### GZIP Compression — Single-File Compression with GZIPOutputStream
 
 GZIP compression is simpler than ZIP because it handles only one stream of data. You wrap an output stream with a `GZIPOutputStream`, write data to it, and close it. The result is a GZIP-compressed file.
 
-```java
 import java.io.*;
 import java.util.zip.*;
 
@@ -184,7 +181,6 @@ public class CompressGzip {
         System.out.println("input.txt.gz created");
     }
 }
-```
 
 Line by line:
 
@@ -194,7 +190,6 @@ Line by line:
 
 To decompress a GZIP file, you wrap a `FileInputStream` with a `GZIPInputStream` and read from it. The `GZIPInputStream` decompresses the data on the fly.
 
-```java
 import java.io.*;
 import java.util.zip.*;
 
@@ -213,7 +208,6 @@ public class DecompressGzip {
         System.out.println("output.txt created");
     }
 }
-```
 
 Line by line:
 
@@ -223,12 +217,10 @@ Line by line:
 
 A common mistake with GZIP is trying to use a `GZIPInputStream` to read a ZIP file. A GZIP file is not a ZIP file — it is a single compressed stream, not a multi-entry archive. A `GZIPInputStream` cannot read a ZIP archive. Use `ZipInputStream` for ZIP.
 
-```java
 // BUG: trying to read a ZIP file with GZIPInputStream
 try (var in = new GZIPInputStream(new FileInputStream("archive.zip"))) {
     // Throws IOException — not a valid GZIP file
 }
-```
 
 Another common mistake is not closing the `GZIPOutputStream`, which leaves the GZIP trailer unwritten and produces a corrupt GZIP file. The try-with-resources pattern prevents this.
 
@@ -236,7 +228,6 @@ Another common mistake is not closing the `GZIPOutputStream`, which leaves the G
 
 If you need more control over compression — the compression level, the compression strategy, or the raw byte-level compression — you can use `Deflater` and `Inflater` directly. These are the low-level compressors that the stream classes use internally.
 
-```java
 import java.util.zip.*;
 
 public class DeflaterDemo {
@@ -261,7 +252,6 @@ public class DeflaterDemo {
         System.out.println("decompressed matches: " + result.equals(data));
     }
 }
-```
 
 Line by line:
 
@@ -278,13 +268,22 @@ The `Deflater` and `Inflater` classes are stateful. You set input, call `deflate
 
 You can control the compression level:
 
+
+**What this code does — step by step:**
+
+1. `deflater.setLevel(Deflater.BEST_COMPRESSION);` — 9 — slowest, smallest
+2. or
+3. `deflater.setLevel(Deflater.NO_COMPRESSION);` — 0 — fast, no compression
+4. or
+5. `deflater.setLevel(Deflater.BEST_SPEED);` — 1 — fast, some compression
+
+The same code, clean:
+
 ```java
 Deflater deflater = new Deflater();
-deflater.setLevel(Deflater.BEST_COMPRESSION);   // 9 — slowest, smallest
-// or
-deflater.setLevel(Deflater.NO_COMPRESSION);     // 0 — fast, no compression
-// or
-deflater.setLevel(Deflater.BEST_SPEED);         // 1 — fast, some compression
+deflater.setLevel(Deflater.BEST_COMPRESSION);
+deflater.setLevel(Deflater.NO_COMPRESSION);
+deflater.setLevel(Deflater.BEST_SPEED);
 ```
 
 Higher compression levels produce smaller output but take more time. For most applications, the default level (6) is a good balance. Only tune the level if you have measured a real need — for example, compressing a large distribution archive where size matters more than time, or a real-time stream where speed matters more than size.
@@ -295,7 +294,6 @@ A GZIP file includes a CRC-32 checksum of the uncompressed data in its trailer. 
 
 ZIP archives can also include checksums. A `ZipEntry` has a `getCrc()` method that returns the CRC-32 of the entry's uncompressed data. When you create a ZIP archive with `ZipOutputStream`, the CRC is computed automatically if you provide the data. You can also use `CheckedOutputStream` and `CheckedInputStream` from `java.util.zip` to compute checksums as you read or write data.
 
-```java
 import java.io.*;
 import java.util.zip.*;
 
@@ -316,7 +314,6 @@ public class ChecksumDemo {
         }
     }
 }
-```
 
 Line by line:
 
@@ -330,6 +327,21 @@ Checksums are useful when you transfer files or store compressed archives and wa
 
 This example exercises all four operations: creating a ZIP archive, reading a ZIP archive, compressing with GZIP, and decompressing with GZIP.
 
+
+**What this code does — step by step:**
+
+1. Create a ZIP archive containing several files
+2. Read a ZIP archive and extract its entries
+3. Compress a file with GZIP
+4. Decompress a GZIP file
+5. Set up a temp workspace
+6. ZIP: create and read
+7. GZIP: compress and decompress
+8. Verify
+9. Cleanup is optional — the temp directory goes away on exit
+
+The same code, clean:
+
 ```java
 import java.io.*;
 import java.nio.file.*;
@@ -337,7 +349,6 @@ import java.util.zip.*;
 
 public class CompressionExample {
 
-    // Create a ZIP archive containing several files
     static void createZip(Path zipPath, Path... files) throws IOException {
         try (var out = new ZipOutputStream(new FileOutputStream(zipPath.toFile()))) {
             for (Path file : files) {
@@ -350,7 +361,6 @@ public class CompressionExample {
         System.out.println("created: " + zipPath);
     }
 
-    // Read a ZIP archive and extract its entries
     static void readZip(Path zipPath, Path extractDir) throws IOException {
         Files.createDirectories(extractDir);
         try (var in = new ZipInputStream(new FileInputStream(zipPath.toFile()))) {
@@ -371,7 +381,6 @@ public class CompressionExample {
         System.out.println("extracted to: " + extractDir);
     }
 
-    // Compress a file with GZIP
     static void compressGzip(Path input, Path output) throws IOException {
         try (var in = new FileInputStream(input.toFile());
              var out = new GZIPOutputStream(new FileOutputStream(output.toFile()))) {
@@ -380,7 +389,6 @@ public class CompressionExample {
         System.out.println("compressed: " + output);
     }
 
-    // Decompress a GZIP file
     static void decompressGzip(Path input, Path output) throws IOException {
         try (var in = new GZIPInputStream(new FileInputStream(input.toFile()));
              var out = new FileOutputStream(output.toFile())) {
@@ -390,7 +398,6 @@ public class CompressionExample {
     }
 
     public static void main(String[] args) throws IOException {
-        // Set up a temp workspace
         Path work = Files.createTempDirectory("compression-demo");
         Path hello = work.resolve("hello.txt");
         Path readme = work.resolve("readme.txt");
@@ -398,23 +405,19 @@ public class CompressionExample {
         Files.writeString(hello, "Hello, World!\n");
         Files.writeString(readme, "This is a test archive.\n");
 
-        // ZIP: create and read
         Path zip = work.resolve("archive.zip");
         createZip(zip, hello, readme);
         Path extracted = work.resolve("extracted");
         readZip(zip, extracted);
 
-        // GZIP: compress and decompress
         Path gz = work.resolve("hello.txt.gz");
         compressGzip(hello, gz);
         Path decompressed = work.resolve("hello-decompressed.txt");
         decompressGzip(gz, decompressed);
 
-        // Verify
         System.out.println("original matches decompressed: " +
             Files.readString(hello).equals(Files.readString(decompressed)));
 
-        // Cleanup is optional — the temp directory goes away on exit
     }
 }
 ```
@@ -462,3 +465,4 @@ In the lab, you will see a workspace with two text files and a broken ZIP creati
 ## Summary
 
 Java's `java.util.zip` package provides `ZipOutputStream` and `ZipInputStream` for ZIP archives (multi-file containers) and `GZIPOutputStream` and `GZIPInputStream` for single-file GZIP compression. Both use the DEFLATE algorithm internally, via `Deflater` and `Inflater`. To create a ZIP archive, open a `ZipOutputStream`, call `putNextEntry` for each entry, write the data, and call `closeEntry` — forgetting `closeEntry` corrupts the archive. To read a ZIP, open a `ZipInputStream`, call `getNextEntry` in a loop, read each entry's data, and close the entry. To compress with GZIP, wrap an output stream with `GZIPOutputStream` and write; to decompress, wrap an input stream with `GZIPInputStream` and read. GZIP verifies a CRC-32 checksum on decompression; for ZIP and raw compression, you can use `CheckedOutputStream` and `CheckedInputStream` for explicit checksums. Use ZIP for multi-file archives, GZIP for single-file compression, and `Deflater`/`Inflater` for low-level control over compression level and strategy.
+

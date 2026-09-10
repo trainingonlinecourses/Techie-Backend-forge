@@ -1,7 +1,7 @@
 ---
 title: Testing Reactive Code — StepVerifier and Beyond
 summary: Testing Mono and Flux with StepVerifier, virtual time, test publishers, WebTestClient, and the patterns that catch reactive bugs before production. Beginner-friendly with line-by-line code.
-order: 11
+order: 10
 minutes: 22
 topics: [reactive testing, StepVerifier, virtual time, test publisher, WebTestClient, reactive assertions, backpressure testing]
 docs:
@@ -15,11 +15,9 @@ docs:
 
 In imperative code, you call a method and check the result:
 
-```java
 // Imperative: simple and straightforward
 User user = userService.findById("123");
 assertEquals("Alice", user.getName());
-```
 
 In reactive code, the result is a **Mono/Flux** — nothing happens until you subscribe. You can't just call `.getName()` on a `Mono<User>`. You need special tools to test reactive streams.
 
@@ -38,6 +36,19 @@ In reactive code, the result is a **Mono/Flux** — nothing happens until you su
 
 ### 1. StepVerifier — The Core Testing Tool
 
+
+**What this code does — step by step:**
+
+1. Step 1: Create the reactive chain
+2. Step 2: Verify the emissions
+3. `.assertNext(user -> {` — Expect one item
+4. `.verifyComplete();` — Then the stream completes
+5. `.verifyComplete();` — Expect empty (no items, just complete)
+6. `.verifyComplete();` — 3 items, then complete
+7. `.verifyError(NotFoundException.class);` — Expect this specific error
+
+The same code, clean:
+
 ```java
 class UserServiceTest {
 
@@ -45,17 +56,15 @@ class UserServiceTest {
 
     @Test
     void shouldFindUserById() {
-        // Step 1: Create the reactive chain
         Mono<User> result = userService.findById("user-123");
 
-        // Step 2: Verify the emissions
         StepVerifier.create(result)
-            .assertNext(user -> {                                 // Expect one item
+            .assertNext(user -> {
                 assertThat(user.getId()).isEqualTo("user-123");
                 assertThat(user.getName()).isEqualTo("Alice");
                 assertThat(user.getEmail()).isEqualTo("alice@example.com");
             })
-            .verifyComplete();                                    // Then the stream completes
+            .verifyComplete();
     }
 
     @Test
@@ -63,7 +72,7 @@ class UserServiceTest {
         Mono<User> result = userService.findById("nonexistent");
 
         StepVerifier.create(result)
-            .verifyComplete();                                    // Expect empty (no items, just complete)
+            .verifyComplete();
     }
 
     @Test
@@ -74,7 +83,7 @@ class UserServiceTest {
             .assertNext(course -> assertThat(course.getTitle()).isEqualTo("Java Basics"))
             .assertNext(course -> assertThat(course.getTitle()).isEqualTo("Spring Boot"))
             .assertNext(course -> assertThat(course.getTitle()).isEqualTo("Microservices"))
-            .verifyComplete();                                    // 3 items, then complete
+            .verifyComplete();
     }
 
     @Test
@@ -82,7 +91,7 @@ class UserServiceTest {
         Mono<User> result = userService.findById("invalid");
 
         StepVerifier.create(result)
-            .verifyError(NotFoundException.class);                // Expect this specific error
+            .verifyError(NotFoundException.class);
     }
 }
 ```
@@ -96,6 +105,17 @@ class UserServiceTest {
 
 ### 2. Testing with Virtual Time
 
+
+**What this code does — step by step:**
+
+1. Use virtual time to avoid waiting 5 real seconds:
+2. `.thenAwait(Duration.ofSeconds(5))` — Fast-forward 5 seconds
+3. `.thenAwait(Duration.ofSeconds(5))` — Fast-forward 5 seconds
+4. `.expectNext(0L, 1L, 2L, 3L, 4L)` — 5 ticks at 1s intervals
+5. `.thenAwait(Duration.ofSeconds(7))` — 1s + 2s + 4s = 7s total
+
+The same code, clean:
+
 ```java
 class DelayedServiceTest {
 
@@ -103,9 +123,8 @@ class DelayedServiceTest {
     void shouldTimeoutAfterDelay() {
         Mono<String> result = delayedService.fetchWithTimeout(Duration.ofSeconds(5));
 
-        // Use virtual time to avoid waiting 5 real seconds:
         StepVerifier.withVirtualTime(() -> result)
-            .thenAwait(Duration.ofSeconds(5))                    // Fast-forward 5 seconds
+            .thenAwait(Duration.ofSeconds(5))
             .assertNext(data -> assertThat(data).isNotEmpty())
             .verifyComplete();
     }
@@ -115,8 +134,8 @@ class DelayedServiceTest {
         Flux<Long> ticks = Flux.interval(Duration.ofSeconds(1)).take(5);
 
         StepVerifier.withVirtualTime(() -> ticks)
-            .thenAwait(Duration.ofSeconds(5))                    // Fast-forward 5 seconds
-            .expectNext(0L, 1L, 2L, 3L, 4L)                    // 5 ticks at 1s intervals
+            .thenAwait(Duration.ofSeconds(5))
+            .expectNext(0L, 1L, 2L, 3L, 4L)
             .verifyComplete();
     }
 
@@ -125,7 +144,7 @@ class DelayedServiceTest {
         Mono<String> result = unreliableService.fetchWithRetry(3);
 
         StepVerifier.withVirtualTime(() -> result)
-            .thenAwait(Duration.ofSeconds(7))                    // 1s + 2s + 4s = 7s total
+            .thenAwait(Duration.ofSeconds(7))
             .assertNext(data -> assertThat(data).isEqualTo("success"))
             .verifyComplete();
     }
@@ -139,6 +158,18 @@ class DelayedServiceTest {
 
 ### 3. WebTestClient — Testing WebFlux Endpoints
 
+
+**What this code does — step by step:**
+
+1. `.exchange()` — Make the request
+2. `.expectStatus().isOk()` — Assert HTTP 200
+3. `.value(order -> {` — Assert response body
+4. `.expectStatus().isUnauthorized();` — Assert HTTP 401
+5. `.expectStatus().isCreated()` — Assert HTTP 201
+6. `.take(3)` — Take first 3 events
+
+The same code, clean:
+
 ```java
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class OrderControllerIntegrationTest {
@@ -151,10 +182,10 @@ class OrderControllerIntegrationTest {
         webTestClient.get()
             .uri("/api/orders/{id}", "order-123")
             .header("Authorization", "Bearer " + validToken)
-            .exchange()                                           // Make the request
-            .expectStatus().isOk()                                // Assert HTTP 200
+            .exchange()
+            .expectStatus().isOk()
             .expectBody(Order.class)
-            .value(order -> {                                     // Assert response body
+            .value(order -> {
                 assertThat(order.getId()).isEqualTo("order-123");
                 assertThat(order.getStatus()).isEqualTo("PAID");
                 assertThat(order.getTotal()).isPositive();
@@ -166,7 +197,7 @@ class OrderControllerIntegrationTest {
         webTestClient.get()
             .uri("/api/orders/{id}", "order-123")
             .exchange()
-            .expectStatus().isUnauthorized();                     // Assert HTTP 401
+            .expectStatus().isUnauthorized();
     }
 
     @Test
@@ -179,7 +210,7 @@ class OrderControllerIntegrationTest {
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(request)
             .exchange()
-            .expectStatus().isCreated()                           // Assert HTTP 201
+            .expectStatus().isCreated()
             .expectBody(Order.class)
             .value(order -> {
                 assertThat(order.getId()).isNotNull();
@@ -198,7 +229,7 @@ class OrderControllerIntegrationTest {
             .expectHeader().contentType(MediaType.TEXT_EVENT_STREAM)
             .returnResult(Event.class)
             .getResponseBody()
-            .take(3)                                              // Take first 3 events
+            .take(3)
             .as(StepVerifier::create)
             .assertNext(event -> assertThat(event.getType()).isNotEmpty())
             .assertNext(event -> assertThat(event.getType()).isNotEmpty())
@@ -210,27 +241,39 @@ class OrderControllerIntegrationTest {
 
 ### 4. TestPublisher — Manual Stream Control
 
+
+**What this code does — step by step:**
+
+1. Create a controllable publisher
+2. Create a subscriber that processes items slowly
+3. `.delayElements(Duration.ofMillis(100))` — Simulate slow processing
+4. `StepVerifier.create(slowProcessor, 1)` — Request 1 item at a time
+5. `publisher.next(1, 2, 3, 4, 5);` — Emit 5 items
+6. `publisher.complete();` — Signal completion
+7. `.thenRequest(1)` — Request more items
+8. `.onErrorReturn("default");` — Fallback on error
+
+The same code, clean:
+
 ```java
 class BackpressureTest {
 
     @Test
     void shouldHandleBackpressure() {
-        // Create a controllable publisher
         TestPublisher<Integer> publisher = TestPublisher.create();
 
-        // Create a subscriber that processes items slowly
         List<Integer> processed = new ArrayList<>();
 
         Flux<Integer> slowProcessor = publisher.flux()
-            .delayElements(Duration.ofMillis(100))               // Simulate slow processing
+            .delayElements(Duration.ofMillis(100))
             .subscribeOn(Schedulers.parallel());
 
-        StepVerifier.create(slowProcessor, 1)                    // Request 1 item at a time
+        StepVerifier.create(slowProcessor, 1)
             .then(() -> {
-                publisher.next(1, 2, 3, 4, 5);                  // Emit 5 items
-                publisher.complete();                              // Signal completion
+                publisher.next(1, 2, 3, 4, 5);
+                publisher.complete();
             })
-            .thenRequest(1)                                       // Request more items
+            .thenRequest(1)
             .assertNext(item -> assertThat(item).isIn(1, 2, 3, 4, 5))
             .thenRequest(1)
             .assertNext(item -> assertThat(item).isIn(1, 2, 3, 4, 5))
@@ -242,7 +285,7 @@ class BackpressureTest {
         TestPublisher<String> publisher = TestPublisher.create();
 
         Flux<String> stream = publisher.flux()
-            .onErrorReturn("default");                            // Fallback on error
+            .onErrorReturn("default");
 
         StepVerifier.create(stream)
             .then(() -> publisher.error(new RuntimeException("boom")))
@@ -258,6 +301,17 @@ class BackpressureTest {
 
 ### Scenario 1: Testing a Reactive Service
 
+
+**What this code does — step by step:**
+
+1. Arrange: mock the email client
+2. Act
+3. Assert
+4. `.verifyComplete();` — Completes without error
+5. Verify the email was sent
+
+The same code, clean:
+
 ```java
 @SpringBootTest
 class NotificationServiceTest {
@@ -270,20 +324,16 @@ class NotificationServiceTest {
 
     @Test
     void shouldSendNotification() {
-        // Arrange: mock the email client
         when(emailClient.send(any()))
             .thenReturn(Mono.just(new SendResult("sent")));
 
-        // Act
         Mono<Void> result = notificationService.sendNotification(
             "user-123", "Your order is ready!"
         );
 
-        // Assert
         StepVerifier.create(result)
-            .verifyComplete();                                    // Completes without error
+            .verifyComplete();
 
-        // Verify the email was sent
         verify(emailClient).send(argThat(msg ->
             msg.getTo().equals("user-123") &&
             msg.getBody().contains("order is ready")
@@ -294,7 +344,6 @@ class NotificationServiceTest {
 
 ### Scenario 2: Testing WebSocket
 
-```java
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class WebSocketIntegrationTest {
 
@@ -312,11 +361,9 @@ class WebSocketIntegrationTest {
             .verifyComplete();
     }
 }
-```
 
 ### Scenario 3: Testing Timeout Behavior
 
-```java
 @Test
 void shouldTimeoutWhenServiceIsSlow() {
     Mono<String> result = slowService.fetchData()
@@ -326,7 +373,6 @@ void shouldTimeoutWhenServiceIsSlow() {
         .thenAwait(Duration.ofSeconds(3))                        // Fast-forward past timeout
         .verifyError(TimeoutException.class);                     // Should timeout
 }
-```
 
 ---
 
@@ -351,3 +397,4 @@ void shouldTimeoutWhenServiceIsSlow() {
 - **Always test both success AND error paths** — reactive error handling is easy to get wrong.
 
 Official docs: [Testing (Reactor)](https://projectreactor.io/docs/core/release/reference/#testing) · [WebTestClient (Spring)](https://docs.spring.io/spring-framework/reference/web/webflux-webfn.html)
+

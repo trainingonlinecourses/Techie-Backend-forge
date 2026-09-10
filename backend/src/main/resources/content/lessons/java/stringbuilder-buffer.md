@@ -1,7 +1,7 @@
 ---
 title: StringBuilder, StringBuffer & StringJoiner — Efficient String Building
 summary: Why string concatenation in loops is slow, StringBuilder vs StringBuffer (thread-safety cost), StringJoiner for delimiters, and the org patterns.
-order: 38
+order: 76
 minutes: 17
 topics: [stringbuilder, stringbuffer, stringjoiner, string-concatenation, mutable-string, delimiter]
 docs:
@@ -15,7 +15,6 @@ docs:
 
 `String` is immutable — every `+` creates a **new** string by copying both operands. In a loop, that's O(n²):
 
-```java
 // WRONG — each iteration allocates a new String and copies everything so far
 String csv = "";
 for (Order o : orders) {
@@ -27,7 +26,6 @@ StringBuilder csv = new StringBuilder(orders.size() * 8);   // pre-size: avoid r
 for (Order o : orders) {
     csv.append(o.id()).append(',');
 }
-```
 
 The single-threaded **`StringBuilder`** is the standard mutable string builder. **`StringBuffer`** is its thread-safe twin — every method synchronized — which costs performance for zero benefit in single-threaded code. **The org rule: `StringBuilder` by default; `StringBuffer` only for genuinely shared, mutable, multi-threaded buffers (nearly never).**
 
@@ -41,18 +39,27 @@ The single-threaded **`StringBuilder`** is the standard mutable string builder. 
 
 Building "a, b, c" or "key=value" strings by hand is error-prone (the trailing-delimiter bug). The standard tools:
 
-```java
-// StringJoiner — explicit prefix/suffix/delimiter
-StringJoiner joiner = new StringJoiner(", ", "[", "]");   // delimiter, prefix, suffix
-joiner.add("a").add("b").add("c");
-joiner.toString();                        // "[a, b, c]" — no trailing comma, ever
 
-// Collectors.joining — the stream form (the one teams use most)
+**What this code does — step by step:**
+
+1. StringJoiner — explicit prefix/suffix/delimiter
+2. `StringJoiner joiner = new StringJoiner(", ", "[", "]");` — delimiter, prefix, suffix
+3. `joiner.toString();` — "[a, b, c]" — no trailing comma, ever
+4. Collectors.joining — the stream form (the one teams use most)
+5. `.collect(Collectors.joining(", "));` — "1, 2, 3" — handles empty → ""
+6. Joining with prefix/suffix and a transform:
+
+The same code, clean:
+
+```java
+StringJoiner joiner = new StringJoiner(", ", "[", "]");
+joiner.add("a").add("b").add("c");
+joiner.toString();
+
 String csv = orders.stream()
     .map(o -> String.valueOf(o.id()))
-    .collect(Collectors.joining(", "));   // "1, 2, 3" — handles empty → ""
+    .collect(Collectors.joining(", "));
 
-// Joining with prefix/suffix and a transform:
 String ids = orders.stream()
     .map(Order::id)
     .map(String::valueOf)
@@ -65,7 +72,6 @@ String ids = orders.stream()
 
 **Scenario 1 — building a large export/CSV/SQL-IN clause.** The hot-path builder:
 
-```java
 public String buildCsv(List<Order> orders) {
     StringBuilder sb = new StringBuilder(orders.size() * 12);   // pre-sized
     sb.append("id,status,amount").append('\n');
@@ -76,15 +82,12 @@ public String buildCsv(List<Order> orders) {
     }
     return sb.toString();
 }
-```
 
 **Scenario 2 — dynamic SQL/log filters.** Composing a query fragment from variable conditions:
 
-```java
 StringBuilder where = new StringBuilder(" WHERE 1=1");     // the "1=1" trick keeps ANDs uniform
 if (status != null) where.append(" AND status = ?");
 if (from != null)   where.append(" AND created_at >= ?");
-```
 
 **Scenario 3 — log message assembly.** SLF4J parameters (`log.info("Order {} for {}", id, user)`) avoid string building entirely — the logger formats lazily. Teams ban `log.info("..." + id + "...")` in favor of parameterized logging (see the logging lesson).
 
@@ -105,3 +108,4 @@ if (from != null)   where.append(" AND created_at >= ?");
 - `StringJoiner`/`Collectors.joining` handle delimiters, prefixes, and empty collections correctly.
 - Pre-size builders when you know the target size; convert to String once at the end.
 - Parameterized logging beats string concatenation in log statements.
+

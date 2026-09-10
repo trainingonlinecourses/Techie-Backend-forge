@@ -1,7 +1,7 @@
 ---
 title: Try-with-Resources — Safe Resource Management
 module: java-exceptions-deep
-order: 2
+order: 5
 minutes: 24
 topics: ["try-with-resources", "AutoCloseable", "resource leak", "suppressed exceptions", "finally"]
 summary: File handles, network sockets, database connections — Java calls these resources, and every one of them is a limited, shared, kernelbacked thing. Y...
@@ -20,19 +20,22 @@ File handles, network sockets, database connections — Java calls these **resou
 
 The classic, error-prone way to close resources is `finally`:
 
-```java
-BufferedReader reader = null;
-try {
-    reader = new BufferedReader(new FileReader("data.txt"));
-    String line = reader.readLine();
-    System.out.println(line);
-} finally {
-    // finally ALWAYS runs — even if the try block threw.
-    if (reader != null) {
-        reader.close();          // but close() can itself throw IOException!
+public class Main {
+
+    public static void main(String[] args) {
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(new FileReader("data.txt"));
+            String line = reader.readLine();
+            System.out.println(line);
+        } finally {
+            // finally ALWAYS runs — even if the try block threw.
+            if (reader != null) {
+                reader.close();          // but close() can itself throw IOException!
+            }
+        }
     }
 }
-```
 
 **Why this is fragile:** three separate things can go wrong. First, `close()` throws a checked `IOException` that itself needs handling. Second, if `readLine()` throws and then `close()` also throws, the *second* exception silently replaces the first — you lose the original failure, and debugging becomes archaeology. Third, you must remember the null-check and the finally block *every single time* — and with nested resources (a file reader wrapping a stream wrapping a socket), the nesting explodes into pyramids of try/finally.
 
@@ -40,7 +43,6 @@ Java 7 gave us the tool that makes all of this vanish: **try-with-resources**.
 
 ## The Mechanism: Try-with-Resources
 
-```java
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -59,7 +61,6 @@ public class TryWithResourcesDemo {
         // At this point the file is ALREADY closed — no finally needed.
     }
 }
-```
 
 **Walking through it, line by line:**
 
@@ -75,33 +76,39 @@ The subtle case: the try block throws an `IOException` (say, the disk hiccuped m
 
 In the old finally style, the close exception replaced the original — bad. In try-with-resources, Java does something clever: the *primary* exception (from the try body) propagates, and any exceptions thrown by `close()` are attached to it as **suppressed exceptions**.
 
-```java
-try (BufferedReader reader = new BufferedReader(new FileReader("data.txt"))) {
-    throw new IOException("read failed");      // primary failure
-} catch (IOException e) {
-    System.out.println("Primary:   " + e.getMessage());
-    for (Throwable s : e.getSuppressed()) {     // close() failures land here
-        System.out.println("Suppressed: " + s.getMessage());
+public class Main {
+
+    public static void main(String[] args) {
+        try (BufferedReader reader = new BufferedReader(new FileReader("data.txt"))) {
+            throw new IOException("read failed");      // primary failure
+        } catch (IOException e) {
+            System.out.println("Primary:   " + e.getMessage());
+            for (Throwable s : e.getSuppressed()) {     // close() failures land here
+                System.out.println("Suppressed: " + s.getMessage());
+            }
+        }
     }
 }
-```
 
 The `getSuppressed()` array is where you find close-time failures — they're preserved for debugging instead of stomping on the real error. This is why logs of try-with-resources code show the true root cause with "Suppressed:" lines beneath it.
 
 ## Multiple Resources in One try
 
-```java
-try (FileInputStream in = new FileInputStream("in.dat");
-     FileOutputStream out = new FileOutputStream("out.dat")) {
-    byte[] buffer = new byte[4096];
-    int read;
-    while ((read = in.read(buffer)) != -1) {
-        out.write(buffer, 0, read);
+public class Main {
+
+    public static void main(String[] args) {
+        try (FileInputStream in = new FileInputStream("in.dat");
+             FileOutputStream out = new FileOutputStream("out.dat")) {
+            byte[] buffer = new byte[4096];
+            int read;
+            while ((read = in.read(buffer)) != -1) {
+                out.write(buffer, 0, read);
+            }
+        } catch (IOException e) {
+            System.out.println("Copy failed: " + e.getMessage());
+        }
     }
-} catch (IOException e) {
-    System.out.println("Copy failed: " + e.getMessage());
 }
-```
 
 Both resources close automatically, **in reverse order** — `out` first, then `in`. That ordering matters: you want the destination flushed and closed before you release the source. A file copy with zero explicit close calls — this is the everyday power of the construct.
 
@@ -109,7 +116,6 @@ Both resources close automatically, **in reverse order** — `out` first, then `
 
 try-with-resources doesn't forbid a `finally` block; it just makes it unnecessary for *resource closing*. Use `finally` for cleanup that isn't a closable resource:
 
-```java
 try (Connection conn = dataSource.getConnection();
      PreparedStatement ps = conn.prepareStatement(sql)) {
     // ... work
@@ -119,7 +125,6 @@ try (Connection conn = dataSource.getConnection();
     // Non-AutoCloseable cleanup, e.g., release a lock or log timing
     metrics.record();
 }
-```
 
 The JDBC `Connection`, `Statement`, and `ResultSet` are all `AutoCloseable`, so the `try (...)` does the closing — the `finally` is purely for your own bookkeeping.
 
@@ -127,7 +132,6 @@ The JDBC `Connection`, `Statement`, and `ResultSet` are all `AutoCloseable`, so 
 
 Rarely, you'll meet a resource that is created *inside* the try body (not in the declaration) — try-with-resources can't auto-close it because the compiler needs the resource declared in the parentheses. The fix: declare it in the parentheses anyway:
 
-```java
 // WRONG: reader is created inside the body — no auto-close.
 try {
     BufferedReader reader = new BufferedReader(new FileReader("f.txt"));
@@ -138,7 +142,6 @@ try {
 try (BufferedReader reader = new BufferedReader(new FileReader("f.txt"))) {
     // ... work — reader is auto-closed
 } catch (IOException e) { }
-```
 
 If the resource genuinely can only exist after some logic, wrap that logic in a helper method that returns the resource, and call the helper inside the parentheses: `try (BufferedReader reader = openReader()) { ... }`.
 
@@ -146,7 +149,6 @@ If the resource genuinely can only exist after some logic, wrap that logic in a 
 
 Implementing `AutoCloseable` is a one-method interface — this is how you give *your* classes the same safety:
 
-```java
 public class ApiConnection implements AutoCloseable {
     private boolean open = true;
 
@@ -169,10 +171,10 @@ public class ApiConnection implements AutoCloseable {
         }   // close() called automatically here
     }
 }
-```
 
 Note the guard inside `close()` — it makes close idempotent (safe to call twice). That's a good habit: try-with-resources guarantees `close()` is called once, but defensive double-close protection costs nothing.
 
 ## Recap
 
 Resources are scarce kernel-level things, and leaking them is the classic invisible production bug. try-with-resources makes the compiler generate correct closing for you: declare `AutoCloseable` resources in the parentheses, and `close()` runs automatically — normally and on exceptions — in reverse declaration order. When both the body and `close()` throw, the body's exception propagates and the close failure is preserved as a *suppressed* exception instead of destroying the original. Prefer it over manual try/finally for every closable resource, and implement `AutoCloseable` in your own classes that own external resources. The result is shorter code that is also *more* correct — the best kind of refactoring.
+

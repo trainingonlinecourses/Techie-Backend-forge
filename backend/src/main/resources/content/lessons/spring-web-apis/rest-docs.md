@@ -1,7 +1,7 @@
 ---
 title: API Docs with Spring REST Docs
 summary: Test-driven API documentation — assertions on the request/response contract, Asciidoctor snippets, and how REST Docs differs from Swagger UI.
-order: 6
+order: 7
 minutes: 13
 topics: [spring rest docs, api documentation, test-driven docs, asciidoctor, snippets]
 docs:
@@ -30,7 +30,6 @@ index.adoc ──Asciidoctor Maven plugin──▶ index.html     ◀─┘
 
 ## The test that documents
 
-```java
 @SpringBootTest
 @AutoConfigureMockMvc
 class OrderDocumentation {
@@ -54,7 +53,6 @@ class OrderDocumentation {
                     fieldWithPath("status").description("Initial status: PENDING"))));
     }
 }
-```
 
 `fieldWithPath(...)` **documents and asserts simultaneously** — every field in the actual response must be described (a new field fails the test until documented), and every documented field must exist. The docs and the contract can't drift.
 
@@ -98,3 +96,4 @@ The bridge: **`spring-restdocs-openapi`** converts REST Docs snippets into an Op
 - Combine with springdoc: test-proven accuracy plus machine-readable OpenAPI.
 
 Official docs: [Spring REST Docs](https://docs.spring.io/spring-restdocs/reference/)
+

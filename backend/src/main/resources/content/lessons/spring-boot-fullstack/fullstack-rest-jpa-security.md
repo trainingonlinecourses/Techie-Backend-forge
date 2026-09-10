@@ -76,7 +76,6 @@ Plus cross-cutting concerns:
 
 ### Step 2: Entity — The Database Model
 
-```java
 @Entity
 @Table(name = "tasks")
 public class Task {
@@ -138,11 +137,9 @@ public class Task {
     public enum Priority { LOW, MEDIUM, HIGH, CRITICAL }
     public enum Status { TODO, IN_PROGRESS, IN_REVIEW, DONE }
 }
-```
 
 ### Step 3: User Entity
 
-```java
 @Entity
 @Table(name = "users")
 public class User {
@@ -173,11 +170,9 @@ public class User {
     
     public enum Role { USER, MANAGER, ADMIN }
 }
-```
 
 ### Step 4: Repository
 
-```java
 @Repository
 public interface TaskRepository extends JpaRepository<Task, Long> {
     
@@ -200,11 +195,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByUsername(String username);
     boolean existsByUsername(String username);
 }
-```
 
 ### Step 5: DTOs — Never Expose Entities Directly
 
-```java
 // Request DTO — what the client sends
 public record CreateTaskRequest(
     @NotBlank String title,
@@ -245,11 +238,9 @@ public record TaskResponse(
         );
     }
 }
-```
 
 ### Step 6: Service Layer — Business Logic
 
-```java
 @Service
 @Transactional
 public class TaskService {
@@ -304,11 +295,9 @@ public class TaskService {
         taskRepo.deleteById(id);
     }
 }
-```
 
 ### Step 7: REST Controller
 
-```java
 @RestController
 @RequestMapping("/api/tasks")
 @Validated
@@ -342,11 +331,9 @@ public class TaskController {
         taskService.deleteTask(id);
     }
 }
-```
 
 ### Step 8: Security Configuration
 
-```java
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -371,11 +358,9 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 }
-```
 
 ### Step 9: Global Exception Handler
 
-```java
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     
@@ -402,13 +387,11 @@ public class GlobalExceptionHandler {
     
     public record ErrorResponse(int status, String message) {}
 }
-```
 
 ---
 
 ## Testing the Application
 
-```java
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
 class TaskControllerTest {
@@ -440,7 +423,6 @@ class TaskControllerTest {
             .andExpect(jsonPath("$.message").value(org.hamcrest.Matchers.containsString("required")));
     }
 }
-```
 
 ---
 
@@ -454,3 +436,4 @@ class TaskControllerTest {
 | Catching all exceptions in controller | Hides bugs | Use `@RestControllerAdvice` with specific handlers |
 | Storing passwords in plain text | Security breach | Always use `BCryptPasswordEncoder` |
 | N+1 queries in JPA | Performance disaster | Use `@EntityGraph` or `JOIN FETCH` |
+

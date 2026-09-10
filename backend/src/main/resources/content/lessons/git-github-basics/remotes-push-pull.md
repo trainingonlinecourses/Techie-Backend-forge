@@ -1,7 +1,7 @@
 ---
 title: Remotes, Push, and Pull — Sharing History
 module: git-github-basics
-order: 3
+order: 4
 minutes: 24
 topics: ["remote", "push", "pull", "fetch", "origin", "GitHub", "clone"]
 summary: So far, Git was local: your repository, your history, on your machine. Remotes connect your repo to a shared copy on a server (GitHub, GitLab, Rend...
@@ -109,3 +109,4 @@ git push origin main
 - Publish via branches + pull requests; keep shared main protected.
 - Never force-push shared branches; check for secrets before pushing.
 - The rhythm: pull → branch → work → commit → push → pull request.
+

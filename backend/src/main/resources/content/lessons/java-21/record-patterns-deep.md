@@ -1,7 +1,7 @@
 ---
 title: Record Patterns — Destructuring Records in Pattern Matching
 summary: What record patterns are, how they deconstruct records, nested destructuring, and how they simplify complex data extraction.
-order: 4
+order: 2
 minutes: 20
 topics: [record-patterns, destructuring, nested-patterns, java21]
 docs:
@@ -12,26 +12,28 @@ docs:
 
 Records hold data. Pattern matching lets you extract that data. **Record patterns** combine both — you can deconstruct a record and bind its components in a single expression:
 
-```java
-// Without record patterns — verbose
-if (obj instanceof Point p) {
-    int x = p.x();
-    int y = p.y();
-    System.out.println("x=" + x + ", y=" + y);
-}
+public class Main {
 
-// With record patterns — clean
-if (obj instanceof Point(int x, int y)) {
-    System.out.println("x=" + x + ", y=" + y);
+    public static void main(String[] args) {
+        // Without record patterns — verbose
+        if (obj instanceof Point p) {
+            int x = p.x();
+            int y = p.y();
+            System.out.println("x=" + x + ", y=" + y);
+        }
+
+        // With record patterns — clean
+        if (obj instanceof Point(int x, int y)) {
+            System.out.println("x=" + x + ", y=" + y);
+        }
+        // x and y are automatically bound as local variables
+    }
 }
-// x and y are automatically bound as local variables
-```
 
 ---
 
 ## Basic Destructuring
 
-```java
 record Point(int x, int y) {}
 record Person(String name, int age) {}
 
@@ -44,13 +46,11 @@ if (obj instanceof Point(int x, int y)) {
 if (obj instanceof Person(String name, int age) && age > 18) {
     System.out.println("Adult: " + name);
 }
-```
 
 ---
 
 ## Nested Destructuring
 
-```java
 record Address(String city, String zip) {}
 record Person(String name, Address address) {}
 
@@ -58,17 +58,39 @@ record Person(String name, Address address) {}
 if (obj instanceof Person(String name, Address(String city, String zip))) {
     System.out.println(name + " lives in " + city + " " + zip);
 }
-```
 
 ---
 
 ## Line-by-Line Walkthrough
 
+
+**What this code does — step by step:**
+
+1. Line 1: Define nested record hierarchy
+2. Line 2: Basic destructuring
+3. Line 3: Nested destructuring
+4. Line 4: Destructuring with guards
+5. Line 5: Destructuring in for-each
+6. Line 6: Destructuring with null handling
+7. Line 7: Test basic destructuring
+8. `System.out.println(describePoint(point));` — "Point at (10, 20)"
+9. Line 8: Test nested destructuring
+10. `System.out.println(describeLine(line));` — "Line from (0,0) to (5,5)"
+11. Line 9: Test guarded destructuring
+12. `System.out.println(classifyRect(rect1));` — "Rectangle 5x3"
+13. `System.out.println(classifyRect(rect2));` — "Horizontal line"
+14. Line 10: Test for-each destructuring
+15. `System.out.println(getEmployeeNames(company));` — [Alice, Bob, Carol]
+16. Line 11: Test null safety
+17. `System.out.println(safeDesribe(null));` — "null"
+18. `System.out.println(safeDesribe(new Point(1, 2)));` — "Point(1,2)"
+
+The same code, clean:
+
 ```java
 import java.util.*;
 
 public class RecordPatternsDemo {
-    // Line 1: Define nested record hierarchy
     record Point(int x, int y) {}
     record Line(Point start, Point end) {}
     record Rect(Point topLeft, Point bottomRight) {}
@@ -76,7 +98,6 @@ public class RecordPatternsDemo {
     record Employee(String name, String department, double salary) {}
     record Company(String name, List<Employee> employees) {}
 
-    // Line 2: Basic destructuring
     static String describePoint(Object obj) {
         return switch (obj) {
             case Point(int x, int y) -> "Point at (" + x + ", " + y + ")";
@@ -84,7 +105,6 @@ public class RecordPatternsDemo {
         };
     }
 
-    // Line 3: Nested destructuring
     static String describeLine(Object obj) {
         return switch (obj) {
             case Line(Point(int x1, int y1), Point(int x2, int y2)) ->
@@ -93,7 +113,6 @@ public class RecordPatternsDemo {
         };
     }
 
-    // Line 4: Destructuring with guards
     static String classifyRect(Rect rect) {
         return switch (rect) {
             case Rect(Point(int x1, int y1), Point(int x2, int y2))
@@ -110,7 +129,6 @@ public class RecordPatternsDemo {
         };
     }
 
-    // Line 5: Destructuring in for-each
     static List<String> getEmployeeNames(Company company) {
         List<String> names = new ArrayList<>();
         for (Company(String name, List<Employee> emps) : List.of(company)) {
@@ -121,7 +139,6 @@ public class RecordPatternsDemo {
         return names;
     }
 
-    // Line 6: Destructuring with null handling
     static String safeDesribe(Object obj) {
         return switch (obj) {
             case null -> "null";
@@ -132,31 +149,26 @@ public class RecordPatternsDemo {
     }
 
     public static void main(String[] args) {
-        // Line 7: Test basic destructuring
         var point = new Point(10, 20);
-        System.out.println(describePoint(point));  // "Point at (10, 20)"
+        System.out.println(describePoint(point));
 
-        // Line 8: Test nested destructuring
         var line = new Line(new Point(0, 0), new Point(5, 5));
-        System.out.println(describeLine(line));    // "Line from (0,0) to (5,5)"
+        System.out.println(describeLine(line));
 
-        // Line 9: Test guarded destructuring
         var rect1 = new Rect(new Point(0, 0), new Point(5, 3));
         var rect2 = new Rect(new Point(0, 0), new Point(5, 0));
-        System.out.println(classifyRect(rect1));   // "Rectangle 5x3"
-        System.out.println(classifyRect(rect2));   // "Horizontal line"
+        System.out.println(classifyRect(rect1));
+        System.out.println(classifyRect(rect2));
 
-        // Line 10: Test for-each destructuring
         var company = new Company("TechCorp", List.of(
             new Employee("Alice", "Engineering", 95000),
             new Employee("Bob", "Marketing", 72000),
             new Employee("Carol", "Engineering", 110000)
         ));
-        System.out.println(getEmployeeNames(company));  // [Alice, Bob, Carol]
+        System.out.println(getEmployeeNames(company));
 
-        // Line 11: Test null safety
-        System.out.println(safeDesribe(null));           // "null"
-        System.out.println(safeDesribe(new Point(1, 2))); // "Point(1,2)"
+        System.out.println(safeDesribe(null));
+        System.out.println(safeDesribe(new Point(1, 2)));
     }
 }
 ```
@@ -167,7 +179,6 @@ public class RecordPatternsDemo {
 
 ### Scenario 1: JSON tree processing
 
-```java
 // Process JSON-like structures
 sealed interface JsonValue permits JsonString, JsonNumber, JsonBoolean, JsonNull, JsonObject, JsonArray {}
 record JsonString(String value) implements JsonValue {}
@@ -192,11 +203,9 @@ String prettyPrint(JsonValue value, int indent) {
             .reduce((x, y) -> x + ",\n" + y).orElse("") + "\n" + pad + "}";
     };
 }
-```
 
 ### Scenario 2: Compiler AST processing
 
-```java
 sealed interface Stmt permits IfStmt, WhileStmt, AssignStmt, Block {}
 record IfStmt(Expr condition, Stmt thenBranch, Stmt elseBranch) implements Stmt {}
 record WhileStmt(Expr condition, Stmt body) implements Stmt {}
@@ -221,7 +230,6 @@ void compile(Stmt stmt) {
         case Block(List<Stmt> stmts) -> stmts.forEach(this::compile);
     };
 }
-```
 
 ---
 
@@ -234,3 +242,4 @@ void compile(Stmt stmt) {
 | Forgetting null in switch | NullPointerException | Add `case null ->` |
 | Using `var` in patterns | Not supported yet | Use explicit types in patterns |
 | Destructuring with wrong component count | Compilation error | Match exact number of components |
+

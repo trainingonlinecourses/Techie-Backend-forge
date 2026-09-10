@@ -1,7 +1,7 @@
 ---
 title: Kubernetes Architecture — Nodes, Pods, and the Control Plane
 module: kubernetes-deep
-order: 1
+order: 2
 minutes: 27
 topics: ["Kubernetes", "pods", "nodes", "control plane", "kubelet", "containers"]
 summary: Docker gives you containers — isolated processes with their own filesystem. But running containers at scale (dozens of machines, hundreds of contai...
@@ -130,3 +130,4 @@ Other pods call `http://payments:80` — the service name resolves via cluster D
 ## Recap
 
 Kubernetes is an operating system for container clusters: the **control plane** (API server, etcd, scheduler, controllers) holds and drives the desired state, while **worker nodes** (kubelet + runtime + kube-proxy) execute it. The **pod** is the atomic scheduling unit — ephemeral, labeled, reachable via **Services** that never change. You interact by *declaring* state (`kubectl apply` a Deployment: "3 replicas of payments:2.1"), and controllers converge the cluster to match — replacing dead pods, scaling, rolling updates. The mental shift is the deepest one: from "operate processes" to "declare desired state and let the system converge." Master pods, deployments, services, and the convergence loop, and everything else in Kubernetes is detail.
+

@@ -1,7 +1,7 @@
 ---
 title: Annotations Deep — Metadata the Compiler and Frameworks Read
 module: java-reflection-annotations
-order: 2
+order: 1
 minutes: 25
 topics: ["annotations", "retention", "target", "custom annotations", "annotation processing"]
 summary: An annotation is metadata attached to code — a label on a class, method, field, or parameter. By itself, an annotation does nothing: it's inert dat...
@@ -26,20 +26,24 @@ This is the single most important idea in modern Java: **frameworks like Spring 
 
 Every annotation has a **retention policy** — how long the label survives:
 
+
+**What this code does — step by step:**
+
+1. SOURCE: discarded by the compiler. Only visible in the source file.
+2. CLASS: stored in the .class file, but NOT readable at runtime. (The default.) Used by bytecode tools, not by your running app.
+3. RUNTIME: stored in the class file AND readable via reflection at runtime. This is what frameworks use.
+
+The same code, clean:
+
 ```java
 import java.lang.annotation.*;
 
-// SOURCE: discarded by the compiler. Only visible in the source file.
 @Retention(RetentionPolicy.SOURCE)
 @interface SourceOnly { }
 
-// CLASS: stored in the .class file, but NOT readable at runtime.
-// (The default.) Used by bytecode tools, not by your running app.
 @Retention(RetentionPolicy.CLASS)
 @interface ClassOnly { }
 
-// RUNTIME: stored in the class file AND readable via reflection at runtime.
-// This is what frameworks use.
 @Retention(RetentionPolicy.RUNTIME)
 @interface RuntimeOnly { }
 ```
@@ -50,7 +54,6 @@ import java.lang.annotation.*;
 
 The `@Target` meta-annotation restricts where an annotation may appear:
 
-```java
 import java.lang.annotation.*;
 
 // This annotation may only appear on methods (and constructors).
@@ -67,7 +70,6 @@ public @interface Entity { }
 @Target({ElementType.FIELD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface NotNull { }
-```
 
 The common `ElementType` values: `TYPE` (classes/interfaces/records/enums), `METHOD`, `FIELD`, `PARAMETER`, `CONSTRUCTOR`, `LOCAL_VARIABLE`, `ANNOTATION_TYPE` (meta-annotations like `@Target` themselves), `PACKAGE`, and `TYPE_USE` (which allows annotations in generic type arguments, e.g. `List<@NotNull String>`).
 
@@ -75,26 +77,34 @@ The common `ElementType` values: `TYPE` (classes/interfaces/records/enums), `MET
 
 Let's build a real one — a `@RateLimit` annotation that Spring could read to enforce API rate limits:
 
+
+**What this code does — step by step:**
+
+1. `@Target(ElementType.METHOD)` — put it on controller methods
+2. `@Retention(RetentionPolicy.RUNTIME)` — Spring must see it at runtime
+3. Elements look like methods; they become annotation parameters.
+4. `int maxRequests() default 100;` — how many calls allowed
+5. `String window() default "1m";` — per what window: "1m", "1h"
+6. A "marker" style: just the presence of the annotation matters. (If you add elements, all must have defaults or be provided.)
+
+The same code, clean:
+
 ```java
 import java.lang.annotation.*;
 
-@Target(ElementType.METHOD)          // put it on controller methods
-@Retention(RetentionPolicy.RUNTIME)  // Spring must see it at runtime
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
 public @interface RateLimit {
 
-    // Elements look like methods; they become annotation parameters.
-    int maxRequests() default 100;      // how many calls allowed
+    int maxRequests() default 100;
 
-    String window() default "1m";       // per what window: "1m", "1h"
+    String window() default "1m";
 
-    // A "marker" style: just the presence of the annotation matters.
-    // (If you add elements, all must have defaults or be provided.)
 }
 ```
 
 **Using it:**
 
-```java
 @RestController
 public class PaymentController {
 
@@ -106,11 +116,9 @@ public class PaymentController {
     @GetMapping("/history")
     public void history() { /* ... */ }
 }
-```
 
 **Reading it with reflection** — the framework side:
 
-```java
 import java.lang.reflect.Method;
 
 public class RateLimitProcessor {
@@ -133,7 +141,6 @@ public class RateLimitProcessor {
         }
     }
 }
-```
 
 **Walking through it:** the annotation's "methods" are its *elements* — `maxRequests()` and `window()` — with `default` values so callers can override selectively. The processor uses `isAnnotationPresent` to check for the label and `getAnnotation` to read the values. This is *exactly* the pattern Spring's machinery runs a thousand times at startup: scan for annotated classes/methods, read their metadata, and build the framework's behavior around it.
 
@@ -162,3 +169,4 @@ An annotation *type* (`@interface`) looks like an interface but isn't: its membe
 ## Recap
 
 Annotations are metadata labels that do nothing by themselves — their power is in the readers: the compiler (`@Override`, `@SuppressWarnings`), annotation processors (Lombok's code generation), and runtime frameworks (Spring's entire wiring model). Three decisions define your annotation: **retention** (SOURCE/CLASS/RUNTIME — must be RUNTIME for frameworks), **target** (where it can sit), and its **elements** (parameters with defaults). Reading them is a simple reflection pattern: `isAnnotationPresent` + `getAnnotation`. Master annotations and you stop seeing Spring as magic and start seeing it as a metadata reader — your `@Service`, `@Transactional`, and `@GetMapping` labels are just data, and the framework is the machinery that acts on them.
+

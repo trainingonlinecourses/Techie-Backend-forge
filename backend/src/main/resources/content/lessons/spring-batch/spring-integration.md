@@ -1,7 +1,7 @@
 ---
 title: Spring Integration — Enterprise Integration Patterns
 summary: Message channels, gateways, routers and transformers — wiring systems together with the Enterprise Integration Patterns, and when it beats hand-written glue.
-order: 6
+order: 8
 minutes: 15
 topics: [spring integration, message channels, gateway, enterprise integration patterns, eip]
 docs:
@@ -28,7 +28,6 @@ file inbound adapter → transformer (parse) → router (by type) → jdbc outbo
 
 A minimal flow in Java DSL:
 
-```java
 @Bean
 IntegrationFlow fileFlow() {
     return IntegrationFlow
@@ -49,13 +48,11 @@ IntegrationFlow handlerFlow() {
         .handle("orderService", "handleOrder")               // service activator
         .get();
 }
-```
 
 ## Gateways: the synchronous face
 
 A **gateway** hides messaging behind a plain interface — callers never see channels:
 
-```java
 public interface OrderSubmission {
     @Gateway(requestChannel = "orders.in", replyChannel = "orders.out")
     Confirmation submit(Order order);   // blocking request/reply
@@ -63,7 +60,6 @@ public interface OrderSubmission {
 
 // Usage — ordinary method call:
 Confirmation c = orderSubmission.submit(order);
-```
 
 With `@MessagingGateway` on the interface, Spring generates the implementation. Gateway + `QueueChannel` gives you async fire-and-forget; gateway + reply channel gives request/reply — all without exposing messaging in the business code.
 
@@ -73,11 +69,9 @@ With `@MessagingGateway` on the interface, Spring generates the implementation. 
 - **Splitter** — one message → many (`order` → `orderLines`), each line flows independently.
 - **Aggregator** — many → one; correlates by a key (e.g. order id) and releases when the group completes or times out:
 
-```java
 .aggregate(a -> a.correlationStrategy(m -> m.getHeaders().get("orderId"))
                  .releaseStrategy(group -> group.size() == expectedLines)
                  .expireGroupsUponTimeout(true))
-```
 
 - **Filter** — drops messages that don't match (with `throwExceptionOnRejection` as the alternative: route to error instead of dropping).
 
@@ -91,7 +85,6 @@ With `@MessagingGateway` on the interface, Spring generates the implementation. 
 
 Every flow can route failures to an error channel instead of failing silently:
 
-```java
 IntegrationFlow.from("orders.in")
     .handle("orderService", "handleOrder")
     .errorChannel("errors.in");         // or global: setDefaultErrorChannel
@@ -102,7 +95,6 @@ IntegrationFlow errorFlow() {
         .handle(m -> log.error("flow failed: {}", m.getPayload()))
         .get();
 }
-```
 
 The error message carries the original message in its headers (`ErrorMessage` wraps the failed `Message`) — so the DLQ discipline works here too: park, alert, replay.
 
@@ -120,3 +112,4 @@ The error message carries the original message in its headers (`ErrorMessage` wr
 - Use it at system boundaries, not for internal calls.
 
 Official docs: [Spring Integration Reference](https://docs.spring.io/spring-integration/reference/) · [EIP book](https://www.enterpriseintegrationpatterns.com/)
+

@@ -1,7 +1,7 @@
 ---
 title: JPA Relationships & Cascade — OneToMany, ManyToMany and Ownership
 summary: Owning vs inverse side, cascade types and orphanRemoval, the fetch defaults, and the relationship-design rules that prevent N+1 and delete surprises.
-order: 12
+order: 8
 minutes: 20
 topics: [relationships, onetomany, manytomany, cascade, orphanremoval, owning-side, join-table, fetch-type]
 docs:
@@ -15,7 +15,6 @@ docs:
 
 A relationship between two entities has an **owning side** (the side that *owns the foreign key*) and an **inverse side** (`mappedBy` — the side that just references back). The owning side decides persistence:
 
-```java
 @Entity
 public class Order {
     @Id @GeneratedValue private Long id;
@@ -33,16 +32,13 @@ public class OrderItem {
     @JoinColumn(name = "order_id", nullable = false)
     private Order order;      // the FK lives HERE — this is the owning side
 }
-```
 
 **The rule every JPA developer learns the hard way:** you must maintain **both sides** of the association in memory (add to `order.items` AND set `item.order`), because Hibernate writes the FK from the owning side's state. A helper method on the aggregate is the standard pattern:
 
-```java
 public void addItem(OrderItem item) {
     items.add(item);
     item.setOrder(this);     // keep both sides in sync — otherwise the FK is never set!
 }
-```
 
 ## Cascade types — what operations propagate
 
@@ -67,7 +63,6 @@ public void addItem(OrderItem item) {
 
 ## ManyToMany — the join table
 
-```java
 @Entity
 public class User {
     @Id @GeneratedValue private Long id;
@@ -78,7 +73,6 @@ public class User {
         inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();     // owns the join table
 }
-```
 
 - The `@JoinTable` is owned by ONE side (here `User`); the other side uses `mappedBy = "roles"`.
 - Use `Set` (not `List`) for ManyToMany — `List` + `@ManyToMany` has a known Hibernate join-table duplicate bug (Hibernate can't easily update a `List` index in the join table).
@@ -109,3 +103,4 @@ public class User {
 - Set LAZY explicitly everywhere; use `@EntityGraph`/`JOIN FETCH` for deliberate eager loads.
 - ManyToMany → `Set` + join table; add an entity when the link carries attributes.
 - Relationship design (ownership, cascade, fetch) is the N+1 and data-loss prevention system.
+

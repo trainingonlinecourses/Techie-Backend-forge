@@ -1,7 +1,7 @@
 ---
 title: The Environment Abstraction — Properties, Profiles and Resolution Order
 summary: Environment, PropertySources, resolution order, and how property precedence protects prod from dev defaults in real deployments.
-order: 19
+order: 12
 minutes: 20
 topics: [environment, propertysources, resolution-order, property-resolution, profiles, property-override]
 docs:
@@ -15,7 +15,6 @@ docs:
 
 `Environment` is Spring's unified view of all configuration: OS environment variables, JVM system properties, `application.properties`, `application.yml`, command-line args, and config-server values. Each source is a **`PropertySource`**; the `Environment` resolves a property by walking them **in precedence order** and returning the first hit.
 
-```java
 @Service
 public class GreetingService {
     @Value("${app.greeting:hello}")   // resolve from Environment, default 'hello'
@@ -23,7 +22,6 @@ public class GreetingService {
     // or programmatically:
     // environment.getProperty("app.greeting")
 }
-```
 
 The whole point of the abstraction: **code never knows where a value came from**. The same `@Value("${db.url}")` works in a dev laptop (H2 via `application-dev.yml`), a CI container (env var), and prod (config server + vault). The environment decides; the code just asks.
 
@@ -59,7 +57,6 @@ app.db.url=jdbc:h2:mem:testdb
 
 **Scenario 2 — reading the environment programmatically.** Feature toggles, region, or instance metadata:
 
-```java
 @Service
 public class RegionRouter {
     private final Environment env;
@@ -70,17 +67,14 @@ public class RegionRouter {
         return env.getProperty("cloud.region", "eu-central-1");  // default for local dev
     }
 }
-```
 
 `@Value` covers most needs; `Environment` is for dynamic lookups, defaults, and reading typed values (`getProperty("x", Integer.class)`).
 
 **Scenario 3 — active profiles in code.** Knowing which profile is active for conditional behavior:
 
-```java
 if (env.acceptsProfiles(Profiles.of("prod"))) {
     metricsRegistry.enable();   // only register prod-only collectors
 }
-```
 
 **Scenario 4 — test overrides.** `@SpringBootTest(properties = "app.db.url=jdbc:h2:mem:t")` adds a test property source *above* everything — tests override prod values cleanly without editing config files.
 
@@ -102,3 +96,4 @@ If you register your own `@PropertySource`, remember **file order and later-decl
 - Profile files carry environment shape; secrets come from deployment env/secret stores.
 - Prefer `@ConfigurationProperties` with validation over scattered `@Value` for groups of settings.
 - Typos fail silently — validate configuration at startup.
+

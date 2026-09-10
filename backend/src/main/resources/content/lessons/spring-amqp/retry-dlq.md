@@ -1,7 +1,7 @@
 ---
 title: Retries, Dead Letter Queues and Poison Messages
 module: spring-amqp
-order: 3
+order: 4
 minutes: 25
 topics: ["retry", "backoff", "DLQ", "poison messages", "reprocessing", "message recovery"]
 summary: Transient failures deserve a retry; permanent failures deserve a dead letter. Without a retry policy, a database blip during a message storm causes...
@@ -27,7 +27,6 @@ Message arrives
 
 ## Spring AMQP's Retry Interceptor
 
-```java
 @Bean
 public RabbitListenerContainerFactory<SimpleMessageListenerContainer>
         rabbitListenerContainerFactory(ConnectionFactory connectionFactory) {
@@ -43,7 +42,6 @@ public RabbitListenerContainerFactory<SimpleMessageListenerContainer>
     factory.setDefaultRequeueRejected(false);   // final failure → DLQ, not infinite loop
     return factory;
 }
-```
 
 - `maxAttempts(3)` — 3 total attempts (1 initial + 2 retries)
 - `backOffOptions(1000, 2.0, 10000)` — initial 1s delay, ×2 each retry, capped at 10s
@@ -64,7 +62,6 @@ Backoff gives the downstream system (DB, external API) time to recover. A fixed 
 
 ## Declaring the DLQ Topology
 
-```java
 @Configuration
 public class DlqConfig {
 
@@ -88,13 +85,11 @@ public class DlqConfig {
             .to(new DirectExchange("")).with("orders.new.dlq");
     }
 }
-```
 
 When a message is rejected-and-not-requeued (or expires), RabbitMQ republishes it to the dead-letter exchange with the dead-letter routing key.
 
 ## The DLQ Consumer
 
-```java
 @Component
 public class OrderDlqConsumer {
 
@@ -115,7 +110,6 @@ public class OrderDlqConsumer {
         alertService.notify("Order consumer failing: " + body);
     }
 }
-```
 
 The `x-death` header records the original queue, reason (`rejected`/`expired`/`maxlen`), and retry count — forensic data for debugging.
 
@@ -123,7 +117,6 @@ The `x-death` header records the original queue, reason (`rejected`/`expired`/`m
 
 Not every failure should retry. A validation error will never succeed:
 
-```java
 @RabbitListener(queues = "orders.new")
 public void onOrderCreated(OrderEvent event) {
     try {
@@ -139,7 +132,6 @@ private void process(OrderEvent event) {
     if (event.amount() <= 0) throw new InvalidOrderException(event);
     // ...
 }
-```
 
 `AmqpRejectAndDontRequeueException` bypasses the retry ladder — the message is rejected immediately and routed to the DLQ.
 
@@ -147,7 +139,6 @@ private void process(OrderEvent event) {
 
 For critical messages, the DLQ isn't the end — it's a parking lot. A reprocessing job drains it:
 
-```java
 @Component
 public class DlqReprocessor {
 
@@ -170,7 +161,6 @@ public class DlqReprocessor {
         }
     }
 }
-```
 
 With a retry counter in the header (`x-death`), stop reprocessing after N attempts and page a human.
 
@@ -186,7 +176,6 @@ With a retry counter in the header (`x-death`), stop reprocessing after N attemp
 
 ## Monitoring the Recovery Ladder
 
-```java
 @RabbitListener(queues = "orders.new.dlq")
 public void onDlq(Message message) {
     dlqCounter.increment();                    // Micrometer counter
@@ -195,7 +184,6 @@ public void onDlq(Message message) {
         alertService.warn("10 messages in DLQ");
     }
 }
-```
 
 A DLQ rate > 0 is normal (transient storms happen); a **rising** DLQ rate is a deploy regression signal.
 
@@ -212,3 +200,4 @@ A DLQ rate > 0 is normal (transient storms happen); a **rising** DLQ rate is a d
 | Monitoring | DLQ counters + queue depth alerts |
 
 The recovery ladder turns "a message failed" from a silent data-loss event into a visible, replayable, alertable condition. Retry the transient, reject the permanent, park the poison, and reprocess deliberately.
+

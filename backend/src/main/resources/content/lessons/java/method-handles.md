@@ -1,7 +1,7 @@
 ---
 title: Method Handles — Faster Dynamic Invocation Than Reflection
 summary: MethodHandle, MethodType, and MethodHandles.Lookup — the java.lang.invoke package that gives you reflection-like flexibility with JIT-inlinable performance.
-order: 81
+order: 54
 minutes: 18
 topics: [method-handle, method-type, method-handles-lookup, invokedynamic, reflection-performance, dynamic-dispatch]
 docs:
@@ -20,23 +20,31 @@ docs:
 
 ## Creating method handles
 
+
+**What this code does — step by step:**
+
+1. Get a lookup object — the entry point for finding handles
+2. Find a method handle for a specific method
+3. Invoke it — like calling the method directly
+4. `int len = (int) strlen.invoke(str);` — returns 5
+5. or with exact type checking (slightly faster for JIT):
+6. `int len2 = (int) strlen.invokeExact(str);` — returns 5 — but str MUST be a String
+
+The same code, clean:
+
 ```java
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodType;
 import java.lang.invoke.MethodHandles;
 
-// Get a lookup object — the entry point for finding handles
 MethodHandles.Lookup lookup = MethodHandles.lookup();
 
-// Find a method handle for a specific method
 MethodHandle strlen = lookup.findVirtual(String.class, "length",
                                          MethodType.methodType(int.class));
 
-// Invoke it — like calling the method directly
 String str = "hello";
-int len = (int) strlen.invoke(str);           // returns 5
-// or with exact type checking (slightly faster for JIT):
-int len2 = (int) strlen.invokeExact(str);     // returns 5 — but str MUST be a String
+int len = (int) strlen.invoke(str);
+int len2 = (int) strlen.invokeExact(str);
 ```
 
 **Line-by-line breakdown:**
@@ -47,63 +55,98 @@ int len2 = (int) strlen.invokeExact(str);     // returns 5 — but str MUST be a
 
 ## MethodType — describing method signatures
 
+
+**What this code does — step by step:**
+
+1. MethodType describes parameter and return types
+2. `MethodType noArgs = MethodType.methodType(void.class);` — () -> void
+3. `MethodType oneString = MethodType.methodType(String.class, String.class);` — (String) -> String
+4. `MethodType twoArgs = MethodType.methodType(int.class, String.class, int.class);` — (String, int) -> int
+5. Append parameters
+6. `MethodType withExtra = oneString.appendParameterTypes(double.class);` — (String, double) -> String
+7. `MethodType changeReturn = oneString.changeReturnType(int.class);` — (String) -> int
+
+The same code, clean:
+
 ```java
 import java.lang.invoke.MethodType;
 
-// MethodType describes parameter and return types
-MethodType noArgs = MethodType.methodType(void.class);                         // () -> void
-MethodType oneString = MethodType.methodType(String.class, String.class);      // (String) -> String
-MethodType twoArgs = MethodType.methodType(int.class, String.class, int.class); // (String, int) -> int
+MethodType noArgs = MethodType.methodType(void.class);
+MethodType oneString = MethodType.methodType(String.class, String.class);
+MethodType twoArgs = MethodType.methodType(int.class, String.class, int.class);
 
-// Append parameters
-MethodType withExtra = oneString.appendParameterTypes(double.class);  // (String, double) -> String
-MethodType changeReturn = oneString.changeReturnType(int.class);      // (String) -> int
+MethodType withExtra = oneString.appendParameterTypes(double.class);
+MethodType changeReturn = oneString.changeReturnType(int.class);
 ```
 
 ## Binding — partial application of arguments
 
+
+**What this code does — step by step:**
+
+1. Bind the first argument (the receiver) — like a method reference
+2. `MethodHandle helloLen = strlen.bindTo("hello");` — partially applied: "hello".length()
+3. `int len = (int) helloLen.invoke();` — 5 — no arguments needed
+4. For static methods, bind the first parameter
+5. `MethodHandle parseBase16 = parse.bindTo("16");` — wrong! parseInt's first arg is the string
+6. Correct: bindTo for static methods binds the first parameter:
+7. `MethodHandle parseWithRadix = parse.bindTo(16);` — WRONG — parseInt(String, int)
+8. Correct way for two-arg static:
+9. `MethodHandle parseHex = parseIntRadix.bindTo(16);` — bind radix = 16
+10. `int hex = (int) parseHex.invoke("FF");` — 255
+
+The same code, clean:
+
 ```java
-// Bind the first argument (the receiver) — like a method reference
 MethodHandle strlen = lookup.findVirtual(String.class, "length",
                                          MethodType.methodType(int.class));
 
-MethodHandle helloLen = strlen.bindTo("hello");  // partially applied: "hello".length()
-int len = (int) helloLen.invoke();               // 5 — no arguments needed
+MethodHandle helloLen = strlen.bindTo("hello");
+int len = (int) helloLen.invoke();
 
-// For static methods, bind the first parameter
 MethodHandle parse = lookup.findStatic(Integer.class, "parseInt",
                                        MethodType.methodType(int.class, String.class));
-MethodHandle parseBase16 = parse.bindTo("16");   // wrong! parseInt's first arg is the string
-// Correct: bindTo for static methods binds the first parameter:
-MethodHandle parseWithRadix = parse.bindTo(16);  // WRONG — parseInt(String, int)
-// Correct way for two-arg static:
+MethodHandle parseBase16 = parse.bindTo("16");
+MethodHandle parseWithRadix = parse.bindTo(16);
 MethodHandle parseIntRadix = lookup.findStatic(Integer.class, "parseInt",
     MethodType.methodType(int.class, String.class, int.class));
-MethodHandle parseHex = parseIntRadix.bindTo(16);  // bind radix = 16
-int hex = (int) parseHex.invoke("FF");             // 255
+MethodHandle parseHex = parseIntRadix.bindTo(16);
+int hex = (int) parseHex.invoke("FF");
 ```
 
 ## Dropping, inserting, and collecting arguments
 
+
+**What this code does — step by step:**
+
+1. Drop the first parameter (useful for filtering callbacks)
+2. `MethodHandle target = ...` — (String, int) -> void
+3. `MethodHandle dropped = target.dropArguments(0, String.class);` — (int) -> void
+4. Insert a constant at the beginning
+5. `MethodHandle log = ...` — (String) -> void
+6. `MethodHandle withPrefix = log.insertArguments(0, "[AUDIT] ");` — () -> void
+7. `withPrefix.invoke();` — logs "[AUDIT] "
+8. Collect an array into varargs
+9. `MethodHandle sum = ...` — (int, int) -> int
+10. `int result = (int) sumArray.invoke(new int[]{1, 2, 3, 4});` — 10
+
+The same code, clean:
+
 ```java
-// Drop the first parameter (useful for filtering callbacks)
-MethodHandle target = ... // (String, int) -> void
-MethodHandle dropped = target.dropArguments(0, String.class);  // (int) -> void
+MethodHandle target = ...
+MethodHandle dropped = target.dropArguments(0, String.class);
 
-// Insert a constant at the beginning
-MethodHandle log = ... // (String) -> void
-MethodHandle withPrefix = log.insertArguments(0, "[AUDIT] ");  // () -> void
-withPrefix.invoke();  // logs "[AUDIT] "
+MethodHandle log = ...
+MethodHandle withPrefix = log.insertArguments(0, "[AUDIT] ");
+withPrefix.invoke();
 
-// Collect an array into varargs
-MethodHandle sum = ... // (int, int) -> int
+MethodHandle sum = ...
 MethodHandle sumArray = sum.asVarargsCollector(int[].class);
-int result = (int) sumArray.invoke(new int[]{1, 2, 3, 4});  // 10
+int result = (int) sumArray.invoke(new int[]{1, 2, 3, 4});
 ```
 
 ## MethodHandles.Lookup — access control
 
-```java
 // The lookup context determines what you can access
 MethodHandles.Lookup publicLookup = MethodHandles.lookup();      // caller's access rights
 MethodHandles.Lookup privateLookup = MethodHandles.privateLookupIn(
@@ -113,7 +156,6 @@ MethodHandles.Lookup privateLookup = MethodHandles.privateLookupIn(
 MethodHandle privateMethod = privateLookup.findVirtual(
     MyClass.class, "secretMethod",
     MethodType.methodType(String.class));
-```
 
 **Access rules:**
 | Lookup type | Can access |
@@ -139,7 +181,6 @@ MethodHandle privateMethod = privateLookup.findVirtual(
 
 ## Real-world scenario — dynamic mapper
 
-```java
 public class DynamicMapper {
     private final Map<Class<?>, MethodHandle> serializers = new HashMap<>();
 
@@ -160,7 +201,6 @@ MethodHandles.Lookup lookup = MethodHandles.lookup();
 MethodHandle jsonSerialize = lookup.findVirtual(JsonUtils.class, "toJson",
     MethodType.methodType(String.class, Object.class));
 mapper.registerSerializer(Order.class, jsonSerialize.bindTo(JsonUtils.class));
-```
 
 ## Common mistakes
 
@@ -180,3 +220,4 @@ mapper.registerSerializer(Order.class, jsonSerialize.bindTo(JsonUtils.class));
 - Use MethodHandles for framework code, serializers, and performance-critical reflection.
 
 **Official docs:** [MethodHandle API](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/invoke/MethodHandle.html) · [MethodHandles API](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/invoke/MethodHandles.html) · [MethodType API](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/invoke/MethodType.html)
+

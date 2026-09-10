@@ -1,7 +1,7 @@
 ---
 title: gRPC Clients, Streaming and Deadlines
 module: grpc-apis
-order: 3
+order: 1
 minutes: 25
 topics: ["blocking stub", "async stub", "client streaming", "bidi streaming", "deadlines", "retry", "channel management"]
 summary: The client side of gRPC comes in three stubs — blocking, async, and streaming — generated from the same .proto. This lesson covers all three, plus ...
@@ -35,7 +35,6 @@ protoc generates:
 
 ## Blocking Stub (the common case)
 
-```java
 ManagedChannel channel = ManagedChannelBuilder
     .forAddress("course-service", 9090)
     .usePlaintext()                          // dev only — TLS in prod
@@ -45,13 +44,11 @@ CourseServiceGrpc.CourseServiceBlockingStub stub =
     CourseServiceGrpc.newBlockingStub(channel);
 
 CourseReply reply = stub.getCourse(CourseRequest.newBuilder().setId(1L).build());
-```
 
 ## Deadlines: The Client's Responsibility
 
 **Always set a deadline** — a gRPC call without one can hang forever:
 
-```java
 // Per-call deadline
 CourseReply reply = stub
     .withDeadline(Deadline.after(3, TimeUnit.SECONDS))
@@ -61,11 +58,9 @@ CourseReply reply = stub
 ManagedChannel channel = ManagedChannelBuilder.forAddress(host, port)
     .keepAliveTime(30, TimeUnit.SECONDS)
     .build();
-```
 
 Catch the timeout:
 
-```java
 try {
     return stub.withDeadline(Deadline.after(2, TimeUnit.SECONDS))
         .getCourse(request);
@@ -75,13 +70,11 @@ try {
     }
     throw translate(e);
 }
-```
 
 ## Channel Reuse: The Golden Rule
 
 **Channels are expensive; stubs are cheap.** Create one channel per service per process — never per call:
 
-```java
 @Configuration
 public class GrpcClientConfig {
 
@@ -100,13 +93,11 @@ public class GrpcClientConfig {
         return CourseServiceGrpc.newBlockingStub(channel);
     }
 }
-```
 
 A channel multiplexes many RPCs over one HTTP/2 connection — creating one per request destroys that.
 
 ## Server Streaming Client
 
-```java
 Iterator<CourseReply> replies = stub.listCourses(
     ListCoursesRequest.newBuilder().setLimit(100).build());
 
@@ -114,11 +105,9 @@ while (replies.hasNext()) {
     CourseReply course = replies.next();   // arrives as produced
     process(course);
 }
-```
 
 ## Client Streaming
 
-```java
 StreamObserver<LessonUpload> uploader = asyncStub.uploadLessons(
     new StreamObserver<UploadReply>() {
         @Override
@@ -133,11 +122,9 @@ for (Lesson lesson : lessons) {
     uploader.onNext(LessonUpload.newBuilder().setLesson(toProto(lesson)).build());
 }
 uploader.onCompleted();    // half-close: signal done sending
-```
 
 ## Bidirectional Streaming
 
-```java
 StreamObserver<ChatMessage> requestObserver = asyncStub.chat(
     new StreamObserver<ChatMessage>() {
         @Override
@@ -152,11 +139,9 @@ StreamObserver<ChatMessage> requestObserver = asyncStub.chat(
 
 requestObserver.onNext(ChatMessage.newBuilder().setText("Explain AOP").build());
 // keep the requestObserver open — send more messages, receive replies
-```
 
 ## Retry Configuration
 
-```java
 // Per-call retry with the API (gRPC 1.46+)
 stub = stub.withWaitForReady();   // retry on UNAVAILABLE
 
@@ -173,13 +158,11 @@ ManagedChannel channel = ManagedChannelBuilder.forAddress(host, port)
                 "retryableStatusCodes", List.of("UNAVAILABLE"))))))
     .enableRetry()
     .build();
-```
 
 **Retry only idempotent calls** — a retried non-idempotent RPC (like a payment charge) must be guarded by an idempotency key, exactly like HTTP.
 
 ## Error Translation
 
-```java
 public Course getCourse(long id) {
     try {
         return toDomain(stub.getCourse(CourseRequest.newBuilder().setId(id).build()));
@@ -192,13 +175,11 @@ public Course getCourse(long id) {
         };
     }
 }
-```
 
 Map gRPC Status codes to your domain exceptions — clients shouldn't see raw gRPC errors.
 
 ## Testing the Client
 
-```java
 class GrpcClientTest {
 
     private Server server;
@@ -228,7 +209,6 @@ class GrpcClientTest {
         assertEquals("Mocked", reply.getTitle());
     }
 }
-```
 
 ## Summary
 
@@ -245,3 +225,4 @@ class GrpcClientTest {
 | Retry | `withWaitForReady` / retry policy (idempotent only) |
 
 gRPC clients are typed end to end: stubs generated from the contract, streaming via observers, deadlines as a first-class concept. Master the stub selection, reuse channels, set deadlines, and translate Status codes — and your services speak gRPC fluently.
+

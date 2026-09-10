@@ -1,7 +1,7 @@
 ---
 title: Switch Expressions and Pattern Guards
 module: java-advanced-language
-order: 2
+order: 4
 minutes: 18
 topics: ["switch expressions", "arrow syntax", "yield", "guards", "null handling"]
 summary: The switch you learned in Java 8 — colon statements, fallthrough, mutable accumulators — has been replaced by a modern expression form that returns...
@@ -16,7 +16,6 @@ The `switch` you learned in Java 8 — colon statements, fall-through, mutable a
 
 ## The Old vs. The New
 
-```java
 // OLD: statement switch — fall-through, break, no value
 String name;
 switch (level) {
@@ -36,13 +35,11 @@ String name = switch (level) {
     case "ADVANCED" -> "Advanced";
     default        -> "Unknown";
 };
-```
 
 The arrow form has no fall-through — each arm is independent. The whole switch *is* a value.
 
 ## The Three Syntaxes
 
-```java
 // 1. Arrow, single expression
 String r1 = switch (x) { case 1 -> "one"; default -> "many"; };
 
@@ -60,7 +57,6 @@ String r3 = switch (x) {
     case 1: yield "one";
     default: yield "many";
 };
-```
 
 `yield` is how a block body returns a value — think of it as `return` for switch arms.
 
@@ -68,7 +64,6 @@ String r3 = switch (x) {
 
 Traditional switch threw NPE on null. The modern switch allows `case null`:
 
-```java
 String describe(String s) {
     return switch (s) {
         case null  -> "null";
@@ -77,13 +72,11 @@ String describe(String s) {
         default    -> "other: " + s;
     };
 }
-```
 
 `case null` must come before other patterns (null doesn't match `default` by default). Multiple comma-separated labels group arms.
 
 ## Pattern Switching on Types
 
-```java
 public String size(Object o) {
     return switch (o) {
         case null          -> "null";
@@ -95,13 +88,11 @@ public String size(Object o) {
         default            -> o.getClass().getSimpleName();
     };
 }
-```
 
 More specific patterns win: `Integer` before `Number`, `Number` before `default`.
 
 ## Guards: When Patterns Need Conditions
 
-```java
 public String classify(Number n) {
     return switch (n) {
         case Integer i when i < 0 -> "negative int";
@@ -112,7 +103,6 @@ public String classify(Number n) {
         default -> "other number";
     };
 }
-```
 
 `when` adds a boolean guard to a pattern; the pattern matches only if the guard holds. Arms are evaluated top-down, first match wins.
 
@@ -120,7 +110,6 @@ public String classify(Number n) {
 
 With sealed hierarchies, the compiler enforces coverage:
 
-```java
 public sealed interface Shape permits Circle, Square, Triangle {}
 public record Circle(double r) implements Shape {}
 public record Square(double s) implements Shape {}
@@ -134,13 +123,11 @@ public double area(Shape shape) {
         // no default needed — the compiler knows these are all Shapes
     };
 }
-```
 
 Add `Rectangle` to `permits` → this switch stops compiling until you handle it. Exhaustiveness turns "forgot a case" from a runtime bug into a compile error.
 
 ## switch Over Enums
 
-```java
 public enum Status { NEW, PROCESSING, PAID, CANCELLED }
 
 public String label(Status status) {
@@ -150,13 +137,11 @@ public String label(Status status) {
         case CANCELLED       -> "void";
     };
 }
-```
 
 Enums are exhaustive without `default` — the compiler enumerates the constants.
 
 ## Practical: Mapping With Side Effects
 
-```java
 public void process(Command cmd) {
     switch (cmd) {
         case StartCommand sc -> {
@@ -170,13 +155,11 @@ public void process(Command cmd) {
         case RestartCommand rc -> restart(rc.jobId());
     }
 }
-```
 
 Statement switches (void) work with arrow syntax too — blocks for multi-step arms.
 
 ## Testing
 
-```java
 @Test
 void classifyHandlesAllCases() {
     assertEquals("negative int", classifier.classify(-5));
@@ -185,7 +168,6 @@ void classifyHandlesAllCases() {
     assertEquals("big long", classifier.classify(2_000_000_000L));
     assertEquals("null", classifier.classify(null));
 }
-```
 
 ## Summary
 
@@ -200,3 +182,4 @@ void classifyHandlesAllCases() {
 | Exhaustiveness | Sealed types / enums — compile-checked |
 
 The modern switch is a full pattern-matching expression: exhaustive, null-safe, value-returning, and guard-capable. It replaces the if/else-if chains and old switch statements that cluttered domain code — and it's the natural companion to the records and sealed classes from the previous lesson.
+

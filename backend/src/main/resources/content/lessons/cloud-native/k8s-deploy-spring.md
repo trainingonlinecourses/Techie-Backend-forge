@@ -102,3 +102,4 @@ The rollout **pauses if readiness never passes** (maxUnavailable: 0 means the ol
 - maxUnavailable: 0 + readiness = safe rollouts; `rollout undo` is the instant rollback.
 
 Official docs: [Spring Boot on Kubernetes](https://docs.spring.io/spring-boot/reference/deployment/kubernetes.html) · [Resource management](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
+

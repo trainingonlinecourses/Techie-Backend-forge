@@ -1,7 +1,7 @@
 ---
 title: String Iteration, isEmpty vs isBlank, and String Inspection — How to Look at a String Correctly
 summary: How to iterate a String character by character, code-point by code-point, and line by line. The difference between isEmpty() and isBlank(), why isBlank() catches the "user entered only spaces" case that isEmpty misses, and how to inspect strings safely without off-by-one errors.
-order: 4
+order: 3
 minutes: 16
 topics: [String iteration, isEmpty, isBlank, codePoints, charAt, lines, whitespace, off-by-one]
 docs:
@@ -26,6 +26,19 @@ And two predicates that look similar but are not:
 
 The difference matters when validating user input: `isEmpty()` lets a string of spaces pass, but `isBlank()` catches it. A user who accidentally presses space a few times and submits an empty-looking form — `isEmpty()` says "not empty," `isBlank()` says "blank, reject it."
 
+
+**What this code does — step by step:**
+
+1. --- 1. Iterate by char (UTF-16 code unit) ---
+2. --- 2. Iterate by code point (real Unicode character) ---
+3. --- 3. Iterate lines ---
+4. --- isEmpty vs isBlank ---
+5. '' -> isEmpty=true, isBlank=true. ' ' -> isEmpty=false, isBlank=true. ' ' -> isEmpty=false, isBlank=true. 'hello' -> isEmpty=false, isBlank=false. ' hello ' -> isEmpty=false, isBlank=false
+6. --- Collecting code points back to a String (round-trip) ---
+7. `System.out.println("round-trip equals original: " + reconstructed.equals(text));` — true
+
+The same code, clean:
+
 ```java
 import java.util.stream.Collectors;
 
@@ -33,7 +46,6 @@ public class StringIterationDemo {
     public static void main(String[] args) {
         String text = "Hello 世界\nLine 2\r\nLine 3";
 
-        // --- 1. Iterate by char (UTF-16 code unit) ---
         System.out.println("--- by charAt ---");
         for (int i = 0; i < text.length(); i++) {
             char c = text.charAt(i);
@@ -41,7 +53,6 @@ public class StringIterationDemo {
         }
         System.out.println();
 
-        // --- 2. Iterate by code point (real Unicode character) ---
         System.out.println("--- by codePoint ---");
         text.codePoints().forEach(cp -> {
             if (cp == '\n') System.out.print("\\n ");
@@ -50,27 +61,19 @@ public class StringIterationDemo {
         });
         System.out.println();
 
-        // --- 3. Iterate lines ---
         System.out.println("--- by lines ---");
         text.lines().forEach(line -> System.out.println("LINE: " + line));
 
-        // --- isEmpty vs isBlank ---
         System.out.println("--- empty vs blank ---");
         String[] tests = {"", "   ", "\t\n", "hello", "  hello  "};
         for (String s : tests) {
             System.out.println("'" + s + "' -> isEmpty=" + s.isEmpty() + ", isBlank=" + s.isBlank());
         }
-        // '' -> isEmpty=true, isBlank=true
-        // '   ' -> isEmpty=false, isBlank=true
-        // '	' -> isEmpty=false, isBlank=true
-        // 'hello' -> isEmpty=false, isBlank=false
-        // '  hello  ' -> isEmpty=false, isBlank=false
 
-        // --- Collecting code points back to a String (round-trip) ---
         String reconstructed = text.codePoints()
             .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
             .toString();
-        System.out.println("round-trip equals original: " + reconstructed.equals(text)); // true
+        System.out.println("round-trip equals original: " + reconstructed.equals(text));
     }
 }
 ```
@@ -92,23 +95,36 @@ A common form-validation bug: the user submits a field with only spaces (maybe t
 
 `isBlank()` returns `true` for that string, so your validation catches it. This is the standard pattern for "is this input meaningfully empty?"
 
+
+**What this code does — step by step:**
+
+1. WRONG: lets spaces through
+2. `if (name == null || name.isEmpty()) return false;` — " " passes
+3. RIGHT: catches spaces, tabs, newlines
+4. `if (name == null || name.isBlank()) return false;` — " " rejected
+5. `return name.trim().length() >= 2;` — also require at least 2 non-space chars
+6. `System.out.println("'' -> " + isValidName(""));` — false (empty)
+7. `System.out.println("'   ' -> " + isValidName("   "));` — false (blank) — caught by isBlank
+8. `System.out.println("'Jo' -> " + isValidName("Jo"));` — true
+9. `System.out.println("'  Jo  ' -> " + isValidName("  Jo  "));` — true (trim + length check)
+
+The same code, clean:
+
 ```java
 public class ValidationDemo {
     public static boolean isValidName(String name) {
-        // WRONG: lets spaces through
-        if (name == null || name.isEmpty()) return false;  // "   " passes
+        if (name == null || name.isEmpty()) return false;
 
-        // RIGHT: catches spaces, tabs, newlines
-        if (name == null || name.isBlank()) return false;  // "   " rejected
+        if (name == null || name.isBlank()) return false;
 
-        return name.trim().length() >= 2;  // also require at least 2 non-space chars
+        return name.trim().length() >= 2;
     }
 
     public static void main(String[] args) {
-        System.out.println("'' -> " + isValidName(""));           // false (empty)
-        System.out.println("'   ' -> " + isValidName("   "));     // false (blank) — caught by isBlank
-        System.out.println("'Jo' -> " + isValidName("Jo"));       // true
-        System.out.println("'  Jo  ' -> " + isValidName("  Jo  ")); // true (trim + length check)
+        System.out.println("'' -> " + isValidName(""));
+        System.out.println("'   ' -> " + isValidName("   "));
+        System.out.println("'Jo' -> " + isValidName("Jo"));
+        System.out.println("'  Jo  ' -> " + isValidName("  Jo  "));
     }
 }
 ```
@@ -126,27 +142,35 @@ Iterating with `charAt` and a for-loop is error-prone. The two classic bugs:
 1. **Starting at 1 instead of 0** — skips the first character.
 2. **Using `<= length()` instead of `< length()`** — `charAt(length())` throws `StringIndexOutOfBoundsException` because valid indices are `0` to `length() - 1`.
 
+
+**What this code does — step by step:**
+
+1. WRONG: skips 'A'
+2. `System.out.println();` — "BC"
+3. WRONG: throws StringIndexOutOfBoundsException
+4. RIGHT:
+5. `System.out.println();` — "ABC"
+
+The same code, clean:
+
 ```java
 public class OffByOneDemo {
     public static void main(String[] args) {
         String s = "ABC";
 
-        // WRONG: skips 'A'
         System.out.print("start at 1: ");
         for (int i = 1; i < s.length(); i++) System.out.print(s.charAt(i));
-        System.out.println();  // "BC"
+        System.out.println();
 
-        // WRONG: throws StringIndexOutOfBoundsException
         try {
             for (int i = 0; i <= s.length(); i++) System.out.print(s.charAt(i));
         } catch (StringIndexOutOfBoundsException e) {
             System.out.println("\n'<= length()' throws: " + e.getMessage());
         }
 
-        // RIGHT:
         System.out.print("correct: ");
         for (int i = 0; i < s.length(); i++) System.out.print(s.charAt(i));
-        System.out.println();  // "ABC"
+        System.out.println();
     }
 }
 ```
@@ -187,3 +211,4 @@ In the lab, you will start with a multiline string that includes emoji, CJK char
 ## Summary
 
 Iterate a `String` the way that matches your purpose: `charAt` + for-loop for legacy code or when you need indices; `codePoints()` for real Unicode character iteration (emoji, CJK safe); `lines()` for multiline text processing (handles all line separators). `isEmpty()` only catches the empty string; `isBlank()` catches empty **and** whitespace-only — use `isBlank()` for input validation to reject space-only submissions. Beware off-by-one errors with `charAt` and `<= length()`. Use `strip()` (Java 11) for Unicode-aware trimming, and `codePointCount` for user-facing character counts. When working with text that may contain emoji or supplementary characters, `codePoints()` is the correct tool — `charAt` and `length()` work at the UTF-16 code-unit level and can misrepresent real characters.
+

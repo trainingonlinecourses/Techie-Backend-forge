@@ -1,7 +1,7 @@
 ---
 title: BigDecimal & Money — Never Use double for Currency
 summary: Why floating point corrupts money, scale and rounding modes, BigDecimal arithmetic, and the money-handling standards organizations enforce.
-order: 20
+order: 10
 minutes: 24
 topics: [bigdecimal, money, rounding, scale, floating-point, monetary-arithmetic, currency]
 docs:
@@ -16,11 +16,14 @@ docs:
 
 Floating-point types (`float`, `double`) store values as binary fractions — `1/10` is *not* exactly representable in binary, the way `1/3` is not exactly representable in decimal. So:
 
-```java
-double a = 0.1;
-double b = 0.2;
-System.out.println(a + b); // 0.30000000000000004  ← not 0.3!
-```
+public class Main {
+
+    public static void main(String[] args) {
+        double a = 0.1;
+        double b = 0.2;
+        System.out.println(a + b); // 0.30000000000000004  ← not 0.3!
+    }
+}
 
 A billing system that computes `0.1 + 0.2` and gets `0.30000000000000004` will, after a million transactions, drift by more than the value of the transaction itself. Rounding hides the error on screen but it is still in the number — and in the audit trail. Every payments organization therefore has a hard rule: **money is `BigDecimal` (or an integer minor-unit count), never `double`**.
 
@@ -28,11 +31,9 @@ A billing system that computes `0.1 + 0.2` and gets `0.30000000000000004` will, 
 
 `BigDecimal` stores an **unscaled integer** and a **scale** (number of digits after the decimal point):
 
-```java
 BigDecimal price = new BigDecimal("19.99");   // unscaled 1999, scale 2
 BigDecimal qty   = new BigDecimal("3");        // unscaled 3, scale 0
 BigDecimal total = price.multiply(qty);        // 59.97, scale 2
-```
 
 Two rules the codebase enforces:
 
@@ -43,7 +44,6 @@ Two rules the codebase enforces:
 
 Here is the calculation core of an invoicing service — the exact code a payments team would review:
 
-```java
 @Service
 public class InvoiceCalculator {
     private static final int MONEY_SCALE = 2;
@@ -60,7 +60,6 @@ public class InvoiceCalculator {
         return new Money(gross.add(tax), Currency.getInstance("USD"));
     }
 }
-```
 
 **Why the rounding order matters:** compute tax on the *rounded* gross, never on raw unrounded values, and always at the same scale. If invoice generation and the refund path round differently, refunds will never equal original charges and reconciliation breaks — a real incident class in fintech.
 
@@ -68,13 +67,11 @@ public class InvoiceCalculator {
 
 `divide` can produce a non-terminating decimal (`10 / 3 = 3.3333…`). Without a scale and rounding mode it throws `ArithmeticException`. The rule: **every `divide` passes a scale and RoundingMode** — the compiler can't enforce it, so it lives in the review checklist and in static-analysis config:
 
-```java
 // Fails at runtime: ArithmeticException: Non-terminating decimal expansion
 // BigDecimal ratio = gross.divide(total);
 
 // Correct — always specify scale + rounding
 BigDecimal ratio = gross.divide(total, 6, RoundingMode.HALF_UP); // keep 6 digits for ratios
-```
 
 ## Comparing and storing money
 
@@ -95,3 +92,4 @@ BigDecimal ratio = gross.divide(total, 6, RoundingMode.HALF_UP); // keep 6 digit
 - Always construct from `String`; always pass scale + `RoundingMode` to `divide` and `setScale`.
 - Compare with `compareTo`, never `equals`; persist as `NUMERIC`; serialize as strings.
 - Round at one consistent point and scale across every code path touching the same money.
+

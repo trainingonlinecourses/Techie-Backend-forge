@@ -26,7 +26,6 @@ Spring's split: **Spring Security** does login/sessions inside an app; **Spring 
 
 Clients are registered server-side (JDBC-backed `RegisteredClientRepository` in production):
 
-```java
 @Bean
 RegisteredClientRepository clientRepository(JdbcTemplate jdbc) {
     RegisteredClient client = RegisteredClient.withId(UUID.randomUUID().toString())
@@ -41,7 +40,6 @@ RegisteredClientRepository clientRepository(JdbcTemplate jdbc) {
         .build();
     return new JdbcRegisteredClientRepository(jdbc);
 }
-```
 
 The client type matters: **public clients** (SPAs, mobile) have no secret and must use **PKCE**; **confidential clients** (server backends) authenticate with `client_id` + `client_secret`.
 
@@ -65,7 +63,6 @@ The sequence behind every "Sign in with …" button:
 
 ## Configuring the server
 
-```java
 @Configuration
 @EnableWebSecurity
 public class AuthorizationServerSecurityConfig {
@@ -89,7 +86,6 @@ public class AuthorizationServerSecurityConfig {
     @Bean
     JwtEncoder jwtEncoder(RSAPublicKey pub, RSAPrivateKey priv) { ... }
 }
-```
 
 Out of the box you get `/oauth2/authorize`, `/oauth2/token`, `/oauth2/jwks` (public keys for RS verification), and `/.well-known/openid-configuration` (the discovery document clients fetch to find endpoints).
 
@@ -117,3 +113,4 @@ Keycloak (open source) sits between: self-hosted, full OIDC, but pre-built — m
 - Evaluate Keycloak/identity providers before building your own AS — the Spring AS shines when you own the token contract.
 
 Official docs: [Spring Authorization Server](https://docs.spring.io/spring-authorization-server/reference/) · [OAuth2.net](https://oauth.net/2/)
+

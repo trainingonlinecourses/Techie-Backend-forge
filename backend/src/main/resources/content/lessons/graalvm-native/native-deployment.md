@@ -1,7 +1,7 @@
 ---
 title: Deploying Native Images — Containers, CI, and Production Patterns
 module: graalvm-native
-order: 4
+order: 2
 minutes: 25
 topics: ["deployment", "containers", "CI/CD", "buildpacks", "distroless", "production native", "observability"]
 summary: A native binary is a different artifact than a jar: no JVM to install, no classpath to manage, a tiny container image, millisecond cold starts. But...
@@ -99,15 +99,16 @@ Native deployment is the ConfigMap/Secrets lesson taken to its logical end — *
 
 The JVM's diagnostics (JFR, `jstack`, heap dumps) are gone. The native observability stack:
 
+
+**What this code does — step by step:**
+
+1. What replaces it: 1. Spring Boot Actuator — the same endpoints, working natively: /actuator/health, /actuator/metrics, /actuator/prometheus. 2. Micrometer + Prometheus — the standard metrics pipeline, unchanged: micrometer-registry-prometheus -> /actuator/prometheus -> Grafana. 3. Structured JSON logs to stdout — the container's log sink:
+2. 4. Distributed tracing — Micrometer Tracing + the collector, unchanged.
+
+The same code, clean:
+
 ```java
-// What replaces it:
-// 1. Spring Boot Actuator — the same endpoints, working natively:
-//    /actuator/health, /actuator/metrics, /actuator/prometheus
-// 2. Micrometer + Prometheus — the standard metrics pipeline, unchanged:
-//    micrometer-registry-prometheus -> /actuator/prometheus -> Grafana
-// 3. Structured JSON logs to stdout — the container's log sink:
 logging.pattern.console={"timestamp":"%d","level":"%p","logger":"%c","message":"%m"}%n
-// 4. Distributed tracing — Micrometer Tracing + the collector, unchanged.
 ```
 
 **The message:** the app-level observability surface (Actuator, Micrometer, structured logs) is *identical* in native — the framework's hints cover it. What changes is only the *JVM-internals* diagnostics (gone) and the *build-time* knobs (compile-time). If your monitoring was app-level (as it should be), native deployment barely changes it.
@@ -125,3 +126,4 @@ logging.pattern.console={"timestamp":"%d","level":"%p","logger":"%c","message":"
 ## Recap
 
 Deploying native images is a new operational model: **small immutable containers** (buildpacks or distroless — no JVM, environment-only config), **CI architected for minute-scale builds** (cache the toolchain, gate natively only on deploy candidates, use beefy runners), **environment-as-configuration** (profiles and values at build time; DB URLs, secrets, and flags at runtime — never secrets in the build), and **app-level observability that carries over unchanged** (Actuator, Micrometer, JSON logs — only the JVM-internal diagnostics are gone). The shifts are deliberate, not surprising: the image is the immutable application, the environment is the configuration surface, and instant startup makes scaling and rollback feel different from the JVM world. Follow the checklist and native deployment becomes the *routine* — fast, small, and boring — rather than the special project.
+

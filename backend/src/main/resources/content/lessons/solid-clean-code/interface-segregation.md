@@ -1,7 +1,7 @@
 ---
 title: ISP — Interface Segregation Principle
 module: solid-clean-code
-order: 4
+order: 2
 minutes: 21
 topics: ["ISP", "fat interfaces", "role interfaces", "segregation", "adapter"]
 summary: The Interface Segregation Principle (the I in SOLID):
@@ -24,16 +24,26 @@ In Java, this is about **fat interfaces**: an interface with many methods where 
 
 ## The Fat Interface
 
+
+**What this code does — step by step:**
+
+1. A fat interface — every implementer must implement EVERYTHING:
+2. `void print(String doc);` — printers need this
+3. `void scan(String doc);` — scanners need this
+4. `void fax(String doc);` — fax machines need this
+5. `void staple(String doc);` — staplers need this
+6. A printer is forced to fake scan/fax/staple:
+
+The same code, clean:
+
 ```java
-// A fat interface — every implementer must implement EVERYTHING:
 interface Machine {
-    void print(String doc);      // printers need this
-    void scan(String doc);       // scanners need this
-    void fax(String doc);        // fax machines need this
-    void staple(String doc);     // staplers need this
+    void print(String doc);
+    void scan(String doc);
+    void fax(String doc);
+    void staple(String doc);
 }
 
-// A printer is forced to fake scan/fax/staple:
 class SimplePrinter implements Machine {
     public void print(String doc) { System.out.println("printing " + doc); }
     public void scan(String doc)  { throw new UnsupportedOperationException("no scanner"); }
@@ -51,29 +61,36 @@ Problems:
 
 ## The Segregated Version
 
+
+**What this code does — step by step:**
+
+1. Small, role-specific interfaces — each implementer implements only what it does:
+2. A printer now implements ONLY printing — no faking, no throws:
+3. A multifunction device implements the roles it actually has:
+4. Clients depend only on the role they need:
+5. The "print a document" client knows only about Printer:
+6. `void printJob(Printer p, String doc) { p.print(doc); }` — works for ANY printer
+
+The same code, clean:
+
 ```java
-// Small, role-specific interfaces — each implementer implements only what it does:
 interface Printer { void print(String doc); }
 interface Scanner { void scan(String doc); }
 interface Faxer    { void fax(String doc); }
 interface Stapler  { void staple(String doc); }
 
-// A printer now implements ONLY printing — no faking, no throws:
 class SimplePrinter implements Printer {
     public void print(String doc) { System.out.println("printing " + doc); }
 }
 
-// A multifunction device implements the roles it actually has:
 class AllInOne implements Printer, Scanner, Faxer {
     public void print(String doc) { System.out.println("printing " + doc); }
     public void scan(String doc)  { System.out.println("scanning " + doc); }
     public void fax(String doc)   { System.out.println("faxing " + doc); }
 }
 
-// Clients depend only on the role they need:
 class Office {
-    // The "print a document" client knows only about Printer:
-    void printJob(Printer p, String doc) { p.print(doc); }   // works for ANY printer
+    void printJob(Printer p, String doc) { p.print(doc); }
 }
 ```
 
@@ -106,13 +123,11 @@ For each method in your interface, ask: *is there a legitimate client that needs
 
 If you *must* work with an existing fat interface, the **Adapter pattern** rescues you: implement the narrow interface you need by wrapping the fat one:
 
-```java
 class PrinterAdapter implements Printer {
     private final Machine machine;
     PrinterAdapter(Machine m) { this.machine = m; }
     public void print(String doc) { machine.print(doc); }   // only the needed method
 }
-```
 
 ## Common Beginner Pitfalls
 
@@ -129,3 +144,4 @@ class PrinterAdapter implements Printer {
 - Fat interfaces force `UnsupportedOperationException` stubs and break every implementer when they grow.
 - Small role interfaces make dependencies honest, testing trivial, and evolution safe.
 - The Adapter pattern bridges from fat framework interfaces to the narrow role you need.
+

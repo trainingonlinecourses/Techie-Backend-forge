@@ -1,7 +1,7 @@
 ---
 title: Profile-Specific Beans — Conditional Registration
 summary: How @Profile works, bean registration strategies, profile groups, default profiles, and how to wire different implementations per environment.
-order: 2
+order: 3
 minutes: 20
 topics: [@Profile, conditional, environment, default-profile, profile-groups, dev-prod]
 docs:
@@ -12,7 +12,6 @@ docs:
 
 `@Profile` registers a bean only when a specific Spring profile is active. This lets you swap entire implementations between environments without changing any code.
 
-```java
 // Only register when "dev" profile is active
 @Component
 @Profile("dev")
@@ -26,7 +25,6 @@ public class ConsoleNotificationService implements NotificationService {
 public class EmailNotificationService implements NotificationService {
     public void send(String msg) { /* send email */ }
 }
-```
 
 ---
 
@@ -47,18 +45,15 @@ spring:
 
 ### Default Profile
 
-```java
 // Fallback when no profile is active
 @Component
 @Profile("default")
 public class H2DataSourceConfig { ... }
-```
 
 ---
 
 ## Line-by-Line Walkthrough
 
-```java
 import org.springframework.context.annotation.*;
 import org.springframework.stereotype.Component;
 
@@ -97,7 +92,6 @@ public class ProfileConfig {
         return new AwsS3StorageService();
     }
 }
-```
 
 ---
 
@@ -105,7 +99,6 @@ public class ProfileConfig {
 
 ### Scenario 1: Feature flags with profiles
 
-```java
 @Component
 @Profile("feature-search-v2")
 public class V2SearchService implements SearchService { ... }
@@ -113,11 +106,9 @@ public class V2SearchService implements SearchService { ... }
 @Component
 @Profile("!feature-search-v2")
 public class V1SearchService implements SearchService { ... }
-```
 
 ### Scenario 2: Testing with mocks
 
-```java
 @Component
 @Profile("test")
 public class MockPaymentGateway implements PaymentGateway {
@@ -125,7 +116,6 @@ public class MockPaymentGateway implements PaymentGateway {
         return PaymentResult.success("mock-123");
     }
 }
-```
 
 ---
 
@@ -136,3 +126,4 @@ public class MockPaymentGateway implements PaymentGateway {
 | Forgetting to set profile | Wrong beans registered | Always set `spring.profiles.active` |
 | Using `!` for negation when you need AND | Wrong logic | Use `!dev & !test` not `!dev !test` |
 | Profile name with spaces | Doesn't match | Use hyphens: `my-feature` not `my feature` |
+

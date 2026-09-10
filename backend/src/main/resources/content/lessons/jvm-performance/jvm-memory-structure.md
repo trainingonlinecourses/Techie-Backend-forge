@@ -1,7 +1,7 @@
 ---
 title: JVM Memory Structure — The Complete Guide
 summary: Heap, stack, metaspace, direct buffers and the object layout — where memory goes in a JVM process and how to read the numbers. Beginner-friendly with line-by-line code.
-order: 1
+order: 4
 minutes: 25
 topics: [jvm memory, heap, stack, metaspace, object layout, jstat, compressed oops, direct buffers, memory regions]
 docs:
@@ -55,25 +55,21 @@ The heap is the most important region. Every object you create with `new` lives 
 
 **Old Generation:** Objects that survive multiple minor GCs are promoted here. Major GC runs less frequently but takes longer.
 
-```java
 // This string lives in Young Gen (Eden space):
 String temp = "Hello";          // Created, used briefly, eligible for GC quickly
 
 // This object gets promoted to Old Gen (long-lived):
 private static final Config config = new Config();  // Lives for the entire app lifetime
-```
 
 ---
 
 ## How Java Objects Use Memory
 
-```java
 class Order {                    // header (12-16 bytes) + fields
     long id;                     //   8 bytes (primitive long)
     String customer;             //   4 bytes (reference, compressed oops)
     BigDecimal total;            //   4 bytes (reference)
 }
-```
 
 **Memory layout explained:**
 - **Object header**: 12 bytes with compressed oops (default for heaps < 32 GB), 16 bytes without. Contains mark word (hashcode, GC age, lock info) + class pointer.
@@ -82,13 +78,11 @@ class Order {                    // header (12-16 bytes) + fields
 
 **The practical impact:** A `Long` object is 16 bytes vs 8 bytes for a primitive `long`. A `HashMap<Long, ...>` stores millions of wrapper objects — that's 2x the memory just for keys.
 
-```java
 // BAD: 16 bytes per key + wrapper overhead
 Map<Long, Order> orders = new HashMap<>();
 
 // BETTER for large datasets: use a primitive-specialized library
 // or consider if the wrapper overhead matters for your use case
-```
 
 ---
 
@@ -135,21 +129,30 @@ jcmd <pid> GC.heap_dump /tmp/heap.hprof   # Take a heap dump
 
 ### Example: Detecting a Memory Leak
 
+
+**What this code does — step by step:**
+
+1. The leak: a static cache that never evicts
+2. `sessions.put(userId, new Session(userId));` — Never removed!
+3. After 1M logins, this map has 1M entries → heap OOM
+4. The fix: use a cache with TTL and max size
+5. `.maximumSize(10_000)` — Max entries
+6. `.expireAfterAccess(Duration.ofMinutes(30))` — Evict after 30 min idle
+
+The same code, clean:
+
 ```java
-// The leak: a static cache that never evicts
 public class UserService {
     private static final Map<String, UserSession> sessions = new HashMap<>();
 
     public void login(String userId) {
-        sessions.put(userId, new Session(userId));   // Never removed!
+        sessions.put(userId, new Session(userId));
     }
-    // After 1M logins, this map has 1M entries → heap OOM
 }
 
-// The fix: use a cache with TTL and max size
 private static final Cache<String, UserSession> sessions = Caffeine.newBuilder()
-    .maximumSize(10_000)               // Max entries
-    .expireAfterAccess(Duration.ofMinutes(30))   // Evict after 30 min idle
+    .maximumSize(10_000)
+    .expireAfterAccess(Duration.ofMinutes(30))
     .build();
 ```
 
@@ -193,3 +196,4 @@ java -Xmx2g -Xms2g \
 - **In containers**: always set `-Xmx` explicitly and remember the heap is not the whole RSS story.
 
 Official docs: [java tool](https://docs.oracle.com/en/java/javase/21/docs/specs/man/java.html) · [JVM Spec — runtime data areas](https://docs.oracle.com/javase/specs/jvms/se21/html/jvms-2.html)
+

@@ -1,7 +1,7 @@
 ---
 title: The String Pool and intern()
 module: java-strings-deep
-order: 2
+order: 4
 minutes: 24
 topics: ["string pool", "intern", "heap vs pool", "memory", "literals"]
 summary: Imagine a library where every patron writes their name on the membership card — and every time they visit, a new card is printed even though the na...
@@ -20,10 +20,8 @@ The Java **string pool** (also called the *intern pool*) does exactly this. It i
 
 When your code contains the literal `"hello"` twice:
 
-```java
 String a = "hello";
 String b = "hello";
-```
 
 the JVM does **not** create two objects. It checks the pool, finds the existing `"hello"`, and makes both `a` and `b` point at that **same object**.
 
@@ -43,11 +41,9 @@ Because of this, `a == b` in the example above is `true` — they literally refe
 
 Strings created at **runtime** — with `new`, or built by concatenation of variables, or returned from methods — are **not** automatically pooled:
 
-```java
 String a = "hello";              // pooled
 String b = new String("hello");  // NOT pooled — a fresh object on the heap
 String c = a + "!";              // runtime concatenation → new object
-```
 
 `b` is a brand-new object even though its content equals the pooled `"hello"`. So:
 
@@ -56,32 +52,45 @@ String c = a + "!";              // runtime concatenation → new object
 
 ## The Code Walkthrough
 
+
+**What this code does — step by step:**
+
+1. 1. Literals are pooled
+2. `System.out.println(s1 == s2);` — true — same pooled object
+3. 2. 'new' always creates a fresh object
+4. `System.out.println(s1 == s3);` — false — different objects
+5. `System.out.println(s1.equals(s3));` — true — same text
+6. 3. Runtime concatenation of literals is folded at compile time
+7. `String s4 = "hel" + "lo";` — compiler folds to "hello"
+8. `System.out.println(s1 == s4);` — true — same literal after folding
+9. 4. Concatenation with a variable happens at runtime → new object
+10. `System.out.println(s1 == s5);` — false — runtime result not pooled
+11. 5. intern() explicitly pools a runtime string
+12. `System.out.println(s1 == s6);` — true — now the pooled object
+
+The same code, clean:
+
 ```java
 public class PoolDemo {
 
     public static void main(String[] args) {
-        // 1. Literals are pooled
         String s1 = "hello";
         String s2 = "hello";
-        System.out.println(s1 == s2);            // true — same pooled object
+        System.out.println(s1 == s2);
 
-        // 2. 'new' always creates a fresh object
         String s3 = new String("hello");
-        System.out.println(s1 == s3);            // false — different objects
-        System.out.println(s1.equals(s3));       // true — same text
+        System.out.println(s1 == s3);
+        System.out.println(s1.equals(s3));
 
-        // 3. Runtime concatenation of literals is folded at compile time
-        String s4 = "hel" + "lo";                // compiler folds to "hello"
-        System.out.println(s1 == s4);            // true — same literal after folding
+        String s4 = "hel" + "lo";
+        System.out.println(s1 == s4);
 
-        // 4. Concatenation with a variable happens at runtime → new object
         String part = "lo";
         String s5 = "hel" + part;
-        System.out.println(s1 == s5);            // false — runtime result not pooled
+        System.out.println(s1 == s5);
 
-        // 5. intern() explicitly pools a runtime string
         String s6 = s5.intern();
-        System.out.println(s1 == s6);            // true — now the pooled object
+        System.out.println(s1 == s6);
     }
 }
 ```
@@ -122,3 +131,4 @@ A legitimate case: a domain where the set of distinct string values is small and
 - Literals reuse pooled objects; `new String(...)` and runtime concatenation do not.
 - `intern()` manually pools a runtime string, but it's rarely worth it.
 - Always compare string content with `.equals()`, never `==`.
+

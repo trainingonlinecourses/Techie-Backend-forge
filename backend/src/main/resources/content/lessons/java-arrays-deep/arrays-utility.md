@@ -19,101 +19,158 @@ Java arrays don't have methods — `int[]` can't call `.sort()` or `.contains()`
 
 ### Sorting
 
+
+**What this code does — step by step:**
+
+1. Basic sort — O(n log n) using Dual-Pivot Quicksort
+2. `System.out.println(Arrays.toString(numbers));` — [1, 2, 3, 5, 8, 9]
+3. Parallel sort — uses multiple CPU cores for large arrays
+4. `Arrays.parallelSort(big);` — 2-4x faster on 4+ cores for large arrays
+5. Sort a range
+6. `Arrays.sort(numbers, 1, 4);` — Sort only indices 1 to 3
+7. Sort with custom comparator (for objects)
+8. `System.out.println(Arrays.toString(names));` — [Bob, Alice, Charlie]
+9. Sort objects by multiple fields
+
+The same code, clean:
+
 ```java
-int[] numbers = {5, 2, 8, 1, 9, 3};
+public class Main {
 
-// Basic sort — O(n log n) using Dual-Pivot Quicksort
-Arrays.sort(numbers);
-System.out.println(Arrays.toString(numbers));  // [1, 2, 3, 5, 8, 9]
+    public static void main(String[] args) {
+        int[] numbers = {5, 2, 8, 1, 9, 3};
 
-// Parallel sort — uses multiple CPU cores for large arrays
-int[] big = new int[10_000_000];
-Arrays.parallelSort(big);  // 2-4x faster on 4+ cores for large arrays
+        Arrays.sort(numbers);
+        System.out.println(Arrays.toString(numbers));
 
-// Sort a range
-Arrays.sort(numbers, 1, 4);  // Sort only indices 1 to 3
+        int[] big = new int[10_000_000];
+        Arrays.parallelSort(big);
 
-// Sort with custom comparator (for objects)
-String[] names = {"Charlie", "Alice", "Bob"};
-Arrays.sort(names, Comparator.comparingInt(String::length));
-System.out.println(Arrays.toString(names));  // [Bob, Alice, Charlie]
+        Arrays.sort(numbers, 1, 4);
 
-// Sort objects by multiple fields
-Employee[] employees = getEmployees();
-Arrays.sort(employees, Comparator
-    .comparing(Employee::department)
-    .thenComparing(Employee::lastName)
-    .thenComparing(Employee::firstName));
+        String[] names = {"Charlie", "Alice", "Bob"};
+        Arrays.sort(names, Comparator.comparingInt(String::length));
+        System.out.println(Arrays.toString(names));
+
+        Employee[] employees = getEmployees();
+        Arrays.sort(employees, Comparator
+            .comparing(Employee::department)
+            .thenComparing(Employee::lastName)
+            .thenComparing(Employee::firstName));
+    }
+}
 ```
 
 ### Searching
 
+
+**What this code does — step by step:**
+
+1. Binary search — O(log n) — array MUST be sorted first!
+2. `System.out.println(index);` — 3 (the index where 7 is)
+3. If element not found, returns -(insertion point) - 1
+4. `System.out.println(missing);` — -4 (would be inserted at index 3)
+5. Binary search with comparator for objects
+
+The same code, clean:
+
 ```java
-int[] sorted = {1, 3, 5, 7, 9, 11};
+public class Main {
 
-// Binary search — O(log n) — array MUST be sorted first!
-int index = Arrays.binarySearch(sorted, 7);
-System.out.println(index);  // 3 (the index where 7 is)
+    public static void main(String[] args) {
+        int[] sorted = {1, 3, 5, 7, 9, 11};
 
-// If element not found, returns -(insertion point) - 1
-int missing = Arrays.binarySearch(sorted, 6);
-System.out.println(missing);  // -4 (would be inserted at index 3)
+        int index = Arrays.binarySearch(sorted, 7);
+        System.out.println(index);
 
-// Binary search with comparator for objects
-String[] sortedNames = {"Alice", "Bob", "Charlie"};
-int idx = Arrays.binarySearch(sortedNames, "Bob",
-    Comparator.comparingInt(String::length));
+        int missing = Arrays.binarySearch(sorted, 6);
+        System.out.println(missing);
+
+        String[] sortedNames = {"Alice", "Bob", "Charlie"};
+        int idx = Arrays.binarySearch(sortedNames, "Bob",
+            Comparator.comparingInt(String::length));
+    }
+}
 ```
 
 ### Filling
 
+
+**What this code does — step by step:**
+
+1. Fill entire array with a value
+2. `System.out.println(Arrays.toString(data));` — [42, 42, 42, 42, 42, ...]
+3. Fill a range
+4. `Arrays.fill(data, 2, 7, 0);` — Set indices 2-6 to 0
+5. [42, 42, 0, 0, 0, 0, 0, 42, 42, 42]
+
+The same code, clean:
+
 ```java
-int[] data = new int[10];
+public class Main {
 
-// Fill entire array with a value
-Arrays.fill(data, 42);
-System.out.println(Arrays.toString(data));  // [42, 42, 42, 42, 42, ...]
+    public static void main(String[] args) {
+        int[] data = new int[10];
 
-// Fill a range
-Arrays.fill(data, 2, 7, 0);  // Set indices 2-6 to 0
-// [42, 42, 0, 0, 0, 0, 0, 42, 42, 42]
+        Arrays.fill(data, 42);
+        System.out.println(Arrays.toString(data));
+
+        Arrays.fill(data, 2, 7, 0);
+    }
+}
 ```
 
 ### Comparing and Copying
 
+
+**What this code does — step by step:**
+
+1. Content comparison
+2. `Arrays.equals(a, b);` — true
+3. `Arrays.equals(a, c);` — false
+4. Hash code for content
+5. `Arrays.hashCode(a);` — Same as b's hash code
+6. Copy with different size
+7. [1, 2, 3, 0, 0] — padded with defaults
+8. Copy a range
+9. [1, 2]
+10. Convert to string
+11. `System.out.println(Arrays.toString(a));` — [1, 2, 3]
+12. Convert to list (boxed — wraps each int in Integer)
+13. `List<Integer> list = Arrays.asList(1, 2, 3);` — Fixed-size list!
+14. Stream from array
+
+The same code, clean:
+
 ```java
-int[] a = {1, 2, 3};
-int[] b = {1, 2, 3};
-int[] c = {1, 2, 4};
+public class Main {
 
-// Content comparison
-Arrays.equals(a, b);  // true
-Arrays.equals(a, c);  // false
+    public static void main(String[] args) {
+        int[] a = {1, 2, 3};
+        int[] b = {1, 2, 3};
+        int[] c = {1, 2, 4};
 
-// Hash code for content
-Arrays.hashCode(a);  // Same as b's hash code
+        Arrays.equals(a, b);
+        Arrays.equals(a, c);
 
-// Copy with different size
-int[] copy = Arrays.copyOf(a, 5);
-// [1, 2, 3, 0, 0] — padded with defaults
+        Arrays.hashCode(a);
 
-// Copy a range
-int[] range = Arrays.copyOfRange(a, 0, 2);
-// [1, 2]
+        int[] copy = Arrays.copyOf(a, 5);
 
-// Convert to string
-System.out.println(Arrays.toString(a));  // [1, 2, 3]
+        int[] range = Arrays.copyOfRange(a, 0, 2);
 
-// Convert to list (boxed — wraps each int in Integer)
-List<Integer> list = Arrays.asList(1, 2, 3);  // Fixed-size list!
-List<Integer> mutableList = new ArrayList<>(Arrays.asList(1, 2, 3));
+        System.out.println(Arrays.toString(a));
 
-// Stream from array
-int sum = Arrays.stream(a).sum();
-List<Integer> doubled = Arrays.stream(a)
-    .map(x -> x * 2)
-    .boxed()
-    .collect(Collectors.toList());
+        List<Integer> list = Arrays.asList(1, 2, 3);
+        List<Integer> mutableList = new ArrayList<>(Arrays.asList(1, 2, 3));
+
+        int sum = Arrays.stream(a).sum();
+        List<Integer> doubled = Arrays.stream(a)
+            .map(x -> x * 2)
+            .boxed()
+            .collect(Collectors.toList());
+    }
+}
 ```
 
 ---
@@ -128,7 +185,6 @@ List<Integer> doubled = Arrays.stream(a)
 | Memory | In-place | Requires extra array |
 | Stability | Not stable | Stable |
 
-```java
 // Decision rule:
 int[] data = getData();
 
@@ -137,7 +193,6 @@ if (data.length < 8192) {
 } else {
     Arrays.parallelSort(data); // Faster for large arrays (uses all CPU cores)
 }
-```
 
 ---
 
@@ -150,3 +205,4 @@ if (data.length < 8192) {
 | `==` instead of `Arrays.equals()` | Compares references, not content | Always use `Arrays.equals()` |
 | Sorting primitives | Can't use `Comparator` with `int[]` | Use wrapper types (`Integer[]`) for custom comparators |
 | `Arrays.fill(data, data)` | Fills with reference, not copies | Use `Arrays.copyOf()` to copy |
+

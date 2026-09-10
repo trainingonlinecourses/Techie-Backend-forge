@@ -1,7 +1,7 @@
 ---
 title: ArrayList and HashMap Internals — How They Actually Work
 summary: Under the hood: array resizing, load factor, hash collision handling, treeification, and why a wrong initial capacity or hashCode() can destroy application performance.
-order: 43
+order: 5
 minutes: 25
 topics: [arraylist-internal, hashmap-internal, load-factor, treeification, hash-collision, initial-capacity, amortized-o1]
 docs:
@@ -25,7 +25,6 @@ Capacity growth: 10 → 15 → 22 → 33 → 49 → 73 → ...
 
 **Why this matters:** the `add()` call is **amortized O(1)** — most calls are instant (just `array[index++] = element`), but every ~10 calls triggers an O(n) copy. If you know you need 10,000 elements, **pre-size** the list:
 
-```java
 // BAD: 14 resizes to hold 10,000 elements
 List<Order> orders = new ArrayList<>();
 for (int i = 0; i < 10_000; i++) orders.add(generateOrder());
@@ -33,7 +32,6 @@ for (int i = 0; i < 10_000; i++) orders.add(generateOrder());
 // GOOD: zero resizes
 List<Order> orders = new ArrayList<>(10_000);
 for (int i = 0; i < 10_000; i++) orders.add(generateOrder());
-```
 
 **Thread safety:** `ArrayList` is **not** thread-safe. Two concurrent `add()` calls can corrupt the internal array (lost updates, `ArrayIndexOutOfBoundsException`). Use `Collections.synchronizedList()` or `CopyOnWriteArrayList` for concurrent access.
 
@@ -67,7 +65,6 @@ Threshold: 12 → 24 → 48 → 96 → ...
 
 ### Scenario 1: pre-sizing for performance — order aggregation
 
-```java
 // Processing a batch of 50,000 orders
 public Map<String, List<Order>> groupByCustomer(List<Order> allOrders) {
     // BAD: default capacity 16, will resize ~12 times
@@ -81,13 +78,11 @@ public Map<String, List<Order>> groupByCustomer(List<Order> allOrders) {
     }
     return grouped;
 }
-```
 
 Pre-sizing eliminates 12 resize-and-rehash operations (each touching all 50K entries). On a large batch, this is the difference between 200ms and 2 seconds.
 
 ### Scenario 2: custom hashCode() — the cache key disaster
 
-```java
 // BROKEN: default hashCode is identity-based
 public class CacheKey {
     private String userId;
@@ -103,17 +98,13 @@ CacheKey key2 = new CacheKey("user-1", "tenant-A");
 
 cache.put(key1, session);
 cache.get(key2);  // null — different hashCode, different bucket
-```
 
 **Fix:** always override `hashCode()` and `equals()` together, or use `record` which generates both:
 
-```java
 public record CacheKey(String userId, String tenantId) {}
-```
 
 ### Scenario 3: ConcurrentHashMap for concurrent access
 
-```java
 @Service
 public class RateLimiter {
 
@@ -125,13 +116,11 @@ public class RateLimiter {
         return count.incrementAndGet() <= 100;  // 100 requests per window
     }
 }
-```
 
 `ConcurrentHashMap` uses **segment locking** (bucket-level locks since Java 8) instead of a single lock, so concurrent `put()` calls on different buckets do not block each other.
 
 ### Scenario 4: LinkedHashMap for insertion-order iteration
 
-```java
 // Maintain insertion order — use case: LRU cache
 public class LruCache<K, V> extends LinkedHashMap<K, V> {
 
@@ -147,7 +136,6 @@ public class LruCache<K, V> extends LinkedHashMap<K, V> {
         return size() > maxSize;
     }
 }
-```
 
 When the map exceeds `maxSize`, it automatically evicts the *least recently accessed* entry. This works because `LinkedHashMap` maintains a doubly-linked list of entries in access order.
 
@@ -172,3 +160,4 @@ When the map exceeds `maxSize`, it automatically evicts the *least recently acce
 | Bad `hashCode()` (e.g., `return 1`) | All entries in one bucket — O(n) lookup |
 | Modifying a key after `put()` | Entry is "lost" — hash bucket is wrong |
 | Default capacity 16 for 100K entries | ~15 resize operations, each rehashing everything |
+

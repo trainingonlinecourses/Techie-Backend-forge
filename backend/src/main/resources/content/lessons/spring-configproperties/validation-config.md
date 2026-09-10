@@ -1,7 +1,7 @@
 ---
 title: Validating Configuration Properties — Fail Fast on Bad Config
 summary: How to validate @ConfigurationProperties with @Validated, using Jakarta Validation annotations, nested properties, and custom validators.
-order: 3
+order: 5
 minutes: 15
 topics: [@Validated, jakarta-validation, nested-properties, custom-validator, fail-fast]
 docs:
@@ -12,7 +12,6 @@ docs:
 
 Spring Boot can validate configuration properties at startup using Jakarta Validation. This catches bad config immediately instead of failing at runtime.
 
-```java
 @Data
 @ConfigurationProperties(prefix = "app.mail")
 @Validated  // enables validation
@@ -23,7 +22,6 @@ public class MailProperties {
     @Min(1) @Max(65535)
     private int port = 587;
 }
-```
 
 If `app.mail.host` is missing, the app fails to start with a clear error.
 
@@ -31,7 +29,6 @@ If `app.mail.host` is missing, the app fails to start with a clear error.
 
 ## Line-by-Line Walkthrough
 
-```java
 import jakarta.validation.constraints.*;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
@@ -63,7 +60,6 @@ public class StorageProperties {
         private String region = "us-east-1";
     }
 }
-```
 
 ---
 
@@ -71,7 +67,6 @@ public class StorageProperties {
 
 ### Scenario 1: Custom validator
 
-```java
 @Component
 public class StoragePropertiesValidator implements Validator {
 
@@ -88,7 +83,6 @@ public class StoragePropertiesValidator implements Validator {
         }
     }
 }
-```
 
 ### Scenario 2: Profile-specific validation
 
@@ -119,3 +113,4 @@ app:
 | Using javax.validation | Wrong package in Spring Boot 3+ | Use jakarta.validation |
 | Not validating nested objects | Inner properties not checked | Add @Valid on nested fields |
 | Validation too strict for dev | App won't start in dev | Use profile-specific config |
+

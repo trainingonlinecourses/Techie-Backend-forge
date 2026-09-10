@@ -16,14 +16,15 @@ A transaction spanning multiple services cannot use a database rollback — each
 
 ## The Problem
 
-```java
-// A single logical operation across services:
-// 1. Create order (Order service)
-// 2. Charge card (Payment service)
-// 3. Reserve inventory (Inventory service)
-// 4. Ship (Shipping service)
 
-// If step 3 fails, steps 1-2 already committed. No global rollback exists.
+**What this code does — step by step:**
+
+1. A single logical operation across services: 1. Create order (Order service). 2. Charge card (Payment service). 3. Reserve inventory (Inventory service). 4. Ship (Shipping service)
+2. If step 3 fails, steps 1-2 already committed. No global rollback exists.
+
+The same code, clean:
+
+```java
 ```
 
 ## The Saga Structure
@@ -50,20 +51,30 @@ Every step has a **compensating action**:
 
 Each service reacts to events and emits the next — no central coordinator:
 
+
+**What this code does — step by step:**
+
+1. Order service — emits events after commit
+2. `paymentClient.charge(event.orderId(), event.amount());` — step 2
+3. Payment service
+4. `inventoryClient.reserve(event.orderId(), event.items());` — step 3
+5. Inventory service — on failure, emit the compensation path
+6. `paymentClient.refund(event.orderId());` — compensate step 2
+7. `orderClient.cancel(event.orderId());` — compensate step 1
+
+The same code, clean:
+
 ```java
-// Order service — emits events after commit
 @TransactionalEventListener(phase = AFTER_COMMIT)
 public void onOrderCreated(OrderCreated event) {
-    paymentClient.charge(event.orderId(), event.amount());   // step 2
+    paymentClient.charge(event.orderId(), event.amount());
 }
 
-// Payment service
 @TransactionalEventListener(phase = AFTER_COMMIT)
 public void onPaymentAuthorized(PaymentAuthorized event) {
-    inventoryClient.reserve(event.orderId(), event.items());  // step 3
+    inventoryClient.reserve(event.orderId(), event.items());
 }
 
-// Inventory service — on failure, emit the compensation path
 @TransactionalEventListener(phase = AFTER_COMMIT)
 public void onInventoryReserved(InventoryReserved event) {
     shippingClient.ship(event.orderId());
@@ -71,8 +82,8 @@ public void onInventoryReserved(InventoryReserved event) {
 
 @TransactionalEventListener(phase = AFTER_COMMIT)
 public void onInventoryFailed(InventoryFailed event) {
-    paymentClient.refund(event.orderId());        // compensate step 2
-    orderClient.cancel(event.orderId());          // compensate step 1
+    paymentClient.refund(event.orderId());
+    orderClient.cancel(event.orderId());
 }
 ```
 
@@ -82,6 +93,17 @@ public void onInventoryFailed(InventoryFailed event) {
 
 A **saga orchestrator** runs the flow and knows the full state machine:
 
+
+**What this code does — step by step:**
+
+1. Each step is a command to a service; each response advances the saga
+2. `payments.charge(order);` — step 1
+3. `inventory.reserve(order);` — step 2
+4. `shipping.ship(order);` — step 3
+5. `payments.refund(order);` — compensate 1
+
+The same code, clean:
+
 ```java
 @Component
 public class OrderSaga {
@@ -90,14 +112,13 @@ public class OrderSaga {
     private final InventoryClient inventory;
     private final ShippingClient shipping;
 
-    // Each step is a command to a service; each response advances the saga
     public void run(Order order) {
         try {
-            payments.charge(order);              // step 1
-            inventory.reserve(order);            // step 2
-            shipping.ship(order);                // step 3
+            payments.charge(order);
+            inventory.reserve(order);
+            shipping.ship(order);
         } catch (InventoryUnavailableException e) {
-            payments.refund(order);              // compensate 1
+            payments.refund(order);
             orderRepository.cancel(order.getId());
             throw e;
         }
@@ -107,7 +128,6 @@ public class OrderSaga {
 
 Better — persistent, resumable:
 
-```java
 @Entity
 public class SagaState {
     @Id private String sagaId;
@@ -115,7 +135,6 @@ public class SagaState {
     private String status;        // RUNNING / COMPLETED / COMPENSATING
     @Lob private String context;  // order data for resumption
 }
-```
 
 **Pros**: the whole flow in one place, resumable, testable. **Cons**: the orchestrator is a coupling point and a potential bottleneck.
 
@@ -137,7 +156,6 @@ public class SagaState {
 
 A robust saga is a **state machine** — every event advances it, every failure routes to compensation:
 
-```java
 public class OrderSagaMachine {
 
     private final Map<String, Action> transitions = Map.of(
@@ -162,7 +180,6 @@ public class OrderSagaMachine {
         }
     }
 }
-```
 
 The persisted state makes the saga **crash-safe**: after a restart, a job reads `RUNNING` sagas and resumes them from the recorded step.
 
@@ -177,7 +194,6 @@ The persisted state makes the saga **crash-safe**: after a restart, a job reads 
 | Log every step + compensation | The saga audit trail |
 | Timeouts on every call | A hung step blocks the saga |
 
-```java
 public void compensate(String sagaId, String failedStep) {
     List<String> completed = getCompletedSteps(sagaId);   // reverse order
     for (String step : reverse(completed)) {
@@ -190,7 +206,6 @@ public void compensate(String sagaId, String failedStep) {
         }
     }
 }
-```
 
 ## The Outbox + Saga Combination
 
@@ -206,7 +221,6 @@ Every step's command is atomic with its local state — the saga can never obser
 
 ## Testing Sagas
 
-```java
 class OrderSagaTest {
 
     private final FakePaymentClient payments = new FakePaymentClient();
@@ -230,7 +244,6 @@ class OrderSagaTest {
         assertTrue(shipping.shipped(order.id()));
     }
 }
-```
 
 ## Summary
 
@@ -243,3 +256,4 @@ class OrderSagaTest {
 | Compensation | Each service's handler | Coordinator issues commands |
 
 A saga is a sequence of local transactions with compensating actions — the distributed replacement for the transaction you can't have. Start with choreography for simple flows, graduate to a persisted orchestrator when the flow gets complex, make every compensation idempotent, and pair it with the outbox for atomic step commands.
+

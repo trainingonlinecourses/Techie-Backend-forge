@@ -1,7 +1,7 @@
 ---
 title: Readers and Writers — Text I/O and Encodings
 module: java-io-nio
-order: 2
+order: 4
 minutes: 24
 topics: ["Reader", "Writer", "charsets", "UTF-8", "text encoding", "line reading"]
 summary: Here is the single most important idea in this lesson: a file on disk is a sequence of bytes. Text is a convention for interpreting those bytes. Th...
@@ -27,6 +27,19 @@ The `Reader`/`Writer` hierarchy exists precisely to handle this conversion for y
 
 ## The Code Walkthrough
 
+
+**What this code does — step by step:**
+
+1. 1. Write text with an explicit charset — never rely on defaults
+2. 2. Read it back with the SAME charset
+3. `System.out.println(roundTrip.equals(text));` — true
+4. 3. Decode with the WRONG charset — see the mojibake
+5. `System.out.println(wrong);` — cafÃ© â€” naÃ¯ve â€” ä¸æ–‡
+6. 4. Streaming with an explicit charset + buffering
+7. 5. Reading lines lazily (doesn't load the file into memory)
+
+The same code, clean:
+
 ```java
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -35,26 +48,21 @@ import java.nio.file.*;
 public class ReaderWriterDemo {
 
     public static void main(String[] args) throws IOException {
-        // 1. Write text with an explicit charset — never rely on defaults
         Path file = Path.of("note.txt");
         String text = "café — naïve — 中文";
         Files.writeString(file, text, StandardCharsets.UTF_8);
 
-        // 2. Read it back with the SAME charset
         String roundTrip = Files.readString(file, StandardCharsets.UTF_8);
-        System.out.println(roundTrip.equals(text));   // true
+        System.out.println(roundTrip.equals(text));
 
-        // 3. Decode with the WRONG charset — see the mojibake
         String wrong = Files.readString(file, StandardCharsets.ISO_8859_1);
-        System.out.println(wrong);                    // cafÃ© â€” naÃ¯ve â€” ä¸æ–‡
+        System.out.println(wrong);
 
-        // 4. Streaming with an explicit charset + buffering
         try (BufferedWriter writer = Files.newBufferedWriter(file, StandardCharsets.UTF_8)) {
             writer.write("line one\n");
             writer.write("line two\n");
         }
 
-        // 5. Reading lines lazily (doesn't load the file into memory)
         try (BufferedReader reader = Files.newBufferedReader(file, StandardCharsets.UTF_8)) {
             String line;
             while ((line = reader.readLine()) != null) {
@@ -81,14 +89,12 @@ public class ReaderWriterDemo {
 
 Sometimes you have bytes (e.g., from a socket or an `InputStream`) but want text APIs:
 
-```java
 // Wrap an InputStream, decode as UTF-8, buffer, read lines:
 try (BufferedReader r = new BufferedReader(
         new InputStreamReader(in, StandardCharsets.UTF_8))) {
     String line;
     while ((line = r.readLine()) != null) { ... }
 }
-```
 
 `InputStreamReader` is the *decoder bridge*: bytes in, chars out. `OutputStreamWriter` is the *encoder bridge*: chars in, bytes out. The charset argument is where you control the encoding — always pass it.
 
@@ -124,3 +130,4 @@ try (BufferedReader r = new BufferedReader(
 - Always pass `StandardCharsets.UTF_8` explicitly — never trust platform defaults.
 - `Files.readString`/`writeString`/`newBufferedReader` are the modern text I/O APIs.
 - Mojibake means an encoding mismatch — fix the charset, not the data.
+

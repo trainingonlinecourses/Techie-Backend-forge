@@ -1,7 +1,7 @@
 ---
 title: OpenAPI — Describing Your API for Machines and Humans
 module: openapi-rest-docs
-order: 1
+order: 3
 minutes: 24
 topics: ["OpenAPI", "Swagger", "API specification", "JSON schema", "contract-first"]
 summary: A REST API without documentation is a guessing game: which endpoints exist? What does each expect and return? What status codes? Handwritten docs g...
@@ -36,7 +36,6 @@ Spring Boot's ecosystem defaults to code-first via **springdoc-openapi** — add
 
 ## The Code Walkthrough
 
-```java
 // ---- 1. Add the dependency ----
 // implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0'
 
@@ -74,7 +73,6 @@ public class CourseController {
         return service.create(request);
     }
 }
-```
 
 ### Walking Through Each Part
 
@@ -127,3 +125,4 @@ This produces a typed client for the frontend — matching models, methods, and 
 - DTO schemas are generated automatically — clean DTOs = clean docs.
 - Swagger UI = browsable, executable docs; the spec feeds code generation.
 - Protect the UI in production; document auth and error codes.
+

@@ -34,7 +34,6 @@ A test suite isn't "a bunch of tests" — it's a *portfolio with a strategy*. Th
 
 The highest-leverage organizational habit is *naming*: a well-named test is executable documentation. The convention that works:
 
-```java
 // Naming = a sentence: methodUnderTest_scenario_expectedResult
 // or the behavior-first style: should_expected_when_condition
 class PaymentServiceTest {
@@ -51,7 +50,6 @@ class PaymentServiceTest {
     @Test
     void refund_overRefund_throwsIllegalArgument() { }
 }
-```
 
 **The three rules:** name the *behavior* (not the implementation), state the *scenario* and the *expectation* explicitly, and let the report read like a specification — "charge valid card deducts balance" tells a reviewer what the system guarantees. (JUnit 5's `@DisplayName` gives you full sentences with spaces for reports: `@DisplayName("charging a declined card throws PaymentDeclined")`.)
 
@@ -59,7 +57,6 @@ class PaymentServiceTest {
 
 Every test should follow the same three-part skeleton — the Arrange-Act-Assert (GWT) pattern:
 
-```java
 @Test
 void charge_overDailyLimit_throwsLimitExceeded() {
     // GIVEN (arrange) — set up the world:
@@ -74,7 +71,6 @@ void charge_overDailyLimit_throwsLimitExceeded() {
     assertThrows(DailyLimitExceededException.class,
                  () -> service.charge("a1", 600));
 }
-```
 
 **The discipline:** one *when* per test (one action, one behavior under test); the given establishes the preconditions; the then verifies the outcome. Tests that violate it — four actions, ten assertions, setup sprawled through the body — are the ones that break confusingly. (And the mock interaction *verification* belongs in the then, not scattered: `verify(repo).save(any());`.)
 
@@ -88,34 +84,42 @@ void charge_overDailyLimit_throwsLimitExceeded() {
 
 Spring Boot's testing story is the pyramid made practical — **test slices** that spin up only the context slice a test needs:
 
+
+**What this code does — step by step:**
+
+1. Fast-ish unit-ish — the service layer, with mocks, NO Spring context:
+2. ...pure unit test, milliseconds
+3. Integration slice — a real Spring context, but ONLY the web layer:
+4. `@WebMvcTest(PaymentController.class)` — controller + MVC machinery
+5. `@MockBean PaymentService service;` — the service is mocked
+6. `@Autowired MockMvc mockMvc;` — real HTTP-ish layer. ...the controller's mapping/serialization/validation, in seconds
+7. Integration slice — ONLY the data layer, real DB (H2 or Testcontainers):
+8. ...real SQL against a real (containerized) database
+9. The full integration test — the whole context, the top of the pyramid:
+10. ...the whole app, real everything, slowest
+
+The same code, clean:
+
 ```java
-// Fast-ish unit-ish — the service layer, with mocks, NO Spring context:
 class PaymentServiceTest {
     @Mock PaymentRepo repo;
     @InjectMocks PaymentService service;
-    // ...pure unit test, milliseconds
 }
 
-// Integration slice — a real Spring context, but ONLY the web layer:
-@WebMvcTest(PaymentController.class)     // controller + MVC machinery
+@WebMvcTest(PaymentController.class)
 class PaymentControllerTest {
-    @MockBean PaymentService service;     // the service is mocked
-    @Autowired MockMvc mockMvc;           // real HTTP-ish layer
-    // ...the controller's mapping/serialization/validation, in seconds
+    @MockBean PaymentService service;
+    @Autowired MockMvc mockMvc;
 }
 
-// Integration slice — ONLY the data layer, real DB (H2 or Testcontainers):
 @DataJpaTest
 class PaymentRepositoryTest {
     @Autowired PaymentRepo repo;
-    // ...real SQL against a real (containerized) database
 }
 
-// The full integration test — the whole context, the top of the pyramid:
 @SpringBootTest
 @AutoConfigureMockMvc
 class PaymentApiIntegrationTest {
-    // ...the whole app, real everything, slowest
 }
 ```
 
@@ -133,3 +137,4 @@ class PaymentApiIntegrationTest {
 ## Recap
 
 Test organization is strategy, not housekeeping: the **testing pyramid** — many fast unit tests, fewer integration tests, a handful of E2E tests — encodes the speed/confidence trade-off that keeps suites alive. Naming tests as behavior sentences and structuring them as given-when-then makes the suite executable documentation. Files follow the one-class-per-test convention; Spring Boot's **test slices** (`@WebMvcTest`, `@DataJpaTest`, `@SpringBootTest`) make each layer's tests as fast as the layer allows. The habits — mock only what the layer needs, use real infrastructure at boundaries, keep the base fast — are what separate a suite that protects a codebase from a pile of tests that nobody runs.
+

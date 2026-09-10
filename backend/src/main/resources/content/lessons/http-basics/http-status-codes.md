@@ -1,7 +1,7 @@
 ---
 title: HTTP Status Codes — The Outcome, in Three Digits
 module: http-basics
-order: 2
+order: 5
 minutes: 24
 topics: ["status codes", "2xx 4xx 5xx", "redirects", "error semantics", "REST responses"]
 summary: Every HTTP response begins with a status line — three digits that tell the client what happened in a machinereadable way. The first digit is the cl...
@@ -66,7 +66,6 @@ The practical rule: **a missing/expired token → 401; a valid token without the
 
 ## The Code Walkthrough — Returning the Right Codes
 
-```java
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -109,7 +108,6 @@ public class CourseController {
         }
     }
 }
-```
 
 ### Walking Through Each Part
 
@@ -154,3 +152,4 @@ Stable fields: `code` (clients switch on it), `message` (humans read it), `statu
 - 409 for state conflicts; 429 + `Retry-After` for rate limits.
 - Retry semantics: 4xx rarely retryable; 5xx sometimes; 503/504 yes.
 - Pair codes with a stable error body (`code`, `message`) documented in the spec.
+

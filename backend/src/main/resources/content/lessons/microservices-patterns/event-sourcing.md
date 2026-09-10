@@ -70,22 +70,36 @@ After 10,000 events, replaying all of them to get the current state is slow. **S
 
 Events are immutable objects. They represent facts — things that already happened and can never be undone.
 
+
+**What this code does — step by step:**
+
+1. Every event is a fact — it happened, it can't be "un-happened". Using Java records (Java 16+) for immutability by default:
+2. `public record AccountOpened(` — The event type name — descriptive, past-tense
+3. `String accountId,` — Which aggregate this happened to
+4. `String ownerName,` — Payload — who opened the account
+5. `Instant occurredAt` — When it happened — critical for ordering
+6. `public record MoneyDeposited(` — Past tense — this already happened
+7. `String accountId,` — Same aggregate ID
+8. `BigDecimal amount,` — How much was deposited
+9. `Instant occurredAt` — When
+10. `public record MoneyWithdrawn(` — Another fact
+
+The same code, clean:
+
 ```java
-// Every event is a fact — it happened, it can't be "un-happened"
-// Using Java records (Java 16+) for immutability by default:
-public record AccountOpened(         // The event type name — descriptive, past-tense
-    String accountId,                // Which aggregate this happened to
-    String ownerName,                // Payload — who opened the account
-    Instant occurredAt               // When it happened — critical for ordering
+public record AccountOpened(
+    String accountId,
+    String ownerName,
+    Instant occurredAt
 ) {}
 
-public record MoneyDeposited(        // Past tense — this already happened
-    String accountId,                // Same aggregate ID
-    BigDecimal amount,               // How much was deposited
-    Instant occurredAt               // When
+public record MoneyDeposited(
+    String accountId,
+    BigDecimal amount,
+    Instant occurredAt
 ) {}
 
-public record MoneyWithdrawn(        // Another fact
+public record MoneyWithdrawn(
     String accountId,
     BigDecimal amount,
     Instant occurredAt
@@ -101,19 +115,35 @@ public record MoneyWithdrawn(        // Another fact
 
 The aggregate is the domain object. In event sourcing, it has two key methods: `apply()` to build state from events, and command methods to validate and emit new events.
 
+
+**What this code does — step by step:**
+
+1. `private BigDecimal balance = BigDecimal.ZERO;` — Starting state: empty
+2. === COMMAND METHOD: validates, then emits an event ===
+3. `throw new IllegalArgumentException("Deposit must be positive");` — Validation FIRST
+4. Emit the event — don't change balance directly!
+5. `throw new IllegalStateException("Insufficient funds");` — Business rule enforcement
+6. === EVENT APPLICATION: pure function, no validation ===
+7. `if (event instanceof MoneyDeposited e) {` — Java 16 pattern matching
+8. `this.balance = this.balance.add(e.amount());` — State changes HERE
+9. `this.uncommittedEvents.add(event);` — Track new events for persistence
+10. === REBUILD STATE FROM HISTORY ===
+11. `history.forEach(account::applyEvent);` — Fold: apply each event in order
+12. `return account;` — Current state = result of the fold
+
+The same code, clean:
+
 ```java
 public class Account {
     private String id;
     private String owner;
-    private BigDecimal balance = BigDecimal.ZERO;    // Starting state: empty
+    private BigDecimal balance = BigDecimal.ZERO;
     private final List<DomainEvent> uncommittedEvents = new ArrayList<>();
 
-    // === COMMAND METHOD: validates, then emits an event ===
     public void deposit(BigDecimal amount) {
         if (amount.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalArgumentException("Deposit must be positive");  // Validation FIRST
+            throw new IllegalArgumentException("Deposit must be positive");
         }
-        // Emit the event — don't change balance directly!
         applyEvent(new MoneyDeposited(this.id, amount, Instant.now()));
     }
 
@@ -122,27 +152,25 @@ public class Account {
             throw new IllegalArgumentException("Withdrawal must be positive");
         }
         if (balance.compareTo(amount) < 0) {
-            throw new IllegalStateException("Insufficient funds");  // Business rule enforcement
+            throw new IllegalStateException("Insufficient funds");
         }
         applyEvent(new MoneyWithdrawn(this.id, amount, Instant.now()));
     }
 
-    // === EVENT APPLICATION: pure function, no validation ===
     private void applyEvent(DomainEvent event) {
-        if (event instanceof MoneyDeposited e) {         // Java 16 pattern matching
-            this.balance = this.balance.add(e.amount());  // State changes HERE
+        if (event instanceof MoneyDeposited e) {
+            this.balance = this.balance.add(e.amount());
         } else if (event instanceof MoneyWithdrawn e) {
             this.balance = this.balance.subtract(e.amount());
         }
-        this.uncommittedEvents.add(event);               // Track new events for persistence
+        this.uncommittedEvents.add(event);
     }
 
-    // === REBUILD STATE FROM HISTORY ===
     public static Account reconstitute(String accountId, List<DomainEvent> history) {
         Account account = new Account();
         account.id = accountId;
-        history.forEach(account::applyEvent);   // Fold: apply each event in order
-        return account;                         // Current state = result of the fold
+        history.forEach(account::applyEvent);
+        return account;
     }
 }
 ```
@@ -155,30 +183,46 @@ public class Account {
 
 ### Step 3: The Event Store (Persistence)
 
+
+**What this code does — step by step:**
+
+1. `private final JdbcTemplate jdbc;` — Using JDBC for simplicity; could be JPA, MongoDB, etc.
+2. === WRITE: append events atomically ===
+3. `int version = getCurrentVersion(aggregateId);` — Get current position in the log
+4. `version++;` — Sequential version per aggregate
+5. `aggregateId,` — Which aggregate
+6. `version,` — Position in the log (optimistic lock)
+7. `event.getClass().getSimpleName(),` — "MoneyDeposited" — for deserialization
+8. `objectMapper.writeValueAsString(event),` — JSON payload
+9. `event.occurredAt()` — When it happened
+10. === READ: load all events for an aggregate ===
+11. === REBUILD: fold events into current state ===
+12. `return Account.reconstitute(accountId, history);` — Rebuild from scratch
+
+The same code, clean:
+
 ```java
 @Repository
 public class EventStore {
-    private final JdbcTemplate jdbc;   // Using JDBC for simplicity; could be JPA, MongoDB, etc.
+    private final JdbcTemplate jdbc;
 
-    // === WRITE: append events atomically ===
     @Transactional
     public void append(String aggregateId, List<DomainEvent> events) {
-        int version = getCurrentVersion(aggregateId);  // Get current position in the log
+        int version = getCurrentVersion(aggregateId);
         for (DomainEvent event : events) {
-            version++;                                 // Sequential version per aggregate
+            version++;
             jdbc.update(
                 "INSERT INTO events (aggregate_id, version, event_type, payload, occurred_at) " +
                 "VALUES (?, ?, ?, ?, ?)",
-                aggregateId,                            // Which aggregate
-                version,                                // Position in the log (optimistic lock)
-                event.getClass().getSimpleName(),       // "MoneyDeposited" — for deserialization
-                objectMapper.writeValueAsString(event),  // JSON payload
-                event.occurredAt()                      // When it happened
+                aggregateId,
+                version,
+                event.getClass().getSimpleName(),
+                objectMapper.writeValueAsString(event),
+                event.occurredAt()
             );
         }
     }
 
-    // === READ: load all events for an aggregate ===
     public List<DomainEvent> loadEvents(String aggregateId) {
         return jdbc.query(
             "SELECT event_type, payload FROM events WHERE aggregate_id = ? ORDER BY version",
@@ -186,10 +230,9 @@ public class EventStore {
         );
     }
 
-    // === REBUILD: fold events into current state ===
     public Account loadAccount(String accountId) {
         List<DomainEvent> history = loadEvents(accountId);
-        return Account.reconstitute(accountId, history);   // Rebuild from scratch
+        return Account.reconstitute(accountId, history);
     }
 }
 ```
@@ -202,28 +245,39 @@ public class EventStore {
 
 ### Step 4: Snapshots (Performance Optimization)
 
+
+**What this code does — step by step:**
+
+1. `private static final int SNAPSHOT_INTERVAL = 100;` — Snapshot every 100 events
+2. 1. Find latest snapshot (if any)
+3. 2. Load events AFTER the snapshot
+4. `events = eventStore.loadEvents(accountId);` — No snapshot — replay everything
+5. 3. Rebuild from snapshot + remaining events
+6. `? snapshot.toAccount()` — Rebuild from snapshot state
+7. `: new Account();` — Start fresh
+8. `events.forEach(account::applyEvent);` — Apply remaining events
+
+The same code, clean:
+
 ```java
 public class AccountSnapshotService {
-    private static final int SNAPSHOT_INTERVAL = 100;   // Snapshot every 100 events
+    private static final int SNAPSHOT_INTERVAL = 100;
 
     public Account loadWithSnapshot(String accountId) {
-        // 1. Find latest snapshot (if any)
         AccountSnapshot snapshot = snapshotStore.findLatest(accountId);
 
-        // 2. Load events AFTER the snapshot
         List<DomainEvent> events;
         if (snapshot != null) {
             events = eventStore.loadEventsAfter(accountId, snapshot.version());
         } else {
-            events = eventStore.loadEvents(accountId);   // No snapshot — replay everything
+            events = eventStore.loadEvents(accountId);
         }
 
-        // 3. Rebuild from snapshot + remaining events
         Account account = snapshot != null
-            ? snapshot.toAccount()                       // Rebuild from snapshot state
-            : new Account();                             // Start fresh
+            ? snapshot.toAccount()
+            : new Account();
 
-        events.forEach(account::applyEvent);             // Apply remaining events
+        events.forEach(account::applyEvent);
         return account;
     }
 }
@@ -254,18 +308,25 @@ With traditional storage, you'd need a separate audit log that somehow stays in 
 
 A dashboard shows wrong data because of a calculation bug in the projection code:
 
+
+**What this code does — step by step:**
+
+1. BUG: was multiplying instead of adding
+2. `dashboard.total = dashboard.total.multiply(e.amount());` — WRONG
+3. FIX: correct the projection code
+4. `dashboard.total = dashboard.total.add(e.amount());` — CORRECT
+5. Replay: rebuild the dashboard from events — bug is gone
+
+The same code, clean:
+
 ```java
-// BUG: was multiplying instead of adding
 public void on(MoneyDeposited e) {
-    dashboard.total = dashboard.total.multiply(e.amount());  // WRONG
+    dashboard.total = dashboard.total.multiply(e.amount());
 }
 
-// FIX: correct the projection code
 public void on(MoneyDeposited e) {
-    dashboard.total = dashboard.total.add(e.amount());       // CORRECT
+    dashboard.total = dashboard.total.add(e.amount());
 }
-
-// Replay: rebuild the dashboard from events — bug is gone
 ```
 
 With traditional storage, the wrong data is already written and you'd need a data fix script. With event sourcing, fix the code, replay, done.
@@ -274,10 +335,8 @@ With traditional storage, the wrong data is already written and you'd need a dat
 
 Customer service asks: "What was John's balance on March 3rd?"
 
-```java
 Account account = accountStore.loadUntil("john-123", Instant.parse("2024-03-03T23:59:59Z"));
 // Replay only events up to March 3 — get exact historical state
-```
 
 ---
 
@@ -317,3 +376,4 @@ Event sourcing includes CQRS naturally (you need projections), and typically use
 - **The outbox hybrid** gives most of the benefits without betting the system on event-derived state.
 
 Official docs: [Event Sourcing (Fowler)](https://martinfowler.com/eaaDev/EventSourcing.html) · [Event Sourcing (microservices.io)](https://microservices.io/patterns/data/event-sourcing.html)
+

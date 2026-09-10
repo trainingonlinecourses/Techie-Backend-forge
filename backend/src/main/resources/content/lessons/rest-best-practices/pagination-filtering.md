@@ -1,7 +1,7 @@
 ---
 title: Pagination, Filtering and Sorting
 module: rest-best-practices
-order: 3
+order: 5
 minutes: 22
 topics: ["Pageable", "Page", "offset vs cursor", "filtering", "sorting", "pagination response shape"]
 summary: Unbounded list endpoints are a performance and UX bug: a GET /api/courses that returns 100,000 rows chokes the DB, the network, and the client. Pag...
@@ -22,7 +22,6 @@ Spring Data's web support auto-binds `Pageable` from query parameters:
 GET /api/courses?page=0&size=20&sort=title,asc&sort=minutes,desc
 ```
 
-```java
 @RestController
 @RequestMapping("/api/courses")
 public class CourseController {
@@ -34,7 +33,6 @@ public class CourseController {
         return repository.findAll(pageable).map(CourseDto::from);
     }
 }
-```
 
 `Pageable` comes pre-parsed: `page` (0-based), `size` (default 20, max 100 by default), `sort` (repeatable, comma-separated field + direction).
 
@@ -59,7 +57,6 @@ public class CourseController {
 
 That's verbose. Many teams trim it to a minimal DTO:
 
-```java
 public record PageResponse<T>(List<T> items, int page, int size,
                               long totalElements, int totalPages) {
 
@@ -68,7 +65,6 @@ public record PageResponse<T>(List<T> items, int page, int size,
             page.getSize(), page.getTotalElements(), page.getTotalPages());
     }
 }
-```
 
 ```json
 { "items": [...], "page": 0, "size": 20, "totalElements": 148, "totalPages": 8 }
@@ -78,7 +74,6 @@ public record PageResponse<T>(List<T> items, int page, int size,
 
 Pass filters as named params and build the query:
 
-```java
 @GetMapping
 public Page<CourseDto> list(
         @RequestParam(required = false) String title,
@@ -97,11 +92,9 @@ public Page<CourseDto> list(
 
     return repository.findAll(spec, pageable).map(CourseDto::from);
 }
-```
 
 For simple cases, Spring Data derived queries plus `Pageable`:
 
-```java
 @Repository
 public interface CourseRepository extends JpaRepository<Course, Long> {
 
@@ -109,7 +102,6 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
 
     Page<Course> findByTitleContainingIgnoreCase(String title, Pageable pageable);
 }
-```
 
 ## Offset vs. Cursor Pagination
 
@@ -129,7 +121,6 @@ LIMIT 20 OFFSET 40
 GET /api/events?limit=20&cursor=eyJpZCI6MTAwMH0=
 ```
 
-```java
 // Keyset: WHERE id > :lastSeen ORDER BY id LIMIT 20
 public List<Event> pageAfter(Long lastId, int limit) {
     return jdbc.query("""
@@ -138,7 +129,6 @@ public List<Event> pageAfter(Long lastId, int limit) {
         ORDER BY id
         LIMIT ?""", eventRowMapper, lastId, limit);
 }
-```
 
 - ✅ Constant-time on any page depth (index seek)
 - ✅ Stable under concurrent inserts
@@ -165,14 +155,11 @@ A `max-page-size` guard is essential — otherwise `?size=1000000` lets a client
 
 Never let raw client input reach `ORDER BY` unsanitized. Whitelist sortable fields:
 
-```java
 public Page<CourseDto> list(Pageable pageable) {
     Pageable safe = PageableUtil.sanitize(pageable, Set.of("title", "minutes", "createdAt"));
     return repository.findAll(safe).map(CourseDto::from);
 }
-```
 
-```java
 public final class PageableUtil {
     private static final Set<String> BLOCKED = Set.of(
         ";", "--", "drop", "select", "union", "\\", "'", "\"", "`");
@@ -187,7 +174,6 @@ public final class PageableUtil {
         return PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), safe);
     }
 }
-```
 
 Note: Spring Data's `Pageable` binding already rejects SQL metacharacters in sort properties (it validates against the entity's properties) — the whitelist is defense-in-depth and keeps the contract explicit.
 
@@ -196,17 +182,14 @@ Note: Spring Data's `Pageable` binding already rejects SQL metacharacters in sor
 - **Filter** = structured, cheap, indexed fields → query params above.
 - **Search** = fuzzy, ranked, across many fields → dedicated search (Postgres full-text, Elasticsearch). Don't bolt `LIKE '%x%'` onto every column.
 
-```java
 @GetMapping("/api/courses/search")
 public Page<CourseDto> search(@RequestParam String q, Pageable pageable) {
     // delegates to a search index, not ILIKE on everything
     return searchService.search(q, pageable).map(CourseDto::from);
 }
-```
 
 ## Testing Pagination
 
-```java
 @SpringBootTest
 @AutoConfigureMockMvc
 class CourseControllerPaginationTest {
@@ -229,7 +212,6 @@ class CourseControllerPaginationTest {
             .andExpect(jsonPath("$.size").value(100));   // clamped by max-page-size
     }
 }
-```
 
 ## Summary
 
@@ -244,3 +226,4 @@ class CourseControllerPaginationTest {
 | Stability | Cursor for live data; offset for admin tables |
 
 Pagination isn't just about the endpoint — it's about protecting your database and giving clients a predictable paging contract they can build UI on.
+

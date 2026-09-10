@@ -1,7 +1,7 @@
 ---
 title: Big-O Notation — How Fast Is Your Code, Really
 module: data-structures-algorithms
-order: 1
+order: 2
 minutes: 26
 topics: ["big-O", "complexity", "time complexity", "space complexity", "growth rates"]
 summary: "How fast is this program?" is the wrong question — the honest answer depends on the machine, the language, the data. The useful question is: how d...
@@ -36,34 +36,46 @@ docs:
 
 ## Counting Operations: From Code to Big-O
 
+
+**What this code does — step by step:**
+
+1. O(1) — constant: no matter how big the array, ONE operation.
+2. `return arr[0];` — 1 operation — always
+3. O(n) — linear: the loop runs once per element.
+4. `for (int x : arr) {` — n iterations
+5. O(n²) — quadratic: nested loops, n×n operations.
+6. `for (int j = i + 1; j < arr.length; j++) {` — inner runs ~n/2 avg
+7. O(log n) — logarithmic: the search space HALVES each step.
+8. `System.out.println(sum(new int[]{1,2,3,4,5}));` — 15
+9. `System.out.println(hasDuplicate(new int[]{3,1,4,1}));` — true
+10. `System.out.println(binarySearch(new int[]{1,3,5,7,9}, 7));` — 3
+
+The same code, clean:
+
 ```java
 public class BigODemo {
 
-    // O(1) — constant: no matter how big the array, ONE operation.
     static int firstElement(int[] arr) {
-        return arr[0];                    // 1 operation — always
+        return arr[0];
     }
 
-    // O(n) — linear: the loop runs once per element.
     static int sum(int[] arr) {
         int total = 0;
-        for (int x : arr) {               // n iterations
+        for (int x : arr) {
             total += x;
         }
         return total;
     }
 
-    // O(n²) — quadratic: nested loops, n×n operations.
     static boolean hasDuplicate(int[] arr) {
         for (int i = 0; i < arr.length; i++) {
-            for (int j = i + 1; j < arr.length; j++) {  // inner runs ~n/2 avg
+            for (int j = i + 1; j < arr.length; j++) {
                 if (arr[i] == arr[j]) return true;
             }
         }
         return false;
     }
 
-    // O(log n) — logarithmic: the search space HALVES each step.
     static int binarySearch(int[] sorted, int target) {
         int lo = 0, hi = sorted.length - 1;
         while (lo <= hi) {
@@ -76,9 +88,9 @@ public class BigODemo {
     }
 
     public static void main(String[] args) {
-        System.out.println(sum(new int[]{1,2,3,4,5}));        // 15
-        System.out.println(hasDuplicate(new int[]{3,1,4,1})); // true
-        System.out.println(binarySearch(new int[]{1,3,5,7,9}, 7)); // 3
+        System.out.println(sum(new int[]{1,2,3,4,5}));
+        System.out.println(hasDuplicate(new int[]{3,1,4,1}));
+        System.out.println(binarySearch(new int[]{1,3,5,7,9}, 7));
     }
 }
 ```
@@ -115,3 +127,4 @@ Before you write an algorithm, *predict* its complexity; after you write it, *ve
 ## Recap
 
 Big-O describes how work grows with input, stripped of machine and constant factors: O(1) flat, O(log n) halving, O(n) linear, O(n log n) sorting, O(n²) nested loops, O(2ⁿ) and beyond explosive. To derive it: count operations, keep the dominant term, drop constants, multiply nested blocks. Apply it to space as well as time. And remember its limits — it's about growth and worst cases, not real seconds or small inputs. Mastered, it turns "will this scale?" from a guess into a calculation you can do on the back of an envelope.
+

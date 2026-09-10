@@ -19,14 +19,12 @@ A monolith updates the database in one transaction. A microservice can't: the cu
 
 Write the side effect **in the same transaction** as the state change, then a relay publishes it:
 
-```java
 @Transactional
 public void createOrder(Order order) {
     orders.save(order);                                             // 1. business state
     outbox.save(new OutboxEvent("order.created", order.getId()));   // 2. event, SAME tx
 }
 // OutboxRelay (polling or CDC) publishes committed events to Kafka and marks them sent
-```
 
 If the process crashes between save and publish, the un-published row is still in the outbox — nothing is lost. This is the pattern that makes "exactly-once-ish" event delivery achievable in practice.
 
@@ -47,10 +45,8 @@ Choreographed (each service publishes events, next acts) or orchestrated (a coor
 
 Network retries mean the same message can arrive twice. Every mutating endpoint/service must be idempotent:
 
-```java
 if (transfers.existsByIdempotencyKey(key)) throw new DuplicateTransferException(key);
 // or: unique constraint on the key, retries return the original result
-```
 
 ## Inter-service security
 
@@ -61,7 +57,6 @@ if (transfers.existsByIdempotencyKey(key)) throw new DuplicateTransferException(
 | **Service-to-service trust** | Network policy (only gateway + peers reach services), mTLS in prod |
 | **Authorization** | Each service still checks its own `@PreAuthorize` — never trust the gateway alone |
 
-```java
 @FeignClient(name = "inventory-service", configuration = TokenForwardConfig.class)
 public interface InventoryClient { ... }
 
@@ -74,7 +69,6 @@ RequestInterceptor tokenForwarding() {
         if (token != null) template.header("Authorization", "Bearer " + token);
     };
 }
-```
 
 ## Testing a distributed system
 
@@ -87,7 +81,6 @@ RequestInterceptor tokenForwarding() {
 
 Contract tests are the microservices-specific discipline: they pin the API between teams so a breaking change fails in CI, not in prod.
 
-```java
 // Spring Cloud Contract example (consumer side)
 @SpringBootTest
 class InventoryContractTest {
@@ -99,7 +92,6 @@ class InventoryContractTest {
             .isTrue();
     }
 }
-```
 
 ## Deployment & the operational baseline
 
@@ -131,3 +123,4 @@ class InventoryContractTest {
 - Watch the anti-patterns: distributed monolith, chatty calls, sync chains.
 
 **Official docs:** [Transactional outbox](https://microservices.io/patterns/data/transactional-outbox.html) · [Spring Cloud reference](https://docs.spring.io/spring-cloud-reference/reference/)
+

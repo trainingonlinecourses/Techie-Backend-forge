@@ -1,7 +1,7 @@
 ---
 title: Math Class & Random — Numbers Beyond Basic Arithmetic
 summary: The Math utility methods every developer should know, why Math.random() is the wrong tool for real applications, and the SecureRandom vs Random vs ThreadLocalRandom decision organizations actually face.
-order: 74
+order: 52
 minutes: 16
 topics: [math-class, random, securerandom, threadlocalrandom, rounding, abs-pow]
 docs:
@@ -13,13 +13,25 @@ docs:
 
 `java.lang.Math` is a utility class of **static** methods — no objects needed. You've used `Math.max` already; here are the ones that matter daily:
 
+
+**What this code does — step by step:**
+
+1. `int    m = Math.max(3, 7);` — 7 — larger of two values (also min)
+2. `double r = Math.round(2.567 * 100) / 100.0;` — 2.57 — round to 2 decimals the classic way
+3. `long   dist = Math.abs(-42L);` — 42 — magnitude without sign
+4. `double area = Math.PI * Math.pow(radius, 2);` — pow = exponentiation
+5. `double root = Math.sqrt(144);` — 12.0
+6. `int    floor = Math.floorDiv(-7, 2);` — -4 — division that floors toward negative infinity
+
+The same code, clean:
+
 ```java
-int    m = Math.max(3, 7);          // 7 — larger of two values (also min)
-double r = Math.round(2.567 * 100) / 100.0;   // 2.57 — round to 2 decimals the classic way
-long   dist = Math.abs(-42L);       // 42 — magnitude without sign
-double area = Math.PI * Math.pow(radius, 2); // pow = exponentiation
-double root = Math.sqrt(144);        // 12.0
-int    floor = Math.floorDiv(-7, 2); // -4 — division that floors toward negative infinity
+int    m = Math.max(3, 7);
+double r = Math.round(2.567 * 100) / 100.0;
+long   dist = Math.abs(-42L);
+double area = Math.PI * Math.pow(radius, 2);
+double root = Math.sqrt(144);
+int    floor = Math.floorDiv(-7, 2);
 ```
 
 Line-by-line notes on the non-obvious ones:
@@ -37,22 +49,31 @@ Line-by-line notes on the non-obvious ones:
 
 ### 1. `Math.random()` — quick and dirty
 
-```java
 int dieRoll = (int) (Math.random() * 6) + 1;  // scale to [0..6), truncate, shift to 1..6
-```
 
 - Internally delegates to a shared `Random`. Fine for exercises; nobody should build features on it because you can't seed, test, or replace it.
 
 ### 2. `java.util.Random` — general purpose
 
+
+**What this code does — step by step:**
+
+1. `Random random = new Random(12345L);` — seeded: same seed → identical sequence every run
+2. `int roll      = random.nextInt(6) + 1;` — 1..6 inclusive-exclusive trick again
+3. `int anyInt    = random.nextInt();` — full int range
+4. `double gauss  = random.nextGaussian();` — bell-curve sample, mean 0 std 1
+5. `String pick = options.get(random.nextInt(options.size()));` — random element, index-safe
+
+The same code, clean:
+
 ```java
-Random random = new Random(12345L);              // seeded: same seed → identical sequence every run
-int roll      = random.nextInt(6) + 1;           // 1..6 inclusive-exclusive trick again
-int anyInt    = random.nextInt();                // full int range
-double gauss  = random.nextGaussian();           // bell-curve sample, mean 0 std 1
+Random random = new Random(12345L);
+int roll      = random.nextInt(6) + 1;
+int anyInt    = random.nextInt();
+double gauss  = random.nextGaussian();
 
 List<String> options = List.of("a", "b", "c");
-String pick = options.get(random.nextInt(options.size()));  // random element, index-safe
+String pick = options.get(random.nextInt(options.size()));
 ```
 
 Why the seed matters: with a fixed seed, "randomness" becomes **reproducible** — invaluable when debugging simulations or generating deterministic test data.
@@ -63,7 +84,6 @@ Two production cautions:
 
 ### 3. `ThreadLocalRandom` & `SecureRandom` — the professional choices
 
-```java
 // Multi-threaded code: each thread gets its own generator, zero contention
 int roll = ThreadLocalRandom.current().nextInt(1, 7);   // bounds are inclusive-low, EXCLUSIVE-high
 
@@ -72,7 +92,6 @@ SecureRandom secure = new SecureRandom();
 byte[] tokenBytes = new byte[32];
 secure.nextBytes(tokenBytes);                            // cryptographically strong entropy
 String token = Base64.getUrlEncoder().withoutPadding().encodeToString(tokenBytes);
-```
 
 | Tool | Use for | Never use for |
 |---|---|---|
@@ -97,3 +116,4 @@ String token = Base64.getUrlEncoder().withoutPadding().encodeToString(tokenBytes
 | `Random` for security tokens | Predictable credentials | SecureRandom, always |
 | Sharing one Random across threads | Contention, skewed sequences | ThreadLocalRandom.current() |
 | Floating-point money rounding via Math.round | Cents drift in reports | BigDecimal with explicit RoundingMode |
+

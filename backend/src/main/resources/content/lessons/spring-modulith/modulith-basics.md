@@ -15,12 +15,10 @@ docs:
 
 Spring Modulith makes the **modular monolith** (previous lesson) enforceable in code. It formalizes the module map: each package is an application module, and the framework verifies at test time that modules only talk to each other through their **API surface** — not by reaching into internals. Modularity becomes a compile-time-adjacent fact instead of a code-review hope.
 
-```java
 @ApplicationModule(id = "billing")
 package com.acme.app.billing;
 
 // package-info.java marks the package as a module
-```
 
 ## The module anatomy
 
@@ -45,11 +43,9 @@ Two rules define the boundary:
 
 Modules may depend on other modules' **public API** — but the dependency graph must stay **acyclic** and honest:
 
-```java
 // The module declares what it may use:
 @ApplicationModule(allowedDependencies = "fulfillment")
 package com.acme.app.billing;
-```
 
 - `allowedDependencies` makes the module map explicit and self-documenting.
 - **Cycles are rejected** — `billing → fulfillment → billing` is a design smell (two modules that can't be understood separately) and Modulith flags it.
@@ -57,7 +53,6 @@ package com.acme.app.billing;
 
 ## Verification: the test that keeps it honest
 
-```java
 import static org.springframework.modulith.core.ApplicationModules;
 
 @SpringBootTest
@@ -74,7 +69,6 @@ class ModulithArchitectureTests {
             .verifyDependencies();                           // strictly the declared graph
     }
 }
-```
 
 Running in CI means **an illegal dependency fails the build** — the module map can't drift silently. This is the enforcement half of the pattern: architecture as a test, not a slide.
 
@@ -82,7 +76,6 @@ Running in CI means **an illegal dependency fails the build** — the module map
 
 When a module must expose a service without exposing its implementation (or when you want the extraction seam), use a **named interface**:
 
-```java
 // billing module root:
 public interface PaymentProcessing {
     PaymentResult process(Payment payment);
@@ -91,7 +84,6 @@ public interface PaymentProcessing {
 // internal implementation:
 @NamedInterface("payments")          // org.springframework.modulith
 class PaymentProcessingImpl implements PaymentProcessing { ... }
-```
 
 Other modules depend on `PaymentProcessing` (the interface); the implementation can change, or the whole module can be extracted to a service with the interface as its contract — the named interface *is* the future microservice's API.
 
@@ -99,14 +91,12 @@ Other modules depend on `PaymentProcessing` (the interface); the implementation 
 
 The anti-pattern this solves: `billing` calling `fulfillment.ship(order)` directly (module A reaching into module B's internals for a side effect). The Modulith answer is **application events** — publish a domain event, other modules listen:
 
-```java
 // billing:
 applicationEvents.publish(new OrderPaid(orderId));     // typed, guaranteed delivery
 
 // fulfillment:
 @TransactionalEventListener(phase = AFTER_COMMIT)
 void on(OrderPaid event) { ... }                        // only after the billing tx commits
-```
 
 Spring Modulith wraps Spring's event infrastructure with **publication tracking**: events are persisted and can be replayed if a listener fails (the next lesson). This is the in-process version of the outbox pattern — same discipline, no network.
 
@@ -118,3 +108,4 @@ Spring Modulith wraps Spring's event infrastructure with **publication tracking*
 - Cross-module side effects go through application events (with publication tracking), not direct internal calls.
 
 Official docs: [Spring Modulith — Application Modules](https://docs.spring.io/spring-modulith/reference/application-modules.html)
+

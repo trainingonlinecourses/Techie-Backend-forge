@@ -22,7 +22,6 @@ Here's the integration dilemma: the *internal* machinery of Spring Integration i
 
 ## The Gateway Interface
 
-```java
 // A plain interface — this is ALL the application code needs:
 public interface OrderGateway {
 
@@ -37,25 +36,35 @@ public interface OrderGateway {
     @Header("contentType", "application/json")
     void markProcessed(Long orderId);
 }
-```
 
 **The magic:** this interface is never implemented by hand. Spring Integration *proxies* it (the dynamic-proxy mechanism from the reflection module) and connects each method to a channel:
+
+
+**What this code does — step by step:**
+
+1. `@MessagingGateway(name = "orderGateway")` — the annotation wires it up
+2. `public interface OrderGatewayMarker { }` — (or use @MessagingGateway on the interface itself)
+3. The FLOW behind the gateway method:
+4. `.from("orders.request")` — <-- the gateway's request channel
+5. `.handle("orderService", "placeOrder")` — the real work
+6. `.channel("orders.reply")` — <-- the reply channel
+
+The same code, clean:
 
 ```java
 @Configuration
 public class GatewayConfig {
 
     @Bean
-    @MessagingGateway(name = "orderGateway")       // the annotation wires it up
-    public interface OrderGatewayMarker { }        // (or use @MessagingGateway on the interface itself)
+    @MessagingGateway(name = "orderGateway")
+    public interface OrderGatewayMarker { }
 
-    // The FLOW behind the gateway method:
     @Bean
     public IntegrationFlow orderFlow() {
         return IntegrationFlow
-                .from("orders.request")            // <-- the gateway's request channel
-                .handle("orderService", "placeOrder")   // the real work
-                .channel("orders.reply")           // <-- the reply channel
+                .from("orders.request")
+                .handle("orderService", "placeOrder")
+                .channel("orders.reply")
                 .get();
     }
 }
@@ -65,21 +74,24 @@ public class GatewayConfig {
 
 ## Request-Reply vs Fire-and-Forget
 
+
+**What this code does — step by step:**
+
+1. REQUEST-REPLY — the method waits for the flow's reply message:
+2. (a void method can still be request-reply — the reply is just discarded)
+3. FIRE-AND-FORGET — the method sends and returns immediately:
+4. The gateway must be told: the reply channel is a NULL channel. (MessageChannels.nullChannel()), or the method is marked as void with. No reply expectation.
+5. ASYNC via CompletableFuture — the best of both:
+6. Spring Integration supports CompletableFuture return types: the caller. Gets a future; the flow runs on its own threads; join() when needed.
+
+The same code, clean:
+
 ```java
-// REQUEST-REPLY — the method waits for the flow's reply message:
 OrderReceipt receipt = orderGateway.placeOrder(req);
-// (a void method can still be request-reply — the reply is just discarded)
 
-// FIRE-AND-FORGET — the method sends and returns immediately:
 orderGateway.notifyCustomer(email, msg);
-// The gateway must be told: the reply channel is a NULL channel
-// (MessageChannels.nullChannel()), or the method is marked as void with
-// no reply expectation.
 
-// ASYNC via CompletableFuture — the best of both:
 CompletableFuture<OrderReceipt> future = orderGateway.placeOrderAsync(req);
-// Spring Integration supports CompletableFuture return types: the caller
-// gets a future; the flow runs on its own threads; join() when needed.
 ```
 
 **The three styles map to the integration's needs:** synchronous request-reply for "call me back with the answer" (an API facade over a messaging flow), fire-and-forget for "this side effect must happen, don't wait" (notifications, audit), and `CompletableFuture` when the caller wants *both* the async execution *and* the eventual result. The gateway interface's return type *is* the contract — `void` (fire-forget), `T` (sync reply), or `CompletableFuture<T>` (async reply).
@@ -88,7 +100,6 @@ CompletableFuture<OrderReceipt> future = orderGateway.placeOrderAsync(req);
 
 The gateway sends; the **service activator** receives and does the real work:
 
-```java
 // A plain Spring bean method as an endpoint:
 @Service
 public class OrderService {
@@ -101,13 +112,11 @@ public class OrderService {
         return new OrderReceipt(order.getId(), order.getStatus());
     }
 }
-```
 
 **The method contract:** the incoming message's payload is passed as the parameter; the return value becomes the outgoing message's payload (routed to `outputChannel` → the gateway's reply channel). The service activator is the bridge from *messaging* back to *normal Spring code* — the same bean-method pattern as `@KafkaListener`, just for channels. Method parameters can be `Message<T>` (full access to headers), the payload type, or annotated (`@Header`, `@Payload`).
 
 ## The Request-Reply in a Real Flow
 
-```java
 // The complete pattern: gateway -> flow with enrichment and routing -> reply.
 @Bean
 public IntegrationFlow enrichedOrderFlow() {
@@ -119,13 +128,11 @@ public IntegrationFlow enrichedOrderFlow() {
             .transform("receiptFormatter", "format")    // shape the reply
             .get();
 }
-```
 
 `from(OrderGateway.class)` — the gateway interface as the flow's source: the proxy, the channels, and the method mapping are all derived from the interface. The flow composes the EIP stations (enrich → handle → transform), and the reply travels back through the gateway. This is the full power: **application code against a plain interface; integration logic as a declarative flow; both testable independently.**
 
 ## The Error Handling Contract
 
-```java
 // What happens when the flow throws?
 // 1. The exception propagates back through the gateway to the caller
 //    (synchronous facade = synchronous errors). The caller's try/catch works.
@@ -136,7 +143,6 @@ public IntegrationFlow errorHandling() {
             .handle("errorLogger", "logAndRecover")
             .get();
 }
-```
 
 The gateway's contract: errors in the flow surface to the caller (the method throws — same as any service call) *unless* the flow routes to an error channel. For request-reply, the exception is the reply. The discipline: gateway methods are the *API surface* — their exceptions should be domain-meaningful (wrap the messaging internals into your business exceptions at the service activator, or in an error-handling flow).
 
@@ -149,3 +155,4 @@ The gateway's contract: errors in the flow surface to the caller (the method thr
 ## Recap
 
 Messaging gateways give application code a plain synchronous (or `CompletableFuture`) interface over message-based flows: a `@MessagingGateway` interface is proxied so each method sends into a request channel, waits for the reply channel, and returns the result — or fire-and-forgets, or returns a future. The **service activator** (`@ServiceActivator`) is the receiving side: a plain bean method that takes the payload and returns the reply. The result is the best of both worlds — normal Spring code with clean interfaces and exception semantics, backed by declarative, testable EIP flows. Gateways are the front desk; the flow is the office; your code never sees the mail system.
+

@@ -1,7 +1,7 @@
 ---
 title: Builder Pattern — Constructing Complex Objects Step by Step
 module: design-patterns
-order: 3
+order: 1
 minutes: 24
 topics: ["builder", "telescoping constructors", "fluent API", "immutability", "Lombok"]
 summary: Here's a real object that needs a lot of configuration: an EmailMessage with a recipient, subject, body, attachments, priority, and whether to trac...
@@ -18,32 +18,26 @@ Here's a real object that needs a lot of configuration: an `EmailMessage` with a
 
 **Option A — one constructor with all parameters:**
 
-```java
 new EmailMessage("a@b.com", "Hello", "Body...", null, null, Priority.HIGH, true, false);
-```
 
 Unreadable. Which `null` is the attachment? Which boolean is tracking? And if a field is optional, callers must pass `null`/`false` anyway. This is the **telescoping constructor** anti-pattern — constructors with ever-growing parameter lists (`(a)`, `(a,b)`, `(a,b,c)`, ...).
 
 **Option B — setters after construction:**
 
-```java
 EmailMessage m = new EmailMessage();
 m.setRecipient("a@b.com");
 m.setSubject("Hello");
 // ... but now the object can be mutated after creation, and
 // a half-configured object can escape if you forget a required field.
-```
 
 **The Builder pattern** offers Option C: a separate *builder* object collects the settings through clear, named methods, and a final `build()` method creates the **immutable** result:
 
-```java
 EmailMessage m = EmailMessage.builder()
         .recipient("a@b.com")
         .subject("Hello")
         .priority(Priority.HIGH)
         .trackRead(true)
         .build();
-```
 
 Each method is named after the field (self-documenting), optional fields can be skipped, and the produced object can be immutable (final fields, no setters) — the builder is the *only* thing that assembles it.
 
@@ -57,13 +51,28 @@ Each method is named after the field (self-documenting), optional fields can be 
 
 ## The Code Walkthrough
 
+
+**What this code does — step by step:**
+
+1. ---- Immutable fields: no setters, final ----
+2. ---- Private constructor: only the Builder can build ----
+3. `this.attachments = List.copyOf(b.attachments);` — defensive copy
+4. ---- Getters ----
+5. ---- The static entry point ----
+6. ---- The Builder itself ----
+7. `private String recipient;` — required
+8. `private String subject = "";` — defaults
+9. `System.out.println(msg.attachments());` — [certificate.pdf]
+10. Missing required field -> clear error at build time:
+
+The same code, clean:
+
 ```java
 import java.util.ArrayList;
 import java.util.List;
 
 class EmailMessage {
 
-    // ---- Immutable fields: no setters, final ----
     private final String recipient;
     private final String subject;
     private final String body;
@@ -73,27 +82,23 @@ class EmailMessage {
 
     enum Priority { LOW, NORMAL, HIGH }
 
-    // ---- Private constructor: only the Builder can build ----
     private EmailMessage(Builder b) {
         this.recipient = b.recipient;
         this.subject = b.subject;
         this.body = b.body;
-        this.attachments = List.copyOf(b.attachments);   // defensive copy
+        this.attachments = List.copyOf(b.attachments);
         this.priority = b.priority;
         this.trackRead = b.trackRead;
     }
 
-    // ---- Getters ----
     public String recipient() { return recipient; }
     public List<String> attachments() { return attachments; }
 
-    // ---- The static entry point ----
     public static Builder builder() { return new Builder(); }
 
-    // ---- The Builder itself ----
     public static class Builder {
-        private String recipient;        // required
-        private String subject = "";     // defaults
+        private String recipient;
+        private String subject = "";
         private String body = "";
         private List<String> attachments = new ArrayList<>();
         private Priority priority = Priority.NORMAL;
@@ -128,9 +133,8 @@ public class BuilderDemo {
                 .build();
 
         System.out.println(msg.recipient());
-        System.out.println(msg.attachments());   // [certificate.pdf]
+        System.out.println(msg.attachments());
 
-        // Missing required field -> clear error at build time:
         try {
             EmailMessage.builder().subject("no recipient").build();
         } catch (IllegalStateException e) {
@@ -186,3 +190,4 @@ The overlap to remember: **factory picks *which* type**; **builder assembles *on
 - The built object has final fields and no setters — safe to share.
 - Factory chooses the *type*; Builder assembles the *instance*.
 - Lombok's `@Builder` generates the pattern; `StringBuilder` is a builder you already use.
+

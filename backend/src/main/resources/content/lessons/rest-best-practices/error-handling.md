@@ -1,7 +1,7 @@
 ---
 title: Consistent Error Handling
 module: rest-best-practices
-order: 2
+order: 3
 minutes: 25
 topics: ["@RestControllerAdvice", "Problem Details", "error envelope", "validation errors", "exception mapping"]
 summary: A good error response is a contract. Every error, from a validation failure to a null pointer, should arrive in the same shape with the same fields...
@@ -56,7 +56,6 @@ Then standard Spring exceptions automatically render as RFC 7807:
 
 Extend `ResponseEntityExceptionHandler` to add your domain errors:
 
-```java
 @RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
@@ -95,13 +94,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return problem;
     }
 }
-```
 
 ## Validation Errors
 
 `@Valid` failures throw `MethodArgumentNotValidException`. Give clients the field-level detail:
 
-```java
 @ExceptionHandler(MethodArgumentNotValidException.class)
 public ProblemDetail handleValidation(MethodArgumentNotValidException ex) {
     ProblemDetail problem = ProblemDetail.forStatusAndDetail(
@@ -115,7 +112,6 @@ public ProblemDetail handleValidation(MethodArgumentNotValidException ex) {
         .toList());
     return problem;
 }
-```
 
 ```json
 {
@@ -134,7 +130,6 @@ public ProblemDetail handleValidation(MethodArgumentNotValidException ex) {
 - **Never** return stack traces, SQL, or internal messages to clients.
 - Log full details server-side with the trace id; return a generic message to the client.
 
-```java
 @ExceptionHandler(DataIntegrityViolationException.class)
 public ProblemDetail handleConstraint(DataIntegrityViolationException ex) {
     log.error("Constraint violation: {}", ex.getMessage());
@@ -143,13 +138,11 @@ public ProblemDetail handleConstraint(DataIntegrityViolationException ex) {
     problem.setTitle("Conflict");
     return problem;
 }
-```
 
 ## The Trace ID
 
 Correlate client-visible errors with server logs:
 
-```java
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -169,13 +162,11 @@ public class GlobalExceptionHandler {
         return problem;
     }
 }
-```
 
 ## Business Exceptions
 
 Prefer meaningful domain exceptions over ad-hoc `IllegalStateException`s:
 
-```java
 public class CourseNotFoundException extends RuntimeException {
     private final String courseId;
     public CourseNotFoundException(String courseId) {
@@ -184,13 +175,11 @@ public class CourseNotFoundException extends RuntimeException {
     }
     public String getCourseId() { return courseId; }
 }
-```
 
 Throw them from the service layer; the advice maps them. Services stay decoupled from HTTP.
 
 ## Testing Error Responses
 
-```java
 @SpringBootTest
 @AutoConfigureMockMvc
 class ErrorHandlingTest {
@@ -215,7 +204,6 @@ class ErrorHandlingTest {
             .andExpect(jsonPath("$.fieldErrors[0].field").value("title"));
     }
 }
-```
 
 ## Summary
 
@@ -230,3 +218,4 @@ class ErrorHandlingTest {
 | Tests | Assert the JSON shape, not just the status |
 
 Consistent errors are a feature — they cut support cost, enable good client SDKs, and make your API pleasant to integrate against. Spend the 30 minutes on the advice class; it pays back on every endpoint.
+

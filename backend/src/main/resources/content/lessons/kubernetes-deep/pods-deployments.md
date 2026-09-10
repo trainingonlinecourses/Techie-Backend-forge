@@ -1,7 +1,7 @@
 ---
 title: Pods, Deployments, and Workloads — Running and Updating Apps
 module: kubernetes-deep
-order: 2
+order: 4
 minutes: 27
 topics: ["Deployments", "pods", "ReplicaSet", "rolling updates", "StatefulSet", "probes", "resources"]
 summary: Pods are ephemeral — you almost never create them directly. You create workload controllers — objects that manage pods on your behalf — and the mos...
@@ -117,3 +117,4 @@ kubectl rollout status deployment/payments
 ## Recap
 
 Workload controllers manage pods: the **Deployment** (stateless replicas, rolling updates, rollbacks — the default for Spring Boot), **StatefulSet** (stable identity for databases), **DaemonSet**, **Job**, and **CronJob**. The production essentials are **resource requests/limits** (scheduling contract + hard caps), **readiness probes** (dependencies — route traffic only to ready pods), **liveness probes** (JVM health — restart when dead), and the **startup probe** for slow warmups. Rolling updates advance only when new pods pass readiness — so correct probes are what turn a bad deploy into a caught rollout instead of an outage. Pin images, size requests from baseline usage, and the Deployment becomes the boring, reliable home for your services.
+

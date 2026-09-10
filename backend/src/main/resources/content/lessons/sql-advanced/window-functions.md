@@ -1,7 +1,7 @@
 ---
 title: Window Functions — RANK, ROW_NUMBER, and Running Totals
 module: sql-advanced
-order: 1
+order: 5
 minutes: 26
 topics: ["window functions", "OVER", "PARTITION BY", "ROW_NUMBER", "RANK", "running totals"]
 summary: GROUP BY collapses rows: it takes many rows and returns one row per group. But a huge class of real questions needs the opposite: keep every row, y...
@@ -139,3 +139,4 @@ The rule that trips people: **you cannot use a window function in WHERE** (it's 
 ## Recap
 
 Window functions compute aggregates *per row*, over a window defined by `PARTITION BY` (grouping), `ORDER BY` (order), and an optional frame (`ROWS BETWEEN`). `ROW_NUMBER` numbers rows, `RANK`/`DENSE_RANK` rank with different tie handling, `SUM`/`AVG` over an ordered window give running totals and moving averages, and `LAG`/`LEAD` reach to neighboring rows. The canonical patterns — top-N per group, deduplication, day-over-day deltas — are all window functions, wrapped in a CTE when you need to filter on the computed value. They're the difference between "I can get the summary" and "I can put the summary right next to every row" — one of the highest-value SQL skills you can add.
+

@@ -1,7 +1,7 @@
 ---
 title: Querying — Derived, Annotated, and Paged
 module: spring-data-jdbc
-order: 3
+order: 2
 minutes: 24
 topics: ["derived queries", "@Query", "pagination", "sorting", "modifying queries"]
 summary: Spring Data JDBC gives you three ways to query, in increasing power:
@@ -24,24 +24,36 @@ Plus **paging and sorting** built into the method signatures — the same `Pagea
 
 ## Derived Query — The Name IS the Query
 
+
+**What this code does — step by step:**
+
+1. `List<Course> findByTitleContaining(String keyword);` — LIKE %keyword%
+2. `List<Course> findByPublishedTrue();` — boolean flag
+3. `List<Course> findByMinutesGreaterThan(int min);` — comparison
+4. `List<Course> findByLessonsTitle(String lessonTitle);` — nested: through the aggregate
+5. `List<Course> findByPublishedTrueOrderByTitleAsc();` — sorting in the name
+6. `Optional<Course> findFirstByOrderByPublishedAtDesc();` — most recent published
+
+The same code, clean:
+
 ```java
 public interface CourseRepository extends CrudRepository<Course, Long> {
 
     List<Course> findByTitle(String title);
 
-    List<Course> findByTitleContaining(String keyword);          // LIKE %keyword%
+    List<Course> findByTitleContaining(String keyword);
 
     List<Course> findByTitleContainingIgnoreCase(String keyword);
 
-    List<Course> findByPublishedTrue();                          // boolean flag
+    List<Course> findByPublishedTrue();
 
-    List<Course> findByMinutesGreaterThan(int min);              // comparison
+    List<Course> findByMinutesGreaterThan(int min);
 
-    List<Course> findByLessonsTitle(String lessonTitle);         // nested: through the aggregate
+    List<Course> findByLessonsTitle(String lessonTitle);
 
-    List<Course> findByPublishedTrueOrderByTitleAsc();           // sorting in the name
+    List<Course> findByPublishedTrueOrderByTitleAsc();
 
-    Optional<Course> findFirstByOrderByPublishedAtDesc();        // most recent published
+    Optional<Course> findFirstByOrderByPublishedAtDesc();
 }
 ```
 
@@ -66,7 +78,6 @@ find[First|Top N][By] Property [Comparison] [And/Or Property ...] [OrderBy...]
 
 ## @Query — Plain SQL, Named Parameters
 
-```java
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -91,7 +102,6 @@ public interface CourseRepository extends CrudRepository<Course, Long> {
     @Query("UPDATE course SET published = false WHERE id = :id")
     int unpublish(@Param("id") long id);
 }
-```
 
 ### Why `@Query` Matters Here
 
@@ -99,7 +109,6 @@ Because there's no JPQL translation layer, `@Query` **is** the SQL — your data
 
 ## Paging and Sorting
 
-```java
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -121,22 +130,18 @@ public class CatalogService {
                 PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "publishedAt")));
     }
 }
-```
 
 `Pageable` from the controller (`?page=2&size=10&sort=title,asc`) flows straight into the query — Spring translates it to `LIMIT/OFFSET` (or keyset) SQL. The controller just forwards it:
 
-```java
 @GetMapping("/courses")
 public Page<Course> list(@PageableDefault(size = 10, sort = "title") Pageable pageable) {
     return service.page(pageable.getPageNumber(), pageable.getPageSize());
 }
-```
 
 ## The Escape Hatches
 
 When derived + `@Query` aren't enough:
 
-```java
 // JdbcTemplate — raw, imperative, any SQL:
 @Repository
 public class CourseStatsDao {
@@ -149,7 +154,6 @@ public class CourseStatsDao {
                 + "(SELECT COUNT(*) FROM course_lesson) AS lessons FROM course");
     }
 }
-```
 
 For dynamic queries (filters built at runtime), `Querydsl` support (`QuerydslPredicateExecutor`) composes predicates safely — or build SQL strings with named parameters via `JdbcTemplate`. **Never concatenate user input into SQL** — parameterize everything.
 
@@ -170,3 +174,4 @@ For dynamic queries (filters built at runtime), `Querydsl` support (`QuerydslPre
 - Paging via `Pageable`/`Sort` flows from controller to SQL automatically.
 - `@Modifying` + `@Transactional` for writes; parameterize everything against injection.
 - Inspect generated SQL for hot queries — predictability is the module's whole point.
+

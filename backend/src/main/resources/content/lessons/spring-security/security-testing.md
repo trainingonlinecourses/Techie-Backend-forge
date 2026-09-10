@@ -1,7 +1,7 @@
 ---
 title: Testing Security & OWASP Top 10
 summary: @WithMockUser, security-aware MockMvc tests, and the vulnerabilities that actually hit Spring apps.
-order: 8
+order: 17
 minutes: 16
 topics: [security-testing, withmockuser, owasp]
 docs:
@@ -13,7 +13,6 @@ docs:
 
 ## Testing the chain with MockMvc
 
-```java
 @WebMvcTest(AccountController.class)
 @Import(SecurityConfig.class)
 class AccountControllerSecurityTest {
@@ -47,13 +46,11 @@ class AccountControllerSecurityTest {
                 .andExpect(status().isNoContent());
     }
 }
-```
 
 `@WithMockUser` shortcuts authentication — perfect for authorization tests. For full end-to-end (JWT filter + real users), use `spring-security-test`'s `httpBasic`/`jwt()` request post-processors, or `@SpringBootTest` + login.
 
 ## Testing with a real token
 
-```java
 @SpringBootTest
 @AutoConfigureMockMvc
 class ApiIntegrationTest {
@@ -73,7 +70,6 @@ class ApiIntegrationTest {
                 .andExpect(status().isOk());
     }
 }
-```
 
 ## The OWASP Top 10, translated to Spring
 
@@ -110,3 +106,4 @@ class ApiIntegrationTest {
 - Dependency scanning in CI catches A06 continuously.
 
 **Official docs:** [Security testing](https://docs.spring.io/spring-security/reference/servlet/test/index.html) · [OWASP Top 10](https://owasp.org/www-project-top-ten/)
+

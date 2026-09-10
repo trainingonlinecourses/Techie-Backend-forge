@@ -1,7 +1,7 @@
 ---
 title: Client Resilience — Timeouts, Retries, and Fallbacks
 module: spring-rest-clients
-order: 5
+order: 1
 minutes: 26
 topics: ["retry", "timeout", "circuit breaker", "fallback", "idempotency", "Resilience4j"]
 summary: The single most important mindset for backendtobackend calls: the remote service will fail — it will be slow, return 500s, time out, or be unreacha...
@@ -26,6 +26,22 @@ The classic real-world analogy: a fire alarm system. It doesn't just *call* the 
 
 ## The Code Walkthrough
 
+
+**What this code does — step by step:**
+
+1. ---- 1. Retry: 3 attempts, exponential backoff, only on 5xx ----
+2. `.waitDuration(Duration.ofMillis(200))` — base delay
+3. `.retryOnException(e -> isTransient(e))` — only retry recoverable errors
+4. ---- 2. Circuit breaker: open after 50% failures in a 10s window ----
+5. `.failureRateThreshold(50)` — open at 50% failures
+6. `.slidingWindowSize(20)` — over the last 20 calls
+7. `.waitDurationInOpenState(Duration.ofSeconds(15))` — cool-down
+8. ---- 3. Wrap the call: retry -> circuit breaker -> fallback ----
+9. `retry.decorateSupplier(call))` — retry inside breaker
+10. `.orElse(Course.fallback());` — fallback if all failed
+
+The same code, clean:
+
 ```java
 import io.github.resilience4j.retry.Retry;
 import io.github.resilience4j.retry.RetryConfig;
@@ -47,31 +63,28 @@ public class ResilientCatalogClient {
     public ResilientCatalogClient(RestClient.Builder builder) {
         this.restClient = builder.baseUrl("https://catalog.example.com").build();
 
-        // ---- 1. Retry: 3 attempts, exponential backoff, only on 5xx ----
         this.retry = Retry.of("catalog-retry", RetryConfig.custom()
                 .maxAttempts(3)
-                .waitDuration(Duration.ofMillis(200))       // base delay
-                .retryOnException(e -> isTransient(e))      // only retry recoverable errors
+                .waitDuration(Duration.ofMillis(200))
+                .retryOnException(e -> isTransient(e))
                 .build());
 
-        // ---- 2. Circuit breaker: open after 50% failures in a 10s window ----
         this.circuitBreaker = CircuitBreaker.of("catalog-cb", CircuitBreakerConfig.custom()
-                .failureRateThreshold(50)                    // open at 50% failures
-                .slidingWindowSize(20)                       // over the last 20 calls
-                .waitDurationInOpenState(Duration.ofSeconds(15))  // cool-down
+                .failureRateThreshold(50)
+                .slidingWindowSize(20)
+                .waitDurationInOpenState(Duration.ofSeconds(15))
                 .build());
     }
 
     public Course getCourse(long id) {
-        // ---- 3. Wrap the call: retry -> circuit breaker -> fallback ----
         Supplier<Course> call = () -> restClient.get()
                 .uri("/api/courses/{id}", id)
                 .retrieve()
                 .body(Course.class);
 
         return circuitBreaker.executeSupplier(
-                retry.decorateSupplier(call))          // retry inside breaker
-                .orElse(Course.fallback());            // fallback if all failed
+                retry.decorateSupplier(call))
+                .orElse(Course.fallback());
     }
 
     private boolean isTransient(Throwable t) {
@@ -116,12 +129,10 @@ The breaker is *your* protection: when the catalog is down, your users get a fas
 
 A bulkhead partitions resources: each dependency gets its own thread pool, so one slow dependency can't exhaust the whole app's threads. With Resilience4j:
 
-```java
 Bulkhead bulkhead = Bulkhead.of("catalog", BulkheadConfig.custom()
         .maxConcurrentCalls(10)      // at most 10 concurrent catalog calls
         .maxWaitDuration(Duration.ofMillis(500))
         .build());
-```
 
 When the catalog is slow, at most 10 threads wait on it; the other 190 threads serve everything else normally. Without bulkheads, a single dying dependency can take down the entire service by hogging every thread.
 
@@ -148,3 +159,4 @@ When the catalog is slow, at most 10 threads wait on it; the other 190 threads s
 - Fallbacks serve degraded-but-valid responses; log them loudly.
 - Bulkheads isolate slow dependencies from the rest of your app.
 - Compose the layers: breaker decides whether, retry decides how many times, fallback decides what to serve.
+

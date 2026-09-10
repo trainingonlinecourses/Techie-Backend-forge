@@ -1,7 +1,7 @@
 ---
 title: Branching and Merging — Parallel Work, Joined History
 module: git-github-basics
-order: 2
+order: 1
 minutes: 26
 topics: ["branches", "merge", "conflicts", "fast-forward", "checkout", "feature branches"]
 summary: A branch is a movable label on a commit — a separate timeline of work. The default branch is main (the "official" line). When you create a branch, ...
@@ -66,13 +66,11 @@ CONFLICT (content): Merge conflict in Course.java
 
 Git pauses the merge and marks the conflict **in the file**:
 
-```java
 <<<<<<< HEAD
 private int minutes = 30;          // what main has
 =======
 private int minutes = 45;          // what the branch has
 >>>>>>> feature/add-lessons
-```
 
 **The resolution process:**
 
@@ -140,3 +138,4 @@ The guidance: **merge for shared branches** (main), **rebase for local/feature w
 - Golden rules: never commit to main, short-lived branches, pull first, delete merged.
 - Merge preserves history; rebase linearizes it; never rebase shared branches.
 - Conflicts are routine — resolve calmly, test after.
+

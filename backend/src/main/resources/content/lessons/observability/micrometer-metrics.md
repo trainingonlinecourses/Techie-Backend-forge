@@ -1,7 +1,7 @@
 ---
 title: Micrometer Metrics Fundamentals
 module: observability
-order: 1
+order: 4
 minutes: 25
 topics: ["MeterRegistry", "Counter", "Timer", "Gauge", "DistributionSummary", "Actuator metrics"]
 summary: Observability has three pillars: metrics (numbers), logs (events), and traces (request paths). Micrometer is Spring Boot's metrics facade — a vendo...
@@ -39,7 +39,6 @@ Hit `/actuator/prometheus` and you get the full metric set in Prometheus text fo
 
 ### Counter — monotonically increasing
 
-```java
 @Service
 public class PaymentService {
 
@@ -56,13 +55,11 @@ public class PaymentService {
         paymentsCounter.increment();
     }
 }
-```
 
 Prometheus: `payments_total{currency="USD"} 42`.
 
 ### Timer — durations
 
-```java
 private final Timer paymentLatency;
 
 public PaymentService(MeterRegistry registry) {
@@ -77,13 +74,11 @@ public void charge() {
     // or: long start = System.nanoTime(); ...; paymentLatency.record(
     //      Duration.ofNanos(System.nanoTime() - start));
 }
-```
 
 Timers give count, sum, max, and (with `publishPercentileHistogram`) percentiles like p50/p95/p99 — the numbers that reveal real user experience.
 
 ### Gauge — current value (can go down)
 
-```java
 Gauge.builder("queue.size", queue, BlockingQueue::size)
     .description("Pending tasks in queue")
     .register(registry);
@@ -91,11 +86,9 @@ Gauge.builder("queue.size", queue, BlockingQueue::size)
 // For cached values, use a supplier:
 Gauge.builder("cache.hit.ratio", this, CacheMetrics::hitRatio)
     .register(registry);
-```
 
 ### DistributionSummary — sizes of things
 
-```java
 DistributionSummary summary = DistributionSummary.builder("order.amount")
     .description("Order amounts")
     .baseUnit("USD")
@@ -103,19 +96,16 @@ DistributionSummary summary = DistributionSummary.builder("order.amount")
     .register(registry);
 
 summary.record(order.getTotal());
-```
 
 ## Tags: The Dimension That Makes Metrics Usable
 
 Tags are **dimensions** — one metric, many slices. Always tag the stable, low-cardinality dimensions (region, status, type), never high-cardinality ones (user id, request id — those explode cardinality and kill your backend):
 
-```java
 Counter.builder("api.requests")
     .tag("endpoint", "/api/courses")
     .tag("method", "GET")
     .tag("status", "404")
     .register(registry);
-```
 
 The same counter, sliced by any tag at query time. A metric without tags is a number; a metric with tags is a dashboard.
 
@@ -144,7 +134,6 @@ You get a production dashboard baseline **before writing a single metric** — i
 
 The most valuable custom metrics wrap dependencies:
 
-```java
 @Service
 public class ExternalApiClient {
 
@@ -172,11 +161,9 @@ public class ExternalApiClient {
         });
     }
 }
-```
 
 ## Testing Metrics
 
-```java
 @SpringBootTest
 class MetricsTest {
 
@@ -194,18 +181,15 @@ class MetricsTest {
         assertEquals(1, counter.count());
     }
 }
-```
 
 Or assert against the Prometheus endpoint:
 
-```java
 @Test
 void prometheusEndpointExposesMetrics() throws Exception {
     mockMvc.perform(get("/actuator/prometheus"))
         .andExpect(status().isOk())
         .andExpect(content().string(containsString("payments_total")));
 }
-```
 
 ## Summary
 
@@ -217,3 +201,4 @@ void prometheusEndpointExposesMetrics() throws Exception {
 | DistributionSummary | Distribution of sizes | order amounts, payload sizes |
 
 Metrics answer *"what's happening right now, at scale"* — is latency creeping up, are errors spiking, is the queue growing? The next lessons cover health indicators, custom metrics wiring, dashboards, and distributed tracing.
+

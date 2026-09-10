@@ -1,7 +1,7 @@
 ---
 title: Production Monitoring & Incident Response
 module: cicd-devops
-order: 5
+order: 4
 minutes: 20
 topics: ["runbooks", "incident response", "postmortems", "logging in prod", "on-call", "blameless culture"]
 summary: Deployments are the easy part; operating production is where systems live or die. This lesson covers the operational layer: what to log, how to res...
@@ -149,3 +149,4 @@ Production is a system of systems; the only way to trust the failure modes is to
 | Prevention | Tests, scans, canary gates, migration checks |
 
 Operations is engineering: the systems you build, the runbooks you write, and the culture you set decide how fast you recover when (not if) production misbehaves. The goal isn't zero incidents — it's fast, safe recovery every time.
+

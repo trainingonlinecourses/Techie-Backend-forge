@@ -1,7 +1,7 @@
 ---
 title: Extensions — The Extension Model That Makes JUnit 5 Powerful
 module: junit5-deep
-order: 3
+order: 2
 minutes: 26
 topics: ["extensions", "TestExecutionListener", "ParameterResolver", "beforeEachCallback", "lifecycle", "custom extensions"]
 summary: JUnit 5's deepest architectural idea: test execution is a pipeline of extension points, and almost everything the framework does is itself an exten...
@@ -22,7 +22,6 @@ JUnit 5's deepest architectural idea: test execution is a **pipeline of extensio
 
 ## The Lifecycle Callbacks
 
-```java
 import org.junit.jupiter.api.extension.*;
 import java.lang.reflect.Method;
 
@@ -45,16 +44,13 @@ public class TimingExtension implements BeforeEachCallback, AfterEachCallback {
         }
     }
 }
-```
 
-```java
 // Register it on a test class:
 @ExtendWith(TimingExtension.class)
 class ServiceTest {
     @Test void fast() { }
     @Test void slow() throws InterruptedException { Thread.sleep(600); }
 }
-```
 
 **Walking through it:** the extension implements the `BeforeEachCallback`/`AfterEachCallback` interfaces — JUnit calls `beforeEach(ExtensionContext)` and `afterEach(ExtensionContext)` around every test. The **`ExtensionContext`** is the extension's window into the test: the display name, the test method (`getTestMethod()`), the test instance, tags, and configuration parameters. This single object is how extensions learn *what* they're running and *how to report back*. The `ThreadLocal` matters: JUnit can run tests in parallel, and the callback context is per-execution.
 
@@ -64,36 +60,41 @@ class ServiceTest {
 
 The most powerful extension point — this is how Mockito's `@Mock` injection and Spring's `@Autowired` test parameters work:
 
+
+**What this code does — step by step:**
+
+1. Step 1: a marker annotation for the parameters we resolve.
+2. Step 2: the resolver — "when the test asks for a parameter annotated. With @RandomUser, I will provide it."
+3. Only claim parameters that carry OUR annotation:
+4. Return the value JUnit will inject into the test method.
+5. Step 3: use it — the parameter appears "out of nowhere."
+
+The same code, clean:
+
 ```java
 import org.junit.jupiter.api.extension.*;
 import java.lang.annotation.*;
 import java.lang.reflect.Parameter;
 
-// Step 1: a marker annotation for the parameters we resolve.
 @Target(ElementType.PARAMETER)
 @Retention(RetentionPolicy.RUNTIME)
 @interface RandomUser { }
 
-// Step 2: the resolver — "when the test asks for a parameter annotated
-// with @RandomUser, I will provide it."
 class RandomUserResolver implements ParameterResolver {
 
     @Override
     public boolean supportsParameter(ParameterContext pc, ExtensionContext ec) {
-        // Only claim parameters that carry OUR annotation:
         return pc.isAnnotated(RandomUser.class);
     }
 
     @Override
     public Object resolveParameter(ParameterContext pc, ExtensionContext ec) {
-        // Return the value JUnit will inject into the test method.
         return new User("user-" + System.nanoTime() % 1000, "Ada");
     }
 
     record User(String id, String name) { }
 }
 
-// Step 3: use it — the parameter appears "out of nowhere."
 @ExtendWith(RandomUserResolver.class)
 class ResolverDemo {
     @Test
@@ -107,7 +108,6 @@ class ResolverDemo {
 
 ## A Realistic Extension: Conditional Execution
 
-```java
 import org.junit.jupiter.api.extension.*;
 
 // An extension that skips tests when an environment flag says so:
@@ -124,28 +124,29 @@ public class DisabledOnMissingEnv implements ExecutionCondition {
         return ConditionEvaluationResult.enabled("TEST_ENV=" + env);
     }
 }
-```
 
 `ExecutionCondition` is the mechanism behind `@Disabled`, `@EnabledOnOs`, and `@EnabledIfEnvironmentVariable` — they're all built-in extensions implementing this interface. The takeaway: **if you can express it as a condition, an extension can apply it.**
 
 ## Registration: Three Ways
 
+
+**What this code does — step by step:**
+
+1. 1. Declarative (most common) — on the class or method:
+2. 2. Composed annotation — bundle several extensions into one custom. Annotation (how @SpringBootTest bundles Spring's extensions):
+3. 3. Programmatic (JUnit 5.5+) — the extension registers itself via. @RegisterExtension on a field, giving you lifecycle access to it: (used for extensions that need setup/teardown in the test itself)
+
+The same code, clean:
+
 ```java
-// 1. Declarative (most common) — on the class or method:
 @ExtendWith(TimingExtension.class)
 class TestA { }
 
-// 2. Composed annotation — bundle several extensions into one custom
-//    annotation (how @SpringBootTest bundles Spring's extensions):
 @ExtendWith(TimingExtension.class)
 @ExtendWith(RandomUserResolver.class)
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @interface FastTestSuite { }
-
-// 3. Programmatic (JUnit 5.5+) — the extension registers itself via
-//    @RegisterExtension on a field, giving you lifecycle access to it:
-//    (used for extensions that need setup/teardown in the test itself)
 ```
 
 The **composed annotation** pattern is the professional packaging: a team's `@WebTest` or `@DatabaseTest` annotation bundles the extension set, tags, and conventions into one meaningful name — the same design philosophy as Spring's stereotype annotations.
@@ -157,3 +158,4 @@ The realization that makes this lesson click: **you've been using extensions all
 ## Recap
 
 JUnit 5 is an extension pipeline: lifecycle callbacks (`BeforeEachCallback`, `BeforeAllCallback`, `TestWatcher`), **`ParameterResolver`** (inventing test arguments — the mechanism behind Mockito's `@Mock` injection and Spring's `@Autowired` params), `ExecutionCondition` (conditional skipping), and `@RegisterExtension` — all plugged in via `@ExtendWith` or composed annotations. The `ExtensionContext` is the extension's window into the test. Everything you thought was "framework magic" — Spring Boot tests, Mockito injection, `@TempDir` — is an extension, and the model is open for your own: timing, retries, environment gating, custom parameter injection. Master the extension points and you can make JUnit do almost anything — because the framework is explicitly designed to let you.
+

@@ -1,7 +1,7 @@
 ---
 title: Circuit Breaker — Fail Fast When the Dependency Is Down
 module: resilience-circuit-breaker
-order: 1
+order: 2
 minutes: 26
 topics: ["circuit breaker", "states", "failure rate", "half-open", "Resilience4j", "fail fast"]
 summary: Your app calls a downstream service (a payment gateway, an AI provider, a catalog API). The service starts failing — slowly at first, then every ca...
@@ -45,6 +45,20 @@ When the dependency is down, the *best* behavior is to fail **quickly** with a c
 
 ## The Code Walkthrough
 
+
+**What this code does — step by step:**
+
+1. ---- 1. Configure the breaker ----
+2. `.failureRateThreshold(50)` — open at 50% failures
+3. `.slidingWindowSize(20)` — over the last 20 calls
+4. `.minimumNumberOfCalls(5)` — don't judge tiny samples
+5. `.waitDurationInOpenState(Duration.ofSeconds(15))` — cool-down
+6. `.permittedNumberOfCallsInHalfOpenState(3)` — probe 3 calls
+7. ---- 2. Wrap the call ----
+8. `return breaker.executeSupplier(call);` — breaker decides: run, or fast-fail. When OPEN, this throws CallNotPermittedException INSTANTLY (no network call)
+
+The same code, clean:
+
 ```java
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
@@ -60,22 +74,19 @@ public class PaymentService {
     private final CircuitBreaker breaker;
 
     public PaymentService(PaymentGateway gateway) {
-        // ---- 1. Configure the breaker ----
         this.breaker = CircuitBreaker.of("payment-gateway", CircuitBreakerConfig.custom()
-                .failureRateThreshold(50)                  // open at 50% failures
-                .slidingWindowSize(20)                     // over the last 20 calls
-                .minimumNumberOfCalls(5)                   // don't judge tiny samples
-                .waitDurationInOpenState(Duration.ofSeconds(15))   // cool-down
-                .permittedNumberOfCallsInHalfOpenState(3)  // probe 3 calls
+                .failureRateThreshold(50)
+                .slidingWindowSize(20)
+                .minimumNumberOfCalls(5)
+                .waitDurationInOpenState(Duration.ofSeconds(15))
+                .permittedNumberOfCallsInHalfOpenState(3)
                 .build());
     }
 
     public PaymentResult charge(ChargeRequest request) {
-        // ---- 2. Wrap the call ----
         Supplier<PaymentResult> call = () -> gateway.charge(request);
 
-        return breaker.executeSupplier(call);   // breaker decides: run, or fast-fail
-        // When OPEN, this throws CallNotPermittedException INSTANTLY (no network call)
+        return breaker.executeSupplier(call);
     }
 }
 ```
@@ -94,14 +105,12 @@ public class PaymentService {
 
 ## The Spring Integration
 
-```java
 @CircuitBreaker(name = "paymentGateway", fallbackMethod = "chargeFallback")
 public PaymentResult charge(ChargeRequest request) { ... }
 
 public PaymentResult chargeFallback(ChargeRequest request, Throwable t) {
     return PaymentResult.declined("gateway temporarily unavailable");
 }
-```
 
 With Resilience4j + Spring Boot, the `@CircuitBreaker` annotation wraps the method; the `fallbackMethod` serves a degraded response when the breaker is open. Add `spring-boot-starter-aop` and the `resilience4j-spring-boot3` dependency, and configuration can live in properties:
 
@@ -141,3 +150,4 @@ Resilience4j publishes Micrometer metrics (`resilience4j.circuitbreaker.state`);
 - Calibrate: minimum calls, failure threshold, cool-down, half-open probes.
 - Monitor breaker state — an OPEN breaker is an alert-worthy signal.
 - Fail fast, fall back gracefully, alert loudly.
+

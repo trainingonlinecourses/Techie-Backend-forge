@@ -1,7 +1,7 @@
 ---
 title: Building a gRPC Server
 module: grpc-apis
-order: 2
+order: 3
 minutes: 25
 topics: ["gRPC", "service definitions", "Unary RPC", "server implementation", "Spring gRPC", "deadlines"]
 summary: gRPC is RPC over HTTP/2 with protobuf payloads: typed method calls, streaming in both directions, deadlines, and firstclass error codes. This lesso...
@@ -70,7 +70,6 @@ protoc generates `CourseServiceGrpc` — the abstract server base class and the 
 </dependency>
 ```
 
-```java
 @GrpcService
 public class CourseGrpcService extends CourseServiceGrpc.CourseServiceImplBase {
 
@@ -95,7 +94,6 @@ public class CourseGrpcService extends CourseServiceGrpc.CourseServiceImplBase {
             .build();
     }
 }
-```
 
 The `StreamObserver` protocol: `onNext(value)` (0 or more), `onError(Throwable)`, `onCompleted()`. Unary = exactly one `onNext` then `onCompleted`.
 
@@ -115,7 +113,6 @@ gRPC has 17 standardized error codes — the equivalent of HTTP status but typed
 | INTERNAL | Server error | 500 |
 | UNAVAILABLE | Service down | 503 |
 
-```java
 throw Status.INVALID_ARGUMENT
     .withDescription("minutes must be positive")
     .withCause(e)
@@ -125,11 +122,9 @@ throw Status.INVALID_ARGUMENT
 Metadata trailers = new Metadata();
 trailers.put(Key.of("trace-id", Metadata.ASCII_STRING_MARSHALLER), traceId);
 throw Status.INTERNAL.asRuntimeException(trailers);
-```
 
 ## Server Streaming
 
-```java
 @Override
 public void listCourses(ListCoursesRequest request,
                         StreamObserver<CourseReply> responseObserver) {
@@ -138,7 +133,6 @@ public void listCourses(ListCoursesRequest request,
     });
     responseObserver.onCompleted();
 }
-```
 
 The client receives courses as they're produced — no full payload buffered.
 
@@ -146,7 +140,6 @@ The client receives courses as they're produced — no full payload buffered.
 
 A server can (and should) check whether the client is still waiting:
 
-```java
 @Override
 public void getCourse(CourseRequest request, StreamObserver<CourseReply> observer) {
     if (Context.current().isCancelled()) {        // client gave up
@@ -155,11 +148,9 @@ public void getCourse(CourseRequest request, StreamObserver<CourseReply> observe
     }
     // ... heavy work, periodically check Context.current().isCancelled()
 }
-```
 
 ## Interceptors: Server-Side
 
-```java
 @Component
 public class GrpcServerInterceptor implements ServerInterceptor {
 
@@ -174,16 +165,13 @@ public class GrpcServerInterceptor implements ServerInterceptor {
         return Contexts.interceptCall(Context.current(), call, headers, next);
     }
 }
-```
 
 Configured via `GrpcServerConfigurer`:
 
-```java
 @Bean
 public GrpcServerConfigurer serverConfigurer() {
     return builder -> builder.intercept(grpcServerInterceptor);
 }
-```
 
 ## Configuring the Server
 
@@ -199,7 +187,6 @@ The gRPC server runs on its own port (default 9090) alongside Tomcat — HTTP fo
 
 ## Testing the Server
 
-```java
 @SpringBootTest
 class GrpcServerTest {
 
@@ -224,7 +211,6 @@ class GrpcServerTest {
         server.shutdownNow();
     }
 }
-```
 
 ## Summary
 
@@ -239,3 +225,4 @@ class GrpcServerTest {
 | Interceptors | ServerInterceptor for cross-cutting |
 
 gRPC servers are typed and contract-first: the .proto is the API, the generated base class is the implementation skeleton, and Status codes give clients a precise error vocabulary. The next lesson covers the client side, streaming, and production hardening.
+

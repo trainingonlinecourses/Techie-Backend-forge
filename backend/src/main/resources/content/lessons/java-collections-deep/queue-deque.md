@@ -1,7 +1,7 @@
 ---
 title: Queues, Deques and PriorityQueue
 module: java-collections-deep
-order: 5
+order: 4
 minutes: 20
 topics: ["Queue", "Deque", "PriorityQueue", "ArrayDeque", "heap", "producer consumer"]
 summary: Queues are the backbone of producerconsumer systems, task processing, and buffering. This lesson covers the Queue/Deque families — including the Pr...
@@ -16,32 +16,41 @@ Queues are the backbone of producer-consumer systems, task processing, and buffe
 
 ## The Queue Contract
 
+
+**What this code does — step by step:**
+
+1. Offer/poll: non-blocking, return status
+2. `boolean ok = queue.offer("a");` — false if full (bounded impls)
+3. `String head = queue.poll();` — null if empty
+4. add/remove: throw on failure
+5. `queue.add("a");` — IllegalStateException if full
+6. `String h = queue.remove();` — NoSuchElementException if empty
+7. Peek: look without removing
+8. `String head = queue.peek();` — null if empty
+
+The same code, clean:
+
 ```java
 Queue<String> queue = new ArrayDeque<>();
 
-// Offer/poll: non-blocking, return status
-boolean ok = queue.offer("a");    // false if full (bounded impls)
-String head = queue.poll();       // null if empty
+boolean ok = queue.offer("a");
+String head = queue.poll();
 
-// add/remove: throw on failure
-queue.add("a");                   // IllegalStateException if full
-String h = queue.remove();        // NoSuchElementException if empty
+queue.add("a");
+String h = queue.remove();
 
-// Peek: look without removing
-String head = queue.peek();       // null if empty
+String head = queue.peek();
 ```
 
 **Production rule**: use `offer`/`poll`/`peek` — the status-returning trio — unless you *want* the exception.
 
 ## ArrayDeque: The Default
 
-```java
 Deque<String> deque = new ArrayDeque<>();
 deque.addFirst("a");
 deque.addLast("b");
 deque.removeFirst();
 deque.removeLast();
-```
 
 - Resizable circular array — no node objects
 - **Faster than LinkedList for queue/stack operations** (contiguous memory, cache-friendly)
@@ -51,11 +60,9 @@ deque.removeLast();
 
 ## PriorityQueue: The Heap
 
-```java
 PriorityQueue<Task> tasks = new PriorityQueue<>(Comparator
     .comparingInt(Task::priority)
     .thenComparing(Task::createdAt));
-```
 
 - A **binary min-heap** — `poll()` returns the *highest priority* (smallest per comparator) element in O(log n)
 - Not FIFO! Order is by priority, not insertion
@@ -63,7 +70,6 @@ PriorityQueue<Task> tasks = new PriorityQueue<>(Comparator
 
 ### The Classic Use: Job Processing
 
-```java
 public class TaskQueue {
 
     private final PriorityQueue<Task> queue = new PriorityQueue<>(
@@ -77,7 +83,6 @@ public class TaskQueue {
         return queue.poll();   // highest-priority task, O(log n)
     }
 }
-```
 
 ### PriorityQueue Pitfalls
 
@@ -102,7 +107,6 @@ The blocking variants (`java.util.concurrent`) are the producer-consumer workhor
 
 ## The Producer-Consumer Pattern
 
-```java
 @Component
 public class TaskProcessor {
 
@@ -124,16 +128,13 @@ public class TaskProcessor {
         }
     }
 }
-```
 
 ## Deque as a Stack
 
-```java
 Deque<String> stack = new ArrayDeque<>();
 stack.push("a");       // == addFirst
 stack.push("b");
 String top = stack.pop();   // "b" — LIFO
-```
 
 `Deque` is the modern replacement for the legacy `Stack` class (which is synchronized — needlessly slow).
 
@@ -151,7 +152,6 @@ String top = stack.pop();   // "b" — LIFO
 
 ## Testing Queues
 
-```java
 @Test
 void priorityQueuePollsInPriorityOrder() {
     PriorityQueue<Task> q = new PriorityQueue<>(Comparator.comparingInt(Task::priority));
@@ -172,7 +172,6 @@ void arrayDequeWorksAsStack() {
     assertEquals("b", stack.pop());
     assertEquals("a", stack.pop());
 }
-```
 
 ## Summary
 
@@ -185,3 +184,4 @@ void arrayDequeWorksAsStack() {
 | DelayQueue | offer/poll | By delay expiry |
 
 Queues are simple to name and subtle to choose: `ArrayDeque` for plain FIFO/LIFO, `PriorityQueue` when priority matters, blocking variants for producer-consumer. The failure modes are equally subtle — mutate a queued object's priority and your "priority" queue quietly becomes random order.
+

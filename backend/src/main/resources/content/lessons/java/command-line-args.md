@@ -1,7 +1,7 @@
 ---
 title: Command-Line Arguments — Configuring Programs Without Recompiling
 summary: How the String[] args array in main works, parsing and validating arguments safely, flag-style arguments, and how organizations use flags to switch behavior without code changes.
-order: 73
+order: 12
 minutes: 14
 topics: [command-line-arguments, main-method, string-args, cli-flags, configuration]
 docs:
@@ -12,9 +12,7 @@ docs:
 
 Look at the main method you've typed a hundred times:
 
-```java
 public static void main(String[] args) { }
-```
 
 That `String[] args` is not decoration. When you launch:
 
@@ -39,27 +37,42 @@ Key facts beginners miss:
 
 ## A Safe Parsing Pattern
 
+
+**What this code does — step by step:**
+
+1. `if (args.length < 1) {` — guard: required input missing
+2. `System.exit(1);` — non-zero exit code signals failure to scripts
+3. `String file = args[0];` — positional argument #1
+4. `String format = "csv";` — sensible default for optional flag
+5. `boolean verbose = false;` — default off
+6. `for (int i = 1; i < args.length; i++) {` — loop remaining arguments
+7. `verbose = true;` — boolean flag needs no value
+8. `format = arg.substring("--format=".length());` — slice off everything after '='
+9. `System.exit(2);` — distinct exit code for bad options
+
+The same code, clean:
+
 ```java
 public static void main(String[] args) {
-    if (args.length < 1) {                          // guard: required input missing
+    if (args.length < 1) {
         System.err.println("Usage: java ReportTool <file> [--format=pdf|csv] [--verbose]");
-        System.exit(1);                             // non-zero exit code signals failure to scripts
+        System.exit(1);
     }
 
-    String file = args[0];                          // positional argument #1
+    String file = args[0];
 
-    String format = "csv";                          // sensible default for optional flag
-    boolean verbose = false;                        // default off
+    String format = "csv";
+    boolean verbose = false;
 
-    for (int i = 1; i < args.length; i++) {         // loop remaining arguments
+    for (int i = 1; i < args.length; i++) {
         String arg = args[i];
         if (arg.equals("--verbose")) {
-            verbose = true;                         // boolean flag needs no value
+            verbose = true;
         } else if (arg.startsWith("--format=")) {
-            format = arg.substring("--format=".length()); // slice off everything after '='
+            format = arg.substring("--format=".length());
         } else {
             System.err.println("Unknown option: " + arg);
-            System.exit(2);                         // distinct exit code for bad options
+            System.exit(2);
         }
     }
 
@@ -98,7 +111,6 @@ Style 2 requires lookahead logic (`if (arg.equals("--port")) port = Integer.pars
 
 **Scenario 3 — Real libraries exist.** For anything beyond ~3 flags, teams use Picocli or JCommander which handle parsing, validation, `--help` generation, and tab-completion:
 
-```java
 @Command(name = "recon")
 class ReconCommand implements Runnable {
     @Parameters(index = "0") String file;          // annotated field auto-populated from args
@@ -106,7 +118,6 @@ class ReconCommand implements Runnable {
 
     public void run() { /* ... */ }
 }
-```
 
 ## Common Mistakes
 
@@ -116,3 +127,4 @@ class ReconCommand implements Runnable {
 | Forgetting parseInt/parseDouble | `"=="` comparisons on strings, or compile errors | Convert explicitly, catch NumberFormatException |
 | Treating args as null-checkable | Dead code / wrong assumption | It's empty array, never null, under normal launches |
 | Silently ignoring unknown flags | Typos activate defaults mysteriously | Reject unknown options with clear errors |
+

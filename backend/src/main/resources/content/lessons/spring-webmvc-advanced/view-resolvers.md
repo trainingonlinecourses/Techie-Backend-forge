@@ -1,7 +1,7 @@
 ---
 title: View Resolvers and Rendering
 module: spring-webmvc-advanced
-order: 4
+order: 13
 minutes: 18
 topics: ["ViewResolver", "Thymeleaf", "View", "model attributes", "redirect vs forward", "template engines"]
 summary: A controller returns a logical view name; a ViewResolver turns it into rendered HTML. Understanding the resolver chain, the model, and the redirect...
@@ -32,7 +32,6 @@ View.render(model, request, response)
 
 Spring checks resolvers **in order** and uses the first that resolves:
 
-```java
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
@@ -43,7 +42,6 @@ public class WebConfig implements WebMvcConfigurer {
         registry.jsp("/WEB-INF/jsp/", ".jsp");   // JSP last
     }
 }
-```
 
 Precedence is configuration order: put the primary engine first.
 
@@ -56,7 +54,6 @@ Precedence is configuration order: put the primary engine first.
 </dependency>
 ```
 
-```java
 @Controller
 public class CourseController {
 
@@ -66,7 +63,6 @@ public class CourseController {
         return "course/detail";     // → templates/course/detail.html
     }
 }
-```
 
 ```html
 <!DOCTYPE html>
@@ -90,7 +86,6 @@ Thymeleaf templates are valid HTML that render in the browser even before the se
 - `model.addAttribute(...)` — per-request data.
 - `@ModelAttribute` methods — populated for **every** handler in the controller:
 
-```java
 @Controller
 public class BaseController {
 
@@ -104,7 +99,6 @@ public class BaseController {
         return authentication == null ? null : userService.find(authentication.getName());
     }
 }
-```
 
 These appear in every template as `${appName}`, `${currentUser}`.
 
@@ -119,26 +113,22 @@ These appear in every template as `${appName}`, `${currentUser}`.
 
 Never return a view directly after a state-changing POST — a refresh would resubmit:
 
-```java
 @PostMapping("/courses")
 public String create(@Valid @ModelAttribute CourseForm form, BindingResult result) {
     if (result.hasErrors()) return "course/form";
     Course course = courseService.create(form);
     return "redirect:/courses/" + course.getId();   // PRG
 }
-```
 
 ### Redirect Attributes
 
 Pass data through a redirect:
 
-```java
 return RedirectAttributes redirectAttributes) {
     ...
     redirectAttributes.addFlashAttribute("message", "Course created");
     return "redirect:/courses";
 }
-```
 
 Flash attributes survive exactly one redirect and vanish — perfect for one-shot success messages.
 
@@ -151,20 +141,17 @@ Controller methods may return:
 - `void` + `@ResponseStatus` — body written directly
 - `ResponseEntity` / `@ResponseBody` — no view at all
 
-```java
 @GetMapping("/courses/{id}")
 public ModelAndView detail(@PathVariable Long id) {
     ModelAndView mav = new ModelAndView("course/detail");
     mav.addObject("course", courseService.findById(id));
     return mav;
 }
-```
 
 ## Content Negotiation With Views
 
 The same data as HTML **or** JSON depending on `Accept`:
 
-```java
 @GetMapping("/courses/{id}")
 public String detail(@PathVariable Long id, Model model) {
     model.addAttribute("course", courseService.findById(id));
@@ -175,7 +162,6 @@ public String detail(@PathVariable Long id, Model model) {
 public @ResponseBody CourseDto detailJson(@PathVariable Long id) {
     return CourseDto.from(courseService.findById(id));
 }
-```
 
 `produces` routes `Accept: application/json` to the second handler; browsers (HTML Accept) get the view.
 
@@ -192,7 +178,6 @@ For new Spring MVC apps: **Thymeleaf**, period.
 
 ## Testing Views
 
-```java
 @SpringBootTest
 @AutoConfigureMockMvc
 class ViewTest {
@@ -216,7 +201,6 @@ class ViewTest {
             .andExpect(redirectedUrlPattern("/courses/*"));
     }
 }
-```
 
 ## Summary
 
@@ -230,3 +214,4 @@ class ViewTest {
 | Engine choice | Thymeleaf for new apps |
 
 View resolution is the classic MVC tail: controller computes, resolver renders. Keep views thin, keep redirects honest, and the server-rendered part of your app stays as maintainable as the REST half.
+

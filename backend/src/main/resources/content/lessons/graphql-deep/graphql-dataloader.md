@@ -1,7 +1,7 @@
 ---
 title: The N+1 Problem and DataLoader — Batching Field Resolution
 module: graphql-deep
-order: 3
+order: 1
 minutes: 27
 topics: ["N+1", "DataLoader", "batch loading", "BatchingLoader", "query efficiency"]
 summary: The resolver chain is elegant — and potentially catastrophic for performance. Consider the innocent query:
@@ -31,8 +31,21 @@ Result: 100 lesson fetches collapse into **1** batched query. The N+1 becomes 1+
 
 ## The Code Walkthrough
 
+
+**What this code does — step by step:**
+
+1. ---- 1. A DataLoader: loads many lessons by course ids in ONE query ----
+2. Register: "for a list of course ids, return the lessons for each"
+3. ONE query for all requested courses:
+4. Group by course id — the framework matches each resolver to its slice:
+5. ---- 2. The resolver now USES the loader instead of querying directly ----
+6. WITHOUT batching — the N+1: @SchemaMapping(typeName = "Course", field = "lessons"). Public List<Lesson> lessons(Course course) {. Return lessons.findByCourseId(course.id()); // N queries. }
+7. WITH batching — Spring GraphQL calls this ONCE for all courses:
+8. ONE query for all courses:
+
+The same code, clean:
+
 ```java
-// ---- 1. A DataLoader: loads many lessons by course ids in ONE query ----
 import org.springframework.graphql.execution.BatchLoaderRegistry;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
@@ -44,12 +57,9 @@ import java.util.concurrent.CompletableFuture;
 public class LessonBatchLoader {
 
     public LessonBatchLoader(BatchLoaderRegistry registry, LessonRepository repo) {
-        // Register: "for a list of course ids, return the lessons for each"
         registry.forTypePair(Long.class, List.class)
                 .registerMappedBatchLoader((courseIds, env) -> {
-                    // ONE query for all requested courses:
                     List<Lesson> all = repo.findByCourseIdIn((List<Long>) courseIds);
-                    // Group by course id — the framework matches each resolver to its slice:
                     return Mono.just(all.stream()
                             .collect(java.util.stream.Collectors.groupingBy(
                                     Lesson::getCourseId,
@@ -58,7 +68,6 @@ public class LessonBatchLoader {
     }
 }
 
-// ---- 2. The resolver now USES the loader instead of querying directly ----
 import org.springframework.graphql.data.method.annotation.BatchMapping;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
 import org.springframework.stereotype.Controller;
@@ -70,16 +79,9 @@ public class CourseResolvers {
 
     public CourseResolvers(LessonRepository lessons) { this.lessons = lessons; }
 
-    // WITHOUT batching — the N+1:
-    // @SchemaMapping(typeName = "Course", field = "lessons")
-    // public List<Lesson> lessons(Course course) {
-    //     return lessons.findByCourseId(course.id());     // N queries
-    // }
 
-    // WITH batching — Spring GraphQL calls this ONCE for all courses:
     @BatchMapping(typeName = "Course", field = "lessons")
     public Map<Course, List<Lesson>> lessons(List<Course> courses) {
-        // ONE query for all courses:
         List<Lesson> all = lessons.findByCourseIdIn(
                 courses.stream().map(Course::getId).toList());
         return all.stream().collect(java.util.stream.Collectors.groupingBy(
@@ -139,3 +141,4 @@ Before reaching for DataLoader: **measure** (the observability module's tools). 
 - Loaders are per-request (fresh data), dedupe ids, and are async by design.
 - Audit query count per execution — that's the metric that matters.
 - Measure first, batch second, re-measure after.
+

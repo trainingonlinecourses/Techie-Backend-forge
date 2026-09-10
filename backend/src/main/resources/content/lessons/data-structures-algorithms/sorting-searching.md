@@ -1,7 +1,7 @@
 ---
 title: Sorting and Searching — The Workhorses of Algorithms
 module: data-structures-algorithms
-order: 5
+order: 4
 minutes: 26
 topics: ["sorting", "merge sort", "quick sort", "binary search", "Comparable", "Comparator"]
 summary: Sorting feels like a chore, but it's actually the enabler of nearly everything: sorted data can be searched in O(log n) instead of O(n), merged eff...
@@ -22,33 +22,47 @@ Sorting feels like a chore, but it's actually the *enabler* of nearly everything
 
 ## Binary Search: The Payoff of Order
 
+
+**What this code does — step by step:**
+
+1. Binary search: repeatedly split the range in half.
+2. `int mid = lo + (hi - lo) / 2;` — avoid overflow: not (lo+hi)/2
+3. `if (sorted[mid] < target) lo = mid + 1;` — target in right half
+4. `else                      hi = mid - 1;` — target in left half
+5. `return -1;` — not found
+6. `System.out.println(binarySearch(data, 23));` — 5
+7. `System.out.println(binarySearch(data, 24));` — -1
+8. Java's built-ins:
+9. `System.out.println(Arrays.binarySearch(data, 23));` — 5
+10. Arrays.binarySearch on a list of objects:
+11. `System.out.println(Arrays.binarySearch(names, "Linus"));` — 2
+
+The same code, clean:
+
 ```java
 import java.util.Arrays;
 
 public class SearchingDemo {
-    // Binary search: repeatedly split the range in half.
     static int binarySearch(int[] sorted, int target) {
         int lo = 0, hi = sorted.length - 1;
         while (lo <= hi) {
-            int mid = lo + (hi - lo) / 2;      // avoid overflow: not (lo+hi)/2
+            int mid = lo + (hi - lo) / 2;
             if (sorted[mid] == target) return mid;
-            if (sorted[mid] < target) lo = mid + 1;   // target in right half
-            else                      hi = mid - 1;   // target in left half
+            if (sorted[mid] < target) lo = mid + 1;
+            else                      hi = mid - 1;
         }
-        return -1;                              // not found
+        return -1;
     }
 
     public static void main(String[] args) {
         int[] data = {2, 5, 8, 12, 16, 23, 38, 56, 72, 91};
-        System.out.println(binarySearch(data, 23));   // 5
-        System.out.println(binarySearch(data, 24));   // -1
+        System.out.println(binarySearch(data, 23));
+        System.out.println(binarySearch(data, 24));
 
-        // Java's built-ins:
-        System.out.println(Arrays.binarySearch(data, 23));  // 5
+        System.out.println(Arrays.binarySearch(data, 23));
 
-        // Arrays.binarySearch on a list of objects:
         String[] names = {"Ada", "Grace", "Linus", "Ken"};
-        System.out.println(Arrays.binarySearch(names, "Linus")); // 2
+        System.out.println(Arrays.binarySearch(names, "Linus"));
     }
 }
 ```
@@ -61,28 +75,39 @@ Both are **divide-and-conquer**: split the problem, solve the halves, combine. B
 
 ### Merge Sort: Split, Sort, Merge
 
+
+**What this code does — step by step:**
+
+1. `if (lo >= hi) return;` — base case: 0 or 1 element
+2. `mergeSort(a, lo, mid);` — sort left half
+3. `mergeSort(a, mid + 1, hi);` — sort right half
+4. `merge(a, lo, mid, hi);` — combine sorted halves
+5. `int[] tmp = new int[hi - lo + 1];` — scratch space
+6. Walk both halves, always taking the smaller head.
+7. Drain whichever half has leftovers.
+8. Copy back.
+
+The same code, clean:
+
 ```java
 public class MergeSort {
     static void mergeSort(int[] a, int lo, int hi) {
-        if (lo >= hi) return;                    // base case: 0 or 1 element
+        if (lo >= hi) return;
         int mid = lo + (hi - lo) / 2;
-        mergeSort(a, lo, mid);                   // sort left half
-        mergeSort(a, mid + 1, hi);               // sort right half
-        merge(a, lo, mid, hi);                   // combine sorted halves
+        mergeSort(a, lo, mid);
+        mergeSort(a, mid + 1, hi);
+        merge(a, lo, mid, hi);
     }
 
     static void merge(int[] a, int lo, int mid, int hi) {
-        int[] tmp = new int[hi - lo + 1];        // scratch space
+        int[] tmp = new int[hi - lo + 1];
         int i = lo, j = mid + 1, k = 0;
-        // Walk both halves, always taking the smaller head.
         while (i <= mid && j <= hi) {
             if (a[i] <= a[j]) tmp[k++] = a[i++];
             else              tmp[k++] = a[j++];
         }
-        // Drain whichever half has leftovers.
         while (i <= mid) tmp[k++] = a[i++];
         while (j <= hi)  tmp[k++] = a[j++];
-        // Copy back.
         System.arraycopy(tmp, 0, a, lo, tmp.length);
     }
 
@@ -98,25 +123,39 @@ public class MergeSort {
 
 ### Quick Sort: Partition Around a Pivot
 
+
+**What this code does — step by step:**
+
+1. `int p = partition(a, lo, hi);` — place pivot in final position
+2. `quickSort(a, lo, p - 1);` — sort left of pivot
+3. `quickSort(a, p + 1, hi);` — sort right of pivot
+4. `int pivot = a[hi];` — pick the last element as pivot
+5. `int i = lo;` — boundary of "smaller" region
+6. `if (a[j] < pivot) {` — found an element smaller than pivot
+7. `swap(a, i, j);` — move it into the smaller region
+8. `swap(a, i, hi);` — pivot to its final home
+
+The same code, clean:
+
 ```java
 public class QuickSort {
     static void quickSort(int[] a, int lo, int hi) {
         if (lo >= hi) return;
-        int p = partition(a, lo, hi);   // place pivot in final position
-        quickSort(a, lo, p - 1);        // sort left of pivot
-        quickSort(a, p + 1, hi);        // sort right of pivot
+        int p = partition(a, lo, hi);
+        quickSort(a, lo, p - 1);
+        quickSort(a, p + 1, hi);
     }
 
     static int partition(int[] a, int lo, int hi) {
-        int pivot = a[hi];              // pick the last element as pivot
-        int i = lo;                     // boundary of "smaller" region
+        int pivot = a[hi];
+        int i = lo;
         for (int j = lo; j < hi; j++) {
-            if (a[j] < pivot) {         // found an element smaller than pivot
-                swap(a, i, j);          // move it into the smaller region
+            if (a[j] < pivot) {
+                swap(a, i, j);
                 i++;
             }
         }
-        swap(a, i, hi);                 // pivot to its final home
+        swap(a, i, hi);
         return i;
     }
 
@@ -136,6 +175,16 @@ public class QuickSort {
 
 ## Sorting Your Own Objects
 
+
+**What this code does — step by step:**
+
+1. Natural order — requires the class to implement Comparable. students.sort(null); // would use compareTo
+2. Comparator: sort by grade, descending:
+3. `System.out.println(students);` — [Ada(92), Zoe(85), Ben(78)]
+4. Chained comparators: grade desc, then name asc as tiebreaker.
+
+The same code, clean:
+
 ```java
 import java.util.*;
 
@@ -147,14 +196,10 @@ public class SortObjectsDemo {
                 new Student("Zoe", 85), new Student("Ada", 92),
                 new Student("Ben", 78)));
 
-        // Natural order — requires the class to implement Comparable.
-        // students.sort(null);  // would use compareTo
 
-        // Comparator: sort by grade, descending:
         students.sort(Comparator.comparingInt(Student::grade).reversed());
-        System.out.println(students);   // [Ada(92), Zoe(85), Ben(78)]
+        System.out.println(students);
 
-        // Chained comparators: grade desc, then name asc as tiebreaker.
         students.sort(Comparator.comparingInt(Student::grade).reversed()
                                 .thenComparing(Student::name));
         System.out.println(students);
@@ -176,3 +221,4 @@ Sorting is O(n log n) — not free. Alternatives worth knowing:
 ## Recap
 
 Sorting (O(n log n)) unlocks logarithmic searching (binary search, O(log n)) and a cascade of efficient operations. Merge sort guarantees O(n log n) with a merge step and O(n) space; quicksort sorts in place with O(log n) space but needs good pivot selection to avoid O(n²); Java ships both plus TimSort's run detection. Sort your own objects via `Comparable` (natural order) or `Comparator` (per-call strategy, keep it consistent with `equals`). The mastery is knowing what's *under* the library calls — so you can trust `Arrays.sort` in production, explain its O(n log n), and reach for a hash map or heap when sorting isn't the right tool at all.
+

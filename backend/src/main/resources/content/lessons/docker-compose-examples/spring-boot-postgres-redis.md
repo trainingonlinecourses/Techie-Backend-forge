@@ -150,3 +150,4 @@ docker-compose down -v
 3. **depends_on with condition** waits for health checks, not just container start
 4. **Alpine images** save 90%+ disk space compared to full images
 5. **Environment variables** configure the app without hardcoding connection strings
+

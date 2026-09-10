@@ -1,7 +1,7 @@
 ---
 title: Concurrent Collections — Thread-Safe Data Structures Beyond Synchronized
 summary: ConcurrentHashMap, CopyOnWriteArrayList, BlockingQueue, and the concurrent map atomic operations that replace manual synchronization in production code.
-order: 79
+order: 15
 minutes: 22
 topics: [concurrent-hashmap, copy-on-write, blocking-queue, concurrent-map, atomic-operations, thread-safe-collections]
 docs:
@@ -22,18 +22,27 @@ Beginners learn `Collections.synchronizedList(...)` — it wraps a collection wi
 
 `ConcurrentHashMap` is a hash table that allows concurrent reads and **segment-level** writes (Java 8+: bin-level locking via `synchronized` on individual nodes, not whole segments):
 
+
+**What this code does — step by step:**
+
+1. Thread-safe put/get — no external synchronization needed
+2. Atomic operations — no lock, no race condition
+3. `visitCounts.putIfAbsent("page-about", 0);` — only puts if absent
+4. `visitCounts.merge("page-home", 1, Integer::sum);` — atomic: get, apply, put
+5. `visitCounts.computeIfAbsent("page-contact", k -> loadCount(k));` — lazy init
+
+The same code, clean:
+
 ```java
 import java.util.concurrent.ConcurrentHashMap;
 
 ConcurrentHashMap<String, Integer> visitCounts = new ConcurrentHashMap<>();
 
-// Thread-safe put/get — no external synchronization needed
 visitCounts.compute("page-home", (key, val) -> val == null ? 1 : val + 1);
 
-// Atomic operations — no lock, no race condition
-visitCounts.putIfAbsent("page-about", 0);           // only puts if absent
-visitCounts.merge("page-home", 1, Integer::sum);    // atomic: get, apply, put
-visitCounts.computeIfAbsent("page-contact", k -> loadCount(k));  // lazy init
+visitCounts.putIfAbsent("page-about", 0);
+visitCounts.merge("page-home", 1, Integer::sum);
+visitCounts.computeIfAbsent("page-contact", k -> loadCount(k));
 ```
 
 **Line-by-line breakdown:**
@@ -54,23 +63,29 @@ visitCounts.computeIfAbsent("page-contact", k -> loadCount(k));  // lazy init
 | `forEach(parallelism, fn)` | Parallel iteration | Large map processing |
 
 **Real-world scenario — request counter:**
-```java
-// Without ConcurrentHashMap — BROKEN (race condition):
-Map<String, Integer> counts = new HashMap<>();
-// Thread A reads 5, Thread B reads 5, both write 6 — lost update!
 
-// With ConcurrentHashMap — CORRECT:
+**What this code does — step by step:**
+
+1. Without ConcurrentHashMap — BROKEN (race condition):
+2. Thread A reads 5, Thread B reads 5, both write 6 — lost update!
+3. With ConcurrentHashMap — CORRECT:
+4. Or simpler with merge:
+5. `counts.merge(endpoint, 1, Integer::sum);` — atomic increment
+
+The same code, clean:
+
+```java
+Map<String, Integer> counts = new HashMap<>();
+
 ConcurrentHashMap<String, AtomicInteger> counts = new ConcurrentHashMap<>();
 counts.computeIfAbsent(endpoint, k -> new AtomicInteger(0)).incrementAndGet();
-// Or simpler with merge:
-counts.merge(endpoint, 1, Integer::sum);  // atomic increment
+counts.merge(endpoint, 1, Integer::sum);
 ```
 
 ## CopyOnWriteArrayList — snapshot iteration
 
 `CopyOnWriteArrayList` makes a **fresh copy of the underlying array** on every `add`/`set`/`remove`. Reads see a consistent snapshot without locking; writes are expensive but rare.
 
-```java
 import java.util.concurrent.CopyOnWriteArrayList;
 
 CopyOnWriteArrayList<Listener> listeners = new CopyOnWriteArrayList<>();
@@ -83,7 +98,6 @@ listeners.remove(deadListener);
 for (Listener l : listeners) {       // iterates over the snapshot taken at loop start
     l.onEvent(event);                // safe even if another thread modifies the list
 }
-```
 
 **When to use it:**
 | Scenario | Why CopyOnWriteArrayList fits |
@@ -103,19 +117,30 @@ for (Listener l : listeners) {       // iterates over the snapshot taken at loop
 
 `BlockingQueue` is a `Queue` that **blocks** when full (on `put`) or empty (on `take`) — the foundation of producer-consumer patterns:
 
+
+**What this code does — step by step:**
+
+1. `BlockingQueue<Task> taskQueue = new ArrayBlockingQueue<>(100);` — bounded: max 100 tasks
+2. Producer thread — blocks if queue is full
+3. `taskQueue.put(new Task("process-payment"));` — blocks until space available
+4. `taskQueue.offer(new Task("send-email"), 5, TimeUnit.SECONDS);` — try with timeout
+5. Consumer thread — blocks if queue is empty
+6. `Task task = taskQueue.take();` — blocks until a task is available
+7. `Task next = taskQueue.poll(10, TimeUnit.SECONDS);` — try with timeout (returns null on timeout)
+
+The same code, clean:
+
 ```java
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ArrayBlockingQueue;
 
-BlockingQueue<Task> taskQueue = new ArrayBlockingQueue<>(100);  // bounded: max 100 tasks
+BlockingQueue<Task> taskQueue = new ArrayBlockingQueue<>(100);
 
-// Producer thread — blocks if queue is full
-taskQueue.put(new Task("process-payment"));    // blocks until space available
-taskQueue.offer(new Task("send-email"), 5, TimeUnit.SECONDS);  // try with timeout
+taskQueue.put(new Task("process-payment"));
+taskQueue.offer(new Task("send-email"), 5, TimeUnit.SECONDS);
 
-// Consumer thread — blocks if queue is empty
-Task task = taskQueue.take();                  // blocks until a task is available
-Task next = taskQueue.poll(10, TimeUnit.SECONDS);  // try with timeout (returns null on timeout)
+Task task = taskQueue.take();
+Task next = taskQueue.poll(10, TimeUnit.SECONDS);
 ```
 
 **Line-by-line breakdown:**
@@ -125,22 +150,31 @@ Task next = taskQueue.poll(10, TimeUnit.SECONDS);  // try with timeout (returns 
 - `offer(...)` with timeout — non-blocking alternative: returns `false` if the queue is full after 5 seconds
 
 **The producer-consumer pattern in an organization:**
+
+**What this code does — step by step:**
+
+1. Producer (API endpoint) — adds tasks to the queue
+2. `: ResponseEntity.status(503).build();` — queue full → backpressure
+3. Consumer (background thread) — processes tasks
+4. `Task task = taskQueue.take();` — blocks until work arrives
+5. `processTask(task);` — do the work
+
+The same code, clean:
+
 ```java
-// Producer (API endpoint) — adds tasks to the queue
 @PostMapping("/orders")
 public ResponseEntity<Void> createOrder(@RequestBody Order order) {
     boolean accepted = taskQueue.offer(new Task("process-order", order), 2, TimeUnit.SECONDS);
     return accepted ? ResponseEntity.accepted().build()
-                    : ResponseEntity.status(503).build();  // queue full → backpressure
+                    : ResponseEntity.status(503).build();
 }
 
-// Consumer (background thread) — processes tasks
 @PostConstruct
 void startConsumer() {
     Thread.startVirtualThread(() -> {
         while (true) {
-            Task task = taskQueue.take();       // blocks until work arrives
-            processTask(task);                  // do the work
+            Task task = taskQueue.take();
+            processTask(task);
         }
     });
 }
@@ -148,17 +182,27 @@ void startConsumer() {
 
 ## ArrayDeque vs LinkedList for queue/deque operations
 
+
+**What this code does — step by step:**
+
+1. ArrayDeque — preferred over LinkedList for queue/deque
+2. `Deque<String> stack = new ArrayDeque<>();` — stack (LIFO)
+3. `String top = stack.pop();` — "second"
+4. `Deque<String> queue = new ArrayDeque<>();` — queue (FIFO)
+5. `String head = queue.poll();` — "first"
+
+The same code, clean:
+
 ```java
-// ArrayDeque — preferred over LinkedList for queue/deque
-Deque<String> stack = new ArrayDeque<>();     // stack (LIFO)
+Deque<String> stack = new ArrayDeque<>();
 stack.push("first");
 stack.push("second");
-String top = stack.pop();                     // "second"
+String top = stack.pop();
 
-Deque<String> queue = new ArrayDeque<>();     // queue (FIFO)
+Deque<String> queue = new ArrayDeque<>();
 queue.offer("first");
 queue.offer("second");
-String head = queue.poll();                   // "first"
+String head = queue.poll();
 ```
 
 **Why ArrayDeque beats LinkedList:** ArrayDeque uses a circular array — O(1) amortized for add/remove at both ends, better cache locality (contiguous memory), and lower memory per element (no Node objects).
@@ -183,3 +227,4 @@ String head = queue.poll();                   // "first"
 - Null keys/values are prohibited in `ConcurrentHashMap` — use `Optional` or sentinels.
 
 **Official docs:** [ConcurrentHashMap API](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/ConcurrentHashMap.html) · [CopyOnWriteArrayList API](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/CopyOnWriteArrayList.html) · [BlockingQueue API](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/BlockingQueue.html)
+

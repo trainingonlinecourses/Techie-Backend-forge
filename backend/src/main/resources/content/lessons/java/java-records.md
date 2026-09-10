@@ -1,7 +1,7 @@
 ---
 title: Java Records — Immutable Data Carriers
 summary: Replace verbose POJOs with one-line records, compact constructors for validation, generic records, and using records for DTOs and domain events.
-order: 26
+order: 44
 minutes: 20
 topics: [java-records, immutable, dto, data-carrier, compact-constructor, pattern-matching]
 docs:
@@ -15,22 +15,34 @@ docs:
 
 Before Java 16, if you wanted a simple class that just holds data, you had to write a LOT of boilerplate:
 
+
+**What this code does — step by step:**
+
+1. Old way — tons of boilerplate for a simple data class
+2. `private final int x;` — 1. Private fields
+3. `public Point(int x, int y) {` — 2. Constructor
+4. `public int getX() { return x; }` — 3. Getters (one per field)
+5. `public boolean equals(Object o) {` — 4. equals()
+6. `public int hashCode() {` — 5. hashCode()
+7. `public String toString() {` — 6. toString()
+
+The same code, clean:
+
 ```java
-// Old way — tons of boilerplate for a simple data class
 public class Point {
-    private final int x;    // 1. Private fields
+    private final int x;
     private final int y;
 
-    public Point(int x, int y) {   // 2. Constructor
+    public Point(int x, int y) {
         this.x = x;
         this.y = y;
     }
 
-    public int getX() { return x; }  // 3. Getters (one per field)
+    public int getX() { return x; }
     public int getY() { return y; }
 
     @Override
-    public boolean equals(Object o) {  // 4. equals()
+    public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Point point = (Point) o;
@@ -38,12 +50,12 @@ public class Point {
     }
 
     @Override
-    public int hashCode() {  // 5. hashCode()
+    public int hashCode() {
         return Objects.hash(x, y);
     }
 
     @Override
-    public String toString() {  // 6. toString()
+    public String toString() {
         return "Point{x=" + x + ", y=" + y + "}";
     }
 }
@@ -51,10 +63,8 @@ public class Point {
 
 **Records** eliminate ALL that boilerplate with one line:
 
-```java
 // New way — same functionality, one line!
 public record Point(int x, int y) {}
-```
 
 That's it. The compiler automatically generates:
 - ✅ Private final fields (`x` and `y`)
@@ -68,27 +78,33 @@ That's it. The compiler automatically generates:
 ## How Records Work Under the Hood
 
 When you write:
-```java
 public record Point(int x, int y) {}
-```
 
 The compiler generates something equivalent to:
+
+**What this code does — step by step:**
+
+1. `public final class Point {` — Note: record is implicitly final
+2. `private final int x;` — private + final (immutable!)
+3. Canonical constructor
+4. Accessor methods (NOT getX(), just x())
+5. equals(), hashCode(), toString() auto-generated
+
+The same code, clean:
+
 ```java
-public final class Point {   // Note: record is implicitly final
-    private final int x;     // private + final (immutable!)
+public final class Point {
+    private final int x;
     private final int y;
 
-    // Canonical constructor
     public Point(int x, int y) {
         this.x = x;
         this.y = y;
     }
 
-    // Accessor methods (NOT getX(), just x())
     public int x() { return x; }
     public int y() { return y; }
 
-    // equals(), hashCode(), toString() auto-generated
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -112,24 +128,36 @@ public final class Point {   // Note: record is implicitly final
 
 ## Using Records
 
+
+**What this code does — step by step:**
+
+1. Creating a record
+2. Accessing fields — use the method name, NOT getX()
+3. `System.out.println(p1.x());` — 3
+4. `System.out.println(p1.y());` — 5
+5. equals() works out of the box
+6. `System.out.println(p1.equals(p2));` — true
+7. toString() works out of the box
+8. `System.out.println(p1);` — Point[x=3, y=5]
+9. Records are immutable — you cannot change fields. P1.x = 10; // ❌ Compilation error — fields are private + final. P1.setX(10); // ❌ No setter exists
+
+The same code, clean:
+
 ```java
-// Creating a record
-Point p1 = new Point(3, 5);
-Point p2 = new Point(3, 5);
+public class Main {
 
-// Accessing fields — use the method name, NOT getX()
-System.out.println(p1.x());     // 3
-System.out.println(p1.y());     // 5
+    public static void main(String[] args) {
+        Point p1 = new Point(3, 5);
+        Point p2 = new Point(3, 5);
 
-// equals() works out of the box
-System.out.println(p1.equals(p2));  // true
+        System.out.println(p1.x());
+        System.out.println(p1.y());
 
-// toString() works out of the box
-System.out.println(p1);             // Point[x=3, y=5]
+        System.out.println(p1.equals(p2));
 
-// Records are immutable — you cannot change fields
-// p1.x = 10;  // ❌ Compilation error — fields are private + final
-// p1.setX(10); // ❌ No setter exists
+        System.out.println(p1);
+    }
+}
 ```
 
 ---
@@ -140,48 +168,68 @@ System.out.println(p1);             // Point[x=3, y=5]
 
 Records have a special "compact constructor" that lets you validate **before** fields are assigned:
 
+
+**What this code does — step by step:**
+
+1. Compact constructor — no parameter list, just the body. Fields are assigned AFTER this runs
+2. Validate before assignment
+3. Normalize to lowercase
+4. Convenience method
+
+The same code, clean:
+
 ```java
 public record EmailAddress(String localPart, String domain) {
 
-    // Compact constructor — no parameter list, just the body
-    // Fields are assigned AFTER this runs
     public EmailAddress {
-        // Validate before assignment
         if (localPart == null || localPart.isBlank()) {
             throw new IllegalArgumentException("Local part cannot be blank");
         }
         if (domain == null || !domain.contains(".")) {
             throw new IllegalArgumentException("Invalid domain: " + domain);
         }
-        // Normalize to lowercase
         localPart = localPart.toLowerCase();
         domain = domain.toLowerCase();
     }
 
-    // Convenience method
     public String fullEmail() {
         return localPart + "@" + domain;
     }
 }
 ```
 
-```java
-// Usage
-EmailAddress email = new EmailAddress("Alice", "Gmail.COM");
-System.out.println(email.localPart());  // "alice" (lowercased)
-System.out.println(email.domain());     // "gmail.com" (lowercased)
-System.out.println(email.fullEmail());  // "alice@gmail.com"
 
-// Validation works
-new EmailAddress("", "gmail.com");  // 💥 IllegalArgumentException
-new EmailAddress("alice", "invalid");  // 💥 IllegalArgumentException
+**What this code does — step by step:**
+
+1. Usage
+2. `System.out.println(email.localPart());` — "alice" (lowercased)
+3. `System.out.println(email.domain());` — "gmail.com" (lowercased)
+4. `System.out.println(email.fullEmail());` — "alice@gmail.com"
+5. Validation works
+6. `new EmailAddress("", "gmail.com");` — 💥 IllegalArgumentException
+7. `new EmailAddress("alice", "invalid");` — 💥 IllegalArgumentException
+
+The same code, clean:
+
+```java
+public class Main {
+
+    public static void main(String[] args) {
+        EmailAddress email = new EmailAddress("Alice", "Gmail.COM");
+        System.out.println(email.localPart());
+        System.out.println(email.domain());
+        System.out.println(email.fullEmail());
+
+        new EmailAddress("", "gmail.com");
+        new EmailAddress("alice", "invalid");
+    }
+}
 ```
 
 ### Additional Fields and Methods
 
 Records can have extra fields and methods, but the extra fields must be `static`:
 
-```java
 public record Student(String name, int age, String major) {
 
     // Static fields are allowed
@@ -209,19 +257,15 @@ public record Student(String name, int age, String major) {
         return new Student(name, age, major);
     }
 }
-```
 
-```java
 Student s = Student.create("Alice", 20, "CS");
 System.out.println(s.isAdult());  // true
 System.out.println(s介绍());    // Alice (20, CS)
-```
 
 ### Records Implementing Interfaces
 
 Records can implement interfaces (but cannot extend classes — they're implicitly `final`):
 
-```java
 public interface Printable {
     String format();
 }
@@ -244,29 +288,29 @@ public record Product(String id, String name, double price) implements Printable
         }
     }
 }
-```
 
-```java
 Product p = new Product("P001", "Laptop", 999.99);
 System.out.println(p.format());  // [P001] Laptop - $999.99
-```
 
 ### Generic Records
 
-```java
-// Records can be generic
-public record Pair<A, B>(A first, B second) {
-    public <C> Pair<A, C> mapSecond(Function<B, C> mapper) {
-        return new Pair<>(first, mapper.apply(second));
+public class Main {
+
+    public static void main(String[] args) {
+        // Records can be generic
+        public record Pair<A, B>(A first, B second) {
+            public <C> Pair<A, C> mapSecond(Function<B, C> mapper) {
+                return new Pair<>(first, mapper.apply(second));
+            }
+        }
+
+        // Usage
+        Pair<String, Integer> nameAge = new Pair<>("Alice", 25);
+        Pair<String, String> nameAgeStr = nameAge.mapSecond(Object::toString);
+        System.out.println(nameAgeStr.first());   // "Alice"
+        System.out.println(nameAgeStr.second());  // "25"
     }
 }
-
-// Usage
-Pair<String, Integer> nameAge = new Pair<>("Alice", 25);
-Pair<String, String> nameAgeStr = nameAge.mapSecond(Object::toString);
-System.out.println(nameAgeStr.first());   // "Alice"
-System.out.println(nameAgeStr.second());  // "25"
-```
 
 ---
 
@@ -274,7 +318,6 @@ System.out.println(nameAgeStr.second());  // "25"
 
 If you've used Lombok, you know `@Data`, `@Value`, and `@AllArgsConstructor`. Records do the same thing but are part of the language:
 
-```java
 // Lombok way
 @Data
 @AllArgsConstructor
@@ -285,7 +328,6 @@ public class Point {
 
 // Java Record way — no library needed
 public record Point(int x, int y) {}
-```
 
 | Feature | Records | Lombok |
 |---------|---------|--------|
@@ -301,10 +343,19 @@ public record Point(int x, int y) {}
 
 ### Scenario 1: API DTOs (Data Transfer Objects)
 
-```java
-// Instead of verbose DTOs, use records for API request/response objects
 
-// Request DTO
+**What this code does — step by step:**
+
+1. Instead of verbose DTOs, use records for API request/response objects
+2. Request DTO
+3. Validation in compact constructor
+4. Response DTO
+5. Error DTO
+6. `timestamp = LocalDateTime.now();` — Auto-set timestamp
+
+The same code, clean:
+
+```java
 public record CreateUserRequest(
     String username,
     String email,
@@ -312,7 +363,6 @@ public record CreateUserRequest(
     String role
 ) {
     public CreateUserRequest {
-        // Validation in compact constructor
         if (username == null || username.length() < 3) {
             throw new IllegalArgumentException("Username must be at least 3 characters");
         }
@@ -325,7 +375,6 @@ public record CreateUserRequest(
     }
 }
 
-// Response DTO
 public record UserResponse(
     Long id,
     String username,
@@ -334,7 +383,6 @@ public record UserResponse(
     LocalDateTime createdAt
 ) {}
 
-// Error DTO
 public record ApiError(
     String message,
     String path,
@@ -342,12 +390,11 @@ public record ApiError(
     LocalDateTime timestamp
 ) {
     public ApiError {
-        timestamp = LocalDateTime.now();  // Auto-set timestamp
+        timestamp = LocalDateTime.now();
     }
 }
 ```
 
-```java
 // Controller using records
 @RestController
 @RequestMapping("/api/users")
@@ -371,11 +418,9 @@ public class UserController {
         ));
     }
 }
-```
 
 ### Scenario 2: Configuration Objects
 
-```java
 // Database configuration as a record
 public record DatabaseConfig(
     String host,
@@ -397,11 +442,9 @@ public record DatabaseConfig(
         return "jdbc:postgresql://" + host + ":" + port + "/" + database;
     }
 }
-```
 
 ### Scenario 3: Domain Events
 
-```java
 // Events as records — immutable, self-documenting
 public record UserRegistered(
     String userId,
@@ -428,9 +471,7 @@ public record OrderPlaced(
         return totalAmount.compareTo(BigDecimal.valueOf(1000)) > 0;
     }
 }
-```
 
-```java
 // Publishing events
 @Service
 public class UserService {
@@ -444,11 +485,9 @@ public class UserService {
         publisher.publishEvent(new UserRegistered(user.getId(), email, LocalDateTime.now()));
     }
 }
-```
 
 ### Scenario 4: Value Objects (DDD)
 
-```java
 // Value objects that represent domain concepts
 public record Money(BigDecimal amount, Currency currency) {
     public Money {
@@ -471,7 +510,6 @@ public record Money(BigDecimal amount, Currency currency) {
         return new Money(amount, Currency.getInstance("USD"));
     }
 }
-```
 
 ---
 
@@ -485,3 +523,4 @@ public record Money(BigDecimal amount, Currency currency) {
 | Mutating record fields in a collection | Fields are `final` — cannot be changed | Create a new record instance instead |
 | Using records for mutable entities | Records are immutable by design | Use regular classes for JPA entities |
 | Forgetting compact constructor validation | Invalid data gets through | Always validate in the compact constructor |
+

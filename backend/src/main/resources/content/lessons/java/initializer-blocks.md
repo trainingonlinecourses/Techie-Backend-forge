@@ -1,7 +1,7 @@
 ---
 title: Initializer Blocks & Initialization Order — The Hidden Constructor Code
 summary: Instance initializer blocks, static initializer blocks, the exact execution order rules, and why organizations mostly avoid them in favor of clearer alternatives.
-order: 75
+order: 26
 minutes: 15
 topics: [initializer-blocks, static-block, initialization-order, field-initializers]
 docs:
@@ -19,11 +19,23 @@ Java gives you **four** places to initialize an object's fields — most beginne
 
 An initializer block is a naked `{ ... }` sitting inside a class body:
 
+
+**What this code does — step by step:**
+
+1. `private static Properties defaults;` — shared across ALL instances → belongs to the class
+2. `static {` — STATIC block: runs ONCE, when the class first loads
+3. `{` — INSTANCE block: runs before EVERY constructor body
+4. `this.socket = openSocket();` — logic common to all constructors goes here
+5. host-specific setup only
+6. port-specific setup only
+
+The same code, clean:
+
 ```java
 public class ConnectionPool {
-    private static Properties defaults;    // shared across ALL instances → belongs to the class
+    private static Properties defaults;
 
-    static {                               // STATIC block: runs ONCE, when the class first loads
+    static {
         defaults = new Properties();
         defaults.setProperty("timeout", "30");
         System.out.println("Class loaded, defaults prepared");
@@ -31,19 +43,17 @@ public class ConnectionPool {
 
     private final Socket socket;
 
-    {                                      // INSTANCE block: runs before EVERY constructor body
+    {
         System.out.println("Instance initializing");
-        this.socket = openSocket();        // logic common to all constructors goes here
+        this.socket = openSocket();
     }
 
     public ConnectionPool(String host) {
         System.out.println("Constructor(host) runs AFTER the instance block");
-        // host-specific setup only
     }
 
     public ConnectionPool(String host, int port) {
         System.out.println("This constructor also ran the instance block above first");
-        // port-specific setup only
     }
 }
 ```
@@ -71,7 +81,6 @@ For `new Child()` where both classes have fields, blocks, and constructors:
 
 Proof program:
 
-```java
 class Base {
     { log("2. base instance block"); }                 // appears before base constructor output
     Base() { log("3. base constructor"); }
@@ -84,11 +93,9 @@ class Derived extends Base {
     Derived() { log("6. derived constructor"); }
 }
 // Output order: (statics first if any), then 2,3,4,5,6
-```
 
 ## What Static Blocks Are Actually Used For
 
-```java
 public class DatabaseDriver {
     static {
         try {
@@ -99,7 +106,6 @@ public class DatabaseDriver {
         }
     }
 }
-```
 
 Classic uses:
 - Registering JDBC drivers (older JDBC versions).
@@ -138,3 +144,4 @@ Modern replacements teams prefer:
 | Heavy work / I/O in static blocks | `ExceptionInInitializerError` masks real errors | Move work into lazy factories or framework hooks |
 | Instance blocks used for constructor sharing | Hard-to-trace setup flow | Prefer a private helper method invoked explicitly |
 | Forward-referencing fields in initializers | Compile error ("illegal forward reference") | Declare before you initialize |
+

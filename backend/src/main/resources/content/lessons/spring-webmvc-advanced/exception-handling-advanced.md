@@ -1,7 +1,7 @@
 ---
 title: Advanced Exception Handling in Spring MVC
 module: spring-webmvc-advanced
-order: 1
+order: 4
 minutes: 22
 topics: ["HandlerExceptionResolver", "@ExceptionHandler chains", "response status", "error page", "async exceptions"]
 summary: @RestControllerAdvice covers 90% of error handling. The remaining 10% — resolver chains, percontroller handlers, mapped exceptions, and error pages...
@@ -28,7 +28,6 @@ If none handle it, the container's error page (or Spring Boot's `/error`) takes 
 
 Advice = global. Controller-local = overrides.
 
-```java
 @RestController
 @RequestMapping("/api/orders")
 public class OrderController {
@@ -40,7 +39,6 @@ public class OrderController {
             "Order " + ex.getOrderId() + " not found");
     }
 }
-```
 
 Spring picks the **most specific** handler: a controller-local `@ExceptionHandler` beats a global advice handler for the same exception type.
 
@@ -48,25 +46,21 @@ Spring picks the **most specific** handler: a controller-local `@ExceptionHandle
 
 `@ExceptionHandler` accepts multiple types — great for shared logic:
 
-```java
 @ExceptionHandler({OrderNotFoundException.class, CustomerNotFoundException.class})
 public ProblemDetail handleNotFound(RuntimeException ex) {
     return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
 }
-```
 
 ## @ResponseStatus on Exceptions
 
 The annotation-based shortcut — the exception *is* the response:
 
-```java
 @ResponseStatus(HttpStatus.NOT_FOUND)
 public class OrderNotFoundException extends RuntimeException {
     public OrderNotFoundException(String orderId) {
         super("Order " + orderId + " not found");
     }
 }
-```
 
 No advice needed for the common case. But once you want a consistent body (Problem Details, trace ids), the advice wins.
 
@@ -74,7 +68,6 @@ No advice needed for the common case. But once you want a consistent body (Probl
 
 Handlers can take richer arguments than just the exception:
 
-```java
 @ExceptionHandler(MethodArgumentNotValidException.class)
 public ProblemDetail handleValidation(MethodArgumentNotValidException ex,
                                      HttpServletRequest request) {
@@ -88,7 +81,6 @@ public ProblemDetail handleValidation(MethodArgumentNotValidException ex,
         .toList());
     return problem;
 }
-```
 
 Available: `HttpServletRequest/Response`, `WebRequest`, `HandlerMethod`, plus the exception itself.
 
@@ -96,18 +88,15 @@ Available: `HttpServletRequest/Response`, `WebRequest`, `HandlerMethod`, plus th
 
 Spring can match handlers by the **cause chain** of a wrapped exception. When a `DataIntegrityViolationException` wraps a `ConstraintViolationException`, the most specific cause handler fires:
 
-```java
 @ExceptionHandler(ConstraintViolationException.class)
 public ProblemDetail handleConstraint(ConstraintViolationException ex) {
     // fires even when the exception is wrapped in another
 }
-```
 
 ## Async Exceptions
 
 For `@Async` / reactive code, exceptions don't surface through the controller path. Handle them where they run:
 
-```java
 @Configuration
 public class AsyncConfig implements AsyncConfigurer {
 
@@ -117,13 +106,11 @@ public class AsyncConfig implements AsyncConfigurer {
             log.error("Async method {} threw", method.getName(), ex);
     }
 }
-```
 
 ## The Error Page and /error
 
 Spring Boot's `BasicErrorController` serves `/error` — the final safety net for unmapped errors (including container-level 404s and 500s). Customize it:
 
-```java
 @Controller
 public class CustomErrorController implements ErrorController {
 
@@ -139,7 +126,6 @@ public class CustomErrorController implements ErrorController {
         return ResponseEntity.status(status != null ? status : 500).body(body);
     }
 }
-```
 
 Also configure error handling for invalid requests:
 
@@ -154,7 +140,6 @@ server:
 
 ## Global Fallback: Catch-All Ordering
 
-```java
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -173,13 +158,11 @@ public class GlobalExceptionHandler {
             HttpStatus.INTERNAL_SERVER_ERROR, "Unexpected error");
     }
 }
-```
 
 Order matters at *runtime*: Spring picks the closest match in the hierarchy, so the catch-all only fires for truly unknown exceptions.
 
 ## Testing Exception Paths
 
-```java
 @SpringBootTest
 @AutoConfigureMockMvc
 class ExceptionHandlingTest {
@@ -207,7 +190,6 @@ class ExceptionHandlingTest {
             .andExpect(jsonPath("$.message").doesNotExist());
     }
 }
-```
 
 ## Summary
 
@@ -222,3 +204,4 @@ class ExceptionHandlingTest {
 | Leakage | `server.error.include-*: never`, log server-side |
 
 The chain is predictable: advice → controller handlers → status resolvers → defaults → error page. Know the order, keep the catch-all last, and every error in your API — expected or not — leaves the same well-formed envelope.
+

@@ -1,7 +1,7 @@
 ---
 title: Docker Compose — Multi-Container Apps Made Manageable
 module: docker-deep
-order: 3
+order: 2
 minutes: 24
 topics: ["docker-compose.yml", "services", "networks", "dependencies", "dev environments"]
 summary: A real application is rarely one container: the backend, the database, Redis, RabbitMQ — each is a container, and they must network together, know ...
@@ -135,3 +135,4 @@ docker compose build             # rebuild images
 - Healthchecks + `depends_on: condition: service_healthy` = correct startup sequencing.
 - Externalize secrets with `${VAR:-default}` and a gitignored `.env`.
 - Compose for dev is the standard; production uses the same model through managed platforms.
+

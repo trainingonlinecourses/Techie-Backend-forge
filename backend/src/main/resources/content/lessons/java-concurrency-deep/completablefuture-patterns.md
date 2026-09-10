@@ -1,7 +1,7 @@
 ---
 title: CompletableFuture Patterns — Async Composition
 summary: chaining, combining, exception handling, timeouts, and production patterns for building async pipelines without blocking threads.
-order: 8
+order: 2
 minutes: 22
 topics: [completablefuture, async, chaining, exception-handling, timeout, parallel-composition, non-blocking]
 docs:
@@ -23,50 +23,84 @@ docs:
 
 ### Creating and Using
 
+
+**What this code does — step by step:**
+
+1. Start an async task
+2. This runs on a separate thread
+3. Do something when the result is ready
+4. Block and get the result (try to avoid this!)
+5. `String result = future.get();` — Blocks until done
+
+The same code, clean:
+
 ```java
-// Start an async task
-CompletableFuture<String> future = CompletableFuture.supplyAsync(() -> {
-    // This runs on a separate thread
-    return fetchDataFromExternalAPI();
-});
+public class Main {
 
-// Do something when the result is ready
-future.thenAccept(result -> {
-    System.out.println("Got: " + result);
-});
+    public static void main(String[] args) {
+        CompletableFuture<String> future = CompletableFuture.supplyAsync(() -> {
+            return fetchDataFromExternalAPI();
+        });
 
-// Block and get the result (try to avoid this!)
-String result = future.get();  // Blocks until done
+        future.thenAccept(result -> {
+            System.out.println("Got: " + result);
+        });
+
+        String result = future.get();
+    }
+}
 ```
 
 ---
 
 ## Chaining Operations
 
-```java
-// Chain multiple operations — each runs when the previous completes
-CompletableFuture<String> future = CompletableFuture
-    .supplyAsync(() -> fetchUserId())           // Step 1: get user ID
-    .thenApply(id -> fetchUserName(id))          // Step 2: get user name
-    .thenApply(name -> "Hello, " + name);        // Step 3: format greeting
 
-// Each step runs asynchronously — no thread is blocked waiting
+**What this code does — step by step:**
+
+1. Chain multiple operations — each runs when the previous completes
+2. `.supplyAsync(() -> fetchUserId())` — Step 1: get user ID
+3. `.thenApply(id -> fetchUserName(id))` — Step 2: get user name
+4. `.thenApply(name -> "Hello, " + name);` — Step 3: format greeting
+5. Each step runs asynchronously — no thread is blocked waiting
+
+The same code, clean:
+
+```java
+CompletableFuture<String> future = CompletableFuture
+    .supplyAsync(() -> fetchUserId())
+    .thenApply(id -> fetchUserName(id))
+    .thenApply(name -> "Hello, " + name);
 ```
 
 ### thenApply vs thenAccept vs thenRun
 
+
+**What this code does — step by step:**
+
+1. thenApply: transform the result, returns new CompletableFuture
+2. `.thenApply(s -> s.length());` — String → Integer
+3. thenAccept: consume the result, returns CompletableFuture<Void>
+4. `.thenAccept(s -> System.out.println("Result: " + s));` — Just consume
+5. thenRun: run after completion, doesn't use the result
+6. `.thenRun(() -> System.out.println("Done!"));` — Just run code
+
+The same code, clean:
+
 ```java
-// thenApply: transform the result, returns new CompletableFuture
-CompletableFuture<Integer> lengthFuture = future
-    .thenApply(s -> s.length());  // String → Integer
+public class Main {
 
-// thenAccept: consume the result, returns CompletableFuture<Void>
-future
-    .thenAccept(s -> System.out.println("Result: " + s));  // Just consume
+    public static void main(String[] args) {
+        CompletableFuture<Integer> lengthFuture = future
+            .thenApply(s -> s.length());
 
-// thenRun: run after completion, doesn't use the result
-future
-    .thenRun(() -> System.out.println("Done!"));  // Just run code
+        future
+            .thenAccept(s -> System.out.println("Result: " + s));
+
+        future
+            .thenRun(() -> System.out.println("Done!"));
+    }
+}
 ```
 
 ---
@@ -75,7 +109,6 @@ future
 
 ### Wait for All
 
-```java
 // Run 3 independent tasks in parallel
 CompletableFuture<User> userFuture = CompletableFuture.supplyAsync(() -> fetchUser());
 CompletableFuture<List<Order>> ordersFuture = CompletableFuture.supplyAsync(() -> fetchOrders());
@@ -91,11 +124,9 @@ CompletableFuture<DashboardData> dashboardFuture = CompletableFuture.allOf(
 ));
 
 // All three ran in parallel — total time = slowest one, not sum of all
-```
 
 ### Wait for Any
 
-```java
 // Get the fastest result from multiple sources
 CompletableFuture<String> source1 = CompletableFuture.supplyAsync(() -> fetchFromSource1());
 CompletableFuture<String> source2 = CompletableFuture.supplyAsync(() -> fetchFromSource2());
@@ -103,13 +134,11 @@ CompletableFuture<String> source3 = CompletableFuture.supplyAsync(() -> fetchFro
 
 // Returns the first one to complete
 CompletableFuture<String> fastest = CompletableFuture.anyOf(source1, source2, source3);
-```
 
 ---
 
 ## Exception Handling
 
-```java
 CompletableFuture<String> future = CompletableFuture
     .supplyAsync(() -> {
         if (Math.random() > 0.5) {
@@ -125,11 +154,9 @@ CompletableFuture<String> future = CompletableFuture
     .thenApply(result -> result.toUpperCase());
 
 // Result is either "SUCCESS" or "FALLBACK VALUE"
-```
 
 ### Multiple Exception Handlers
 
-```java
 CompletableFuture<String> future = CompletableFuture
     .supplyAsync(() -> riskyOperation())
     .exceptionally(ex -> {
@@ -141,11 +168,9 @@ CompletableFuture<String> future = CompletableFuture
             return "Unknown error — using default";
         }
     });
-```
 
 ### handle (Process Either Success or Failure)
 
-```java
 CompletableFuture<String> future = CompletableFuture
     .supplyAsync(() -> riskyOperation())
     .handle((result, ex) -> {
@@ -155,13 +180,11 @@ CompletableFuture<String> future = CompletableFuture
         }
         return result;
     });
-```
 
 ---
 
 ## Timeouts
 
-```java
 // Java 9+ timeout
 CompletableFuture<String> future = CompletableFuture
     .supplyAsync(() -> slowOperation())
@@ -177,13 +200,23 @@ CompletableFuture<String> future = CompletableFuture
 CompletableFuture<String> future = CompletableFuture
     .supplyAsync(() -> slowOperation())
     .completeOnTimeout("Default value", 5, TimeUnit.SECONDS);
-```
 
 ---
 
 ## In an Organization
 
 ### Scenario 1: Aggregated API Gateway
+
+
+**What this code does — step by step:**
+
+1. Fire all three requests in parallel
+2. `.exceptionally(ex -> User.unknown(userId));` — Fallback
+3. `.exceptionally(ex -> List.of());` — Empty list fallback
+4. `.exceptionally(ex -> 0);` — Zero fallback
+5. Combine results
+
+The same code, clean:
 
 ```java
 @Service
@@ -194,20 +227,18 @@ public class DashboardAggregator {
     private final NotificationServiceClient notificationClient;
 
     public CompletableFuture<DashboardData> getDashboard(String userId) {
-        // Fire all three requests in parallel
         CompletableFuture<User> userFuture = CompletableFuture
             .supplyAsync(() -> userClient.getUser(userId))
-            .exceptionally(ex -> User.unknown(userId));  // Fallback
+            .exceptionally(ex -> User.unknown(userId));
 
         CompletableFuture<List<Order>> ordersFuture = CompletableFuture
             .supplyAsync(() -> orderClient.getRecentOrders(userId, 10))
-            .exceptionally(ex -> List.of());  // Empty list fallback
+            .exceptionally(ex -> List.of());
 
         CompletableFuture<Integer> notifCountFuture = CompletableFuture
             .supplyAsync(() -> notificationClient.getUnreadCount(userId))
-            .exceptionally(ex -> 0);  // Zero fallback
+            .exceptionally(ex -> 0);
 
-        // Combine results
         return CompletableFuture.allOf(userFuture, ordersFuture, notifCountFuture)
             .thenApply(v -> new DashboardData(
                 userFuture.join(),
@@ -220,7 +251,6 @@ public class DashboardAggregator {
 
 ### Scenario 2: Retry with Backoff
 
-```java
 public <T> CompletableFuture<T> retryWithBackoff(
         Supplier<T> operation,
         int maxRetries,
@@ -250,11 +280,9 @@ public <T> CompletableFuture<T> retryWithBackoff(
         })
         .thenCompose(Function.identity());
 }
-```
 
 ### Scenario 3: Timeout with Fallback
 
-```java
 @Service
 public class ExternalDataService {
 
@@ -271,7 +299,6 @@ public class ExternalDataService {
             });
     }
 }
-```
 
 ---
 
@@ -285,3 +312,4 @@ public class ExternalDataService {
 | Creating too many threads | Resource exhaustion | Use `CompletableFuture.supplyAsync(() -> ..., executor)` with a bounded executor |
 | Not using `allOf` for parallel | Sequential when parallel is possible | Use `allOf()` to wait for multiple futures |
 | Ignoring `join()` exceptions | `CompletionException` not caught | Wrap in try-catch or use `.exceptionally()` |
+

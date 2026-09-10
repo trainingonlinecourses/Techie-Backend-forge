@@ -1,7 +1,7 @@
 ---
 title: Kafka in Production — Hardening Your Event Streaming
 summary: Production configuration for Kafka — consumer groups, partitioning, idempotent producers, dead letter queues, monitoring, and the operational patterns that prevent data loss. Beginner-friendly with line-by-line code.
-order: 7
+order: 3
 minutes: 22
 topics: [Kafka production, consumer groups, partitioning, idempotent producer, DLQ, monitoring, exactly-once, production config]
 docs:
@@ -32,36 +32,50 @@ Getting Kafka working in development is easy. Making it work reliably in product
 
 ### Production Producer Configuration
 
+
+**What this code does — step by step:**
+
+1. Bootstrap servers (multiple for HA):
+2. Serialization:
+3. Durability: wait for ALL replicas to acknowledge:
+4. `config.put(ProducerConfig.ACKS_CONFIG, "all");` — "all" = wait for ISR replicas
+5. Reliability: retry on transient failures:
+6. `config.put(ProducerConfig.RETRIES_CONFIG, Integer.MAX_VALUE);` — Retry forever (with backoff)
+7. `config.put(ProducerConfig.RETRY_BACKOFF_MS_CONFIG, 1000);` — Wait 1s between retries
+8. Idempotency: prevent duplicate messages:
+9. `config.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, true);` — Each message written exactly once
+10. `config.put(ProducerConfig.MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION, 5);` — Allow 5 concurrent requests
+11. Batching (performance):
+12. `config.put(ProducerConfig.BATCH_SIZE_CONFIG, 16384);` — 16KB batch size
+13. `config.put(ProducerConfig.LINGER_MS_CONFIG, 5);` — Wait 5ms to fill batch
+14. Compression:
+15. `config.put(ProducerConfig.COMPRESSION_TYPE_CONFIG, "snappy");` — Compress for network efficiency
+
+The same code, clean:
+
 ```java
 @Bean
 public ProducerFactory<String, OrderEvent> producerFactory() {
     Map<String, Object> config = new HashMap<>();
 
-    // Bootstrap servers (multiple for HA):
     config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,
         "kafka-1:9092,kafka-2:9092,kafka-3:9092");
 
-    // Serialization:
     config.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
     config.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
 
-    // Durability: wait for ALL replicas to acknowledge:
-    config.put(ProducerConfig.ACKS_CONFIG, "all");              // "all" = wait for ISR replicas
+    config.put(ProducerConfig.ACKS_CONFIG, "all");
 
-    // Reliability: retry on transient failures:
-    config.put(ProducerConfig.RETRIES_CONFIG, Integer.MAX_VALUE);  // Retry forever (with backoff)
-    config.put(ProducerConfig.RETRY_BACKOFF_MS_CONFIG, 1000);     // Wait 1s between retries
+    config.put(ProducerConfig.RETRIES_CONFIG, Integer.MAX_VALUE);
+    config.put(ProducerConfig.RETRY_BACKOFF_MS_CONFIG, 1000);
 
-    // Idempotency: prevent duplicate messages:
-    config.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, true);   // Each message written exactly once
-    config.put(ProducerConfig.MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION, 5);  // Allow 5 concurrent requests
+    config.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, true);
+    config.put(ProducerConfig.MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION, 5);
 
-    // Batching (performance):
-    config.put(ProducerConfig.BATCH_SIZE_CONFIG, 16384);         // 16KB batch size
-    config.put(ProducerConfig.LINGER_MS_CONFIG, 5);              // Wait 5ms to fill batch
+    config.put(ProducerConfig.BATCH_SIZE_CONFIG, 16384);
+    config.put(ProducerConfig.LINGER_MS_CONFIG, 5);
 
-    // Compression:
-    config.put(ProducerConfig.COMPRESSION_TYPE_CONFIG, "snappy"); // Compress for network efficiency
+    config.put(ProducerConfig.COMPRESSION_TYPE_CONFIG, "snappy");
 
     return new DefaultKafkaProducerFactory<>(config);
 }
@@ -75,6 +89,22 @@ public ProducerFactory<String, OrderEvent> producerFactory() {
 
 ### Production Consumer Configuration
 
+
+**What this code does — step by step:**
+
+1. `factory.setConcurrency(3);` — 3 consumer threads (match partitions)
+2. Acknowledgment mode:
+3. Manually acknowledge AFTER processing — prevents data loss
+4. Retry and DLQ:
+5. Shutdown:
+6. `factory.getContainerProperties().setStopImmediate(true);` — Stop processing immediately on shutdown
+7. Auto-offset reset: start from beginning if no offset exists:
+8. Don't auto-commit — we'll commit manually after processing:
+9. Max poll records (prevent rebalancing):
+10. `config.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, 100);` — Process 100 at a time
+
+The same code, clean:
+
 ```java
 @Bean
 public ConcurrentKafkaListenerContainerFactory<String, OrderEvent> kafkaListenerContainerFactory() {
@@ -82,17 +112,13 @@ public ConcurrentKafkaListenerContainerFactory<String, OrderEvent> kafkaListener
         new ConcurrentKafkaListenerContainerFactory<>();
 
     factory.setConsumerFactory(consumerFactory());
-    factory.setConcurrency(3);                             // 3 consumer threads (match partitions)
+    factory.setConcurrency(3);
 
-    // Acknowledgment mode:
     factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL_IMMEDIATE);
-    // Manually acknowledge AFTER processing — prevents data loss
 
-    // Retry and DLQ:
     factory.setCommonErrorHandler(dltHandler());
 
-    // Shutdown:
-    factory.getContainerProperties().setStopImmediate(true);  // Stop processing immediately on shutdown
+    factory.getContainerProperties().setStopImmediate(true);
 
     return factory;
 }
@@ -108,14 +134,11 @@ public ConsumerFactory<String, OrderEvent> consumerFactory() {
     config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
     config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
 
-    // Auto-offset reset: start from beginning if no offset exists:
     config.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
 
-    // Don't auto-commit — we'll commit manually after processing:
     config.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
 
-    // Max poll records (prevent rebalancing):
-    config.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, 100);   // Process 100 at a time
+    config.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, 100);
 
     return new DefaultKafkaConsumerFactory<>(config);
 }
@@ -129,27 +152,36 @@ public ConsumerFactory<String, OrderEvent> consumerFactory() {
 
 ### Dead Letter Queue (DLQ)
 
+
+**What this code does — step by step:**
+
+1. When a message fails after all retries, send it to the DLQ:
+2. `new FixedBackOff(1000L, 3L)` — Retry 3 times with 1s delay before DLQ
+3. Don't retry for these exceptions (permanent failures):
+4. `ValidationException.class,` — Bad data — retrying won't help
+5. `SerializationException.class` — Can't deserialize — retrying won't help
+6. DLQ consumer — monitor and alert on failed messages:
+
+The same code, clean:
+
 ```java
 @Bean
 public DefaultErrorHandler dltHandler() {
-    // When a message fails after all retries, send it to the DLQ:
     DeadLetterPublishingRecoverer recoverer = new DeadLetterPublishingRecoverer(kafkaTemplate);
 
     DefaultErrorHandler errorHandler = new DefaultErrorHandler(
         recoverer,
-        new FixedBackOff(1000L, 3L)     // Retry 3 times with 1s delay before DLQ
+        new FixedBackOff(1000L, 3L)
     );
 
-    // Don't retry for these exceptions (permanent failures):
     errorHandler.addNotRetryableExceptions(
-        ValidationException.class,       // Bad data — retrying won't help
-        SerializationException.class     // Can't deserialize — retrying won't help
+        ValidationException.class,
+        SerializationException.class
     );
 
     return errorHandler;
 }
 
-// DLQ consumer — monitor and alert on failed messages:
 @KafkaListener(topics = "order-events.DLT", groupId = "dlq-monitor")
 public void handleDLT(OrderEvent event,
                       @Header(KafkaHeaders.RECEIVED_TOPIC) String topic,
@@ -166,6 +198,19 @@ public void handleDLT(OrderEvent event,
 
 ### Scenario 1: Exactly-Once Order Processing
 
+
+**What this code does — step by step:**
+
+1. 1. Check if already processed (idempotency):
+2. `ack.acknowledge();` — Skip — already processed
+3. 2. Process the event:
+4. 3. Mark as processed:
+5. 4. Acknowledge:
+6. `ack.acknowledge();` — Offset committed — won't be redelivered
+7. Don't acknowledge — message will be redelivered. After max retries, it goes to DLQ
+
+The same code, clean:
+
 ```java
 @Service
 public class OrderEventHandler {
@@ -173,25 +218,19 @@ public class OrderEventHandler {
     @KafkaListener(topics = "order-events", groupId = "order-processing")
     public void handleOrderEvent(OrderEvent event, Acknowledgment ack) {
         try {
-            // 1. Check if already processed (idempotency):
             if (processedEvents.contains(event.getEventId())) {
-                ack.acknowledge();     // Skip — already processed
+                ack.acknowledge();
                 return;
             }
 
-            // 2. Process the event:
             orderService.processPayment(event.getOrderId(), event.getAmount());
 
-            // 3. Mark as processed:
             processedEvents.add(event.getEventId());
 
-            // 4. Acknowledge:
-            ack.acknowledge();         // Offset committed — won't be redelivered
+            ack.acknowledge();
 
         } catch (Exception e) {
             log.error("Failed to process event {}: {}", event.getEventId(), e.getMessage());
-            // Don't acknowledge — message will be redelivered
-            // After max retries, it goes to DLQ
             throw e;
         }
     }
@@ -200,16 +239,22 @@ public class OrderEventHandler {
 
 ### Scenario 2: Partition Ordering
 
-```java
-// Key-based partitioning ensures messages with the same key go to the same partition:
-kafkaTemplate.send("order-events", order.getCustomerId(), orderEvent);
-// ↑ CustomerId is the KEY → all events for the same customer are ordered
 
-// The consumer processes each partition sequentially:
-@KafkaListener(topics = "order-events", concurrency = "3")  // 3 partitions
+**What this code does — step by step:**
+
+1. Key-based partitioning ensures messages with the same key go to the same partition:
+2. ↑ CustomerId is the KEY → all events for the same customer are ordered
+3. The consumer processes each partition sequentially:
+4. `@KafkaListener(topics = "order-events", concurrency = "3")` — 3 partitions
+5. Within each partition, events are processed IN ORDER. Across partitions, order is not guaranteed
+
+The same code, clean:
+
+```java
+kafkaTemplate.send("order-events", order.getCustomerId(), orderEvent);
+
+@KafkaListener(topics = "order-events", concurrency = "3")
 public void handle(OrderEvent event) {
-    // Within each partition, events are processed IN ORDER
-    // Across partitions, order is not guaranteed
 }
 ```
 
@@ -256,3 +301,4 @@ Consumer D joins (4 consumers, 3 partitions):
 - **Monitor consumer lag** — it's the most important Kafka metric in production.
 
 Official docs: [Kafka Producer Config](https://kafka.apache.org/documentation/#producerconfigs) · [Spring Kafka](https://docs.spring.io/spring-kafka/reference/html/)
+

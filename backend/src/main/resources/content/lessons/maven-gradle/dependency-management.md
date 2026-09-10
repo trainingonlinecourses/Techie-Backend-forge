@@ -1,7 +1,7 @@
 ---
 title: Dependency Management and Versioning
 module: maven-gradle
-order: 2
+order: 1
 minutes: 22
 topics: ["dependency scopes", "transitive deps", "exclusions", "dependencyManagement", "BOM", "conflict resolution"]
 summary: Dependencies are the biggest source of build pain: conflicts, scope mistakes, and silent version drift. This lesson covers the dependency mechanism...
@@ -190,3 +190,4 @@ mvn versions:display-dependency-updates   # newer versions available
 | Audit | `dependency:analyze`, `versions:display-dependency-updates` |
 
 Dependency management is governance: scopes say where a jar lives, the BOM says what version, exclusions trim what leaks in, and the tree shows what actually arrived. Run `dependency:tree` before every upgrade — the graph tells you more than the docs.
+

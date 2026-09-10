@@ -1,7 +1,7 @@
 ---
 title: String Formatting — printf, String.format, and MessageFormat
 module: java-strings-deep
-order: 4
+order: 1
 minutes: 21
 topics: ["printf", "String.format", "format specifiers", "locale", "MessageFormat"]
 summary: Concatenation with + gets ugly fast when you want control over layout:
@@ -16,9 +16,7 @@ docs:
 
 Concatenation with `+` gets ugly fast when you want control over layout:
 
-```java
 String line = "Total: $" + total + " — discount " + pct + "% off — " + count + " items";
-```
 
 Three problems:
 
@@ -28,9 +26,7 @@ Three problems:
 
 **Formatting** separates *what you want to print* (a template with placeholders) from *the values* you plug in:
 
-```java
 String line = String.format("Total: $%.2f — discount %d%% off — %d items", total, pct, count);
-```
 
 The template `"Total: $%.2f — discount %d%% off — %d items"` shows the exact output shape. `%.2f`, `%d` are **format specifiers** — placeholders that say "put a floating-point number here, rounded to 2 decimals" and "put an integer here".
 
@@ -51,6 +47,24 @@ The template `"Total: $%.2f — discount %d%% off — %d items"` shows the exact
 
 ## The Code Walkthrough
 
+
+**What this code does — step by step:**
+
+1. 1. String.format — returns a String
+2. You bought 3 Widget(s) for $1,234.57 (15% off)
+3. 2. printf — prints directly to System.out (same specifiers)
+4. | Widget | 1234.57 |
+5. 3. Explicit argument index — reuse without reordering
+6. B is cheaper than A
+7. 4. Zero-padding and sign flags
+8. `System.out.printf("%05d%n", 42);` — 00042
+9. `System.out.printf("%+d and %+d%n", 7, -7);` — +7 and -7
+10. 5. Locale-aware formatting (comma vs dot decimals)
+11. `System.out.printf(Locale.GERMANY, "%.2f%n", 1234.5);` — 1234,50
+12. `System.out.printf(Locale.US, "%.2f%n", 1234.5);` — 1234.50
+
+The same code, clean:
+
 ```java
 import java.util.Locale;
 
@@ -62,28 +76,20 @@ public class FormatDemo {
         double discount = 15.0;
         String product = "Widget";
 
-        // 1. String.format — returns a String
         String line = String.format(
                 "You bought %d %s(s) for $%,.2f (%.0f%% off)",
                 items, product, total, discount);
         System.out.println(line);
-        // You bought 3 Widget(s) for $1,234.57 (15% off)
 
-        // 2. printf — prints directly to System.out (same specifiers)
         System.out.printf("| %-10s | %6.2f |%n", product, total);
-        // | Widget     | 1234.57 |
 
-        // 3. Explicit argument index — reuse without reordering
         System.out.printf("%2$s is cheaper than %1$s%n", "A", "B");
-        // B is cheaper than A
 
-        // 4. Zero-padding and sign flags
-        System.out.printf("%05d%n", 42);          // 00042
-        System.out.printf("%+d and %+d%n", 7, -7); // +7 and -7
+        System.out.printf("%05d%n", 42);
+        System.out.printf("%+d and %+d%n", 7, -7);
 
-        // 5. Locale-aware formatting (comma vs dot decimals)
-        System.out.printf(Locale.GERMANY, "%.2f%n", 1234.5);   // 1234,50
-        System.out.printf(Locale.US, "%.2f%n", 1234.5);        // 1234.50
+        System.out.printf(Locale.GERMANY, "%.2f%n", 1234.5);
+        System.out.printf(Locale.US, "%.2f%n", 1234.5);
     }
 }
 ```
@@ -115,12 +121,16 @@ public class FormatDemo {
 
 `%t` conversions format dates and times (need `java.time` types):
 
-```java
 import java.time.LocalDateTime;
 
-LocalDateTime now = LocalDateTime.now();
-System.out.printf("%tF %<tT%n", now);   // 2026-08-18 14:30:05
-```
+public class Main {
+
+    public static void main(String[] args) {
+
+        LocalDateTime now = LocalDateTime.now();
+        System.out.printf("%tF %<tT%n", now);   // 2026-08-18 14:30:05
+    }
+}
 
 `%tF` = ISO date, `%<tT` = time; the `<` flag means "reuse the previous argument", so we don't pass `now` twice.
 
@@ -138,3 +148,4 @@ System.out.printf("%tF %<tT%n", now);   // 2026-08-18 14:30:05
 - `width`/`flags` give column alignment and padding.
 - Always pass an explicit `Locale` for locale-sensitive output.
 - Use `MessageFormat` (`{0}` style) for user-facing internationalized text.
+

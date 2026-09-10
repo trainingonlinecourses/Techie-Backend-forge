@@ -1,7 +1,7 @@
 ---
 title: ResponseEntity & HTTP Status Codes — Speaking HTTP Correctly
 summary: ResponseEntity bodies/status/headers, the status code decision table, ETag/Last-Modified, and the error-body conventions production APIs follow.
-order: 9
+order: 11
 minutes: 18
 topics: [responseentity, status-codes, http-status, etag, last-modified, headers, error-body]
 docs:
@@ -15,14 +15,12 @@ docs:
 
 A controller that returns an object gets `200 OK` and a JSON body from Spring's default. `ResponseEntity<T>` gives you the **whole HTTP response**: status, headers, and body — the tool for when "200 + JSON" isn't the right answer.
 
-```java
 @GetMapping("/api/orders/{id}")
 public ResponseEntity<Order> getOrder(@PathVariable Long id) {
     return orderService.findById(id)
         .map(o -> ResponseEntity.ok(o))                       // 200 + body
         .orElse(ResponseEntity.notFound().build());           // 404, no body
 }
-```
 
 `ResponseEntity` has builders for every common case: `ok()`, `created(uri)`, `accepted()`, `noContent()`, `badRequest()`, `notFound()`, `status(HttpStatus.X)`. The static `ResponseEntity` is for simple responses; `ResponseEntity.BodyBuilder` chains headers: `.header(...)`, `.contentType(...)`, `.cacheControl(...)`, `.location(uri)`.
 
@@ -53,7 +51,6 @@ Getting status codes right is a core API quality issue — teams maintain a tabl
 
 **Scenario 1 — REST API error body convention.** Every error is the same shape, so clients parse one format:
 
-```java
 public record ApiError(Instant timestamp, int status, String error, String message, String path) {}
 
 @RestControllerAdvice
@@ -65,24 +62,20 @@ public class ApiExceptionHandler {
     }
     // + handlers for validation errors (400 with field messages), conflict (409), etc.
 }
-```
 
 **Scenario 2 — 201 with Location on create:**
 
-```java
 @PostMapping("/api/orders")
 public ResponseEntity<Order> create(@Valid @RequestBody OrderRequest r, UriComponentsBuilder ucb) {
     Order created = orderService.create(r);
     URI location = ucb.path("/api/orders/{id}").buildAndExpand(created.getId()).toUri();
     return ResponseEntity.created(location).body(created);   // 201 + Location
 }
-```
 
 `UriComponentsBuilder` builds the Location from the current request's base URL — the client can immediately GET the new resource.
 
 **Scenario 3 — conditional reads with ETag/Last-Modified (cache-friendly APIs).**
 
-```java
 @GetMapping("/api/profile")
 public ResponseEntity<Profile> profile() {
     Profile p = profileService.current();
@@ -91,18 +84,15 @@ public ResponseEntity<Profile> profile() {
         .lastModified(p.updatedAt().toEpochMilli())
         .body(p);
 }
-```
 
 The client sends `If-None-Match: "v3"`; the server compares and can answer **304 Not Modified** with no body — saving bandwidth on every unchanged read. A `WebRequest` argument automates this:
 
-```java
 public ResponseEntity<Profile> profile(WebRequest request) {
     if (request.checkNotModified(profileService.currentVersion())) {
         return null;   // framework sends 304
     }
     ...
 }
-```
 
 **Scenario 4 — async/202 pattern.** A long job: accept the request with 202 + a job id in the body; a separate endpoint reports progress; the client polls or receives a webhook.
 
@@ -121,3 +111,4 @@ public ResponseEntity<Profile> profile(WebRequest request) {
 - Standardize an error body via `@ControllerAdvice` so every failure is parseable.
 - ETag/Last-Modified + `WebRequest.checkNotModified` enable cheap 304 responses.
 - Business statuses live in the handler; unexpected errors in the advice.
+

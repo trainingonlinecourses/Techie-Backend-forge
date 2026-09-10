@@ -17,12 +17,29 @@ A `LinkedHashMap` is a `HashMap` with a linked list running through its entries.
 
 But often you need the map sorted, not just insertion-ordered. You want entries sorted by key ("Alice", "Bob", "Charlie") or by value (the highest scores first). A `LinkedHashMap` can hold a sorted copy — you build it from the original map's entries sorted with a `Comparator`.
 
+
+**What this code does — step by step:**
+
+1. Original: insertion order
+2. Charlie, Alice, Bob, Diana
+3. --- Sort by KEY (alphabetical) ---
+4. `.sorted(Map.Entry.comparingByKey())` — natural order of String: alphabetical
+5. Alice, Bob, Charlie, Diana
+6. --- Sort by VALUE ascending ---
+7. `.sorted(Map.Entry.comparingByValue())` — natural order of Integer: smallest first
+8. Bob(78), Charlie(85), Alice(92), Diana(92)
+9. --- Sort by VALUE descending, with tie-breaker on key ---
+10. `int cmp = Integer.compare(b.getValue(), a.getValue());` — higher score first
+11. `return a.getKey().compareTo(b.getKey());` — same score → alphabetical by name
+12. Alice(92), Diana(92), Charlie(85), Bob(78). Alice before Diana because both have 92 and "Alice" < "Diana"
+
+The same code, clean:
+
 ```java
 import java.util.*;
 
 public class LinkedHashMapSorting {
     public static void main(String[] args) {
-        // Original: insertion order
         Map<String, Integer> scores = new LinkedHashMap<>();
         scores.put("Charlie", 85);
         scores.put("Alice", 92);
@@ -31,42 +48,34 @@ public class LinkedHashMapSorting {
 
         System.out.println("--- insertion order (original) ---");
         scores.forEach((k, v) -> System.out.println(k + " = " + v));
-        // Charlie, Alice, Bob, Diana
 
-        // --- Sort by KEY (alphabetical) ---
         Map<String, Integer> byKey = new LinkedHashMap<>();
         scores.entrySet().stream()
-            .sorted(Map.Entry.comparingByKey())          // natural order of String: alphabetical
+            .sorted(Map.Entry.comparingByKey())
             .forEach(e -> byKey.put(e.getKey(), e.getValue()));
 
         System.out.println("--- sorted by key ---");
         byKey.forEach((k, v) -> System.out.println(k + " = " + v));
-        // Alice, Bob, Charlie, Diana
 
-        // --- Sort by VALUE ascending ---
         Map<String, Integer> byValueAsc = new LinkedHashMap<>();
         scores.entrySet().stream()
-            .sorted(Map.Entry.comparingByValue())        // natural order of Integer: smallest first
+            .sorted(Map.Entry.comparingByValue())
             .forEach(e -> byValueAsc.put(e.getKey(), e.getValue()));
 
         System.out.println("--- sorted by value (ascending) ---");
         byValueAsc.forEach((k, v) -> System.out.println(k + " = " + v));
-        // Bob(78), Charlie(85), Alice(92), Diana(92)
 
-        // --- Sort by VALUE descending, with tie-breaker on key ---
         Map<String, Integer> byValueDesc = new LinkedHashMap<>();
         scores.entrySet().stream()
             .sorted((a, b) -> {
-                int cmp = Integer.compare(b.getValue(), a.getValue());  // higher score first
+                int cmp = Integer.compare(b.getValue(), a.getValue());
                 if (cmp != 0) return cmp;
-                return a.getKey().compareTo(b.getKey());                // same score → alphabetical by name
+                return a.getKey().compareTo(b.getKey());
             })
             .forEach(e -> byValueDesc.put(e.getKey(), e.getValue()));
 
         System.out.println("--- sorted by value (descending), ties broken by name ---");
         byValueDesc.forEach((k, v) -> System.out.println(k + " = " + v));
-        // Alice(92), Diana(92), Charlie(85), Bob(78)
-        // Alice before Diana because both have 92 and "Alice" < "Diana"
     }
 }
 ```
@@ -89,22 +98,33 @@ A `LinkedHashMap` gives you O(1) and insertion order by default. When you need a
 
 If you need to sort **by value**, `TreeMap` cannot do it (it only sorts by key). You must build a sorted `LinkedHashMap` or `ArrayList` of entries from a sorted stream, exactly as shown above. This is the standard pattern for "display the map sorted by value" — leaderboard, frequency table, sorted cache statistics.
 
+
+**What this code does — step by step:**
+
+1. LinkedHashMap as an ordered cache
+2. `Map<String, String> cache = new LinkedHashMap<>(16, 0.75f, true);` — accessOrder = true
+3. `System.out.println("after insertion: " + cache.keySet());` — [a, b, c]
+4. `cache.get("a");` — access "a" — in accessOrder mode, it moves to the end
+5. `System.out.println("after get(a): " + cache.keySet());` — [b, c, a]
+6. `System.out.println("after get(b): " + cache.keySet());` — [c, a, b]
+
+The same code, clean:
+
 ```java
 public class LinkedHashMapInsertionOrderDemo {
     public static void main(String[] args) {
-        // LinkedHashMap as an ordered cache
-        Map<String, String> cache = new LinkedHashMap<>(16, 0.75f, true); // accessOrder = true
+        Map<String, String> cache = new LinkedHashMap<>(16, 0.75f, true);
         cache.put("a", "value-a");
         cache.put("b", "value-b");
         cache.put("c", "value-c");
 
-        System.out.println("after insertion: " + cache.keySet());  // [a, b, c]
+        System.out.println("after insertion: " + cache.keySet());
 
-        cache.get("a");   // access "a" — in accessOrder mode, it moves to the end
-        System.out.println("after get(a): " + cache.keySet());  // [b, c, a]
+        cache.get("a");
+        System.out.println("after get(a): " + cache.keySet());
 
         cache.get("b");
-        System.out.println("after get(b): " + cache.keySet());  // [c, a, b]
+        System.out.println("after get(b): " + cache.keySet());
     }
 }
 ```
@@ -144,3 +164,4 @@ In the lab, you will start with an insertion-ordered `LinkedHashMap` of city →
 ## Summary
 
 `LinkedHashMap` is a `HashMap` with predictable iteration order — insertion-order by default, access-order when you request it. It gives O(1) lookups and a stable order, which makes it the right choice for JSON serialization, configuration display, and LRU caches. When you need to sort by key or value, build a new `LinkedHashMap` from the original entries sorted with a `Comparator` — the original map keeps its order, and the sorted copy is a separate view. `TreeMap` sorts by key only and is O(log n); it cannot sort by value, so a sorted stream into a `LinkedHashMap` is the standard pattern for value-sorted maps. Always add a tie-breaker when values can be equal, and never assume any `Map` is thread-safe without synchronization.
+

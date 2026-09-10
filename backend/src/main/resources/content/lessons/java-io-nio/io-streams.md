@@ -1,7 +1,7 @@
 ---
 title: I/O Streams — Bytes and the Stream Model
 module: java-io-nio
-order: 1
+order: 2
 minutes: 26
 topics: ["InputStream", "OutputStream", "byte streams", "buffering", "try-with-resources"]
 summary: Think of water flowing through a pipe. You don't load the entire ocean into the pipe at once — water arrives continuously, in whatever amount the p...
@@ -36,29 +36,36 @@ The `InputStreamReader`/`OutputStreamWriter` adapters bridge the two: they conve
 
 ## The Code Walkthrough
 
+
+**What this code does — step by step:**
+
+1. 1. WRITE bytes to a file
+2. `}` — <- try-with-resources closes the stream (and flushes) automatically
+3. 2. READ bytes back, chunk by chunk
+4. process the chunk: bytesRead tells us how many bytes are valid
+5. 3. READ TEXT line by line (character stream)
+
+The same code, clean:
+
 ```java
 import java.io.*;
 
 public class StreamDemo {
 
     public static void main(String[] args) throws IOException {
-        // 1. WRITE bytes to a file
         byte[] data = "hello streams".getBytes(java.nio.charset.StandardCharsets.UTF_8);
         try (OutputStream out = new BufferedOutputStream(new FileOutputStream("out.bin"))) {
             out.write(data);
-        }   // <- try-with-resources closes the stream (and flushes) automatically
+        }
 
-        // 2. READ bytes back, chunk by chunk
         try (InputStream in = new BufferedInputStream(new FileInputStream("out.bin"))) {
             byte[] buffer = new byte[4096];
             int bytesRead;
             while ((bytesRead = in.read(buffer)) != -1) {
-                // process the chunk: bytesRead tells us how many bytes are valid
                 System.out.println("read " + bytesRead + " bytes");
             }
         }
 
-        // 3. READ TEXT line by line (character stream)
         try (BufferedReader reader = new BufferedReader(new FileReader("out.bin"))) {
             String line;
             while ((line = reader.readLine()) != null) {
@@ -75,11 +82,9 @@ public class StreamDemo {
 
 **Part 2 — reading in a loop.** The universal read idiom:
 
-```java
 byte[] buffer = new byte[4096];
 int bytesRead;
 while ((bytesRead = in.read(buffer)) != -1) { ... }
-```
 
 `read(buffer)` fills up to `buffer.length` bytes and returns how many it actually got — which can be **less than requested** (a stream delivers whatever is available). `-1` means end of stream. Always loop on the *returned count*, never assume the buffer is full. This pattern handles files, sockets, and pipes identically.
 
@@ -87,37 +92,36 @@ while ((bytesRead = in.read(buffer)) != -1) { ... }
 
 ## Why try-with-resources Is Non-Negotiable
 
-```java
 try (OutputStream out = ...) {
     ...
 }   // out.close() called automatically, even if an exception is thrown
-```
 
 Streams hold **OS resources** (file handles, sockets). If you forget to close, you leak handles until the process runs out. `try-with-resources` (Java 7+) guarantees `close()` runs on every exit path — normal or exceptional. Closing also **flushes** buffered writers, so data you wrote actually reaches the file.
 
 Never do the old-style manual close in `finally` unless you're on truly ancient Java:
 
-```java
 // DON'T write this in modern Java:
 OutputStream out = null;
 try { out = ...; ... } finally { if (out != null) out.close(); }
-```
 
 ## The Decorator Pattern in Practice
 
 Streams compose, and the composition is the feature:
 
-```java
-// Reading a compressed text file with an explicit charset:
-try (BufferedReader r = new BufferedReader(
-        new InputStreamReader(
-            new GZIPInputStream(
-                new FileInputStream("log.txt.gz")),
-            StandardCharsets.UTF_8))) {
-    String line;
-    while ((line = r.readLine()) != null) System.out.println(line);
+public class Main {
+
+    public static void main(String[] args) {
+        // Reading a compressed text file with an explicit charset:
+        try (BufferedReader r = new BufferedReader(
+                new InputStreamReader(
+                    new GZIPInputStream(
+                        new FileInputStream("log.txt.gz")),
+                    StandardCharsets.UTF_8))) {
+            String line;
+            while ((line = r.readLine()) != null) System.out.println(line);
+        }
+    }
 }
-```
 
 Reading the chain **from the inside out**: `FileInputStream` gets bytes from the file → `GZIPInputStream` decompresses them → `InputStreamReader` decodes bytes to chars (UTF-8) → `BufferedReader` groups chars into lines. Each layer adds one behavior. This is why stream-based code is so flexible — and why it looks nested.
 
@@ -125,9 +129,7 @@ Reading the chain **from the inside out**: `FileInputStream` gets bytes from the
 
 For **small** files, Java 11+ gives a one-liner:
 
-```java
 String content = Files.readString(Path.of("out.bin"));   // loads whole file
-```
 
 This is clean for config files and templates. But it loads everything into memory — for a 2 GB log you'd die. Rule of thumb:
 
@@ -149,3 +151,4 @@ This is clean for config files and templates. But it loads everything into memor
 - Decorate to add behavior: `Buffered*`, `GZIP*`, charset adapters.
 - The `while ((n = read(buf)) != -1)` loop is the universal read idiom.
 - Always close with try-with-resources — it flushes and frees OS handles.
+

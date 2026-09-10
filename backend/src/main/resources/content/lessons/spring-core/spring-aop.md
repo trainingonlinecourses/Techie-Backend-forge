@@ -1,7 +1,7 @@
 ---
 title: AOP & Proxies
 summary: Aspects, pointcuts, advice types, how Spring AOP works — and the self-invocation trap that bites everyone.
-order: 7
+order: 20
 minutes: 18
 topics: [aop, aspects, pointcuts, proxies, self-invocation]
 docs:
@@ -26,7 +26,6 @@ docs:
 
 ## A working aspect
 
-```java
 @Aspect
 @Component
 public class ServiceTimingAspect {
@@ -54,7 +53,6 @@ public class ServiceTimingAspect {
         }
     }
 }
-```
 
 ## How Spring AOP works: proxies
 
@@ -67,7 +65,6 @@ The context injects the **proxy**; your class is the target inside. This is the 
 
 ## The self-invocation trap (top-10 Spring bug)
 
-```java
 @Service
 public class OrderService {
     @Transactional
@@ -76,11 +73,9 @@ public class OrderService {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void inner() { /* ... */ }
 }
-```
 
 Because `this` is the raw bean (not the proxy), `inner()`'s `@Transactional` never runs. Fixes:
 
-```java
 // Fix 1: extract into another bean
 @Service
 public class PaymentService {
@@ -95,7 +90,6 @@ public class OrderService {
     private final ObjectProvider<OrderService> self;
     public void outer() { self.getObject().inner(); }   // goes through the proxy
 }
-```
 
 ## Transactions under the hood (same story)
 
@@ -111,3 +105,4 @@ public class OrderService {
 - Transactions bind to the thread — async/thread hops break them.
 
 **Official docs:** [AOP](https://docs.spring.io/spring-framework/reference/core/aop.html) · [Pointcuts](https://docs.spring.io/spring-framework/reference/core/aop/pointcuts.html)
+

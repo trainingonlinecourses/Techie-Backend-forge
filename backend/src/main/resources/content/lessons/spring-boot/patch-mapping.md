@@ -1,7 +1,7 @@
 ---
 title: @PatchMapping — Partial Updates in REST APIs
 summary: PUT vs PATCH semantics, partial updates with nullable DTOs, JSON Merge Patch (RFC 7396), and safe field-by-field updates.
-order: 26
+order: 40
 minutes: 14
 topics: [patch-mapping, partial-update, put-vs-patch, json-merge-patch, rest-api-design]
 docs:
@@ -41,7 +41,6 @@ In REST APIs, there are different ways to update a resource:
 
 ### Basic Usage
 
-```java
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
@@ -68,16 +67,25 @@ public class UserController {
         return ResponseEntity.ok(toResponse(updated));
     }
 }
-```
 
 ### With a Dedicated Request DTO (Better)
 
+
+**What this code does — step by step:**
+
+1. Request DTO with nullable fields
+2. `String name,` — null means "don't change"
+3. `String email,` — null means "don't change"
+4. `Integer age` — null means "don't change"
+5. Only apply non-null fields
+
+The same code, clean:
+
 ```java
-// Request DTO with nullable fields
 public record PatchUserRequest(
-    String name,      // null means "don't change"
-    String email,     // null means "don't change"
-    Integer age       // null means "don't change"
+    String name,
+    String email,
+    Integer age
 ) {}
 
 @RestController
@@ -91,7 +99,6 @@ public class UserController {
 
         User user = userService.findById(id);
 
-        // Only apply non-null fields
         if (request.name() != null) user.setName(request.name());
         if (request.email() != null) user.setEmail(request.email());
         if (request.age() != null) user.setAge(request.age());
@@ -106,7 +113,6 @@ public class UserController {
 
 ## PUT vs PATCH
 
-```java
 // PUT — replace the entire resource
 @PutMapping("/{id}")
 public ResponseEntity<UserResponse> replaceUser(
@@ -134,7 +140,6 @@ public ResponseEntity<UserResponse> patchUser(
     User updated = userService.save(user);
     return ResponseEntity.ok(toResponse(updated));
 }
-```
 
 ---
 
@@ -142,7 +147,6 @@ public ResponseEntity<UserResponse> patchUser(
 
 A more formal approach to PATCH — the client sends a JSON object with only the fields to change, and null means "remove this field":
 
-```java
 // PatchUserRequest with special handling for null
 public record PatchUserRequest(
     String name,
@@ -154,9 +158,7 @@ public record PatchUserRequest(
     private boolean emailExplicitlySet;
     private boolean ageExplicitlySet;
 }
-```
 
-```java
 // Simple approach: use a Map and check for key existence
 @PatchMapping(value = "/{id}", consumes = "application/merge-patch+json")
 public ResponseEntity<UserResponse> mergePatchUser(
@@ -179,7 +181,6 @@ public ResponseEntity<UserResponse> mergePatchUser(
     User updated = userService.save(user);
     return ResponseEntity.ok(toResponse(updated));
 }
-```
 
 ---
 
@@ -187,7 +188,6 @@ public ResponseEntity<UserResponse> mergePatchUser(
 
 ### Scenario 1: Profile Settings (Partial Update)
 
-```java
 public record PatchProfileRequest(
     String displayName,
     String avatarUrl,
@@ -215,11 +215,9 @@ public class ProfileController {
         return ResponseEntity.ok(toResponse(updated));
     }
 }
-```
 
 ### Scenario 2: Order Status Update
 
-```java
 public record PatchOrderRequest(
     String status,
     String cancellationReason,
@@ -255,11 +253,9 @@ public class OrderController {
         return ResponseEntity.ok(toResponse(updated));
     }
 }
-```
 
 ### Scenario 3: Product Price Update
 
-```java
 @PatchMapping("/{id}/price")
 public ResponseEntity<ProductResponse> updatePrice(
         @PathVariable Long id,
@@ -281,7 +277,6 @@ public ResponseEntity<ProductResponse> updatePrice(
     Product updated = productService.save(product);
     return ResponseEntity.ok(toResponse(updated));
 }
-```
 
 ---
 
@@ -295,3 +290,4 @@ public ResponseEntity<ProductResponse> updatePrice(
 | Not checking for null | Accidentally nullifying fields | Use `Optional.ofNullable().ifPresent()` |
 | Mixing PATCH and PUT semantics | Confusing API behavior | Keep PUT for full replacement, PATCH for partial |
 | Forgetting to handle `null` vs "not sent" | Different semantics | Use a wrapper type or check key existence |
+

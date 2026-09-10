@@ -1,7 +1,7 @@
 ---
 title: Varargs, Method Overloading & Overriding — Signatures That Work
 summary: How varargs desugar, the overload resolution rules, @Override discipline, and the signature-design patterns that keep APIs clean and bug-free.
-order: 36
+order: 83
 minutes: 18
 topics: [varargs, overloading, overriding, method-signature, overload-resolution, @Override]
 docs:
@@ -15,14 +15,24 @@ docs:
 
 **Varargs** (`String... args`) lets a method take a variable number of arguments. Under the hood it's **exactly an array parameter** — `f(String... a)` compiles to `f(String[] a)` — with the compiler wrapping call-site arguments:
 
+
+**What this code does — step by step:**
+
+1. args is an Object[] — may be empty, never null unless explicitly passed null
+2. `log("hello");` — args = []
+3. `log("a=%s", 1);` — args = [1]
+4. `log("x=%s", 1, "two", 3.0);` — args = [1, "two", 3.0]
+5. `log("y=%s", new Object[]{5});` — explicit array also works
+
+The same code, clean:
+
 ```java
 public static void log(String fmt, Object... args) {
-    // args is an Object[] — may be empty, never null unless explicitly passed null
 }
-log("hello");                 // args = []
-log("a=%s", 1);               // args = [1]
-log("x=%s", 1, "two", 3.0);   // args = [1, "two", 3.0]
-log("y=%s", new Object[]{5}); // explicit array also works
+log("hello");
+log("a=%s", 1);
+log("x=%s", 1, "two", 3.0);
+log("y=%s", new Object[]{5});
 ```
 
 **Overloading** — several methods with the same name but different parameter lists, resolved at compile time. **Overriding** — a subclass re-implements a parent method with the same signature, resolved at runtime (polymorphism).
@@ -35,7 +45,6 @@ When you call an overloaded method, the compiler picks the **most specific** app
 2. Among widening options, the narrowest wins (`int` param beats `long` for an `int` arg).
 3. Varargs is the last resort — only when nothing else applies.
 
-```java
 void f(int x) {}
 void f(long x) {}
 void f(Integer x) {}
@@ -44,7 +53,6 @@ void f(Object... xs) {}
 f(5);        // int — exact match
 f(5L);       // long — exact
 f(null);     // Integer — boxing (more specific than Object...); beware null-ambiguity!
-```
 
 **The null-ambiguity trap:** calling `f(null)` with both `f(String)` and `f(Integer)` overloads is a **compile error** ("ambiguous") because both are equally specific. It's a design smell — avoid null-passing overloads that collide.
 
@@ -52,50 +60,40 @@ f(null);     // Integer — boxing (more specific than Object...); beware null-a
 
 **Scenario 1 — varargs for logging and formatting.** `String.format`, `Logger` params, and `MessageFormat` are the canonical varargs APIs. Teams wrap them:
 
-```java
 public final class AppLog {
     private static final Logger LOG = LoggerFactory.getLogger(AppLog.class);
     public static void warn(String fmt, Object... args) {
         if (LOG.isWarnEnabled()) LOG.warn(fmt, args);   // varargs → SLF4J varargs
     }
 }
-```
 
 **Scenario 2 — overloads as defaults.** A method with a defaulted parameter as an overload chain (the "convenience overloads" pattern):
 
-```java
 public List<Order> search(String query) { return search(query, 20, Sort.DEFAULT); }
 public List<Order> search(String query, int limit) { return search(query, limit, Sort.DEFAULT); }
 public List<Order> search(String query, int limit, Sort sort) { /* real implementation */ }
-```
 
 Keep the *full* signature as the single implementation; shorter overloads delegate. Review rule: **don't duplicate logic across overloads — chain to the richest one.**
 
 **Scenario 3 — builder-style fluent APIs.** Varargs shines for "any number of" semantics in builders and configuration:
 
-```java
 new SearchSpec().sortBy("createdAt", "status")     // sortBy(String... fields)
-```
 
 **Scenario 4 — overriding with @Override always.** The annotation is mandatory in review: it turns a typo'd override (silently a new method) into a compile error, and it documents intent:
 
-```java
 @Override
 public boolean equals(Object o) { ... }   // typo in signature → compile error, not a silent bug
-```
 
 ## Overloading vs overriding — the confusion that causes bugs
 
 - **Overloading is compile-time** — the compiler picks the method by the *declared* type of the argument.
 - **Overriding is runtime** — the JVM dispatches by the *actual* type of the receiver.
 
-```java
 class A { void f(A a) {} void f(B b) {} }        // overloads
 class B extends A { @Override void f(A a) {} }   // overrides the f(A) overload
 
 A x = new B();
 x.f(new B());   // resolves f(B) at compile time (x is declared A) → A.f(B), NOT overridden
-```
 
 This is the classic source of "I overrode it but the wrong method ran" bugs: overload resolution uses the *static* type. If dispatch-by-actual-type matters, the methods must have the *same* signature (true overriding).
 
@@ -114,3 +112,4 @@ This is the classic source of "I overrode it but the wrong method ran" bugs: ove
 - Overriding is runtime dispatch by actual type; overloading is compile-time by declared type — never mix them up.
 - Chain convenience overloads to one full implementation; don't duplicate logic.
 - Always `@Override`; watch null-ambiguity and generic-array varargs.
+

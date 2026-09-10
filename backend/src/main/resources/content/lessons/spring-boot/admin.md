@@ -1,7 +1,7 @@
 ---
 title: Spring Boot Admin — Monitoring and Managing Your Application
 summary: Spring Boot Admin Server setup, client registration, Actuator endpoints exposure, logging level management, notification channels, and how organizations monitor application health without expensive APM tools.
-order: 41
+order: 2
 minutes: 18
 topics: [spring-boot-admin, actuator, monitoring, health-check, log-level, notification, micrometer, metrics]
 docs:
@@ -27,7 +27,6 @@ Spring Boot Admin (SBA) is a web UI for monitoring and managing Spring Boot appl
 </dependency>
 ```
 
-```java
 @SpringBootApplication
 @EnableAdminServer
 public class AdminServerApplication {
@@ -35,7 +34,6 @@ public class AdminServerApplication {
         SpringApplication.run(AdminServerApplication.class, args);
     }
 }
-```
 
 ## Setup: Client Application
 
@@ -87,13 +85,17 @@ management:
 
 SBA lets you change log levels without redeploying:
 
-```java
-// Via SBA UI or API:
-// POST /api/instances/{id}/actuator/loggers/com.backendforge
-// {"configuredLevel": "DEBUG"}
 
-// Via API:
-curl -X POST http://admin:9090/api/instances/my-app/actuator/loggers/com.backendforge \
+**What this code does — step by step:**
+
+1. Via SBA UI or API: POST /api/instances/{id}/actuator/loggers/com.backendforge. {"configuredLevel": "DEBUG"}
+2. Via API:
+3. `curl -X POST http:` — admin:9090/api/instances/my-app/actuator/loggers/com.backendforge \
+
+The same code, clean:
+
+```java
+curl -X POST http:
   -H "Content-Type: application/json" \
   -u admin:secret \
   -d '{"configuredLevel": "DEBUG"}'
@@ -124,7 +126,6 @@ spring:
 
 ## Custom health indicators
 
-```java
 @Component
 public class ExternalApiHealthIndicator implements HealthIndicator {
 
@@ -143,7 +144,6 @@ public class ExternalApiHealthIndicator implements HealthIndicator {
         }
     }
 }
-```
 
 ## How we use it in organizations
 
@@ -190,7 +190,6 @@ SBA shows real-time JVM metrics: heap usage, GC frequency, thread count, CPU loa
 
 ## Security
 
-```java
 @Configuration
 public class AdminSecurityConfig {
 
@@ -207,7 +206,6 @@ public class AdminSecurityConfig {
         return http.build();
     }
 }
-```
 
 ## Common mistakes
 
@@ -218,3 +216,4 @@ public class AdminSecurityConfig {
 | No custom health indicators | Only shows Spring's built-in health |
 | Too many endpoints exposed | Performance overhead, security surface |
 | No notification configuration | Ops not alerted when app goes down |
+

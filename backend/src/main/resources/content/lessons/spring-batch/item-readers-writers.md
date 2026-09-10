@@ -1,7 +1,7 @@
 ---
 title: ItemReaders & ItemWriters
 summary: The built-in readers and writers for files, databases and messages — flat files, CSV, JSON, multi-line records, and the decorators that compose them.
-order: 3
+order: 5
 minutes: 14
 topics: [itemreader, itemwriter, flat file, csv, json, file processing]
 docs:
@@ -25,7 +25,6 @@ Spring Batch ships production-grade readers and writers for the common cases —
 
 ## Flat files: the classic
 
-```java
 @Bean
 FlatFileItemReader<Order> reader() {
     return new FlatFileItemReaderBuilder<Order>()
@@ -38,13 +37,11 @@ FlatFileItemReader<Order> reader() {
         .linesToSkip(1)                       // skip the header
         .build();
 }
-```
 
 The `FieldSet` mapper is the workhorse: `readString`, `readLong`, `readBigDecimal`, `readDate`, defaults for missing columns (`fs.readString("x", "unknown")`). For fixed-width input use `.fixedLength().columns(new Range(1, 10), new Range(11, 20))`.
 
 ## Writing flat files
 
-```java
 new FlatFileItemWriterBuilder<Order>()
     .name("orderWriter")
     .resource(new FileSystemResource("/data/out/orders.csv"))
@@ -53,13 +50,11 @@ new FlatFileItemWriterBuilder<Order>()
     .headerCallback(w -> w.write("id,customer,amount"))
     .shouldDeleteIfEmpty(true)
     .build();
-```
 
 Write to a **staging name first, then rename** (`.transactional` + append-to-target patterns exist for this) — a half-written target file on a crashed run is the classic flat-file writer failure.
 
 ## JSON and multi-resource
 
-```java
 new JsonItemReaderBuilder<Order>()
     .name("jsonReader")
     .resource(new FileSystemResource("/data/orders.json"))
@@ -72,7 +67,6 @@ new MultiResourceItemReaderBuilder<Order>()
     .resources(fileSystemResources)   // Resource[] — use a pattern like /drop/*.csv
     .delegate(singleFileReader())     // the per-file reader
     .build();
-```
 
 `MultiResourceItemReader` feeds each resource through the delegate sequentially — the pattern for directory-based ingestion.
 
@@ -86,11 +80,9 @@ new MultiResourceItemReaderBuilder<Order>()
 
 Some jobs need header/footer records (a total line). Use **state in the processor + a `CompositeItemWriter`**, or simpler: `ClassifierCompositeItemWriter` routes items by type, and a `FlatFileFooterCallback` writes the trailer after the last chunk:
 
-```java
 new FlatFileItemWriterBuilder<Order>()
     .footerCallback(w -> w.write("total," + totalService.sum()))
     .build();
-```
 
 ## Key takeaways
 
@@ -100,3 +92,4 @@ new FlatFileItemWriterBuilder<Order>()
 - Prefer `JdbcBatchItemWriter` for DB volume; keep side-effect writers transactional-aware.
 
 Official docs: [Readers & Writers](https://docs.spring.io/spring-batch/reference/readers-and-writers.html)
+

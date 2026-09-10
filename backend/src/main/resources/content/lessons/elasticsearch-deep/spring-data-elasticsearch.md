@@ -33,7 +33,6 @@ Spring Data Elasticsearch brings the repository pattern to Elasticsearch: `@Docu
 spring.elasticsearch.uris=http://localhost:9200
 ```
 
-```java
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
@@ -63,13 +62,11 @@ public class Product {
 
     // getters/setters...
 }
-```
 
 **Walking through it:** `@Document(indexName)` maps the class to an index; `@Field(type)` declares each field's Elasticsearch type — the mapping annotations from the mapping lesson, in Java. The `text` + `keyword` sub-field pattern (`name` searchable, `name.keyword` sortable) is expressed directly. Spring creates/updates the index from these annotations on startup (`spring.elasticsearch...index.auto-create`), which is convenient for dev — production typically manages mappings explicitly (index templates, migrations) and relies on the annotations for the definition.
 
 ## The Repository
 
-```java
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 import java.util.List;
 
@@ -82,11 +79,20 @@ public interface ProductRepository extends ElasticsearchRepository<Product, Stri
     List<Product> findByInStockTrue();
     long countByBrand(String brand);
 }
-```
 
 Out of the box: `save`, `findById`, `findAll`, `deleteById`, `count` — all mapped to Elasticsearch operations. The derived methods (`findByPriceBetween` → `range` query, `findByInStockTrue` → `term` on boolean) follow the same name-grammar as Mongo/JPA. The limitation to know: derived *search* methods on analyzed `text` fields can be subtle (matching tokens, not phrases) — for real relevance search you'll reach for `ElasticsearchOperations`.
 
 ## The Search Template: Native Power
+
+
+**What this code does — step by step:**
+
+1. Criteria-based: readable, type-safe composition:
+2. `c = c.and(new Criteria("brand").is(brand));` — term
+3. The FULL native DSL for the 10% case — this is the Elasticsearch. JSON query expressed in the typed client's builder (or with the. Fluent StringQuery for raw JSON):
+4. Using the low-level client's query builder through Spring:
+
+The same code, clean:
 
 ```java
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
@@ -105,25 +111,20 @@ public class ProductSearchService {
         this.operations = operations;
     }
 
-    // Criteria-based: readable, type-safe composition:
     public SearchHits<Product> search(String keyword, String brand, double maxPrice) {
         Criteria c = new Criteria();
         if (keyword != null && !keyword.isBlank()) {
             c = c.and(new Criteria("description").matches(keyword));
         }
         if (brand != null && !brand.isBlank()) {
-            c = c.and(new Criteria("brand").is(brand));     // term
+            c = c.and(new Criteria("brand").is(brand));
         }
         c = c.and(new Criteria("price").lessThanEqual(maxPrice));
 
         return operations.search(new CriteriaQuery(c), Product.class);
     }
 
-    // The FULL native DSL for the 10% case — this is the Elasticsearch
-    // JSON query expressed in the typed client's builder (or with the
-    // fluent StringQuery for raw JSON):
     public SearchHits<Product> nativeSearch(String keyword) {
-        // Using the low-level client's query builder through Spring:
         org.elasticsearch.index.query.QueryBuilder qb =
             org.elasticsearch.index.query.QueryBuilders.boolQuery()
                 .must(QueryBuilders.matchQuery("description", keyword))
@@ -140,7 +141,6 @@ public class ProductSearchService {
 
 ## Index Management and the Write Side
 
-```java
 @Service
 public class IndexService {
     private final ElasticsearchOperations operations;
@@ -153,7 +153,6 @@ public class IndexService {
         operations.indexOps(type).putMapping();      // applies the mapping
     }
 }
-```
 
 `IndexOperations` (`operations.indexOps(...)`) is the mapping/index management face: `exists`, `create`, `putMapping`, `refresh`, `delete`. For production you'll mostly manage indices externally (templates, aliases, reindex scripts) — but the Java API is there when the app must own its index lifecycle.
 
@@ -171,3 +170,4 @@ The engineering rule: **the database is authoritative; the index is a derived, e
 ## Recap
 
 Spring Data Elasticsearch gives you repository-style CRUD (`ElasticsearchRepository` with derived methods) and full query power (`ElasticsearchOperations` with `Criteria`, `NativeQuery`, and `SearchHits` carrying scores). `@Document`/`@Field` annotations declare the mapping — including the `text`+`keyword` sub-field pattern — and `IndexOperations` manages the index lifecycle. The two habits to take away: use repositories for standard access and the search template for relevance search; and treat the index as a **derived, eventually-consistent projection of the database** — synced deliberately (dual-write, outbox, or CDC), rebuilt from the source of truth when it drifts. Search is a feature you add to your data, not a second database you must keep perfectly in lockstep.
+

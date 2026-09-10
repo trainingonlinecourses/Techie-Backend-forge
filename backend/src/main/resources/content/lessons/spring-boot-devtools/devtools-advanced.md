@@ -1,7 +1,7 @@
 ---
 title: DevTools Advanced — Customizing Restart, LiveReload, and Remote Debug
 summary: Advanced DevTools configuration: custom restart triggers, conditional restart exclusions, remote application debugging, resource-only restart for frontend dev, and performance tuning.
-order: 2
+order: 1
 minutes: 22
 topics: ["trigger file", "restart exclusion", "remote debug", "resource restart", "performance tuning"]
 docs:
@@ -61,7 +61,6 @@ spring:
 
 Better yet, use `spring-boot-devtools` with a custom restart strategy:
 
-```java
 @Configuration
 public class DevToolsConfig {
 
@@ -70,7 +69,6 @@ public class DevToolsConfig {
         return new ConditionalOnDevToolsRestart();
     }
 }
-```
 
 ---
 
@@ -181,7 +179,6 @@ Then use `spring-boot-devtools` with Spring Loaded or DCEVM for hot-swapping ind
 
 Verify that DevTools is NOT active in production:
 
-```java
 @SpringBootTest
 class DevToolsActivationTest {
 
@@ -197,7 +194,6 @@ class DevToolsActivationTest {
         System.out.println("DevTools active: " + devtoolsActive);
     }
 }
-```
 
 ---
 
@@ -210,3 +206,4 @@ class DevToolsActivationTest {
 | Trigger file on network drive | File change detection fails | Use a local file, not network-mounted |
 | Forgetting remote secret | Anyone can connect to remote server | Always set a strong secret |
 | Including DevTools in fat JAR | DevTools runs in production | Use `<optional>true</optional>` |
+

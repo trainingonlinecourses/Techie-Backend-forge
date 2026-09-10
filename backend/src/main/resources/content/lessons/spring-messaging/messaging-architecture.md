@@ -1,7 +1,7 @@
 ---
 title: Messaging Architecture — The Big Picture
 module: spring-messaging
-order: 1
+order: 4
 minutes: 25
 topics: ["messaging", "message brokers", "point-to-point", "pub-sub", "Spring Integration"]
 summary: In direct calls (REST), the caller waits: request → response, both parties alive, tightly coupled in time and space. Messaging replaces the phone l...
@@ -55,13 +55,23 @@ The broker is what makes decoupling real: the producer never needs to know the c
 
 Spring Integration (the framework behind `@MessagingGateway`, channels, and transformers) models messaging *in-process* first, then bridges to brokers. Here's the shape:
 
+
+**What this code does — step by step:**
+
+1. ---- 1. The gateway: your code calls a Java method, messaging happens ----
+2. ---- 2. The pipeline: channel -> transformer -> service ----
+3. Receives from the 'orders.in' channel
+4. ---- 3. Where the processed order ends up ----
+5. call the payment service, or publish to a broker
+
+The same code, clean:
+
 ```java
 import org.springframework.integration.annotation.Gateway;
 import org.springframework.integration.annotation.MessagingGateway;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.stereotype.Component;
 
-// ---- 1. The gateway: your code calls a Java method, messaging happens ----
 @MessagingGateway
 public interface OrderGateway {
 
@@ -69,11 +79,9 @@ public interface OrderGateway {
     void submit(Order order);
 }
 
-// ---- 2. The pipeline: channel -> transformer -> service ----
 @Component
 public class OrderFlow {
 
-    // Receives from the 'orders.in' channel
     @ServiceActivator(inputChannel = "orders.in", outputChannel = "orders.processed")
     public Order validate(Order order) {
         if (order == null || order.items().isEmpty()) {
@@ -83,14 +91,12 @@ public class OrderFlow {
     }
 }
 
-// ---- 3. Where the processed order ends up ----
 @Component
 public class OrderHandler {
 
     @ServiceActivator(inputChannel = "orders.processed")
     public void handle(Order order) {
         System.out.println("processing order " + order.id());
-        // call the payment service, or publish to a broker
     }
 }
 ```
@@ -146,3 +152,4 @@ The academy's own backend uses this split: `@Async`/`@EventListener` for in-proc
 - A message = payload + headers (id, correlation, routing).
 - Spring Integration: `@MessagingGateway` → channels → `@ServiceActivator` pipelines.
 - In-process channels for internal async; brokers for cross-service integration.
+

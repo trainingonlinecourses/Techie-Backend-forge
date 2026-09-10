@@ -1,7 +1,7 @@
 ---
 title: Spring Data MongoDB
 summary: Documents, collections and the MongoRepository — embedding vs. referencing, @Document mapping, GeoJSON, aggregations and the schema-flexibility trade-off.
-order: 4
+order: 3
 minutes: 15
 topics: [mongodb, mongorepository, document model, aggregation pipeline, embedding]
 docs:
@@ -15,7 +15,6 @@ docs:
 
 MongoDB stores **BSON documents** in collections — no fixed schema, no joins. The entire mindset shift from SQL: you model *documents as you read them*, and you decide up front whether data lives **inside** a document (embedded) or **in another collection** (referenced).
 
-```java
 @Document(collection = "products")
 public class Product {
     @Id String id;
@@ -30,7 +29,6 @@ public interface ProductRepository extends MongoRepository<Product, String> {
     List<Product> findByCategoryOrderByPriceDesc(String category);  // derived query works
     Page<Product> findByPriceBetween(BigDecimal min, BigDecimal max, Pageable pageable);
 }
-```
 
 ## Embed vs. reference — the decision that matters
 
@@ -52,7 +50,6 @@ The 16 MB document limit is the hard backstop: an unbounded embedded list is a t
 
 For anything beyond simple queries, the aggregation pipeline (`$match → $group → $sort → $limit`) is Mongo's answer to GROUP BY:
 
-```java
 Aggregation agg = Aggregation.newAggregation(
     Aggregation.match(Criteria.where("status").is("COMPLETED")),
     Aggregation.group("customerId").sum("amount").as("total"),
@@ -61,7 +58,6 @@ Aggregation agg = Aggregation.newAggregation(
 
 AggregationResults<CustomerTotal> results =
     mongoTemplate.aggregate(agg, "orders", CustomerTotal.class);
-```
 
 `MongoTemplate` is the escape hatch for pipeline queries, `$lookup` (the closest thing to a join), `$unwind`, and raw updates — when repository methods aren't enough.
 
@@ -69,13 +65,11 @@ AggregationResults<CustomerTotal> results =
 
 Multi-document transactions work on replica sets (and `mongod` standalone since 4.0 in limited form):
 
-```java
 @Transactional
 public void moveStock(Product p, int qty) {
     productRepo.save(p.decrement(qty));      // two documents, one transaction
     stockRepo.record(p.getId(), qty);
 }
-```
 
 Spring Data Mongo honors `@Transactional` when the connection is configured with transactions enabled. The catch: transactions are single-node by default and have overhead — use them for genuine multi-document invariants, not for every write.
 
@@ -100,3 +94,4 @@ The selling point is no-migration schema evolution (add a field, old docs just l
 - No schema means validate at the boundary and version your documents.
 
 Official docs: [Spring Data MongoDB](https://docs.spring.io/spring-data/mongodb/reference/) · [MongoDB Manual](https://www.mongodb.com/docs/manual/)
+

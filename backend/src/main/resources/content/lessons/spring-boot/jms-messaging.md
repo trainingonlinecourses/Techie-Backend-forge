@@ -1,7 +1,7 @@
 ---
 title: JMS & Spring Messaging — Decoupling Services with Message Brokers
 summary: The JMS programming model (queues vs topics), Spring's JmsTemplate and @JmsListener, message acknowledgment modes, and how organizations use ActiveMQ to survive downstream outages.
-order: 53
+order: 35
 minutes: 24
 topics: [jms, messaging, activemq, jmslistener, queue, topic, decoupling]
 docs:
@@ -31,7 +31,6 @@ Synchronous REST calls have a hidden weakness: if service B is down, service A f
 
 ## Sending — `JmsTemplate`
 
-```java
 @Service
 public class OrderEventPublisher {
 
@@ -46,11 +45,9 @@ public class OrderEventPublisher {
         //                     ↑ queue name     ↑ any object → auto-converted to JSON via MessageConverter
     }
 }
-```
 
 One line does what raw JMS needs ~10 lines for (connections, sessions, producers). `convertAndSend` serializes the object using the configured converter — configure JSON like this:
 
-```java
 @Configuration
 public class JmsConfig {
 
@@ -62,13 +59,11 @@ public class JmsConfig {
         return converter;
     }
 }
-```
 
 The `_type` header carries the class name so the consumer can deserialize without compile-time knowledge of your sender code.
 
 ## Receiving — `@JmsListener`
 
-```java
 @Component
 public class InventoryListener {
 
@@ -78,7 +73,6 @@ public class InventoryListener {
         // if this throws → by default the message is REDELIVERED (redelivery policy applies)
     }
 }
-```
 
 Line-by-line behavior:
 
@@ -123,3 +117,4 @@ Acknowledge modes, from naive to robust:
 | Poison messages looping forever | Queue backs up behind one bad message | Retry limit + dead-letter queue (DLQ) |
 | Forgetting the MessageConverter config | Receiver gets bytes it can't parse, or wrong type | Configure Jackson converter on both sides |
 | Assuming exactly-once delivery | Rare duplicates treated as bugs in design | Design for at-least-once from day one |
+

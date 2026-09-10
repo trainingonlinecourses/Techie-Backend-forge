@@ -1,7 +1,7 @@
 ---
 title: Testing Your Starter — Auto-Configuration Tests
 summary: How to write tests for Spring Boot auto-configuration, using ApplicationContextRunner, verifying conditional beans, and testing configuration properties.
-order: 4
+order: 3
 minutes: 15
 topics: [starter-testing, application-context-runner, conditional-bean-test, configuration-test]
 docs:
@@ -12,7 +12,6 @@ docs:
 
 Spring Boot provides `ApplicationContextRunner` to test auto-configuration without starting the full application context. It's fast and lets you verify conditional behavior.
 
-```java
 @Test
 void testAutoConfiguration() {
     new ApplicationContextRunner()
@@ -23,13 +22,11 @@ void testAutoConfiguration() {
             assertThat(context).hasSingleBean(MyProperties.class);
         });
 }
-```
 
 ---
 
 ## Line-by-Line Walkthrough
 
-```java
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -90,7 +87,6 @@ public class MyAutoConfigurationTest {
         }
     }
 }
-```
 
 ---
 
@@ -102,3 +98,4 @@ public class MyAutoConfigurationTest {
 | Forgetting to test disabled state | Missing conditional logic test | Test both enabled and disabled |
 | Not testing property binding | Config values ignored | Test with withPropertyValues |
 | Testing with @SpringBootTest | Overkill for starter tests | Use ApplicationContextRunner |
+

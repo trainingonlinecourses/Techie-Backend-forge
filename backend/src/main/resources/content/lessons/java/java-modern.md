@@ -1,7 +1,7 @@
 ---
 title: Modern Java (17+) — Sealed Classes, Pattern Matching, Text Blocks, and Records
 summary: The most impactful modern Java features explained for beginners: sealed classes for type safety, pattern matching instanceof and switch, text blocks for multi-line strings, records for data carriers, switch expressions, and how organizations adopt these features incrementally with line-by-line walkthroughs.
-order: 11
+order: 37
 minutes: 30
 topics: [sealed-classes, pattern-matching, text-blocks, records, switch-expressions, modern-java, java17, java21]
 docs:
@@ -22,24 +22,44 @@ Java 17 (LTS) and Java 21 (LTS) brought features that make Java more expressive,
 
 Records replace 50+ lines of boilerplate with a single line:
 
-```java
-// OLD WAY: Java bean — lots of boilerplate
-public class UserOld {
-    private final String name;          // field
-    private final String email;         // field
-    private final int age;              // field
 
-    public UserOld(String name, String email, int age) {  // constructor
+**What this code does — step by step:**
+
+1. OLD WAY: Java bean — lots of boilerplate
+2. `private final String name;` — field
+3. `private final String email;` — field
+4. `private final int age;` — field
+5. `public UserOld(String name, String email, int age) {` — constructor
+6. `public String getName() { return name; }` — getter
+7. `@Override public boolean equals(Object o) {` — equals — 10+ lines
+8. NEW WAY: record — one line does ALL of the above
+9. You automatically get: ✅ Constructor: new User("Alice", "alice@example.com", 30). ✅ Getters: user.name(), user.email(), user.age() (NO 'get' prefix!). ✅ equals(): compares all fields. ✅ hashCode(): based on all fields. ✅ toString(): "User[name=Alice, email=alice@example.com, age=30]"
+10. Add validation in a compact constructor (no parameter list)
+11. Usage:
+12. `System.out.println(alice.name());` — "Alice" — no getName() needed
+13. `System.out.println(alice.toString());` — "User[name=Alice, email=alice@example.com, age=30]"
+14. `System.out.println(alice);` — same — auto toString()
+15. Records are IMMUTABLE — no setters. Alice.age = 31; // COMPILE ERROR
+
+The same code, clean:
+
+```java
+public class UserOld {
+    private final String name;
+    private final String email;
+    private final int age;
+
+    public UserOld(String name, String email, int age) {
         this.name = name;
         this.email = email;
         this.age = age;
     }
 
-    public String getName() { return name; }    // getter
+    public String getName() { return name; }
     public String getEmail() { return email; }
     public int getAge() { return age; }
 
-    @Override public boolean equals(Object o) {  // equals — 10+ lines
+    @Override public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof UserOld u)) return false;
         return age == u.age && name.equals(u.name) && email.equals(u.email);
@@ -50,16 +70,8 @@ public class UserOld {
     @Override public String toString() { return "UserOld{name='" + name + "', email='" + email + "', age=" + age + "}"; }
 }
 
-// NEW WAY: record — one line does ALL of the above
 public record User(String name, String email, int age) {
-    // You automatically get:
-    // ✅ Constructor: new User("Alice", "alice@example.com", 30)
-    // ✅ Getters: user.name(), user.email(), user.age() (NO 'get' prefix!)
-    // ✅ equals(): compares all fields
-    // ✅ hashCode(): based on all fields
-    // ✅ toString(): "User[name=Alice, email=alice@example.com, age=30]"
 
-    // Add validation in a compact constructor (no parameter list)
     public User {
         if (name == null || name.isBlank()) throw new IllegalArgumentException("Name required");
         if (email == null || !email.contains("@")) throw new IllegalArgumentException("Invalid email");
@@ -67,37 +79,45 @@ public record User(String name, String email, int age) {
     }
 }
 
-// Usage:
 User alice = new User("Alice", "alice@example.com", 30);
-System.out.println(alice.name());           // "Alice" — no getName() needed
-System.out.println(alice.toString());       // "User[name=Alice, email=alice@example.com, age=30]"
-System.out.println(alice);                  // same — auto toString()
-
-// Records are IMMUTABLE — no setters
-// alice.age = 31;                          // COMPILE ERROR
+System.out.println(alice.name());
+System.out.println(alice.toString());
+System.out.println(alice);
 ```
 
 ## Sealed Classes — controlling who can implement your interface (Java 17)
 
-```java
-// Sealed classes/interfaces restrict which classes can extend/implement them
-// This gives the compiler complete knowledge of all possible subtypes
 
+**What this code does — step by step:**
+
+1. Sealed classes/interfaces restrict which classes can extend/implement them. This gives the compiler complete knowledge of all possible subtypes
+2. Only CreditCard, DebitCard, BankTransfer, and CryptoWallet can implement this. No other class in the entire codebase can implement PaymentMethod
+3. `return stripeGateway.charge(cardNumber, amount);` — delegate to Stripe
+4. `return bankGateway.debit(cardNumber, amount);` — delegate to bank
+5. BENEFIT: exhaustive switch — compiler knows ALL possible types
+6. NO 'default' needed! Compiler knows these are ALL the cases. If you add a new payment method later, this switch COMPILES WITH AN ERROR. Until you handle the new case — prevents silent bugs!
+7. The 'permits' keyword also works with classes:
+8. Only these three classes can extend Shape
+9. `public final class Circle extends Shape { ... }` — final = can't be extended further
+10. `public non-sealed class Rectangle extends Shape { ... }` — non-sealed = anyone can extend Rectangle
+11. `public sealed class Triangle extends Shape permits RightTriangle { ... }` — sealed = only RightTriangle
+
+The same code, clean:
+
+```java
 public sealed interface PaymentMethod permits CreditCard, DebitCard, BankTransfer, CryptoWallet {
-    // Only CreditCard, DebitCard, BankTransfer, and CryptoWallet can implement this
-    // No other class in the entire codebase can implement PaymentMethod
     Money charge(Money amount);
 }
 
 public record CreditCard(String cardNumber, String cvv) implements PaymentMethod {
     public Money charge(Money amount) {
-        return stripeGateway.charge(cardNumber, amount);   // delegate to Stripe
+        return stripeGateway.charge(cardNumber, amount);
     }
 }
 
 public record DebitCard(String cardNumber) implements PaymentMethod {
     public Money charge(Money amount) {
-        return bankGateway.debit(cardNumber, amount);      // delegate to bank
+        return bankGateway.debit(cardNumber, amount);
     }
 }
 
@@ -113,62 +133,85 @@ public record CryptoWallet(String address) implements PaymentMethod {
     }
 }
 
-// BENEFIT: exhaustive switch — compiler knows ALL possible types
 public String describePayment(PaymentMethod method) {
     return switch (method) {
         case CreditCard cc    -> "Credit card ending in " + cc.cardNumber().substring(cc.cardNumber().length() - 4);
         case DebitCard dc     -> "Debit card ending in " + dc.cardNumber().substring(dc.cardNumber().length() - 4);
         case BankTransfer bt  -> "Bank transfer to " + bt.iban();
         case CryptoWallet cw  -> "Crypto wallet " + cw.address().substring(0, 10) + "...";
-        // NO 'default' needed! Compiler knows these are ALL the cases
-        // If you add a new payment method later, this switch COMPILES WITH AN ERROR
-        // until you handle the new case — prevents silent bugs!
     };
 }
 
-// The 'permits' keyword also works with classes:
 public sealed class Shape permits Circle, Rectangle, Triangle {
-    // Only these three classes can extend Shape
 }
 
-public final class Circle extends Shape { ... }       // final = can't be extended further
-public non-sealed class Rectangle extends Shape { ... } // non-sealed = anyone can extend Rectangle
-public sealed class Triangle extends Shape permits RightTriangle { ... } // sealed = only RightTriangle
+public final class Circle extends Shape { ... }
+public non-sealed class Rectangle extends Shape { ... }
+public sealed class Triangle extends Shape permits RightTriangle { ... }
 ```
 
 ## Pattern Matching for instanceof (Java 16+)
 
+
+**What this code does — step by step:**
+
+1. OLD WAY: check type, then cast manually
+2. `String s = (String) obj;` — manual cast — error-prone
+3. NEW WAY: pattern matching — check and cast in one step
+4. `if (obj instanceof String s) {` — 's' is the cast variable — only in scope if true
+5. `System.out.println(s.length());` — s is already a String — no cast needed
+6. In conditions — combine type check with additional tests
+7. With records — destructure directly!
+8. `if (obj instanceof Point(int x, int y)) {` — extract x and y directly!
+9. `System.out.println("Point at " + x + "," + y);` — x=3, y=4
+
+The same code, clean:
+
 ```java
-// OLD WAY: check type, then cast manually
-Object obj = getSomething();
-if (obj instanceof String) {
-    String s = (String) obj;           // manual cast — error-prone
-    System.out.println(s.length());
-}
+public class Main {
 
-// NEW WAY: pattern matching — check and cast in one step
-if (obj instanceof String s) {         // 's' is the cast variable — only in scope if true
-    System.out.println(s.length());    // s is already a String — no cast needed
-}
+    public static void main(String[] args) {
+        Object obj = getSomething();
+        if (obj instanceof String) {
+            String s = (String) obj;
+            System.out.println(s.length());
+        }
 
-// In conditions — combine type check with additional tests
-if (obj instanceof String s && s.length() > 5) {
-    System.out.println("Long string: " + s);
-}
+        if (obj instanceof String s) {
+            System.out.println(s.length());
+        }
 
-// With records — destructure directly!
-public record Point(int x, int y) {}
+        if (obj instanceof String s && s.length() > 5) {
+            System.out.println("Long string: " + s);
+        }
 
-Object obj = new Point(3, 4);
-if (obj instanceof Point(int x, int y)) {    // extract x and y directly!
-    System.out.println("Point at " + x + "," + y);  // x=3, y=4
+        public record Point(int x, int y) {}
+
+        Object obj = new Point(3, 4);
+        if (obj instanceof Point(int x, int y)) {
+            System.out.println("Point at " + x + "," + y);
+        }
+    }
 }
 ```
 
 ## Pattern Matching for switch (Java 21)
 
+
+**What this code does — step by step:**
+
+1. OLD WAY: ugly chain of instanceof checks
+2. NEW WAY: pattern matching switch — clean, exhaustive, type-safe
+3. `case Integer i    -> "Integer: " + i;` — i is the Integer
+4. `case String s     -> "String: " + s;` — s is the String
+5. `case double[] arr -> "Array of " + arr.length + " doubles";` — arr is the array
+6. `case null         -> "Null value";` — handles null!
+7. With guards (when clauses)
+8. Destructuring nested records
+
+The same code, clean:
+
 ```java
-// OLD WAY: ugly chain of instanceof checks
 String describe(Object obj) {
     if (obj instanceof Integer) {
         return "Integer: " + obj;
@@ -181,18 +224,16 @@ String describe(Object obj) {
     }
 }
 
-// NEW WAY: pattern matching switch — clean, exhaustive, type-safe
 String describe(Object obj) {
     return switch (obj) {
-        case Integer i    -> "Integer: " + i;                    // i is the Integer
-        case String s     -> "String: " + s;                     // s is the String
-        case double[] arr -> "Array of " + arr.length + " doubles";  // arr is the array
-        case null         -> "Null value";                        // handles null!
+        case Integer i    -> "Integer: " + i;
+        case String s     -> "String: " + s;
+        case double[] arr -> "Array of " + arr.length + " doubles";
+        case null         -> "Null value";
         default           -> "Unknown: " + obj.getClass().getSimpleName();
     };
 }
 
-// With guards (when clauses)
 String categorizeAge(Object obj) {
     return switch (obj) {
         case Integer i when i < 0   -> "Invalid";
@@ -203,7 +244,6 @@ String categorizeAge(Object obj) {
     };
 }
 
-// Destructuring nested records
 public record Street(String name, int number) {}
 public record Address(Street street, String city) {}
 public record User(String name, Address address) {}
@@ -221,8 +261,20 @@ String describeUser(User user) {
 
 ## Text Blocks — multi-line strings (Java 15+)
 
+
+**What this code does — step by step:**
+
+1. OLD WAY: escape characters, concatenation — ugly
+2. NEW WAY: text blocks — clean, readable, no escaping
+3. HTML template — no escaping needed
+4. Line continuation with \ (suppresses the newline)
+5. Result: "This is a very long string that appears on one line"
+6. Indentation is automatically stripped
+7. The leading spaces (based on the closing """) are stripped automatically
+
+The same code, clean:
+
 ```java
-// OLD WAY: escape characters, concatenation — ugly
 String json = "{\n" +
     "    \"name\": \"Alice\",\n" +
     "    \"age\": 30,\n" +
@@ -234,7 +286,6 @@ String sql = "SELECT u.name, u.email\n" +
     "WHERE u.active = true\n" +
     "ORDER BY u.name";
 
-// NEW WAY: text blocks — clean, readable, no escaping
 String json = """
         {
             "name": "Alice",
@@ -250,7 +301,6 @@ String sql = """
         ORDER BY u.name
         """;
 
-// HTML template — no escaping needed
 String html = """
         <html>
             <body>
@@ -260,26 +310,33 @@ String html = """
         </html>
         """.formatted("Alice");
 
-// Line continuation with \ (suppresses the newline)
 String singleLine = """
         This is a very long \
         string that appears \
         on one line""";
-// Result: "This is a very long string that appears on one line"
 
-// Indentation is automatically stripped
 String xml = """
         <root>
             <item>value</item>
         </root>
         """;
-// The leading spaces (based on the closing """) are stripped automatically
 ```
 
 ## Switch Expressions (Java 14+)
 
+
+**What this code does — step by step:**
+
+1. OLD WAY: switch statement with break (fall-through bugs)
+2. `break;` — forget this? Bug!
+3. NEW WAY: switch expression — no break, no fall-through, returns a value
+4. With complex logic, use yield to return a value
+5. `log.info("Starting the week!");` — can have statements in the block
+6. `yield 6;` — yield returns the value
+
+The same code, clean:
+
 ```java
-// OLD WAY: switch statement with break (fall-through bugs)
 String dayType;
 switch (day) {
     case "MONDAY":
@@ -288,7 +345,7 @@ switch (day) {
     case "THURSDAY":
     case "FRIDAY":
         dayType = "Weekday";
-        break;                          // forget this? Bug!
+        break;
     case "SATURDAY":
     case "SUNDAY":
         dayType = "Weekend";
@@ -298,18 +355,16 @@ switch (day) {
         break;
 }
 
-// NEW WAY: switch expression — no break, no fall-through, returns a value
 String dayType = switch (day) {
     case "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY" -> "Weekday";
     case "SATURDAY", "SUNDAY" -> "Weekend";
     default -> "Unknown";
 };
 
-// With complex logic, use yield to return a value
 int numLetters = switch (day) {
     case "MONDAY" -> {
-        log.info("Starting the week!");     // can have statements in the block
-        yield 6;                             // yield returns the value
+        log.info("Starting the week!");
+        yield 6;
     }
     case "TUESDAY" -> 7;
     case "WEDNESDAY" -> 9;
@@ -321,7 +376,6 @@ int numLetters = switch (day) {
 
 ### Scenario 1: Type-safe API response with sealed hierarchy
 
-```java
 // Sealed response — compiler knows ALL possible outcomes
 public sealed interface ApiResponse<T> permits Success, Error, Loading {
     record Success<T>(T data, int statusCode) implements ApiResponse<T> {}
@@ -338,11 +392,9 @@ public <T> ResponseEntity<?> toHttpEntity(ApiResponse<T> response) {
         case Loading<T>    -> ResponseEntity.status(202).body("Loading...");
     };
 }
-```
 
 ### Scenario 2: Pattern matching for configuration parsing
 
-```java
 public record ConfigEntry(String key, Object value) {
 
     public String toString() {
@@ -356,11 +408,9 @@ public record ConfigEntry(String key, Object value) {
         };
     }
 }
-```
 
 ### Scenario 3: Text blocks for SQL and JSON templates
 
-```java
 @Repository
 public class UserRepository {
 
@@ -385,7 +435,6 @@ public class UserRepository {
     List<UserProjection> findActiveUsers(@Param("since") Instant since,
                                           @Param("limit") int limit);
 }
-```
 
 ## When to adopt each feature
 
@@ -407,3 +456,4 @@ public class UserRepository {
 | Using text blocks for short strings | Unnecessary overhead | Use regular strings for short content |
 | Not using `yield` in switch expression blocks | Compile error | Always `yield` a value from `{}` blocks |
 | Sealing with `non-sealed` when not needed | Opens hierarchy unexpectedly | Use `final` unless you need extensibility |
+

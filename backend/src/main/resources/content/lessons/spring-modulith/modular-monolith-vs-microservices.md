@@ -27,24 +27,30 @@ Most teams jump from "spaghetti monolith" straight to "microservices" — skippi
 
 A **modular monolith** is one deployment unit whose *internals* are separated into modules with explicit boundaries and dependencies. Think of it like an apartment building: one structure, but each apartment (module) has its own rooms, its own furniture, and clear walls between neighbors.
 
-```java
-// A modular monolith has clear module boundaries:
-// Order module → can see: OrderRepository, OrderService
-//                cannot see: PaymentRepository (that's in Payment module)
 
-// The Payment module exposes an API, not its internals:
+**What this code does — step by step:**
+
+1. A modular monolith has clear module boundaries: Order module → can see: OrderRepository, OrderService. Cannot see: PaymentRepository (that's in Payment module)
+2. The Payment module exposes an API, not its internals:
+3. `PaymentResult charge(PaymentRequest request);` — This is the public API
+4. The Order module depends on the Payment API, not the implementation:
+5. `private final PaymentService paymentService;` — Depends on the INTERFACE
+6. `paymentService.charge(new PaymentRequest(order));` — Uses the public API
+
+The same code, clean:
+
+```java
 public interface PaymentService {
-    PaymentResult charge(PaymentRequest request);  // This is the public API
+    PaymentResult charge(PaymentRequest request);
 }
 
-// The Order module depends on the Payment API, not the implementation:
 @Service
 public class OrderService {
-    private final PaymentService paymentService;  // Depends on the INTERFACE
-    
+    private final PaymentService paymentService;
+
     public Order placeOrder(OrderRequest request) {
         Order order = createOrder(request);
-        paymentService.charge(new PaymentRequest(order));  // Uses the public API
+        paymentService.charge(new PaymentRequest(order));
         return order;
     }
 }
@@ -101,33 +107,41 @@ An E-commerce system has these bounded contexts:
 
 **Rule:** `Order` in the *billing* context and `Order` in the *fulfillment* context are **different models**. Sharing one entity class across contexts is how monoliths become spaghetti.
 
+
+**What this code does — step by step:**
+
+1. WRONG — Order entity shared across all modules
+2. `private Payment payment;` — Payment fields leaked into Order
+3. `private Shipment shipment;` — Shipping fields leaked into Order
+4. `private Stock stock;` — Inventory fields leaked into Order. This is the "God Object" anti-pattern
+5. RIGHT — each module has its own model. Order module:
+6. Only Order-relevant fields
+7. Payment module:
+8. `private OrderId orderId;` — Reference by ID, not by object
+9. Only Payment-relevant fields
+
+The same code, clean:
+
 ```java
-// WRONG — Order entity shared across all modules
 @Entity
 public class Order {
-    private Payment payment;      // Payment fields leaked into Order
-    private Shipment shipment;    // Shipping fields leaked into Order
-    private Stock stock;          // Inventory fields leaked into Order
-    // This is the "God Object" anti-pattern
+    private Payment payment;
+    private Shipment shipment;
+    private Stock stock;
 }
 
-// RIGHT — each module has its own model
-// Order module:
 @Entity
 public class Order {
     private OrderId id;
     private List<OrderLine> lines;
     private OrderStatus status;
-    // Only Order-relevant fields
 }
 
-// Payment module:
 @Entity  
 public class Payment {
     private PaymentId id;
-    private OrderId orderId;  // Reference by ID, not by object
+    private OrderId orderId;
     private PaymentStatus status;
-    // Only Payment-relevant fields
 }
 ```
 
@@ -195,3 +209,4 @@ After (microservice):
 - A modular monolith is the best preparation for (and alternative to) microservices
 
 **Official docs:** [Spring Modulith](https://docs.spring.io/spring-modulith/reference/) · [MonolithFirst (Fowler)](https://martinfowler.com/bliki/MonolithFirst.html)
+

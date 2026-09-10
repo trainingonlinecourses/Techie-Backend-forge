@@ -1,7 +1,7 @@
 ---
 title: Spring Cloud OpenFeign
 summary: Declarative HTTP clients that plug into discovery and load balancing — @FeignClient, fallbacks, and how Feign compares to RestClient interfaces.
-order: 9
+order: 8
 minutes: 15
 topics: [openfeign, declarative client, load balancing, fallback, service discovery]
 docs:
@@ -14,7 +14,6 @@ docs:
 
 Feign turns an **interface** into a working HTTP client — no implementation, no `RestClient` boilerplate. In a Spring Cloud world it also wires into **service discovery and client-side load balancing**: the interface names a *service* (`payments`), and Feign resolves it through Eureka/Consul and round-robins across instances.
 
-```java
 @FeignClient(name = "payments", fallback = PaymentClientFallback.class)
 public interface PaymentClient {
 
@@ -27,7 +26,6 @@ public interface PaymentClient {
 
 // Usage — a typed method call:
 Payment p = paymentClient.get(order.paymentId());
-```
 
 ## The pieces
 
@@ -49,7 +47,6 @@ feign:
 
 Feign plugs into **Resilience4j** (the circuit-breaker lesson) with zero custom wiring:
 
-```java
 @FeignClient(name = "payments", fallback = PaymentClientFallback.class)
 public interface PaymentClient { ... }
 
@@ -58,7 +55,6 @@ public class PaymentClientFallback implements PaymentClient {   // must implemen
     public Payment get(long id) { return Payment.UNKNOWN; }      // fail-soft when the breaker is open
     public Payment create(CreatePaymentRequest req) { throw new PaymentsUnavailableException(); }
 }
-```
 
 ```yaml
 feign.circuitbreaker.enabled: true
@@ -86,23 +82,19 @@ Rule: inside a Spring Cloud/Eureka stack, Feign is the idiomatic client; in a pl
 3. **Feign inheritance** — sharing interfaces between client and server (`@FeignClient` on a controller interface) couples them; prefer standalone client contracts (the contract can still be generated from OpenAPI).
 4. **Feign + `@RequestHeader`** — headers set in a filter (auth token, correlation id) must be propagated explicitly (a `RequestInterceptor` is the standard spot).
 
-```java
 @Bean
 RequestInterceptor authHeader() {            // attach the token to every Feign call
     return template -> template.header("Authorization", "Bearer " + currentToken());
 }
-```
 
 ## Testing Feign clients
 
-```java
 // Mock the interface (Mockito) — it's just an interface:
 PaymentClient client = mock(PaymentClient.class);
 when(client.get(42L)).thenReturn(payment);
 
 // Or WireMock for real HTTP behavior at the boundary:
 // stub the /payments/{id} endpoint, assert request/response shapes.
-```
 
 Unit tests mock it; boundary tests use a real stub server (WireMock/MockWebServer). The interface design makes both trivial — the same pattern as the rest-clients lesson.
 
@@ -114,3 +106,4 @@ Unit tests mock it; boundary tests use a real stub server (WireMock/MockWebServe
 - Don't hard-code URLs in a discovery world; propagate auth/correlation headers via `RequestInterceptor`.
 
 Official docs: [Spring Cloud OpenFeign](https://docs.spring.io/spring-cloud-openfeign/reference/)
+

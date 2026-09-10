@@ -1,7 +1,7 @@
 ---
 title: CORS & CSRF in Depth — Browser Security Models and API Hardening
 summary: Same-origin policy, CORS preflight, when CSRF applies (cookies) vs not (Bearer tokens), and the exact configurations production APIs use.
-order: 13
+order: 4
 minutes: 20
 topics: [cors, csrf, same-origin, preflight, cookies, bearer-tokens, browser-security, headers]
 docs:
@@ -30,7 +30,6 @@ For **simple requests** (GET/POST with a few safe headers) the browser just adds
 
 CSRF protection exists because **cookies are attached automatically**. If your API authenticates with `Authorization: Bearer <jwt>` from `localStorage`, the browser does **not** attach it automatically — the JS must explicitly add it. A CSRF attack can't send a header it can't read, so **token-in-header APIs generally disable CSRF** (and Spring Security does exactly that when you configure a stateless session):
 
-```java
 @Bean
 public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     http
@@ -41,19 +40,27 @@ public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
             .anyRequest().authenticated());
     return http.build();
 }
-```
 
 If instead your app uses **cookie sessions** (traditional server-rendered, or session-based auth), CSRF protection must stay **on**:
 
-```java
 http.csrf(Customizer.withDefaults());          // default ON for cookie-based apps
 // plus: http.csrf(csrf -> csrf.ignoringRequestMatchers("/api/webhook/**"));
 //       — public webhooks are exempt because they're unauthenticated
-```
 
 ## How we use it in an organization: the scenarios
 
 **Scenario 1 — SPA frontend at a different origin calling the API.** Vite dev server on `localhost:5173`, API on `localhost:8080` — that's two origins, so CORS is needed in dev. Production often proxies through the same origin (Vercel rewrites `/api/*` to the backend), but a separate API origin needs explicit CORS:
+
+
+**What this code does — step by step:**
+
+1. `"https://app.example.com",` — prod SPA — explicit, not "*"
+2. `"http://localhost:5173"));` — dev server
+3. `cfg.setAllowCredentials(true);` — only if cookies are used; must NOT be "*" then
+4. `cfg.setMaxAge(3600L);` — cache preflight for an hour
+5. Then: http.cors(Customizer.withDefaults()) in the filter chain
+
+The same code, clean:
 
 ```java
 @Configuration
@@ -62,19 +69,18 @@ public class CorsConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration cfg = new CorsConfiguration();
         cfg.setAllowedOrigins(List.of(
-            "https://app.example.com",          // prod SPA — explicit, not "*"
-            "http://localhost:5173"));          // dev server
+            "https://app.example.com",
+            "http://localhost:5173"));
         cfg.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         cfg.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With"));
         cfg.setExposedHeaders(List.of("X-Total-Count", "Location"));
-        cfg.setAllowCredentials(true);          // only if cookies are used; must NOT be "*" then
-        cfg.setMaxAge(3600L);                   // cache preflight for an hour
+        cfg.setAllowCredentials(true);
+        cfg.setMaxAge(3600L);
         UrlBasedCorsConfigurationSource src = new UrlBasedCorsConfigurationSource();
         src.registerCorsConfiguration("/api/**", cfg);
         return src;
     }
 }
-// Then: http.cors(Customizer.withDefaults()) in the filter chain
 ```
 
 Production rules: **explicit allow-list** (never `*` for credentialed requests), scoped to `/api/**`, and `OPTIONS` must pass through unauthenticated (Spring's `cors()` integration handles preflight before auth).
@@ -100,3 +106,4 @@ Production rules: **explicit allow-list** (never `*` for credentialed requests),
 - Cookie sessions: keep CSRF on and wire the token; stateless JWT: disable and use headers.
 - Allow-list origins explicitly; never combine `*` with credentials; scoped to `/api/**`.
 - Webhooks are protected by signatures, not CSRF; same-origin proxying avoids CORS entirely.
+

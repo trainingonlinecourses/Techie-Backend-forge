@@ -1,7 +1,7 @@
 ---
 title: Static Nested, Local, and Anonymous Classes — All Three Explained
 summary: Static nested classes for helpers without outer references, local classes for method-specific logic, and anonymous classes for one-time implementations — when to use each.
-order: 3
+order: 4
 minutes: 24
 topics: [static-nested, local-class, anonymous-class, lambda-replacement, callback]
 docs:
@@ -22,33 +22,41 @@ Java has 4 types of nested classes. We covered inner classes (non-static). Now l
 
 ## Static Nested Classes
 
+
+**What this code does — step by step:**
+
+1. Static nested class — no reference to outer instance
+2. Can access static members of outer
+3. No outer instance needed!
+4. `System.out.println("Area: " + calc.area());` — 78.54
+5. `System.out.println("Circumference: " + calc.circumference());` — 31.42
+
+The same code, clean:
+
 ```java
 public class MathUtils {
     private static final double PI = 3.14159;
-    
-    // Static nested class — no reference to outer instance
+
     public static class Calculator {
         private double radius;
-        
+
         public Calculator(double radius) {
             this.radius = radius;
         }
-        
-        // Can access static members of outer
+
         public double area() {
             return PI * radius * radius;
         }
-        
+
         public double circumference() {
             return 2 * PI * radius;
         }
     }
-    
+
     public static void main(String[] args) {
-        // No outer instance needed!
         MathUtils.Calculator calc = new MathUtils.Calculator(5.0);
-        System.out.println("Area: " + calc.area());           // 78.54
-        System.out.println("Circumference: " + calc.circumference());  // 31.42
+        System.out.println("Area: " + calc.area());
+        System.out.println("Circumference: " + calc.circumference());
     }
 }
 ```
@@ -57,7 +65,6 @@ public class MathUtils {
 
 ## Local Classes
 
-```java
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Comparator;
@@ -105,19 +112,28 @@ public class StringProcessor {
         System.out.println(processed);  // [[HELLO], [WORLD], [JAVA]]
     }
 }
-```
 
 ---
 
 ## Anonymous Classes
 
+
+**What this code does — step by step:**
+
+1. Line 1: Anonymous class implementing Runnable
+2. Line 2: Anonymous class extending abstract class
+3. Line 3: Anonymous class implementing Comparator
+4. `return a.length() - b.length();` — Sort by length
+5. `System.out.println(names);` — [Bob, Alice, Charlie]
+
+The same code, clean:
+
 ```java
 import java.util.*;
 
 public class AnonymousClassDemo {
-    
+
     public static void main(String[] args) {
-        // Line 1: Anonymous class implementing Runnable
         Runnable task = new Runnable() {
             @Override
             public void run() {
@@ -125,38 +141,36 @@ public class AnonymousClassDemo {
             }
         };
         task.run();
-        
-        // Line 2: Anonymous class extending abstract class
+
         abstract class Shape {
             abstract double area();
             abstract String describe();
         }
-        
+
         Shape circle = new Shape() {
             double radius = 5.0;
-            
+
             @Override
             double area() {
                 return Math.PI * radius * radius;
             }
-            
+
             @Override
             String describe() {
                 return "Circle with area " + area();
             }
         };
         System.out.println(circle.describe());
-        
-        // Line 3: Anonymous class implementing Comparator
+
         List<String> names = new ArrayList<>(Arrays.asList("Charlie", "Alice", "Bob"));
-        
+
         Collections.sort(names, new Comparator<String>() {
             @Override
             public int compare(String a, String b) {
-                return a.length() - b.length();  // Sort by length
+                return a.length() - b.length();
             }
         });
-        System.out.println(names);  // [Bob, Alice, Charlie]
+        System.out.println(names);
     }
 }
 ```
@@ -167,7 +181,6 @@ public class AnonymousClassDemo {
 
 ### Static Nested: Helper classes that don't need outer
 
-```java
 public class OrderService {
     // Static nested — no outer reference needed
     public static class OrderValidator {
@@ -191,11 +204,9 @@ public class OrderService {
         }
     }
 }
-```
 
 ### Local: Method-specific logic
 
-```java
 public class DataProcessor {
     
     public List<Employee> findTopEarners(List<Employee> employees, double threshold) {
@@ -216,11 +227,9 @@ public class DataProcessor {
             .toList();
     }
 }
-```
 
 ### Anonymous: One-time implementations
 
-```java
 public class EventSystem {
     
     public void setupListeners() {
@@ -243,7 +252,6 @@ public class EventSystem {
         worker.start();
     }
 }
-```
 
 ---
 
@@ -261,29 +269,41 @@ public class EventSystem {
 
 ## Modern Alternatives
 
+
+**What this code does — step by step:**
+
+1. Before Java 8: Anonymous class
+2. Java 8+: Lambda (for functional interfaces)
+3. Before Java 8: Anonymous Comparator
+4. Java 8+: Lambda
+5. Java 7+: Method reference
+
+The same code, clean:
+
 ```java
-// Before Java 8: Anonymous class
-Runnable task = new Runnable() {
-    @Override
-    public void run() {
-        System.out.println("Hello");
+public class Main {
+
+    public static void main(String[] args) {
+        Runnable task = new Runnable() {
+            @Override
+            public void run() {
+                System.out.println("Hello");
+            }
+        };
+
+        Runnable task = () -> System.out.println("Hello");
+
+        Comparator<String> comp = new Comparator<String>() {
+            @Override
+            public int compare(String a, String b) {
+                return a.length() - b.length();
+            }
+        };
+
+        Comparator<String> comp = (a, b) -> a.length() - b.length();
+
+        Comparator<String> comp = Comparator.comparingInt(String::length);
     }
-};
-
-// Java 8+: Lambda (for functional interfaces)
-Runnable task = () -> System.out.println("Hello");
-
-// Before Java 8: Anonymous Comparator
-Comparator<String> comp = new Comparator<String>() {
-    @Override
-    public int compare(String a, String b) {
-        return a.length() - b.length();
-    }
-};
-
-// Java 8+: Lambda
-Comparator<String> comp = (a, b) -> a.length() - b.length();
-
-// Java 7+: Method reference
-Comparator<String> comp = Comparator.comparingInt(String::length);
+}
 ```
+

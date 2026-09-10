@@ -1,7 +1,7 @@
 ---
 title: RestClient — The Modern Way to Call REST APIs
 module: spring-rest-clients
-order: 1
+order: 4
 minutes: 24
 topics: ["RestClient", "HTTP client", "JSON", "RestTemplate", "API consumption"]
 summary: So far your Spring app has been the server (accepting requests). But backend services constantly call other services: the frontend calls your API, ...
@@ -24,12 +24,10 @@ Spring's history here:
 
 `RestClient` lets you write: "GET this URL, turn the JSON into this type" in a fluent chain:
 
-```java
 String result = restClient.get()
         .uri("/api/courses/{id}", 42)
         .retrieve()
         .body(String.class);
-```
 
 ## The Core Operations
 
@@ -45,6 +43,19 @@ Every call follows the same shape: **method → URI → (optional body) → retr
 
 ## The Code Walkthrough
 
+
+**What this code does — step by step:**
+
+1. Configure once, reuse everywhere
+2. ---- GET: fetch and convert to a typed object ----
+3. ---- GET: fetch a list ----
+4. ---- POST: send JSON, get the created object ----
+5. `.body(request)` — Jackson serializes to JSON
+6. `.body(Course.class);` — Jackson deserializes response
+7. ---- Error handling: 404 → null or a custom exception ----
+
+The same code, clean:
+
 ```java
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -56,14 +67,12 @@ public class CourseCatalogClient {
     private final RestClient restClient;
 
     public CourseCatalogClient(RestClient.Builder builder) {
-        // Configure once, reuse everywhere
         this.restClient = builder
                 .baseUrl("https://catalog.example.com")
                 .defaultHeader("Accept", MediaType.APPLICATION_JSON_VALUE)
                 .build();
     }
 
-    // ---- GET: fetch and convert to a typed object ----
     public Course getCourse(long id) {
         return restClient.get()
                 .uri("/api/courses/{id}", id)
@@ -71,7 +80,6 @@ public class CourseCatalogClient {
                 .body(Course.class);
     }
 
-    // ---- GET: fetch a list ----
     public List<Course> listCourses() {
         return restClient.get()
                 .uri("/api/courses")
@@ -79,17 +87,15 @@ public class CourseCatalogClient {
                 .body(new ParameterizedTypeReference<List<Course>>() {});
     }
 
-    // ---- POST: send JSON, get the created object ----
     public Course createCourse(CourseRequest request) {
         return restClient.post()
                 .uri("/api/courses")
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(request)                    // Jackson serializes to JSON
+                .body(request)
                 .retrieve()
-                .body(Course.class);              // Jackson deserializes response
+                .body(Course.class);
     }
 
-    // ---- Error handling: 404 → null or a custom exception ----
     public Course findOrNull(long id) {
         try {
             return restClient.get()
@@ -143,3 +149,4 @@ Rule: **new code in a Spring MVC app → `RestClient`.** If your stack is WebFlu
 - Use `ParameterizedTypeReference` for generic response types.
 - 4xx/5xx throw by default — catch or map with `onStatus`.
 - Choose `RestClient` for MVC apps, `WebClient` for reactive ones, never `RestTemplate` for new code.
+

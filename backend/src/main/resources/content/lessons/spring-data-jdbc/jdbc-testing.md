@@ -1,7 +1,7 @@
 ---
 title: Testing Spring Data JDBC — DataJdbcTest and Testcontainers
 module: spring-data-jdbc
-order: 5
+order: 4
 minutes: 25
 topics: ["@DataJdbcTest", "Testcontainers", "repository tests", "test slices", "H2 vs Postgres"]
 summary: Repository tests are the most valuable and the most errorprone layer: they must verify that your derived queries match the schema, that aggregates ...
@@ -35,7 +35,6 @@ The industry answer: **test against Postgres** (Testcontainers), use H2 only for
 
 ## The Code Walkthrough
 
-```java
 // ---- 1. The slice test ----
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,7 +81,6 @@ class CourseRepositoryTest {
         assertThat(hits.get(0).getTitle()).isEqualTo("Advanced Java");
     }
 }
-```
 
 ### Walking Through Each Part
 
@@ -98,7 +96,6 @@ class CourseRepositoryTest {
 
 When you need services + transactions + the full context (not just the slice):
 
-```java
 @SpringBootTest
 @Testcontainers
 class OrderServiceTest {
@@ -119,7 +116,6 @@ class OrderServiceTest {
         assertThat(order.getTotal().amount()).isEqualByComparingTo("10.00");
     }
 }
-```
 
 Rule of thumb: **unit tests for services with mocked repositories; `@DataJdbcTest` for repository behavior; `@SpringBootTest` for integration flows** — don't boot the whole app to test one query.
 
@@ -129,14 +125,12 @@ Tests need the schema. Options:
 
 1. **Flyway migrations run against the Testcontainers DB** — the tests use the *same* migrations as production. This is the gold standard: migrations are tested before they ever hit prod.
 
-```java
 @DataJdbcTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class ... {
     @Container @ServiceConnection static PostgreSQLContainer<?> postgres = ...;
     // Flyway auto-runs the migrations; schema is production-identical
 }
-```
 
 2. **`spring.sql.init`** — simple `schema.sql`/`data.sql` for throwaway tests.
 
@@ -167,3 +161,4 @@ Skip levels deliberately: if your derived query has never run against Postgres, 
 - Test aggregates round-trip (children come with the root) and derived queries against the real schema.
 - Run Flyway migrations in tests so migrations are validated pre-production.
 - Pyramid: unit (mocked) → slice (`@DataJdbcTest`) → integration (`@SpringBootTest`).
+

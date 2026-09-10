@@ -1,7 +1,7 @@
 ---
 title: Java Logging Deep — SLF4J, Logback and Structured Logging
 summary: The logging facade pattern, SLF4J and Logback setup, log levels in production, MDC for request context, structured JSON logs, and the logging patterns that make debugging production issues possible.
-order: 52
+order: 51
 minutes: 22
 topics: [logging, slf4j, logback, mdc, structured-logging, log-levels, correlation-id]
 docs:
@@ -22,7 +22,6 @@ Java has a layered logging architecture:
 
 This separation means you can swap Logback for Log4j2 without changing a single line of application code.
 
-```java
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,7 +36,6 @@ public class OrderService {
         log.error("Failed to process order {}", order.getId(), exception);
     }
 }
-```
 
 ## Log levels — when to use each
 
@@ -57,7 +55,6 @@ public class OrderService {
 
 **MDC** (Mapped Diagnostic Context) lets you attach key-value pairs to the current thread's log output. Every log line within that request automatically includes the request ID:
 
-```java
 @Component
 public class RequestContextFilter implements Filter {
 
@@ -76,7 +73,6 @@ public class RequestContextFilter implements Filter {
         }
     }
 }
-```
 
 ```xml
 <!-- logback-spring.xml: include MDC fields in every log line -->
@@ -128,7 +124,6 @@ Output (one JSON object per line):
 
 Never log passwords, credit card numbers, or API keys. Use a logback converter to mask sensitive fields:
 
-```java
 public class MaskingConverter extends ClassicConverter {
     private static final Pattern SENSITIVE = Pattern.compile(
         "(password|token|secret|ssn|creditCard)[\"\\s:=]+([^,\\s\"}]+)",
@@ -143,7 +138,6 @@ public class MaskingConverter extends ClassicConverter {
         return m.replaceAll("$1=***REDACTED***");
     }
 }
-```
 
 ```xml
 <conversionRule conversionWord="maskedMsg" converterClass="com.backendforge.MaskingConverter" />
@@ -175,7 +169,6 @@ Logging synchronously blocks the request thread. In high-throughput systems, use
 
 Avoid expensive string concatenation when the log level is disabled:
 
-```java
 // BAD — always concatenates the string, even when DEBUG is disabled
 log.debug("User details: " + user.toString());
 
@@ -184,7 +177,6 @@ log.debug("User details: {}", user.toString());
 
 // BEST — the lambda is not evaluated at all if DEBUG is disabled
 log.atDebug().log(() -> "User details: " + expensiveToJson(user));
-```
 
 ## Logback configuration hierarchy
 
@@ -221,3 +213,4 @@ log.atDebug().log(() -> "User details: " + expensiveToJson(user));
 | Synchronous logging in hot path | Thread blocks on I/O, throughput drops |
 | Too many DEBUG logs in production | Disk fills, performance degrades, signal lost in noise |
 | Catching exceptions and not logging them | Silent failures, impossible to debug |
+

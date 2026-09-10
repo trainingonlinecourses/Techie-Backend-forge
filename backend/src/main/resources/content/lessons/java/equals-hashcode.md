@@ -1,7 +1,7 @@
 ---
 title: equals, hashCode & toString — The Object Contracts
 summary: The equals/hashCode contract, why HashSet and HashMap break when you violate it, and how records made the boilerplate obsolete.
-order: 24
+order: 20
 minutes: 20
 topics: [equals, hashcode, contract, hashmap, hashset, records, identity-vs-equality]
 docs:
@@ -15,27 +15,42 @@ Every Java object inherits three methods from `java.lang.Object` — but their d
 
 ### Identity vs Equality — What's the difference?
 
-```java
-Customer a = new Customer(1L, "Amy");
-Customer b = new Customer(1L, "Amy");
-Customer c = a;
+public class Main {
 
-System.out.println(a == b);       // false — different objects in memory
-System.out.println(a.equals(b));  // false by default! — same data, different reference
-System.out.println(a == c);       // true  — c points to the exact same object as a
-```
+    public static void main(String[] args) {
+        Customer a = new Customer(1L, "Amy");
+        Customer b = new Customer(1L, "Amy");
+        Customer c = a;
+
+        System.out.println(a == b);       // false — different objects in memory
+        System.out.println(a.equals(b));  // false by default! — same data, different reference
+        System.out.println(a == c);       // true  — c points to the exact same object as a
+    }
+}
 
 The default `equals()` from `Object` is just `==` — it asks "are these the **same object in memory**?" For a business system, you usually want "do they represent the **same customer**?" — meaning the same `id`, not the same memory address.
 
 ## equals() — How to Override Correctly
 
+
+**What this code does — step by step:**
+
+1. `@Override` — tells compiler: I intend to override Object.equals
+2. `public boolean equals(Object o) {` — MUST take Object, not Customer — see pitfall below
+3. `if (this == o) return true;` — fast path: same reference → trivially equal
+4. `if (o == null || getClass() != o.getClass()) return false;` — different type → never equal
+5. `Customer other = (Customer) o;` — safe cast: we know the type now
+6. `return id.equals(other.id);` — compare by BUSINESS identity (the id field)
+
+The same code, clean:
+
 ```java
-@Override                                          // tells compiler: I intend to override Object.equals
-public boolean equals(Object o) {                   // MUST take Object, not Customer — see pitfall below
-    if (this == o) return true;                    // fast path: same reference → trivially equal
-    if (o == null || getClass() != o.getClass()) return false;  // different type → never equal
-    Customer other = (Customer) o;                  // safe cast: we know the type now
-    return id.equals(other.id);                     // compare by BUSINESS identity (the id field)
+@Override
+public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    Customer other = (Customer) o;
+    return id.equals(other.id);
 }
 ```
 
@@ -61,21 +76,22 @@ Hash-based collections (`HashMap`, `HashSet`) work in two steps: find the right 
 
 If you override `equals()` but forget `hashCode()`:
 
-```java
-Set<Customer> customers = new HashSet<>();
-customers.add(new Customer(1L, "Amy"));
-customers.add(new Customer(1L, "Amy"));
-System.out.println(customers.size());  // 2 — WRONG! Should be 1, but hashCode is different
-```
+public class Main {
+
+    public static void main(String[] args) {
+        Set<Customer> customers = new HashSet<>();
+        customers.add(new Customer(1L, "Amy"));
+        customers.add(new Customer(1L, "Amy"));
+        System.out.println(customers.size());  // 2 — WRONG! Should be 1, but hashCode is different
+    }
+}
 
 The fix:
 
-```java
 @Override
 public int hashCode() {
     return Objects.hash(id);   // same field used in equals — contract satisfied
 }
-```
 
 Line-by-line:
 
@@ -86,7 +102,6 @@ Line-by-line:
 
 ## toString() — Making Objects Debuggable
 
-```java
 // Default: "Customer@1b6d3586" — useless in logs at 3 AM
 // Override to:
 @Override
@@ -95,7 +110,6 @@ public String toString() {
 }
 // Now: "Customer{id=1, email='Amy'}" — immediately useful
 }
-```
 
 **Org scenario:** A payment fails at 2 AM. Engineers read logs. `Payment@7a81197d` tells them nothing. `Payment{orderId=8891, amount=49.99, status=FAILED}` lets support resolve the ticket without opening the database.
 
@@ -103,11 +117,9 @@ public String toString() {
 
 Since Java 16, you can replace all three methods with a one-liner:
 
-```java
 public record Customer(Long id, String email) { }
 // Automatically generates: constructor, getters, equals(), hashCode(), toString()
 // Immutable by default — all fields are final
-```
 
 This is why most new Java code uses records for data carriers. The boilerplate is gone, the contract is always satisfied, and the compiler enforces immutability.
 
@@ -128,3 +140,4 @@ This is why most new Java code uses records for data carriers. The boilerplate i
 | Mutable fields in hashCode | "Lost" entries after field change | Hash only immutable fields |
 | Missing @Override on equals | New method instead of override — compile succeeds, runtime broken | Always annotate |
 | Using `==` instead of `.equals()` for objects | Compares memory addresses, not data | Always `.equals()` for value objects |
+

@@ -1,7 +1,7 @@
 ---
 title: Cookies and Sessions — State on a Stateless Protocol
 module: http-basics
-order: 4
+order: 2
 minutes: 26
 topics: ["cookies", "sessions", "SameSite", "HttpOnly", "Secure", "statelessness"]
 summary: HTTP is stateless: each request is independent — the server doesn't know it's the same person who logged in a minute ago. Yet every web app remembe...
@@ -58,6 +58,18 @@ Both appear in real stacks — and the modern pattern combines them: **HttpOnly 
 
 ## The Code Walkthrough — Sessions in Spring
 
+
+**What this code does — step by step:**
+
+1. ---- 1. Create session state at login ----
+2. `session.setAttribute("userId", user.getId());` — server-side state
+3. The container sends Set-Cookie: JSESSIONID=... automatically
+4. ---- 2. Read session state on later requests ----
+5. ---- 3. Invalidate the session at logout ----
+6. `session.invalidate();` — the server forgets everything
+
+The same code, clean:
+
 ```java
 import jakarta.servlet.http.HttpSession;
 import org.springframework.web.bind.annotation.*;
@@ -66,17 +78,14 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api")
 public class SessionController {
 
-    // ---- 1. Create session state at login ----
     @PostMapping("/login")
     public String login(@RequestBody LoginRequest req, HttpSession session) {
         User user = authService.authenticate(req.username(), req.password());
-        session.setAttribute("userId", user.getId());   // server-side state
+        session.setAttribute("userId", user.getId());
         session.setAttribute("roles", user.getRoles());
-        // The container sends Set-Cookie: JSESSIONID=... automatically
         return "ok";
     }
 
-    // ---- 2. Read session state on later requests ----
     @GetMapping("/me")
     public UserDto me(HttpSession session) {
         Long userId = (Long) session.getAttribute("userId");
@@ -86,10 +95,9 @@ public class SessionController {
         return userService.get(userId);
     }
 
-    // ---- 3. Invalidate the session at logout ----
     @PostMapping("/logout")
     public void logout(HttpSession session) {
-        session.invalidate();            // the server forgets everything
+        session.invalidate();
     }
 }
 ```
@@ -136,3 +144,4 @@ For multi-instance deployments (like this academy's backend), **in-memory sessio
 - Cookie-session auth is revocable (delete the session); JWT auth is stateless but stale-until-expiry.
 - Multi-instance production needs a shared session store (Redis) or stateless tokens.
 - Defend: HttpOnly (XSS), SameSite (CSRF), Secure (sniffing), session rotation (fixation).
+

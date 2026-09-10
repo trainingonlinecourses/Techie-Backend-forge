@@ -1,7 +1,7 @@
 ---
 title: MongoDB Operations — CRUD, Aggregation, and Indexing
 summary: Spring Data MongoDB operations — insert, find, update, aggregate pipelines, indexing strategies, and how organizations use MongoDB for document-oriented data. Beginner-friendly with line-by-line code.
-order: 5
+order: 4
 minutes: 22
 topics: [MongoDB, MongoTemplate, MongoRepository, aggregation, indexing, document model, embedding, referencing]
 docs:
@@ -50,35 +50,47 @@ MongoDB is a **document database** — instead of rows and columns (like SQL), i
 
 ### 1. MongoDB Entity (Document)
 
+
+**What this code does — step by step:**
+
+1. `@Document(collection = "orders")` — Maps to the "orders" collection
+2. `@Id` — Maps to the "_id" field
+3. `@Field("customer_name")` — Custom field name in MongoDB
+4. `@Embedded` — Nested object (embedded in the document)
+5. `private List<OrderItem> items;` — Array of embedded documents
+6. `@Indexed` — Create an index on this field
+7. `@Version` — Optimistic locking
+
+The same code, clean:
+
 ```java
-@Document(collection = "orders")          // Maps to the "orders" collection
+@Document(collection = "orders")
 public class Order {
 
-    @Id                                  // Maps to the "_id" field
+    @Id
     private String id;
 
-    @Field("customer_name")              // Custom field name in MongoDB
+    @Field("customer_name")
     private String customerName;
 
-    @Embedded                             // Nested object (embedded in the document)
+    @Embedded
     private Address shippingAddress;
 
-    private List<OrderItem> items;        // Array of embedded documents
+    private List<OrderItem> items;
 
-    @Indexed                              // Create an index on this field
+    @Indexed
     private String status;
 
     @CreatedDate
     private Instant createdAt;
 
-    @Version                              // Optimistic locking
+    @Version
     private Long version;
 }
 ```
 
 ### 2. MongoRepository (Simple CRUD)
 
-```java
 @Repository
 public interface OrderRepository extends MongoRepository<Order, String> {
 
@@ -101,7 +113,6 @@ public interface OrderRepository extends MongoRepository<Order, String> {
     })
     List<Document> getTopCustomersByStatus(String status);
 }
-```
 
 **Line-by-line explained:**
 - `@Document(collection = "orders")` — This entity maps to the "orders" collection in MongoDB.
@@ -112,13 +123,27 @@ public interface OrderRepository extends MongoRepository<Order, String> {
 
 ### 3. MongoTemplate (Advanced Operations)
 
+
+**What this code does — step by step:**
+
+1. Find with complex criteria:
+2. `.regex(criteria.getCustomerName(), "i"));` — Case-insensitive regex
+3. `query.limit(20);` — Max 20 results
+4. Update specific fields (partial update):
+5. `.set("status", newStatus)` — Set the status field
+6. `.set("updatedAt", Instant.now());` — Set the timestamp
+7. Upsert (insert or update):
+8. Aggregation pipeline:
+9. `Aggregation.limit(30)` — Last 30 days
+
+The same code, clean:
+
 ```java
 @Service
 public class OrderMongoService {
 
     private final MongoTemplate mongoTemplate;
 
-    // Find with complex criteria:
     public List<Order> findOrders(OrderSearchCriteria criteria) {
         Query query = new Query();
 
@@ -130,32 +155,29 @@ public class OrderMongoService {
         }
         if (criteria.getCustomerName() != null) {
             query.addCriteria(Criteria.where("customerName")
-                .regex(criteria.getCustomerName(), "i"));    // Case-insensitive regex
+                .regex(criteria.getCustomerName(), "i"));
         }
 
         query.with(Sort.by(Sort.Direction.DESC, "createdAt"));
-        query.limit(20);                                    // Max 20 results
+        query.limit(20);
 
         return mongoTemplate.find(query, Order.class);
     }
 
-    // Update specific fields (partial update):
     public void updateOrderStatus(String orderId, String newStatus) {
         Query query = Query.query(Criteria.where("_id").is(orderId));
         Update update = new Update()
-            .set("status", newStatus)                       // Set the status field
-            .set("updatedAt", Instant.now());               // Set the timestamp
+            .set("status", newStatus)
+            .set("updatedAt", Instant.now());
 
         mongoTemplate.updateFirst(query, update, Order.class);
     }
 
-    // Upsert (insert or update):
     public void upsertOrder(Order order) {
         Query query = Query.query(Criteria.where("_id").is(order.getId()));
         mongoTemplate.upsert(query, order, Order.class);
     }
 
-    // Aggregation pipeline:
     public List<Document> getRevenueByDay() {
         Aggregation aggregation = Aggregation.newAggregation(
             Aggregation.match(Criteria.where("status").is("PAID")),
@@ -163,7 +185,7 @@ public class OrderMongoService {
                 .sum("total").as("dailyRevenue")
                 .count().as("orderCount"),
             Aggregation.sort(Sort.Direction.ASC, "_id"),
-            Aggregation.limit(30)                           // Last 30 days
+            Aggregation.limit(30)
         );
 
         return mongoTemplate.aggregate(aggregation, "orders", Document.class)
@@ -178,6 +200,17 @@ public class OrderMongoService {
 
 ### Scenario 1: E-Commerce Product Catalog
 
+
+**What this code does — step by step:**
+
+1. `private List<String> tags;` — Array of strings
+2. `private Map<String, Object> attributes;` — Dynamic attributes (color, size, weight)
+3. `private List<Review> reviews;` — Embedded reviews
+4. Query: find products by tag (uses multikey index):
+5. Query: find products by dynamic attribute:
+
+The same code, clean:
+
 ```java
 @Document(collection = "products")
 public class Product {
@@ -187,23 +220,20 @@ public class Product {
     private String description;
     private double price;
     private String category;
-    private List<String> tags;                          // Array of strings
-    private Map<String, Object> attributes;             // Dynamic attributes (color, size, weight)
-    private List<Review> reviews;                       // Embedded reviews
+    private List<String> tags;
+    private Map<String, Object> attributes;
+    private List<Review> reviews;
     private int stockQuantity;
 }
 
-// Query: find products by tag (uses multikey index):
 List<Product> products = productRepository.findByTagsContaining("laptop");
 
-// Query: find products by dynamic attribute:
 Query query = Query.query(Criteria.where("attributes.color").is("black")
     .and("attributes.weight").lte(2.0));
 ```
 
 ### Scenario 2: Logging/Analytics (Time Series)
 
-```java
 @Document(collection = "events")
 @Indexed(name = "timestamp_idx", direction = IndexDirection.DESCENDING)
 public class AnalyticsEvent {
@@ -221,34 +251,38 @@ Query query = Query.query(
 );
 query.with(Sort.by(Sort.Direction.DESC, "timestamp"));
 query.limit(1000);
-```
 
 ### Scenario 3: Chat Messages (Embedded vs Referenced)
 
+
+**What this code does — step by step:**
+
+1. EMBEDDED (denormalized): messages inside the conversation
+2. `private List<Message> messages;` — Embedded — fast to read
+3. REFERENCED (normalized): messages in separate collection
+4. `private String conversationId;` — Reference to parent
+5. When to use which: Embedded: messages are always loaded with the conversation (< 16MB total). Referenced: messages are loaded independently, or conversation has > 100K messages
+
+The same code, clean:
+
 ```java
-// EMBEDDED (denormalized): messages inside the conversation
 @Document(collection = "conversations")
 public class Conversation {
     @Id
     private String id;
     private String title;
-    private List<Message> messages;             // Embedded — fast to read
+    private List<Message> messages;
 }
 
-// REFERENCED (normalized): messages in separate collection
 @Document(collection = "messages")
 public class Message {
     @Id
     private String id;
-    private String conversationId;             // Reference to parent
+    private String conversationId;
     private String sender;
     private String content;
     private Instant timestamp;
 }
-
-// When to use which:
-// Embedded: messages are always loaded with the conversation (< 16MB total)
-// Referenced: messages are loaded independently, or conversation has > 100K messages
 ```
 
 ---
@@ -274,3 +308,4 @@ public class Message {
 - **Embed vs Reference**: embed for 1:1 and 1:few relationships. Reference for 1:many and many:many.
 
 Official docs: [Spring Data MongoDB](https://docs.spring.io/spring-data/mongodb/docs/current/reference/html/) · [MongoDB CRUD](https://www.mongodb.com/docs/manual/crud/)
+

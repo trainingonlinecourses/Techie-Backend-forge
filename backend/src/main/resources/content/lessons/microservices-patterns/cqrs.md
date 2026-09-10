@@ -1,7 +1,7 @@
 ---
 title: CQRS — Command Query Responsibility Segregation
 summary: Splitting the write model from the read model — when CQRS earns its complexity, projections, and the scale of the pattern from simple to full event-sourced.
-order: 2
+order: 1
 minutes: 16
 topics: [cqrs, command query segregation, read model, projections, eventual consistency]
 docs:
@@ -50,7 +50,6 @@ CQRS is a spectrum, not a binary:
 
 ## Projections: the heart of the read model
 
-```java
 // Write side (domain model) publishes events:
 // OrderPlaced(orderId, customerId, total, lines...)
 
@@ -64,7 +63,6 @@ public class OrderReadProjector {
             e.lines().stream().map(LineRow::from).toList()));   // one row per dashboard card
     }
 }
-```
 
 - The read model is **denormalized on purpose** — the query is a single indexed lookup, not a join tree.
 - **Replay**: rebuild the read model from the event history (or from the write model) — the projector is the schema of the read side.
@@ -72,14 +70,24 @@ public class OrderReadProjector {
 
 ## The classic CQRS query
 
-```java
-// BEFORE (one model): the dashboard query walks the domain:
-List<Order> orders = orderRepo.findByCustomer(customerId);      // entities, lazy, N+1-prone
-return orders.stream().map(OrderDashboardDto::from).toList();   // mapping gymnastics
 
-// AFTER (CQRS): the read model IS the DTO shape:
-List<OrderRow> rows = orderReadRepo.findByCustomer(customerId); // one indexed query
-return rows;                                                    // done
+**What this code does — step by step:**
+
+1. BEFORE (one model): the dashboard query walks the domain:
+2. `List<Order> orders = orderRepo.findByCustomer(customerId);` — entities, lazy, N+1-prone
+3. `return orders.stream().map(OrderDashboardDto::from).toList();` — mapping gymnastics
+4. AFTER (CQRS): the read model IS the DTO shape:
+5. `List<OrderRow> rows = orderReadRepo.findByCustomer(customerId);` — one indexed query
+6. `return rows;` — done
+
+The same code, clean:
+
+```java
+List<Order> orders = orderRepo.findByCustomer(customerId);
+return orders.stream().map(OrderDashboardDto::from).toList();
+
+List<OrderRow> rows = orderReadRepo.findByCustomer(customerId);
+return rows;
 ```
 
 The read model is a **query shape**, not an entity graph — which is exactly the projection/query-methods discipline from the Spring Data module, applied structurally.
@@ -103,3 +111,4 @@ The read model is a **query shape**, not an entity graph — which is exactly th
 - Use it when read shapes genuinely conflict with the write model; it's ceremony otherwise.
 
 Official docs: [CQRS (Fowler)](https://martinfowler.com/bliki/CQRS.html) · [CQRS (microservices.io)](https://microservices.io/patterns/data/cqrs.html)
+

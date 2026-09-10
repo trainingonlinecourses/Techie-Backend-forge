@@ -1,7 +1,7 @@
 ---
 title: Pagination & Sorting — Pageable, Page vs Slice, and Keyset Pagination
 summary: Pageable and Sort, the difference between Page and Slice, the COUNT query cost, and keyset pagination for deep pages.
-order: 9
+order: 6
 minutes: 18
 topics: [pagination, pageable, page, slice, sort, keyset-pagination, offset, count-query]
 docs:
@@ -15,21 +15,17 @@ docs:
 
 Any list that can grow — orders, users, log rows — must be paginated: fetch a *page* of N rows instead of everything. Spring Data's `Pageable`/`Sort` turn this into a one-line repository signature, but choosing the right variant matters because the cost differs dramatically.
 
-```java
 public interface OrderRepository extends JpaRepository<Order, Long> {
     Page<Order> findByCustomerId(Long customerId, Pageable pageable);   // returns Page
     Slice<Order> findByCustomerId(Long customerId, Pageable pageable);  // returns Slice
     List<Order> findTop10ByCustomerIdOrderByCreatedAtDesc(Long customerId); // fixed-size — no paging at all
 }
-```
 
 The call site:
 
-```java
 PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"))
 // or with multiple keys:
 PageRequest.of(0, 20, Sort.by("status").descending().and(Sort.by("createdAt").descending()))
-```
 
 ## Page vs Slice — the COUNT query
 
@@ -45,7 +41,6 @@ Slice:  SELECT * ... LIMIT 21 OFFSET 40                                    (1 qu
 
 ## Pageable from the controller
 
-```java
 @GetMapping("/api/orders")
 public Page<OrderSummary> list(@RequestParam(defaultValue = "0") int page,
                                @RequestParam(defaultValue = "20") int size,
@@ -55,7 +50,6 @@ public Page<OrderSummary> list(@RequestParam(defaultValue = "0") int page,
     //   GET /api/orders?page=0&size=20&sort=createdAt,desc&sort=status,asc
     return orderRepo.findSummariesBy(pageable);
 }
-```
 
 Binding `Pageable` directly from query params (`?page=&size=&sort=`) is the Spring Data idiom; a `@PageableDefault` annotation sets safe defaults so a missing param can't blow up.
 
@@ -63,7 +57,6 @@ Binding `Pageable` directly from query params (`?page=&size=&sort=`) is the Spri
 
 Offset pagination (`LIMIT x OFFSET y`) degrades: to fetch page 10,000, the database still scans 200,000 rows to skip them. **Keyset (seek) pagination** instead fetches rows *after a known key* — no offset, always index-range reads, O(1)-ish per page:
 
-```java
 public interface OrderRepository extends JpaRepository<Order, Long> {
     // keyset: rows strictly after (createdAt, id) — a stable, unique sort key
     @Query("select o from Order o where (o.createdAt > :cursorTime) " +
@@ -74,7 +67,6 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
                           @Param("limit") int limit);
 }
 // page 2 = findAfter(cursorTime of last row of page 1, cursorId of last row of page 1, 20)
-```
 
 The cursor is the *last seen* (`createdAt`, `id`) pair — the composite key must be unique and stable, which `(createdAt, id)` guarantees. This is the pattern for **infinite scroll, activity feeds, and exports over large tables** — where offset pages 100+ make the database crawl. (Many teams adopt the same idea at the API level as cursor-based pagination: `?cursor=...`.)
 
@@ -103,3 +95,4 @@ The cursor is the *last seen* (`createdAt`, `id`) pair — the composite key mus
 - Offset pagination degrades on deep pages — keyset/seek pagination by a stable `(key, id)` cursor.
 - Clamp `size`, whitelist sort keys, keep sort columns indexed.
 - Choose per scenario: admin lists → `Page`; feeds/exports → `Slice` or keyset.
+

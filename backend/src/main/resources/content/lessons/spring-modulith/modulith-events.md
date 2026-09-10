@@ -16,7 +16,6 @@ Spring's `ApplicationEventPublisher` is in-memory and fire-and-forget: if the li
 
 ## Publishing with tracking
 
-```java
 // Any bean — the framework records the event BEFORE the transaction commits:
 @Service
 public class BillingService {
@@ -28,27 +27,30 @@ public class BillingService {
         // if this transaction rolls back, the recorded event rolls back with it
     }
 }
-```
 
 The `EventPublicationRegistry` table stores the event + its state (`IN_PROGRESS`, `COMPLETED`, `CANCELLED`, or failed) inside the same database transaction as the business data — **atomic: either the payment is recorded AND the event is recorded, or neither**.
 
 ## Listening: synchronous or async
 
+
+**What this code does — step by step:**
+
+1. Runs in the SAME transaction as the publisher (after the handler completes). Side effects here must be transactional-safe (DB writes, not external calls).
+2. Runs AFTER the publishing transaction commits — the safe spot for. External side effects (email, HTTP, file writes).
+3. Or fully async on its own executor:
+
+The same code, clean:
+
 ```java
 @Component
 public class FulfillmentListener {
 
-    // Runs in the SAME transaction as the publisher (after the handler completes).
-    // Side effects here must be transactional-safe (DB writes, not external calls).
     @EventListener
     void handle(OrderPaid event) { ... }
 
-    // Runs AFTER the publishing transaction commits — the safe spot for
-    // external side effects (email, HTTP, file writes).
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     void handleAfterCommit(OrderPaid event) { ... }
 
-    // Or fully async on its own executor:
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     void handleAsync(OrderPaid event) { ... }
@@ -61,7 +63,6 @@ The three modes are a decision, not a pick-one: same-transaction for *consistenc
 
 By default an event is marked `COMPLETED` when the listener returns; if it throws, the publication stays pending. **`@CompletionHandler`** is the Modulith answer to "the listener crashed":
 
-```java
 @Component
 public class OrderPaidCompletion {
 
@@ -73,18 +74,15 @@ public class OrderPaidCompletion {
         // park the event, alert, prepare a replay — never swallow silently
     }
 }
-```
 
 Combined with the **`EventPublicationRegistry`**, this gives you the full DLQ discipline in-process: events that failed are *queryable* (`registry.findIncompletePublications()`), replayable (`registry.markCompleted(...)` after a fix), and auditable — without Kafka.
 
 ## The admin/ops surface
 
-```java
 // Ops endpoint or scheduled job — find what's stuck:
 List<EventPublication> stuck = registry.findIncompletePublications();
 // after fixing the listener, complete them:
 stuck.forEach(p -> registry.markCompleted(p.getIdentifier(), Instant.now(), null));
-```
 
 A scheduled reconcile ("complete any publication that's been IN_PROGRESS for > 5 min with a still-pending listener") is the in-process version of the Kafka consumer's rebalance: **events can't vanish silently**.
 
@@ -109,3 +107,4 @@ The decision rule: **in-process events for module coupling inside the monolith; 
 - It's the outbox pattern without the broker — use it inside the monolith; move to Kafka at the service boundary.
 
 Official docs: [Spring Modulith — Events](https://docs.spring.io/spring-modulith/reference/events.html)
+

@@ -1,7 +1,7 @@
 ---
 title: Docker Basics — Complete Beginner's Guide
 summary: What Docker solves, containers vs VMs, images, layers, and the Dockerfile that packages a Spring Boot app.
-order: 1
+order: 2
 minutes: 20
 topics: [docker, containers, images, layers, dockerfile, docker-compose]
 docs:
@@ -190,3 +190,4 @@ docker run -d -p 8080:8080 myregistry/academy-api:latest
 - `docker-compose` runs multi-container apps (app + database) together
 
 **Official docs:** [Docker Get Started](https://docs.docker.com/get-started/) · [Dockerfile Reference](https://docs.docker.com/engine/reference/builder/)
+

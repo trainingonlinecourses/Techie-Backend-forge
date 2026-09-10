@@ -1,7 +1,7 @@
 ---
 title: @DataJpaTest in Depth — Real JPA Against a Real Database
 summary: The slice test for repositories, why H2 differs from Postgres, flush/clear assertions, and Testcontainers for the real thing.
-order: 10
+order: 2
 minutes: 17
 topics: [datajpatest, slice-test, h2, testcontainers, repository-test, flush, rollback]
 docs:
@@ -15,7 +15,6 @@ docs:
 
 `@DataJpaTest` boots only the **JPA layer** — repositories, the `EntityManager`, and the transaction machinery — without controllers, services, or security:
 
-```java
 @DataJpaTest
 class OrderRepositoryTest {
     @Autowired OrderRepository orderRepo;
@@ -29,7 +28,6 @@ class OrderRepositoryTest {
         assertThat(orderRepo.findByStatus("PAID")).hasSize(1);
     }
 }
-```
 
 Each test method runs in a **transaction that rolls back** after the test — fast, isolated, no cleanup code. The slice is the right home for: derived-query correctness, JPQL syntax, mappings (columns/relations), and constraint behavior.
 
@@ -47,7 +45,6 @@ Each test method runs in a **transaction that rolls back** after the test — fa
 
 **The org rule:** H2 for *fast everyday* repository tests (query shape, mappings); **Testcontainers-Postgres for anything touching Postgres-specific behavior** (partial indexes, `ON CONFLICT`, JSONB, window functions). The classic bug: a query that passes on H2 and fails on Postgres (or vice versa) — H2's dialect is *similar but not equal*.
 
-```java
 @DataJpaTest
 @Testcontainers
 class OrderRepositoryPostgresTest {
@@ -62,7 +59,6 @@ class OrderRepositoryPostgresTest {
     }
     // ... the real-DB assertions
 }
-```
 
 Teams often run **both**: an H2 suite in the fast path (every push) and the Testcontainers suite on the full pipeline or nightly. The fidelity decision is a review item: "does this test depend on Postgres behavior? then it needs the container."
 
@@ -70,7 +66,6 @@ Teams often run **both**: an H2 suite in the fast path (every push) and the Test
 
 JPA defers writes until flush. A test that saves and immediately asserts a *query* can see stale state:
 
-```java
 @Test
 void saveThenQuery() {
     orderRepo.save(new Order("PAID"));
@@ -78,15 +73,12 @@ void saveThenQuery() {
     // (the INSERT is pending; the same persistence context may return it,
     //  a fresh query in another context might not — nondeterministic)
 }
-```
 
 The fix — force the flush, and clear the context to simulate a fresh read:
 
-```java
 orderRepo.saveAndFlush(new Order("PAID"));      // INSERT now
 entityManager.clear();                          // detach — next query is a real SELECT
 assertThat(orderRepo.findByStatus("PAID")).hasSize(1);
-```
 
 `TestEntityManager.persistAndFlush` and `clear` are exactly for this. Tests that assert *query results* (not just object identity) should always flush + clear — otherwise they can pass vacuously against the in-memory context.
 
@@ -122,3 +114,4 @@ assertThat(orderRepo.findByStatus("PAID")).hasSize(1);
 - Always `flush` (or `saveAndFlush`) + `entityManager.clear()` before asserting query results.
 - The slice covers repositories/mappings/JPQL — not services or the HTTP stack.
 - Import auditing config explicitly when testing `@CreatedDate`/`@LastModifiedDate`.
+

@@ -95,3 +95,4 @@ Both are excellent and both beat hand-run scripts by a mile. The choice is cultu
 - Same hygiene as Flyway: never edit an applied changeSet, validate in CI, test against real Postgres.
 
 Official docs: [Liquibase](https://docs.liquibase.com/) · [Boot data initialization](https://docs.spring.io/spring-boot/reference/how-to/data-initialization.html)
+

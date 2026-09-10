@@ -1,7 +1,7 @@
 ---
 title: Default Methods — Evolving Interfaces Without Breaking Code
 summary: Why default methods exist, syntax, the diamond problem, static interface methods, and how they power the entire Java collections framework upgrade.
-order: 6
+order: 1
 minutes: 18
 topics: [default-methods, interface-evolution, diamond-problem, static-interface-methods, java8]
 docs:
@@ -14,7 +14,6 @@ Before Java 8, interfaces could only have abstract methods. If you wanted to add
 
 Java 8 solved this with **default methods** — methods in an interface that have a body (default implementation). Classes can override them or use the default:
 
-```java
 public interface List<E> extends Collection<E> {
     // New in Java 8: default method with a body
     default void sort(Comparator<? super E> c) {
@@ -35,7 +34,6 @@ public interface List<E> extends Collection<E> {
         return Arrays.asList(elements);
     }
 }
-```
 
 **Why this matters:** When Java 8 added `sort()`, `stream()`, `forEach()`, and `removeIf()` to the `Collection` interface, ALL existing implementations (ArrayList, HashSet, LinkedList, etc.) got these methods for free via default implementations. No breaking changes.
 
@@ -43,33 +41,46 @@ public interface List<E> extends Collection<E> {
 
 ## Syntax
 
-```java
-public interface MyInterface {
-    // Abstract method (no body)
-    void abstractMethod();
+public class Main {
 
-    // Default method (has a body)
-    default void defaultMethod() {
-        System.out.println("Default implementation");
-    }
+    public static void main(String[] args) {
+        public interface MyInterface {
+            // Abstract method (no body)
+            void abstractMethod();
 
-    // Static method (has a body, belongs to interface)
-    static void staticMethod() {
-        System.out.println("Static interface method");
-    }
+            // Default method (has a body)
+            default void defaultMethod() {
+                System.out.println("Default implementation");
+            }
 
-    // Private method (Java 9+)
-    private void helperMethod() {
-        System.out.println("Private helper");
+            // Static method (has a body, belongs to interface)
+            static void staticMethod() {
+                System.out.println("Static interface method");
+            }
+
+            // Private method (Java 9+)
+            private void helperMethod() {
+                System.out.println("Private helper");
+            }
+        }
     }
 }
-```
 
 ---
 
 ## The Diamond Problem
 
 What happens if a class implements two interfaces with the same default method?
+
+
+**What this code does — step by step:**
+
+1. COMPILE ERROR if we don't override: class Duck implements Flyable, Swimmable { }
+2. Resolution: MUST override to disambiguate
+3. Option 1: Choose one
+4. Option 2: Combine both. Return Flyable.super.move() + " and " + Swimmable.super.move();
+
+The same code, clean:
 
 ```java
 interface Flyable {
@@ -80,18 +91,12 @@ interface Swimmable {
     default String move() { return "swimming"; }
 }
 
-// COMPILE ERROR if we don't override:
-// class Duck implements Flyable, Swimmable { }
 
-// Resolution: MUST override to disambiguate
 class Duck implements Flyable, Swimmable {
     @Override
     public String move() {
-        // Option 1: Choose one
         return Flyable.super.move();
 
-        // Option 2: Combine both
-        // return Flyable.super.move() + " and " + Swimmable.super.move();
     }
 }
 ```
@@ -100,30 +105,40 @@ class Duck implements Flyable, Swimmable {
 
 ## Line-by-Line Walkthrough
 
+
+**What this code does — step by step:**
+
+1. Line 1: Define an interface with default methods
+2. Default method: check if key exists
+3. Default method: get or compute if absent
+4. Static factory method
+5. Line 2: Implementation only needs to provide abstract methods
+6. containsKey and getOrDefault inherited from default implementations
+7. Line 3: Usage
+8. `System.out.println(userCache.containsKey("u1"));` — true (default method)
+9. `System.out.println(userCache.getOrDefault("u2", Guest));` — Guest (default method)
+
+The same code, clean:
+
 ```java
-// Line 1: Define an interface with default methods
 public interface Cache<K, V> {
     V get(K key);
     void put(K key, V value);
 
-    // Default method: check if key exists
     default boolean containsKey(K key) {
         return get(key) != null;
     }
 
-    // Default method: get or compute if absent
     default V getOrDefault(K key, V defaultValue) {
         V value = get(key);
         return value != null ? value : defaultValue;
     }
 
-    // Static factory method
     static <K, V> Cache<K, V> createInMemory() {
         return new InMemoryCache<>();
     }
 }
 
-// Line 2: Implementation only needs to provide abstract methods
 public class InMemoryCache<K, V> implements Cache<K, V> {
     private final Map<K, V> store = new HashMap<>();
 
@@ -132,14 +147,12 @@ public class InMemoryCache<K, V> implements Cache<K, V> {
 
     @Override
     public void put(K key, V value) { store.put(key, value); }
-    // containsKey and getOrDefault inherited from default implementations
 }
 
-// Line 3: Usage
 Cache<String, User> userCache = Cache.createInMemory();
 userCache.put("u1", new User("Alice"));
-System.out.println(userCache.containsKey("u1"));           // true (default method)
-System.out.println(userCache.getOrDefault("u2", Guest));   // Guest (default method)
+System.out.println(userCache.containsKey("u1"));
+System.out.println(userCache.getOrDefault("u2", Guest));
 ```
 
 ---
@@ -148,7 +161,6 @@ System.out.println(userCache.getOrDefault("u2", Guest));   // Guest (default met
 
 ### Scenario 1: Versioned API contracts
 
-```java
 public interface PaymentProcessor {
     PaymentResult process(PaymentRequest request);
 
@@ -167,11 +179,9 @@ public interface PaymentProcessor {
         return processWithRetry(request, 3);  // fallback to retry logic
     }
 }
-```
 
 ### Scenario 2: Mixin-style capabilities
 
-```java
 public interface Auditable {
     default AuditRecord createAuditRecord(String action, String userId) {
         return new AuditRecord(
@@ -189,7 +199,6 @@ public interface AuditedEntity extends Auditable {
         getAuditHistory().add(createAuditRecord(action, userId));
     }
 }
-```
 
 ---
 
@@ -200,3 +209,4 @@ public interface AuditedEntity extends Auditable {
 | Default method conflicts | Two interfaces with same default method | Override to disambiguate |
 | Calling `this.method()` in default | Calls the implementing class method | Use `InterfaceName.super.method()` |
 | Forgetting static methods aren't inherited | Can't call `obj.staticMethod()` | Call via `Interface.staticMethod()` |
+

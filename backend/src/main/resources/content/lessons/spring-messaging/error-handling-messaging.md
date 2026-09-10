@@ -1,7 +1,7 @@
 ---
 title: Error Handling — Dead Letters, Retries, and Poison Messages
 module: spring-messaging
-order: 4
+order: 1
 minutes: 25
 topics: ["error channels", "dead letter queue", "retries", "poison messages", "idempotency"]
 summary: When a method throws, the caller gets the exception in a stack trace. When a message consumer throws, there's often no caller — the message came fr...
@@ -26,6 +26,16 @@ The toolkit: **retries** (bounded, with backoff), **error channels** (a destinat
 
 ## The Code Walkthrough
 
+
+**What this code does — step by step:**
+
+1. ---- The consumer: processing can fail ----
+2. Simulate a transient DB hiccup that clears up after 2 tries
+3. ---- The error channel: where failures land after retries ----. Wire in config: errorChannel -> retry advice -> orders.processed
+4. notify ops, log, park in a dead-letter table...
+
+The same code, clean:
+
 ```java
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.integration.channel.DirectChannel;
@@ -39,30 +49,24 @@ public class OrderConsumer {
 
     private int attempts = 0;
 
-    // ---- The consumer: processing can fail ----
     @ServiceActivator(inputChannel = "orders.processed")
     public void handle(Order order) {
-        // Simulate a transient DB hiccup that clears up after 2 tries
         if (attempts++ < 2) {
             throw new IllegalStateException("db temporarily unavailable");
         }
         System.out.println("order " + order.id() + " processed");
     }
 
-    // ---- The error channel: where failures land after retries ----
-    // Wire in config: errorChannel -> retry advice -> orders.processed
     @ServiceActivator(inputChannel = "orders.errors")
     public void onError(Message<?> failed) {
         Throwable cause = (Throwable) failed.getPayload();
         Order original = (Order) failed.getHeaders().get("order");
         System.out.println("FINAL failure for order "
                 + (original != null ? original.id() : "?") + ": " + cause.getMessage());
-        // notify ops, log, park in a dead-letter table...
     }
 }
 ```
 
-```java
 // ---- The retry advice: bounded retries with backoff, then error channel ----
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -96,7 +100,6 @@ public class RetryConfig {
         return advice;
     }
 }
-```
 
 ### Walking Through Each Part
 
@@ -118,7 +121,6 @@ A message that always fails (malformed payload, a code bug) will: fail → retry
 
 Brokers deliver **at least once** — the same message may arrive twice (consumer crashed after processing but before acking). Therefore:
 
-```java
 // The consumer MUST tolerate duplicates:
 @ServiceActivator(inputChannel = "orders.processed")
 public void handle(Order order) {
@@ -126,7 +128,6 @@ public void handle(Order order) {
         process(order);                          // runs once per order id
     }
 }
-```
 
 Idempotency patterns: a `processed` table keyed by message id, a dedupe set, or natural idempotency (a `SET balance = balance - x` that's safe to re-run... no — for financial ops use a unique constraint on the operation id).
 
@@ -157,3 +158,4 @@ The broker DLQ (covered in the AMQP/Kafka modules) is the durable version: faile
 - Poison messages need attempt tracking and DLQ inspection, not endless reprocessing.
 - At-least-once delivery means consumers must be idempotent — dedupe by message key.
 - Alert on DLQ depth: an unread dead-letter queue is silent data loss.
+

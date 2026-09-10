@@ -1,7 +1,7 @@
 ---
 title: Protocol Buffers Fundamentals
 module: grpc-apis
-order: 1
+order: 5
 minutes: 22
 topics: ["protobuf", ".proto files", "message types", "scalar types", "repeated", "oneof", "serialization"]
 summary: Protocol Buffers (protobuf) is Google's binary serialization format — the contract language of gRPC. Where JSON is humanreadable and wasteful, prot...
@@ -77,14 +77,12 @@ message Course {
 }
 ```
 
-```java
 Course course = Course.newBuilder()
     .addTags("java")
     .addAllTags(List.of("spring", "boot"))
     .build();
 
 List<String> tags = course.getTagsList();   // immutable view
-```
 
 ## Nested Messages
 
@@ -98,10 +96,8 @@ message Course {
 }
 ```
 
-```java
 Course.Author author = Course.Author.newBuilder()
     .setName("Ada").setEmail("ada@example.com").build();
-```
 
 ## oneof: Exactly One Field
 
@@ -115,10 +111,8 @@ message Payment {
 }
 ```
 
-```java
 Payment p = Payment.newBuilder().setCardToken("tok_123").build();
 // Setting bankIban clears cardToken — only one is set
-```
 
 ## Maps
 
@@ -128,12 +122,10 @@ message Metadata {
 }
 ```
 
-```java
 Metadata m = Metadata.newBuilder()
     .putLabels("env", "prod")
     .putLabels("region", "us-east")
     .build();
-```
 
 ## Defaults in proto3
 
@@ -147,9 +139,7 @@ Proto3 fields have **implicit defaults** — no `null`:
 | enum | first value (0) |
 | message | absent (use `hasField()` to check presence) |
 
-```java
 course.hasAuthor();    // presence check for messages
-```
 
 This is why the enum's first value must be a meaningful default (`STATUS_UNSPECIFIED = 0`), not a real state.
 
@@ -201,29 +191,36 @@ Maven compiles `.proto` files in `src/main/proto/` into Java builders. The gener
 
 ## Serialization Round-Trip
 
+
+**What this code does — step by step:**
+
+1. Serialize
+2. `byte[] bytes = course.toByteArray();` — ~40 bytes
+3. Deserialize
+4. `assertEquals(course, parsed);` — deterministic equality
+5. JSON interop (protobuf-java-util)
+
+The same code, clean:
+
 ```java
 Course course = Course.newBuilder()
     .setId(1L).setTitle("Spring Boot").setMinutes(25)
     .addTags("java").addTags("spring")
     .build();
 
-// Serialize
-byte[] bytes = course.toByteArray();       // ~40 bytes
+byte[] bytes = course.toByteArray();
 ByteString bs = course.toByteString();
 String base64 = Base64.getEncoder().encodeToString(bytes);
 
-// Deserialize
 Course parsed = Course.parseFrom(bytes);
-assertEquals(course, parsed);              // deterministic equality
+assertEquals(course, parsed);
 
-// JSON interop (protobuf-java-util)
 String json = JsonFormat.printer().print(course);
 Course fromJson = JsonFormat.parser().parse(json, Course.class);
 ```
 
 ## Testing Protobuf
 
-```java
 @Test
 void roundTripsThroughBinary() throws Exception {
     Course original = courseBuilder().build();
@@ -240,7 +237,6 @@ void oneofSetsExactlyOneField() {
     assertFalse(p.hasCardToken());   // setting the second cleared the first
     assertTrue(p.hasBankIban());
 }
-```
 
 ## Summary
 
@@ -255,3 +251,4 @@ void oneofSetsExactlyOneField() {
 | Generated code | Immutable builders via protoc |
 
 Protobuf is the contract layer: schema-first, versioned, compiled, and 6× smaller than JSON. It's the substrate for gRPC — the next lessons put these messages on the wire with typed RPCs, streaming, and error codes.
+

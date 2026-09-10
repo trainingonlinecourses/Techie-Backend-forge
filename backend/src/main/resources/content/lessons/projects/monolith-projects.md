@@ -1,7 +1,7 @@
 ---
 title: Monolith Projects — 10 Complete Production-Ready Applications
 summary: Build 10 real-world Spring Boot monolith applications from scratch — Task Manager, E-Commerce, Blog, Library, Hotel Booking, Employee Portal, Inventory, Social Feed, Recipe App, and Event Ticketing — each with full code, architecture, Docker setup, and tests.
-order: 1
+order: 3
 minutes: 180
 topics: [projects, monolith, spring-boot, crud, rest-api, docker, architecture, production]
 docs:
@@ -45,7 +45,6 @@ Every concept you've learned — Spring Boot, JPA, Security, Testing, Docker —
 ### Complete Source Code
 
 **Application.java**
-```java
 package com.backendforge.taskmanager;
 
 import org.springframework.boot.SpringApplication;
@@ -57,10 +56,8 @@ public class TaskManagerApplication {
         SpringApplication.run(TaskManagerApplication.class, args);
     }
 }
-```
 
 **Task.java — JPA Entity**
-```java
 package com.backendforge.taskmanager.entity;
 
 import jakarta.persistence.*;
@@ -119,10 +116,8 @@ public class Task {
 
 enum TaskStatus { TODO, IN_PROGRESS, DONE }
 enum TaskPriority { LOW, MEDIUM, HIGH, URGENT }
-```
 
 **TaskRepository.java**
-```java
 package com.backendforge.taskmanager.repository;
 
 import com.backendforge.taskmanager.entity.Task;
@@ -135,10 +130,8 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
     List<Task> findByPriority(TaskPriority priority);
     List<Task> findByTitleContainingIgnoreCase(String keyword);
 }
-```
 
 **TaskService.java**
-```java
 package com.backendforge.taskmanager.service;
 
 import com.backendforge.taskmanager.entity.Task;
@@ -187,10 +180,8 @@ public class TaskService {
         return repository.findByStatus(status);
     }
 }
-```
 
 **TaskController.java**
-```java
 package com.backendforge.taskmanager.controller;
 
 import com.backendforge.taskmanager.entity.Task;
@@ -244,10 +235,8 @@ public class TaskController {
         return service.getTasksByStatus(status);
     }
 }
-```
 
 **TaskControllerTest.java**
-```java
 package com.backendforge.taskmanager.controller;
 
 import com.backendforge.taskmanager.entity.Task;
@@ -299,7 +288,6 @@ class TaskControllerTest {
             .andExpect(status().isNotFound());
     }
 }
-```
 
 ### application.yml
 ```yaml
@@ -392,7 +380,6 @@ services:
 ### Complete Source Code
 
 **Product.java**
-```java
 package com.backendforge.ecommerce.entity;
 
 import jakarta.persistence.*;
@@ -449,10 +436,8 @@ public class Product {
     public String getImageUrl() { return imageUrl; }
     public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
 }
-```
 
 **CartItem.java**
-```java
 package com.backendforge.ecommerce.entity;
 
 import jakarta.persistence.*;
@@ -489,10 +474,8 @@ public class CartItem {
     public Integer getQuantity() { return quantity; }
     public void setQuantity(Integer quantity) { this.quantity = quantity; }
 }
-```
 
 **Order.java**
-```java
 package com.backendforge.ecommerce.entity;
 
 import jakarta.persistence.*;
@@ -543,10 +526,8 @@ public class Order {
 }
 
 enum OrderStatus { PENDING, CONFIRMED, SHIPPED, DELIVERED, CANCELLED }
-```
 
 **OrderItem.java**
-```java
 package com.backendforge.ecommerce.entity;
 
 import jakarta.persistence.*;
@@ -580,10 +561,8 @@ public class OrderItem {
     public BigDecimal getUnitPrice() { return unitPrice; }
     public void setUnitPrice(BigDecimal price) { this.unitPrice = price; }
 }
-```
 
 **ProductRepository.java**
-```java
 package com.backendforge.ecommerce.repository;
 
 import com.backendforge.ecommerce.entity.Product;
@@ -595,10 +574,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findByPriceBetween(java.math.BigDecimal min, java.math.BigDecimal max);
     List<Product> findByNameContainingIgnoreCase(String name);
 }
-```
 
 **CartRepository.java**
-```java
 package com.backendforge.ecommerce.repository;
 
 import com.backendforge.ecommerce.entity.CartItem;
@@ -609,10 +586,8 @@ public interface CartRepository extends JpaRepository<CartItem, Long> {
     List<CartItem> findBySessionId(String sessionId);
     void deleteBySessionId(String sessionId);
 }
-```
 
 **OrderRepository.java**
-```java
 package com.backendforge.ecommerce.repository;
 
 import com.backendforge.ecommerce.entity.Order;
@@ -623,10 +598,8 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     List<Order> findByCustomerEmail(String email);
     List<Order> findByStatus(com.backendforge.ecommerce.entity.OrderStatus status);
 }
-```
 
 **ProductService.java**
-```java
 package com.backendforge.ecommerce.service;
 
 import com.backendforge.ecommerce.entity.Product;
@@ -678,10 +651,8 @@ public class ProductService {
         return repository.findByCategory(category);
     }
 }
-```
 
 **CartService.java**
-```java
 package com.backendforge.ecommerce.service;
 
 import com.backendforge.ecommerce.entity.*;
@@ -771,10 +742,8 @@ public class CartService {
         return orderRepository.save(order);
     }
 }
-```
 
 **ProductController.java**
-```java
 package com.backendforge.ecommerce.controller;
 
 import com.backendforge.ecommerce.entity.Product;
@@ -819,10 +788,8 @@ public class ProductController {
         return service.getProductsByCategory(category);
     }
 }
-```
 
 **CartController.java**
-```java
 package com.backendforge.ecommerce.controller;
 
 import com.backendforge.ecommerce.entity.*;
@@ -867,7 +834,6 @@ public class CartController {
         return service.checkout(sessionId, body.get("email"));
     }
 }
-```
 
 ### docker-compose.yml
 ```yaml
@@ -970,3 +936,4 @@ curl http://localhost:8080/api/tasks
 # Run tests
 mvn test
 ```
+

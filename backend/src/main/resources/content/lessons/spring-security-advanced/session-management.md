@@ -1,7 +1,7 @@
 ---
 title: Session Management & Hardening
 summary: Sessions beyond the default — session fixation, concurrency control, session registry, Redis-backed storage and the session-vs-JWT decision.
-order: 3
+order: 5
 minutes: 14
 topics: [session management, session fixation, concurrency control, session registry, redis sessions]
 docs:
@@ -19,33 +19,27 @@ Spring Security creates an `HttpSession` on login (the `JSESSIONID` cookie). It'
 
 **Session fixation** = the attacker plants a known session id in the victim's browser, then waits for the victim to log in — the attacker now shares the authenticated session.
 
-```java
 http.sessionManagement(sm -> sm.sessionFixation(SessionFixationConfigurer::newSession));
-```
 
 Spring Security's **default is already `changeSessionId()`** (keep the session, rotate the id) — never disable it. The equivalent discipline for JWT-based apps: always rotate tokens/keys on privilege change.
 
 ## Concurrency control: one user, how many sessions?
 
-```java
 http.sessionManagement(sm -> sm
     .maximumSessions(1)                        // one active session per user
     .maxSessionsPreventsLogin(true)            // new login rejected (vs. kicking the old one)
     .expiredUrl("/login?expired"));
-```
 
 The two semantics: `maxSessionsPreventsLogin(false)` (default) **invalidates the oldest session** — the user gets silently logged out elsewhere; `true` **rejects the new login**. Choose per product: banking = reject new; internal tool = kick old.
 
 **`SessionRegistry`** is the bookkeeping that makes this work (and powers "show all sessions of user X", "kill a session remotely"):
 
-```java
 @Bean
 SessionRegistry sessionRegistry() { return new SessionRegistryImpl(); }
 
 // Audit / admin: enumerate and destroy sessions
 List<SessionInformation> sessions = sessionRegistry.getAllSessions(user, false);
 sessions.forEach(s -> s.expireNow());
-```
 
 Register sessions by adding `http.sessionManagement(sm -> sm.sessionRegistry(sessionRegistry()))` — concurrent-session control **requires** the registry.
 
@@ -60,10 +54,8 @@ The default in-memory `HttpSession` dies on restart and breaks load-balanced dep
 </dependency>
 ```
 
-```java
 @EnableRedisHttpSession(defaultMaxInactiveIntervalSeconds = 3600)  // 1h TTL
 public class SessionConfig { }
-```
 
 Now: sessions survive restarts, any instance serves any user, and the session has a **server-enforced TTL** (the Redis key expires). The same pattern covers JDBC-backed sessions (`spring-session-jdbc`) when Redis isn't in the stack.
 
@@ -93,3 +85,4 @@ Rule of thumb: **server-rendered/HTMX app or tight server control → sessions; 
 - Sessions = revocable + CSRF-bound; JWT = stateless + limited revocation — pick by architecture, not fashion.
 
 Official docs: [Spring Session](https://docs.spring.io/spring-session/reference/) · [Session Management](https://docs.spring.io/spring-security/reference/servlet/authentication/session-management.html)
+

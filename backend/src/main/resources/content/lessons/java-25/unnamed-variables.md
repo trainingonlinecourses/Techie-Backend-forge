@@ -12,79 +12,116 @@ docs:
 
 Sometimes you need a variable syntactically but never use it. Before Java 22, you had to give it a meaningless name:
 
+
+**What this code does — step by step:**
+
+1. OLD: variable 'e' is never used but required
+2. `} catch (Exception e) {` — 'e' is never used
+3. OLD: loop variable unused
+4. 'i' is never used
+5. OLD: lambda parameter unused
+6. Actually 'item' IS used — but what about:
+7. `list.stream().map(String::length).toList();` — here we don't create unused vars
+
+The same code, clean:
+
 ```java
-// OLD: variable 'e' is never used but required
-try {
-    riskyOperation();
-} catch (Exception e) {       // 'e' is never used
-    logError();
-}
+public class Main {
 
-// OLD: loop variable unused
-for (int i = 0; i < 10; i++) {
-    System.out.println("Processing...");
-    // 'i' is never used
-}
+    public static void main(String[] args) {
+        try {
+            riskyOperation();
+        } catch (Exception e) {
+            logError();
+        }
 
-// OLD: lambda parameter unused
-list.forEach(item -> System.out.println(item));
-// Actually 'item' IS used — but what about:
-list.stream().map(String::length).toList();  // here we don't create unused vars
+        for (int i = 0; i < 10; i++) {
+            System.out.println("Processing...");
+        }
+
+        list.forEach(item -> System.out.println(item));
+        list.stream().map(String::length).toList();
+    }
+}
 ```
 
 Java 22 introduced **unnamed variables** using `_` (underscore):
 
+
+**What this code does — step by step:**
+
+1. JAVA 22+: Clearly signals "I don't need this"
+2. `} catch (Exception _) {` — underscore = intentionally unused
+3. Unnamed loop variable
+4. Unnamed pattern variable
+5. Unnamed lambda parameter
+6. `list.forEach(_ -> {});` — intentionally ignoring the element
+
+The same code, clean:
+
 ```java
-// JAVA 22+: Clearly signals "I don't need this"
-try {
-    riskyOperation();
-} catch (Exception _) {       // underscore = intentionally unused
-    logError();
-}
+public class Main {
 
-// Unnamed loop variable
-for (int _ = 0; _ < 10; _++) {
-    System.out.println("Processing...");
-}
+    public static void main(String[] args) {
+        try {
+            riskyOperation();
+        } catch (Exception _) {
+            logError();
+        }
 
-// Unnamed pattern variable
-if (obj instanceof String _) {
-    System.out.println("It's a string");
-}
+        for (int _ = 0; _ < 10; _++) {
+            System.out.println("Processing...");
+        }
 
-// Unnamed lambda parameter
-list.forEach(_ -> {});  // intentionally ignoring the element
+        if (obj instanceof String _) {
+            System.out.println("It's a string");
+        }
+
+        list.forEach(_ -> {});
+    }
+}
 ```
 
 ---
 
 ## When to Use `_`
 
+
+**What this code does — step by step:**
+
+1. Good: Catch block where you only care about the exception type
+2. Good: Pattern matching where you only check type
+3. Good: Records you're destructuring but don't need all fields
+4. Only need status
+5. Good: Nested try-with-resources
+6. 'a.txt' is opened for side effects, we don't use the stream directly
+
+The same code, clean:
+
 ```java
-// Good: Catch block where you only care about the exception type
-try {
-    parse(input);
-} catch (NumberFormatException _) {
-    return defaultValue;
-}
+public class Main {
 
-// Good: Pattern matching where you only check type
-if (obj instanceof Integer _) {
-    System.out.println("It's an integer");
-}
+    public static void main(String[] args) {
+        try {
+            parse(input);
+        } catch (NumberFormatException _) {
+            return defaultValue;
+        }
 
-// Good: Records you're destructuring but don't need all fields
-record Result(String status, String data, int code) {}
-if (result instanceof Result(String status, _, _)) {
-    // Only need status
-    System.out.println("Status: " + status);
-}
+        if (obj instanceof Integer _) {
+            System.out.println("It's an integer");
+        }
 
-// Good: Nested try-with-resources
-try (var _ = new FileInputStream("a.txt");
-     var reader = new BufferedReader(new InputStreamReader(new FileInputStream("b.txt")))) {
-    // 'a.txt' is opened for side effects, we don't use the stream directly
-    String line = reader.readLine();
+        record Result(String status, String data, int code) {}
+        if (result instanceof Result(String status, _, _)) {
+            System.out.println("Status: " + status);
+        }
+
+        try (var _ = new FileInputStream("a.txt");
+             var reader = new BufferedReader(new InputStreamReader(new FileInputStream("b.txt")))) {
+            String line = reader.readLine();
+        }
+    }
 }
 ```
 
@@ -92,22 +129,44 @@ try (var _ = new FileInputStream("a.txt");
 
 ## Line-by-Line Walkthrough
 
+
+**What this code does — step by step:**
+
+1. Line 1: Exception handling — catch without using the exception
+2. We don't need the exception details
+3. Line 2: Pattern matching — check type but don't use the variable
+4. Line 3: Record destructuring — ignore fields you don't need
+5. Line 4: Loop variables — when count doesn't matter
+6. Line 5: Test safe parsing
+7. `System.out.println(safeParseInt("42", 0));` — 42
+8. `System.out.println(safeParseInt("abc", -1));` — -1
+9. Line 6: Test type checking
+10. `System.out.println(getType("hello"));` — "string"
+11. `System.out.println(getType(42));` — "integer"
+12. `System.out.println(getType(List.of(1, 2)));` — "list"
+13. Line 7: Test record destructuring
+14. `System.out.println(getDisplayName(user));` — "Alice (30)"
+15. Line 8: Test repeat
+16. Hello! Hello! Hello!
+17. Line 9: Unnamed in streams
+18. `.filter(_ -> true)` — keep all (unnamed parameter)
+19. `.map(name -> name.toUpperCase())` — named when used
+
+The same code, clean:
+
 ```java
 import java.util.*;
 import java.util.stream.*;
 
 public class UnnamedVariablesDemo {
-    // Line 1: Exception handling — catch without using the exception
     static int safeParseInt(String input, int defaultValue) {
         try {
             return Integer.parseInt(input);
         } catch (NumberFormatException _) {
-            // We don't need the exception details
             return defaultValue;
         }
     }
 
-    // Line 2: Pattern matching — check type but don't use the variable
     static String getType(Object obj) {
         return switch (obj) {
             case String _    -> "string";
@@ -119,7 +178,6 @@ public class UnnamedVariablesDemo {
         };
     }
 
-    // Line 3: Record destructuring — ignore fields you don't need
     record User(String name, String email, String password, int age) {}
 
     static String getDisplayName(Object obj) {
@@ -129,7 +187,6 @@ public class UnnamedVariablesDemo {
         return "Unknown";
     }
 
-    // Line 4: Loop variables — when count doesn't matter
     static void repeat(int times, Runnable action) {
         for (int _ = 0; _ < times; _++) {
             action.run();
@@ -137,30 +194,22 @@ public class UnnamedVariablesDemo {
     }
 
     public static void main(String[] args) {
-        // Line 5: Test safe parsing
-        System.out.println(safeParseInt("42", 0));    // 42
-        System.out.println(safeParseInt("abc", -1));   // -1
+        System.out.println(safeParseInt("42", 0));
+        System.out.println(safeParseInt("abc", -1));
 
-        // Line 6: Test type checking
-        System.out.println(getType("hello"));          // "string"
-        System.out.println(getType(42));               // "integer"
-        System.out.println(getType(List.of(1, 2)));    // "list"
+        System.out.println(getType("hello"));
+        System.out.println(getType(42));
+        System.out.println(getType(List.of(1, 2)));
 
-        // Line 7: Test record destructuring
         var user = new User("Alice", "alice@mail.com", "secret", 30);
-        System.out.println(getDisplayName(user));      // "Alice (30)"
+        System.out.println(getDisplayName(user));
 
-        // Line 8: Test repeat
         repeat(3, () -> System.out.println("Hello!"));
-        // Hello!
-        // Hello!
-        // Hello!
 
-        // Line 9: Unnamed in streams
         List<String> names = List.of("Alice", "Bob", "Charlie");
         names.stream()
-            .filter(_ -> true)  // keep all (unnamed parameter)
-            .map(name -> name.toUpperCase())  // named when used
+            .filter(_ -> true)
+            .map(name -> name.toUpperCase())
             .forEach(name -> System.out.println(name));
     }
 }
@@ -172,7 +221,6 @@ public class UnnamedVariablesDemo {
 
 ### Scenario 1: Error handling without details
 
-```java
 public Optional<User> findUser(String id) {
     try {
         return Optional.of(userRepository.findById(id));
@@ -180,18 +228,15 @@ public Optional<User> findUser(String id) {
         return Optional.empty();  // don't need the exception
     }
 }
-```
 
 ### Scenario 2: Try-with-resources for side effects
 
-```java
 public void copyFile(String from, String to) throws IOException {
     try (var _ = new FileInputStream(from);    // opened for side effect
          var out = new FileOutputStream(to)) {
         in.transferTo(out);  // 'in' is the from stream
     }
 }
-```
 
 ---
 
@@ -203,3 +248,4 @@ public void copyFile(String from, String to) throws IOException {
 | Overusing `_` everywhere | Reduces readability | Only use when truly unused |
 | Multiple `_` in same scope | Confusing | Use `_` only for clearly independent variables |
 | Using `_` in old-style for loops | May not work in all contexts | Test in your JDK version |
+

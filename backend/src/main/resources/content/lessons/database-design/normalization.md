@@ -1,7 +1,7 @@
 ---
 title: Normalization — Designing Tables That Don't Lie
 module: database-design
-order: 1
+order: 4
 minutes: 27
 topics: ["normal forms", "1NF", "2NF", "3NF", "data redundancy", "update anomalies"]
 summary: Why bother? Consider what happens with redundant data:
@@ -174,3 +174,4 @@ The tension: **joins cost** — a heavily normalized schema means more joins per
 - 3NF is the practical baseline for most schemas.
 - Joins are the cost of normalization; denormalize deliberately on the read path.
 - Enforce relationships with real foreign keys — not just naming.
+

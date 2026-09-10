@@ -1,7 +1,7 @@
 ---
 title: Multi-Dimensional Arrays — Matrices, Jagged Arrays, and Real Data
 summary: How Java multi-dimensional arrays actually work (arrays of arrays), jagged arrays, Matrix operations, and when to use arrays vs collections for numerical data.
-order: 2
+order: 4
 minutes: 20
 topics: ["2D arrays", "jagged arrays", "matrix", "array of arrays", "Arrays.copyOf", "System.arraycopy"]
 docs:
@@ -13,31 +13,40 @@ docs:
 
 A 2D array in Java is actually **an array of arrays** — not a true matrix. Each row can be a different length (jagged array), which is different from languages like C or Python.
 
+
+**What this code does — step by step:**
+
+1. This creates 3 rows, each row is an int[] array
+2. Access element at row 1, column 2
+3. Print the shape
+4. `System.out.println("Rows: " + grid.length);` — 3
+5. `System.out.println("Cols: " + grid[0].length);` — 4
+
+The same code, clean:
+
 ```java
-// This creates 3 rows, each row is an int[] array
-int[][] grid = new int[3][4];
+public class Main {
 
-// Access element at row 1, column 2
-grid[1][2] = 42;
+    public static void main(String[] args) {
+        int[][] grid = new int[3][4];
 
-// Print the shape
-System.out.println("Rows: " + grid.length);        // 3
-System.out.println("Cols: " + grid[0].length);     // 4
+        grid[1][2] = 42;
+
+        System.out.println("Rows: " + grid.length);
+        System.out.println("Cols: " + grid[0].length);
+    }
+}
 ```
 
 ### Line-by-Line Breakdown
 
-```java
 int[][] grid = new int[3][4];
-```
 - `int[][]` — The type is "array of arrays of int"
 - `new int[3]` — Creates an array of 3 elements, each element is a reference
 - `[4]` — Each of those 3 elements is initialized as an `int[4]`
 - In memory: 1 outer array + 3 inner arrays (each with 4 ints)
 
-```java
 grid[1][2] = 42;
-```
 - `grid[1]` → gets the second inner array (row 1)
 - `[2]` → gets the third element in that row
 - Java checks bounds: throws `ArrayIndexOutOfBoundsException` if out of range
@@ -46,26 +55,37 @@ grid[1][2] = 42;
 
 ## Jagged Arrays — Rows of Different Lengths
 
+
+**What this code does — step by step:**
+
+1. Create a jagged array where each row has a different number of columns
+2. `jagged[0] = new int[]{1, 2, 3};` — Row 0: 3 columns
+3. `jagged[1] = new int[]{4, 5, 6, 7, 8};` — Row 1: 5 columns
+4. `jagged[2] = new int[]{9};` — Row 2: 1 column
+5. Print each row
+6. Output: Row 0 (3 cols): 1 2 3. Row 1 (5 cols): 4 5 6 7 8. Row 2 (1 cols): 9
+
+The same code, clean:
+
 ```java
-// Create a jagged array where each row has a different number of columns
-int[][] jagged = new int[3][];
+public class Main {
 
-jagged[0] = new int[]{1, 2, 3};        // Row 0: 3 columns
-jagged[1] = new int[]{4, 5, 6, 7, 8};  // Row 1: 5 columns
-jagged[2] = new int[]{9};               // Row 2: 1 column
+    public static void main(String[] args) {
+        int[][] jagged = new int[3][];
 
-// Print each row
-for (int row = 0; row < jagged.length; row++) {
-    System.out.print("Row " + row + " (" + jagged[row].length + " cols): ");
-    for (int col = 0; col < jagged[row].length; col++) {
-        System.out.print(jagged[row][col] + " ");
+        jagged[0] = new int[]{1, 2, 3};
+        jagged[1] = new int[]{4, 5, 6, 7, 8};
+        jagged[2] = new int[]{9};
+
+        for (int row = 0; row < jagged.length; row++) {
+            System.out.print("Row " + row + " (" + jagged[row].length + " cols): ");
+            for (int col = 0; col < jagged[row].length; col++) {
+                System.out.print(jagged[row][col] + " ");
+            }
+            System.out.println();
+        }
     }
-    System.out.println();
 }
-// Output:
-// Row 0 (3 cols): 1 2 3
-// Row 1 (5 cols): 4 5 6 7 8
-// Row 2 (1 cols): 9
 ```
 
 **Why jagged arrays exist:**
@@ -77,7 +97,6 @@ for (int row = 0; row < jagged.length; row++) {
 
 ## Matrix Operations
 
-```java
 public class MatrixOps {
 
     /**
@@ -133,36 +152,42 @@ public class MatrixOps {
         }
     }
 }
-```
 
 ---
 
 ## Array Copying — System.arraycopy vs Arrays.copyOf
 
+
+**What this code does — step by step:**
+
+1. Method 1: System.arraycopy (fastest, low-level)
+2. Method 2: Arrays.copyOf (convenience)
+3. Method 3: clone (shallow copy)
+4. Method 4: Manual loop (slowest, most control)
+5. For 2D arrays — note: only copies the outer array!
+6. `int[][] shallow = original2D.clone();` — shallow[0] == original2D[0] ← same reference!
+7. Deep copy of 2D array
+
+The same code, clean:
+
 ```java
 int[] original = {1, 2, 3, 4, 5};
 
-// Method 1: System.arraycopy (fastest, low-level)
 int[] copy1 = new int[original.length];
 System.arraycopy(original, 0, copy1, 0, original.length);
 
-// Method 2: Arrays.copyOf (convenience)
 int[] copy2 = Arrays.copyOf(original, original.length);
 
-// Method 3: clone (shallow copy)
 int[] copy3 = original.clone();
 
-// Method 4: Manual loop (slowest, most control)
 int[] copy4 = new int[original.length];
 for (int i = 0; i < original.length; i++) {
     copy4[i] = original[i];
 }
 
-// For 2D arrays — note: only copies the outer array!
 int[][] original2D = {{1, 2}, {3, 4}};
-int[][] shallow = original2D.clone();  // shallow[0] == original2D[0] ← same reference!
+int[][] shallow = original2D.clone();
 
-// Deep copy of 2D array
 int[][] deep = new int[original2D.length][];
 for (int i = 0; i < original2D.length; i++) {
     deep[i] = original2D[i].clone();
@@ -192,3 +217,4 @@ for (int i = 0; i < original2D.length; i++) {
 | Forgetting arrays are 0-indexed | Off-by-one errors | Use `for(int i=0; i<arr.length; i++)` |
 | Assuming `==` compares contents | It compares references | Use `Arrays.equals(a, b)` for content comparison |
 | `new int[3][4]` creates 12 objects | Actually 4 objects (1 outer + 3 inner) | That's fine — JVM optimizes this |
+

@@ -103,7 +103,6 @@ GET /api/quiz-answers?lessonId=7
 
 Spring mappings:
 
-```java
 @GetMapping("/courses/{id}")
 public ResponseEntity<CourseDto> get(@PathVariable Long id) {
     return courseService.findById(id)
@@ -123,17 +122,14 @@ public ResponseEntity<Void> delete(@PathVariable Long id) {
     courseService.delete(id);
     return ResponseEntity.noContent().build();
 }
-```
 
 ## Content Negotiation
 
 Let clients choose the representation:
 
-```java
 @GetMapping(value = "/courses/{id}", produces = {MediaType.APPLICATION_JSON_VALUE,
                                                   MediaType.APPLICATION_XML_VALUE})
 public CourseDto get(@PathVariable Long id) { ... }
-```
 
 Honor `Accept` headers; use `Accept: application/json` and `Content-Type: application/json` consistently. Spring handles both automatically via `produces`/`consumes` and the `Accept` header.
 
@@ -141,14 +137,12 @@ Honor `Accept` headers; use `Accept: application/json` and `Content-Type: applic
 
 Stateless + cacheable: tell intermediaries how long a response can be cached:
 
-```java
 @GetMapping("/courses/popular")
 public ResponseEntity<List<CourseDto>> popular() {
     return ResponseEntity.ok()
         .cacheControl(CacheControl.maxAge(Duration.ofMinutes(5)))
         .body(courseService.popular());
 }
-```
 
 `Cache-Control: max-age=300` lets CDNs and browsers serve the same payload for 5 minutes — a 10× reduction in upstream load for stable data.
 
@@ -166,7 +160,6 @@ Three mainstream strategies (covered in depth in a later lesson):
 
 HATEOS = return links along with data:
 
-```java
 @GetMapping("/courses/{id}")
 public ResponseEntity<CourseDto> get(@PathVariable Long id) {
     CourseDto dto = courseService.findById(id).orElseThrow();
@@ -174,7 +167,6 @@ public ResponseEntity<CourseDto> get(@PathVariable Long id) {
     dto.addLink(linkTo(methodOn(LessonController.class).list(id)).withRel("lessons"));
     return ResponseEntity.ok(dto);
 }
-```
 
 (Full HATEOAS via Spring HATEOAS is covered in the APIs module — this is the principle: the server tells the client what it can do next.)
 
@@ -189,3 +181,4 @@ public ResponseEntity<CourseDto> get(@PathVariable Long id) {
 - ✅ Versioning strategy decided up front
 
 These fundamentals are the contract your API's consumers depend on. The next lessons build on them: error handling, pagination, versioning, and rate limiting.
+

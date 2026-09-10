@@ -1,7 +1,7 @@
 ---
 title: @ConfigurationProperties Deep Dive — Type-Safe Configuration Binding
 summary: Advanced @ConfigurationProperties patterns: nested properties, constructor binding, @DefaultValue, validation, prefix aliases, relaxed binding rules, and configuration profiles.
-order: 2
+order: 1
 minutes: 28
 topics: ["constructor binding", "nested properties", "validation", "relaxed binding", "defaultValue", "profile-specific config"]
 docs:
@@ -19,7 +19,6 @@ Spring Boot's `@ConfigurationProperties` is the official way to bind `applicatio
 
 Instead of setters, use constructors for immutable configuration:
 
-```java
 @ConfigurationProperties(prefix = "app.payment")
 public record PaymentProperties(
     String gateway,
@@ -47,7 +46,6 @@ public record PaymentProperties(
         @DefaultValue("5000") int timeoutMs
     ) {}
 }
-```
 
 ```yaml
 app:
@@ -75,24 +73,16 @@ app:
 
 ### Line-by-Line Breakdown
 
-```java
 @ConfigurationProperties(prefix = "app.payment")
-```
 - The `prefix` maps to `app.payment.*` in YAML. All properties under this prefix bind to this record.
 
-```java
 @DefaultValue("USD") String defaultCurrency
-```
 - If `app.payment.default-currency` is not set in YAML, the value defaults to `"USD"`.
 
-```java
 RetryProperties retry
-```
 - **Nested binding**: `app.payment.retry.*` maps to a `RetryProperties` record. Spring Boot automatically binds nested objects.
 
-```java
 Map<String, GatewayConfig> gateways
-```
 - **Map binding**: `app.payment.gateways.stripe.*` becomes a map entry with key `"stripe"` and value `GatewayConfig`.
 
 ---
@@ -101,7 +91,6 @@ Map<String, GatewayConfig> gateways
 
 For classes (not records):
 
-```java
 @ConfigurationProperties(prefix = "app.redis")
 @ConstructorBinding
 public class RedisProperties {
@@ -134,7 +123,6 @@ public class RedisProperties {
         @DefaultValue("0") int minIdle
     ) {}
 }
-```
 
 ```yaml
 app:
@@ -151,7 +139,6 @@ app:
 
 Add `@Validated` and Jakarta Bean Validation constraints:
 
-```java
 @ConfigurationProperties(prefix = "app.email")
 @Validated
 public record EmailProperties(
@@ -161,7 +148,6 @@ public record EmailProperties(
     @Min(1) @Max(100) int maxRecipients,
     @NotBlank String apiKey
 ) {}
-```
 
 ```yaml
 app:
@@ -212,3 +198,4 @@ APP_PAYMENT_API_KEY=abc123
 | Forgetting `@Validated` | Invalid config silently accepted | Add `@Validated` + constraint annotations |
 | Using `@Component` instead of `@EnableConfigurationProperties` | Less control over activation | Use `@EnableConfigurationProperties` on a `@Configuration` class |
 | Deep nesting (>3 levels) | Configuration becomes hard to understand | Flatten: use dot-separated property names |
+

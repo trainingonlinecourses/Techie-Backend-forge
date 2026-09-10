@@ -1,7 +1,7 @@
 ---
 title: Switch Expressions — Modern Switch That Returns Values
 summary: What switch expressions are, arrow syntax, yield keyword, exhaustive matching, how they replace if-else chains, and how organizations use them.
-order: 5
+order: 6
 minutes: 20
 topics: [switch-expression, arrow-syntax, yield, java17]
 docs:
@@ -17,7 +17,6 @@ The old `switch` statement had problems:
 
 Java 14 introduced **switch expressions** — a modern, safer alternative:
 
-```java
 // OLD: switch statement (fall-through bugs, no return value)
 String dayType;
 switch (day) {
@@ -41,72 +40,89 @@ String dayType = switch (day) {
     case "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY" -> "Weekday";
     case "SATURDAY", "SUNDAY" -> "Weekend";
 };
-```
 
 ---
 
 ## Arrow Syntax vs Colon Syntax
 
-```java
-// Arrow syntax (Java 14+) — no fall-through, concise
-String result = switch (input) {
-    case "A" -> "Alpha";
-    case "B" -> "Beta";
-    case "C" -> "Gamma";
-    default -> "Unknown";
-};
+public class Main {
 
-// Arrow with block and yield
-int result = switch (input) {
-    case "A" -> {
-        System.out.println("Processing A");
-        yield 1;  // yield returns a value from the block
-    }
-    case "B" -> {
-        System.out.println("Processing B");
-        yield 2;
-    }
-    default -> 0;
-};
+    public static void main(String[] args) {
+        // Arrow syntax (Java 14+) — no fall-through, concise
+        String result = switch (input) {
+            case "A" -> "Alpha";
+            case "B" -> "Beta";
+            case "C" -> "Gamma";
+            default -> "Unknown";
+        };
 
-// Colon syntax with break (traditional, but still works)
-switch (input) {
-    case "A":
-        result = "Alpha";
-        break;
-    case "B":
-        result = "Beta";
-        break;
-    default:
-        result = "Unknown";
-        break;
+        // Arrow with block and yield
+        int result = switch (input) {
+            case "A" -> {
+                System.out.println("Processing A");
+                yield 1;  // yield returns a value from the block
+            }
+            case "B" -> {
+                System.out.println("Processing B");
+                yield 2;
+            }
+            default -> 0;
+        };
+
+        // Colon syntax with break (traditional, but still works)
+        switch (input) {
+            case "A":
+                result = "Alpha";
+                break;
+            case "B":
+                result = "Beta";
+                break;
+            default:
+                result = "Unknown";
+                break;
+        }
+    }
 }
-```
 
 ---
 
 ## Line-by-Line Walkthrough
 
+
+**What this code does — step by step:**
+
+1. Line 1: Basic switch expression
+2. No default needed if compiler can prove exhaustiveness (sealed types). For String, compiler requires default
+3. Line 2: Switch expression with yield (multi-statement)
+4. `yield (int) amount;` — yield returns the value
+5. Line 3: Null-safe switch
+6. Line 4: Complex decision logic
+7. Line 5: Using switch expressions
+8. Line 6: Using yield
+9. Line 7: Null-safe
+10. `System.out.println(nullable(null));` — "null value"
+11. `System.out.println(nullable("A"));` — "Alpha"
+12. Line 8: Complex routing
+13. `System.out.println(route(request));` — "User list"
+
+The same code, clean:
+
 ```java
 import java.util.*;
 
 public class SwitchExpressionsDemo {
-    // Line 1: Basic switch expression
     static String getDayType(String day) {
         return switch (day) {
             case "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY" -> "Weekday";
             case "SATURDAY", "SUNDAY" -> "Weekend";
         };
-        // No default needed if compiler can prove exhaustiveness (sealed types)
-        // For String, compiler requires default
     }
 
-    // Line 2: Switch expression with yield (multi-statement)
     static int processOrder(String type, double amount) {
         return switch (type) {
             case "STANDARD" -> {
                 System.out.println("Standard order: $" + amount);
-                yield (int) amount;  // yield returns the value
+                yield (int) amount;
             }
             case "PREMIUM" -> {
                 int discounted = (int) (amount * 0.9);
@@ -122,7 +138,6 @@ public class SwitchExpressionsDemo {
         };
     }
 
-    // Line 3: Null-safe switch
     static String nullable(String input) {
         return switch (input) {
             case null -> "null value";
@@ -132,7 +147,6 @@ public class SwitchExpressionsDemo {
         };
     }
 
-    // Line 4: Complex decision logic
     record HttpRequest(String method, String path, boolean authenticated) {}
 
     static String route(HttpRequest request) {
@@ -157,23 +171,19 @@ public class SwitchExpressionsDemo {
     }
 
     public static void main(String[] args) {
-        // Line 5: Using switch expressions
         for (String day : List.of("MONDAY", "SATURDAY", "WEDNESDAY")) {
             System.out.println(day + ": " + getDayType(day));
         }
 
-        // Line 6: Using yield
         System.out.println("Standard: " + processOrder("STANDARD", 100));
         System.out.println("Premium: " + processOrder("PREMIUM", 100));
         System.out.println("Bulk: " + processOrder("BULK", 100));
 
-        // Line 7: Null-safe
-        System.out.println(nullable(null));   // "null value"
-        System.out.println(nullable("A"));   // "Alpha"
+        System.out.println(nullable(null));
+        System.out.println(nullable("A"));
 
-        // Line 8: Complex routing
         var request = new HttpRequest("GET", "/api/users", true);
-        System.out.println(route(request));  // "User list"
+        System.out.println(route(request));
     }
 }
 ```
@@ -184,7 +194,6 @@ public class SwitchExpressionsDemo {
 
 ### Scenario 1: Status code mapping
 
-```java
 public String statusMessage(int code) {
     return switch (code) {
         case 200 -> "OK";
@@ -197,11 +206,9 @@ public String statusMessage(int code) {
         default -> "Unknown status: " + code;
     };
 }
-```
 
 ### Scenario 2: State machine transitions
 
-```java
 record Transition(String from, String to, String event) {}
 
 public String nextState(String current, String event) {
@@ -213,7 +220,6 @@ public String nextState(String current, String event) {
         default -> current;
     };
 }
-```
 
 ---
 
@@ -225,3 +231,4 @@ public String nextState(String current, String event) {
 | Forgetting `yield` in block arrow | Block must yield a value | Add `yield value;` at end of block |
 | Not handling all cases | Compilation error for expressions | Add `default` or ensure exhaustiveness |
 | Using `->` with old fall-through semantics | Confusing | Use `:` syntax if you need fall-through |
+

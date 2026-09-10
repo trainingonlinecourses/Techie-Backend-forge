@@ -1,7 +1,7 @@
 ---
 title: WebSocket Security — Auth, Origins, and Authorization
 module: websockets-deep
-order: 4
+order: 5
 minutes: 25
 topics: ["handshake auth", "origin checks", "destination authorization", "CSRF", "JWT over WS"]
 summary: A WebSocket is a longlived, bidirectional connection — which makes it a bigger risk than a request/response call:
@@ -30,6 +30,17 @@ WebSocket security has three layers, mirroring HTTP security but with WebSocket 
 
 The connection *starts* as HTTP — so the JWT/CSRF machinery from the security modules applies at that moment. The standard pattern: validate the token in an **interceptor** during the handshake and attach the principal to the session:
 
+
+**What this code does — step by step:**
+
+1. The token rides the handshake URL: /ws?token=...
+2. `String token = extractToken(query);` — parse token=...
+3. Attach the identity to the session attributes — available to handlers later
+4. `return true;` — allow the connection
+5. `return false;` — reject the handshake
+
+The same code, clean:
+
 ```java
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
@@ -50,29 +61,25 @@ public class JwtHandshakeInterceptor implements HandshakeInterceptor {
     public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response,
                                    WebSocketHandler wsHandler, Map<String, Object> attributes) {
 
-        // The token rides the handshake URL: /ws?token=...
         String query = request.getURI().getQuery();
-        String token = extractToken(query);           // parse token=...
+        String token = extractToken(query);
 
         if (token != null && validator.isValid(token)) {
-            // Attach the identity to the session attributes — available to handlers later
             attributes.put("userId", validator.subject(token));
-            return true;                               // allow the connection
+            return true;
         }
 
         response.setStatusCode(org.springframework.http.HttpStatus.UNAUTHORIZED);
-        return false;                                  // reject the handshake
+        return false;
     }
 }
 ```
 
 Register the interceptor:
 
-```java
 registry.addEndpoint("/ws")
         .addInterceptors(new JwtHandshakeInterceptor(validator))
         .setAllowedOrigins("https://academy.example.com");
-```
 
 ### Why the Handshake Is the Only Place
 
@@ -80,10 +87,8 @@ Once the connection is established, there's no more HTTP — the token can't be 
 
 ## Layer 2 — Origin Checks
 
-```java
 registry.addEndpoint("/ws")
         .setAllowedOrigins("https://academy.example.com");   // exact allow-list
-```
 
 Without origin restrictions, **any** website can open a socket to `/ws` (browsers don't enforce same-origin on WebSockets by default). With the allow-list, only your domain's pages can connect. Never use `"*"` for authenticated sockets.
 
@@ -91,7 +96,6 @@ Without origin restrictions, **any** website can open a socket to `/ws` (browser
 
 The dangerous scenario: a logged-in user subscribes to `/topic/admin/alerts` or SENDS to `/app/admin.action`. Spring Security can intercept SUBSCRIBE and SEND frames:
 
-```java
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.Message;
@@ -121,7 +125,6 @@ public class WebSocketSecurityConfig {
         return messages.build();
     }
 }
-```
 
 **Deny-by-default is the key**: any destination not explicitly allowed is rejected. A user with a valid token but no admin role gets a `403`-style rejection when subscribing to `/topic/admin/**` — at the frame level, before any data flows.
 
@@ -161,3 +164,4 @@ Because the client sends STOMP frames over the socket (not browser-form submissi
 - Bearer-token auth makes CSRF largely moot; cookie auth needs CSRF + SameSite.
 - Use `wss://` in production; heartbeat idle connections; rate-limit SEND.
 - Topic design is a security decision — not everyone should see every channel.
+

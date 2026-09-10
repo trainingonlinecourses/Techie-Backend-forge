@@ -60,7 +60,6 @@ GET /products/_search
 
 ## The bool Query: Composing Everything
 
-```java
 // The production query shape — combining scored and unscored clauses:
 SearchResponse<Product> response = es.search(s -> s
     .index("products")
@@ -73,7 +72,6 @@ SearchResponse<Product> response = es.search(s -> s
                                     .lt(JsonData.of(150))))
         .filter(f -> f.term(t -> t.field("inStock").value(true)))
     ), Product.class);
-```
 
 **The bool clause roles:**
 
@@ -108,7 +106,6 @@ Elasticsearch ranks results by a score computed with **BM25** (the modern succes
 
 ## Pagination, Sorting, and Aggregations
 
-```java
 SearchResponse<Product> response = es.search(s -> s
     .index("products")
     .query(q -> q.match(m -> m.field("description").query("keyboard")))
@@ -125,10 +122,10 @@ SearchResponse<Product> aggResponse = es.search(s -> s
                                                .size(10)))
     .aggregations("avgPrice", a -> a.avg(av -> av.field("price"))),
     Product.class);
-```
 
 **The two big reminders:** deep pagination via `from`/`size` is expensive beyond a few thousand (use **search_after** or PIT for deep pages); and **aggregations need `keyword` fields** — aggregating on analyzed `text` errors. Aggregations are the analytics half of Elasticsearch: counts by category, averages, date histograms ("requests per hour") — the ELK log-dashboard engine.
 
 ## Recap
 
 The Query DSL has two clause families: scored *query* clauses (`match`, `match_phrase`, `multi_match` — the search intent, ranked by BM25 relevance) and unscored *filter* clauses (`term`, `range` — exact constraints, cacheable). The `bool` query composes them: `must` (required + scored), `filter` (required, unscored, cached), `should` (optional boosts), `must_not` (excluded). Relevance comes from term frequency and inverse document frequency, tuned with field boosts. And the operational extras — sorting, pagination (shallow), and aggregations on `keyword` fields — complete the toolbox. Read a query as "search intent + constraints," and the DSL stops being a wall of JSON and becomes a sentence.
+

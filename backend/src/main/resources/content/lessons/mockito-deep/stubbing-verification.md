@@ -1,7 +1,7 @@
 ---
 title: Advanced Stubbing and Verification — Matchers, doAnswer, and Verify Modes
 module: mockito-deep
-order: 3
+order: 5
 minutes: 26
 topics: ["argument matchers", "doAnswer", "verify modes", "inOrder", "timeouts", "stubbing chains"]
 summary: The basics cover when(x).thenReturn(y) and verify(x).times(n). Real tests outgrow them fast: stubs that must compute an answer from the arguments, ...
@@ -22,36 +22,56 @@ The basics cover `when(x).thenReturn(y)` and `verify(x).times(n)`. Real tests ou
 
 ## Argument Matchers, In Depth
 
+
+**What this code does — step by step:**
+
+1. The matcher families:
+2. `any()` — any object (non-null)
+3. `anyString(), anyInt(), anyLong()` — any value of the type
+4. `anyList(), anyMap()` — any collection
+5. `any(Order.class)` — any instance of the class
+6. `eq(value)` — EQUAL to the value (use with other matchers)
+7. `same(ref)` — the SAME instance (identity)
+8. `isNull() / isNotNull()` — null-ness
+9. `contains("sub"), startsWith("x"), endsWith("y")` — string patterns
+10. `matches("[0-9]+")` — regex
+
+The same code, clean:
+
 ```java
 import static org.mockito.ArgumentMatchers.*;
 
-// The matcher families:
-any()                       // any object (non-null)
-anyString(), anyInt(), anyLong()   // any value of the type
-anyList(), anyMap()         // any collection
-any(Order.class)            // any instance of the class
-eq(value)                   // EQUAL to the value (use with other matchers)
-same(ref)                   // the SAME instance (identity)
-isNull() / isNotNull()      // null-ness
-contains("sub"), startsWith("x"), endsWith("y")  // string patterns
-matches("[0-9]+")           // regex
+any()
+anyString(), anyInt(), anyLong()
+anyList(), anyMap()
+any(Order.class)
+eq(value)
+same(ref)
+isNull() / isNotNull()
+contains("sub"), startsWith("x"), endsWith("y")
+matches("[0-9]+")
 ```
 
+
+**What this code does — step by step:**
+
+1. The critical rule — matchers must be ALL or NOTHING per call:
+2. `when(repo.findById(anyString())).thenReturn(p);` — OK — all matcher
+3. `when(repo.find(anyString(), eq(5))).thenReturn(p);` — OK — matchers + eq()
+4. when(repo.find(anyString(), 5)).thenReturn(p); // ERROR — mixed! raw values are illegal alongside matchers; wrap them in eq().
+
+The same code, clean:
+
 ```java
-// The critical rule — matchers must be ALL or NOTHING per call:
-when(repo.findById(anyString())).thenReturn(p);        // OK — all matcher
-when(repo.find(anyString(), eq(5))).thenReturn(p);     // OK — matchers + eq()
-// when(repo.find(anyString(), 5)).thenReturn(p);      // ERROR — mixed!
-// raw values are illegal alongside matchers; wrap them in eq().
+when(repo.findById(anyString())).thenReturn(p);
+when(repo.find(anyString(), eq(5))).thenReturn(p);
 ```
 
 **Custom matchers** with `argThat` — the "is this the right object?" check:
 
-```java
 verify(repo).save(argThat(order ->
         order.status().equals("PENDING") && order.total() > 0));
 // argThat takes a Predicate — your own matching logic inline.
-```
 
 **The rules to internalize:** matchers must be used consistently within a call (`eq` for raw values); `argThat` predicates should be *pure* (no side effects — they may run multiple times); and matching is by `equals` for `eq` — so records and properly-overridden classes work naturally.
 
@@ -59,43 +79,62 @@ verify(repo).save(argThat(order ->
 
 The escape hatch for stubs that must derive their answer from the arguments — simulating an ID-generating repository, a stateful counter, or a callback-invoking method:
 
+
+**What this code does — step by step:**
+
+1. A repository that assigns IDs like the real one would:
+2. `Order incoming = invocation.getArgument(0);` — the argument passed
+3. `incoming.total());` — "the DB" assigns an ID
+4. Then the code under test sees a realistic result:
+5. `assertEquals("generated-", saved.id().substring(0, 10));` — worked!
+
+The same code, clean:
+
 ```java
-// A repository that assigns IDs like the real one would:
 when(repo.save(any(Order.class))).thenAnswer(invocation -> {
-    Order incoming = invocation.getArgument(0);   // the argument passed
+    Order incoming = invocation.getArgument(0);
     return new Order("generated-" + System.nanoTime(), incoming.status(),
-                     incoming.total());           // "the DB" assigns an ID
+                     incoming.total());
 });
 
-// Then the code under test sees a realistic result:
 Order saved = service.placeOrder("c1", 25.0);
-assertEquals("generated-", saved.id().substring(0, 10));  // worked!
+assertEquals("generated-", saved.id().substring(0, 10));
 ```
 
 **The `InvocationOnMock` gives you everything:** `getArgument(0)` (the args), `getMethod()` (which method), `getMock()` (the mock), and `callRealMethod()` (delegate to the real one). The classic uses: ID/sequence generation, time-based values, simulating a queue that acknowledges, and **callback invocation** — `doAnswer` to invoke the callback argument the way a real async API would.
 
 ## The do* Family — When when() Can't Work
 
+
+**What this code does — step by step:**
+
+1. Void methods — when() cannot stub a void (nothing to return):
+2. `doNothing().when(repo).delete(anyString());` — explicit no-op (readability)
+3. Spies — avoid when() which calls the real method:
+4. doCallRealMethod — the inverse: force the real method on a full mock. (rare; usually you'd use a spy instead):
+
+The same code, clean:
+
 ```java
-// Void methods — when() cannot stub a void (nothing to return):
-doThrow(new DataAccessException("db down")).when(repo).delete(anyString());
-doAnswer(inv -> { System.out.println("deleted " + inv.getArgument(0)); return null; })
-    .when(repo).delete(anyString());
-doNothing().when(repo).delete(anyString());   // explicit no-op (readability)
+public class Main {
 
-// Spies — avoid when() which calls the real method:
-doReturn(42).when(spy).secretNumber();
+    public static void main(String[] args) {
+        doThrow(new DataAccessException("db down")).when(repo).delete(anyString());
+        doAnswer(inv -> { System.out.println("deleted " + inv.getArgument(0)); return null; })
+            .when(repo).delete(anyString());
+        doNothing().when(repo).delete(anyString());
 
-// doCallRealMethod — the inverse: force the real method on a full mock
-// (rare; usually you'd use a spy instead):
-doCallRealMethod().when(mock).someMethod();
+        doReturn(42).when(spy).secretNumber();
+
+        doCallRealMethod().when(mock).someMethod();
+    }
+}
 ```
 
 **The rule:** `when(mock.method()).thenReturn(...)` first *calls* `method()` to record the stub — fine for mocks (no-op), dangerous for spies (real side effects) and impossible for voids. `doReturn/doThrow/doAnswer/doNothing` skip the call entirely — the safe family for voids and spies.
 
 ## Verify Modes: The Full Accounting
 
-```java
 verify(mock).method();                    // exactly once (the default)
 verify(mock, times(3)).method();
 verify(mock, never()).method();
@@ -105,13 +144,11 @@ verify(mock, atMost(2)).method();
 verify(mock, only()).method();            // called exactly once, nothing else
 verifyNoMoreInteractions(mock);           // NOTHING else was called on it
 verifyNoInteractions(mock);               // it was never touched at all
-```
 
 **`verifyNoMoreInteractions` and `verifyNoInteractions`** are the strictness tools: they assert the *absence* of unexpected calls. `verifyNoInteractions(mock)` is the standard "this path must not touch the dependency" assertion — e.g., "a cached read must not hit the repository."
 
 **In-order verification** — asserting the sequence of calls:
 
-```java
 InOrder inOrder = inOrder(repo, auditLog);
 
 service.charge("a1", 50);
@@ -120,7 +157,6 @@ service.charge("a1", 50);
 inOrder.verify(repo).findById("a1");
 inOrder.verify(repo).save(any(Account.class));
 inOrder.verify(auditLog).record(any(AuditEntry.class));
-```
 
 `inOrder` asserts *relative* ordering (not that no other calls happened) — the tool for "the code did the right thing in the right sequence" (a save before an audit entry, a lock before a release).
 
@@ -128,14 +164,12 @@ inOrder.verify(auditLog).record(any(AuditEntry.class));
 
 For asynchronous code (executor, CompletableFuture, virtual threads), the verification must *wait* for the call to happen:
 
-```java
 // timeout() — poll for the interaction, up to the given duration:
 verify(mock, timeout(2000)).process(anyString());
 // vs times() inside: verify(mock, timeout(2000).times(2)).process(any());
 
 // The distinction: times() fails immediately if the call hasn't happened
 // yet (race in async tests); timeout() waits up to the window for it.
-```
 
 **The async testing discipline:** prefer making the code's async boundary injectable (an `Executor`, a `CompletableFuture` you complete in the test) — then `timeout()` isn't needed. When the async is genuinely external, `timeout(ms)` with a generous window is the pragmatic tool — never a bare `Thread.sleep`, which is both slow and flaky.
 
@@ -151,3 +185,4 @@ The biggest real-world Mockito problem is **over-stubbing**: stubbing everything
 ## Recap
 
 Advanced Mockito is the middle tier between basics and desperation: **argument matchers** (`any`, `eq`, `argThat` — all-or-nothing per call) describe which calls count; **`doAnswer`** computes answers from the arguments (ID generation, callbacks); the **`do*` family** handles voids and spies where `when()` can't; **verify modes** (`times`, `never`, `atLeastOnce`, `verifyNoInteractions`, `inOrder`) provide the full accounting of interactions; and **`timeout()`** tames async verification. The discipline that ties it together: stub only what the path uses, verify what you care about, and when a test demands elaborate mocking, question the design before adding another layer of stubs.
+

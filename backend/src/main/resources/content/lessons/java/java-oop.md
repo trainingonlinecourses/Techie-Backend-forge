@@ -1,7 +1,7 @@
 ---
 title: OOP & Encapsulation — Classes, Interfaces, Records, Polymorphism
 summary: The four pillars of OOP explained for beginners: encapsulation with private fields, inheritance with the fragile base class problem, polymorphism as the foundation of Spring DI, abstraction through interfaces and records, and composition over inheritance.
-order: 3
+order: 41
 minutes: 35
 topics: [oop, encapsulation, polymorphism, records, interfaces, inheritance, composition, abstraction]
 docs:
@@ -17,45 +17,65 @@ OOP is a way of organizing code around **objects** — bundles of data (fields) 
 
 **Beginner mental model:** Think of a car. A car has properties (color, speed, fuel level) and behaviors (accelerate, brake, refuel). In Java, you'd model this as a class:
 
+
+**What this code does — step by step:**
+
+1. PROPERTIES (fields) — what the car HAS
+2. `private String color;` — private = only this class can access it
+3. `private int speed;` — current speed in km/h
+4. `private double fuelLevel;` — percentage (0.0 to 100.0)
+5. CONSTRUCTOR — called when you create a new Car
+6. `this.color = color;` — 'this' refers to this object's field
+7. `this.speed = 0;` — new car starts at 0 speed
+8. BEHAVIOR (methods) — what the car DOES
+9. `if (fuelLevel <= 0) {` — can't accelerate without fuel
+10. `return;` — exit the method early
+11. `speed += amount;` — increase speed
+12. `fuelLevel -= amount * 0.1;` — fuel decreases as you speed up
+13. `speed = Math.max(0, speed - 20);` — reduce speed, minimum 0
+14. GETTER — lets other classes READ the value (but not change it)
+15. Note: no setSpeed() — we control speed changes through accelerate() and brake()
+16. USING the class:
+17. `Car myCar = new Car("Red", 100.0);` — create a new Car object
+18. `myCar.accelerate(50);` — speed is now 50
+19. `System.out.println(myCar.getSpeed());` — prints 50
+20. `myCar.brake();` — speed is now 30
+
+The same code, clean:
+
 ```java
 public class Car {
-    // PROPERTIES (fields) — what the car HAS
-    private String color;           // private = only this class can access it
-    private int speed;              // current speed in km/h
-    private double fuelLevel;       // percentage (0.0 to 100.0)
+    private String color;
+    private int speed;
+    private double fuelLevel;
 
-    // CONSTRUCTOR — called when you create a new Car
     public Car(String color, double initialFuel) {
-        this.color = color;         // 'this' refers to this object's field
-        this.speed = 0;             // new car starts at 0 speed
+        this.color = color;
+        this.speed = 0;
         this.fuelLevel = initialFuel;
     }
 
-    // BEHAVIOR (methods) — what the car DOES
     public void accelerate(int amount) {
-        if (fuelLevel <= 0) {                   // can't accelerate without fuel
+        if (fuelLevel <= 0) {
             System.out.println("Out of fuel!");
-            return;                             // exit the method early
+            return;
         }
-        speed += amount;                        // increase speed
-        fuelLevel -= amount * 0.1;              // fuel decreases as you speed up
+        speed += amount;
+        fuelLevel -= amount * 0.1;
     }
 
     public void brake() {
-        speed = Math.max(0, speed - 20);        // reduce speed, minimum 0
+        speed = Math.max(0, speed - 20);
     }
 
-    // GETTER — lets other classes READ the value (but not change it)
     public int getSpeed() { return speed; }
     public String getColor() { return color; }
-    // Note: no setSpeed() — we control speed changes through accelerate() and brake()
 }
 
-// USING the class:
-Car myCar = new Car("Red", 100.0);  // create a new Car object
-myCar.accelerate(50);                // speed is now 50
-System.out.println(myCar.getSpeed()); // prints 50
-myCar.brake();                       // speed is now 30
+Car myCar = new Car("Red", 100.0);
+myCar.accelerate(50);
+System.out.println(myCar.getSpeed());
+myCar.brake();
 ```
 
 ## The Four Pillars of OOP
@@ -64,16 +84,27 @@ myCar.brake();                       // speed is now 30
 
 **Encapsulation** means keeping fields `private` and providing controlled access through methods. The class protects its own data — no external code can put it in an invalid state.
 
-```java
-// BAD: no encapsulation — anyone can set balance to anything
-public class BankAccount {
-    public double balance;    // PUBLIC — any code can modify this directly
-}
-// Problem: bankAccount.balance = -1000000;  — invalid state, no validation!
 
-// GOOD: encapsulated — the class controls its own state
+**What this code does — step by step:**
+
+1. BAD: no encapsulation — anyone can set balance to anything
+2. `public double balance;` — PUBLIC — any code can modify this directly
+3. Problem: bankAccount.balance = -1000000; — invalid state, no validation!
+4. GOOD: encapsulated — the class controls its own state
+5. `private double balance;` — PRIVATE — only this class can access it
+6. `balance += amount;` — validated — no invalid deposits
+7. `balance -= amount;` — validated — no overdrafts
+8. `return balance;` — read-only access — no setter!
+
+The same code, clean:
+
+```java
 public class BankAccount {
-    private double balance;   // PRIVATE — only this class can access it
+    public double balance;
+}
+
+public class BankAccount {
+    private double balance;
 
     public BankAccount(double initialBalance) {
         if (initialBalance < 0) {
@@ -86,18 +117,18 @@ public class BankAccount {
         if (amount <= 0) {
             throw new IllegalArgumentException("Deposit must be positive");
         }
-        balance += amount;    // validated — no invalid deposits
+        balance += amount;
     }
 
     public void withdraw(double amount) {
         if (amount > balance) {
             throw new InsufficientFundsException("Cannot withdraw " + amount);
         }
-        balance -= amount;    // validated — no overdrafts
+        balance -= amount;
     }
 
     public double getBalance() {
-        return balance;       // read-only access — no setter!
+        return balance;
     }
 }
 ```
@@ -108,10 +139,29 @@ public class BankAccount {
 
 Inheritance lets a class inherit fields and methods from a parent class. Use it when the child genuinely IS-A type of the parent.
 
+
+**What this code does — step by step:**
+
+1. Parent class (superclass)
+2. `protected String color;` — protected = accessible by subclasses
+3. Method that subclasses can override
+4. `return 0;` — default — subclasses should override this
+5. Child class (subclass) — extends Shape
+6. `super(color);` — calls Shape's constructor — must be FIRST line
+7. `@Override` — tells compiler: "I'm overriding a parent method"
+8. `return Math.PI * radius * radius;` — Circle-specific calculation
+9. Another child class
+10. `return width * height;` — Rectangle-specific calculation
+11. POLYMORPHISM: same method call, different behavior
+12. `System.out.println(s1.area());` — 78.54 — Circle's area()
+13. `System.out.println(s2.area());` — 24.0 — Rectangle's area()
+14. Java automatically calls the correct version based on the ACTUAL object type
+
+The same code, clean:
+
 ```java
-// Parent class (superclass)
 public class Shape {
-    protected String color;        // protected = accessible by subclasses
+    protected String color;
 
     public Shape(String color) {
         this.color = color;
@@ -119,28 +169,25 @@ public class Shape {
 
     public String getColor() { return color; }
 
-    // Method that subclasses can override
     public double area() {
-        return 0;                  // default — subclasses should override this
+        return 0;
     }
 }
 
-// Child class (subclass) — extends Shape
 public class Circle extends Shape {
     private double radius;
 
     public Circle(String color, double radius) {
-        super(color);              // calls Shape's constructor — must be FIRST line
+        super(color);
         this.radius = radius;
     }
 
-    @Override                      // tells compiler: "I'm overriding a parent method"
+    @Override
     public double area() {
-        return Math.PI * radius * radius;  // Circle-specific calculation
+        return Math.PI * radius * radius;
     }
 }
 
-// Another child class
 public class Rectangle extends Shape {
     private double width, height;
 
@@ -152,17 +199,15 @@ public class Rectangle extends Shape {
 
     @Override
     public double area() {
-        return width * height;     // Rectangle-specific calculation
+        return width * height;
     }
 }
 
-// POLYMORPHISM: same method call, different behavior
 Shape s1 = new Circle("Red", 5.0);
 Shape s2 = new Rectangle("Blue", 4.0, 6.0);
 
-System.out.println(s1.area());    // 78.54 — Circle's area()
-System.out.println(s2.area());    // 24.0  — Rectangle's area()
-// Java automatically calls the correct version based on the ACTUAL object type
+System.out.println(s1.area());
+System.out.println(s2.area());
 ```
 
 **The "fragile base class" problem:** If you change `Shape`, you might accidentally break `Circle` and `Rectangle`. This is why many teams prefer composition over inheritance (see below).
@@ -171,8 +216,18 @@ System.out.println(s2.area());    // 24.0  — Rectangle's area()
 
 Polymorphism means "many forms." A single reference type can point to different object types, and the correct method is called at runtime.
 
+
+**What this code does — step by step:**
+
+1. This is EXACTLY how Spring Dependency Injection works:
+2. The SERVICE doesn't know or care which implementation it's using:
+3. `private final PaymentProcessor processor;` — depends on the INTERFACE
+4. `this.processor = processor;` — Spring injects the right one
+5. `PaymentResult result = processor.process(order.payment());` — polymorphic call. Could be StripeProcessor or PayPalProcessor — OrderService doesn't know
+
+The same code, clean:
+
 ```java
-// This is EXACTLY how Spring Dependency Injection works:
 interface PaymentProcessor {
     PaymentResult process(PaymentRequest request);
 }
@@ -189,17 +244,15 @@ class PayPalProcessor implements PaymentProcessor {
     }
 }
 
-// The SERVICE doesn't know or care which implementation it's using:
 public class OrderService {
-    private final PaymentProcessor processor;   // depends on the INTERFACE
+    private final PaymentProcessor processor;
 
     public OrderService(PaymentProcessor processor) {
-        this.processor = processor;             // Spring injects the right one
+        this.processor = processor;
     }
 
     public Order checkout(Order order) {
-        PaymentResult result = processor.process(order.payment());  // polymorphic call
-        // Could be StripeProcessor or PayPalProcessor — OrderService doesn't know
+        PaymentResult result = processor.process(order.payment());
     }
 }
 ```
@@ -208,48 +261,71 @@ public class OrderService {
 
 Abstraction means showing only the essential features and hiding the implementation details.
 
+
+**What this code does — step by step:**
+
+1. ABSTRACTION: the user doesn't need to know HOW email sending works
+2. Implementation hides all the complexity
+3. 50 lines of SMTP protocol, connection pooling, retry logic, etc. The caller doesn't see any of this — they just call sendEmail()
+4. Caller only sees the simple interface:
+5. They don't know about SMTP, MIME encoding, TLS handshake, or retry logic
+
+The same code, clean:
+
 ```java
-// ABSTRACTION: the user doesn't need to know HOW email sending works
 interface EmailService {
     void sendEmail(String to, String subject, String body);
 }
 
-// Implementation hides all the complexity
 @Service
 public class SmtpEmailService implements EmailService {
     public void sendEmail(String to, String subject, String body) {
-        // 50 lines of SMTP protocol, connection pooling, retry logic, etc.
-        // The caller doesn't see any of this — they just call sendEmail()
     }
 }
 
-// Caller only sees the simple interface:
 emailService.sendEmail("alice@example.com", "Welcome!", "Hello Alice!");
-// They don't know about SMTP, MIME encoding, TLS handshake, or retry logic
 ```
 
 ## Records — immutable data classes (Java 16+)
 
 Records are the modern way to create immutable data carriers. They automatically generate constructor, getters, `equals()`, `hashCode()`, and `toString()`:
 
+
+**What this code does — step by step:**
+
+1. OLD WAY: 50+ lines of boilerplate for a simple data class
+2. `private final String name;` — final = can't change after construction
+3. `public UserOld(String name, String email, int age) {` — constructor
+4. `public String getName() { return name; }` — getter
+5. `@Override public boolean equals(Object o) {` — 10+ lines of equals
+6. NEW WAY: records do ALL of this automatically
+7. That's it. One line. You get: ✅ Constructor: new User("Alice", "alice@example.com", 30). ✅ Getters: user.name(), user.email(), user.age() (no 'get' prefix!). ✅ equals(): compares all fields. ✅ hashCode(): based on all fields. ✅ toString(): "User[name=Alice, email=alice@example.com, age=30]"
+8. Add validation in a "compact constructor" (no parameter list)
+9. Add custom methods as needed
+10. Usage:
+11. `System.out.println(alice.name());` — "Alice" — no getName() needed
+12. `System.out.println(alice.displayName());` — "Alice (alice@example.com)"
+13. Records are IMMUTABLE — no setters, all fields are final. Alice.age = 31; // COMPILE ERROR — can't modify a record's fields
+
+The same code, clean:
+
 ```java
-// OLD WAY: 50+ lines of boilerplate for a simple data class
 public class UserOld {
-    private final String name;          // final = can't change after construction
+    private final String name;
     private final String email;
     private final int age;
 
-    public UserOld(String name, String email, int age) {   // constructor
+    public UserOld(String name, String email, int age) {
         this.name = name;
         this.email = email;
         this.age = age;
     }
 
-    public String getName() { return name; }    // getter
+    public String getName() { return name; }
     public String getEmail() { return email; }
     public int getAge() { return age; }
 
-    @Override public boolean equals(Object o) {  // 10+ lines of equals
+    @Override public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof UserOld u)) return false;
         return age == u.age && name.equals(u.name) && email.equals(u.email);
@@ -260,63 +336,63 @@ public class UserOld {
     @Override public String toString() { return "UserOld{name='" + name + "', email='" + email + "', age=" + age + "}"; }
 }
 
-// NEW WAY: records do ALL of this automatically
 public record User(String name, String email, int age) {
-    // That's it. One line. You get:
-    // ✅ Constructor: new User("Alice", "alice@example.com", 30)
-    // ✅ Getters: user.name(), user.email(), user.age() (no 'get' prefix!)
-    // ✅ equals(): compares all fields
-    // ✅ hashCode(): based on all fields
-    // ✅ toString(): "User[name=Alice, email=alice@example.com, age=30]"
 
-    // Add validation in a "compact constructor" (no parameter list)
     public User {
         if (name == null || name.isBlank()) throw new IllegalArgumentException("Name required");
         if (email == null || !email.contains("@")) throw new IllegalArgumentException("Invalid email");
         if (age < 0 || age > 150) throw new IllegalArgumentException("Invalid age");
     }
 
-    // Add custom methods as needed
     public String displayName() {
         return name + " (" + email + ")";
     }
 }
 
-// Usage:
 User alice = new User("Alice", "alice@example.com", 30);
-System.out.println(alice.name());         // "Alice" — no getName() needed
-System.out.println(alice.displayName());  // "Alice (alice@example.com)"
-
-// Records are IMMUTABLE — no setters, all fields are final
-// alice.age = 31;   // COMPILE ERROR — can't modify a record's fields
+System.out.println(alice.name());
+System.out.println(alice.displayName());
 ```
 
 ## Composition over Inheritance — the modern preference
 
+
+**What this code does — step by step:**
+
+1. INHERITANCE (fragile — changing parent breaks children)
+2. `class Car extends Vehicle {` — Car IS-A Vehicle
+3. `Engine engine;` — Car also HAS-A Engine — should be composition!
+4. COMPOSITION (flexible — changing Engine doesn't break Car)
+5. `private final Engine engine;` — Car HAS-A Engine
+6. `private final List<Tire> tires;` — Car HAS-A tires
+7. `private final FuelTank fuelTank;` — Car HAS-A fuel tank
+8. `this.engine = engine;` — injected — easy to swap for electric engine
+9. `engine.start();` — delegate to the engine
+10. Now you can easily swap engines without changing Car:
+
+The same code, clean:
+
 ```java
-// INHERITANCE (fragile — changing parent breaks children)
-class Car extends Vehicle {           // Car IS-A Vehicle
-    Engine engine;                     // Car also HAS-A Engine — should be composition!
+class Car extends Vehicle {
+    Engine engine;
 }
 
-// COMPOSITION (flexible — changing Engine doesn't break Car)
 class Car {
-    private final Engine engine;       // Car HAS-A Engine
-    private final List<Tire> tires;    // Car HAS-A tires
-    private final FuelTank fuelTank;   // Car HAS-A fuel tank
+    private final Engine engine;
+    private final List<Tire> tires;
+    private final FuelTank fuelTank;
 
     public Car(Engine engine, List<Tire> tires, FuelTank fuelTank) {
-        this.engine = engine;          // injected — easy to swap for electric engine
+        this.engine = engine;
         this.tires = tires;
         this.fuelTank = fuelTank;
     }
 
     public void start() {
-        engine.start();                // delegate to the engine
+        engine.start();
     }
 }
 
-// Now you can easily swap engines without changing Car:
 Car gasCar = new Car(new GasEngine(), tires, new FuelTank());
 Car electricCar = new Car(new ElectricEngine(), tires, new Battery());
 ```
@@ -325,11 +401,26 @@ Car electricCar = new Car(new ElectricEngine(), tires, new Battery());
 
 ### Scenario 1: Encapsulation prevents data corruption in a banking system
 
+
+**What this code does — step by step:**
+
+1. `private final String id;` — immutable — never changes
+2. `private Money balance;` — encapsulated — only modified through methods
+3. `private final List<Transaction> history = new ArrayList<>();` — private list
+4. `throw new InsufficientFundsException(id);` — validate before modifying
+5. `balance = balance.subtract(amount);` — update state
+6. `history.add(new Transaction(TransactionType.DEBIT, amount, Instant.now()));` — audit trail
+7. `public Money getBalance() { return balance; }` — read-only access
+8. Returns a COPY of history — not the internal list
+9. `return List.copyOf(history);` — defensive copy
+
+The same code, clean:
+
 ```java
 public class Account {
-    private final String id;              // immutable — never changes
-    private Money balance;                // encapsulated — only modified through methods
-    private final List<Transaction> history = new ArrayList<>();  // private list
+    private final String id;
+    private Money balance;
+    private final List<Transaction> history = new ArrayList<>();
 
     public Account(String id, Money openingBalance) {
         this.id = Objects.requireNonNull(id);
@@ -338,58 +429,66 @@ public class Account {
 
     public void debit(Money amount) {
         if (amount.compareTo(balance) > 0) {
-            throw new InsufficientFundsException(id);  // validate before modifying
+            throw new InsufficientFundsException(id);
         }
-        balance = balance.subtract(amount);             // update state
-        history.add(new Transaction(TransactionType.DEBIT, amount, Instant.now()));  // audit trail
+        balance = balance.subtract(amount);
+        history.add(new Transaction(TransactionType.DEBIT, amount, Instant.now()));
     }
 
-    public Money getBalance() { return balance; }      // read-only access
+    public Money getBalance() { return balance; }
 
-    // Returns a COPY of history — not the internal list
     public List<Transaction> getHistory() {
-        return List.copyOf(history);                    // defensive copy
+        return List.copyOf(history);
     }
 }
 ```
 
 ### Scenario 2: Polymorphism enables the Strategy pattern
 
+
+**What this code does — step by step:**
+
+1. Different pricing strategies — all implement the same interface
+2. `return order.getSubtotal();` — full price
+3. `return order.getSubtotal().multiply(0.9);` — 10% discount
+4. `return order.getSubtotal().multiply(0.5);` — 50% off
+5. The order service doesn't know which pricing strategy it's using:
+6. `return strategy.calculatePrice(order);` — polymorphic — strategy decides the price
+
+The same code, clean:
+
 ```java
-// Different pricing strategies — all implement the same interface
 interface PricingStrategy {
     Money calculatePrice(Order order);
 }
 
 class StandardPricing implements PricingStrategy {
     public Money calculatePrice(Order order) {
-        return order.getSubtotal();                    // full price
+        return order.getSubtotal();
     }
 }
 
 class MemberPricing implements PricingStrategy {
     public Money calculatePrice(Order order) {
-        return order.getSubtotal().multiply(0.9);      // 10% discount
+        return order.getSubtotal().multiply(0.9);
     }
 }
 
 class FlashSalePricing implements PricingStrategy {
     public Money calculatePrice(Order order) {
-        return order.getSubtotal().multiply(0.5);      // 50% off
+        return order.getSubtotal().multiply(0.5);
     }
 }
 
-// The order service doesn't know which pricing strategy it's using:
 public class OrderService {
     public Money calculateTotal(Order order, PricingStrategy strategy) {
-        return strategy.calculatePrice(order);  // polymorphic — strategy decides the price
+        return strategy.calculatePrice(order);
     }
 }
 ```
 
 ### Scenario 3: Sealed classes for type-safe state machines (Java 17+)
 
-```java
 // A ride-sharing order can only be in specific states — sealed class enforces this
 public sealed interface OrderState permits
         OrderState.Created,
@@ -416,7 +515,6 @@ public String describeState(OrderState state) {
         // No 'default' needed — compiler knows all cases are covered!
     };
 }
-```
 
 ## Composition vs Inheritance — decision guide
 
@@ -436,3 +534,4 @@ public String describeState(OrderState state) {
 | Forgetting `@Override` | Typos silently create new methods instead of overriding | Always add `@Override` |
 | Exposing mutable internal collections | External code modifies your private state | Return `List.copyOf()` or unmodifiable views |
 | Using `==` to compare objects | Compares references, not values | Use `.equals()` (records generate it for you) |
+

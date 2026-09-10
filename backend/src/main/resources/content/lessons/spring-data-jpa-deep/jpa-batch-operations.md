@@ -1,7 +1,7 @@
 ---
 title: JPA Batch Operations — Bulk Inserts, saveAll and Flush Discipline
 summary: Why saveAll isn't magically fast, JDBC batching and the hibernate.jdbc.batch_size flag, flush/clear discipline, and bulk update/delete with @Modifying.
-order: 11
+order: 3
 minutes: 19
 topics: [batch, saveall, jdbc-batching, batch-size, flush, clear, modifying-query, bulk-update]
 docs:
@@ -27,25 +27,21 @@ spring.jpa.properties.hibernate.order_inserts=true
 spring.jpa.properties.hibernate.order_updates=true
 ```
 
-```java
 @Transactional
 public void importBatch(List<Order> orders) {
     // With batch_size=50, Hibernate groups INSERTs into batches of 50 —
     // 1M rows ≈ 20k round-trips instead of 1M
     orderRepo.saveAll(orders);
 }
-```
 
 Without the flag, `saveAll` is a **loop of single inserts** — the flag is what makes it fast. `order_inserts=true` lets Hibernate reorder and group inserts by table (important when mixed entity types are interleaved, e.g., parents + children).
 
 **The ID-generation caveat:** batching only works when the IDs are assigned *before* the insert — `GenerationType.IDENTITY` requires the INSERT to run immediately (to get the id), **defeating batching**. The fix: use `SEQUENCE`-based ids (`GenerationType.SEQUENCE` with `allocationSize` matching, or `UUID`):
 
-```java
 @Id
 @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "order_seq")
 @SequenceGenerator(name = "order_seq", sequenceName = "order_seq", allocationSize = 50)
 private Long id;
-```
 
 This is a classic hidden perf issue: the app "uses saveAll" but IDs are IDENTITY, so it's still one-by-one.
 
@@ -53,7 +49,6 @@ This is a classic hidden perf issue: the app "uses saveAll" but IDs are IDENTITY
 
 Inside one transaction, the persistence context **accumulates every managed entity**. Inserting a million orders keeps a million entities in memory by the end. The fix is periodic **flush + clear**:
 
-```java
 @Transactional
 public void importLarge(List<Order> orders) {
     int i = 0;
@@ -66,7 +61,6 @@ public void importLarge(List<Order> orders) {
         }
     }
 }
-```
 
 The rhythm: **flush periodically to bound the SQL lag, clear periodically to bound the memory**. Every 500-1000 rows is the common band; tune by measuring. Without this discipline, "batch import" jobs are the classic `OutOfMemoryError` in prod.
 
@@ -74,7 +68,6 @@ The rhythm: **flush periodically to bound the SQL lag, clear periodically to bou
 
 For "update everything matching a predicate", never loop-and-save:
 
-```java
 public interface OrderRepository extends JpaRepository<Order, Long> {
     @Modifying
     @Query("update Order o set o.status = 'ARCHIVED' where o.updatedAt < :cutoff")
@@ -84,7 +77,6 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     @Query("delete from Order o where o.id in :ids")
     int deleteByIds(@Param("ids") Collection<Long> ids);
 }
-```
 
 `@Modifying` runs a **bulk JPQL update/delete** — one statement, no entity loading. Critical consequences:
 
@@ -92,13 +84,11 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 - **It bypasses lifecycle callbacks** (`@PreUpdate`, auditing) — the DB rows change, the entities don't know.
 - It must run in a **transaction** (or `@Transactional` on the caller); returns the affected row count.
 
-```java
 @Transactional
 public void archiveOldOrders() {
     orderRepo.archiveOlderThan(Instant.now().minus(365, ChronoUnit.DAYS));
     entityManager.clear();    // detach stale managed entities — next reads see the DB truth
 }
-```
 
 ## How we use it in an organization: the scenarios
 
@@ -125,3 +115,4 @@ public void archiveOldOrders() {
 - Periodic `flush()` + `entityManager.clear()` bounds memory in large imports.
 - `@Modifying` bulk queries do one DB statement — always `clear()` after, and know they skip callbacks.
 - Match the tool to the job: entity loop for per-row logic, bulk query for set-wide changes.
+

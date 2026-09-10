@@ -1,7 +1,7 @@
 ---
 title: Assertions and Debugging — Catching Bugs at the Source
 summary: Programming-by-contract with assert, when assertions are disabled, assert vs validation, jdb basics, logging diagnostics, and how organizations use assertions as executable documentation.
-order: 48
+order: 8
 minutes: 16
 topics: [assert, assertions, assertions-disabled, debugging, jdb, programming-by-contract, invariant-checking]
 docs:
@@ -15,7 +15,6 @@ docs:
 
 An **assertion** is a statement that declares something you believe to be true at that point in the code. If it is false, the program is in an inconsistent state — a bug.
 
-```java
 public Order processOrder(OrderRequest request) {
     Order order = createOrder(request);
     assert order != null : "createOrder returned null";
@@ -26,7 +25,6 @@ public Order processOrder(OrderRequest request) {
 
     return order;
 }
-```
 
 If the assertion fails, an `AssertionError` is thrown — a **programming error**, not a recoverable exception.
 
@@ -51,14 +49,12 @@ This means assertions have **zero cost in production** — the JVM skips them en
 
 **The implication:** never put logic with side effects inside an assertion:
 
-```java
 // WRONG: the counter increment is skipped when assertions are off
 assert processCounter.increment() == 1 : "Should be first";
 
 // RIGHT: the counter works regardless
 processCounter.increment();
 assert processCounter.getCount() == 1 : "Should be first";
-```
 
 ## Assertions vs exceptions vs validation
 
@@ -75,7 +71,6 @@ assert processCounter.getCount() == 1 : "Should be first";
 
 ### Scenario 1: assertions for method preconditions and postconditions
 
-```java
 public class Money {
     private final BigDecimal amount;
     private final Currency currency;
@@ -100,11 +95,9 @@ public class Money {
         return new Money(this.amount.add(other.amount), this.currency);
     }
 }
-```
 
 ### Scenario 2: assertions for algorithm correctness
 
-```java
 public class BinarySearch {
 
     public static int search(int[] sorted, int target) {
@@ -130,13 +123,11 @@ public class BinarySearch {
         return true;
     }
 }
-```
 
 ### Scenario 3: debugging with logging and diagnostics
 
 When assertions are off in production, structured logging replaces them:
 
-```java
 @Component
 public class OrderService {
 
@@ -161,7 +152,6 @@ public class OrderService {
         return order;
     }
 }
-```
 
 ## JVM debugging tools
 
@@ -194,3 +184,4 @@ jstat -gcutil <pid> 1000 10
 | Using assertions for input validation | Users get `AssertionError` instead of a proper message |
 | Leaving `-ea` on in production | Slight performance cost, confusing `AssertionError` in logs |
 | Ignoring assertion failures in tests | Tests pass but logic is broken |
+

@@ -1,7 +1,7 @@
 ---
 title: "Concurrent Collections — Thread-Safe Data Structures That Actually Scale"
 summary: "ConcurrentHashMap internals, CopyOnWriteArrayList trade-offs, BlockingQueue for producer-consumer, and when to use which thread-safe collection."
-order: 6
+order: 1
 minutes: 22
 topics: [concurrent-hashmap, copyonwritearraylist, blocking-queue, collections-thread-safe, java-util-concurrent]
 docs:
@@ -15,12 +15,10 @@ docs:
 
 A regular `HashMap` is not thread-safe. If two threads write to it simultaneously, you get data corruption:
 
-```java
 Map<String, Integer> map = new HashMap<>();
 // Thread 1: map.put("count", 1);
 // Thread 2: map.put("count", 2);
 // Race condition: one write may be lost, or internal structure corrupts
-```
 
 Even worse, `HashMap` uses a linked list internally. Concurrent modifications can create an infinite loop (the classic "CPU spike" bug).
 
@@ -28,28 +26,34 @@ Even worse, `HashMap` uses a linked list internally. Concurrent modifications ca
 
 `ConcurrentHashMap` is the thread-safe replacement for `HashMap`. It uses **segment locking** (Java 8+) — only the specific bucket being modified is locked, not the entire map:
 
+
+**What this code does — step by step:**
+
+1. Thread-safe put — no locks needed
+2. Atomic operations — combine check + act in one step
+3. ↑ Only puts if key doesn't exist — no race condition
+4. ↑ Atomically reads + updates — no separate get/put
+5. ↑ Atomically merges: if key exists, apply function
+6. Thread-safe iteration (weakly consistent)
+
+The same code, clean:
+
 ```java
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ConcurrentMapDemo {
     public static void main(String[] args) {
         ConcurrentHashMap<String, Integer> scores = new ConcurrentHashMap<>();
-        
-        // Thread-safe put — no locks needed
+
         scores.put("Alice", 95);
         scores.put("Bob", 87);
-        
-        // Atomic operations — combine check + act in one step
+
         scores.putIfAbsent("Charlie", 92);
-        // ↑ Only puts if key doesn't exist — no race condition
-        
+
         scores.compute("Alice", (key, val) -> val + 5);
-        // ↑ Atomically reads + updates — no separate get/put
-        
+
         scores.merge("Bob", 10, Integer::sum);
-        // ↑ Atomically merges: if key exists, apply function
-        
-        // Thread-safe iteration (weakly consistent)
+
         scores.forEach((name, score) -> {
             System.out.println(name + ": " + score);
         });
@@ -66,7 +70,6 @@ public class ConcurrentMapDemo {
 
 `CopyOnWriteArrayList` creates a **new copy of the array** on every write. This makes writes expensive but reads lock-free:
 
-```java
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class CopyOnWriteDemo {
@@ -87,7 +90,6 @@ public class CopyOnWriteDemo {
         }
     }
 }
-```
 
 **When to use CopyOnWriteArrayList:**
 - Listener/observer lists (registered once, notified many times)
@@ -102,6 +104,18 @@ public class CopyOnWriteDemo {
 
 `BlockingQueue` is a queue that blocks when full (producer waits) or empty (consumer waits):
 
+
+**What this code does — step by step:**
+
+1. ↑ Capacity of 5 — producer blocks when full
+2. Producer thread
+3. `queue.put("item-" + i);` — Blocks if queue is full
+4. `queue.put("DONE");` — Poison pill — signals consumer to stop
+5. Consumer thread
+6. `String item = queue.take();` — Blocks if queue is empty
+
+The same code, clean:
+
 ```java
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -109,26 +123,23 @@ import java.util.concurrent.BlockingQueue;
 public class ProducerConsumerDemo {
     public static void main(String[] args) {
         BlockingQueue<String> queue = new ArrayBlockingQueue<>(5);
-        // ↑ Capacity of 5 — producer blocks when full
-        
-        // Producer thread
+
         Thread producer = new Thread(() -> {
             try {
                 for (int i = 0; i < 10; i++) {
-                    queue.put("item-" + i);  // Blocks if queue is full
+                    queue.put("item-" + i);
                     System.out.println("Produced: item-" + i);
                 }
-                queue.put("DONE");  // Poison pill — signals consumer to stop
+                queue.put("DONE");
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
         });
-        
-        // Consumer thread
+
         Thread consumer = new Thread(() -> {
             try {
                 while (true) {
-                    String item = queue.take();  // Blocks if queue is empty
+                    String item = queue.take();
                     if ("DONE".equals(item)) break;
                     System.out.println("Consumed: " + item);
                 }
@@ -136,7 +147,7 @@ public class ProducerConsumerDemo {
                 Thread.currentThread().interrupt();
             }
         });
-        
+
         producer.start();
         consumer.start();
     }
@@ -155,24 +166,29 @@ public class ProducerConsumerDemo {
 
 ### Collections.unmodifiable* — Immutable Views
 
+
+**What this code does — step by step:**
+
+1. Create immutable view — throws UnsupportedOperationException on write
+2. Thread-safe for reads (no synchronization needed)
+3. `String first = immutable.get(0);` — Safe
+4. mutable.add("D"); // Still works — modifies original. Immutable.add("E"); // Throws UnsupportedOperationException!
+5. Note: This is a VIEW — if mutable changes, immutable reflects it. For true immutability, use List.copyOf() (Java 10+)
+
+The same code, clean:
+
 ```java
 import java.util.Collections;
 
 public class ImmutableDemo {
     public static void main(String[] args) {
         List<String> mutable = new ArrayList<>(List.of("A", "B", "C"));
-        
-        // Create immutable view — throws UnsupportedOperationException on write
+
         List<String> immutable = Collections.unmodifiableList(mutable);
-        
-        // Thread-safe for reads (no synchronization needed)
-        String first = immutable.get(0);  // Safe
-        
-        // mutable.add("D");  // Still works — modifies original
-        // immutable.add("E");  // Throws UnsupportedOperationException!
-        
-        // Note: This is a VIEW — if mutable changes, immutable reflects it
-        // For true immutability, use List.copyOf() (Java 10+)
+
+        String first = immutable.get(0);
+
+
         List<String> trulyImmutable = List.copyOf(mutable);
     }
 }
@@ -181,7 +197,6 @@ public class ImmutableDemo {
 ### Organization Use Cases
 
 **1. Thread-Safe Caching**
-```java
 public class ThreadSafeCache {
     private final ConcurrentHashMap<String, String> cache = new ConcurrentHashMap<>();
     
@@ -191,10 +206,8 @@ public class ThreadSafeCache {
         // ↑ Thread-safe: no race conditions
     }
 }
-```
 
 **2. Rate Limiter with BlockingQueue**
-```java
 public class RateLimiter {
     private final BlockingQueue<Instant> requests = new ArrayBlockingQueue<>(100);
     
@@ -206,10 +219,8 @@ public class RateLimiter {
         return requests.size() <= 100;  // Allow 100 req/sec
     }
 }
-```
 
 **3. Event Bus**
-```java
 public class EventBus {
     private final ConcurrentHashMap<Class<?>, CopyOnWriteArrayList<Object>> listeners = new ConcurrentHashMap<>();
     
@@ -227,7 +238,6 @@ public class EventBus {
         }
     }
 }
-```
 
 ### Common Mistakes
 
@@ -257,3 +267,4 @@ A real-time analytics platform processes 50,000 events/second. They use:
 - `ConcurrentLinkedQueue` for lock-free event logging
 
 The result: thread-safe operations without any `synchronized` blocks, achieving sub-millisecond latency per event.
+

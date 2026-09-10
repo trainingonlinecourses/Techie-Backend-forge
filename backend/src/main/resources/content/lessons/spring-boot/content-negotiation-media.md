@@ -1,7 +1,7 @@
 ---
 title: Spring Boot Content Negotiation — JSON, XML and Multiple Formats
 summary: Content negotiation strategy, media type configuration, Jackson and JAXB, produce/consume annotations, custom MessageConverters, and API versioning through content type.
-order: 47
+order: 19
 minutes: 18
 topics: [content-negotiation, media-type, jackson, xml, message-converter, api-versioning, accept-header]
 docs:
@@ -31,6 +31,17 @@ Accept: text/plain           → User{id=123, name=John}
 
 ## Configuration
 
+
+**What this code does — step by step:**
+
+1. `.defaultContentType(MediaType.APPLICATION_JSON)` — default if no Accept header
+2. `.mediaType("json", MediaType.APPLICATION_JSON)` — mapping aliases
+3. `.favorParameter(true)` — ?format=xml also works
+4. `.parameterName("format")` — query param name
+5. `.ignoreAcceptHeader(false);` — respect the Accept header
+
+The same code, clean:
+
 ```java
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
@@ -38,12 +49,12 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
         configurer
-            .defaultContentType(MediaType.APPLICATION_JSON)       // default if no Accept header
-            .mediaType("json", MediaType.APPLICATION_JSON)        // mapping aliases
+            .defaultContentType(MediaType.APPLICATION_JSON)
+            .mediaType("json", MediaType.APPLICATION_JSON)
             .mediaType("xml", MediaType.APPLICATION_XML)
-            .favorParameter(true)                                 // ?format=xml also works
-            .parameterName("format")                              // query param name
-            .ignoreAcceptHeader(false);                           // respect the Accept header
+            .favorParameter(true)
+            .parameterName("format")
+            .ignoreAcceptHeader(false);
     }
 }
 ```
@@ -58,7 +69,6 @@ public class WebConfig implements WebMvcConfigurer {
 
 ### Scenario 1: REST API supporting JSON and XML
 
-```java
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
@@ -74,9 +84,7 @@ public class UserController {
         return ResponseEntity.status(201).body(user);
     }
 }
-```
 
-```java
 // User POJO — Jackson handles both JSON and XML
 @XmlRootElement  // Enable XML serialization
 public class User {
@@ -88,13 +96,11 @@ public class User {
     @XmlElement(name = "id")   // XML element name
     public String getId() { return id; }
 }
-```
 
 ### Scenario 2: API versioning via content type
 
 Use content negotiation for API versioning:
 
-```java
 @RestController
 @RequestMapping("/api/v1/products")
 public class ProductControllerV1 {
@@ -112,9 +118,7 @@ public class ProductControllerV2 {
         return productService.findByIdV2(id);  // new format with new fields
     }
 }
-```
 
-```java
 @Configuration
 public class ApiVersionConfig implements WebMvcConfigurer {
     @Override
@@ -123,11 +127,9 @@ public class ApiVersionConfig implements WebMvcConfigurer {
         configurer.mediaType("v2", MediaType.parseMediaType("application/vnd.myapp.v2+json"));
     }
 }
-```
 
 ### Scenario 3: Custom MessageConverter for CSV export
 
-```java
 @Component
 public class CsvMessageConverter<T> extends AbstractGenericHttpMessageConverter<List<T>> {
 
@@ -145,9 +147,7 @@ public class CsvMessageConverter<T> extends AbstractGenericHttpMessageConverter<
         writer.writeValue(outputMessage.getBody(), objects);
     }
 }
-```
 
-```java
 // Controller endpoint that returns CSV
 @GetMapping("/export")
 public List<Order> exportOrders(
@@ -158,7 +158,6 @@ public List<Order> exportOrders(
     }
     return orderService.findAll();
 }
-```
 
 ## Common mistakes
 
@@ -170,3 +169,4 @@ public List<Order> exportOrders(
 | Versioning by URL only (`/v1/`, `/v2/`) | Hard to maintain, proliferates controllers |
 | Ignoring the Accept header | Client gets wrong format, integration breaks |
 | Using `@ResponseBody` with view resolution | Conflict between content negotiation and view |
+

@@ -1,7 +1,7 @@
 ---
 title: Distributed Locks
 module: distributed-systems
-order: 4
+order: 3
 minutes: 25
 topics: ["distributed locks", "Redis SET NX", "lease", "fencing tokens", "ShedLock", "lock expiry"]
 summary: A distributed lock coordinates work across nodes — exactly one instance runs the job, exactly one consumer drains the queue. But distributed locks ...
@@ -16,7 +16,6 @@ A distributed lock coordinates work across nodes — exactly one instance runs t
 
 ## The Naive Pattern (and Why It Fails)
 
-```java
 // ❌ set + expire in two steps — crash between them = lock without TTL = forever
 redis.set("job:lock", nodeId);
 redis.expire("job:lock", 30);
@@ -25,11 +24,9 @@ redis.expire("job:lock", 30);
 if (redis.get("job:lock").equals(nodeId)) {
     redis.del("job:lock");     // lock may have EXPIRED and been RE-ACQUIRED
 }
-```
 
 ## The Correct Pattern: SET NX EX
 
-```java
 // Atomic: set only if absent, with a TTL — ONE command
 String result = redis.set("job:lock", nodeId, Duration.ofSeconds(30), SetOption.SET_IF_ABSENT);
 
@@ -43,7 +40,6 @@ if ("OK".equals(result)) {
         redis.execute(script, List.of("job:lock"), List.of(nodeId));
     }
 }
-```
 
 Three non-negotiables:
 
@@ -60,7 +56,6 @@ t=60   Node A finishes and releases... Node B's lock!
        → Both nodes ran the job — the lock FAILED
 ```
 
-```java
 // ❌ Long job + short TTL = lock lost mid-job
 redis.set("job:lock", nodeId, Duration.ofSeconds(30));   // job takes 60s!
 
@@ -71,7 +66,6 @@ redis.set("job:lock", nodeId, Duration.ofMinutes(10));
 scheduler.scheduleAtFixedRate(() ->
     redis.set("job:lock", nodeId, Duration.ofMinutes(2), SetOption.SET_IF_PRESENT), 
     1, 1, TimeUnit.MINUTES);
-```
 
 The renewal/watchdog pattern is what ShedLock and etcd leases do — the lock dies with the holder, not with the job.
 
@@ -88,7 +82,6 @@ Lock expires, Node B: token 22 → writes accepted
 Node A finishes, writes with token 21 → REJECTED (22 > 21)
 ```
 
-```java
 // The protected service checks the token before mutating
 @PostMapping("/inventory")
 public ResponseEntity<Void> adjust(@RequestBody AdjustRequest req) {
@@ -100,17 +93,14 @@ public ResponseEntity<Void> adjust(@RequestBody AdjustRequest req) {
     inventoryService.adjust(req);
     return ResponseEntity.noContent().build();
 }
-```
 
 The fencing token turns "the lock might have expired" from a silent bug into a detectable rejection.
 
 ## ShedLock: The Battle-Tested Implementation
 
-```java
 @Scheduled(cron = "0 0 3 * * *")
 @SchedulerLock(name = "nightly-report", lockAtMostFor = "30m", lockAtLeastFor = "5m")
 public void runNightly() { ... }
-```
 
 - `lockAtMostFor` — the lease; must exceed the worst-case run
 - `lockAtLeastFor` — minimum hold; stops fast jobs from thrashing
@@ -150,3 +140,4 @@ public void runNightly() { ... }
 | Production | ShedLock (JDBC/Redis) or etcd/ZooKeeper |
 
 Distributed locks are a lease, not a guarantee: TTLs make them crash-safe, renewals keep long jobs covered, and fencing tokens make stale holders harmless. For job scheduling, use ShedLock; for critical coordination, use a consensus system — and when you can, prefer idempotency, which makes the lock's failure mode irrelevant.
+

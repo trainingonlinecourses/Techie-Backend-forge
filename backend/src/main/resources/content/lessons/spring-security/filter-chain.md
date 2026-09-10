@@ -1,7 +1,7 @@
 ---
 title: The Security Filter Chain
 summary: SecurityFilterChain, ordering, and how each request travels through security filters.
-order: 2
+order: 7
 minutes: 16
 topics: [filter-chain, securityfilterchain, filters]
 docs:
@@ -15,7 +15,6 @@ docs:
 
 Security in a servlet app is a **chain of filters**. Each request passes through, and filters can: pass it along, short-circuit it (401/403), or mutate the request/response. Spring Security configures the chain for you via `SecurityFilterChain`.
 
-```java
 @Bean
 SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http
@@ -26,7 +25,6 @@ SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
             .anyRequest().authenticated());
     return http.build();
 }
-```
 
 ## The default order of filters (simplified)
 
@@ -46,7 +44,6 @@ SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
 Filters are beans; add yours before/after the built-ins:
 
-```java
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
 
@@ -68,23 +65,18 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         chain.doFilter(request, response);
     }
 }
-```
 
-```java
 http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
-```
 
 `OncePerRequestFilter`: runs exactly once per request even with filter chains/forwards.
 
 ## Matching rules: the order matters
 
-```java
 .authorizeHttpRequests(auth -> auth
     .requestMatchers("/api/auth/**").permitAll()      // specific first
     .requestMatchers("/api/admin/**").hasRole("ADMIN")
     .requestMatchers(HttpMethod.GET, "/api/content/**").permitAll()
     .anyRequest().authenticated())                    // catch-all last
-```
 
 Rules are evaluated **top to bottom**, first match wins. Put specific rules before catch-alls.
 
@@ -102,3 +94,4 @@ You can register several `SecurityFilterChain` beans, matched by path — e.g. a
 - One security config per app; rules specific → catch-all.
 
 **Official docs:** [SecurityFilterChain](https://docs.spring.io/spring-security/reference/servlet/architecture.html#servlet-securityfilterchain) · [Filters](https://docs.spring.io/spring-security/reference/servlet/architecture.html#servlet-filters-review)
+

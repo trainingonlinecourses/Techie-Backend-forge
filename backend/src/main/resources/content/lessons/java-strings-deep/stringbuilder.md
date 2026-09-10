@@ -1,7 +1,7 @@
 ---
 title: StringBuilder — Building Strings Efficiently
 module: java-strings-deep
-order: 3
+order: 5
 minutes: 23
 topics: ["StringBuilder", "mutable strings", "concatenation", "performance", "capacity"]
 summary: Recall that String is immutable — every operation that "changes" a string creates a new object. Now think about building a sentence word by word in...
@@ -16,12 +16,10 @@ docs:
 
 Recall that `String` is immutable — every operation that "changes" a string creates a **new object**. Now think about building a sentence word by word in a loop:
 
-```java
 String result = "";
 for (int i = 0; i < 1000; i++) {
     result = result + "word" + i + " ";   // creates a NEW string every iteration
 }
-```
 
 With 1,000 iterations, this creates roughly **2,000–3,000 intermediate String objects**, each one copying all the previous content. That's O(n²) copying — for large loops it becomes brutally slow and churns the garbage collector.
 
@@ -43,29 +41,34 @@ Because growth is geometric (doubling), the total number of copies over many app
 
 ## The Code Walkthrough
 
+
+**What this code does — step by step:**
+
+1. 1. Create with initial capacity to avoid regrowth
+2. 2. Append various types — they are converted to text and added
+3. 3. Insert at a position
+4. 4. Replace a range [start, end)
+5. 5. Reverse (yes, it's built in). Sb.reverse();
+6. 6. Convert to an immutable String when done
+
+The same code, clean:
+
 ```java
 public class StringBuilderDemo {
 
     public static void main(String[] args) {
-        // 1. Create with initial capacity to avoid regrowth
         StringBuilder sb = new StringBuilder(128);
 
-        // 2. Append various types — they are converted to text and added
         sb.append("Order #").append(1042)
           .append(" | total: $").append(59.99)
           .append(" | status: ").append("PAID");
 
-        // 3. Insert at a position
         sb.insert(0, "[RECEIPT] ");
 
-        // 4. Replace a range [start, end)
         int start = sb.indexOf("PAID");
         sb.replace(start, start + 4, "COMPLETED");
 
-        // 5. Reverse (yes, it's built in)
-        // sb.reverse();
 
-        // 6. Convert to an immutable String when done
         String receipt = sb.toString();
         System.out.println(receipt);
     }
@@ -112,17 +115,13 @@ There is an older sibling: **`StringBuffer`**. It is identical in API but its me
 
 The Java compiler automatically uses `StringBuilder` for simple `+` chains:
 
-```java
 String s = a + b + c;   // compiler: new StringBuilder().append(a).append(b).append(c).toString()
-```
 
 So a few `+` in one statement are fine — no need to hand-roll a builder. But in a **loop**, the compiler cannot hoist the builder out:
 
-```java
 for (...) {
     result = result + x;   // a NEW StringBuilder per iteration — still quadratic
 }
-```
 
 That's why the rule is: **in a loop, write the `StringBuilder` yourself, outside the loop.**
 
@@ -140,3 +139,4 @@ That's why the rule is: **in a loop, write the `StringBuilder` yourself, outside
 - Pre-size the buffer when you know the output length.
 - Convert to `String` once with `toString()` when done.
 - Prefer `StringBuilder` over `StringBuffer` (no locking).
+

@@ -1,7 +1,7 @@
 ---
 title: GraphQL Resolvers — How Fields Get Their Values
 module: graphql-deep
-order: 2
+order: 4
 minutes: 25
 topics: ["resolvers", "field resolution", "@SchemaMapping", "data fetching", "batch resolution"]
 summary: In REST, an endpoint returns a preshaped object. In GraphQL, the client selects fields — so the server can't know in advance what to fetch. The ans...
@@ -29,16 +29,23 @@ The parent resolver's result (a `Course`) becomes the *source* for its children'
 
 If a field's value is already on the object (a plain getter), **no resolver is needed** — GraphQL reads it by name:
 
-```java
 public record Course(Long id, String title, int minutes, List<Lesson> lessons) {
     // 'id', 'title', 'minutes', 'lessons' all resolve by default
     // (record accessors ARE the getters)
 }
-```
 
 The engine calls `course.id()`, `course.title()`, etc. Resolvers are only needed when the value must be *computed or fetched* — the interesting 20%.
 
 ## The Code Walkthrough — Resolvers for the Interesting Fields
+
+
+**What this code does — step by step:**
+
+1. ---- 1. Resolve a field that requires a data fetch ----. Schema: type Course { ... lessons: [Lesson!]! }. The Course object from the parent resolver doesn't carry full lessons —. Fetch them here:
+2. `return lessons.findByCourseId(course.id());` — a real query
+3. ---- 2. Computed fields ----. Schema: type Course { ... durationLabel: String }
+
+The same code, clean:
 
 ```java
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
@@ -51,17 +58,11 @@ public class CourseResolvers {
 
     public CourseResolvers(LessonRepository lessons) { this.lessons = lessons; }
 
-    // ---- 1. Resolve a field that requires a data fetch ----
-    // Schema: type Course { ... lessons: [Lesson!]! }
-    // The Course object from the parent resolver doesn't carry full lessons —
-    // fetch them here:
     @SchemaMapping(typeName = "Course", field = "lessons")
     public List<Lesson> lessons(Course course) {
-        return lessons.findByCourseId(course.id());   // a real query
+        return lessons.findByCourseId(course.id());
     }
 
-    // ---- 2. Computed fields ----
-    // Schema: type Course { ... durationLabel: String }
     @SchemaMapping(typeName = "Course", field = "durationLabel")
     public String durationLabel(Course course) {
         int h = course.minutes() / 60;
@@ -120,3 +121,4 @@ The discipline: **keep the entity lean; resolve on demand.** Don't preload every
 - Errors are field-scoped: partial data + precise `path` in the response.
 - Fetch the root, resolve children on demand — don't preload everything.
 - The N+1 trap is the resolver's classic pitfall — batched resolution is the fix (next lesson).
+

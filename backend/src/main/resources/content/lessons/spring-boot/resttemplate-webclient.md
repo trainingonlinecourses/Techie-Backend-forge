@@ -1,7 +1,7 @@
 ---
 title: RestTemplate and WebClient — Calling External APIs
 summary: RestTemplate vs WebClient, synchronous vs reactive HTTP, error handling with RestTemplate exchange, WebClient with filters and retry, and how organizations build resilient API clients.
-order: 35
+order: 44
 minutes: 22
 topics: [resttemplate, webclient, http-client, api-client, error-handling, retry, resilience, synchronous, reactive]
 docs:
@@ -22,7 +22,6 @@ Spring provides two HTTP clients:
 
 ## RestTemplate configuration
 
-```java
 @Configuration
 public class RestTemplateConfig {
 
@@ -36,9 +35,7 @@ public class RestTemplateConfig {
             .build();
     }
 }
-```
 
-```java
 @Service
 public class InventoryClient {
 
@@ -58,13 +55,11 @@ public class InventoryClient {
         return rest.postForObject(baseUrl + "/reservations", request, Reservation.class);
     }
 }
-```
 
 ## Error handling with RestTemplate
 
 RestTemplate throws `HttpClientErrorException` (4xx) or `HttpServerErrorException` (5xx) by default. A custom error handler maps these to domain exceptions:
 
-```java
 public class CustomErrorHandler implements ResponseErrorHandler {
 
     @Override
@@ -88,11 +83,9 @@ public class CustomErrorHandler implements ResponseErrorHandler {
         }
     }
 }
-```
 
 ## WebClient — the modern choice
 
-```java
 @Configuration
 public class WebClientConfig {
 
@@ -112,9 +105,7 @@ public class WebClientConfig {
             .build();
     }
 }
-```
 
-```java
 @Service
 public class InventoryClientWebClient {
 
@@ -156,7 +147,6 @@ public class InventoryClientWebClient {
                 .filter(ex -> ex instanceof ServerException));
     }
 }
-```
 
 ## RestTemplate vs WebClient comparison
 
@@ -174,7 +164,6 @@ public class InventoryClientWebClient {
 
 ### Scenario 1: payment gateway client with circuit breaker
 
-```java
 @Service
 public class PaymentClient {
 
@@ -197,11 +186,9 @@ public class PaymentClient {
         return PaymentResult.pending("Payment queued — gateway unavailable");
     }
 }
-```
 
 ### Scenario 2: bulk data fetch with streaming
 
-```java
 public Flux<Order> fetchAllOrders() {
     return webClient.get()
         .uri("/api/orders/stream")
@@ -209,11 +196,9 @@ public Flux<Order> fetchAllOrders() {
         .retrieve()
         .bodyToFlux(Order.class);  // each SSE event is one Order
 }
-```
 
 ### Scenario 3: retry with exponential backoff
 
-```java
 public Mono<ExternalConfig> fetchConfig() {
     return webClient.get()
         .uri("/config")
@@ -225,7 +210,6 @@ public Mono<ExternalConfig> fetchConfig() {
         )
         .timeout(Duration.ofSeconds(30));
 }
-```
 
 ## Common mistakes
 
@@ -236,3 +220,4 @@ public Mono<ExternalConfig> fetchConfig() {
 | Creating a new WebClient per request | No connection pooling |
 | Swallowing HTTP errors | Silent data corruption |
 | Not using circuit breaker for external calls | Cascading failures |
+

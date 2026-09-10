@@ -1,7 +1,7 @@
 ---
 title: EXPLAIN ANALYZE — Reading Query Execution Plans
 summary: How to read EXPLAIN output, sequential vs index scans, join algorithms, cost estimation, and how organizations optimize slow SQL queries. Beginner-friendly with line-by-line code.
-order: 5
+order: 3
 minutes: 22
 topics: [EXPLAIN, query plan, execution plan, index scan, sequential scan, join algorithm, cost estimation, query optimization]
 docs:
@@ -180,3 +180,4 @@ WHERE c.region = 'US';
 - **Most slow queries need one or two well-placed indexes**, not a complete rewrite.
 
 Official docs: [EXPLAIN (PostgreSQL)](https://www.postgresql.org/docs/current/using-explain.html) · [Use The Index, Luke](https://use-the-index-luke.com/)
+

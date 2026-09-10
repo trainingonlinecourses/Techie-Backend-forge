@@ -1,7 +1,7 @@
 ---
 title: Specifications and Dynamic Queries
 module: spring-data-jpa-deep
-order: 4
+order: 13
 minutes: 22
 topics: ["Specification", "Criteria API", "dynamic queries", "composable predicates", "JpaSpecificationExecutor"]
 summary: Filter forms with ten optional fields can't use one hardcoded query. Specifications — Spring Data's wrapper around the Criteria API — let you compo...
@@ -16,24 +16,19 @@ Filter forms with ten optional fields can't use one hardcoded query. **Specifica
 
 ## The Problem
 
-```java
 // A search with 5 optional filters needs 32 query methods — insane
 List<Course> findByLevel(String level);
 List<Course> findByLevelAndPublishedTrue(String level);
 List<Course> findByLevelAndMinutesGreaterThan(String level, int min);
 // ... 32 combinations
-```
 
 ## The Specification
 
-```java
 public interface CourseRepository extends JpaRepository<Course, Long>,
         JpaSpecificationExecutor<Course> {
     // Specifications work through JpaSpecificationExecutor
 }
-```
 
-```java
 // One specification per filter — composable
 public class CourseSpecifications {
 
@@ -57,13 +52,11 @@ public class CourseSpecifications {
                 : cb.like(cb.lower(root.get("title")), "%" + text.toLowerCase() + "%");
     }
 }
-```
 
 **The contract**: return `null` for "no filter" — the predicate is skipped. Each specification is a `(Root, CriteriaQuery, CriteriaBuilder) → Predicate` lambda.
 
 ## Composing at Runtime
 
-```java
 @Service
 public class CourseSearchService {
 
@@ -79,19 +72,15 @@ public class CourseSearchService {
         return repository.findAll(spec, pageable).getContent();
     }
 }
-```
 
-```java
 // The controller — 10 filters, ONE endpoint, zero query methods
 @GetMapping("/courses/search")
 public Page<Course> search(CourseFilter filter, Pageable pageable) {
     return repository.findAll(buildSpec(filter), pageable);
 }
-```
 
 ## Specification Combinators
 
-```java
 Specification<Course> spec = Specification.where(null);   // start empty
 
 if (level != null)        spec = spec.and(hasLevel(level));
@@ -104,13 +93,11 @@ Specification<Course> beginnerOrAdvanced =
 
 // Negation
 Specification<Course> notArchived = Specification.not(isArchived());
-```
 
 `where()` is the null-safe start — composing with a null spec is a no-op.
 
 ## Joins in Specifications
 
-```java
 public static Specification<Course> hasTag(String tag) {
     return (root, query, cb) -> {
         Join<Course, Tag> tags = root.join("tags");
@@ -125,11 +112,9 @@ public static Specification<Course> hasNoLessons() {
         return cb.isNull(lessons.get("id"));
     };
 }
-```
 
 ## Sorting and Distinct
 
-```java
 // Sort inside the specification (avoids duplicate rows from joins)
 public static Specification<Course> orderedByMinutes() {
     return (root, query, cb) -> {
@@ -145,15 +130,12 @@ public static Specification<Course> distinct() {
         return null;
     };
 }
-```
 
 ## Combining With Pagination
 
-```java
 Page<Course> page = repository.findAll(
     spec,
     PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "minutes")));
-```
 
 Specifications compose with `Pageable` and `Sort` natively — filters and pagination are orthogonal.
 
@@ -174,7 +156,6 @@ Specifications compose with `Pageable` and `Sort` natively — filters and pagin
 
 ## Testing Specifications
 
-```java
 @DataJpaTest
 @Testcontainers
 class SpecificationTest {
@@ -207,7 +188,6 @@ class SpecificationTest {
         assertEquals(2, repository.findAll(spec).size());   // 2 of 3 published
     }
 }
-```
 
 ## When to Use Specifications
 
@@ -230,3 +210,4 @@ class SpecificationTest {
 | Setup | Extend `JpaSpecificationExecutor` |
 
 Specifications turn dynamic filters from 32 hand-written methods into a composable algebra: one predicate per filter, combined at runtime, type-checked by the compiler. They're the standard solution for search forms and admin filters — and they play perfectly with the pagination and sorting you already use.
+

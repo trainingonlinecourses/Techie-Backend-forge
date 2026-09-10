@@ -1,7 +1,7 @@
 ---
 title: GraphQL — Queries, Mutations & Errors
 summary: Arguments, pagination, validation, error handling with the GraphQLError contract, and the DataLoader batch pattern for nested fields.
-order: 4
+order: 3
 minutes: 15
 topics: [graphql queries, mutations, graphql errors, dataloader, pagination, batching]
 docs:
@@ -21,11 +21,9 @@ input OrderFilter { status: OrderStatus, minAmount: BigDecimal, customerId: ID }
 type Query { orders(filter: OrderFilter, page: Int = 0, size: Int = 10): OrderConnection! }
 ```
 
-```java
 @QueryMapping
 public OrderConnection orders(@Argument OrderFilter filter,
                               @Argument int page, @Argument int size) { ... }
-```
 
 **Bean Validation works on input objects too** — validate `@Argument` payloads with `@Valid` and constraint annotations; violations become GraphQL errors automatically (the Spring Core validation lesson applies unchanged).
 
@@ -39,13 +37,11 @@ type OrderEdge { node: Order! cursor: String! }
 type PageInfo { hasNextPage: Boolean! hasPreviousPage: Boolean! startCursor: String endCursor: String }
 ```
 
-```java
 @QueryMapping
 public OrderConnection orders(@Argument int first, @Argument String after) {
     Page<Order> page = orderService.page(after == null ? 0 : decode(after), first);
     return new OrderConnection(edges(page), new PageInfo(page.hasNext(), ...));
 }
-```
 
 Offset vs. cursor: connections default to **cursor-based** (stable under concurrent inserts); `first`/`after` are the conventional argument names. Whatever you choose, the connection wrapper makes it explicit — GraphQL clients expect it.
 
@@ -62,7 +58,6 @@ GraphQL responses have a fixed shape — `data` and **`errors`** are separate, a
 
 Spring for GraphQL translates exceptions into the errors array:
 
-```java
 @ControllerAdvice
 public class GraphQlExceptionHandler {
     @ExceptionHandler(NotFoundException.class)
@@ -75,7 +70,6 @@ public class GraphQlExceptionHandler {
             .build();
     }
 }
-```
 
 Production discipline: **every error carries a stable machine-readable `code`** in `extensions` (clients switch on codes, not message strings), and internal exception details (stack traces, SQL text) **never** reach the errors array.
 
@@ -89,7 +83,6 @@ Production discipline: **every error carries a stable machine-readable `code`** 
 
 Nested resolvers fire **per parent item** — a list of 50 orders, each resolving `customer`, issues 51 queries unless you batch:
 
-```java
 @Controller
 public class CustomerResolver {
     private final DataLoader<Long, Customer> loader;
@@ -99,7 +92,6 @@ public class CustomerResolver {
         return loader.load(order.customerId());   // batched into ONE query per level
     }
 }
-```
 
 DataLoader coalesces all loads in a tick into a single batch call. In Spring for GraphQL, register a `DataLoader` per batch loader — this single pattern is what separates production GraphQL from demo GraphQL.
 
@@ -116,3 +108,4 @@ DataLoader coalesces all loads in a tick into a single batch call. In Spring for
 - Enforce query depth/complexity limits and resolver-level security before going public.
 
 Official docs: [Spring for GraphQL](https://docs.spring.io/spring-graphql/reference/) · [GraphQL queries](https://graphql.org/learn/queries/)
+

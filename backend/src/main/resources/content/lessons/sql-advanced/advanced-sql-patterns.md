@@ -1,7 +1,7 @@
 ---
 title: Advanced SQL Patterns — Upserts, Pivots, and Time Bucketing
 module: sql-advanced
-order: 4
+order: 1
 minutes: 27
 topics: ["upsert", "ON CONFLICT", "pivot", "crosstab", "date_trunc", "generate_series", "full-text search"]
 summary: Beyond the fundamentals, production SQL is a handful of recurring recipes: upserts (insert or update depending on existence), pivots (rows → column...
@@ -142,3 +142,4 @@ ORDER BY rank DESC LIMIT 10;
 ## Recap
 
 The advanced SQL patterns are the standard library of production queries: `ON CONFLICT DO UPDATE` for atomic, race-free upserts; conditional aggregation with `FILTER` (and `crosstab` for true pivots) to turn rows into columns; `date_trunc` plus `generate_series` for gapless time bucketing; and PostgreSQL's `tsvector` full-text search for ranked text queries without a separate engine. Each pattern replaces a fragile multi-step application workaround with one atomic, indexed, database-native statement. Master these five and the gap between "I can write SQL" and "I can build the data layer of a real product" closes dramatically.
+

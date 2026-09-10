@@ -1,7 +1,7 @@
 ---
 title: Test Property Sources — Configuring Test Environments
 summary: @TestPropertySource, @DynamicPropertySource, test profiles, and how to isolate tests from external dependencies like databases and APIs. Beginner-friendly with line-by-line code.
-order: 9
+order: 8
 minutes: 18
 topics: [test properties, @TestPropertySource, @DynamicPropertySource, test profiles, test configuration, property override]
 docs:
@@ -23,13 +23,24 @@ Think of it like a hotel room: the main config is the hotel's standard room setu
 
 ### 1. @TestPropertySource (Static Properties)
 
+
+**What this code does — step by step:**
+
+1. `"spring.datasource.url=jdbc:h2:mem:testdb",` — Override: in-memory database
+2. `"spring.datasource.driver-class-name=org.h2.Driver",` — Override: H2 driver
+3. `"app.jwt.secret=test-secret-key-for-testing-only",` — Override: test JWT secret
+4. `"app.payment.gateway.url=http://localhost:9999"` — Override: mock payment service
+5. This test uses the TEST properties, not production. H2 in-memory database, not PostgreSQL. Mock payment URL, not real Stripe
+
+The same code, clean:
+
 ```java
 @SpringBootTest
 @TestPropertySource(properties = {
-    "spring.datasource.url=jdbc:h2:mem:testdb",        // Override: in-memory database
-    "spring.datasource.driver-class-name=org.h2.Driver", // Override: H2 driver
-    "app.jwt.secret=test-secret-key-for-testing-only",   // Override: test JWT secret
-    "app.payment.gateway.url=http://localhost:9999"       // Override: mock payment service
+    "spring.datasource.url=jdbc:h2:mem:testdb",
+    "spring.datasource.driver-class-name=org.h2.Driver",
+    "app.jwt.secret=test-secret-key-for-testing-only",
+    "app.payment.gateway.url=http://localhost:9999"
 })
 class OrderServiceTest {
 
@@ -38,9 +49,6 @@ class OrderServiceTest {
 
     @Test
     void shouldCreateOrder() {
-        // This test uses the TEST properties, not production
-        // H2 in-memory database, not PostgreSQL
-        // Mock payment URL, not real Stripe
     }
 }
 ```
@@ -52,7 +60,6 @@ class OrderServiceTest {
 
 ### 2. @DynamicPropertySource (For Containers)
 
-```java
 @SpringBootTest
 @Testcontainers
 class OrderServiceIntegrationTest {
@@ -79,7 +86,6 @@ class OrderServiceIntegrationTest {
         registry.add("spring.data.redis.port", () -> redis.getMappedPort(6379));
     }
 }
-```
 
 **Line-by-line explained:**
 - `@Testcontainers` — Enables Testcontainers support in Spring Boot.
@@ -89,7 +95,6 @@ class OrderServiceIntegrationTest {
 
 ### 3. Test Profiles
 
-```java
 // application-test.yml — dedicated test configuration
 spring:
   datasource:
@@ -109,9 +114,7 @@ app:
 logging:
   level:
     com.example.academy: DEBUG              # Verbose logging for debugging
-```
 
-```java
 @SpringBootTest
 @ActiveProfiles("test")                     // Activate the test profile
 class PaymentServiceTest {
@@ -123,7 +126,6 @@ class PaymentServiceTest {
         // H2 in-memory database
     }
 }
-```
 
 ---
 
@@ -131,7 +133,6 @@ class PaymentServiceTest {
 
 ### Scenario 1: Database Per Developer
 
-```java
 @SpringBootTest
 @TestPropertySource(properties = {
     "spring.datasource.url=jdbc:postgresql://localhost:5432/test_${user.name}"
@@ -141,11 +142,9 @@ class PaymentServiceTest {
 class DeveloperIntegrationTest {
     // No conflicts between developers running tests simultaneously
 }
-```
 
 ### Scenario 2: Mock External Services
 
-```java
 @SpringBootTest
 @TestPropertySource(properties = {
     "app.services.payment.url=http://localhost:8082",
@@ -169,7 +168,6 @@ class EndToEndTest {
             "http://" + emailMock.getHost() + ":" + emailMock.getServerPort());
     }
 }
-```
 
 ### Scenario 3: CI/CD Pipeline Properties
 
@@ -181,14 +179,12 @@ SPRING_DATASOURCE_USERNAME=ci_user
 SPRING_DATASOURCE_PASSWORD=ci_password
 ```
 
-```java
 // application.yml uses environment variables:
 spring:
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:h2:mem:default}     // Default to H2 if not set
     username: ${SPRING_DATASOURCE_USERNAME:sa}             // Default to 'sa' if not set
     password: ${SPRING_DATASOURCE_PASSWORD:}               // Default to empty if not set
-```
 
 ---
 
@@ -213,3 +209,4 @@ spring:
 - **Always override secrets and URLs** — never use production values in tests.
 
 Official docs: [Test Properties (Spring)](https://docs.spring.io/spring-framework/reference/testing.html) · [Testcontainers (Spring Boot)](https://docs.spring.io/spring-boot/reference/testing/spring-boot-tests.html#autoconfigured-tests)
+

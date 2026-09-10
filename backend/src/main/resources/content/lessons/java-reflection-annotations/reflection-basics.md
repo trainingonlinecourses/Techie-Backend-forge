@@ -1,7 +1,7 @@
 ---
 title: Reflection Basics — Inspecting Classes at Runtime
 module: java-reflection-annotations
-order: 1
+order: 4
 minutes: 26
 topics: ["reflection", "Class objects", "method invocation", "field access", "performance"]
 summary: Normally, a program works with objects: you call methods, read fields, pass values. Reflection is the ability of a running program to inspect itsel...
@@ -26,28 +26,39 @@ Normally, a program works *with* objects: you call methods, read fields, pass va
 
 Reflection always starts from a `Class<?>` object, and there are three ways to get one:
 
+
+**What this code does — step by step:**
+
+1. Way 1: the .class literal — compile-time known class.
+2. Way 2: from an instance — the object tells you its class.
+3. Way 3: by name — the power move. The name is a runtime string,. So the class doesn't even need to exist at compile time.
+4. `System.out.println(c1.getName());` — java.lang.String
+5. `System.out.println(c2.getName());` — java.lang.String
+6. `System.out.println(c3.getName());` — java.util.ArrayList
+7. What IS a Class object? It's the runtime description of a type:
+8. `System.out.println(c3.getSimpleName());` — ArrayList
+9. `System.out.println(c3.getPackageName());` — java.util
+10. `System.out.println(c3.isInterface());` — false
+
+The same code, clean:
+
 ```java
 public class ReflectionBasics {
     public static void main(String[] args) throws Exception {
-        // Way 1: the .class literal — compile-time known class.
         Class<String> c1 = String.class;
 
-        // Way 2: from an instance — the object tells you its class.
         String hello = "hello";
         Class<?> c2 = hello.getClass();
 
-        // Way 3: by name — the power move. The name is a runtime string,
-        // so the class doesn't even need to exist at compile time.
         Class<?> c3 = Class.forName("java.util.ArrayList");
 
-        System.out.println(c1.getName());   // java.lang.String
-        System.out.println(c2.getName());   // java.lang.String
-        System.out.println(c3.getName());   // java.util.ArrayList
+        System.out.println(c1.getName());
+        System.out.println(c2.getName());
+        System.out.println(c3.getName());
 
-        // What IS a Class object? It's the runtime description of a type:
-        System.out.println(c3.getSimpleName());   // ArrayList
-        System.out.println(c3.getPackageName());  // java.util
-        System.out.println(c3.isInterface());     // false
+        System.out.println(c3.getSimpleName());
+        System.out.println(c3.getPackageName());
+        System.out.println(c3.isInterface());
     }
 }
 ```
@@ -56,7 +67,6 @@ public class ReflectionBasics {
 
 ## Inspecting a Class: Methods, Fields, Constructors
 
-```java
 import java.lang.reflect.*;
 
 public class InspectDemo {
@@ -87,34 +97,41 @@ public class InspectDemo {
         return sb.toString();
     }
 }
-```
 
 **The key distinction to internalize:** `getMethods()` returns **public** methods including inherited ones (you see `Object`'s `toString`, `equals`, `hashCode` too); `getDeclaredMethods()` returns **all** methods declared in this class itself — including `private` ones — but *not* inherited. Same rule for `getFields()` vs `getDeclaredFields()`. That "declared" variant is the famous private-access door.
 
 ## Calling Methods Dynamically
+
+
+**What this code does — step by step:**
+
+1. The method name is just a string — decided at runtime.
+2. Find the method by name + parameter types.
+3. `Method m = clazz.getMethod(methodName);` — toUpperCase(). Invoke it on the target object. Returns Object — cast as needed.
+4. `System.out.println(result);` — HELLO WORLD
+5. With parameters: find the 2-arg substring(int, int).
+6. `System.out.println(sliced);` — hello
+
+The same code, clean:
 
 ```java
 import java.lang.reflect.Method;
 
 public class InvokeDemo {
     public static void main(String[] args) throws Exception {
-        // The method name is just a string — decided at runtime.
         String methodName = "toUpperCase";
 
         Object target = "hello world";
         Class<?> clazz = target.getClass();
 
-        // Find the method by name + parameter types.
-        Method m = clazz.getMethod(methodName);      // toUpperCase()
-        // Invoke it on the target object. Returns Object — cast as needed.
+        Method m = clazz.getMethod(methodName);
         Object result = m.invoke(target);
 
-        System.out.println(result);    // HELLO WORLD
+        System.out.println(result);
 
-        // With parameters: find the 2-arg substring(int, int).
         Method sub = clazz.getMethod("substring", int.class, int.class);
         Object sliced = sub.invoke(target, 0, 5);
-        System.out.println(sliced);    // hello
+        System.out.println(sliced);
     }
 }
 ```
@@ -123,7 +140,6 @@ public class InvokeDemo {
 
 ## Accessing Private Fields — and the Cost
 
-```java
 import java.lang.reflect.Field;
 
 public class PrivateAccessDemo {
@@ -143,11 +159,20 @@ public class PrivateAccessDemo {
         System.out.println(value);    // classified
     }
 }
-```
 
 `setAccessible(true)` is the "master key" — it bypasses Java's access control for that member. Frameworks use it constantly (Spring's field injection, ORM hydration, serialization of private state). But it also breaks encapsulation, and in modern Java (17+) it's gated: the `java.lang.reflect` access-control module and `--add-opens` flags exist precisely to stop arbitrary code from reaching into JDK internals. Use it only where you own both sides of the contract.
 
 ## Creating Objects Without `new`
+
+
+**What this code does — step by step:**
+
+1. Find the no-arg constructor and call it:
+2. The returned Object is a real StringBuilder — call through reflection:
+3. `System.out.println(clazz.getMethod("toString").invoke(sb));` — Hello from reflection
+4. Or: the convenience method newInstance() — deprecated in 9+ because. It bypasses checked-exception transparency; prefer getConstructor().
+
+The same code, clean:
 
 ```java
 import java.lang.reflect.Constructor;
@@ -156,14 +181,10 @@ public class NewInstanceDemo {
     public static void main(String[] args) throws Exception {
         Class<?> clazz = Class.forName("java.lang.StringBuilder");
 
-        // Find the no-arg constructor and call it:
         Object sb = clazz.getConstructor().newInstance();
-        // The returned Object is a real StringBuilder — call through reflection:
         clazz.getMethod("append", String.class).invoke(sb, "Hello from reflection");
-        System.out.println(clazz.getMethod("toString").invoke(sb)); // Hello from reflection
+        System.out.println(clazz.getMethod("toString").invoke(sb));
 
-        // Or: the convenience method newInstance() — deprecated in 9+ because
-        // it bypasses checked-exception transparency; prefer getConstructor().
     }
 }
 ```
@@ -183,3 +204,4 @@ Frameworks do the heavy lifting so you rarely write raw reflection — but when 
 ## Recap
 
 Reflection lets a running program inspect and manipulate its own classes: `Class<?>` objects describe types, `getMethods()`/`getDeclaredFields()` reveal their members, `invoke()` calls methods by name, and constructors can be instantiated dynamically. It powers Spring, Jackson, ORMs, and test frameworks — everything that must work with classes it never compiled against. The trade-offs are real: names become runtime strings (no compile check), `setAccessible` breaks encapsulation, and per-call reflection is slower than direct calls. Use it at boundaries and initialization, cache your lookups, and let frameworks mediate — that's how the whole ecosystem gets dynamism without chaos.
+

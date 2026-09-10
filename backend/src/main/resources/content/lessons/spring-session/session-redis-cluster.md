@@ -1,7 +1,7 @@
 ---
 title: Spring Session with Redis Cluster — Distributed Session Management
 summary: Configuring Spring Session with Redis for horizontally scaled Spring Boot applications, including session serialization, TTL policies, and Redis cluster configuration.
-order: 4
+order: 2
 minutes: 20
 topics: [spring-session, redis-cluster, distributed-session, session-serialization, sticky-sessions]
 docs:
@@ -44,7 +44,6 @@ server:
 ```
 
 ### Session Usage in Controllers
-```java
 @RestController
 public class AuthController {
 
@@ -76,7 +75,6 @@ public class AuthController {
         return ResponseEntity.ok(user);
     }
 }
-```
 
 ## Key Takeaways
 
@@ -85,3 +83,4 @@ public class AuthController {
 3. **Session serialization** — use Kryo or JSON for complex objects
 4. **TTL policies** — set timeout based on security requirements
 5. **Sticky sessions are not needed** — any instance can handle any request
+

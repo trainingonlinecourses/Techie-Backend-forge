@@ -1,7 +1,7 @@
 ---
 title: Rate Limiting — Protecting Capacity
 module: resilience-circuit-breaker
-order: 4
+order: 3
 minutes: 24
 topics: ["rate limiter", "token bucket", "fixed window", "sliding window", "429", "Resilience4j"]
 summary: Every service has a capacity: threads, DB connections, API quota, cost. Rate limiting is the mechanism that caps how many requests a caller may mak...
@@ -54,6 +54,18 @@ The token bucket is the standard: it allows *bursts* while capping *sustained* r
 
 ## The Code Walkthrough
 
+
+**What this code does — step by step:**
+
+1. ---- 1. Token bucket: 10 calls per minute, bursts up to 5 ----
+2. `.limitForPeriod(10)` — 10 tokens per period
+3. `.limitRefreshPeriod(Duration.ofMinutes(1))` — the period
+4. `.timeoutDuration(Duration.ofMillis(100))` — wait briefly for a token
+5. ---- 2. The guarded call ----
+6. When tokens are exhausted (and the timeout expired): throws RequestNotPermitted (the caller maps it to 429)
+
+The same code, clean:
+
 ```java
 import io.github.resilience4j.ratelimiter.RateLimiter;
 import io.github.resilience4j.ratelimiter.RateLimiterConfig;
@@ -67,19 +79,15 @@ public class AiQuotaService {
     private final RateLimiter limiter;
 
     public AiQuotaService() {
-        // ---- 1. Token bucket: 10 calls per minute, bursts up to 5 ----
         this.limiter = RateLimiter.of("ai-quota", RateLimiterConfig.custom()
-                .limitForPeriod(10)                       // 10 tokens per period
-                .limitRefreshPeriod(Duration.ofMinutes(1))// the period
-                .timeoutDuration(Duration.ofMillis(100))  // wait briefly for a token
+                .limitForPeriod(10)
+                .limitRefreshPeriod(Duration.ofMinutes(1))
+                .timeoutDuration(Duration.ofMillis(100))
                 .build());
     }
 
     public String ask(String question) {
-        // ---- 2. The guarded call ----
         return limiter.executeSupplier(() -> aiProvider.answer(question));
-        // When tokens are exhausted (and the timeout expired):
-        // throws RequestNotPermitted (the caller maps it to 429)
     }
 }
 ```
@@ -106,7 +114,6 @@ The academy's AI tutor is the perfect example: without a limiter, a scripted cli
 
 When a limit is hit, return `429 Too Many Requests` with a `Retry-After` header:
 
-```java
 @GetMapping("/api/tutor")
 public ResponseEntity<?> ask(@RequestParam String q) {
     try {
@@ -117,7 +124,6 @@ public ResponseEntity<?> ask(@RequestParam String q) {
                 .body(Map.of("error", "RATE_LIMITED", "retryAfterSeconds", 60));
     }
 }
-```
 
 Clients that honor `Retry-After` back off politely; the limit becomes a coordination signal rather than an error.
 
@@ -149,3 +155,4 @@ Different axes: time-based (limiter), concurrency-based (bulkhead), health-based
 - Limit per user/key/IP, per resource class — not one global number.
 - Rate limiter (time) + bulkhead (concurrency) + breaker (health) compose.
 - Monitor rejection rates — sustained 429s are a signal, not noise.
+

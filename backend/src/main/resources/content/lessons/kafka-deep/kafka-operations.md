@@ -1,7 +1,7 @@
 ---
 title: Kafka Operations — Admin, Monitoring, and Production Hardening
 module: kafka-deep
-order: 5
+order: 4
 minutes: 26
 topics: ["Kafka operations", "admin API", "monitoring", "JMX", "KRaft", "production config"]
 summary: The client APIs are the easy part — the hard part is that Kafka is a distributed system you operate: brokers to configure, topics to create and siz...
@@ -22,7 +22,6 @@ The client APIs are the easy part — the hard part is that Kafka is a *distribu
 
 The `AdminClient` is the operations tool in Java — create topics, check cluster state, describe groups, all from code (or from `kafka-topics.sh`, which uses it under the hood):
 
-```java
 import org.apache.kafka.clients.admin.*;
 import org.apache.kafka.common.errors.TopicExistsException;
 import java.util.*;
@@ -60,7 +59,6 @@ public class AdminDemo {
         }
     }
 }
-```
 
 **Walking through it:** `createTopics` with `new NewTopic(name, partitions, replicationFactor)` is how topics are born with the *right* shape — partition count sized for parallelism, replication factor for durability. The `ExecutionException` unwrap is the async-API idiom: Kafka's admin calls return futures; the cause hides the real error (`TopicExistsException`). Describe calls (`describeCluster`, `describeTopics`, `listConsumerGroups`) give you the cluster's truth from code — the same data the CLI shows.
 
@@ -117,3 +115,4 @@ For most of Kafka's life, a ZooKeeper ensemble managed cluster metadata (broker 
 ## Recap
 
 Operating Kafka means controlling it programmatically (the `AdminClient` for topic creation and cluster introspection), watching the metrics that predict failure (consumer **lag** first, then under-replicated partitions and disk), and setting the production configs that define your guarantees (replication 3 + `min.insync.replicas=2` + `acks=all` for durability; `unclean.leader.election.enable=false` against data loss; no auto-created topics). KRaft removes ZooKeeper from the stack, and security (TLS + SASL + ACLs) is non-negotiable outside trusted networks. The operational truth is the same as for any distributed system: the clients are easy, the running is the craft — and the lag metric is your honesty check.
+

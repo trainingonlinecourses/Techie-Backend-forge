@@ -1,7 +1,7 @@
 ---
 title: Scheduled Tasks — @Scheduled, @Async, and Task Schedulers
 summary: Cron expressions, fixed-rate vs fixed-delay, task scheduler configuration, distributed scheduling with ShedLock, thread pool sizing, and how organizations run background jobs without duplication.
-order: 40
+order: 12
 minutes: 20
 topics: [scheduled, cron, fixed-rate, fixed-delay, task-scheduler, shedlock, async, thread-pool, distributed-lock]
 docs:
@@ -19,7 +19,6 @@ Spring's `@Scheduled` annotation runs methods on a timer. Behind the scenes, a `
 
 ## Configuration
 
-```java
 @Configuration
 @EnableScheduling
 @EnableAsync
@@ -45,42 +44,47 @@ public class SchedulingConfig implements SchedulingConfigurer {
         return scheduler;
     }
 }
-```
 
 ## @Scheduled timing strategies
+
+
+**What this code does — step by step:**
+
+1. Run every 5 seconds — timer starts after previous completion
+2. Run every 10 seconds — timer starts at fixed intervals regardless of completion
+3. Run at 2 AM every day
+4. Run every Monday at 9 AM
+5. Initial delay: wait 30 seconds after startup, then run every minute
+
+The same code, clean:
 
 ```java
 @Component
 public class ScheduledTasks {
 
-    // Run every 5 seconds — timer starts after previous completion
     @Scheduled(fixedDelay = 5000)
     public void pollForUpdates() {
         List<Event> events = eventQueue.drain(100);
         events.forEach(this::processEvent);
     }
 
-    // Run every 10 seconds — timer starts at fixed intervals regardless of completion
     @Scheduled(fixedRate = 10000)
     public void healthCheck() {
         externalService.ping();
     }
 
-    // Run at 2 AM every day
     @Scheduled(cron = "0 0 2 * * ?")
     public void dailyReport() {
         Report report = reportService.generate();
         emailService.send(report);
     }
 
-    // Run every Monday at 9 AM
     @Scheduled(cron = "0 0 9 ? * MON")
     public void weeklyDigest() {
         List<User> subscribers = userService.findAllSubscribed();
         subscribers.forEach(user -> emailService.sendDigest(user));
     }
 
-    // Initial delay: wait 30 seconds after startup, then run every minute
     @Scheduled(initialDelay = 30000, fixedRate = 60000)
     public void cacheWarmer() {
         productCatalog.refreshCache();
@@ -105,12 +109,10 @@ public class ScheduledTasks {
 * * * * * *
 ```
 
-```java
 @Scheduled(cron = "0 30 8 * * MON-FRI")   // 8:30 AM weekdays
 @Scheduled(cron = "0 0 */2 * * ?")         // every 2 hours
 @Scheduled(cron = "0 0 0 1 * ?")           // first day of month
 @Scheduled(cron = "0 * * * * ?")           // every minute
-```
 
 ## Distributed scheduling with ShedLock
 
@@ -127,7 +129,6 @@ public class ScheduledTasks {
 </dependency>
 ```
 
-```java
 @Scheduled(cron = "0 0 2 * * ?")
 @SchedulerLock(name = "dailyReport",
     lockAtLeastFor = "PT5M",       // minimum lock duration
@@ -137,13 +138,11 @@ public void dailyReport() {
     Report report = reportService.generate();
     emailService.send(report);
 }
-```
 
 ShedLock uses a database table (`shedlock`) to coordinate. When pod A acquires the lock, pod B sees it's already locked and skips.
 
 ## @Async for parallel execution
 
-```java
 @Component
 public class AsyncTasks {
 
@@ -169,13 +168,11 @@ public Executor taskExecutor() {
     executor.initialize();
     return executor;
 }
-```
 
 ## How we use it in organizations
 
 ### Scenario 1: cache refresh every 5 minutes
 
-```java
 @Component
 @Primary
 public class CacheRefreshScheduler {
@@ -190,11 +187,9 @@ public class CacheRefreshScheduler {
         log.info("Cache refreshed: {} products", catalog.size());
     }
 }
-```
 
 ### Scenario 2: retry failed jobs every 30 minutes
 
-```java
 @Component
 public class FailedJobRetryScheduler {
 
@@ -213,11 +208,9 @@ public class FailedJobRetryScheduler {
         }
     }
 }
-```
 
 ### Scenario 3: database cleanup
 
-```java
 @Component
 public class CleanupScheduler {
 
@@ -228,7 +221,6 @@ public class CleanupScheduler {
         log.info("Cleaned up {} expired sessions", deleted);
     }
 }
-```
 
 ## Common mistakes
 
@@ -240,3 +232,4 @@ public class CleanupScheduler {
 | No error handling in scheduled tasks | One failure stops the scheduler thread |
 | Doing I/O in scheduler thread pool | Blocks other scheduled tasks |
 | Forgetting `@EnableScheduling` | `@Scheduled` silently ignored |
+

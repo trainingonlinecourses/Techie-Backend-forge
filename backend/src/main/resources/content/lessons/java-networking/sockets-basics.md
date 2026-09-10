@@ -1,7 +1,7 @@
 ---
 title: Sockets — The Foundation of Network Programming
 module: java-networking
-order: 1
+order: 4
 minutes: 28
 topics: ["sockets", "TCP", "ServerSocket", "client-server", "streams"]
 summary: Every network conversation in Java — HTTP requests, database connections, message queues — ultimately runs over sockets. A socket is the endpoint o...
@@ -24,45 +24,51 @@ Every network conversation in Java — HTTP requests, database connections, mess
 
 ## A Complete Server, Line by Line
 
+
+**What this code does — step by step:**
+
+1. 1. Listen on port 9090. The server socket just WAITS for callers.
+2. 2. accept() BLOCKS until a client connects. Each accepted socket is a separate conversation.
+3. 3. Handle this client (we'll do it inline for simplicity).
+4. 4. Wrap the socket's byte streams in reader/writer for text.
+5. 5. Read lines until the client closes the connection. (readLine returns null on EOF).
+6. `out.println("echo: " + line);` — send it back
+7. `client.close();` — clean up the conversation socket
+
+The same code, clean:
+
 ```java
 import java.io.*;
 import java.net.*;
 
 public class EchoServer {
     public static void main(String[] args) throws IOException {
-        // 1. Listen on port 9090. The server socket just WAITS for callers.
         try (ServerSocket server = new ServerSocket(9090)) {
             System.out.println("Echo server listening on port 9090");
 
-            // 2. accept() BLOCKS until a client connects.
-            //    Each accepted socket is a separate conversation.
             while (true) {
                 Socket client = server.accept();
                 System.out.println("Client connected: " +
                                    client.getInetAddress().getHostAddress());
 
-                // 3. Handle this client (we'll do it inline for simplicity).
                 handleClient(client);
             }
         }
     }
 
     private static void handleClient(Socket client) throws IOException {
-        // 4. Wrap the socket's byte streams in reader/writer for text.
         try (BufferedReader in = new BufferedReader(
                      new InputStreamReader(client.getInputStream()));
              PrintWriter out = new PrintWriter(client.getOutputStream(), true)) {
 
             String line;
-            // 5. Read lines until the client closes the connection
-            //    (readLine returns null on EOF).
             while ((line = in.readLine()) != null) {
                 System.out.println("Received: " + line);
-                out.println("echo: " + line);   // send it back
+                out.println("echo: " + line);
             }
         }
         System.out.println("Client disconnected");
-        client.close();  // clean up the conversation socket
+        client.close();
     }
 }
 ```
@@ -79,27 +85,34 @@ public class EchoServer {
 
 ## The Client Side
 
+
+**What this code does — step by step:**
+
+1. 1. Connect to the server — this performs the TCP handshake.
+2. 2. Same stream setup, opposite direction.
+3. 3. Send a message.
+4. 4. Block until the server replies.
+5. `System.out.println("Server said: " + reply);` — echo: Hello...
+6. try-with-resources closes the socket — clean disconnect.
+
+The same code, clean:
+
 ```java
 import java.io.*;
 import java.net.*;
 
 public class EchoClient {
     public static void main(String[] args) throws IOException {
-        // 1. Connect to the server — this performs the TCP handshake.
         try (Socket socket = new Socket("localhost", 9090)) {
 
-            // 2. Same stream setup, opposite direction.
             BufferedReader in = new BufferedReader(
                     new InputStreamReader(socket.getInputStream()));
             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
 
-            // 3. Send a message.
             out.println("Hello from the client!");
-            // 4. Block until the server replies.
             String reply = in.readLine();
-            System.out.println("Server said: " + reply);   // echo: Hello...
+            System.out.println("Server said: " + reply);
         }
-        // try-with-resources closes the socket — clean disconnect.
     }
 }
 ```
@@ -110,7 +123,6 @@ public class EchoClient {
 
 The server above handles one client at a time: while `handleClient` runs (blocked on `readLine`), the main loop can't `accept()` anyone else. For a real server, that's fatal — one slow client blocks everyone. The classic fix: **a thread per client**:
 
-```java
 try (ServerSocket server = new ServerSocket(9090)) {
     while (true) {
         Socket client = server.accept();
@@ -122,7 +134,6 @@ try (ServerSocket server = new ServerSocket(9090)) {
         }).start();
     }
 }
-```
 
 Now the accept loop never blocks on a conversation. This is exactly how the first generation of web servers worked — and it's the problem **virtual threads** (Java 21) and **NIO** solve with far better scalability: virtual threads let you write this same blocking style with thousands of concurrent clients, and NIO/reactor models (Netty, Spring WebFlux) avoid threads per connection entirely. You'll see both in the later lessons of this module.
 
@@ -136,3 +147,4 @@ Now the accept loop never blocks on a conversation. This is exactly how the firs
 ## Recap
 
 Sockets are the two endpoints of a network conversation — the server listens (`ServerSocket.accept()` blocks for callers), the client dials (`new Socket(host, port)`), and once connected both sides exchange bytes through layered streams. TCP gives reliability and ordering; UDP trades them for speed. The `accept → handle → repeat` loop with a thread per client is the classic server architecture, and its scalability limits drive the virtual-thread and NIO approaches in the next lessons. Master this foundation and everything above it — HTTP, databases, messaging — becomes a protocol layered on the same mechanism you just built.
+

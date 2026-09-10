@@ -1,7 +1,7 @@
 ---
 title: Weak, Soft & Phantom References — Memory-Sensitive Caching and Cleanup
 summary: Reference types beyond strong — WeakReference for caches, SoftReference for memory-sensitive storage, PhantomReference for cleanup, and ReferenceQueue for post-GC notification.
-order: 82
+order: 85
 minutes: 18
 topics: [weak-reference, soft-reference, phantom-reference, reference-queue, memory-cache, gc-integration, weakhashmap]
 docs:
@@ -30,25 +30,34 @@ A **strong reference** (`User u = new User()`) keeps the object alive — the GC
 
 ## WeakReference — the cache that won't cause memory leaks
 
+
+**What this code does — step by step:**
+
+1. Create a weak reference
+2. Access the referent
+3. `User cached = weakAlice.get();` — returns "alice" if not yet collected
+4. The GC collected the User — cache miss
+5. Once no strong references exist, the GC will collect the User
+6. `alice = null;` — only the WeakReference holds it
+7. `System.gc();` — hint to GC (not guaranteed)
+8. Next GC: weakAlice.get() returns null
+
+The same code, clean:
+
 ```java
 import java.lang.ref.WeakReference;
 
-// Create a weak reference
 User alice = new User("alice");
 WeakReference<User> weakAlice = new WeakReference<>(alice);
 
-// Access the referent
-User cached = weakAlice.get();        // returns "alice" if not yet collected
+User cached = weakAlice.get();
 if (cached == null) {
-    // The GC collected the User — cache miss
     cached = loadFromDB("alice");
     weakAlice = new WeakReference<>(cached);
 }
 
-// Once no strong references exist, the GC will collect the User
-alice = null;                           // only the WeakReference holds it
-System.gc();                            // hint to GC (not guaranteed)
-// Next GC: weakAlice.get() returns null
+alice = null;
+System.gc();
 ```
 
 **Line-by-line breakdown:**
@@ -58,7 +67,6 @@ System.gc();                            // hint to GC (not guaranteed)
 - `System.gc()` — a hint (not a command); the JVM may or may not run GC in response
 
 **Real-world scenario — WeakHashMap as a cache:**
-```java
 import java.util.WeakHashMap;
 
 // Keys are weakly referenced — when the key is GC'd, the entry is removed
@@ -70,13 +78,11 @@ sessionTokens.put(session, "bearer-token-456");
 // When session is GC'd, the entry disappears automatically — no memory leak
 session = null;
 // Next GC: the entry is removed
-```
 
 **Why WeakHashMap for caches:** you don't need to manually evict entries — the GC does it for you. The trade-off: entries can disappear at any time (even immediately), so you need a fallback (database, default value).
 
 ## SoftReference — memory-sensitive cache
 
-```java
 import java.lang.ref.SoftReference;
 import java.util.HashMap;
 import java.util.Map;
@@ -94,7 +100,6 @@ public Image getImage(String url) {
     }
     return img;
 }
-```
 
 **How SoftReference differs from WeakReference:**
 - `WeakReference` — collected at the **next GC** regardless of available memory
@@ -104,7 +109,6 @@ public Image getImage(String url) {
 
 ## PhantomReference — cleanup after collection
 
-```java
 import java.lang.ref.PhantomReference;
 import java.lang.ref.ReferenceQueue;
 
@@ -125,7 +129,6 @@ Thread cleanupThread = Thread.ofVirtual().start(() -> {
         if (t != null) t.cleanup();                 // release native resources
     }
 });
-```
 
 **Line-by-line breakdown:**
 - `new PhantomReference<>(resource, queue)` — wraps `resource` with a phantom reference; when `resource` is GC'd, the phantom reference is enqueued in `queue`
@@ -137,21 +140,27 @@ Thread cleanupThread = Thread.ofVirtual().start(() -> {
 
 ## ReferenceQueue — the notification system
 
-```java
 import java.lang.ref.Reference;
+
 import java.lang.ref.ReferenceQueue;
+
 import java.lang.ref.WeakReference;
 
-ReferenceQueue<Object> queue = new ReferenceQueue<>();
-WeakReference<Object> ref = new WeakReference<>(new Object(), queue);
+public class Main {
 
-// In a background loop:
-Reference<?> collected;
-while ((collected = queue.poll()) != null) {
-    System.out.println("Object was collected: " + collected);
-    // Perform cleanup, remove from maps, etc.
+    public static void main(String[] args) {
+
+        ReferenceQueue<Object> queue = new ReferenceQueue<>();
+        WeakReference<Object> ref = new WeakReference<>(new Object(), queue);
+
+        // In a background loop:
+        Reference<?> collected;
+        while ((collected = queue.poll()) != null) {
+            System.out.println("Object was collected: " + collected);
+            // Perform cleanup, remove from maps, etc.
+        }
+    }
 }
-```
 
 **How it works:**
 1. Create a `ReferenceQueue` and pass it to the reference constructor
@@ -162,7 +171,6 @@ while ((collected = queue.poll()) != null) {
 ## Common patterns
 
 **Pattern 1 — Cache with eviction listener:**
-```java
 public class EvictingCache<K, V> {
     private final Map<K, WeakReference<V>> cache = new WeakHashMap<>();
     private final ReferenceQueue<V> queue = new ReferenceQueue<>();
@@ -179,10 +187,8 @@ public class EvictingCache<K, V> {
         }
     }
 }
-```
 
 **Pattern 2 — ThreadLocal leak prevention:**
-```java
 // Bad: ThreadLocal holding a large object — leaks in thread pools
 private static final ThreadLocal<LargeObject> tl = ThreadLocal.withInitial(LargeObject::new);
 
@@ -191,7 +197,6 @@ private static final WeakReferenceThreadLocal<LargeObject> tl = new WeakReferenc
 
 // The WeakReferenceThreadLocal uses weak references internally,
 // so the LargeObject can be GC'd when no strong references exist
-```
 
 ## Common mistakes
 
@@ -212,3 +217,4 @@ private static final WeakReferenceThreadLocal<LargeObject> tl = new WeakReferenc
 - `get()` returns `null` after the referent is collected — always null-check.
 
 **Official docs:** [WeakReference API](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/ref/WeakReference.html) · [SoftReference API](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/ref/SoftReference.html) · [PhantomReference API](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/ref/PhantomReference.html) · [ReferenceQueue API](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/ref/ReferenceQueue.html)
+

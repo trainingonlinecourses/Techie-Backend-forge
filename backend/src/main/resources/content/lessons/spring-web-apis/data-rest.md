@@ -1,7 +1,7 @@
 ---
 title: Spring Data REST — Complete Beginner's Guide
 summary: Auto-exposing repositories as HAL+JSON APIs, pagination, filtering, projections, and when REST endpoints should be explicit instead.
-order: 5
+order: 1
 minutes: 18
 topics: [spring data rest, hal, hypermedia, repositories, pagination, projections]
 docs:
@@ -14,8 +14,18 @@ docs:
 
 Spring Data REST automatically exposes your JPA repositories as **REST endpoints** — no controller code needed. It generates CRUD operations, pagination, sorting, and hypermedia links (HAL+JSON format).
 
+
+**What this code does — step by step:**
+
+1. Just define the entity and repository — Spring Data REST creates the API!
+2. Spring Data REST automatically creates: GET /products → List all products (paginated). GET /products/1 → Get product by ID. POST /products → Create a product. PUT /products/1 → Update product 1. DELETE /products/1 → Delete product 1
+3. Plus these derived from method names:
+4. `List<Product> findByCategory(String category);` — GET /products/search/findByCategory?category=electronics
+5. `Optional<Product> findByName(String name);` — GET /products/search/findByName?name=iPhone
+
+The same code, clean:
+
 ```java
-// Just define the entity and repository — Spring Data REST creates the API!
 @Entity
 public class Product {
     @Id @GeneratedValue
@@ -27,16 +37,9 @@ public class Product {
 
 @RepositoryRestResource(collectionResourceRel = "products", path = "products")
 public interface ProductRepository extends PagingAndSortingRepository<Product, Long> {
-    // Spring Data REST automatically creates:
-    // GET /products          → List all products (paginated)
-    // GET /products/1        → Get product by ID
-    // POST /products         → Create a product
-    // PUT /products/1        → Update product 1
-    // DELETE /products/1     → Delete product 1
-    
-    // Plus these derived from method names:
-    List<Product> findByCategory(String category);    // GET /products/search/findByCategory?category=electronics
-    Optional<Product> findByName(String name);         // GET /products/search/findByName?name=iPhone
+
+    List<Product> findByCategory(String category);
+    Optional<Product> findByName(String name);
 }
 ```
 
@@ -87,15 +90,12 @@ public interface ProductRepository extends PagingAndSortingRepository<Product, L
 
 ### Change the path
 
-```java
 @RepositoryRestResource(path = "catalog")  // Line 1: Use /catalog instead of /products
 public interface ProductRepository extends PagingAndSortingRepository<Product, Long> {
 }
-```
 
 ### Disable specific HTTP methods
 
-```java
 @RepositoryRestResource
 public interface ProductRepository extends PagingAndSortingRepository<Product, Long> {
     // Disable DELETE for products (no deleting allowed!)
@@ -106,11 +106,9 @@ public interface ProductRepository extends PagingAndSortingRepository<Product, L
     
     // Better approach: use @RepositoryRestResource(exported = false)
 }
-```
 
 ### Add custom search endpoints
 
-```java
 @RepositoryRestResource
 public interface ProductRepository extends PagingAndSortingRepository<Product, Long> {
     
@@ -127,52 +125,57 @@ public interface ProductRepository extends PagingAndSortingRepository<Product, L
         @Param("max") BigDecimal max
     );
 }
-```
 
 ## Real-world scenario — product catalog API
 
+
+**What this code does — step by step:**
+
+1. Entity
+2. Repository with custom searches
+3. Search by category
+4. Search by name (case-insensitive)
+5. Search by price range
+6. Active products only
+
+The same code, clean:
+
 ```java
-// Entity
 @Entity
 @Table(name = "products")
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
     @Column(nullable = false)
     private String name;
-    
+
     @Column(nullable = false)
     private BigDecimal price;
-    
+
     @Column(nullable = false)
     private String category;
-    
+
     private boolean active = true;
-    
+
     @CreatedDate
     private LocalDateTime createdAt;
 }
 
-// Repository with custom searches
 @RepositoryRestResource(collectionResourceRel = "products", path = "products")
 public interface ProductRepository extends PagingAndSortingRepository<Product, Long> {
-    
-    // Search by category
+
     Page<Product> findByCategory(@Param("category") String category, Pageable pageable);
-    
-    // Search by name (case-insensitive)
+
     Page<Product> findByNameContainingIgnoreCase(@Param("name") String name, Pageable pageable);
-    
-    // Search by price range
+
     Page<Product> findByPriceBetween(
         @Param("min") BigDecimal min,
         @Param("max") BigDecimal max,
         Pageable pageable
     );
-    
-    // Active products only
+
     Page<Product> findByActiveTrue(Pageable pageable);
 }
 ```
@@ -237,3 +240,4 @@ Content-Type: application/json
 - Don't use for complex business logic — use `@RestController` instead
 
 **Official docs:** [Spring Data REST Reference](https://docs.spring.io/spring-data/rest/reference/)
+

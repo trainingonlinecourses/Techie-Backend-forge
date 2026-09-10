@@ -19,39 +19,55 @@ A `byte` is an 8-bit number. A `char` is a 16-bit Unicode code unit. They are no
 
 The conversion between bytes and chars is not a cast — it is an **encoding translation**. You must tell Java which character set (charset) to use. `UTF-8`, `ISO-8859-1`, `UTF-16` — each maps bytes to characters differently. If you pick the wrong charset, you get mojibake (garbage characters).
 
+
+**What this code does — step by step:**
+
+1. The text "hello" in UTF-8
+2. 1. String → byte[] (text to bytes, for disk/network)
+3. `System.out.println("UTF-8 bytes length: " + bytesUtf8.length);` — 5
+4. `System.out.println("bytes as hex: " + bytesToHex(bytesUtf8));` — 68 65 6c 6c 6f
+5. 2. byte[] → String (bytes back to text, using the SAME charset)
+6. `System.out.println("decoded: " + decoded);` — hello
+7. 3. String → char[] (text to code units, for in-memory processing)
+8. `System.out.println("char count: " + chars.length);` — 5
+9. `System.out.println("first char: " + chars[0]);` — h (U+0068)
+10. 4. char[] → String
+11. `System.out.println("from chars: " + fromChars);` — hello
+12. --- The danger: wrong charset ---
+13. `byte[] utf8Bytes = "café".getBytes(StandardCharsets.UTF_8);` — café → 5 bytes: 63 61 66 c3 a9
+14. `String wrong = new String(utf8Bytes, StandardCharsets.ISO_8859_1);` — reads c3 a9 as two Latin chars
+15. `System.out.println("wrong charset: " + wrong);` — cafÃ© ← corrupted
+16. `System.out.println("right charset: " + right);` — café ← correct
+
+The same code, clean:
+
 ```java
 import java.nio.charset.StandardCharsets;
 
 public class ByteCharConversion {
     public static void main(String[] args) {
-        // The text "hello" in UTF-8
         String text = "hello";
 
-        // 1. String → byte[]  (text to bytes, for disk/network)
         byte[] bytesUtf8 = text.getBytes(StandardCharsets.UTF_8);
-        System.out.println("UTF-8 bytes length: " + bytesUtf8.length);  // 5
-        System.out.println("bytes as hex: " + bytesToHex(bytesUtf8));   // 68 65 6c 6c 6f
+        System.out.println("UTF-8 bytes length: " + bytesUtf8.length);
+        System.out.println("bytes as hex: " + bytesToHex(bytesUtf8));
 
-        // 2. byte[] → String  (bytes back to text, using the SAME charset)
         String decoded = new String(bytesUtf8, StandardCharsets.UTF_8);
-        System.out.println("decoded: " + decoded);  // hello
+        System.out.println("decoded: " + decoded);
 
-        // 3. String → char[]  (text to code units, for in-memory processing)
         char[] chars = text.toCharArray();
-        System.out.println("char count: " + chars.length);  // 5
-        System.out.println("first char: " + chars[0]);      // h  (U+0068)
+        System.out.println("char count: " + chars.length);
+        System.out.println("first char: " + chars[0]);
 
-        // 4. char[] → String
         String fromChars = new String(chars);
-        System.out.println("from chars: " + fromChars);  // hello
+        System.out.println("from chars: " + fromChars);
 
-        // --- The danger: wrong charset ---
-        byte[] utf8Bytes = "café".getBytes(StandardCharsets.UTF_8);   // café → 5 bytes: 63 61 66 c3 a9
-        String wrong = new String(utf8Bytes, StandardCharsets.ISO_8859_1); // reads c3 a9 as two Latin chars
-        System.out.println("wrong charset: " + wrong);  // cafÃ©  ← corrupted
+        byte[] utf8Bytes = "café".getBytes(StandardCharsets.UTF_8);
+        String wrong = new String(utf8Bytes, StandardCharsets.ISO_8859_1);
+        System.out.println("wrong charset: " + wrong);
 
         String right = new String(utf8Bytes, StandardCharsets.UTF_8);
-        System.out.println("right charset: " + right);  // café  ← correct
+        System.out.println("right charset: " + right);
     }
 
     static String bytesToHex(byte[] bytes) {
@@ -89,19 +105,29 @@ The golden rule: **always specify the charset explicitly**. Never use the no-arg
 
 A `byte[]` might be a UTF-8-encoded text, a PNG image, an encrypted message, or a protocol frame. You cannot tell from the bytes alone. A `char[]` is always text — but only part of the Unicode story (it cannot hold a full supplementary character in one `char`; for that you need a `String` with a surrogate pair).
 
+
+**What this code does — step by step:**
+
+1. The emoji "😊" is U+1F60A — beyond the BMP, requires two char surrogates
+2. `System.out.println("string length: " + emoji.length());` — 2 (two char code units, not one character)
+3. `System.out.println("code point count: " + emoji.codePointCount(0, emoji.length()));` — 1
+4. `System.out.println("char[0]: " + Integer.toHexString(chars[0]));` — d83d (high surrogate)
+5. `System.out.println("char[1]: " + Integer.toHexString(chars[1]));` — de0a (low surrogate)
+6. The correct way to iterate real characters, not UTF-16 code units
+
+The same code, clean:
+
 ```java
 public class CharSurrogateDemo {
     public static void main(String[] args) {
-        // The emoji "😊" is U+1F60A — beyond the BMP, requires two char surrogates
         String emoji = "😊";
-        System.out.println("string length: " + emoji.length());   // 2  (two char code units, not one character)
-        System.out.println("code point count: " + emoji.codePointCount(0, emoji.length()));  // 1
+        System.out.println("string length: " + emoji.length());
+        System.out.println("code point count: " + emoji.codePointCount(0, emoji.length()));
 
         char[] chars = emoji.toCharArray();
-        System.out.println("char[0]: " + Integer.toHexString(chars[0]));  // d83d (high surrogate)
-        System.out.println("char[1]: " + Integer.toHexString(chars[1]));  // de0a (low surrogate)
+        System.out.println("char[0]: " + Integer.toHexString(chars[0]));
+        System.out.println("char[1]: " + Integer.toHexString(chars[1]));
 
-        // The correct way to iterate real characters, not UTF-16 code units
         System.out.println("--- real characters ---");
         emoji.codePoints().forEach(cp ->
             System.out.println("code point: U+" + Integer.toHexString(cp) + " = " + new String(Character.toChars(cp))));
@@ -144,3 +170,4 @@ In the lab, you will start with a byte array that encodes "cafétière" in UTF-8
 ## Summary
 
 Bytes and chars are different types with different purposes — bytes are binary data (files, network, crypto), chars are UTF-16 text code units for in-memory manipulation. Converting between them requires an explicit charset; `UTF-8` is the modern default. Always pass the charset to `getBytes(charset)` and `new String(bytes, charset)` — never use the platform-default versions, because the default differs between machines. A `char` is not one visible character; supplementary characters (emoji, rare CJK) take two `char`s (a surrogate pair). Use `codePoints()` to iterate real Unicode characters. The wrong charset turns "café" into "cafÃ©" — and that bug is entirely preventable by always naming the charset.
+

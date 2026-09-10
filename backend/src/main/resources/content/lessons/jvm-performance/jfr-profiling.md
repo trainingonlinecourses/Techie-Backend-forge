@@ -1,7 +1,7 @@
 ---
 title: JFR Profiling — Flight Recorder for Production
 summary: Java Flight Recorder captures low-overhead diagnostic data in production — CPU hotspots, lock contention, I/O latency, GC pauses — without stopping the app.
-order: 2
+order: 3
 minutes: 22
 topics: [JFR, flight recorder, profiling, CPU hotspot, lock contention, I/O latency, jdk.jfr, continuous profiling]
 docs:
@@ -55,6 +55,22 @@ jcmd <pid> JFR.stop name=profile
 
 ### Programmatic JFR Control
 
+
+**What this code does — step by step:**
+
+1. Enable specific event categories
+2. `recording.enable("jdk.CPUInformation");` — CPU info
+3. `recording.enable("jdk.GarbageCollection");` — GC events
+4. `recording.enable("jdk.JavaMonitorWait");` — Lock contention
+5. `recording.enable("jdk.FileRead");` — File I/O
+6. `recording.enable("jdk.SocketRead");` — Network I/O
+7. `recording.enable("jdk.ExecutionSample");` — CPU profiling (method-level)
+8. Configure settings
+9. `recording.setDuration(Duration.ofMinutes(30));` — Record for 30 minutes
+10. `return recording;` — Bean lifecycle manages start/stop
+
+The same code, clean:
+
 ```java
 import jdk.jfr.*;
 
@@ -65,25 +81,23 @@ public class JfrConfig {
     public Recording jfrRecording() {
         Recording recording = new Recording();
 
-        // Enable specific event categories
-        recording.enable("jdk.CPUInformation");      // CPU info
-        recording.enable("jdk.GarbageCollection");     // GC events
-        recording.enable("jdk.JavaMonitorWait");       // Lock contention
-        recording.enable("jdk.FileRead");              // File I/O
+        recording.enable("jdk.CPUInformation");
+        recording.enable("jdk.GarbageCollection");
+        recording.enable("jdk.JavaMonitorWait");
+        recording.enable("jdk.FileRead");
         recording.enable("jdk.FileWrite");
-        recording.enable("jdk.SocketRead");            // Network I/O
+        recording.enable("jdk.SocketRead");
         recording.enable("jdk.SocketWrite");
-        recording.enable("jdk.ExecutionSample");       // CPU profiling (method-level)
+        recording.enable("jdk.ExecutionSample");
 
-        // Configure settings
         recording.setSetting("jdk.CPULoader.interval", "10 ms");
         recording.setSetting("jdk.NativeMethodSampling.interval", "10 ms");
 
-        recording.setDuration(Duration.ofMinutes(30));  // Record for 30 minutes
+        recording.setDuration(Duration.ofMinutes(30));
         recording.setDestination(Path.of("/var/log/app/recording.jfr"));
 
         recording.start();
-        return recording;     // Bean lifecycle manages start/stop
+        return recording;
     }
 }
 ```
@@ -97,11 +111,26 @@ public class JfrConfig {
 
 ### Custom JFR Events (Your Business Metrics)
 
+
+**What this code does — step by step:**
+
+1. Define a custom event — JFR records it automatically
+2. `@StackTrace(true)` — Capture the full stack trace
+3. `@Category("Business")` — Organize in JMC
+4. `@Timespan` — JFR renders this as a duration
+5. Usage in your service:
+6. `OrderProcessingEvent event = new OrderProcessingEvent();` — Create event
+7. `event.orderId = request.getId();` — Set fields
+8. `event.begin();` — Start timing
+9. `Order order = doProcess(request);` — Actual work
+10. `event.end();` — Stop timing — record the event
+
+The same code, clean:
+
 ```java
-// Define a custom event — JFR records it automatically
 @Label("Order Processing")
-@StackTrace(true)           // Capture the full stack trace
-@Category("Business")       // Organize in JMC
+@StackTrace(true)
+@Category("Business")
 public class OrderProcessingEvent extends jdk.jfr.Event {
 
     @Label("Order ID")
@@ -111,31 +140,30 @@ public class OrderProcessingEvent extends jdk.jfr.Event {
     int itemCount;
 
     @Label("Total Amount")
-    @Timespan              // JFR renders this as a duration
+    @Timespan
     long processingNanos;
 
     @Label("Success")
     boolean success;
 }
 
-// Usage in your service:
 @Service
 public class OrderService {
     public Order processOrder(OrderRequest request) {
-        OrderProcessingEvent event = new OrderProcessingEvent();   // Create event
-        event.orderId = request.getId();                           // Set fields
+        OrderProcessingEvent event = new OrderProcessingEvent();
+        event.orderId = request.getId();
         event.itemCount = request.getItems().size();
-        event.begin();                                             // Start timing
+        event.begin();
 
         try {
-            Order order = doProcess(request);                      // Actual work
+            Order order = doProcess(request);
             event.success = true;
             return order;
         } catch (Exception e) {
             event.success = false;
             throw e;
         } finally {
-            event.end();                                           // Stop timing — record the event
+            event.end();
         }
     }
 }
@@ -237,3 +265,4 @@ jfr print --json profile.jfr | jq '.events[] | select(.eventType == "jdk.Garbage
 - **Flame graphs** are the fastest way to understand CPU hotspots — they show the full call chain.
 
 Official docs: [jfr tool](https://docs.oracle.com/en/java/javase/21/docs/specs/man/jfr.html) · [JFR API](https://docs.oracle.com/javase/8/docs/platform/jdk/jfr/)
+

@@ -1,7 +1,7 @@
 ---
 title: Dynamic Proxies — Runtime Code Generation
 summary: How Java creates proxy classes at runtime, the Proxy and InvocationHandler API, when to use JDK proxies vs CGLIB, and how Spring AOP is built on top of them.
-order: 3
+order: 4
 minutes: 25
 topics: [dynamic-proxy, proxy, invocation-handler, cglib, spring-aop, runtime-generation]
 docs:
@@ -12,19 +12,22 @@ docs:
 
 A dynamic proxy creates a new class at runtime that implements one or more interfaces. You give it an `InvocationHandler` that intercepts every method call. The proxy class never exists on disk — it's generated in memory by the JVM.
 
-```java
-// What you write:
-MyInterface proxy = (MyInterface) Proxy.newProxyInstance(
-    MyInterface.class.getClassLoader(),
-    new Class[]{MyInterface.class},
-    (obj, method, args) -> {
-        System.out.println("Intercepted: " + method.getName());
-        return method.invoke(realObject, args);  // delegate to real object
-    }
-);
+public class Main {
 
-proxy.doSomething();  // prints "Intercepted: doSomething", then calls real object
-```
+    public static void main(String[] args) {
+        // What you write:
+        MyInterface proxy = (MyInterface) Proxy.newProxyInstance(
+            MyInterface.class.getClassLoader(),
+            new Class[]{MyInterface.class},
+            (obj, method, args) -> {
+                System.out.println("Intercepted: " + method.getName());
+                return method.invoke(realObject, args);  // delegate to real object
+            }
+        );
+
+        proxy.doSomething();  // prints "Intercepted: doSomething", then calls real object
+    }
+}
 
 This is the foundation of Spring AOP, transaction management, and remote method invocation.
 
@@ -34,26 +37,34 @@ This is the foundation of Spring AOP, transaction management, and remote method 
 
 ### Creating a Proxy
 
+
+**What this code does — step by step:**
+
+1. The interface to proxy
+2. Create the proxy
+3. `UserService.class.getClassLoader(),` — class loader
+4. `new Class[]{UserService.class},` — interfaces to implement
+5. `new LoggingHandler(new UserServiceImpl())` — our interceptor
+
+The same code, clean:
+
 ```java
 import java.lang.reflect.*;
 
-// The interface to proxy
 interface UserService {
     User findById(Long id);
     void save(User user);
 }
 
-// Create the proxy
 UserService proxy = (UserService) Proxy.newProxyInstance(
-    UserService.class.getClassLoader(),   // class loader
-    new Class[]{UserService.class},       // interfaces to implement
-    new LoggingHandler(new UserServiceImpl())  // our interceptor
+    UserService.class.getClassLoader(),
+    new Class[]{UserService.class},
+    new LoggingHandler(new UserServiceImpl())
 );
 ```
 
 ### InvocationHandler
 
-```java
 class LoggingHandler implements InvocationHandler {
     private final Object target;
 
@@ -69,11 +80,23 @@ class LoggingHandler implements InvocationHandler {
         return result;
     }
 }
-```
 
 ---
 
 ## Line-by-Line Walkthrough
+
+
+**What this code does — step by step:**
+
+1. The real service
+2. InvocationHandler that adds logging
+3. InvocationHandler that adds caching
+4. Create a logging proxy
+5. Call through proxy
+6. `var proxyService = (OrderServiceImpl) proxy;` — cast to use it
+7. The proxy IS-A Object (not OrderServiceImpl)
+
+The same code, clean:
 
 ```java
 import java.lang.reflect.*;
@@ -81,7 +104,6 @@ import java.util.*;
 
 public class DynamicProxyDemo {
 
-    // The real service
     static class OrderServiceImpl {
         public String createOrder(String item) {
             return "Order-" + item.hashCode();
@@ -91,7 +113,6 @@ public class DynamicProxyDemo {
         }
     }
 
-    // InvocationHandler that adds logging
     static class LoggingHandler implements InvocationHandler {
         private final Object target;
         private final List<String> log = new ArrayList<>();
@@ -114,7 +135,6 @@ public class DynamicProxyDemo {
         public List<String> getLog() { return log; }
     }
 
-    // InvocationHandler that adds caching
     static class CachingHandler implements InvocationHandler {
         private final Object target;
         private final Map<String, Object> cache = new HashMap<>();
@@ -140,7 +160,6 @@ public class DynamicProxyDemo {
     public static void main(String[] args) {
         OrderServiceImpl realService = new OrderServiceImpl();
 
-        // Create a logging proxy
         LoggingHandler handler = new LoggingHandler(realService);
         Object proxy = Proxy.newProxyInstance(
             OrderServiceImpl.class.getClassLoader(),
@@ -148,12 +167,10 @@ public class DynamicProxyDemo {
             handler
         );
 
-        // Call through proxy
-        var proxyService = (OrderServiceImpl) proxy;  // cast to use it
+        var proxyService = (OrderServiceImpl) proxy;
         proxyService.createOrder("laptop");
         proxyService.cancelOrder("Order-123");
 
-        // The proxy IS-A Object (not OrderServiceImpl)
         System.out.println("Is proxy: " + Proxy.isProxyClass(proxy.getClass()));
         System.out.println("Log entries: " + handler.getLog());
     }
@@ -175,7 +192,6 @@ public class DynamicProxyDemo {
 - Used by Spring when the bean doesn't implement an interface
 - Cannot proxy final classes or final methods
 
-```java
 // JDK proxy (target implements interface)
 UserService proxy = (UserService) Proxy.newProxyInstance(
     UserService.class.getClassLoader(),
@@ -185,7 +201,6 @@ UserService proxy = (UserService) Proxy.newProxyInstance(
 
 // CGLIB proxy (target is any class) — Spring does this automatically
 // @Configuration classes use CGLIB to intercept @Bean methods
-```
 
 ---
 
@@ -193,7 +208,6 @@ UserService proxy = (UserService) Proxy.newProxyInstance(
 
 ### Scenario 1: Transaction proxy (simplified Spring)
 
-```java
 class TransactionHandler implements InvocationHandler {
     private final Object target;
 
@@ -220,11 +234,9 @@ UserService txService = (UserService) Proxy.newProxyInstance(
     new TransactionHandler(new UserServiceImpl())
 );
 txService.save(user);  // wrapped in BEGIN/COMMIT or ROLLBACK
-```
 
 ### Scenario 2: Access control proxy
 
-```java
 class SecurityHandler implements InvocationHandler {
     private final Object target;
     private final Set<String> adminMethods = Set.of("delete", "update");
@@ -243,11 +255,9 @@ class SecurityHandler implements InvocationHandler {
         return "ADMIN".equals(System.getenv("ROLE"));
     }
 }
-```
 
 ### Scenario 3: Remote method invocation
 
-```java
 class RemoteHandler implements InvocationHandler {
     private final String host;
     private final int port;
@@ -265,7 +275,6 @@ class RemoteHandler implements InvocationHandler {
         return null; // actual implementation would send over network
     }
 }
-```
 
 ---
 
@@ -277,3 +286,4 @@ class RemoteHandler implements InvocationHandler {
 | Forgetting to delegate | Method calls never reach real object | Always call `method.invoke(target, args)` |
 | Catching all exceptions | Proxy hides errors from caller | Only catch exceptions you can handle |
 | Using proxy for simple delegation | Adds complexity for no benefit | Only proxy when you need cross-cutting concerns |
+

@@ -41,7 +41,6 @@ Elasticsearch:
 
 ## Indexing documents — adding data
 
-```java
 // Spring Data Elasticsearch — just annotate your entity
 @Document(indexName = "products")
 public class Product {
@@ -63,9 +62,7 @@ public class Product {
     @Field(type = FieldType.Date)
     private LocalDateTime createdAt;
 }
-```
 
-```java
 // Repository — Spring Data generates the implementation
 @Repository
 public interface ProductRepository extends ElasticsearchRepository<Product, Long> {
@@ -73,22 +70,31 @@ public interface ProductRepository extends ElasticsearchRepository<Product, Long
     List<Product> findByNameContaining(String name);                    // Full-text search
     List<Product> findByCategoryAndPriceLessThan(String cat, Double p); // Filter + range
 }
-```
 
 ## Searching with Query DSL
 
 Elasticsearch has its own query language (DSL). Spring Data Elasticsearch wraps it, but understanding DSL helps:
 
+
+**What this code does — step by step:**
+
+1. Method 1: Repository methods (simple)
+2. Method 2: ElasticsearchOperations (complex queries)
+3. `.withQuery(QueryBuilders.matchQuery("name", "wireless headphones"))` — Line 1: Full-text search
+4. `.withFilter(QueryBuilders.rangeQuery("price").lt(100.0))` — Line 2: Price filter
+5. `.withSort(Sort.by("price").ascending())` — Line 3: Sort by price
+6. `.withPageable(PageRequest.of(0, 10))` — Line 4: Pagination
+
+The same code, clean:
+
 ```java
-// Method 1: Repository methods (simple)
 List<Product> products = productRepository.findByNameContaining("wireless headphones");
 
-// Method 2: ElasticsearchOperations (complex queries)
 SearchQuery query = new NativeSearchQueryBuilder()
-    .withQuery(QueryBuilders.matchQuery("name", "wireless headphones"))  // Line 1: Full-text search
-    .withFilter(QueryBuilders.rangeQuery("price").lt(100.0))            // Line 2: Price filter
-    .withSort(Sort.by("price").ascending())                              // Line 3: Sort by price
-    .withPageable(PageRequest.of(0, 10))                                 // Line 4: Pagination
+    .withQuery(QueryBuilders.matchQuery("name", "wireless headphones"))
+    .withFilter(QueryBuilders.rangeQuery("price").lt(100.0))
+    .withSort(Sort.by("price").ascending())
+    .withPageable(PageRequest.of(0, 10))
     .build();
 
 List<Product> products = operations.queryForList(query, Product.class);
@@ -98,26 +104,21 @@ List<Product> products = operations.queryForList(query, Product.class);
 
 ### Full-text search
 
-```java
 // "find products where name OR description contains 'wireless'"
 SearchQuery query = new NativeSearchQueryBuilder()
     .withQuery(QueryBuilders.multiMatchQuery("wireless", "name", "description"))
     .build();
-```
 
 ### Fuzzy search (typo-tolerant)
 
-```java
 // "find products matching 'iphon' (fuzzy → matches 'iPhone')"
 SearchQuery query = new NativeSearchQueryBuilder()
     .withQuery(QueryBuilders.fuzzyQuery("name", "iphon")
         .fuzziness(Fuzziness.AUTO))  // Line 1: Allow typos
     .build();
-```
 
 ### Autocomplete
 
-```java
 // Suggest completions as user types
 SearchQuery query = new NativeSearchQueryBuilder()
     .withSuggestBuilder(new SuggestBuilder()
@@ -127,71 +128,98 @@ SearchQuery query = new NativeSearchQueryBuilder()
                 .skipDuplicates(true)      // Line 2: No duplicate suggestions
                 .size(5)))                // Line 3: Top 5 suggestions
     .build();
-```
 
 ## Aggregations — analytics
 
+
+**What this code does — step by step:**
+
+1. "count products by category, average price per category"
+2. `.terms("by_category")` — Line 1: Group by category
+3. `.field("category")` — Line 2: Field to group on
+4. `.subAggregation(` — Line 3: Nested aggregation
+5. `.field("price")` — Line 4: Average price
+6. `String category = bucket.getKeyAsString();` — Line 1: Category name
+7. `long count = bucket.getDocCount();` — Line 2: Number of products
+8. `Avg avgPrice = bucket.getAggregations().get("avg_price");` — Line 3: Average price
+
+The same code, clean:
+
 ```java
-// "count products by category, average price per category"
-SearchQuery query = new NativeSearchQueryBuilder()
-    .addAggregation(AggregationBuilders
-        .terms("by_category")                     // Line 1: Group by category
-        .field("category")                        // Line 2: Field to group on
-        .subAggregation(                          // Line 3: Nested aggregation
-            AggregationBuilders.avg("avg_price")
-                .field("price")                   // Line 4: Average price
-        )
-    )
-    .build();
+public class Main {
 
-Aggregations aggregations = operations.query(query, SearchResponse.class).getAggregations();
-Terms byCategory = aggregations.get("by_category");
+    public static void main(String[] args) {
+        SearchQuery query = new NativeSearchQueryBuilder()
+            .addAggregation(AggregationBuilders
+                .terms("by_category")
+                .field("category")
+                .subAggregation(
+                    AggregationBuilders.avg("avg_price")
+                        .field("price")
+                )
+            )
+            .build();
 
-for (Terms.Bucket bucket : byCategory.getBuckets()) {
-    String category = bucket.getKeyAsString();     // Line 1: Category name
-    long count = bucket.getDocCount();             // Line 2: Number of products
-    Avg avgPrice = bucket.getAggregations().get("avg_price");  // Line 3: Average price
-    System.out.println(category + ": " + count + " products, avg $" + avgPrice.getValue());
+        Aggregations aggregations = operations.query(query, SearchResponse.class).getAggregations();
+        Terms byCategory = aggregations.get("by_category");
+
+        for (Terms.Bucket bucket : byCategory.getBuckets()) {
+            String category = bucket.getKeyAsString();
+            long count = bucket.getDocCount();
+            Avg avgPrice = bucket.getAggregations().get("avg_price");
+            System.out.println(category + ": " + count + " products, avg $" + avgPrice.getValue());
+        }
+    }
 }
 ```
 
 ## Real-world scenario — product search
 
+
+**What this code does — step by step:**
+
+1. Advanced search with filters, sorting, and pagination
+2. Full-text search across name and description
+3. `builder.withQuery(QueryBuilders.matchAllQuery());` — Line 1: No query → return all
+4. Category filter
+5. `builder.withFilter(QueryBuilders.termQuery("category", category));` — Line 2: Exact match
+6. Price range filter
+7. `if (minPrice != null) priceRange.gte(minPrice);` — Line 3: Minimum price
+8. `if (maxPrice != null) priceRange.lte(maxPrice);` — Line 4: Maximum price
+9. Sorting and pagination
+
+The same code, clean:
+
 ```java
 @Service
 public class ProductSearchService {
     private final ElasticsearchOperations operations;
-    
-    // Advanced search with filters, sorting, and pagination
+
     public SearchResults<Product> search(String query, String category, 
                                          Double minPrice, Double maxPrice,
                                          int page, int size) {
         NativeSearchQueryBuilder builder = new NativeSearchQueryBuilder();
-        
-        // Full-text search across name and description
+
         if (query != null && !query.isEmpty()) {
             builder.withQuery(QueryBuilders.multiMatchQuery(query, "name", "description"));
         } else {
-            builder.withQuery(QueryBuilders.matchAllQuery());  // Line 1: No query → return all
+            builder.withQuery(QueryBuilders.matchAllQuery());
         }
-        
-        // Category filter
+
         if (category != null) {
-            builder.withFilter(QueryBuilders.termQuery("category", category));  // Line 2: Exact match
+            builder.withFilter(QueryBuilders.termQuery("category", category));
         }
-        
-        // Price range filter
+
         if (minPrice != null || maxPrice != null) {
             RangeQueryBuilder priceRange = QueryBuilders.rangeQuery("price");
-            if (minPrice != null) priceRange.gte(minPrice);  // Line 3: Minimum price
-            if (maxPrice != null) priceRange.lte(maxPrice);  // Line 4: Maximum price
+            if (minPrice != null) priceRange.gte(minPrice);
+            if (maxPrice != null) priceRange.lte(maxPrice);
             builder.withFilter(priceRange);
         }
-        
-        // Sorting and pagination
+
         builder.withSort(Sort.by("price").ascending());
         builder.withPageable(PageRequest.of(page, size));
-        
+
         return operations.queryForPage(builder.build(), Product.class);
     }
 }
@@ -216,3 +244,4 @@ public class ProductSearchService {
 - Spring Data Elasticsearch generates repositories like JPA — minimal code
 
 **Official docs:** [Elasticsearch Reference](https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html) · [Spring Data Elasticsearch](https://docs.spring.io/spring-data/elasticsearch/reference/)
+

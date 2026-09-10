@@ -1,7 +1,7 @@
 ---
 title: "Records in Depth — More Than Just Data Classes"
 summary: "Compact constructors, validation in records, records with inheritance, records as map keys, records with builder patterns, and how organizations use records for type-safe APIs."
-order: 6
+order: 3
 minutes: 22
 topics: [records, compact-constructors, record-validation, record-patterns, record-builder, java-21]
 docs:
@@ -14,15 +14,12 @@ docs:
 ### Records Are More Than You Think
 
 Most developers know records as simple data holders:
-```java
 public record Point(int x, int y) {}
-```
 
 But records have powerful features that make them essential for real-world Java:
 
 ### Compact Constructors for Validation
 
-```java
 public record Range(int min, int max) {
     // Compact constructor — validates without duplicating field names
     public Range {
@@ -38,11 +35,9 @@ public record Range(int min, int max) {
     // Range valid = new Range(1, 10);     // OK
     // Range invalid = new Range(10, 5);   // Throws exception
 }
-```
 
 ### Records with Custom Methods
 
-```java
 public record Money(BigDecimal amount, Currency currency) {
     // Compact constructor with validation
     public Money {
@@ -74,11 +69,9 @@ public record Money(BigDecimal amount, Currency currency) {
         return currency.getCurrencyCode() + " " + amount;
     }
 }
-```
 
 ### Records as Map Keys
 
-```java
 public record Coordinate(int row, int col) {
     // Records automatically generate good equals() and hashCode()
     // Perfect for use as Map keys
@@ -90,11 +83,9 @@ grid.put(new Coordinate(1, 2), "Target");
 
 // Lookups work correctly because records have proper equals/hashCode
 String value = grid.get(new Coordinate(1, 2)); // "Target"
-```
 
 ### Records with Builder Pattern
 
-```java
 // Using Lombok
 @Builder
 public record CreateUserRequest(
@@ -110,11 +101,9 @@ CreateUserRequest request = CreateUserRequest.builder()
     .email("alice@example.com")
     .password("secret123")
     .build();
-```
 
 ### Records in Sealed Hierarchies
 
-```java
 // Records work perfectly with sealed classes
 public sealed interface Shape 
     permits Circle, Rectangle, Triangle {
@@ -141,7 +130,6 @@ static double area(Shape shape) {
         // No default needed — compiler knows all cases
     };
 }
-```
 
 ### Records vs Classes Decision Guide
 
@@ -182,3 +170,4 @@ A fintech company uses records extensively:
 - `AuditLog(userId, action, timestamp, details)` — immutable event record
 
 Every record validates in its compact constructor, making it impossible to create invalid objects. The immutable nature means they're safe to share across threads without synchronization.
+

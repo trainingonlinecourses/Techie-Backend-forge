@@ -1,7 +1,7 @@
 ---
 title: CacheManagers Compared
 module: spring-cache
-order: 4
+order: 3
 minutes: 20
 topics: ["ConcurrentMapCacheManager", "CaffeineCacheManager", "CompositeCacheManager", "JCache", "choosing"]
 summary: Spring's CacheManager is the plug point of the whole abstraction. Understand the four real options — and how to mix them — and you can pick the rig...
@@ -27,12 +27,10 @@ Spring's `CacheManager` is the plug point of the whole abstraction. Understand t
 
 The default. Zero configuration, unlimited size, no TTL — entries live until evicted or the JVM dies.
 
-```java
 @Bean
 public CacheManager cacheManager() {
     return new ConcurrentMapCacheManager("courses", "users");
 }
-```
 
 - ✅ No dependencies, works everywhere
 - ❌ No TTL, unbounded (memory leak risk), per-instance only
@@ -43,7 +41,6 @@ Use it only for development or trivial caches. Every production guide says the s
 
 Caffeine is the de facto in-memory cache for JVM apps — bounded, TTL-aware, with hit-rate statistics.
 
-```java
 @Bean
 public CacheManager cacheManager() {
     CaffeineCacheManager manager = new CaffeineCacheManager();
@@ -54,11 +51,9 @@ public CacheManager cacheManager() {
         .recordStats());
     return manager;
 }
-```
 
 Or per-region via `CaffeineCache` instances:
 
-```java
 @Bean
 public CacheManager cacheManager() {
     CaffeineCacheManager manager = new CaffeineCacheManager();
@@ -68,18 +63,20 @@ public CacheManager cacheManager() {
         Caffeine.newBuilder().maximumSize(1_000).expireAfterWrite(Duration.ofMinutes(5)).build());
     return manager;
 }
-```
 
 ### Reading Hit Rates
 
-```java
-Cache courses = cacheManager.getCache("courses");
-if (courses instanceof CaffeineCache caffeineCache) {
-    CacheStats stats = caffeineCache.getNativeCache().stats();
-    System.out.printf("hits=%d misses=%d hitRate=%.2f%n",
-        stats.hitCount(), stats.missCount(), stats.hitRate());
+public class Main {
+
+    public static void main(String[] args) {
+        Cache courses = cacheManager.getCache("courses");
+        if (courses instanceof CaffeineCache caffeineCache) {
+            CacheStats stats = caffeineCache.getNativeCache().stats();
+            System.out.printf("hits=%d misses=%d hitRate=%.2f%n",
+                stats.hitCount(), stats.missCount(), stats.hitRate());
+        }
+    }
 }
-```
 
 Expose this via an Actuator endpoint or Micrometer and you can see whether the cache actually helps.
 
@@ -108,18 +105,15 @@ JSR-107 is a Java standard; Ehcache 3 is the reference implementation. Configura
 </config>
 ```
 
-```java
 @Bean
 public JCacheCacheManager cacheManager(CacheManager jcache) {
     return new JCacheCacheManager(jcache);
 }
-```
 
 ## CompositeCacheManager: Mixing Stores
 
 Different data, different stores — one app, both:
 
-```java
 @Bean
 public CacheManager cacheManager(CacheManager caffeine, CacheManager redis) {
     CompositeCacheManager composite = new CompositeCacheManager();
@@ -127,7 +121,6 @@ public CacheManager cacheManager(CacheManager caffeine, CacheManager redis) {
     composite.setFallbackToNoOpCache(true);
     return composite;
 }
-```
 
 Reads check Redis first, then Caffeine. Note: composite managers are read-mostly; writes go to the first manager that has the cache.
 
@@ -135,7 +128,6 @@ Reads check Redis first, then Caffeine. Note: composite managers are read-mostly
 
 The entire point of the abstraction: switch stores without touching business code.
 
-```java
 // Dev profile: in-memory
 @Profile("dev")
 @Bean
@@ -149,7 +141,6 @@ public CacheManager devCacheManager() {
 public RedisCacheManager prodCacheManager(RedisConnectionFactory factory) {
     return RedisCacheManager.create(factory);
 }
-```
 
 Business code stays `@Cacheable("courses")` — the CacheManager is selected by profile at runtime.
 
@@ -157,7 +148,6 @@ Business code stays `@Cacheable("courses")` — the CacheManager is selected by 
 
 Sometimes you need cache access outside annotations:
 
-```java
 @Service
 public class CacheAdminService {
 
@@ -179,7 +169,6 @@ public class CacheAdminService {
             : Optional.ofNullable(cache.get(key, Object.class));
     }
 }
-```
 
 ## Summary
 
@@ -192,3 +181,4 @@ public class CacheAdminService {
 | Mixed workloads | CompositeCacheManager |
 
 The abstraction exists so this decision is a configuration choice, not a rewrite. Pick Caffeine for single-node, Redis for scale-out, and Composite when both workloads coexist.
+

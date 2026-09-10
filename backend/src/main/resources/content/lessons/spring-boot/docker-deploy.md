@@ -1,7 +1,7 @@
 ---
 title: Dockerizing Spring Boot — From JAR to Container
 summary: Multi-stage Dockerfiles, layer caching, Jib vs Dockerfile, .dockerignore, health checks, and how organizations build production-ready containers with minimal image size and fast builds.
-order: 39
+order: 23
 minutes: 20
 topics: [docker, dockerfile, multi-stage-build, layer-caching, jib, container, health-check, image-size, dockerignore]
 docs:
@@ -236,3 +236,4 @@ jobs:
 | Not setting JVM memory flags | OOMKilled by Docker |
 | No health check | Orchestrator cannot detect unhealthy containers |
 | `COPY . .` before `pom.xml` | Breaks layer caching — rebuilds everything |
+

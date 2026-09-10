@@ -1,7 +1,7 @@
 ---
 title: NumberFormatException — Parsing Failures and Safe Conversion
 summary: What causes NumberFormatException, safe parsing with try-catch, optional-based parsing, input validation patterns, and locale-aware number parsing.
-order: 5
+order: 3
 minutes: 10
 topics: [numberformatexception, parsing, validation, optional, locale, safe-conversion]
 docs:
@@ -12,11 +12,9 @@ docs:
 
 `NumberFormatException` is thrown when you try to parse a string that isn't a valid number. It's one of the most common runtime exceptions in Java.
 
-```java
 int num = Integer.parseInt("42");   // OK
 int bad = Integer.parseInt("abc");  // NumberFormatException!
 int also = Integer.parseInt("12.5"); // NumberFormatException — no decimals for int
-```
 
 ---
 
@@ -24,17 +22,19 @@ int also = Integer.parseInt("12.5"); // NumberFormatException — no decimals fo
 
 ### Try-Catch
 
-```java
-try {
-    int value = Integer.parseInt(input);
-} catch (NumberFormatException e) {
-    System.out.println("Invalid number: " + input);
+public class Main {
+
+    public static void main(String[] args) {
+        try {
+            int value = Integer.parseInt(input);
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid number: " + input);
+        }
+    }
 }
-```
 
 ### Optional-Based
 
-```java
 Optional<Integer> parsed = Optional.ofNullable(input)
     .filter(s -> !s.isBlank())
     .flatMap(s -> {
@@ -43,11 +43,9 @@ Optional<Integer> parsed = Optional.ofNullable(input)
     });
 
 int value = parsed.orElse(0);  // default to 0
-```
 
 ### Apache Commons / Guava
 
-```java
 // Apache Commons Lang
 int value = NumberUtils.toInt(input, -1);  // returns -1 if invalid
 
@@ -55,13 +53,11 @@ int value = NumberUtils.toInt(input, -1);  // returns -1 if invalid
 try {
     int value = Ints.tryParse(input);  // returns null if invalid
 } catch (Exception e) { ... }
-```
 
 ---
 
 ## Line-by-Line Walkthrough
 
-```java
 import java.util.*;
 
 public class NumberParsingDemo {
@@ -118,7 +114,6 @@ public class NumberParsingDemo {
         }
     }
 }
-```
 
 ---
 
@@ -131,3 +126,4 @@ public class NumberParsingDemo {
 | Not trimming whitespace | " 42 " fails parseInt | Trim before parsing |
 | Ignoring locale | "1,234" fails in US locale | Use locale-aware parsing |
 | Parsing user input without validation | Security risk (injection) | Validate range after parsing |
+

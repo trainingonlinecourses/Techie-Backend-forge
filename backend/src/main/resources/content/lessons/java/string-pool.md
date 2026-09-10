@@ -1,7 +1,7 @@
 ---
 title: The String Constant Pool — Why == Fails and Intern Saves Memory
 summary: How Java's string interning works, the heap vs pool distinction, when == gives wrong answers, String.intern(), and why modern code avoids the pool for performance.
-order: 62
+order: 75
 minutes: 20
 topics: [string-pool, string-intern, string-literal, heap-string, ==-vs-equals, string-caching]
 docs:
@@ -33,37 +33,73 @@ This is why `"Hello" == "Hello"` is `true` (same pool reference) but `new String
 
 ## How it works in code
 
+
+**What this code does — step by step:**
+
+1. LITERALS — both point to the SAME pool entry
+2. `String a = "Hello";` — creates "Hello" in the pool, a points to it
+3. `String b = "Hello";` — pool already has "Hello", b points to the SAME entry
+4. `System.out.println(a == b);` — true — same reference
+5. `System.out.println(a.equals(b));` — true — same characters
+6. NEW KEYWORD — always creates a separate heap object
+7. `String c = new String("Hello");` — new object on the heap, NOT in pool
+8. `String d = new String("Hello");` — another new object on the heap
+9. `System.out.println(c == d);` — false — two different objects!
+10. `System.out.println(c.equals(d));` — true — same characters, different objects
+11. MIXED — literal and new are never the same reference
+12. `System.out.println(a == c);` — false — pool vs heap
+13. `System.out.println(a.equals(c));` — true — same characters
+
+The same code, clean:
+
 ```java
-// LITERALS — both point to the SAME pool entry
-String a = "Hello";          // creates "Hello" in the pool, a points to it
-String b = "Hello";          // pool already has "Hello", b points to the SAME entry
-System.out.println(a == b);   // true — same reference
-System.out.println(a.equals(b)); // true — same characters
+public class Main {
 
-// NEW KEYWORD — always creates a separate heap object
-String c = new String("Hello");  // new object on the heap, NOT in pool
-String d = new String("Hello");  // another new object on the heap
-System.out.println(c == d);       // false — two different objects!
-System.out.println(c.equals(d));  // true — same characters, different objects
+    public static void main(String[] args) {
+        String a = "Hello";
+        String b = "Hello";
+        System.out.println(a == b);
+        System.out.println(a.equals(b));
 
-// MIXED — literal and new are never the same reference
-System.out.println(a == c);       // false — pool vs heap
-System.out.println(a.equals(c));  // true — same characters
+        String c = new String("Hello");
+        String d = new String("Hello");
+        System.out.println(c == d);
+        System.out.println(c.equals(d));
+
+        System.out.println(a == c);
+        System.out.println(a.equals(c));
+    }
+}
 ```
 
 **Why does this matter?** Because if your code uses `==` to compare strings (a very common beginner bug), it works for literals but breaks when strings come from user input, databases, or network — those are always heap objects.
 
 ## String.intern() — manually entering the pool
 
+
+**What this code does — step by step:**
+
+1. `String userinput = new String("Hello");` — heap object (from database, API, etc.)
+2. `String literal = "Hello";` — pool reference
+3. `System.out.println(userinput == literal);` — false — different objects
+4. intern() checks the pool: if "Hello" exists, returns pool reference
+5. `System.out.println(interned == literal);` — true — now both point to pool entry
+
+The same code, clean:
+
 ```java
-String userinput = new String("Hello");   // heap object (from database, API, etc.)
-String literal = "Hello";                  // pool reference
+public class Main {
 
-System.out.println(userinput == literal);  // false — different objects
+    public static void main(String[] args) {
+        String userinput = new String("Hello");
+        String literal = "Hello";
 
-// intern() checks the pool: if "Hello" exists, returns pool reference
-String interned = userinput.intern();
-System.out.println(interned == literal);   // true — now both point to pool entry
+        System.out.println(userinput == literal);
+
+        String interned = userinput.intern();
+        System.out.println(interned == literal);
+    }
+}
 ```
 
 **How intern() works step by step:**
@@ -73,14 +109,12 @@ System.out.println(interned == literal);   // true — now both point to pool en
 
 ## The hidden cost — memory leak trap
 
-```java
 // DANGER: intern() in a loop can fill the pool and crash the JVM
 for (int i = 0; i < 1_000_000; i++) {
     String unique = new String("user-" + i);  // each is unique content
     unique.intern();   // adds to pool — but pool has limited memory!
     // After ~500K unique strings, you get OutOfMemoryError: Metaspace
 }
-```
 
 **Why this happens:** The pool lives in Metaspace (native memory), which is limited. Each interned string stays forever (or until GC runs a Full GC). In a loop creating millions of unique strings, the pool explodes.
 
@@ -99,17 +133,25 @@ The pool still exists and still saves memory for repeated literals. But explicit
 
 A common production bug: comparing a string from a database with a literal:
 
+
+**What this code does — step by step:**
+
+1. `private static final String STATUS_ACTIVE = "ACTIVE";` — literal — in pool
+2. BUG: order.getStatus() comes from the database — it's a heap object. == will be FALSE even though the content is "ACTIVE"!
+3. `return order.getStatus() == STATUS_ACTIVE;` — WRONG!
+4. CORRECT: use equals()
+5. `return STATUS_ACTIVE.equals(order.getStatus());` — RIGHT!
+
+The same code, clean:
+
 ```java
 public class OrderService {
-    private static final String STATUS_ACTIVE = "ACTIVE";  // literal — in pool
+    private static final String STATUS_ACTIVE = "ACTIVE";
 
     public boolean isActive(Order order) {
-        // BUG: order.getStatus() comes from the database — it's a heap object
-        // == will be FALSE even though the content is "ACTIVE"!
-        return order.getStatus() == STATUS_ACTIVE;  // WRONG!
+        return order.getStatus() == STATUS_ACTIVE;
 
-        // CORRECT: use equals()
-        return STATUS_ACTIVE.equals(order.getStatus());  // RIGHT!
+        return STATUS_ACTIVE.equals(order.getStatus());
     }
 }
 ```
@@ -118,22 +160,30 @@ public class OrderService {
 
 ### Scenario 2: Enums already solve this — don't intern status strings
 
+
+**What this code does — step by step:**
+
+1. BAD: stringly-typed status (pool issues, typos, == comparison bugs)
+2. `private String status;` — "ACTIVE", "SHIPPED", "CANCELLED"
+3. GOOD: enum (== works perfectly, no typos possible, type-safe)
+4. `private OrderStatus status;` — OrderStatus.ACTIVE — no string issues ever
+5. Now == is perfectly safe
+
+The same code, clean:
+
 ```java
-// BAD: stringly-typed status (pool issues, typos, == comparison bugs)
 public class Order {
-    private String status;  // "ACTIVE", "SHIPPED", "CANCELLED"
+    private String status;
 }
 
-// GOOD: enum (== works perfectly, no typos possible, type-safe)
 public enum OrderStatus {
     ACTIVE, SHIPPED, CANCELLED, REFUNDED
 }
 
 public class Order {
-    private OrderStatus status;  // OrderStatus.ACTIVE — no string issues ever
+    private OrderStatus status;
 }
 
-// Now == is perfectly safe
 if (order.getStatus() == OrderStatus.ACTIVE) { ... }
 ```
 
@@ -141,7 +191,6 @@ if (order.getStatus() == OrderStatus.ACTIVE) { ... }
 
 When processing millions of strings with many duplicates (like log file analysis), interning can save significant memory:
 
-```java
 public class LogProcessor {
     private static final int EXPECTED_UNIQUE_LEVELS = 5;
 
@@ -161,7 +210,6 @@ public class LogProcessor {
         // With intern: only 1 String object for "INFO", shared by all entries
     }
 }
-```
 
 **When this is actually useful:**
 - Processing CSV/JSON files with millions of rows and few unique values in certain columns.
@@ -170,20 +218,27 @@ public class LogProcessor {
 
 ### Scenario 4: equals() vs == in production code
 
+
+**What this code does — step by step:**
+
+1. User input comes from HTTP request — always heap string. NEVER use == here!
+2. `.filter(u -> u.getRole().equals(roleInput))` — content comparison
+3. For enums, == is safe and faster
+4. `return user.getRole() == Role.ADMIN;` — enum comparison — OK!
+
+The same code, clean:
+
 ```java
 public class UserService {
     public User findByRole(String roleInput) {
-        // User input comes from HTTP request — always heap string
-        // NEVER use == here!
         return users.stream()
-            .filter(u -> u.getRole().equals(roleInput))  // content comparison
+            .filter(u -> u.getRole().equals(roleInput))
             .findFirst()
             .orElse(null);
     }
 
-    // For enums, == is safe and faster
     public boolean isAdmin(User user) {
-        return user.getRole() == Role.ADMIN;  // enum comparison — OK!
+        return user.getRole() == Role.ADMIN;
     }
 }
 ```
@@ -207,3 +262,4 @@ public class UserService {
 | Using `intern()` instead of an enum for status codes | Unnecessary complexity + pool pollution |
 | Forgetting that `"a" + "b"` creates a new literal, not interned | Works fine (compiler optimizes), but `new String("ab")` wouldn't be |
 | Switching from `==` to `.equals()` on enums | Wasteful `.equals()` when `==` is correct and faster |
+

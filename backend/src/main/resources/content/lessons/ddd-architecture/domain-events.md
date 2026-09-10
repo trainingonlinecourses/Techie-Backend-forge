@@ -1,7 +1,7 @@
 ---
 title: Domain Events and Event-Driven DDD
 module: ddd-architecture
-order: 5
+order: 4
 minutes: 25
 topics: ["domain events", "event storming", "event sourcing intro", "CQRS intro", "eventual consistency"]
 summary: Domain events turn aggregates from objects that change into objects that announce changes. They're the bridge between DDD's consistency boundaries ...
@@ -18,14 +18,12 @@ Domain events turn aggregates from objects that change into objects that *announ
 
 A domain event is a **fact in the past tense** — something that happened, captured as data:
 
-```java
 public record OrderPlaced(
     OrderId orderId,
     Long customerId,
     Money total,
     Instant occurredAt
 ) {}
-```
 
 Events are immutable facts: they describe *what happened*, not what to do. Whoever receives them decides.
 
@@ -36,7 +34,6 @@ Emit an event when **the business cares**:
 - Order placed, payment authorized, shipment dispatched
 - NOT "row updated", "setter called" — those are implementation details
 
-```java
 public class Order {
 
     public void confirm() {
@@ -53,13 +50,11 @@ public class Order {
         return drained;
     }
 }
-```
 
 ## Publishing After Commit
 
 The critical rule: **publish after the transaction commits** — otherwise listeners see phantom state.
 
-```java
 @Transactional
 public OrderId placeOrder(PlaceOrderCommand cmd) {
     Order order = new Order(customerId);
@@ -77,20 +72,16 @@ public OrderId placeOrder(PlaceOrderCommand cmd) {
         });
     return id;
 }
-```
 
 Or declaratively with Spring:
 
-```java
 @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
 public void onOrderPlaced(OrderPlaced event) {
     loyaltyService.awardPoints(event.customerId(), event.total());
 }
-```
 
 ## The Event Handlers
 
-```java
 @Component
 public class OrderEventHandlers {
 
@@ -111,7 +102,6 @@ public class OrderEventHandlers {
         fraudService.evaluate(event.orderId());
     }
 }
-```
 
 Each handler is independent — one failing doesn't stop the others (async + after-commit).
 
@@ -124,7 +114,6 @@ Order 123: [OrderPlaced, PaymentAuthorized, ItemShipped]
 Current state = fold(events) = SHIPPED
 ```
 
-```java
 public class Order {
     private OrderStatus status;
     private final List<Object> applied = new ArrayList<>();
@@ -144,7 +133,6 @@ public class Order {
         }
     }
 }
-```
 
 ### The Trade-Offs
 
@@ -165,7 +153,6 @@ Write side: Command → Aggregate → Domain Events → Event Store
 Read side:  Read Model (denormalized tables, ES indexes) → Queries
 ```
 
-```java
 // Write side — commands mutate the aggregate
 public void placeOrder(PlaceOrderCommand cmd) { ... }
 
@@ -175,7 +162,6 @@ public record OrderSummary(Long orderId, String status, int lineCount) {}
 public List<OrderSummary> recentOrders(Long customerId) {
     return readModelRepository.findByCustomerIdOrderByPlacedAtDesc(customerId);
 }
-```
 
 The read model is denormalized for queries — no joins, no locking, no aggregate rules. Projections rebuild it from the event stream.
 
@@ -187,10 +173,8 @@ The workshop technique: domain experts + engineers post **orange sticky notes (e
 
 Events outlive code. Version them:
 
-```java
 public record OrderPlacedV2(OrderId orderId, Long customerId, Money total,
                             String currency, Instant occurredAt) {}
-```
 
 Or add `eventVersion` and keep the parser tolerant — consumers must handle old versions during rollout.
 
@@ -216,3 +200,4 @@ Or add `eventVersion` and keep the parser tolerant — consumers must handle old
 | Event storming | Workshop to discover the events |
 
 Domain events are the connective tissue of DDD: aggregates stay small and consistent while the rest of the system reacts to what happened. When the events themselves become the storage (event sourcing) and the queries split off (CQRS), you've graduated from event-driven DDD to a full event-driven architecture — powerful, and worth it only when the requirements demand the audit trail, replay, or read/write separation.
+

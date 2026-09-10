@@ -1,7 +1,7 @@
 ---
 title: RestClient Configuration — Timeouts, Errors, and Interceptors
 module: spring-rest-clients
-order: 2
+order: 3
 minutes: 25
 topics: ["timeouts", "onStatus", "interceptors", "error handlers", "ClientHttpRequestInterceptor"]
 summary: A bare RestClient call works great when the server responds quickly with 200. Production is when the server is slow, down, or returns errors — and ...
@@ -21,6 +21,17 @@ A bare `RestClient` call works great when the server responds quickly with 200. 
 - **Interceptors** — cross-cutting behavior for every request: logging, auth headers, correlation IDs, retries.
 
 ## The Code Walkthrough
+
+
+**What this code does — step by step:**
+
+1. ---- 1. Timeouts on the underlying HTTP client ----
+2. ---- 2. Log every request/response (debug) ----
+3. ---- 3. Map HTTP errors to domain exceptions ----
+4. An interceptor that logs each outgoing request
+5. `var response = execution.execute(request, body);` — perform the call
+
+The same code, clean:
 
 ```java
 import org.springframework.boot.web.client.ClientHttpRequestFactorySettings;
@@ -43,15 +54,12 @@ public class RestClientConfig {
         return builder
                 .baseUrl("https://catalog.example.com")
 
-                // ---- 1. Timeouts on the underlying HTTP client ----
                 .requestFactory(ClientHttpRequestFactorySettings.defaults()
                         .withConnectTimeout(Duration.ofSeconds(3))
                         .withReadTimeout(Duration.ofSeconds(10)))
 
-                // ---- 2. Log every request/response (debug) ----
                 .requestInterceptor(loggingInterceptor())
 
-                // ---- 3. Map HTTP errors to domain exceptions ----
                 .defaultStatusHandler(HttpStatusCode::is4xxClientError, (req, res) -> {
                     throw new CatalogNotFoundException(
                             "Catalog returned " + res.getStatusCode() + " for " + req.getURI());
@@ -59,12 +67,11 @@ public class RestClientConfig {
                 .build();
     }
 
-    // An interceptor that logs each outgoing request
     private ClientHttpRequestInterceptor loggingInterceptor() {
         return (request, body, execution) -> {
             System.out.println("→ " + request.getMethod() + " " + request.getURI());
             long start = System.nanoTime();
-            var response = execution.execute(request, body);      // perform the call
+            var response = execution.execute(request, body);
             System.out.println("← " + response.getStatusCode() + " in "
                     + (System.nanoTime() - start) / 1_000_000 + "ms");
             return response;
@@ -100,7 +107,6 @@ Retry logic (covered in depth in the resilience module) composes with RestClient
 
 A minimal interceptor-based retry:
 
-```java
 ClientHttpRequestInterceptor retryInterceptor() {
     return (request, body, execution) -> {
         for (int attempt = 1; ; attempt++) {
@@ -113,18 +119,15 @@ ClientHttpRequestInterceptor retryInterceptor() {
         }
     };
 }
-```
 
 **Important:** retry only **idempotent** requests (GET, PUT, DELETE — safe to repeat). Never blindly retry a POST that creates a resource without idempotency keys (see the idempotency lesson in REST best practices).
 
 ## Headers You Should Always Consider
 
-```java
 // Set once on the client:
 .defaultHeader("Accept", "application/json")
 .defaultHeader("User-Agent", "academy-backend/1.0")
 .defaultHeader("X-Correlation-Id", () -> java.util.UUID.randomUUID().toString())
-```
 
 The `X-Correlation-Id` (or `traceparent`) header is how you **correlate logs across services**: your app generates an ID per inbound request and passes it to outbound calls, so logs from service A and service B can be stitched together. Propagate it via an interceptor (Part 2) so every outbound call carries it automatically.
 
@@ -145,3 +148,4 @@ The `X-Correlation-Id` (or `traceparent`) header is how you **correlate logs acr
 - Retry idempotent requests only (GET/PUT/DELETE), never bare POSTs.
 - Propagate correlation IDs so multi-service failures are traceable.
 - Configure per-client, not one-size-fits-all.
+

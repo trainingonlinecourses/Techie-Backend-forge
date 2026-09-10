@@ -1,7 +1,7 @@
 ---
 title: YAML Configuration — Structured and Readable
 module: spring-configuration
-order: 3
+order: 5
 minutes: 22
 topics: ["YAML", "application.yml", "structured config", "lists and maps", "multi-document"]
 summary: application.properties is a flat list of key=value lines. As config grows, that gets repetitive and hard to group:
@@ -81,7 +81,6 @@ app:
     - ops@example.com
 ```
 
-```java
 // ---- Bind the structured config to a typed object ----
 @Component
 @ConfigurationProperties(prefix = "app")
@@ -97,7 +96,6 @@ public class AppFeatures {
     }
     // getters & setters...
 }
-```
 
 ### Walking Through Each Part
 
@@ -156,3 +154,4 @@ Both formats are equivalent to Spring — **choose one per project and be consis
 - Indentation is the syntax — spaces, never tabs; wrong indentation binds to nothing.
 - YAML and properties are interchangeable to Spring; pick one, stay consistent.
 - Same secret rules apply: `${VAR}` placeholders, never committed credentials.
+

@@ -1,7 +1,7 @@
 ---
 title: Distributed Data Consistency — The Complete Guide
 summary: Choosing a consistency model — ACID within a service, eventual consistency between them, and the idempotency + reconciliation toolkit. Beginner-friendly with line-by-line code.
-order: 5
+order: 2
 minutes: 25
 topics: [eventual consistency, idempotency, reconciliation, cap theorem, distributed data, saga, distributed lock, versioned state]
 docs:
@@ -45,6 +45,17 @@ Since network failures are inevitable, you **must** have partition tolerance. So
 
 When a payment fails due to a timeout, the client retries. Without idempotency, the customer gets charged twice. With an idempotency key, the retry returns the same result.
 
+
+**What this code does — step by step:**
+
+1. `@RequestHeader("Idempotency-Key") String idempotencyKey` — Client sends a unique key
+2. Check if we've already processed this exact request
+3. `return ResponseEntity.ok(previous.get());` — Return cached result — no duplicate charge
+4. First time seeing this key — process the payment
+5. Cache the result with the key — next retry hits this
+
+The same code, clean:
+
 ```java
 @RestController
 public class PaymentController {
@@ -54,18 +65,15 @@ public class PaymentController {
     @PostMapping("/payments/charge")
     public ResponseEntity<PaymentResult> charge(
             @RequestBody PaymentRequest request,
-            @RequestHeader("Idempotency-Key") String idempotencyKey  // Client sends a unique key
+            @RequestHeader("Idempotency-Key") String idempotencyKey
     ) {
-        // Check if we've already processed this exact request
         Optional<PaymentResult> previous = paymentStore.findByKey(idempotencyKey);
         if (previous.isPresent()) {
-            return ResponseEntity.ok(previous.get());   // Return cached result — no duplicate charge
+            return ResponseEntity.ok(previous.get());
         }
 
-        // First time seeing this key — process the payment
         PaymentResult result = paymentService.process(request);
 
-        // Cache the result with the key — next retry hits this
         paymentStore.save(idempotencyKey, result, Duration.ofHours(24));
 
         return ResponseEntity.ok(result);
@@ -81,16 +89,29 @@ public class PaymentController {
 
 ### 2. Optimistic Locking (Concurrent Updates Don't Corrupt Data)
 
+
+**What this code does — step by step:**
+
+1. `@Version` — JPA optimistic lock
+2. `private Long version;` — Incremented on every save
+3. `private String status;` — PENDING, PAID, SHIPPED
+4. `throw new IllegalStateException("Can't ship unpaid order");` — Business rule
+5. `order.setStatus("SHIPPED");` — Change the state
+6. `orderRepository.save(order);` — JPA checks @Version — if another
+7. `} catch (OptimisticConcurrencyException e) {` — thread saved first, this fails
+
+The same code, clean:
+
 ```java
 @Entity
 public class Order {
     @Id
     private String id;
 
-    @Version                                          // JPA optimistic lock
-    private Long version;                              // Incremented on every save
+    @Version
+    private Long version;
 
-    private String status;                             // PENDING, PAID, SHIPPED
+    private String status;
     private BigDecimal total;
 }
 
@@ -102,14 +123,14 @@ public class OrderService {
             .orElseThrow(() -> new NotFoundException("Order not found"));
 
         if (!"PAID".equals(order.getStatus())) {
-            throw new IllegalStateException("Can't ship unpaid order");  // Business rule
+            throw new IllegalStateException("Can't ship unpaid order");
         }
 
-        order.setStatus("SHIPPED");                   // Change the state
+        order.setStatus("SHIPPED");
 
         try {
-            orderRepository.save(order);              // JPA checks @Version — if another
-        } catch (OptimisticConcurrencyException e) {  // thread saved first, this fails
+            orderRepository.save(order);
+        } catch (OptimisticConcurrencyException e) {
             throw new ConflictException("Order was modified by another user — retry");
         }
     }
@@ -122,14 +143,23 @@ public class OrderService {
 
 ### 3. The Reconciliation Job (The Safety Net)
 
+
+**What this code does — step by step:**
+
+1. `@Scheduled(cron = "0 0 2 * * ?")` — Run at 2 AM daily
+2. Find orders marked as PAID but with no matching payment record
+3. Option 1: Check payment service directly. Option 2: Re-trigger the payment flow. Option 3: Flag for manual review
+4. Find payments with no matching order
+
+The same code, clean:
+
 ```java
 @Component
 public class OrderPaymentReconciler {
 
-    @Scheduled(cron = "0 0 2 * * ?")   // Run at 2 AM daily
+    @Scheduled(cron = "0 0 2 * * ?")
     @Transactional
     public void reconcile() {
-        // Find orders marked as PAID but with no matching payment record
         List<Order> orphaned = jdbc.query(
             "SELECT o.* FROM orders o " +
             "LEFT JOIN payments p ON o.id = p.order_id " +
@@ -139,13 +169,9 @@ public class OrderPaymentReconciler {
 
         for (Order order : orphaned) {
             log.warn("Order {} marked PAID but no payment found — investigating", order.getId());
-            // Option 1: Check payment service directly
-            // Option 2: Re-trigger the payment flow
-            // Option 3: Flag for manual review
             alertService.send("Reconciliation: Order " + order.getId() + " needs review");
         }
 
-        // Find payments with no matching order
         List<Payment> orphanedPayments = jdbc.query(
             "SELECT p.* FROM payments p " +
             "LEFT JOIN orders o ON p.order_id = o.id " +
@@ -189,7 +215,6 @@ User changes their email. The profile service saves it, but the search index tak
 - For 5 seconds, searching by the new email won't find the user — this is acceptable (eventual consistency).
 - The user themselves sees their new email immediately (read-your-writes).
 
-```java
 // The profile service guarantees read-your-writes by reading from its own DB
 // for the next few seconds, and falling back to the search index after
 public User findByEmail(String email) {
@@ -197,11 +222,9 @@ public User findByEmail(String email) {
     return profileRepository.findByEmail(email)
         .orElseGet(() -> searchIndex.findByEmail(email));   // Fall back to eventual index
 }
-```
 
 ### Scenario 3: Distributed Lock for Critical Operations
 
-```java
 @Service
 public class InventoryService {
 
@@ -228,7 +251,6 @@ public class InventoryService {
         }
     }
 }
-```
 
 **Line-by-line explained:**
 - `redisson.getLock("inventory:" + productId)` — Creates a distributed lock for this specific product. Only one service instance can hold it at a time.
@@ -242,18 +264,14 @@ public class InventoryService {
 
 Every cross-service flow should have a consistency decision table:
 
+
+**What this code does — step by step:**
+
+1. Part of the design review document: . Flow: Place Order → Charge Payment → Ship. . Step | Consistency | Max Skew | Reconciliation. ------------------|---------------|-----------|----------------. Order + Outbox | Atomic | 0ms | None (same TX). Payment charge | Idempotent | 30s | PaymentReconciler. Mark order PAID | Eventual | 5min | OrderReconciler. Ship item | Eventual | 15min | InventoryReconciler. Send email | Best-effort | 1hr | DeadLetterHandler
+
+The same code, clean:
+
 ```java
-// Part of the design review document:
-//
-// Flow: Place Order → Charge Payment → Ship
-//
-// Step              | Consistency   | Max Skew  | Reconciliation
-// ------------------|---------------|-----------|----------------
-// Order + Outbox    | Atomic        | 0ms       | None (same TX)
-// Payment charge    | Idempotent    | 30s       | PaymentReconciler
-// Mark order PAID   | Eventual      | 5min      | OrderReconciler
-// Ship item         | Eventual      | 15min     | InventoryReconciler
-// Send email        | Best-effort   | 1hr       | DeadLetterHandler
 ```
 
 ---
@@ -280,3 +298,4 @@ Every cross-service flow should have a consistency decision table:
 - Most "distributed consistency" incidents are **missing idempotency and reconciliation**, not missing theoretical guarantees.
 
 Official docs: [Data patterns (microservices.io)](https://microservices.io/patterns/data/index.html) · [Patterns of Distributed Systems (Fowler)](https://martinfowler.com/articles/patterns-of-distributed-systems/)
+

@@ -1,7 +1,7 @@
 ---
 title: Refresh Tokens — Staying Logged In Safely
 module: spring-security-jwt-deep
-order: 4
+order: 5
 minutes: 27
 topics: ["refresh tokens", "token rotation", "revocation", "logout", "sliding sessions"]
 summary: A single longlived JWT is a liability: a stolen token works until expiry, and you can't revoke it (stateless). A single shortlived token is a UX ni...
@@ -39,6 +39,21 @@ The security math: a stolen access token is useful for minutes (bounded blast ra
 
 ## The Code Walkthrough
 
+
+**What this code does — step by step:**
+
+1. `private final TokenService tokenService;` — issues access tokens (previous lesson)
+2. Called at login: create a refresh token record
+3. `UUID.randomUUID().toString(),` — unguessable token value
+4. `Instant.now().plusSeconds(30 * 24 * 3600));` — 30 days
+5. Called at /api/auth/refresh: validate + rotate
+6. `repository.delete(stored);` — expired — clean up
+7. ROTATION: the old token is dead the moment it's used
+8. `repository.save(stored.withToken(newRefresh));` — new token, same user, fresh expiry
+9. `repository.deleteByToken(refreshTokenValue);` — logout = delete the record
+
+The same code, clean:
+
 ```java
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,38 +65,35 @@ import java.util.UUID;
 public class RefreshTokenService {
 
     private final RefreshTokenRepository repository;
-    private final TokenService tokenService;      // issues access tokens (previous lesson)
+    private final TokenService tokenService;
 
     public RefreshTokenService(RefreshTokenRepository repo, TokenService tokens) {
         this.repository = repo; this.tokenService = tokens;
     }
 
-    // Called at login: create a refresh token record
     @Transactional
     public RefreshToken issue(User user) {
         RefreshToken rt = new RefreshToken(
-                UUID.randomUUID().toString(),     // unguessable token value
+                UUID.randomUUID().toString(),
                 user.getId(),
-                Instant.now().plusSeconds(30 * 24 * 3600));   // 30 days
+                Instant.now().plusSeconds(30 * 24 * 3600));
         return repository.save(rt);
     }
 
-    // Called at /api/auth/refresh: validate + rotate
     @Transactional
     public TokenPair refresh(String refreshTokenValue) {
         RefreshToken stored = repository.findByToken(refreshTokenValue)
                 .orElseThrow(() -> new InvalidTokenException("unknown refresh token"));
 
         if (stored.getExpiresAt().isBefore(Instant.now())) {
-            repository.delete(stored);            // expired — clean up
+            repository.delete(stored);
             throw new InvalidTokenException("refresh token expired");
         }
 
-        // ROTATION: the old token is dead the moment it's used
         repository.delete(stored);
 
         String newRefresh = UUID.randomUUID().toString();
-        repository.save(stored.withToken(newRefresh));   // new token, same user, fresh expiry
+        repository.save(stored.withToken(newRefresh));
 
         String newAccess = tokenService.issueToken(userService.load(stored.getUserId()));
         return new TokenPair(newAccess, newRefresh);
@@ -89,7 +101,7 @@ public class RefreshTokenService {
 
     @Transactional
     public void revoke(String refreshTokenValue) {
-        repository.deleteByToken(refreshTokenValue);    // logout = delete the record
+        repository.deleteByToken(refreshTokenValue);
     }
 }
 ```
@@ -156,3 +168,4 @@ Even with refresh tokens, the access token itself is stateless: **its `exp` is t
 - Store refresh tokens in HttpOnly cookies; access tokens in memory.
 - Cap absolute session lifetime; detect reuse; rate-limit the refresh endpoint.
 - This is the standard session model behind most modern auth — and the pattern Spring Security's OAuth2 login (and the login in this academy app) builds on.
+

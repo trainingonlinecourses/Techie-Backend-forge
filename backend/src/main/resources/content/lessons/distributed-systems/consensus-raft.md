@@ -103,7 +103,6 @@ This is the mechanism that prevents two leaders in a network partition: the mino
 
 ## Using Consensus From Spring
 
-```java
 // etcd — distributed lock / leader election
 @Component
 public class LeaderElector {
@@ -121,7 +120,6 @@ public class LeaderElector {
         }
     }
 }
-```
 
 The leader election pattern behind ShedLock's Redis/etcd providers — the consensus system is what makes "exactly one node runs the job" true even across partitions.
 
@@ -150,7 +148,6 @@ Client reads from any node (may be slightly stale) unless sync read
 
 ## Testing Quorum Behavior
 
-```java
 @Test
 void writeFailsWithoutQuorum() {
     // With a 3-node etcd where one node is down:
@@ -159,7 +156,6 @@ void writeFailsWithoutQuorum() {
     assertThrows(EtcdException.class,
         () -> client.put(KEY, VALUE).get());
 }
-```
 
 ## Summary
 
@@ -174,3 +170,4 @@ void writeFailsWithoutQuorum() {
 | Rule | Never implement consensus yourself |
 
 Consensus is how distributed systems get a single source of truth: a leader, a replicated log, and a majority rule that survives partitions and failures. Use etcd or ZooKeeper for leadership, locks, and config — and remember every consensus write costs a quorum round-trip, which is the price of the guarantee.
+

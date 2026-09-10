@@ -1,7 +1,7 @@
 ---
 title: Volumes and Networks — State and Connectivity
 module: docker-deep
-order: 4
+order: 5
 minutes: 24
 topics: ["volumes", "bind mounts", "bridge networks", "container networking", "data persistence"]
 summary: Two facts shape everything about running containers:
@@ -140,3 +140,4 @@ volumes:
 - The db lives on the internal network with no host ports; the backend is the single entry point.
 - Data survives `down` but not `down -v` — treat `-v` with respect.
 - Inside a network, reach services by name, not `localhost`.
+

@@ -1,7 +1,7 @@
 ---
 title: Advanced Projects — CQRS, Event Sourcing, Saga, and Distributed Patterns
 summary: Build 5 advanced distributed system projects — CQRS Order System, Event Sourcing Bank, Saga Orchestration, Distributed Configuration, and Service Mesh — each demonstrating production-grade patterns for complex domains.
-order: 3
+order: 1
 minutes: 150
 topics: [cqrs, event-sourcing, saga, distributed-config, service-mesh, advanced-patterns]
 docs:
@@ -32,7 +32,6 @@ Commands (Write)          Queries (Read)
 ### Command Side
 
 **PlaceOrderCommand.java**
-```java
 package com.backendforge.cqrs.command;
 
 import java.math.BigDecimal;
@@ -64,10 +63,8 @@ public class PlaceOrderCommand {
         public void setPrice(BigDecimal price) { this.price = price; }
     }
 }
-```
 
 **OrderAggregate.java**
-```java
 package com.backendforge.cqrs.command;
 
 import com.backendforge.cqrs.common.DomainEvent;
@@ -149,12 +146,10 @@ public class OrderAggregate {
         public BigDecimal getPrice() { return price; }
     }
 }
-```
 
 ### Event Store
 
 **EventStore.java**
-```java
 package com.backendforge.cqrs.eventstore;
 
 import com.backendforge.cqrs.common.DomainEvent;
@@ -190,12 +185,10 @@ public class EventStore {
             .toList();
     }
 }
-```
 
 ### Query Side
 
 **OrderQueryService.java**
-```java
 package com.backendforge.cqrs.query;
 
 import org.springframework.stereotype.Service;
@@ -240,7 +233,6 @@ public class OrderQueryService {
         readRepository.save(view);
     }
 }
-```
 
 ---
 
@@ -265,7 +257,6 @@ Traditional:        Event Sourcing:
 ### BankAccount Aggregate
 
 **BankAccount.java**
-```java
 package com.backendforge.bankservice.aggregate;
 
 import com.backendforge.bankservice.event.*;
@@ -362,7 +353,6 @@ public class BankAccount {
     public List<DomainEvent> getChanges() { return changes; }
     public void clearChanges() { changes.clear(); }
 }
-```
 
 ---
 
@@ -384,6 +374,18 @@ Order Saga:
 ### Saga Orchestrator
 
 **OrderSagaOrchestrator.java**
+
+**What this code does — step by step:**
+
+1. Step 1: Create order
+2. Step 2: Reserve inventory
+3. Step 3: Process payment
+4. Step 4: Confirm order
+5. Step 5: Schedule shipping
+6. Compensate — undo in reverse order
+
+The same code, clean:
+
 ```java
 package com.backendforge.saga.orchestrator;
 
@@ -394,13 +396,13 @@ import java.util.UUID;
 
 @Component
 public class OrderSagaOrchestrator {
-    
+
     private final OrderService orderService;
     private final InventoryService inventoryService;
     private final PaymentService paymentService;
     private final ShippingService shippingService;
     private final SagaLogRepository sagaLog;
-    
+
     public OrderSagaOrchestrator(OrderService order, InventoryService inv,
                                    PaymentService pay, ShippingService ship,
                                    SagaLogRepository log) {
@@ -410,42 +412,36 @@ public class OrderSagaOrchestrator {
         this.shippingService = ship;
         this.sagaLog = log;
     }
-    
+
     @Transactional
     public void executeOrderSaga(CreateOrderCommand command) {
         String sagaId = UUID.randomUUID().toString();
-        
+
         try {
-            // Step 1: Create order
             Order order = orderService.createPendingOrder(command);
             logStep(sagaId, "ORDER_CREATED", order.getId());
-            
-            // Step 2: Reserve inventory
+
             inventoryService.reserve(order.getId(), command.getItems());
             logStep(sagaId, "INVENTORY_RESERVED", order.getId());
-            
-            // Step 3: Process payment
+
             paymentService.charge(order.getId(), order.getTotalAmount());
             logStep(sagaId, "PAYMENT_PROCESSED", order.getId());
-            
-            // Step 4: Confirm order
+
             orderService.confirmOrder(order.getId());
             logStep(sagaId, "ORDER_CONFIRMED", order.getId());
-            
-            // Step 5: Schedule shipping
+
             shippingService.schedule(order.getId());
             logStep(sagaId, "SHIPPING_SCHEDULED", order.getId());
-            
+
         } catch (Exception e) {
-            // Compensate — undo in reverse order
             compensate(sagaId, command);
             throw new SagaFailedException("Order saga failed: " + e.getMessage(), e);
         }
     }
-    
+
     private void compensate(String sagaId, CreateOrderCommand command) {
         var completedSteps = sagaLog.findBySagaId(sagaId);
-        
+
         for (var step : completedSteps.reversed()) {
             try {
                 switch (step.getAction()) {
@@ -460,7 +456,7 @@ public class OrderSagaOrchestrator {
             }
         }
     }
-    
+
     private void logStep(String sagaId, String action, Long entityId) {
         SagaLogEntry entry = new SagaLogEntry(sagaId, action, entityId);
         sagaLog.save(entry);
@@ -475,7 +471,6 @@ public class OrderSagaOrchestrator {
 ### Spring Cloud Config Server
 
 **ConfigServerApplication.java**
-```java
 package com.backendforge.configserver;
 
 import org.springframework.boot.SpringApplication;
@@ -489,7 +484,6 @@ public class ConfigServerApplication {
         SpringApplication.run(ConfigServerApplication.class, args);
     }
 }
-```
 
 ### Config Client
 
@@ -582,3 +576,4 @@ docker-compose up -d
 # Place order (triggers saga): curl -X POST http://localhost:8080/api/orders -d '...'
 # Check saga status: curl http://localhost:8080/api/sagas/abc-123
 ```
+

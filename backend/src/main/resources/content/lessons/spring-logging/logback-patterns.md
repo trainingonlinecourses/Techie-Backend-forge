@@ -1,7 +1,7 @@
 ---
 title: Logback Patterns — Structuring Your Logs
 summary: Logback pattern syntax, common conversion words, custom patterns, colorized output, and production-ready log formats.
-order: 2
+order: 1
 minutes: 15
 topics: [logback, pattern, conversion, layout, color, timestamp]
 docs:
@@ -89,7 +89,6 @@ logging:
 
 ### Scenario 1: Request tracing with MDC
 
-```java
 @Component
 public class MdcFilter implements Filter {
     @Override
@@ -104,7 +103,6 @@ public class MdcFilter implements Filter {
         }
     }
 }
-```
 
 Pattern: `%d{HH:mm:ss.SSS} %-5level [%thread] [%X{requestId}] %logger - %msg%n`
 
@@ -118,3 +116,4 @@ Pattern: `%d{HH:mm:ss.SSS} %-5level [%thread] [%X{requestId}] %logger - %msg%n`
 | Using `%d` without format | Default format is too verbose | Specify: `%d{yyyy-MM-dd HH:mm:ss}` |
 | Not abbreviating logger | Lines too long | Use `%logger{36}` |
 | Colors in file appender | ANSI codes in log file | Only use colors in CONSOLE |
+

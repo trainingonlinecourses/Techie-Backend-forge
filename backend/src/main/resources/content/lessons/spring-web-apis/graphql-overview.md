@@ -1,7 +1,7 @@
 ---
 title: GraphQL with Spring for GraphQL
 summary: What GraphQL changes versus REST — schema-first design, the query model, and when a graph-shaped API beats REST endpoints.
-order: 3
+order: 2
 minutes: 14
 topics: [graphql, spring for graphql, schema, graphql java, query model]
 docs:
@@ -59,7 +59,6 @@ Types are **nullable by default** in GraphQL (`String` allows null; `String!` do
 
 The schema defines *what*; resolvers define *how*. Spring for GraphQL wires schema types to controller methods:
 
-```java
 @Controller
 public class OrderGraphController {
 
@@ -73,11 +72,9 @@ public class OrderGraphController {
     @MutationMapping
     public Order createOrder(@Argument CreateOrderInput input) { ... }
 }
-```
 
 Nested fields get their own resolvers — the graph is lazily walked:
 
-```java
 @Controller
 public class OrderLineResolvers {
     @SchemaMapping
@@ -85,7 +82,6 @@ public class OrderLineResolvers {
         return productService.find(line.productId());  // called only if the client asked for product
     }
 }
-```
 
 This lazy per-field resolution is the source of both GraphQL's power (cheap nesting) and its risk (**n+1 per field**) — the DataLoader pattern (batch per field) is the standard fix.
 
@@ -114,3 +110,4 @@ GraphQL's costs: no HTTP caching out of the box, harder observability (every que
 - Use it where clients are heterogeneous and graphs are deep; keep REST where caching and simplicity dominate.
 
 Official docs: [Spring for GraphQL](https://docs.spring.io/spring-graphql/reference/) · [GraphQL spec & learn](https://graphql.org/learn/)
+

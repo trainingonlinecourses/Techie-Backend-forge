@@ -172,22 +172,29 @@ GROUP BY o.id, u.username, o.total, o.status, o.created_at;
 
 ## Flyway in Spring Boot — integration
 
-```java
-// Spring Boot auto-configures Flyway — just add SQL files to db/migration/
-// But if you need custom configuration:
 
+**What this code does — step by step:**
+
+1. Spring Boot auto-configures Flyway — just add SQL files to db/migration/. But if you need custom configuration:
+2. `.locations("classpath:db/migration", "classpath:db/extra")` — Line 1: Additional locations
+3. `.baselineOnMigrate(true)` — Line 2: Baseline existing DB
+4. `return new FlywayMigrationInitializer(flyway);` — Line 3: Run on startup
+
+The same code, clean:
+
+```java
 @Configuration
 public class FlywayConfig {
-    
+
     @Bean
     public FlywayMigrationInitializer flywayInitializer(DataSource dataSource) {
         Flyway flyway = Flyway.configure()
             .dataSource(dataSource)
-            .locations("classpath:db/migration", "classpath:db/extra")  // Line 1: Additional locations
-            .baselineOnMigrate(true)                                    // Line 2: Baseline existing DB
+            .locations("classpath:db/migration", "classpath:db/extra")
+            .baselineOnMigrate(true)
             .load();
-        
-        return new FlywayMigrationInitializer(flyway);                 // Line 3: Run on startup
+
+        return new FlywayMigrationInitializer(flyway);
     }
 }
 ```
@@ -220,3 +227,4 @@ public class FlywayConfig {
 - `flyway_schema_history` table tracks what's been applied
 
 **Official docs:** [Flyway Documentation](https://flywaydb.org/documentation/) · [Spring Boot Flyway](https://docs.spring.io/spring-boot/reference/howto/data-initialization.html#howto.data-initialization.migration-tool.flyway)
+

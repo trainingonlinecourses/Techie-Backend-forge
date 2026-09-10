@@ -1,7 +1,7 @@
 ---
 title: API Documentation with OpenAPI / Swagger — Living Documentation
 summary: springdoc-openapi setup, @Operation and @Schema annotations, grouping, authentication in docs, Swagger UI, and how organizations maintain API docs that stay in sync with code.
-order: 38
+order: 48
 minutes: 18
 topics: [openapi, swagger, springdoc, api-documentation, schema, grouping, bearer-auth, swagger-ui]
 docs:
@@ -43,7 +43,6 @@ Visit `http://localhost:8080/swagger-ui.html` for the interactive UI.
 
 ## Annotations
 
-```java
 @RestController
 @RequestMapping("/api/orders")
 @Tag(name = "Orders", description = "Order management operations")
@@ -69,11 +68,9 @@ public class OrderController {
         return ResponseEntity.status(HttpStatus.CREATED).body(order);
     }
 }
-```
 
 ## Schema documentation on models
 
-```java
 @Schema(description = "Order entity")
 public record OrderResponse(
     @Schema(description = "Unique order identifier", example = "ord-123")
@@ -91,11 +88,9 @@ public record OrderResponse(
     @Schema(description = "When the order was created")
     Instant createdAt
 ) {}
-```
 
 ## API grouping
 
-```java
 @Configuration
 public class OpenApiConfig {
 
@@ -115,9 +110,7 @@ public class OpenApiConfig {
                         .bearerFormat("JWT")));
     }
 }
-```
 
-```java
 @Configuration
 public class OpenApiGroupConfig {
 
@@ -137,7 +130,6 @@ public class OpenApiGroupConfig {
             .build();
     }
 }
-```
 
 ## How we use it in organizations
 
@@ -153,7 +145,6 @@ Frontend developers use Swagger UI to:
 
 Generate the OpenAPI spec and use it for contract tests:
 
-```java
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class OrderApiContractTest {
 
@@ -164,11 +155,9 @@ class OrderApiContractTest {
         new OpenAPIParser().readContents(spec);
     }
 }
-```
 
 ### Scenario 3: API versioning documentation
 
-```java
 @RestController
 @RequestMapping("/api/v2/orders")
 @Tag(name = "Orders v2", description = "V2 order operations — includes bulk operations")
@@ -180,7 +169,6 @@ public class OrderControllerV2 {
         return orderService.bulkCreate(requests);
     }
 }
-```
 
 ## Common mistakes
 
@@ -191,3 +179,4 @@ public class OrderControllerV2 {
 | Missing `@ApiResponse` for error codes | Error formats undocumented |
 | Exposing internal DTOs in API | Internal implementation leaks |
 | Not versioning the API spec | Breaking changes break frontend |
+

@@ -1,7 +1,7 @@
 ---
 title: Resources & ResourceLoader
 summary: Abstracting files, classpath entries and URLs behind Spring's Resource interface — ResourceLoader injection, patterns, and reading resources in Boot apps.
-order: 13
+order: 17
 minutes: 12
 topics: [resource, resourceloader, classpath, files, resource patterns]
 docs:
@@ -14,11 +14,9 @@ docs:
 
 `new File("config.json")` hard-codes a *filesystem* path — but the same artifact must read from the classpath in a jar, from a URL in the cloud, and from disk in tests. Spring abstracts all of them behind one interface: **`Resource`**.
 
-```java
 Resource r = new ClassPathResource("data/seed.json");   // classpath:...
 Resource r = new FileSystemResource("/etc/app/conf");    // file:...
 Resource r = new UrlResource("https://example.com/x");   // https:...
-```
 
 ## Prefixes decide the source
 
@@ -43,7 +41,6 @@ Injected fields get the right `Resource` automatically — Boot's `Binder` conve
 
 Spring beans get a `ResourceLoader` (the `ApplicationContext` implements it) that resolves location strings at runtime:
 
-```java
 @Service
 public class TemplateService {
     private final ResourceLoader loader;
@@ -57,7 +54,6 @@ public class TemplateService {
             : null;
     }
 }
-```
 
 `Resource.getInputStream()` is the universal read path — `getFile()` only works for real filesystem resources, so prefer the stream (it works inside jars, too).
 
@@ -65,9 +61,7 @@ public class TemplateService {
 
 `PathMatchingResourcePatternResolver` resolves **ant-style patterns** — this is how Spring finds component classes and how Boot scans configs:
 
-```java
 Resource[] r = new PathMatchingResourcePatternResolver().getResources("classpath:content/lessons/*/*.md");
-```
 
 Patterns: `*` (one path segment), `**` (any depth), `?` (one char), `{a,b}` (alternatives).
 
@@ -77,10 +71,8 @@ Patterns: `*` (one path segment), `**` (any depth), `?` (one char), `{a,b}` (alt
 - **Reading bundled content**: `ClassPathResource("content/modules.json").getInputStream()` — how the content seed loader in this academy works.
 - **`@Value("classpath:...")`** injects a `Resource` directly:
 
-```java
 @Value("classpath:data/terms.txt")
 Resource terms;
-```
 
 ## Resource vs. filesystem discipline
 
@@ -96,3 +88,4 @@ Resource terms;
 - External config (`spring.config.import`) is the production pattern for files that must live outside the jar.
 
 Official docs: [Spring Resources](https://docs.spring.io/spring-framework/reference/core/resources.html)
+

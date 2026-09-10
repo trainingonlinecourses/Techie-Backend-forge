@@ -1,7 +1,7 @@
 ---
 title: Strangler Fig Pattern — Migrating Legacy Systems Safely
 summary: How to replace a monolith piece by piece without a risky big-bang rewrite — the pattern that lets you migrate production systems with zero downtime.
-order: 4
+order: 5
 minutes: 22
 topics: [strangler fig, legacy migration, big-bang rewrite, gradual migration, feature toggle, anti-corruption layer]
 docs:
@@ -55,27 +55,37 @@ The key is the **API Gateway/Router** that decides which requests go to the new 
 
 ### Step 1: The Route Migration Config
 
+
+**What this code does — step by step:**
+
+1. Feature toggle: which routes are migrated?
+2. MIGRATED: goes to the new Orders microservice
+3. `.path("/api/orders/**")` — Match order requests
+4. `.uri("http://orders-service:8081"))` — Forward to new service
+5. NOT YET MIGRATED: goes to the legacy monolith
+6. `.path("/**")` — Catch everything else
+7. `.uri("http://legacy-monolith:8080"))` — Forward to old system
+
+The same code, clean:
+
 ```java
 @Configuration
 public class StranglerRouteConfig {
 
-    // Feature toggle: which routes are migrated?
     @Value("${strangler.routes.migrated:orders,payments}")
     private Set<String> migratedRoutes;
 
     @Bean
     public RouteLocator customRouting(RouteLocatorBuilder builder) {
         return builder.routes()
-            // MIGRATED: goes to the new Orders microservice
             .route("orders-api", r -> r
-                .path("/api/orders/**")                          // Match order requests
+                .path("/api/orders/**")
                 .filters(f -> f.rewritePath("/api/orders/(?<seg>.*)", "/orders/${seg}"))
-                .uri("http://orders-service:8081"))              // Forward to new service
+                .uri("http://orders-service:8081"))
 
-            // NOT YET MIGRATED: goes to the legacy monolith
             .route("legacy-default", r -> r
-                .path("/**")                                     // Catch everything else
-                .uri("http://legacy-monolith:8080"))             // Forward to old system
+                .path("/**")
+                .uri("http://legacy-monolith:8080"))
             .build();
     }
 }
@@ -92,31 +102,43 @@ public class StranglerRouteConfig {
 
 When the new service needs data from the legacy system during migration, you use an ACL to translate between the old and new models:
 
+
+**What this code does — step by step:**
+
+1. `private final WebClient legacyClient;` — Talks to the old monolith
+2. The new Orders service needs user info, but Users haven't been migrated yet
+3. Call the legacy system's internal API
+4. `.block(Duration.ofSeconds(2));` — Timeout — don't let legacy slowness cascade
+5. TRANSLATE: old model → new model
+6. `legacy.getFirstName() + " " + legacy.getLastName(),` — Old had separate fields
+7. `legacy.getEmailAddr(),` — Different field name
+8. `Instant.ofEpochMilli(legacy.getCreatedTimestamp())` — Different time format
+9. `return Optional.empty();` — Graceful degradation
+
+The same code, clean:
+
 ```java
 @Service
 public class LegacyUserACL {
-    private final WebClient legacyClient;     // Talks to the old monolith
+    private final WebClient legacyClient;
 
-    // The new Orders service needs user info, but Users haven't been migrated yet
     public Optional<UserDTO> getUser(String userId) {
         try {
-            // Call the legacy system's internal API
             LegacyUser legacy = legacyClient.get()
                 .uri("/internal/users/{id}", userId)
                 .retrieve()
                 .bodyToMono(LegacyUser.class)
-                .block(Duration.ofSeconds(2));    // Timeout — don't let legacy slowness cascade
+                .block(Duration.ofSeconds(2));
 
-            // TRANSLATE: old model → new model
             return Optional.of(new UserDTO(
                 legacy.getId(),
-                legacy.getFirstName() + " " + legacy.getLastName(),  // Old had separate fields
-                legacy.getEmailAddr(),                                // Different field name
-                Instant.ofEpochMilli(legacy.getCreatedTimestamp())    // Different time format
+                legacy.getFirstName() + " " + legacy.getLastName(),
+                legacy.getEmailAddr(),
+                Instant.ofEpochMilli(legacy.getCreatedTimestamp())
             ));
         } catch (Exception e) {
             log.warn("Legacy user lookup failed for {}: {}", userId, e.getMessage());
-            return Optional.empty();   // Graceful degradation
+            return Optional.empty();
         }
     }
 }
@@ -130,17 +152,26 @@ public class LegacyUserACL {
 
 ### Step 3: Data Migration (Dual Write → Cutover)
 
+
+**What this code does — step by step:**
+
+1. During migration: write to BOTH old and new systems
+2. 1. Create in the new system
+3. 2. Also write to legacy (dual write — temporary!)
+4. `.subscribe();` — Fire-and-forget with retries
+5. After cutover: reads from new system, legacy is decommissioned
+6. `@Scheduled(cron = "0 0 3 * * ?")` — Daily verification
+
+The same code, clean:
+
 ```java
 @Service
 public class OrderMigrationService {
 
-    // During migration: write to BOTH old and new systems
     @Transactional
     public Order createOrder(OrderRequest request) {
-        // 1. Create in the new system
         Order newOrder = orderRepository.save(new Order(request));
 
-        // 2. Also write to legacy (dual write — temporary!)
         legacyOrderClient.post()
             .uri("/api/orders")
             .bodyValue(toLegacyOrder(newOrder))
@@ -148,13 +179,12 @@ public class OrderMigrationService {
             .bodyToMono(Void.class)
             .timeout(Duration.ofSeconds(5))
             .retry(3)
-            .subscribe();      // Fire-and-forget with retries
+            .subscribe();
 
         return newOrder;
     }
 
-    // After cutover: reads from new system, legacy is decommissioned
-    @Scheduled(cron = "0 0 3 * * ?")   // Daily verification
+    @Scheduled(cron = "0 0 3 * * ?")
     public void verifyMigration() {
         long legacyCount = legacyOrderClient.get()
             .uri("/api/orders/count")
@@ -240,3 +270,4 @@ After credit cards are migrated, migrate PayPal the same way. Then the legacy pa
 - **One bounded context at a time** — don't try to migrate everything simultaneously.
 
 Official docs: [Strangler Fig (Fowler)](https://martinfowler.com/bliki/StranglerFigApplication.html) · [Strangler Fig (microservices.io)](https://microservices.io/patterns/migration/strangler-fig.html)
+

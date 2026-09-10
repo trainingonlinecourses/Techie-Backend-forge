@@ -1,7 +1,7 @@
 ---
 title: Structured Concurrency — Predictable Parallelism in Java 21
 summary: Why structured concurrency replaces thread pools and CompletableFuture for many tasks, how TaskScope manages the lifecycle of concurrent work, and the patterns for gathering results.
-order: 59
+order: 77
 minutes: 18
 topics: [structured concurrency, TaskScope, Java 21, concurrency, thread management, gather results]
 docs:
@@ -19,17 +19,14 @@ Structured concurrency (preview in Java 21) treats concurrent tasks like blocks 
 
 With raw threads and CompletableFuture, concurrency is unstructured — tasks can outlive their scope, errors are easy to swallow, and cancellation requires manual coordination:
 
-```java
 // UNSTRUCTURED: manual lifecycle management
 CompletableFuture<User> userFuture = CompletableFuture.supplyAsync(() -> fetchUser(id));
 CompletableFuture<Account> acctFuture = CompletableFuture.supplyAsync(() -> fetchAccount(id));
 // What if userFuture fails? acctFuture keeps running...
 // What if the method returns before futures complete? They run in background...
-```
 
 ## TaskScope — structured concurrency
 
-```java
 import java.util.concurrent.StructuredTaskScope;
 
 public UserProfile loadProfile(long userId) throws Exception {
@@ -47,13 +44,11 @@ public UserProfile loadProfile(long userId) throws Exception {
         return new UserProfile(user.get(), account.get(), notifications.get());
     }
 }
-```
 
 **ShutdownOnFailure:** if any task fails, cancel all others and propagate the exception. **ShutdownOnSuccess:** if any task succeeds, cancel the rest and return the first success.
 
 ## ShutdownOnSuccess — first-wins pattern
 
-```java
 public String fetchFromAnyServer(List<String> servers) throws Exception {
     try (var scope = new StructuredTaskScope.ShutdownOnSuccess<String>()) {
         for (String server : servers) {
@@ -65,13 +60,11 @@ public String fetchFromAnyServer(List<String> servers) throws Exception {
     }
 }
 // If server A responds in 50ms and server B in 5s, B is cancelled
-```
 
 ## Error handling — failures are always visible
 
 Unlike CompletableFuture where `.exceptionally()` is optional (and easy to forget), structured concurrency forces error handling:
 
-```java
 try (var scope = new StructuredTaskScope.ShutdownOnFailure()) {
     Subtask<Data> task1 = scope.fork(() -> riskyOperation1());
     Subtask<Data> task2 = scope.fork(() -> riskyOperation2());
@@ -86,13 +79,11 @@ try (var scope = new StructuredTaskScope.ShutdownOnFailure()) {
     // Both tasks are guaranteed to be done (success or cancelled)
     // No zombie threads, no resource leaks
 }
-```
 
 ## org patterns
 
 **Parallel API aggregation:** call 3 microservices simultaneously, combine results:
 
-```java
 public OrderDetails getOrderDetails(long orderId) throws Exception {
     try (var scope = new StructuredTaskScope.ShutdownOnFailure()) {
         var order = scope.fork(() -> orderService.getOrder(orderId));
@@ -104,18 +95,15 @@ public OrderDetails getOrderDetails(long orderId) throws Exception {
         return new OrderDetails(order.get(), customer.get(), shipping.get());
     }
 }
-```
 
 **Retry with fallback:** first try with timeout, fallback to cached:
 
-```java
 try (var scope = new StructuredTaskScope.ShutdownOnSuccess<Data>()) {
     scope.fork(() -> freshDataService.get(key));       // primary
     scope.fork(() -> cacheService.get(key));           // fallback
     scope.join().throwIfFailed();
     return scope.result();
 }
-```
 
 ## Key takeaways
 
@@ -124,3 +112,4 @@ try (var scope = new StructuredTaskScope.ShutdownOnSuccess<Data>()) {
 - `scope.join()` waits for all tasks; `scope.throwIfFailed()` propagates errors. Both are mandatory.
 - Use structured concurrency instead of CompletableFuture when you need parallel execution with guaranteed lifecycle management.
 - Still in preview in Java 21 — use `--enable-preview` and be aware the API may evolve.
+

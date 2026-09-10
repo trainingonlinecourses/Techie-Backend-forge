@@ -1,7 +1,7 @@
 ---
 title: Functional Style — Pitfalls and When to Stop
 module: java-functional-programming
-order: 5
+order: 3
 minutes: 25
 topics: ["side effects", "mutable state", "performance", "readability", "when not to use streams"]
 summary: The previous lessons sold the functional style hard — and it is powerful. But every technique has a failure mode, and functional Java has several c...
@@ -24,7 +24,6 @@ The three failure families:
 
 ## The Sneaky Side Effect
 
-```java
 // LOOKS functional, but mutates shared state inside the lambda:
 List<String> log = new ArrayList<>();
 items.stream()
@@ -32,11 +31,29 @@ items.stream()
      .forEach(i -> log.add(i.getName()));      // <-- mutation inside the stream!
 
 // The mutation races/orders unpredictably and breaks functional guarantees.
-```
 
 **Why it's wrong:** `forEach` with a side effect on *external* state abandons everything functional style promises. The stream's internal iteration order is not guaranteed (and with `parallel()` it's genuinely concurrent) — so `log` ends up in an arbitrary order, and concurrent writers can corrupt it. If you need a result from the stream, **collect it**; if you need a side effect per element, use a plain `for` loop, which is honest about what it does.
 
 ## The Code Walkthrough
+
+
+**What this code does — step by step:**
+
+1. ---- 1. Correct: derive results, don't mutate ----
+2. `.collect(Collectors.toList());` — <- collect, not forEach-add
+3. `System.out.println(evens);` — [2, 4, 6, 8, 10]
+4. ---- 2. Performance trap: multiple full passes ----. This runs THREE separate pipelines (3 passes over the data):
+5. `long total = nums.stream().filter(n -> n % 2 == 0).count();` — pass 1
+6. `int max = nums.stream().filter(n -> n % 2 == 0).max(Integer::compareTo).orElse(0);` — pass 2. Prefer ONE pass with reduce or a custom collector when you need several stats.
+7. ---- 3. Boxing: ints become Integer objects per stage ----. Use IntStream to avoid boxing:
+8. `System.out.println(evenCount);` — 5
+9. ---- 4. The infinite stream trap ----. Stream.iterate(0, n -> n + 1) alone is infinite — MUST limit:
+10. `System.out.println(sumFirst100);` — 4950
+11. ---- 5. Readability: when a loop is clearer ----. Stream that needs early exit + index + mutation → loop wins
+12. `if (nums.get(i) > 5) break;` — early exit
+13. `System.out.println(out);` — [2, 4, 6, 8, 10]
+
+The same code, clean:
 
 ```java
 import java.util.*;
@@ -47,41 +64,31 @@ public class FunctionalPitfalls {
     public static void main(String[] args) {
         List<Integer> nums = List.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
 
-        // ---- 1. Correct: derive results, don't mutate ----
         List<Integer> evens = nums.stream()
                 .filter(n -> n % 2 == 0)
-                .collect(Collectors.toList());          // <- collect, not forEach-add
-        System.out.println(evens);                      // [2, 4, 6, 8, 10]
+                .collect(Collectors.toList());
+        System.out.println(evens);
 
-        // ---- 2. Performance trap: multiple full passes ----
-        // This runs THREE separate pipelines (3 passes over the data):
-        long total = nums.stream().filter(n -> n % 2 == 0).count();   // pass 1
-        int max = nums.stream().filter(n -> n % 2 == 0).max(Integer::compareTo).orElse(0);  // pass 2
-        // Prefer ONE pass with reduce or a custom collector when you need several stats.
+        long total = nums.stream().filter(n -> n % 2 == 0).count();
+        int max = nums.stream().filter(n -> n % 2 == 0).max(Integer::compareTo).orElse(0);
 
-        // ---- 3. Boxing: ints become Integer objects per stage ----
-        // Use IntStream to avoid boxing:
         long evenCount = nums.stream().mapToInt(Integer::intValue)
                 .filter(n -> n % 2 == 0)
                 .count();
-        System.out.println(evenCount);                  // 5
+        System.out.println(evenCount);
 
-        // ---- 4. The infinite stream trap ----
-        // Stream.iterate(0, n -> n + 1) alone is infinite — MUST limit:
         int sumFirst100 = Stream.iterate(0, n -> n + 1)
                 .limit(100)
                 .mapToInt(Integer::intValue)
                 .sum();
-        System.out.println(sumFirst100);                // 4950
+        System.out.println(sumFirst100);
 
-        // ---- 5. Readability: when a loop is clearer ----
-        // Stream that needs early exit + index + mutation → loop wins
         List<Integer> out = new ArrayList<>();
         for (int i = 0; i < nums.size(); i++) {
-            if (nums.get(i) > 5) break;                 // early exit
+            if (nums.get(i) > 5) break;
             out.add(nums.get(i) * 2);
         }
-        System.out.println(out);                        // [2, 4, 6, 8, 10]
+        System.out.println(out);
     }
 }
 ```
@@ -100,12 +107,10 @@ public class FunctionalPitfalls {
 
 ## The Parallel Trap
 
-```java
 // parallel() does NOT make everything faster:
 int slow = nums.parallelStream()
         .map(n -> heavyCpuWork(n))       // maybe faster with cores...
         .sum();
-```
 
 Parallelism has overhead (splitting, coordination, merging). It pays off only for:
 - **Large** collections (rule of thumb: tens of thousands+ of elements),
@@ -156,3 +161,4 @@ The fixes: extract intermediate steps into **named methods**, or convert to a lo
 - Infinite streams must be bounded with `limit`/`findFirst`.
 - `parallel()` is an optimization you earn with measurement, not a default.
 - If the pipeline is hard to read, refactor to named methods — clarity wins.
+

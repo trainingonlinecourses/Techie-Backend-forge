@@ -1,7 +1,7 @@
 ---
 title: Prompt Engineering — Designing Effective AI Prompts
 summary: System prompts, few-shot examples, chain-of-thought, structured output prompts, prompt templates, and the techniques that make AI responses accurate and consistent. Beginner-friendly with line-by-line code.
-order: 11
+order: 8
 minutes: 22
 topics: [prompt engineering, system prompt, few-shot, chain-of-thought, prompt templates, output formatting, temperature, token management]
 docs:
@@ -34,7 +34,6 @@ Think of it like giving instructions to a new employee:
 
 ### 1. System Prompt Patterns
 
-```java
 @Service
 public class PromptPatterns {
 
@@ -96,11 +95,9 @@ public class PromptPatterns {
             .content();
     }
 }
-```
 
 ### 2. Few-Shot Examples
 
-```java
 // Show the AI what good output looks like:
 public String classifyCode(String codeSnippet) {
     return chatClient.prompt()
@@ -122,11 +119,9 @@ public String classifyCode(String codeSnippet) {
             .call()
             .content();
     }
-```
 
 ### 3. Prompt Templates with Variables
 
-```java
 @Service
 public class PromptTemplateService {
 
@@ -173,41 +168,49 @@ public class PromptTemplateService {
             .content();
     }
 }
-```
 
 ### 4. Temperature and Model Selection
+
+
+**What this code does — step by step:**
+
+1. Factual tasks: low temperature (deterministic)
+2. `.temperature(0.1)` — Very deterministic — same input = same output
+3. Creative tasks: higher temperature (more variety)
+4. `.temperature(0.8)` — More creative — different outputs each time
+5. Code generation: very low temperature
+6. `.temperature(0.0)` — Maximum determinism for code
+
+The same code, clean:
 
 ```java
 @Configuration
 public class AiModelConfig {
 
-    // Factual tasks: low temperature (deterministic)
     @Bean
     public ChatModel factualModel() {
         return OpenAiChatModel.builder()
             .apiKey(apiKey)
             .model("gpt-4o")
-            .temperature(0.1)               // Very deterministic — same input = same output
+            .temperature(0.1)
             .build();
     }
 
-    // Creative tasks: higher temperature (more variety)
     @Bean
     public ChatModel creativeModel() {
         return OpenAiChatModel.builder()
             .apiKey(apiKey)
             .model("gpt-4o")
-            .temperature(0.8)               // More creative — different outputs each time
+            .temperature(0.8)
             .build();
     }
 
-    // Code generation: very low temperature
     @Bean
     public ChatModel codeModel() {
         return OpenAiChatModel.builder()
             .apiKey(apiKey)
             .model("gpt-4o")
-            .temperature(0.0)               // Maximum determinism for code
+            .temperature(0.0)
             .build();
     }
 }
@@ -219,7 +222,6 @@ public class AiModelConfig {
 
 ### Scenario 1: Consistent API Response Generation
 
-```java
 // Generate consistent, structured responses for an AI tutor:
 public LessonResponse generateLesson(String topic) {
     return chatClient.prompt()
@@ -239,11 +241,9 @@ public LessonResponse generateLesson(String topic) {
         .call()
         .entity(LessonResponse.class);     // Parse into structured object
 }
-```
 
 ### Scenario 2: Code Review with Specific Standards
 
-```java
 public String reviewWithStandards(String code, List<String> standards) {
     String standardsText = standards.stream()
         .map(s -> "- " + s)
@@ -268,11 +268,9 @@ public String reviewWithStandards(String code, List<String> standards) {
         .call()
         .content();
 }
-```
 
 ### Scenario 3: Multi-Language Content Generation
 
-```java
 public String generateMultilingual(String content, String targetLanguage) {
     return chatClient.prompt()
         .system("""
@@ -287,7 +285,6 @@ public String generateMultilingual(String content, String targetLanguage) {
         .call()
         .content();
 }
-```
 
 ---
 
@@ -314,3 +311,4 @@ public String generateMultilingual(String content, String targetLanguage) {
 - **Always specify output format** — JSON, markdown, or structured text.
 
 Official docs: [ChatClient (Spring AI)](https://docs.spring.io/spring-ai/reference/api/chatclient.html) · [Prompt Templates](https://docs.spring.io/spring-ai/reference/api/prompt-template.html)
+

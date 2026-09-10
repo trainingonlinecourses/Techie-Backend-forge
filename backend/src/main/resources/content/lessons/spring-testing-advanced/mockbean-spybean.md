@@ -1,7 +1,7 @@
 ---
 title: @MockBean & @SpyBean — Replacing Real Beans in Tests
 summary: When to mock a bean in a Spring context, @MockBean vs @SpyBean semantics, reset behavior, and why @MockitoBean/@MockitoSpyBean replaced them in Boot 3.4+.
-order: 8
+order: 3
 minutes: 16
 topics: [mockbean, spybean, mockitobean, bean-replacement, test-doubles, spring-boot-3-4]
 docs:
@@ -15,7 +15,6 @@ docs:
 
 A `@SpringBootTest` boots the *whole* context — including the bean that calls Stripe, reads Kafka, or sends email. For tests that don't care about those integrations, you replace the bean with a **mock**: same type, scripted behavior, zero side effects.
 
-```java
 @SpringBootTest
 class CheckoutServiceTest {
     @MockBean PaymentGateway paymentGateway;   // replaces the real bean in the context
@@ -28,7 +27,6 @@ class CheckoutServiceTest {
             .isInstanceOf(GatewayUnavailableException.class);
     }
 }
-```
 
 `@MockBean` (from `spring-boot-test`) **removes the real bean definition from the context and registers a Mockito mock in its place** — every bean that injected `PaymentGateway` now receives the mock. This is the standard way to isolate a Spring integration test from real external systems.
 
@@ -37,7 +35,6 @@ class CheckoutServiceTest {
 - **`@MockBean`** — a full mock: all methods return defaults (null/0/false) unless stubbed. Best for *outputs you control* (gateways, repositories you don't want touching the DB, email senders).
 - **`@SpyBean`** — wraps the *real* bean: real methods run by default, individual methods can be stubbed. Best for *real logic with a few overrides* — e.g., the real `OrderService` but a stubbed `orderRepo.save` (avoiding DB writes while testing the real service logic).
 
-```java
 @SpringBootTest
 class OrderFlowTest {
     @SpyBean OrderService orderService;              // real logic
@@ -51,7 +48,6 @@ class OrderFlowTest {
             .isInstanceOf(DuplicateOrderException.class);
     }
 }
-```
 
 ## Reset semantics — the trap
 
@@ -70,9 +66,7 @@ If you *don't* want resets (rare — usually a sign of poor isolation), `@MockBe
 
 **Scenario 3 — assert side effects happened.** Mock + verify — the "did we call the audit service?" assertion:
 
-```java
 verify(auditService).record(eq("ORDER_CREATED"), any(Order.class));
-```
 
 **Scenario 4 — stub time and randomness.** `@MockBean Clock` (return a fixed Instant) makes date-dependent logic deterministic in tests.
 
@@ -80,12 +74,10 @@ verify(auditService).record(eq("ORDER_CREATED"), any(Order.class));
 
 Spring Boot 3.4 introduced **`@MockitoBean`** and **`@MockitoSpyBean`** (from `org.springframework.test.context.bean.override.mockito`), and `@MockBean`/`@SpyBean` are deprecated. Why: the new annotations use Spring Framework 6.2's **`BeanOverride`** mechanism — they override the bean without rebuilding the whole context, work with cached contexts, and behave more predictably across slices. The migration is mechanical:
 
-```java
 // Old (deprecated in Boot 3.4+):
 @MockBean PaymentGateway paymentGateway;
 // New:
 @MockitoBean PaymentGateway paymentGateway;
-```
 
 If your project is on Boot 3.4+, write new tests with `@MockitoBean`; the behavior is the same, the machinery is cleaner.
 
@@ -104,3 +96,4 @@ If your project is on Boot 3.4+, write new tests with `@MockitoBean`; the behavi
 - Mock the *boundaries* (external systems), keep your own code real for meaningful tests.
 - `@MockitoBean`/`@MockitoSpyBean` are the Boot 3.4+ replacements — prefer them in new code.
 - Use `verify` to assert side effects, not just stub returns.
+

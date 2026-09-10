@@ -1,7 +1,7 @@
 ---
 title: Centralized Configuration with Spring Cloud Config
 summary: A config server, config clients, profiles per environment, refresh at runtime, and encrypted secrets.
-order: 3
+order: 5
 minutes: 18
 topics: [config-server, config-client, centralized-config, refresh]
 docs:
@@ -24,11 +24,9 @@ inventory-service ──GET /inventory-service/prod──▶ config-server
 
 ## 1. The config server
 
-```java
 @SpringBootApplication
 @EnableConfigServer
 public class ConfigServerApplication { ... }
-```
 
 ```xml
 <dependency>
@@ -103,14 +101,12 @@ The client asks for `/{app}/{profile}` — the profile comes from `spring.profil
 
 The context stays immutable after startup, so Spring Cloud Config can't rewrite `@Value` fields live. Instead, re-read config on demand:
 
-```java
 @RefreshScope          // re-created when a refresh is triggered
 @Component
 public class OrderProperties {
     @Value("${app.order-limit:100}")
     private int orderLimit;
 }
-```
 
 ```bash
 curl -X POST localhost:9001/actuator/refresh     # re-fetch from config server
@@ -139,3 +135,4 @@ Config server can encrypt values (symmetric key via `encrypt.key`) but the moder
 - Secrets go to Vault/env, not config files.
 
 **Official docs:** [Config reference](https://docs.spring.io/spring-cloud-config/reference/) · [Server](https://docs.spring.io/spring-cloud-config/reference/server.html) · [Client](https://docs.spring.io/spring-cloud-config/reference/client.html)
+

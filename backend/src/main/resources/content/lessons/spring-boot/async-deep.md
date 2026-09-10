@@ -1,7 +1,7 @@
 ---
 title: Async Methods in Spring Boot — @Async, Thread Pools and Error Handling
 summary: How @Async works under the hood, configuring task executors, exception handling for async methods, and the patterns that prevent thread starvation.
-order: 31
+order: 4
 minutes: 20
 topics: [@Async, TaskExecutor, thread pool, CompletableFuture, error handling, async patterns]
 docs:
@@ -17,7 +17,6 @@ docs:
 
 ## Basic @Async usage
 
-```java
 @Service
 public class NotificationService {
 
@@ -34,11 +33,9 @@ public class NotificationService {
         return CompletableFuture.completedFuture(status);
     }
 }
-```
 
 **The self-invocation trap:** `@Async` works through AOP proxies. If you call `this.sendWelcomeEmail()` from the same class, the proxy is bypassed — it runs synchronously on the calling thread:
 
-```java
 @Service
 public class UserService {
     @Autowired private NotificationService notifications;
@@ -55,11 +52,9 @@ public class UserService {
         notifications.sendWelcomeEmail(user);  // runs async
     }
 }
-```
 
 ## Configuring the thread pool
 
-```java
 @Configuration
 @EnableAsync
 public class AsyncConfig implements AsyncConfigurer {
@@ -84,13 +79,11 @@ public class AsyncConfig implements AsyncConfigurer {
         };
     }
 }
-```
 
 ## Exception handling in @Async
 
 `@Async` exceptions are swallowed by default. You must handle them:
 
-```java
 @Service
 public class ReportService {
 
@@ -115,11 +108,9 @@ public void handleRequest(ReportRequest request) {
             return null;
         });
 }
-```
 
 ## Scheduling @Async tasks
 
-```java
 @Service
 public class CleanupService {
 
@@ -131,34 +122,28 @@ public class CleanupService {
         sessionRepository.deleteOlderThan(Duration.ofDays(30));
     }
 }
-```
 
 ## org scenarios
 
 **Email service:** async email sending so the HTTP response returns immediately:
 
-```java
 @Async
 public void sendOrderConfirmation(Order order) {
     Email email = EmailBuilder.orderConfirmation(order).build();
     smtpTransport.send(email);
 }
 // Controller calls this and returns 200 — email sends in background
-```
 
 **Audit logging:** non-blocking audit trail writes:
 
-```java
 @Async
 public void audit(User user, String action, Map<String, Object> details) {
     AuditEvent event = new AuditEvent(user.id(), action, details, Instant.now());
     auditRepository.save(event);
 }
-```
 
 **Parallel task execution:** combine multiple @Async calls:
 
-```java
 CompletableFuture<User> userFuture = userService.getUserAsync(userId);
 CompletableFuture<List<Order>> ordersFuture = orderService.getOrdersAsync(userId);
 CompletableFuture<Stats> statsFuture = analyticsService.getStatsAsync(userId);
@@ -169,7 +154,6 @@ CompletableFuture.allOf(userFuture, ordersFuture, statsFuture).join();
 UserProfile profile = new UserProfile(
     userFuture.join(), ordersFuture.join(), statsFuture.join()
 );
-```
 
 ## Key takeaways
 
@@ -178,3 +162,4 @@ UserProfile profile = new UserProfile(
 - Configure the thread pool via `AsyncConfigurer` — set core/max sizes, queue capacity, and rejection policy.
 - `@Async` exceptions are swallowed — return `CompletableFuture` and handle failures in the caller.
 - Use `CallerRunsPolicy` for backpressure — when the pool is full, the caller thread runs the task.
+

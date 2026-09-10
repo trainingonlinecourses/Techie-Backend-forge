@@ -1,7 +1,7 @@
 ---
 title: Spring Boot + React Full Stack — API-First Development
 summary: Building a full-stack application with Spring Boot backend and React frontend, covering CORS configuration, API-first design, proxy setup for development, and production deployment.
-order: 4
+order: 3
 minutes: 22
 topics: [react-integration, cors, proxy, api-first, full-stack, vite]
 docs:
@@ -17,7 +17,6 @@ During development, they run on different ports (8080 for Spring Boot, 5173 for 
 ## The Code
 
 ### Spring Boot Backend
-```java
 @RestController
 @RequestMapping("/api/courses")
 @CrossOrigin(origins = "http://localhost:5173")
@@ -44,7 +43,6 @@ public class CourseController {
         return repo.save(course);
     }
 }
-```
 
 ### React Frontend
 ```javascript
@@ -89,3 +87,4 @@ export default defineConfig({
 3. **API-first design** — define the contract before building either side
 4. **axios/fetch** — use baseURL to keep API calls portable
 5. **Spring CORS annotation** — @CrossOrigin for development flexibility
+

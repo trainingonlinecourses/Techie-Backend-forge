@@ -1,7 +1,7 @@
 ---
 title: Enum Validation & State Machines — Beyond Simple Constants
 summary: Using enums for input validation, state machines, and strategy dispatch — patterns that eliminate null checks, reduce if-else chains, and make invalid states unrepresentable.
-order: 4
+order: 3
 minutes: 20
 topics: [enum-validation, state-machine, strategy-dispatch, null-object, type-safety]
 docs:
@@ -20,7 +20,6 @@ Enums in Java are not just named constants. Each enum constant is a full class i
 ## The Code
 
 ### Pattern 1: Input Validation
-```java
 public enum LogLevel {
     DEBUG(0), INFO(1), WARN(2), ERROR(3), FATAL(4);
 
@@ -47,9 +46,18 @@ LogLevel level = LogLevel.fromString(userInput);
 if (level.isAtLeast(LogLevel.WARN)) {
     alertService.send(level.name() + ": " + message);
 }
-```
 
 ### Pattern 2: State Machine
+
+**What this code does — step by step:**
+
+1. `public OrderState next() { return this; }` — Terminal
+2. Usage: compiler ensures all states handled
+3. `state = state.next();` — CONFIRMED. SHIPPED
+4. `state.canCancel();` — false — no accidental cancellation
+
+The same code, clean:
+
 ```java
 public enum OrderState {
     PENDING {
@@ -65,7 +73,7 @@ public enum OrderState {
         public boolean canCancel() { return false; }
     },
     DELIVERED {
-        public OrderState next() { return this; }  // Terminal
+        public OrderState next() { return this; }
         public boolean canCancel() { return false; }
     };
 
@@ -80,15 +88,13 @@ public enum OrderState {
     }
 }
 
-// Usage: compiler ensures all states handled
 OrderState state = OrderState.PENDING;
-state = state.next();   // CONFIRMED
-state = state.next();   // SHIPPED
-state.canCancel();      // false — no accidental cancellation
+state = state.next();
+state = state.next();
+state.canCancel();
 ```
 
 ### Pattern 3: Strategy Dispatch
-```java
 public enum PaymentMethod {
     CREDIT_CARD {
         public void process(BigDecimal amount) {
@@ -112,7 +118,6 @@ public enum PaymentMethod {
 // Usage: no if-else chain
 PaymentMethod method = PaymentMethod.valueOf(order.getPaymentType());
 method.process(order.getTotal());
-```
 
 ## Line-by-Line Explanation
 
@@ -131,3 +136,4 @@ method.process(order.getTotal());
 3. **Strategy pattern** — replace if-else with polymorphism
 4. **EnumSet for flags** — O(1) union, intersection, and subset checks
 5. **Each constant is a class** — with fields, methods, and constructors
+

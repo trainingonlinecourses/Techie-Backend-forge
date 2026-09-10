@@ -1,7 +1,7 @@
 ---
 title: Spring Boot Actuator — Production Monitoring Endpoints
 summary: What Actuator provides, health checks, metrics, info endpoints, custom health indicators, custom metrics, and how organizations monitor production systems.
-order: 1
+order: 3
 minutes: 30
 topics: [actuator, health, metrics, info, custom-health, custom-metrics, production-monitoring]
 docs:
@@ -32,10 +32,23 @@ management:
 
 ## The Built-in Endpoints
 
+
+**What this code does — step by step:**
+
+1. Health endpoint
+2. Response:
+3. Metrics endpoint
+4. Lists all available metrics
+5. Response:
+6. Info endpoint
+7. Response:
+8. Prometheus endpoint
+9. Returns metrics in Prometheus format for scraping
+
+The same code, clean:
+
 ```java
-// Health endpoint
 GET /actuator/health
-// Response:
 {
     "status": "UP",
     "components": {
@@ -45,34 +58,40 @@ GET /actuator/health
     }
 }
 
-// Metrics endpoint
 GET /actuator/metrics
-// Lists all available metrics
 
 GET /actuator/metrics/jvm.memory.used
-// Response:
 {
     "name": "jvm.memory.used",
     "measurements": [{ "statistic": "VALUE", "value": 268435456 }],
     "availableTags": [...]
 }
 
-// Info endpoint
 GET /actuator/info
-// Response:
 {
     "app": { "name": "My App", "version": "1.0.0" },
     "git": { "commit": { "id": "abc123" } }
 }
 
-// Prometheus endpoint
 GET /actuator/prometheus
-// Returns metrics in Prometheus format for scraping
 ```
 
 ---
 
 ## Line-by-Line Walkthrough
+
+
+**What this code does — step by step:**
+
+1. Line 1: Custom health indicator
+2. Try to execute a simple query
+3. Line 2: Custom health indicator for external API
+4. Line 3: Custom info contributor
+5. Line 4: Custom metrics with Micrometer
+6. `orderCounter.increment();` — increment the counter
+7. Line 5: Custom meter (gauge)
+
+The same code, clean:
 
 ```java
 import org.springframework.boot.actuate.health.*;
@@ -80,7 +99,6 @@ import org.springframework.boot.actuate.info.InfoContributor;
 import org.springframework.stereotype.Component;
 import java.util.Map;
 
-// Line 1: Custom health indicator
 @Component
 public class DatabaseHealthIndicator implements HealthIndicator {
 
@@ -93,7 +111,6 @@ public class DatabaseHealthIndicator implements HealthIndicator {
     @Override
     public Health health() {
         try (Connection conn = dataSource.getConnection()) {
-            // Try to execute a simple query
             conn.createStatement().execute("SELECT 1");
             return Health.up()
                 .withDetail("database", "PostgreSQL")
@@ -108,7 +125,6 @@ public class DatabaseHealthIndicator implements HealthIndicator {
     }
 }
 
-// Line 2: Custom health indicator for external API
 @Component
 public class ExternalApiHealthIndicator implements HealthIndicator {
 
@@ -147,7 +163,6 @@ public class ExternalApiHealthIndicator implements HealthIndicator {
     }
 }
 
-// Line 3: Custom info contributor
 @Component
 public class AppInfoContributor implements InfoContributor {
 
@@ -163,7 +178,6 @@ public class AppInfoContributor implements InfoContributor {
     }
 }
 
-// Line 4: Custom metrics with Micrometer
 @RestController
 public class OrderController {
 
@@ -187,13 +201,12 @@ public class OrderController {
     public Order createOrder(@RequestBody CreateOrderRequest request) {
         return orderTimer.record(() -> {
             Order order = orderService.create(request);
-            orderCounter.increment();  // increment the counter
+            orderCounter.increment();
             return order;
         });
     }
 }
 
-// Line 5: Custom meter (gauge)
 @Component
 public class QueueSizeMetrics {
 
@@ -261,7 +274,6 @@ management:
 
 ### Scenario 3: Custom health check with dependencies
 
-```java
 @Component
 public class CompositeHealthIndicator implements HealthIndicator {
 
@@ -288,7 +300,6 @@ public class CompositeHealthIndicator implements HealthIndicator {
             .build();
     }
 }
-```
 
 ---
 
@@ -301,3 +312,4 @@ public class CompositeHealthIndicator implements HealthIndicator {
 | Health check too slow | Startup delays | Add timeouts to health checks |
 | Not monitoring metrics | Blind in production | Set up Prometheus + Grafana |
 | Forgetting custom health indicators | Dependencies not checked | Add health indicators for external services |
+

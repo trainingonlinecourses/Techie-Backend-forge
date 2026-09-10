@@ -1,7 +1,7 @@
 ---
 title: Capstone — Domain Model & Business Logic
 summary: The Money value object, Account and Transfer entities, and transfer business rules with invariants.
-order: 2
+order: 3
 minutes: 18
 topics: [capstone, domain, money, entities, invariants]
 capstone: true
@@ -15,7 +15,6 @@ Open `projects/payments-api/src/main/java/com/example/payments/` and follow alon
 
 ## Money: never double, always BigDecimal
 
-```java
 package com.example.payments.money;
 
 import java.math.BigDecimal;
@@ -57,13 +56,11 @@ public final class Money {
     public BigDecimal amount() { return amount; }
     public String currencyCode() { return currency.getCurrencyCode(); }
 }
-```
 
 **The invariant lives here**: money is always 2-dp, currencies never mix, and every math operation goes through one class. No `double` anywhere in the codebase.
 
 ## Account: entity with a guarded balance
 
-```java
 package com.example.payments.account;
 
 import jakarta.persistence.*;
@@ -112,13 +109,11 @@ public class Account {
         balanceCents -= cents;
     }
 }
-```
 
 Note: `credit`/`debit` are the *only* mutators and they're not part of the public API — money moves exclusively through `TransferService` (a JPA entity is shared state, so all mutation goes through services). The entity guards its own invariant: no negative balances.
 
 ## Transfer: the atomic unit of work
 
-```java
 package com.example.payments.transfer;
 
 import jakarta.persistence.*;
@@ -161,11 +156,9 @@ public class Transfer {
     }
     // getters...
 }
-```
 
 ## The business rule, in one transaction
 
-```java
 package com.example.payments.transfer;
 
 import org.springframework.stereotype.Service;
@@ -200,7 +193,6 @@ public class TransferService {
         return transfers.save(new Transfer(fromIban, toIban, cents, "EUR", idempotencyKey)).id();
     }
 }
-```
 
 This is the money-movement pattern: **one transaction, row-level mutations, idempotency key, domain exceptions rolling back everything.**
 
@@ -214,3 +206,4 @@ This is the money-movement pattern: **one transaction, row-level mutations, idem
 - One `@Transactional` per business operation; exceptions roll back everything.
 
 **Official docs:** [Spring Data JPA](https://docs.spring.io/spring-data/jpa/reference/)
+

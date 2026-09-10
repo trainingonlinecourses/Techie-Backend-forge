@@ -1,7 +1,7 @@
 ---
 title: JdbcClient — Modern JDBC (Spring 6.1)
 summary: Fluent builder API for SQL queries, named parameters, batch operations, stored procedures, and replacing JdbcTemplate in new projects.
-order: 51
+order: 34
 minutes: 16
 topics: [jdbcclient, jdbc-template, sql, named-parameters, batch-operations, transactions]
 docs:
@@ -17,7 +17,6 @@ docs:
 
 Before JdbcClient, you used `JdbcTemplate`:
 
-```java
 // ❌ Old way — JdbcTemplate (verbose)
 String name = jdbcTemplate.queryForObject(
     "SELECT name FROM users WHERE id = ?",
@@ -30,9 +29,7 @@ List<User> users = jdbcTemplate.query(
     (rs, rowNum) -> new User(rs.getLong("id"), rs.getString("name")),
     18
 );
-```
 
-```java
 // ✅ New way — JdbcClient (clean, fluent)
 String name = jdbcClient.sql("SELECT name FROM users WHERE id = ?")
     .param(userId)
@@ -41,7 +38,6 @@ String name = jdbcClient.sql("SELECT name FROM users WHERE id = ?")
 List<User> users = jdbcClient.sql("SELECT * FROM users WHERE age > ?")
     .param(18)
     .query((rs, rowNum) -> new User(rs.getLong("id"), rs.getString("name")));
-```
 
 ---
 
@@ -49,7 +45,6 @@ List<User> users = jdbcClient.sql("SELECT * FROM users WHERE age > ?")
 
 ### Creating JdbcClient
 
-```java
 @Configuration
 public class DatabaseConfig {
 
@@ -58,11 +53,9 @@ public class DatabaseConfig {
         return JdbcClient.create(dataSource);
     }
 }
-```
 
 ### SELECT — Single Row
 
-```java
 @Repository
 public class UserRepository {
 
@@ -98,11 +91,9 @@ public class UserRepository {
         );
     }
 }
-```
 
 ### SELECT — Multiple Rows
 
-```java
 // Find all users
 public List<User> findAll() {
     return jdbcClient.sql("SELECT * FROM users ORDER BY name")
@@ -135,24 +126,29 @@ public List<User> findPage(int page, int size) {
             rs.getString("email")
         ));
 }
-```
 
 ### INSERT
 
+
+**What this code does — step by step:**
+
+1. Insert and return generated key
+2. `.update();` — Returns number of rows affected
+3. For generated keys: .sql("INSERT INTO users ...").param(...).update(keyHolder);
+4. Insert multiple users (batch)
+
+The same code, clean:
+
 ```java
-// Insert and return generated key
 public Long insert(User user) {
     return jdbcClient.sql("INSERT INTO users (name, email, age) VALUES (:name, :email, :age)")
         .param("name", user.getName())
         .param("email", user.getEmail())
         .param("age", user.getAge())
-        .update();  // Returns number of rows affected
+        .update();
 
-    // For generated keys:
-    // .sql("INSERT INTO users ...").param(...).update(keyHolder);
 }
 
-// Insert multiple users (batch)
 public int[] insertBatch(List<User> users) {
     return jdbcClient.sql("INSERT INTO users (name, email) VALUES (:name, :email)")
         .update(users, (ps, user) -> {
@@ -164,7 +160,6 @@ public int[] insertBatch(List<User> users) {
 
 ### UPDATE and DELETE
 
-```java
 // Update user
 public int updateUser(Long id, String name, String email) {
     return jdbcClient.sql("UPDATE users SET name = :name, email = :email WHERE id = :id")
@@ -180,7 +175,6 @@ public int deleteUser(Long id) {
         .param("id", id)
         .update();
 }
-```
 
 ---
 
@@ -188,7 +182,6 @@ public int deleteUser(Long id) {
 
 ### Named Parameters
 
-```java
 // Named parameters make SQL more readable
 public List<Order> findOrdersByUserAndStatus(String userId, String status) {
     return jdbcClient.sql("""
@@ -206,11 +199,9 @@ public List<Order> findOrdersByUserAndStatus(String userId, String status) {
             rs.getString("status")
         ));
 }
-```
 
 ### Batch Operations
 
-```java
 // Batch insert — much faster than individual inserts
 public void insertAll(List<User> users) {
     jdbcClient.sql("INSERT INTO users (name, email) VALUES (:name, :email)")
@@ -228,22 +219,18 @@ public void updateStatus(List<Long> ids, String status) {
             ps.setLong(2, id);
         });
 }
-```
 
 ### Stored Procedures
 
-```java
 // Call a stored procedure
 public String callGetUserStatus(Long userId) {
     return jdbcClient.sql("CALL get_user_status(?)")
         .param(userId)
         .queryForObject(String.class);
 }
-```
 
 ### Transaction Management
 
-```java
 @Service
 public class TransferService {
 
@@ -266,7 +253,6 @@ public class TransferService {
         // If either fails, both are rolled back
     }
 }
-```
 
 ---
 
@@ -286,7 +272,6 @@ public class TransferService {
 
 ### Scenario 1: Reporting Query
 
-```java
 @Repository
 public class ReportRepository {
 
@@ -312,11 +297,9 @@ public class ReportRepository {
             ));
     }
 }
-```
 
 ### Scenario 2: Audit Log
 
-```java
 @Repository
 public class AuditRepository {
 
@@ -349,11 +332,9 @@ public class AuditRepository {
             ));
     }
 }
-```
 
 ### Scenario 3: Dynamic Query Building
 
-```java
 @Repository
 public class SearchRepository {
 
@@ -390,7 +371,6 @@ public class SearchRepository {
         ));
     }
 }
-```
 
 ---
 
@@ -404,3 +384,4 @@ public class SearchRepository {
 | Not using `@Transactional` | Partial updates on failure | Annotate methods that need atomicity |
 | Ignoring return values of `update()` | Can't verify success | Check the returned row count |
 | Using `queryForObject` for optional data | Throws EmptyResultDataAccessException | Use `query().stream().findFirst()` |
+

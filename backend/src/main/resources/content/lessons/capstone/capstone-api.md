@@ -1,7 +1,7 @@
 ---
 title: Capstone — REST API & Error Handling
 summary: Controllers, DTOs, validation and the uniform error contract in the payments API.
-order: 3
+order: 1
 minutes: 15
 topics: [capstone, rest, dto, validation, error-handling]
 capstone: true
@@ -15,7 +15,6 @@ Open `projects/payments-api/src/main/java/com/example/payments/` and follow alon
 
 ## DTOs: records at the boundary
 
-```java
 package com.example.payments.account;
 
 import jakarta.validation.constraints.NotBlank;
@@ -26,9 +25,7 @@ public record CreateAccountRequest(
         @NotBlank @Pattern(regexp = "[A-Z]{3}", message = "invalid currency") String currency,
         @NotBlank String owner,
         @Min(0) Long openingBalanceCents) {}   // optional initial deposit
-```
 
-```java
 public record AccountView(Long id, String iban, String currency, long balanceCents, String owner,
                           java.time.Instant createdAt) {
     public static AccountView from(Account a) {
@@ -36,13 +33,11 @@ public record AccountView(Long id, String iban, String currency, long balanceCen
                 a.getOwner(), a.getCreatedAt());
     }
 }
-```
 
 **Entities never cross the boundary** — services return views, controllers return views. The wire format is stable even when the entity changes.
 
 ## The controller
 
-```java
 package com.example.payments.account;
 
 import jakarta.validation.Valid;
@@ -77,11 +72,9 @@ public class AccountController {
         return accountService.create(request);
     }
 }
-```
 
 ## The transfer endpoint
 
-```java
 @RestController
 @RequestMapping("/api/transfers")
 public class TransferController {
@@ -95,19 +88,15 @@ public class TransferController {
                 request.amountCents(), request.idempotencyKey());
     }
 }
-```
 
-```java
 public record CreateTransferRequest(
         @NotBlank String fromIban,
         @NotBlank String toIban,
         @NotNull @Min(1) Long amountCents,
         @NotBlank String idempotencyKey) {}
-```
 
 ## The uniform error contract
 
-```java
 package com.example.payments.common;
 
 import java.time.Instant;
@@ -117,9 +106,7 @@ public record ApiError(String timestamp, int status, String error, String messag
                        List<FieldError> fieldErrors) {
     public record FieldError(String field, String message) {}
 }
-```
 
-```java
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -144,7 +131,6 @@ public class GlobalExceptionHandler {
                 .body(ApiError.of(400, "Bad Request", "Validation failed", req.getRequestURI(), errors));
     }
 }
-```
 
 Every failure — validation, not-found, insufficient funds, duplicate idempotency key — comes back as the **same JSON shape** with the right status code.
 
@@ -169,3 +155,4 @@ Every failure — validation, not-found, insufficient funds, duplicate idempoten
 - Controllers are thin; all logic is in services.
 
 **Official docs:** [Spring Boot web](https://docs.spring.io/spring-boot/reference/web/index.html)
+

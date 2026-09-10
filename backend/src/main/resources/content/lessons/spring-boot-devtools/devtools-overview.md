@@ -1,7 +1,7 @@
 ---
 title: Spring Boot DevTools — Development Productivity
 summary: How Spring Boot DevTools accelerates development with automatic restarts, LiveReload, property defaults, and remote debugging — and why it's automatically disabled in production.
-order: 1
+order: 2
 minutes: 20
 topics: ["devtools", "automatic restart", "livereload", "property defaults", "remote debug"]
 docs:
@@ -177,3 +177,4 @@ This gives you local restart capability while the app runs on a remote server.
 | Watching too many paths | Slow polling, CPU waste | Use `exclude` to skip test/build directories |
 | Ignoring `quiet-period` | Rapid saves cause multiple restarts | Set `quiet-period: 500ms` for stability |
 | Using DevTools with dev profile | DevTools runs regardless of profile | It's classpath-based, not profile-based |
+

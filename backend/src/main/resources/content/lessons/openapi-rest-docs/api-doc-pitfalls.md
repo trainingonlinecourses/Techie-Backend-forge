@@ -1,7 +1,7 @@
 ---
 title: API Documentation — Pitfalls and Best Practices
 module: openapi-rest-docs
-order: 5
+order: 1
 minutes: 23
 topics: ["doc pitfalls", "DTO hygiene", "examples", "deprecation", "changelog", "naming"]
 summary: Your API's documentation is the first impression a consumer has of your product. Bad docs cost real money: developers abandon APIs they can't figur...
@@ -22,7 +22,6 @@ The sad truth about API docs: **they rot**. The endpoint changes, the field is r
 
 The most impactful documentation decision you make is **what your endpoints return**. If you return entities, the docs (and clients) inherit every internal detail:
 
-```java
 // BAD: the entity leaks into the docs and the wire
 @Entity
 public class User {
@@ -36,11 +35,9 @@ public class User {
 
 @GetMapping("/users/{id}")
 public User getUser(@PathVariable long id) { return repo.findById(id); }
-```
 
 Springdoc generates schemas from `User` — the password hash, the reset token, the internal timestamps are all documented and serialized. **Never return entities from controllers.**
 
-```java
 // GOOD: a purpose-built response DTO
 public record UserResponse(
         long id,
@@ -54,13 +51,11 @@ public UserResponse getUser(@PathVariable long id) {
     return new UserResponse(u.getId(), u.getEmail(), u.getDisplayName(),
             u.getRoles().stream().map(Role::name).toList());
 }
-```
 
 The spec now shows exactly the public contract: id, email, display name, roles. No internals, no surprise fields, no drift between "what we intended to expose" and "what got serialized".
 
 ## Provide Examples — The Docs Come Alive
 
-```java
 @Operation(summary = "Create a course",
         requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
                 content = @Content(mediaType = "application/json",
@@ -73,7 +68,6 @@ The spec now shows exactly the public contract: id, email, display name, roles. 
                                 """))))
 @PostMapping
 public CourseDto create(@RequestBody @Valid CourseRequest req) { ... }
-```
 
 One realistic example request is worth a paragraph of prose. The consumer sees the *shape* of a real call and can copy-paste it. Add examples to: the request body, the success response, and at least one error response.
 
@@ -81,15 +75,24 @@ One realistic example request is worth a paragraph of prose. The consumer sees t
 
 The most under-documented part of any API is *failure*. Consumers spend most of their integration time handling errors:
 
-```java
-// Document the error shape once:
-public record ApiError(
-        String code,        // e.g., "COURSE_NOT_FOUND"
-        String message,     // human-readable
-        Instant timestamp,
-        Map<String, String> fieldErrors) {}   // validation details
 
-// ...and reference it in every operation's error responses
+**What this code does — step by step:**
+
+1. Document the error shape once:
+2. `String code,` — e.g., "COURSE_NOT_FOUND"
+3. `String message,` — human-readable
+4. `Map<String, String> fieldErrors) {}` — validation details
+5. ...and reference it in every operation's error responses
+
+The same code, clean:
+
+```java
+public record ApiError(
+        String code,
+        String message,
+        Instant timestamp,
+        Map<String, String> fieldErrors) {}
+
 @ApiResponse(responseCode = "400", description = "Validation failed",
         content = @Content(schema = @Schema(implementation = ApiError.class)))
 ```
@@ -98,13 +101,11 @@ public record ApiError(
 
 ## Deprecation — The Honest Exit
 
-```java
 @Deprecated
 @Operation(deprecated = true,
         description = "Use POST /api/v2/courses instead")
 @GetMapping("/api/v1/courses")
 public List<CourseDto> listV1() { ... }
-```
 
 Deprecation is documentation's way of saying "this still works, but stop using it." In the spec it marks the operation deprecated; in the UI it dims it. Combined with a clear `description` pointing at the replacement, deprecation is the polite, non-breaking path to API evolution. (See the versioning lesson in REST best practices for the full strategy.)
 
@@ -146,3 +147,4 @@ Deprecation is documentation's way of saying "this still works, but stop using i
 - Examples make docs actionable; error codes make them complete.
 - Deprecation + versioned specs = honest, non-breaking evolution.
 - Run the scorecard above before calling your docs done.
+

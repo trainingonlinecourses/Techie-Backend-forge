@@ -1,7 +1,7 @@
 ---
 title: Shell Commands — Building CLI Interfaces
 summary: Defining @ShellMethod commands, parameter types, availability conditions, and building interactive CLI tools with Spring Shell.
-order: 2
+order: 1
 minutes: 20
 topics: [@ShellMethod, cli, commands, availability, options, interactive]
 docs:
@@ -12,7 +12,6 @@ docs:
 
 Spring Shell lets you build interactive command-line tools. You define commands with `@ShellMethod`, and Spring Shell handles parsing, help generation, and tab completion.
 
-```java
 @Component
 public class GreetingCommands {
 
@@ -21,13 +20,24 @@ public class GreetingCommands {
         return "Hello, " + name + "!";
     }
 }
-```
 
 User types: `hello --name Alice` → Output: `Hello, Alice!`
 
 ---
 
 ## Line-by-Line Walkthrough
+
+
+**What this code does — step by step:**
+
+1. 1. Basic command
+2. ... list files
+3. 2. Command with multiple options
+4. ... copy files
+5. 3. Command with validation
+6. 4. Availability conditions
+
+The same code, clean:
 
 ```java
 import org.springframework.shell.standard.*;
@@ -36,26 +46,21 @@ import org.springframework.stereotype.Component;
 @Component
 public class FileCommands {
 
-    // 1. Basic command
     @ShellMethod(value = "List files in directory", key = "ls")
     public String listFiles(
             @ShellOption(defaultValue = ".") String path,
             @ShellOption(defaultValue = "false") boolean hidden) {
-        // ... list files
         return "Files in " + path;
     }
 
-    // 2. Command with multiple options
     @ShellMethod(value = "Copy files", key = "cp")
     public String copy(
             @ShellOption String source,
             @ShellOption String destination,
             @ShellOption(defaultValue = "false") boolean recursive) {
-        // ... copy files
         return "Copied " + source + " to " + destination;
     }
 
-    // 3. Command with validation
     @ShellMethod(value = "Create user", key = "create-user")
     public String createUser(
             @ShellOption String username,
@@ -65,7 +70,6 @@ public class FileCommands {
         return "User created: " + username;
     }
 
-    // 4. Availability conditions
     @ShellMethod(value = "Admin command", key = "admin-reset")
     @ShellMethodAvailability("isAdminAvailable")
     public String adminReset() {
@@ -85,7 +89,6 @@ public class FileCommands {
 
 ### Scenario 1: Database management CLI
 
-```java
 @Component
 public class DbCommands {
 
@@ -103,11 +106,9 @@ public class DbCommands {
         return "Migrated to version: " + version;
     }
 }
-```
 
 ### Scenario 2: Deployment CLI
 
-```java
 @Component
 public class DeployCommands {
 
@@ -120,7 +121,6 @@ public class DeployCommands {
         return "Deployed to " + env;
     }
 }
-```
 
 ---
 
@@ -132,3 +132,4 @@ public class DeployCommands {
 | Not using @ShellOption defaultValue | Command fails without args | Provide defaults or make required |
 | Forgetting availability checks | Unauthorized commands exposed | Always check permissions |
 | Using interactive input | Breaks scripting | Use @ShellOption for all params |
+

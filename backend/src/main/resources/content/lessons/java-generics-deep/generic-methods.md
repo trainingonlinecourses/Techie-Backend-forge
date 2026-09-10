@@ -1,7 +1,7 @@
 ---
 title: Generic Methods — Type Parameters on Methods
 module: java-generics-deep
-order: 3
+order: 1
 minutes: 23
 topics: ["generic methods", "type inference", "bounded type parameters", "static generics"]
 summary: A generic class (class Box<T) makes every member of the class generic. But most of the time you need generics for just one method — a helper that w...
@@ -20,11 +20,9 @@ A generic class (`class Box<T>`) makes *every* member of the class generic. But 
 
 The syntax looks odd the first time you see it — the type parameter goes **before the return type**:
 
-```java
 public <T> T identity(T value) {
     return value;
 }
-```
 
 Read it as: "This method declares a type parameter `T`. It takes one argument of type `T` and returns a value of type `T`." The `<T>` before the return type is the declaration; everywhere else in the signature is the usage.
 
@@ -34,7 +32,6 @@ Think about `Collections.max`. It takes a collection and returns the largest ele
 
 Compare these two:
 
-```java
 // Wildcard version: loses the exact type. You get a Number back,
 // even if you passed a list of Integers.
 static Number firstNumber(List<? extends Number> list) {
@@ -46,7 +43,6 @@ static Number firstNumber(List<? extends Number> list) {
 static <T> T first(List<T> list) {
     return list.get(0);
 }
-```
 
 The generic method is *generic in the relationship*: whatever element type the list holds, that's the return type. This is impossible to express with a plain wildcard, because a wildcard deliberately hides the type.
 
@@ -54,25 +50,33 @@ The generic method is *generic in the relationship*: whatever element type the l
 
 Let's write a method that finds the maximum element of any list — the classic `Collections.max` re-implementation:
 
+
+**What this code does — step by step:**
+
+1. <T extends Comparable<T>> declares a BOUNDED type parameter: T must be a type that implements Comparable<T> — i.e., it knows. How to compare itself to another of its own kind.
+2. `T current = list.get(0);` — start with the first element
+3. compareTo is available because T is bounded by Comparable<T>. If candidate is "greater than" current, swap.
+4. `Integer biggest = max(numbers);` — returns Integer, not Object
+5. `System.out.println(biggest);` — 9
+6. `String longest = max(words);` — returns String
+7. `System.out.println(longest);` — mango (alphabetically last)
+
+The same code, clean:
+
 ```java
 import java.util.List;
 import java.util.Arrays;
 
 public class GenericMethodDemo {
 
-    // <T extends Comparable<T>> declares a BOUNDED type parameter:
-    // T must be a type that implements Comparable<T> — i.e., it knows
-    // how to compare itself to another of its own kind.
     public static <T extends Comparable<T>> T max(List<T> list) {
         if (list == null || list.isEmpty()) {
             throw new IllegalArgumentException("list must not be empty");
         }
 
-        T current = list.get(0);      // start with the first element
+        T current = list.get(0);
         for (int i = 1; i < list.size(); i++) {
             T candidate = list.get(i);
-            // compareTo is available because T is bounded by Comparable<T>.
-            // If candidate is "greater than" current, swap.
             if (candidate.compareTo(current) > 0) {
                 current = candidate;
             }
@@ -82,12 +86,12 @@ public class GenericMethodDemo {
 
     public static void main(String[] args) {
         List<Integer> numbers = Arrays.asList(3, 9, 1, 7, 5);
-        Integer biggest = max(numbers);   // returns Integer, not Object
-        System.out.println(biggest);      // 9
+        Integer biggest = max(numbers);
+        System.out.println(biggest);
 
         List<String> words = Arrays.asList("apple", "mango", "banana");
-        String longest = max(words);      // returns String
-        System.out.println(longest);      // mango (alphabetically last)
+        String longest = max(words);
+        System.out.println(longest);
     }
 }
 ```
@@ -127,3 +131,4 @@ But a static method can declare **its own** type parameter: `static <T> Box<T> o
 ## Recap
 
 Generic methods put a type parameter on a single method, connecting input and output types so callers get exact types back without casts. The declaration sits before the return type, bounds (`<T extends Comparable<T>>`) grant the method access to capabilities of `T`, and type inference makes call sites clean. Use a generic method whenever the relationship between parameter types and return type matters; use wildcards when you only need to accept a range of types. Combined, they give you the full expressive power of the generics system.
+

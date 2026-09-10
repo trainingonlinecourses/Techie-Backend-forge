@@ -1,7 +1,7 @@
 ---
 title: "RestClient — The Modern Way to Call REST APIs from Spring"
 summary: "RestClient basics, timeouts and interceptors, request/response logging, error handling, and how organizations build resilient API clients."
-order: 9
+order: 8
 minutes: 18
 topics: [rest-client, http-client, webclient, timeouts, interceptors, resilience, spring-6]
 docs:
@@ -20,7 +20,6 @@ Spring has three HTTP clients for calling REST APIs:
 
 **RestClient** is the modern replacement for RestTemplate. It's simpler, fluent, and supports the latest features:
 
-```java
 // Old way — RestTemplate
 RestTemplate restTemplate = new RestTemplate();
 ResponseEntity<User> response = restTemplate.exchange(
@@ -38,11 +37,9 @@ User user = client.get()
     .uri("/users/{id}", userId)
     .retrieve()
     .body(User.class);
-```
 
 ### Creating RestClient
 
-```java
 // Basic — uses default settings
 RestClient client = RestClient.create("https://api.example.com");
 
@@ -62,18 +59,26 @@ RestClient client = RestClient.builder()
             .build()
     ))
     .build();
-```
 
 ### Making Requests
 
+
+**What this code does — step by step:**
+
+1. GET — simple
+2. GET — with query params
+3. POST — create
+4. PUT — update
+5. DELETE — remove
+
+The same code, clean:
+
 ```java
-// GET — simple
 User user = client.get()
     .uri("/users/{id}", userId)
     .retrieve()
     .body(User.class);
 
-// GET — with query params
 List<Order> orders = client.get()
     .uri(uriBuilder -> uriBuilder
         .path("/orders")
@@ -84,7 +89,6 @@ List<Order> orders = client.get()
     .retrieve()
     .body(new ParameterizedTypeReference<List<Order>>() {});
 
-// POST — create
 User created = client.post()
     .uri("/users")
     .contentType(MediaType.APPLICATION_JSON)
@@ -92,7 +96,6 @@ User created = client.post()
     .retrieve()
     .body(User.class);
 
-// PUT — update
 client.put()
     .uri("/users/{id}", userId)
     .contentType(MediaType.APPLICATION_JSON)
@@ -100,7 +103,6 @@ client.put()
     .retrieve()
     .toBodilessEntity();
 
-// DELETE — remove
 client.delete()
     .uri("/users/{id}", userId)
     .retrieve()
@@ -109,7 +111,6 @@ client.delete()
 
 ### Error Handling
 
-```java
 // Handle specific status codes
 User user = client.get()
     .uri("/users/{id}", userId)
@@ -136,11 +137,9 @@ try {
     // 5xx error
     log.error("Server error: {}", e.getResponseBodyAsString());
 }
-```
 
 ### Interceptors (Request/Response Logging)
 
-```java
 RestClient client = RestClient.builder()
     .requestInterceptor((request, body, execution) -> {
         log.info("→ {} {} {}bytes", request.getMethod(), request.getURL(), body.length);
@@ -151,12 +150,10 @@ RestClient client = RestClient.builder()
         return response;
     })
     .build();
-```
 
 ### Organization Use Cases
 
 **1. Microservice Client**
-```java
 @Service
 public class UserServiceClient {
     private final RestClient client;
@@ -182,10 +179,8 @@ public class UserServiceClient {
         }
     }
 }
-```
 
 **2. External API Integration**
-```java
 @Service
 public class PaymentGateway {
     private final RestClient client;
@@ -205,7 +200,6 @@ public class PaymentGateway {
             .body(PaymentResult.class);
     }
 }
-```
 
 ### Common Mistakes
 
@@ -235,3 +229,4 @@ A platform calls 12 external services (payment, email, shipping, etc.). Each ser
 - Metrics interceptor (latency per service)
 
 When a service is slow, the timeout kicks in and the circuit breaker opens. The RestClient is configured once per service and injected into the business logic.
+

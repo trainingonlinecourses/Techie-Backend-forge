@@ -1,7 +1,7 @@
 ---
 title: Method Handles — Faster, Safer Reflection
 module: java-reflection-annotations
-order: 4
+order: 3
 minutes: 24
 topics: ["method handles", "MethodHandles", "invokedynamic", "performance", "modern reflection"]
 summary: Classic reflection (Method.invoke) has two real problems: it's slow (every call does access checks, argument boxing, and dynamic dispatch through l...
@@ -26,6 +26,19 @@ Java 7 introduced **method handles** (`java.lang.invoke`) to fix both: a typed, 
 
 You don't *create* handles directly — you get them from a **`Lookup`**, which is the module-system-aware gatekeeper. The lookup captures the access context (which module you're in), so all access checks happen when you ask for the handle, once:
 
+
+**What this code does — step by step:**
+
+1. 1. The lookup — the key to everything. It knows YOUR module's. Access rights, so it can legitimately see your own classes.
+2. 2. MethodType describes the signature: return type first,. Then parameter types. toUpperCase() takes nothing, returns String.
+3. 3. Find the virtual (instance) method and get its handle.
+4. 4. Invoke it — note the receiver comes FIRST.
+5. `System.out.println(result);` — HELLO
+6. With parameters: substring(int, int) -> String.
+7. `System.out.println((String) sub.invoke("hello world", 0, 5));` — hello
+
+The same code, clean:
+
 ```java
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -33,27 +46,20 @@ import java.lang.invoke.MethodType;
 
 public class MethodHandleDemo {
     public static void main(String[] args) throws Throwable {
-        // 1. The lookup — the key to everything. It knows YOUR module's
-        //    access rights, so it can legitimately see your own classes.
         MethodHandles.Lookup lookup = MethodHandles.lookup();
 
-        // 2. MethodType describes the signature: return type first,
-        //    then parameter types. toUpperCase() takes nothing, returns String.
         MethodType mt = MethodType.methodType(String.class);
 
-        // 3. Find the virtual (instance) method and get its handle.
         MethodHandle upper = lookup.findVirtual(
                 String.class, "toUpperCase", mt);
 
-        // 4. Invoke it — note the receiver comes FIRST.
         Object result = upper.invoke("hello");
-        System.out.println(result);        // HELLO
+        System.out.println(result);
 
-        // With parameters: substring(int, int) -> String.
         MethodType subType = MethodType.methodType(
                 String.class, int.class, int.class);
         MethodHandle sub = lookup.findVirtual(String.class, "substring", subType);
-        System.out.println((String) sub.invoke("hello world", 0, 5)); // hello
+        System.out.println((String) sub.invoke("hello world", 0, 5));
     }
 }
 ```
@@ -64,15 +70,24 @@ public class MethodHandleDemo {
 
 Handles offer two invocation styles, differing in how strictly they check types:
 
+
+**What this code does — step by step:**
+
+1. `MethodHandle upper = ...;` — toUpperCase() : () String
+2. invoke() — permissive: converts/boxes arguments and results as needed.
+3. `Object r1 = upper.invoke("hi");` — String -> Object OK
+4. invokeExact() — strict: types must match the MethodType EXACTLY.
+5. `String r2 = (String) upper.invokeExact("hi");` — must be exactly String
+6. upper.invokeExact((Object) "hi") would throw WrongMethodTypeException!
+
+The same code, clean:
+
 ```java
-MethodHandle upper = ...; // toUpperCase() : () String
+MethodHandle upper = ...;
 
-// invoke() — permissive: converts/boxes arguments and results as needed.
-Object r1 = upper.invoke("hi");          // String -> Object OK
+Object r1 = upper.invoke("hi");
 
-// invokeExact() — strict: types must match the MethodType EXACTLY.
-String r2 = (String) upper.invokeExact("hi");  // must be exactly String
-// upper.invokeExact((Object) "hi") would throw WrongMethodTypeException!
+String r2 = (String) upper.invokeExact("hi");
 ```
 
 `invoke()` is convenient but does a type adaptation dance; `invokeExact()` skips it, matching the declared `MethodType` precisely. Hot paths use `invokeExact` — and `invokeExact` is what the `invokedynamic` instruction calls, which is how lambdas get their speed.
@@ -97,7 +112,6 @@ For your *own* code, this is strictly better: `lookup()` inside your class sees 
 
 Method handles shine where you must call methods discovered at runtime — say, a small dispatch table:
 
-```java
 import java.lang.invoke.*;
 import java.util.Map;
 import java.util.HashMap;
@@ -129,7 +143,6 @@ public class DispatchDemo {
         public int multiply(int a, int b) { return a * b; }
     }
 }
-```
 
 This is the skeleton of how frameworks dispatch to handler methods (controllers, event listeners, message handlers): a startup-time scan builds a map of handles, and request-time dispatch is one fast `invoke`.
 
@@ -148,3 +161,4 @@ This is the skeleton of how frameworks dispatch to handler methods (controllers,
 ## Recap
 
 Method handles are typed, immutable, JIT-friendly pointers to methods, obtained from a `MethodHandles.Lookup` and described by precise `MethodType` signatures. They're faster than classic reflection (the JIT can inline them like direct calls), safer in the module system (access checked once at lookup), and they power modern Java's own machinery — lambdas and `invokedynamic` compile down to them. Use reflection for introspection, handles for invocation; look up once and cache; and prefer `invokeExact` on hot paths. That's the toolkit modern frameworks use to stay fast and modular — and now it's in yours.
+

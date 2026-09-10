@@ -1,7 +1,7 @@
 ---
 title: Java Concurrency — Threads, Synchronization, ExecutorService, and CompletableFuture
 summary: Thread basics for beginners, creating and starting threads, synchronized and volatile, ExecutorService thread pools, Future and CompletableFuture for async composition, Callable vs Runnable, and common concurrency patterns with line-by-line walkthroughs.
-order: 9
+order: 31
 minutes: 35
 topics: [threads, synchronized, volatile, executor-service, future, completable-future, callable, thread-pool, concurrency]
 docs:
@@ -19,59 +19,81 @@ docs:
 
 ## Creating Threads — two ways
 
+
+**What this code does — step by step:**
+
+1. Way 1: extend Thread class
+2. `public void run() {` — run() contains the code the thread executes
+3. `t.start();` — START the thread (calls run() in a new thread)
+4. Don't call run() directly! That runs in the CURRENT thread, not a new one.
+5. Way 2: implement Runnable (preferred — more flexible)
+6. `Thread t = new Thread(task);` — pass the Runnable to Thread constructor
+7. Way 3: ExecutorService (recommended for production — manages thread pools)
+8. `ExecutorService executor = Executors.newFixedThreadPool(4);` — pool of 4 threads
+9. `executor.shutdown();` — stop accepting new tasks, finish existing ones
+
+The same code, clean:
+
 ```java
-// Way 1: extend Thread class
 class MyThread extends Thread {
     @Override
-    public void run() {       // run() contains the code the thread executes
+    public void run() {
         System.out.println("Thread is running: " + getName());
     }
 }
 MyThread t = new MyThread();
-t.start();                    // START the thread (calls run() in a new thread)
-// Don't call run() directly! That runs in the CURRENT thread, not a new one.
+t.start();
 
-// Way 2: implement Runnable (preferred — more flexible)
 Runnable task = () -> {
     System.out.println("Task running on: " + Thread.currentThread().getName());
 };
-Thread t = new Thread(task);  // pass the Runnable to Thread constructor
+Thread t = new Thread(task);
 t.start();
 
-// Way 3: ExecutorService (recommended for production — manages thread pools)
-ExecutorService executor = Executors.newFixedThreadPool(4);  // pool of 4 threads
+ExecutorService executor = Executors.newFixedThreadPool(4);
 executor.submit(() -> {
     System.out.println("Running on pool thread: " + Thread.currentThread().getName());
 });
-executor.shutdown();  // stop accepting new tasks, finish existing ones
+executor.shutdown();
 ```
 
 ## Synchronized — preventing race conditions
 
 A **race condition** happens when two threads modify the same data simultaneously, causing unpredictable results.
 
+
+**What this code does — step by step:**
+
+1. PROBLEM: race condition without synchronization
+2. `count++;` — NOT atomic! This is actually 3 steps: 1. Read current value of count. 2. Add 1. 3. Write new value back. Thread A reads 5, Thread B reads 5, both write 6 — should be 7!
+3. SOLUTION: synchronized — only one thread can execute this method at a time
+4. `public synchronized void increment() {` — synchronized keyword
+5. `count++;` — Now safe — only one thread at a time
+6. Or synchronize only the critical section (finer control)
+7. `private final Object lock = new Object();` — dedicated lock object
+8. ... do non-critical work here (no lock needed)
+9. `synchronized (lock) {` — only this section is synchronized
+10. `count++;` — safe
+11. ... do non-critical work here (no lock needed)
+
+The same code, clean:
+
 ```java
-// PROBLEM: race condition without synchronization
 public class Counter {
     private int count = 0;
 
     public void increment() {
-        count++;  // NOT atomic! This is actually 3 steps:
-        // 1. Read current value of count
-        // 2. Add 1
-        // 3. Write new value back
-        // Thread A reads 5, Thread B reads 5, both write 6 — should be 7!
+        count++;
     }
 
     public int getCount() { return count; }
 }
 
-// SOLUTION: synchronized — only one thread can execute this method at a time
 public class SafeCounter {
     private int count = 0;
 
-    public synchronized void increment() {   // synchronized keyword
-        count++;  // Now safe — only one thread at a time
+    public synchronized void increment() {
+        count++;
     }
 
     public synchronized int getCount() {
@@ -79,17 +101,14 @@ public class SafeCounter {
     }
 }
 
-// Or synchronize only the critical section (finer control)
 public class FineGrainedCounter {
     private int count = 0;
-    private final Object lock = new Object();  // dedicated lock object
+    private final Object lock = new Object();
 
     public void increment() {
-        // ... do non-critical work here (no lock needed)
-        synchronized (lock) {            // only this section is synchronized
-            count++;                      // safe
+        synchronized (lock) {
+            count++;
         }
-        // ... do non-critical work here (no lock needed)
     }
 }
 ```
@@ -102,18 +121,27 @@ public class FineGrainedCounter {
 
 ## volatile — visibility across threads
 
-```java
-// PROBLEM: without volatile, threads may see stale values
-private boolean running = true;  // Thread A sets this to false, Thread B might not see it
 
-// SOLUTION: volatile guarantees visibility
+**What this code does — step by step:**
+
+1. PROBLEM: without volatile, threads may see stale values
+2. `private boolean running = true;` — Thread A sets this to false, Thread B might not see it
+3. SOLUTION: volatile guarantees visibility
+4. Thread A:
+5. `running = false;` — write
+6. Thread B:
+7. `while (running) {` — read — guaranteed to see the latest value from Thread A
+
+The same code, clean:
+
+```java
+private boolean running = true;
+
 private volatile boolean running = true;
 
-// Thread A:
-running = false;  // write
+running = false;
 
-// Thread B:
-while (running) {   // read — guaranteed to see the latest value from Thread A
+while (running) {
     process();
 }
 ```
@@ -124,107 +152,152 @@ while (running) {   // read — guaranteed to see the latest value from Thread A
 
 ## Callable and Future — returning results from threads
 
+
+**What this code does — step by step:**
+
+1. Runnable: runs a task, returns nothing
+2. Callable: runs a task, returns a result
+3. `Thread.sleep(1000);` — simulate work
+4. `return 42;` — return a value
+5. Future: represents a pending result
+6. Get the result (blocks until complete)
+7. `Integer result = future.get();` — waits up to default timeout
+8. `Integer result2 = future.get(5, TimeUnit.SECONDS);` — waits up to 5 seconds, then TimeoutException
+9. Check without blocking
+10. `boolean isDone = future.isDone();` — true if complete (successfully or with exception)
+11. Cancel
+12. `future.cancel(true);` — true = interrupt the thread if running
+
+The same code, clean:
+
 ```java
-// Runnable: runs a task, returns nothing
-Runnable task = () -> System.out.println("Hello");
-executor.submit(task);
+public class Main {
 
-// Callable: runs a task, returns a result
-Callable<Integer> computation = () -> {
-    Thread.sleep(1000);     // simulate work
-    return 42;              // return a value
-};
+    public static void main(String[] args) {
+        Runnable task = () -> System.out.println("Hello");
+        executor.submit(task);
 
-// Future: represents a pending result
-Future<Integer> future = executor.submit(computation);
+        Callable<Integer> computation = () -> {
+            Thread.sleep(1000);
+            return 42;
+        };
 
-// Get the result (blocks until complete)
-Integer result = future.get();      // waits up to default timeout
-Integer result2 = future.get(5, TimeUnit.SECONDS);  // waits up to 5 seconds, then TimeoutException
+        Future<Integer> future = executor.submit(computation);
 
-// Check without blocking
-boolean isDone = future.isDone();   // true if complete (successfully or with exception)
-boolean isCancelled = future.isCancelled();
+        Integer result = future.get();
+        Integer result2 = future.get(5, TimeUnit.SECONDS);
 
-// Cancel
-future.cancel(true);   // true = interrupt the thread if running
+        boolean isDone = future.isDone();
+        boolean isCancelled = future.isCancelled();
+
+        future.cancel(true);
+    }
+}
 ```
 
 ## CompletableFuture — composing async operations
 
-```java
-// CompletableFuture chains multiple async operations together
-// Like a pipeline: each step starts when the previous one completes
 
-// Simple async operation
+**What this code does — step by step:**
+
+1. CompletableFuture chains multiple async operations together. Like a pipeline: each step starts when the previous one completes
+2. Simple async operation
+3. Chain transformations
+4. `.supplyAsync(() -> fetchUserIdFromDB())` — Step 1: get user ID
+5. `.thenApply(userId -> fetchUserName(userId))` — Step 2: get name (uses Step 1's result)
+6. `.thenApply(name -> name.toUpperCase())` — Step 3: uppercase
+7. `.thenApply(name -> name.length());` — Step 4: get length
+8. Result: CompletableFuture<Integer> — eventually contains the length of the uppercase name
+9. Handle errors gracefully
+10. `.exceptionally(ex -> "Default value on error")` — fallback if exception occurs
+11. Combine two independent async operations
+12. Both run in parallel — combined result is ready when BOTH complete
+13. Wait for all to complete
+14. `allDone.join();` — blocks until ALL three futures complete
+15. Wait for any to complete
+16. `Object first = anyDone.join();` — gets the result of whichever finishes first
+
+The same code, clean:
+
+```java
 CompletableFuture<String> future = CompletableFuture.supplyAsync(() -> {
     Thread.sleep(1000);
     return "Hello from async!";
 });
 
-// Chain transformations
 CompletableFuture<Integer> result = CompletableFuture
-    .supplyAsync(() -> fetchUserIdFromDB())         // Step 1: get user ID
-    .thenApply(userId -> fetchUserName(userId))      // Step 2: get name (uses Step 1's result)
-    .thenApply(name -> name.toUpperCase())           // Step 3: uppercase
-    .thenApply(name -> name.length());               // Step 4: get length
-// Result: CompletableFuture<Integer> — eventually contains the length of the uppercase name
+    .supplyAsync(() -> fetchUserIdFromDB())
+    .thenApply(userId -> fetchUserName(userId))
+    .thenApply(name -> name.toUpperCase())
+    .thenApply(name -> name.length());
 
-// Handle errors gracefully
 CompletableFuture<String> safeResult = CompletableFuture
     .supplyAsync(() -> riskyOperation())
-    .exceptionally(ex -> "Default value on error")  // fallback if exception occurs
+    .exceptionally(ex -> "Default value on error")
     .thenApply(result -> result + " processed");
 
-// Combine two independent async operations
 CompletableFuture<String> userFuture = CompletableFuture.supplyAsync(() -> fetchUser());
 CompletableFuture<Order> orderFuture = CompletableFuture.supplyAsync(() -> fetchOrder());
 
 CompletableFuture<String> combined = userFuture.thenCombine(orderFuture,
     (user, order) -> user.getName() + " ordered " + order.getProduct()
 );
-// Both run in parallel — combined result is ready when BOTH complete
 
-// Wait for all to complete
 CompletableFuture<Void> allDone = CompletableFuture.allOf(future1, future2, future3);
-allDone.join();  // blocks until ALL three futures complete
+allDone.join();
 
-// Wait for any to complete
 CompletableFuture<Object> anyDone = CompletableFuture.anyOf(future1, future2, future3);
-Object first = anyDone.join();  // gets the result of whichever finishes first
+Object first = anyDone.join();
 ```
 
 ## ExecutorService — managing thread pools
 
+
+**What this code does — step by step:**
+
+1. Fixed thread pool — always N threads
+2. Cached thread pool — creates threads as needed, reuses idle ones
+3. Single thread executor — runs one task at a time (sequential processing)
+4. Scheduled executor — runs tasks after a delay or periodically
+5. Schedule a task to run after 5 seconds
+6. Schedule a task to run every 10 seconds (fixed rate)
+7. `() -> System.out.println("Periodic task"),` — the task
+8. `0,` — initial delay
+9. `10,` — period
+10. CRITICAL: always shut down the executor
+11. `fixed.shutdown();` — stop accepting new tasks
+12. `fixed.awaitTermination(30, TimeUnit.SECONDS);` — wait for running tasks to finish
+13. `fixed.shutdownNow();` — force shutdown — interrupt running tasks
+
+The same code, clean:
+
 ```java
-// Fixed thread pool — always N threads
-ExecutorService fixed = Executors.newFixedThreadPool(4);
+public class Main {
 
-// Cached thread pool — creates threads as needed, reuses idle ones
-ExecutorService cached = Executors.newCachedThreadPool();
+    public static void main(String[] args) {
+        ExecutorService fixed = Executors.newFixedThreadPool(4);
 
-// Single thread executor — runs one task at a time (sequential processing)
-ExecutorService single = Executors.newSingleThreadExecutor();
+        ExecutorService cached = Executors.newCachedThreadPool();
 
-// Scheduled executor — runs tasks after a delay or periodically
-ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(2);
+        ExecutorService single = Executors.newSingleThreadExecutor();
 
-// Schedule a task to run after 5 seconds
-scheduler.schedule(() -> System.out.println("Delayed task"), 5, TimeUnit.SECONDS);
+        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(2);
 
-// Schedule a task to run every 10 seconds (fixed rate)
-scheduler.scheduleAtFixedRate(
-    () -> System.out.println("Periodic task"),  // the task
-    0,                                           // initial delay
-    10,                                          // period
-    TimeUnit.SECONDS
-);
+        scheduler.schedule(() -> System.out.println("Delayed task"), 5, TimeUnit.SECONDS);
 
-// CRITICAL: always shut down the executor
-fixed.shutdown();                   // stop accepting new tasks
-fixed.awaitTermination(30, TimeUnit.SECONDS);  // wait for running tasks to finish
-if (!fixed.isShutdown()) {
-    fixed.shutdownNow();            // force shutdown — interrupt running tasks
+        scheduler.scheduleAtFixedRate(
+            () -> System.out.println("Periodic task"),
+            0,
+            10,
+            TimeUnit.SECONDS
+        );
+
+        fixed.shutdown();
+        fixed.awaitTermination(30, TimeUnit.SECONDS);
+        if (!fixed.isShutdown()) {
+            fixed.shutdownNow();
+        }
+    }
 }
 ```
 
@@ -232,12 +305,21 @@ if (!fixed.isShutdown()) {
 
 ### Scenario 1: Parallel API calls — reducing response time
 
+
+**What this code does — step by step:**
+
+1. These 3 calls are independent — run them in parallel
+2. Wait for all three to complete
+3. Build the dashboard from all three results
+4. Total time: max(3 calls) instead of sum(3 calls). If each takes 200ms, total is 200ms instead of 600ms
+
+The same code, clean:
+
 ```java
 @Service
 public class DashboardService {
 
     public DashboardData getDashboard(String userId) {
-        // These 3 calls are independent — run them in parallel
         CompletableFuture<User> userFuture = CompletableFuture.supplyAsync(
             () -> userService.getUser(userId));
 
@@ -247,22 +329,29 @@ public class DashboardService {
         CompletableFuture<Recommendations> recsFuture = CompletableFuture.supplyAsync(
             () -> recommendationService.getRecommendations(userId));
 
-        // Wait for all three to complete
         CompletableFuture.allOf(userFuture, ordersFuture, recsFuture).join();
 
-        // Build the dashboard from all three results
         return new DashboardData(
             userFuture.join(),
             ordersFuture.join(),
             recsFuture.join()
         );
-        // Total time: max(3 calls) instead of sum(3 calls)
-        // If each takes 200ms, total is 200ms instead of 600ms
     }
 }
 ```
 
 ### Scenario 2: Thread-safe cache with synchronized
+
+
+**What this code does — step by step:**
+
+1. `synchronized (lock) {` — only one thread at a time
+2. `return cache.get(key);` — cache hit — return cached value
+3. `V value = loader.get();` — cache miss — load from source
+4. `cache.put(key, value);` — store in cache
+5. `timestamps.put(key, System.currentTimeMillis());` — record timestamp
+
+The same code, clean:
 
 ```java
 public class ThreadSafeCache<K, V> {
@@ -272,15 +361,15 @@ public class ThreadSafeCache<K, V> {
     private final Object lock = new Object();
 
     public V get(K key, Supplier<V> loader) {
-        synchronized (lock) {                                    // only one thread at a time
+        synchronized (lock) {
             Long timestamp = timestamps.get(key);
             if (timestamp != null && System.currentTimeMillis() - timestamp < ttlMillis) {
-                return cache.get(key);                           // cache hit — return cached value
+                return cache.get(key);
             }
 
-            V value = loader.get();                              // cache miss — load from source
-            cache.put(key, value);                               // store in cache
-            timestamps.put(key, System.currentTimeMillis());    // record timestamp
+            V value = loader.get();
+            cache.put(key, value);
+            timestamps.put(key, System.currentTimeMillis());
             return value;
         }
     }
@@ -289,7 +378,6 @@ public class ThreadSafeCache<K, V> {
 
 ### Scenario 3: Graceful shutdown with ScheduledExecutorService
 
-```java
 @Component
 public class HealthChecker {
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
@@ -323,7 +411,6 @@ public class HealthChecker {
         }
     }
 }
-```
 
 ## Concurrency patterns
 
@@ -345,3 +432,4 @@ public class HealthChecker {
 | Using `Thread.sleep()` for timing | Inaccurate, wastes thread | Use ScheduledExecutorService |
 | Not shutting down ExecutorService | Thread leak — threads run forever | Always call shutdown() in @PreDestroy |
 | Using `future.get()` without timeout | Potential infinite hang | Always use `get(timeout, unit)` |
+

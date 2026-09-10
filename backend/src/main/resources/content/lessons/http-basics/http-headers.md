@@ -60,6 +60,17 @@ Content negotiation: the client declares preferences (`Accept`), the server pick
 
 ## The Code Walkthrough — Headers in Spring
 
+
+**What this code does — step by step:**
+
+1. ---- 1. Reading request headers ----
+2. tenantId: multi-tenant routing; auth: the bearer token
+3. ---- 2. Setting response headers (with a Location on create) ----
+4. `.created(URI.create("/api/courses/" + created.id()))` — Location header
+5. ---- 3. Declaring what the endpoint produces/consumes ----
+
+The same code, clean:
+
 ```java
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
@@ -68,26 +79,22 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/courses")
 public class CourseController {
 
-    // ---- 1. Reading request headers ----
     @GetMapping("/{id}")
     public CourseDto get(@PathVariable long id,
                          @RequestHeader(value = "X-Tenant-Id", required = false) String tenantId,
                          @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String auth) {
-        // tenantId: multi-tenant routing; auth: the bearer token
         return service.get(id);
     }
 
-    // ---- 2. Setting response headers (with a Location on create) ----
     @PostMapping
     public ResponseEntity<CourseDto> create(@RequestBody @Valid CourseRequest req) {
         CourseDto created = service.create(req);
         return ResponseEntity
-                .created(URI.create("/api/courses/" + created.id()))   // Location header
+                .created(URI.create("/api/courses/" + created.id()))
                 .header("X-Course-Created-By", currentUser())
                 .body(created);
     }
 
-    // ---- 3. Declaring what the endpoint produces/consumes ----
     @GetMapping(value = "/export", produces = "application/json")
     public String export() { return "{\"format\":\"json\"}"; }
 }
@@ -139,7 +146,6 @@ Access-Control-Allow-Headers: Authorization, Content-Type
 
 In Spring:
 
-```java
 @Configuration
 public class CorsConfig implements WebMvcConfigurer {
     @Override
@@ -150,7 +156,6 @@ public class CorsConfig implements WebMvcConfigurer {
                 .allowedHeaders("Authorization", "Content-Type");
     }
 }
-```
 
 **The common failure**: frontend at one origin calls the API at another, and the browser silently blocks the response (CORS errors in the console). The fix is *server-side*: the API must allow the frontend's origin. (This academy's Vercel frontend → Render backend is exactly a cross-origin setup — the API must allow the Vercel origin.)
 
@@ -171,3 +176,4 @@ public class CorsConfig implements WebMvcConfigurer {
 - `Location` + 201 points at the created resource.
 - CORS is server-side policy: the API must allow the frontend's origin.
 - Set `Cache-Control` explicitly; keep secrets out of headers.
+

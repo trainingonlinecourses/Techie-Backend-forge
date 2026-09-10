@@ -1,7 +1,7 @@
 ---
 title: Idempotency Keys and Rate Limiting
 module: rest-best-practices
-order: 5
+order: 4
 minutes: 25
 topics: ["idempotency keys", "retries", "rate limiting", "Bucket4j", "429 handling", "concurrency safety"]
 summary: Two protections every public API needs: idempotency so retries don't doubleexecute, and rate limiting so one misbehaving client can't take the API ...
@@ -37,7 +37,6 @@ Server contract:
 
 ### Implementation
 
-```java
 @Entity
 public class IdempotencyRecord {
     @Id private String key;
@@ -47,9 +46,7 @@ public class IdempotencyRecord {
     private Instant expiresAt;
     // getters/setters...
 }
-```
 
-```java
 @Service
 public class IdempotencyService {
 
@@ -84,9 +81,7 @@ public class IdempotencyService {
         });
     }
 }
-```
 
-```java
 @PostMapping("/payments")
 public ResponseEntity<?> createPayment(
         @RequestHeader("Idempotency-Key") String key,
@@ -106,7 +101,6 @@ public ResponseEntity<?> createPayment(
     idempotency.complete(key, 201, body);
     return ResponseEntity.status(HttpStatus.CREATED).body(body);
 }
-```
 
 ### Concurrency Note
 
@@ -130,7 +124,6 @@ A bucket holds `N` tokens. Each request removes one. Tokens refill at `R` per se
 </dependency>
 ```
 
-```java
 @Component
 public class RateLimitInterceptor implements HandlerInterceptor {
 
@@ -165,9 +158,7 @@ public class RateLimitInterceptor implements HandlerInterceptor {
         return apiKey != null ? "key:" + apiKey : "ip:" + request.getRemoteAddr();
     }
 }
-```
 
-```java
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
@@ -180,13 +171,11 @@ public class WebConfig implements WebMvcConfigurer {
             .excludePathPatterns("/api/auth/**");   // don't rate-limit login (or do, carefully)
     }
 }
-```
 
 ### Bucket4j With Redis
 
 In a cluster, in-memory buckets are per-instance (3 replicas = 3× the limit). Bucket4j's `ProxyManager` with Redis makes limits global:
 
-```java
 @Bean
 public ProxyManager<String> bucketProxyManager(RedisConnectionFactory factory) {
     RedisBasedProxyManager<String> manager = RedisBasedProxyManager
@@ -198,17 +187,14 @@ public ProxyManager<String> bucketProxyManager(RedisConnectionFactory factory) {
         }
     };
 }
-```
 
 ### Multiple Tiers
 
-```java
 // Per-key: 10 req/s
 Bandwidth perKey = Bandwidth.classic(10, Refill.greedy(1, Duration.ofSeconds(1)));
 // Global: 1000 req/s across all keys
 Bandwidth global = Bandwidth.classic(1000, Refill.greedy(100, Duration.ofSeconds(1)));
 Bucket bucket = Bucket.builder().addLimit(perKey).addLimit(global).build();
-```
 
 ## The 429 Response
 
@@ -226,7 +212,6 @@ Content-Type: application/json
 
 Clients should retry with exponential backoff + jitter:
 
-```java
 public <T> T withRetry(Supplier<T> call, int maxAttempts) {
     for (int attempt = 1; ; attempt++) {
         try {
@@ -241,7 +226,6 @@ public <T> T withRetry(Supplier<T> call, int maxAttempts) {
         }
     }
 }
-```
 
 ## Summary
 
@@ -254,3 +238,4 @@ public <T> T withRetry(Supplier<T> call, int maxAttempts) {
 | Backoff | `Retry-After` header | Clients honor it, with jitter |
 
 Idempotency makes retries *safe*; rate limiting makes the API *available*. Together they're what turns an API from a prototype into a service other teams can depend on.
+

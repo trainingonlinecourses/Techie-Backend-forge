@@ -1,7 +1,7 @@
 ---
 title: The Embedded Server — Tomcat Inside Your App
 module: spring-boot-internals
-order: 3
+order: 4
 minutes: 23
 topics: ["embedded Tomcat", "executable jar", "server configuration", "context path", "ports"]
 summary: In the classic Spring era, deploying meant: install Tomcat on a server, drop your app's WAR file into Tomcat's webapps folder, and hope the Tomcat ...
@@ -18,14 +18,12 @@ In the classic Spring era, deploying meant: install Tomcat on a server, drop you
 
 **Spring Boot flips this**: the web server (Tomcat by default, but also Jetty or Undertow) is a **library inside your application**. Your `main` method starts the whole thing — server included:
 
-```java
 @SpringBootApplication
 public class AcademyApplication {
     public static void main(String[] args) {
         SpringApplication.run(AcademyApplication.class, args);   // starts Tomcat too
     }
 }
-```
 
 When this runs, Spring Boot:
 
@@ -50,7 +48,6 @@ One file, everything inside, runs anywhere with a JRE. This is what makes deploy
 
 ## The Code Walkthrough — Configuring the Server
 
-```java
 // application.properties — the server is just properties now
 server.port=8080                 # which port to bind (0 = random free port)
 server.address=0.0.0.0           # bind to all interfaces (for containers)
@@ -60,9 +57,7 @@ server.tomcat.threads.min-spare=10
 server.tomcat.max-connections=10000
 server.shutdown=graceful         # wait for in-flight requests on shutdown
 server.tomcat.connection-timeout=20s
-```
 
-```java
 // Or programmatically, if you need logic at startup:
 import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.boot.web.servlet.server.ConfigurableServletWebServerFactory;
@@ -80,7 +75,6 @@ class ServerConfig {
         };
     }
 }
-```
 
 ### Walking Through Each Part
 
@@ -139,3 +133,4 @@ Same application code, different server — the servlet API (`jakarta.servlet`) 
 - Every property maps to an env var — containers configure the server externally.
 - Swap Tomcat for Jetty/Undertow by changing the starter dependency.
 - Set `forward-headers-strategy=framework` behind a proxy that terminates TLS.
+

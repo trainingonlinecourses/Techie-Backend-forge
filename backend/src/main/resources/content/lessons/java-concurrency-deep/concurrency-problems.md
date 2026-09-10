@@ -1,7 +1,7 @@
 ---
 title: Race Conditions, Deadlocks and LiveLocks
 module: java-concurrency-deep
-order: 4
+order: 3
 minutes: 25
 topics: ["race conditions", "deadlock", "livelock", "starvation", "memory visibility", "detection tools"]
 summary: Concurrency bugs don't crash at compile time — they corrupt data under load, hang threads at 3 AM, and vanish when you add logging. This lesson is ...
@@ -18,7 +18,6 @@ Concurrency bugs don't crash at compile time — they corrupt data under load, h
 
 **Definition**: the outcome depends on the interleaving of threads — a check-then-act window where two threads can both observe the same pre-condition and act inconsistently.
 
-```java
 public class BookingService {
     private int seats = 10;
 
@@ -28,13 +27,11 @@ public class BookingService {
         }
     }
 }
-```
 
 **Recognition**: works in dev, corrupts under load; wrong counts; missing bookings; "it only happens in production."
 
 **Fix**: make check-then-act atomic (synchronized, lock, or an atomic op):
 
-```java
 private final AtomicInteger seats = new AtomicInteger(10);
 
 public void book() {
@@ -44,19 +41,16 @@ public void book() {
         if (seats.compareAndSet(current, current - 1)) return;  // atomic claim
     }
 }
-```
 
 ## 2. Deadlock
 
 **Definition**: two or more threads each hold a lock the other needs — all wait forever.
 
-```java
 // Thread A: transfer(a→b)
 synchronized (accountA) { synchronized (accountB) { ... } }
 
 // Thread B: transfer(b→a)
 synchronized (accountB) { synchronized (accountA) { ... } }
-```
 
 **Recognition**: threads stuck forever (jstack shows both `WAITING` on each other's monitors), thread dump shows the cycle:
 
@@ -68,11 +62,9 @@ synchronized (accountB) { synchronized (accountA) { ... } }
 **Fixes** (in order of preference):
 
 1. **Lock ordering** — always acquire locks in a global order (by id, by name):
-```java
 Account first = a.id() < b.id() ? a : b;
 Account second = a.id() < b.id() ? b : a;
 synchronized (first) { synchronized (second) { ... } }
-```
 2. **Timeout** — `tryLock(timeout)` and back off instead of waiting forever.
 3. **Single lock** — one lock per subsystem beats lock nesting.
 4. **Lock-free** — atomics and immutable data eliminate the cycle entirely.
@@ -81,32 +73,26 @@ synchronized (first) { synchronized (second) { ... } }
 
 **Definition**: threads aren't blocked — they're *spinning*, each undoing the other's progress forever.
 
-```java
 // Two threads, both politely yielding on contention — neither progresses
 while (!tryLock()) {
     Thread.yield();    // both yield to each other forever
 }
-```
 
 **Recognition**: CPU pegged, threads RUNNABLE but no progress, jstack shows them retrying in a loop.
 
 **Fix**: add randomness/backoff so they desynchronize:
 
-```java
 while (!lock.tryLock()) {
     Thread.sleep(ThreadLocalRandom.current().nextLong(1, 50));  // jitter breaks the symmetry
 }
-```
 
 ## 4. Starvation
 
 **Definition**: a thread is *runnable* but never gets scheduled — others keep winning the lock.
 
-```java
 // Non-fair lock: a burst of thread A acquisitions starves thread B
 // (synchronized is non-fair; ReentrantLock can be fair)
 ReentrantLock lock = new ReentrantLock(true);   // fair — FCFS, prevents starvation
-```
 
 **Recognition**: one thread never progresses while others complete; thread dump shows it RUNNABLE but the same others always hold the lock.
 
@@ -116,7 +102,6 @@ ReentrantLock lock = new ReentrantLock(true);   // fair — FCFS, prevents starv
 
 Not a lock problem — a *memory* problem. Without a happens-before edge, thread B may never see thread A's write:
 
-```java
 // ❌ No happens-before: the loop may run forever
 private boolean done = false;       // not volatile!
 threadA: done = true;
@@ -124,7 +109,6 @@ threadB: while (!done) { }          // may never see the write
 
 // ✅ volatile: visibility guaranteed
 private volatile boolean done = false;
-```
 
 **Recognition**: infinite loops, stale values that "should" have updated, works after adding a print (which incidentally syncs).
 
@@ -163,7 +147,6 @@ Extreme:          single-writer + immutable reads (copy-on-write)
 
 ## Testing for Concurrency Bugs
 
-```java
 // Stress test that reproduces races (run many times)
 @Test
 void noLostUpdatesUnderStress() throws Exception {
@@ -173,7 +156,6 @@ void noLostUpdatesUnderStress() throws Exception {
     }
     assertEquals(100_000, counter.get());
 }
-```
 
 Real production detection: **Chaos/load tests** with high concurrency + randomized schedules, plus JCStress for proving individual races.
 
@@ -188,3 +170,4 @@ Real production detection: **Chaos/load tests** with high concurrency + randomiz
 | Visibility | Stale reads | volatile / happens-before |
 
 All five failures share one cure: **respect the happens-before rules and make check-then-act atomic**. Recognize the symptom (stuck? spinning? stale? wrong?), apply the matching fix, and prove it with stress tests — because a race that "never happens" is just one you haven't reproduced yet.
+

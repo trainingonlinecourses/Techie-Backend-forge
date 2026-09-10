@@ -1,7 +1,7 @@
 ---
 title: Spring Kafka — Producers & Listeners
 summary: KafkaTemplate, @KafkaListener, JSON serialization, config, and the consumer container that powers it all.
-order: 2
+order: 7
 minutes: 20
 topics: [spring-kafka, kafkatemplate, kafkalistener, serde, json]
 docs:
@@ -20,7 +20,6 @@ Spring Kafka gives you a producer and a consumer abstraction over the native cli
 
 ## Producer — KafkaTemplate
 
-```java
 @Service
 public class OrderEventPublisher {
 
@@ -35,13 +34,11 @@ public class OrderEventPublisher {
         kafka.send("orders", event.orderId().toString(), event);
     }
 }
-```
 
 The **key** decides partitioning: same key → same partition → strict per-key ordering. No key → round-robin (good for parallelism, no ordering guarantee).
 
 ## Consumer — @KafkaListener
 
-```java
 @Component
 public class OrderEventConsumer {
 
@@ -51,7 +48,6 @@ public class OrderEventConsumer {
         warehouseService.reserveStock(event);
     }
 }
-```
 
 The method runs in the **consumer container**; returning normally commits the offset. Throwing triggers redelivery — which is why listeners must be **idempotent** (process by event id).
 
@@ -78,13 +74,11 @@ The `JsonSerializer`/`JsonDeserializer` pair handles **type headers**: the produ
 
 ## Records, batches and concurrency
 
-```java
 @KafkaListener(topics = "orders", groupId = "order-processors",
                concurrency = "3") // 3 threads → 3 consumers in this group
 public void onOrder(List<OrderCreated> batch) { // batch mode: use ConsumerRecord or List
     ...
 }
-```
 
 - Default is one record per call; `concurrency` spins up multiple consumers that split the topic's partitions.
 - **A partition is always processed by exactly one consumer in a group** — scaling past the partition count doesn't help.
@@ -92,12 +86,10 @@ public void onOrder(List<OrderCreated> batch) { // batch mode: use ConsumerRecor
 
 ## Callbacks and async errors
 
-```java
 CompletableFuture<SendResult<String, Object>> future = kafka.send("orders", key, event);
 future.whenComplete((res, ex) -> {
     if (ex != null) log.error("Failed to publish order event {}", event.orderId(), ex);
 });
-```
 
 `send` is async — check the future or listen for errors, and **never swallow producer exceptions silently** (the message is lost).
 
@@ -116,3 +108,4 @@ future.whenComplete((res, ex) -> {
 - [Spring Kafka Quick Tour](https://docs.spring.io/spring-kafka/reference/quick-tour.html)
 - [Receiving Messages (@KafkaListener)](https://docs.spring.io/spring-kafka/reference/kafka/receiving-messages/receiving-messages.html)
 - [Apache Kafka Producer/Consumer docs](https://kafka.apache.org/documentation/#producerapi)
+

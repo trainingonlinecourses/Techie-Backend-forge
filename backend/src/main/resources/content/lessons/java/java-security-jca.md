@@ -1,7 +1,7 @@
 ---
 title: Java Cryptography Architecture — Complete Beginner's Guide
 summary: How Java's security API works, message digests, digital signatures, key management, and the crypto operations every backend dev should know.
-order: 17
+order: 46
 minutes: 18
 topics: [jca, cryptography, message digest, digital signature, keypair, keystore]
 docs:
@@ -29,23 +29,34 @@ Algorithm:   Actual SHA-256 implementation
 
 A **message digest** (hash) converts data into a fixed-length string. It's one-way: you can't reverse it.
 
+
+**What this code does — step by step:**
+
+1. Hash a password with SHA-256
+2. `MessageDigest digest = MessageDigest.getInstance("SHA-256");` — Line 1: Get SHA-256 instance
+3. `byte[] hash = digest.digest(password.getBytes(StandardCharsets.UTF_8));` — Line 2: Hash the bytes
+4. `return hash;` — Line 3: Returns 32-byte array (256 bits)
+5. Convert to hex string for storage
+6. `sb.append(String.format("%02x", b));` — Line 1: Convert each byte to 2 hex chars
+7. `return sb.toString();` — Line 2: Returns "a3f2b8c1..." (64 hex chars for SHA-256)
+
+The same code, clean:
+
 ```java
-// Hash a password with SHA-256
 import java.security.MessageDigest;
 
 public byte[] hashPassword(String password) throws Exception {
-    MessageDigest digest = MessageDigest.getInstance("SHA-256");  // Line 1: Get SHA-256 instance
-    byte[] hash = digest.digest(password.getBytes(StandardCharsets.UTF_8));  // Line 2: Hash the bytes
-    return hash;  // Line 3: Returns 32-byte array (256 bits)
+    MessageDigest digest = MessageDigest.getInstance("SHA-256");
+    byte[] hash = digest.digest(password.getBytes(StandardCharsets.UTF_8));
+    return hash;
 }
 
-// Convert to hex string for storage
 public String toHex(byte[] bytes) {
     StringBuilder sb = new StringBuilder();
     for (byte b : bytes) {
-        sb.append(String.format("%02x", b));  // Line 1: Convert each byte to 2 hex chars
+        sb.append(String.format("%02x", b));
     }
-    return sb.toString();  // Line 2: Returns "a3f2b8c1..." (64 hex chars for SHA-256)
+    return sb.toString();
 }
 ```
 
@@ -55,51 +66,81 @@ public String toHex(byte[] bytes) {
 
 A **digital signature** proves that data came from a specific sender and hasn't been tampered with.
 
+
+**What this code does — step by step:**
+
+1. Generate a key pair (public + private)
+2. `KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");` — Line 1: RSA algorithm
+3. `keyGen.initialize(2048);` — Line 2: 2048-bit key size
+4. `KeyPair keyPair = keyGen.generateKeyPair();` — Line 3: Generate keys
+5. Sign data
+6. `Signature sig = Signature.getInstance("SHA256withRSA");` — Line 1: Signing algorithm
+7. `sig.initSign(keyPair.getPrivate());` — Line 2: Use private key to sign
+8. `sig.update(data.getBytes(StandardCharsets.UTF_8));` — Line 3: Feed the data
+9. `byte[] signature = sig.sign();` — Line 4: Generate signature
+10. Verify signature
+11. `Signature verifySig = Signature.getInstance("SHA256withRSA");` — Line 1: Same algorithm
+12. `verifySig.initVerify(keyPair.getPublic());` — Line 2: Use public key to verify
+13. `verifySig.update(data.getBytes(StandardCharsets.UTF_8));` — Line 3: Feed the same data
+14. `boolean isValid = verifySig.verify(signature);` — Line 4: Check if signature matches
+15. isValid = true → data is authentic and untampered
+
+The same code, clean:
+
 ```java
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.Signature;
 
-// Generate a key pair (public + private)
-KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");  // Line 1: RSA algorithm
-keyGen.initialize(2048);                                        // Line 2: 2048-bit key size
-KeyPair keyPair = keyGen.generateKeyPair();                     // Line 3: Generate keys
+KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
+keyGen.initialize(2048);
+KeyPair keyPair = keyGen.generateKeyPair();
 
-// Sign data
-Signature sig = Signature.getInstance("SHA256withRSA");  // Line 1: Signing algorithm
-sig.initSign(keyPair.getPrivate());                      // Line 2: Use private key to sign
-sig.update(data.getBytes(StandardCharsets.UTF_8));       // Line 3: Feed the data
-byte[] signature = sig.sign();                           // Line 4: Generate signature
+Signature sig = Signature.getInstance("SHA256withRSA");
+sig.initSign(keyPair.getPrivate());
+sig.update(data.getBytes(StandardCharsets.UTF_8));
+byte[] signature = sig.sign();
 
-// Verify signature
-Signature verifySig = Signature.getInstance("SHA256withRSA");  // Line 1: Same algorithm
-verifySig.initVerify(keyPair.getPublic());                      // Line 2: Use public key to verify
-verifySig.update(data.getBytes(StandardCharsets.UTF_8));        // Line 3: Feed the same data
-boolean isValid = verifySig.verify(signature);                   // Line 4: Check if signature matches
-// isValid = true → data is authentic and untampered
+Signature verifySig = Signature.getInstance("SHA256withRSA");
+verifySig.initVerify(keyPair.getPublic());
+verifySig.update(data.getBytes(StandardCharsets.UTF_8));
+boolean isValid = verifySig.verify(signature);
 ```
 
 **Real-world use:** JWT tokens use digital signatures to prove the token was issued by your server and wasn't modified.
 
 ## Key Management — storing and protecting keys
 
+
+**What this code does — step by step:**
+
+1. Generate and store a key pair in a keystore
+2. Create a keystore
+3. `KeyStore keyStore = KeyStore.getInstance("PKCS12");` — Line 1: PKCS12 format
+4. `keyStore.load(null, "password".toCharArray());` — Line 2: Initialize empty keystore
+5. `keyStore.setKeyEntry("mykey",` — Line 3: Alias
+6. `keyPair.getPrivate(),` — Line 4: Private key
+7. `"password".toCharArray(),` — Line 5: Key password
+8. `new Certificate[]{/* certificate */});` — Line 6: Certificate chain
+9. Save keystore to file
+10. `keyStore.store(fos, "password".toCharArray());` — Line 1: Store with password
+
+The same code, clean:
+
 ```java
-// Generate and store a key pair in a keystore
 KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
 keyGen.initialize(2048);
 KeyPair keyPair = keyGen.generateKeyPair();
 
-// Create a keystore
-KeyStore keyStore = KeyStore.getInstance("PKCS12");  // Line 1: PKCS12 format
-keyStore.load(null, "password".toCharArray());        // Line 2: Initialize empty keystore
-keyStore.setKeyEntry("mykey",                        // Line 3: Alias
-    keyPair.getPrivate(),                            // Line 4: Private key
-    "password".toCharArray(),                        // Line 5: Key password
-    new Certificate[]{/* certificate */});            // Line 6: Certificate chain
+KeyStore keyStore = KeyStore.getInstance("PKCS12");
+keyStore.load(null, "password".toCharArray());
+keyStore.setKeyEntry("mykey",
+    keyPair.getPrivate(),
+    "password".toCharArray(),
+    new Certificate[]{/* certificate */});
 
-// Save keystore to file
 try (FileOutputStream fos = new FileOutputStream("keystore.p12")) {
-    keyStore.store(fos, "password".toCharArray());   // Line 1: Store with password
+    keyStore.store(fos, "password".toCharArray());
 }
 ```
 
@@ -112,19 +153,29 @@ try (FileOutputStream fos = new FileOutputStream("keystore.p12")) {
 | **Key distribution** | Problem: how to share the key safely | Easy: share public key openly |
 | **Use case** | Encrypting data at rest | Key exchange, digital signatures, JWT |
 
+
+**What this code does — step by step:**
+
+1. Symmetric encryption (AES)
+2. `keyGen.init(256);` — Line 1: 256-bit key
+3. `Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");` — Line 2: AES with GCM mode
+4. `cipher.init(Cipher.ENCRYPT_MODE, key);` — Line 3: Initialize for encryption
+5. `byte[] encrypted = cipher.doFinal(data.getBytes());` — Line 4: Encrypt
+
+The same code, clean:
+
 ```java
-// Symmetric encryption (AES)
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 
 KeyGenerator keyGen = KeyGenerator.getInstance("AES");
-keyGen.init(256);  // Line 1: 256-bit key
+keyGen.init(256);
 SecretKey key = keyGen.generateKey();
 
-Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");  // Line 2: AES with GCM mode
-cipher.init(Cipher.ENCRYPT_MODE, key);                      // Line 3: Initialize for encryption
-byte[] encrypted = cipher.doFinal(data.getBytes());         // Line 4: Encrypt
+Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+cipher.init(Cipher.ENCRYPT_MODE, key);
+byte[] encrypted = cipher.doFinal(data.getBytes());
 ```
 
 ## Common mistakes
@@ -146,3 +197,4 @@ byte[] encrypted = cipher.doFinal(data.getBytes());         // Line 4: Encrypt
 - Never hardcode keys — use keystores, vaults, or environment variables
 
 **Official docs:** [JCA Reference Guide](https://docs.oracle.com/en/java/javase/21/security/java-cryptography-architecture-jca-reference-guide.html) · [Standard Names](https://docs.oracle.com/en/java/javase/21/docs/specs/security/standard-names.html)
+

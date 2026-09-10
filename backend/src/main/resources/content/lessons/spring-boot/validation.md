@@ -1,7 +1,7 @@
 ---
 title: "Bean Validation — Reject Bad Data Before It Touches Your Code"
 summary: "What Bean Validation is, how @Valid works, custom constraints, group validation, and how organizations use it to enforce data quality at the API boundary."
-order: 55
+order: 54
 minutes: 20
 topics: [bean-validation, hibernate-validator, @valid, custom-constraints, validation-groups, jakarta-validation]
 docs:
@@ -16,66 +16,78 @@ docs:
 **Bean Validation = automatic input checking.** It's a standard (Jakarta Bean Validation) that lets you declare rules on your data classes, and the framework checks them automatically.
 
 Without validation:
+
+**What this code does — step by step:**
+
+1. BAD — no validation
+2. user.name could be null, empty, or "a". User.email could be "not-an-email". User.age could be -5 or 999
+3. Garbage in, garbage out — bugs everywhere
+
+The same code, clean:
+
 ```java
-// BAD — no validation
 @PostMapping("/users")
 public User create(@RequestBody User user) {
-    // user.name could be null, empty, or "a"
-    // user.email could be "not-an-email"
-    // user.age could be -5 or 999
     return userService.create(user);
-    // Garbage in, garbage out — bugs everywhere
 }
 ```
 
 With validation:
+
+**What this code does — step by step:**
+
+1. GOOD — validation at the boundary
+2. @Valid triggers automatic validation. If name is blank → 400 Bad Request with error message. If email is invalid → 400 Bad Request with error message. If age < 0 → 400 Bad Request with error message. Only valid data reaches your service layer
+
+The same code, clean:
+
 ```java
-// GOOD — validation at the boundary
 @PostMapping("/users")
 public User create(@Valid @RequestBody User user) {
-    // @Valid triggers automatic validation
-    // If name is blank → 400 Bad Request with error message
-    // If email is invalid → 400 Bad Request with error message
-    // If age < 0 → 400 Bad Request with error message
-    // Only valid data reaches your service layer
     return userService.create(user);
 }
 ```
 
 ### The Basics — Built-in Annotations
 
+
+**What this code does — step by step:**
+
+1. ↑ Cannot be null, empty, or whitespace-only
+2. ↑ Must match email format
+3. ↑ Cannot be null AND must be > 0
+4. ↑ Length must be between 8 and 100
+5. ↑ Must match regex pattern
+6. ↑ Must be between 1 and 999
+7. ↑ Must be between 0.01 and 99,999.99
+
+The same code, clean:
+
 ```java
 public class CreateUserRequest {
-    
+
     @NotBlank(message = "Name is required")
     String name;
-    // ↑ Cannot be null, empty, or whitespace-only
-    
+
     @NotBlank @Email(message = "Email must be valid")
     String email;
-    // ↑ Must match email format
-    
+
     @NotNull @Positive(message = "Age must be positive")
     Integer age;
-    // ↑ Cannot be null AND must be > 0
-    
+
     @Size(min = 8, max = 100, message = "Password must be 8-100 chars")
     String password;
-    // ↑ Length must be between 8 and 100
-    
+
     @Pattern(regexp = "^[A-Z]{2}\\d{4}$", message = "Code must be 2 letters + 4 digits")
     String code;
-    // ↑ Must match regex pattern
-    
+
     @Min(value = 1, message = "Quantity must be at least 1")
     @Max(value = 999, message = "Quantity cannot exceed 999")
     int quantity;
-    // ↑ Must be between 1 and 999
-    
+
     @DecimalMin(value = "0.01", message = "Price must be positive")
     @DecimalMax(value = "99999.99", message = "Price cannot exceed 99,999.99")
     BigDecimal price;
-    // ↑ Must be between 0.01 and 99,999.99
 }
 ```
 
@@ -100,7 +112,6 @@ public class CreateUserRequest {
 
 Create your own validation annotations:
 
-```java
 // Step 1: Define the annotation
 @Target({ElementType.FIELD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
@@ -128,23 +139,30 @@ public class ContactRequest {
     @PhoneNumber String phone;
     @NotBlank String name;
 }
-```
 
 ### Nested Validation
 
 Validate objects inside objects:
 
+
+**What this code does — step by step:**
+
+1. ↑ @Valid triggers validation on Customer fields too
+2. ↑ Each item in the list is also validated
+3. `String notes;` — Optional, no validation
+4. When you validate OrderRequest: - customer.name must not be blank. - customer.email must be valid. - Each item.productId must not be blank. - Each item.quantity must be positive. - etc.
+
+The same code, clean:
+
 ```java
 public class OrderRequest {
     @NotNull @Valid
     Customer customer;
-    // ↑ @Valid triggers validation on Customer fields too
-    
+
     @NotEmpty @Valid
     List<OrderItem> items;
-    // ↑ Each item in the list is also validated
-    
-    String notes; // Optional, no validation
+
+    String notes;
 }
 
 public class Customer {
@@ -158,20 +176,12 @@ public class OrderItem {
     @Positive int quantity;
     @PositiveOrZero BigDecimal price;
 }
-
-// When you validate OrderRequest:
-// - customer.name must not be blank
-// - customer.email must be valid
-// - Each item.productId must not be blank
-// - Each item.quantity must be positive
-// - etc.
 ```
 
 ### Global Exception Handler
 
 Handle validation errors gracefully:
 
-```java
 @RestControllerAdvice
 public class ValidationExceptionHandler {
     
@@ -189,30 +199,38 @@ public class ValidationExceptionHandler {
         // Returns: {"name": "Name is required", "email": "Email must be valid"}
     }
 }
-```
 
 ### Validation Groups
 
 Validate different fields for different operations:
 
+
+**What this code does — step by step:**
+
+1. Define groups
+2. `@NotBlank(groups = Create.class)` — Required only on create
+3. `@NotBlank(groups = {Create.class, Update.class})` — Always required
+4. `@NotBlank(groups = Create.class)` — Required only on create
+5. Controller — use different groups
+
+The same code, clean:
+
 ```java
-// Define groups
 public interface Create {}
 public interface Update {}
 
 public class UserRequest {
-    @NotBlank(groups = Create.class)  // Required only on create
+    @NotBlank(groups = Create.class)
     Long id;
-    
-    @NotBlank(groups = {Create.class, Update.class})  // Always required
+
+    @NotBlank(groups = {Create.class, Update.class})
     String name;
-    
-    @NotBlank(groups = Create.class)  // Required only on create
+
+    @NotBlank(groups = Create.class)
     @Size(min = 8, groups = Create.class)
     String password;
 }
 
-// Controller — use different groups
 @PostMapping
 public User create(@Validated(Create.class) @RequestBody UserRequest request) {
     return userService.create(request);
@@ -237,34 +255,36 @@ public User update(@PathVariable Long id,
 
 ### Line-by-Line Code Explanation
 
+
+**What this code does — step by step:**
+
+1. ↑ Java Record — immutable, auto-generates everything
+2. ↑ Constraint: name cannot be null, empty, or whitespace-only. ↑ message = custom error message shown to client
+3. ↑ Field type: String — the user's display name
+4. ↑ Two constraints on the same field — BOTH must pass. ↑ @Email checks format: something@something.domain
+5. ↑ Only validated when Create group is active. ↑ On Update, password can be null (user keeps existing password)
+6. ↑ Optional field — if provided, must match E.164 format. ↑ null is allowed (phone is optional)
+
+The same code, clean:
+
 ```java
 public record CreateUserRequest(
-    // ↑ Java Record — immutable, auto-generates everything
-    
+
     @NotBlank(message = "Name is required")
-    // ↑ Constraint: name cannot be null, empty, or whitespace-only
-    // ↑ message = custom error message shown to client
-    
+
     String name,
-    // ↑ Field type: String — the user's display name
-    
+
     @NotBlank(message = "Email is required")
     @Email(message = "Must be a valid email address")
-    // ↑ Two constraints on the same field — BOTH must pass
-    // ↑ @Email checks format: something@something.domain
-    
+
     String email,
-    
+
     @NotBlank(groups = Create.class, message = "Password required")
     @Size(min = 8, max = 100, groups = Create.class, message = "8-100 characters")
     String password,
-    // ↑ Only validated when Create group is active
-    // ↑ On Update, password can be null (user keeps existing password)
-    
+
     @Pattern(regexp = "^\\+?[1-9]\\d{1,14}$", message = "Invalid phone")
     String phone
-    // ↑ Optional field — if provided, must match E.164 format
-    // ↑ null is allowed (phone is optional)
 ) {}
 ```
 
@@ -280,3 +300,4 @@ public record CreateUserRequest(
 ### Real-World Organization Scenario
 
 A healthcare platform validates patient data with 20+ custom constraints: `@ValidPatientId`, `@ValidDosage`, `@ValidDateOfBirth`. They use validation groups to enforce different rules for `Admission` vs `Discharge` vs `Update` operations. The global exception handler returns structured error messages that the frontend displays inline next to each form field.
+

@@ -1,7 +1,7 @@
 ---
 title: API Gateway Filters — Request Transformation
 summary: Pre/post filters, rate limiting, authentication, request/response modification, and routing in Spring Cloud Gateway.
-order: 12
+order: 1
 minutes: 18
 topics: [api-gateway, gateway-filters, rate-limiting, authentication, request-transformation, routing]
 docs:
@@ -33,7 +33,6 @@ A **Gateway Filter** intercepts requests and responses at the API Gateway level,
 
 ### Authentication Filter
 
-```java
 @Component
 public class AuthenticationFilter implements GlobalFilter, Ordered {
 
@@ -78,11 +77,9 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
         return -100;  // Run early in the filter chain
     }
 }
-```
 
 ### Rate Limiting Filter
 
-```java
 @Component
 public class RateLimitFilter implements GlobalFilter, Ordered {
 
@@ -127,11 +124,9 @@ public class RateLimitFilter implements GlobalFilter, Ordered {
         return -90;
     }
 }
-```
 
 ### Logging Filter
 
-```java
 @Component
 public class LoggingFilter implements GlobalFilter, Ordered {
 
@@ -162,7 +157,6 @@ public class LoggingFilter implements GlobalFilter, Ordered {
         return -200;  // Run first
     }
 }
-```
 
 ---
 
@@ -200,7 +194,6 @@ spring:
 
 ## Custom Gateway Filter Factory
 
-```java
 @Component
 public class AddUserInfoGatewayFilterFactory extends AbstractGatewayFilterFactory<Object> {
 
@@ -230,7 +223,6 @@ public class AddUserInfoGatewayFilterFactory extends AbstractGatewayFilterFactor
         return "PREMIUM";  // Simplified
     }
 }
-```
 
 ---
 
@@ -238,7 +230,6 @@ public class AddUserInfoGatewayFilterFactory extends AbstractGatewayFilterFactor
 
 ### Scenario 1: Multi-Tenant Routing
 
-```java
 @Component
 public class TenantRoutingFilter implements GlobalFilter, Ordered {
 
@@ -271,11 +262,9 @@ public class TenantRoutingFilter implements GlobalFilter, Ordered {
         return -150;
     }
 }
-```
 
 ### Scenario 2: Request Response Transformation
 
-```java
 @Component
 public class ResponseTransformationFilter implements GlobalFilter, Ordered {
 
@@ -309,7 +298,6 @@ public class ResponseTransformationFilter implements GlobalFilter, Ordered {
         return -50;
     }
 }
-```
 
 ---
 
@@ -323,3 +311,4 @@ public class ResponseTransformationFilter implements GlobalFilter, Ordered {
 | Missing CORS in gateway | Frontend can't call API | Handle CORS at gateway level |
 | No request timeout | Requests hang forever | Configure per-route timeouts |
 | Logging everything | Performance impact | Log selectively, use structured logging |
+

@@ -1,7 +1,7 @@
 ---
 title: OWASP Top 10 for Spring Backends
 summary: The ten vulnerabilities that actually hit web APIs — and the Spring/Java countermeasures for each, from injection to insecure design.
-order: 5
+order: 4
 minutes: 16
 topics: [owasp top 10, injection, xss, csrf, ssrf, security hardening]
 docs:
@@ -17,7 +17,6 @@ The OWASP Top 10 is the industry's agreed list of the most dangerous web vulnera
 
 Missing authorization checks, IDOR (`GET /orders/42` — but is it *your* 42?), privilege escalation, forced browsing.
 
-```java
 @GetMapping("/orders/{id}")
 public OrderDto get(@PathVariable long id) {
     Order o = orderRepo.findById(id).orElseThrow();
@@ -28,7 +27,6 @@ public OrderDto get(@PathVariable long id) {
 // Never trust a client-supplied "isAdmin" — authority comes from the server's authentication
 @PreAuthorize("hasRole('ADMIN')")
 @DeleteMapping("/users/{id}")
-```
 
 Countermeasures: authorization at **every** layer (URL + method + object), deny-by-default `anyRequest().authenticated()`, never rely on client-sent identity, and test with role-matrix tests (user A must not read user B's data — write that test).
 
@@ -45,13 +43,11 @@ Sensitive data in transit or at rest unprotected — old TLS, weak algorithms, p
 
 The classic: string-built queries.
 
-```java
 // WRONG
 jdbc.query("SELECT * FROM users WHERE name = '" + input + "'", ...);   // ' OR 1=1 --
 // RIGHT
 jdbc.query("SELECT * FROM users WHERE name = ?", ps -> ps.setString(1, input), ...);
 // Spring Data derived queries and @Query with :params are parameterized by design — use them
-```
 
 Countermeasures: **parameterized queries everywhere** (JDBC `?`, JPA named params, Mongo `Criteria` — never string-concatenated `$where`), validate input at the boundary (Bean Validation), least-privilege DB roles (the app user can't `DROP TABLE`). SpEL/user expressions: only `SimpleEvaluationContext` (the SpEL lesson).
 
@@ -103,12 +99,10 @@ You can't respond to what you can't see. The logging lesson's discipline: struct
 
 The app fetches a user-supplied URL → the attacker points it at internal services (`http://169.254.169.254/`, the cloud metadata endpoint).
 
-```java
 // Validate and allowlist destinations before any client.fetch(url):
 URI u = new URI(url);
 if (!ALLOWED_HOSTS.contains(u.getHost())) throw new BadRequestException();
 // or block private/loopback/link-local ranges explicitly
-```
 
 Applies to: webhooks, image fetchers, file-import-by-URL, **AI tool-calling** (a chat model that fetches URLs — the exact surface this academy's AI tutor could expose). Never follow redirects blindly; validate the *final* host.
 
@@ -125,3 +119,4 @@ A security regression suite isn't exotic — it's five `MockMvc` tests: anonymou
 - Validate any URL your server will fetch (SSRF) — including URLs an AI assistant might fetch.
 
 Official docs: [OWASP Top 10](https://owasp.org/Top10/) · [Spring Security](https://docs.spring.io/spring-security/reference/)
+

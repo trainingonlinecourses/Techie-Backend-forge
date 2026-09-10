@@ -1,7 +1,7 @@
 ---
 title: Spring Profiles — Environment-Specific Configuration
 summary: Profile-based beans, YAML multi-document profiles, @Profile on @Configuration, activation strategies, profile groups, and how organizations isolate dev/staging/prod without config drift.
-order: 27
+order: 41
 minutes: 22
 topics: [spring-profile, profile-activation, profile-specific-yaml, @profile, profile-groups, config-drift, environment-isolation]
 docs:
@@ -92,7 +92,6 @@ spring:
 
 ## @Profile on beans and configurations
 
-```java
 @Configuration
 public class CacheConfig {
 
@@ -108,9 +107,7 @@ public class CacheConfig {
         return new RedisCacheService();  // production-grade Redis cache
     }
 }
-```
 
-```java
 @Configuration
 @Profile("prod")
 @EnableScheduling
@@ -121,17 +118,14 @@ public class ProductionMetricsConfig {
         return registry -> registry.config().commonTags("env", "prod");
     }
 }
-```
 
 **Negation:** `@Profile("!prod")` means "load this bean in every profile EXCEPT prod."
 
-```java
 @Bean
 @Profile("!prod")
 public DataSource devDataSource() {
     return new EmbeddedDatabaseBuilder().setType(H2).build();  // H2 for non-prod
 }
-```
 
 ## Profile groups
 
@@ -151,7 +145,6 @@ Now `--spring.profiles.active=production` activates `prod`, `metrics`, and `audi
 
 Combine `@Profile` with other conditions for fine-grained control:
 
-```java
 @Component
 @Profile("prod & monitoring")
 @ConditionalOnProperty(name = "management.prometheus.enabled", havingValue = "true")
@@ -159,13 +152,11 @@ public class CustomPrometheusExporter {
     // Only loads when prod profile is active AND monitoring profile is active
     // AND prometheus is enabled in properties
 }
-```
 
 ## How we use it in organizations
 
 ### Scenario 1: different payment gateways per environment
 
-```java
 @Configuration
 public class PaymentGatewayConfig {
 
@@ -187,13 +178,11 @@ public class PaymentGatewayConfig {
         return new MockPaymentGateway();  // always succeeds
     }
 }
-```
 
 Developers use `local` (mock), QA uses `sandbox` (test keys), production uses `prod` (real keys). Zero config changes needed to switch.
 
 ### Scenario 2: database per environment
 
-```java
 @Configuration
 @Profile("test")
 public class TestDatabaseConfig {
@@ -211,11 +200,9 @@ public class TestDatabaseConfig {
         return Flyway::migrate;  // run migrations on test DB
     }
 }
-```
 
 ### Scenario 3: scheduled tasks only in production
 
-```java
 @Component
 @Profile("prod")
 public class DailyReportScheduler {
@@ -227,7 +214,6 @@ public class DailyReportScheduler {
         s3Service.upload(report);
     }
 }
-```
 
 Developers do not get spammed with daily reports during local development.
 
@@ -257,3 +243,4 @@ If active profiles are `dev,prod`, the value is `300` (prod wins because it was 
 | Too many profiles | Combinatorial explosion — hard to test |
 | Not activating profiles in tests | Tests run with default config, not environment-specific |
 | Storing secrets in profile YAML files | Secrets in source control — use env vars instead |
+

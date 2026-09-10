@@ -1,7 +1,7 @@
 ---
 title: Non-Web Spring Boot Applications — CLI, Batch, and Background Services
 summary: Building Spring Boot apps that don't serve HTTP — command-line runners, application runners, scheduled services, and when to use a web server vs a standalone process.
-order: 19
+order: 38
 minutes: 18
 topics: [non-web, commandline-runner, application-runner, spring-boot-cli, background-service, headless]
 docs:
@@ -28,7 +28,6 @@ These apps start up, do their work, and either keep running (background service)
 
 The simplest way: tell Spring Boot not to start a web server.
 
-```java
 @SpringBootApplication
 public class BatchApplication {
     public static void main(String[] args) {
@@ -37,7 +36,6 @@ public class BatchApplication {
         app.run(args);                                        // Line 2: start and run
     }
 }
-```
 
 **Line-by-line walkthrough:**
 
@@ -53,18 +51,15 @@ spring:
 ```
 
 **Another alternative (for pure batch):**
-```java
 @SpringBootApplication(exclude = {
     DataSourceAutoConfiguration.class,  // if you don't need a database yet
     HibernateJpaAutoConfiguration.class
 })
-```
 
 ## CommandLineRunner: Run Once at Startup
 
 `CommandLineRunner` is a bean that runs **exactly once** after the application context is fully loaded. It receives the raw command-line arguments:
 
-```java
 @Component
 public class DataMigrationRunner implements CommandLineRunner {
 
@@ -92,7 +87,6 @@ public class DataMigrationRunner implements CommandLineRunner {
         System.out.println("Migration complete!");
     }
 }
-```
 
 **Run it:**
 ```bash
@@ -114,7 +108,6 @@ java -jar myapp.jar                      # skips it
 
 `ApplicationRunner` is identical to `CommandLineRunner` but wraps the arguments in an `ApplicationArguments` object that parses `--key=value` flags:
 
-```java
 @Component
 public class ReportGenerator implements ApplicationRunner {
 
@@ -136,7 +129,6 @@ public class ReportGenerator implements ApplicationRunner {
         }
     }
 }
-```
 
 **Run it:**
 ```bash
@@ -155,7 +147,6 @@ java -jar myapp.jar --format=pdf report1.csv report2.csv
 
 `CommandLineRunner` and `ApplicationRunner` run once and return. For services that need to keep running (processing queue messages, watching files, running scheduled tasks), you need something that keeps the JVM alive:
 
-```java
 @SpringBootApplication
 public class QueueProcessorApplication {
     public static void main(String[] args) {
@@ -186,12 +177,10 @@ public class MessageListener implements CommandLineRunner {
         });
     }
 }
-```
 
 **How it stays alive:** The `executor.submit()` starts a daemon thread. Spring Boot's main thread is blocked by `SpringApplication.run()` waiting for a shutdown signal (Ctrl+C / SIGTERM). The background thread processes messages until the app is stopped.
 
 **For scheduled tasks (no background thread needed):**
-```java
 @Component
 public class DailyReportJob {
 
@@ -201,7 +190,6 @@ public class DailyReportJob {
         // ... work ...
     }
 }
-```
 
 The `@Scheduled` annotation keeps the Spring context alive (the task scheduler thread pool is a non-daemon thread). No manual thread management needed.
 
@@ -218,7 +206,7 @@ The `@Scheduled` annotation keeps the Spring context alive (the task scheduler t
 ## Production Considerations
 
 1. **Health checks:** Even non-web apps can expose health via Spring Boot Actuator on a separate management port:
-   ```yaml
+```yaml
    management:
      server:
        port: 8081  # separate port for Actuator
@@ -227,12 +215,10 @@ The `@Scheduled` annotation keeps the Spring context alive (the task scheduler t
 2. **Graceful shutdown:** Implement `DisposableBean` or `@PreDestroy` to clean up resources (close database connections, finish in-flight work, flush logs).
 
 3. **Exit codes:** Use `System.exit()` or Spring Boot's `ExitCodeGenerator` to signal success/failure to orchestrators (Kubernetes, systemd):
-   ```java
    @Bean
    public ExitCodeGenerator exitCodeGenerator() {
        return () -> someCondition ? 0 : 1;
    }
-   ```
 
 4. **Logging:** Non-web apps should log to stdout (container convention) or a file, not the web server's access log.
 
@@ -247,3 +233,4 @@ The `@Scheduled` annotation keeps the Spring context alive (the task scheduler t
 - Use Actuator on a separate port for health checks even without a main web server
 
 Official docs: [Application Arguments](https://docs.spring.io/spring-boot/reference/using/application-arguments.html) · [Scheduling](https://docs.spring.io/spring-boot/reference/io/scheduling.html)
+

@@ -1,7 +1,7 @@
 ---
 title: Spring Cloud Function
 summary: Business logic as portable functions — the same Function/Supplier/Consumer deployed as a REST endpoint, a Kafka/Rabbit consumer, or a serverless function.
-order: 10
+order: 11
 minutes: 14
 topics: [spring cloud function, functions, serverless, portability, function composition]
 docs:
@@ -14,7 +14,6 @@ docs:
 
 Spring Cloud Function separates **business logic** from its **transport**. You write a plain `Function<T, R>`; the framework exposes it as whatever the deployment needs — a REST endpoint, a Kafka/Rabbit/Stream consumer, a serverless function (AWS Lambda, Azure). Same jar, different bindings, zero business-code changes.
 
-```java
 @Configuration
 public class OrderFunctions {
 
@@ -34,7 +33,6 @@ public class OrderFunctions {
         return () -> reportService.generate();          // produces on demand / on schedule
     }
 }
-```
 
 No controllers, no listeners — just functions with typed input/output.
 
@@ -64,13 +62,11 @@ Functions compose the way they should — with `|`:
 spring.cloud.function.definition: validateOrder|planShipping
 ```
 
-```java
 @Bean
 Function<OrderCreated, OrderCreated> validateOrder() {
     return o -> { if (!o.valid()) throw new IllegalArgumentException(); return o; };
 }
 // validateOrder|planShipping = the pipeline, declared in config, reorderable without code
-```
 
 **Routing** picks a function at runtime by a header/payload key:
 
@@ -101,13 +97,11 @@ The honest guidance: it's a **deployment portability layer**, not an application
 
 The portability pays for itself in tests — the function is a plain Java call:
 
-```java
 @Test
 void plansShipping() {
     ShippingInstruction result = functions.planShipping().apply(new OrderCreated("42", "berlin"));
     assertThat(result.destination()).isEqualTo("berlin");
 }
-```
 
 The integration test replaces the transport: call the function, or use the Spring Cloud Stream test binder (`spring-cloud-stream-test-binder`) to assert it emits onto its binding — the same test-binder discipline as the Stream lesson.
 
@@ -119,3 +113,4 @@ The integration test replaces the transport: call the function, or use the Sprin
 - Functions are plain Java: unit tests are trivial, and the test binder covers the transport.
 
 Official docs: [Spring Cloud Function](https://docs.spring.io/spring-cloud-function/reference/)
+

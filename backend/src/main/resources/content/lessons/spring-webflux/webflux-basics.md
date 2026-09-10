@@ -1,7 +1,7 @@
 ---
 title: Spring WebFlux — Controllers & Functional Endpoints
 summary: Annotation-based controllers returning Mono/Flux, RouterFunction endpoints, Netty, and streaming responses.
-order: 3
+order: 14
 minutes: 20
 topics: [webflux, controller, routerfunction, netty, sse, functional-endpoints]
 docs:
@@ -17,7 +17,6 @@ WebFlux runs on **Netty** (or servlet 3.1+ containers in servlet mode) with a **
 
 ## Style 1 — Annotation controllers (familiar, most common)
 
-```java
 @RestController
 @RequestMapping("/api/customers")
 public class CustomerController {
@@ -43,13 +42,11 @@ public class CustomerController {
         return repo.save(customer);
     }
 }
-```
 
 Controller methods return `Mono<T>` (one thing) or `Flux<T>` (many things); Spring adapts them to the HTTP response automatically. One crucial difference from servlet: **`@RequestBody` is read reactively** — the request body becomes the argument without ever blocking a thread.
 
 ## Style 2 — Functional endpoints (RouterFunction)
 
-```java
 @Configuration
 public class CustomerRouter {
 
@@ -62,9 +59,7 @@ public class CustomerRouter {
                 .build();
     }
 }
-```
 
-```java
 @Component
 public class CustomerHandler {
 
@@ -80,7 +75,6 @@ public class CustomerHandler {
                 .switchIfEmpty(ServerResponse.notFound().build());
     }
 }
-```
 
 Functional style shines for: small gateways, route tables that are config-like, and programmatic composition (add auth/validation per route). Most applications are fine with annotation controllers; use functional where the routing *is* the feature.
 
@@ -88,12 +82,10 @@ Functional style shines for: small gateways, route tables that are config-like, 
 
 WebFlux streams a `Flux` to the client with **Server-Sent Events** — the browser- and HTTP-friendly push protocol:
 
-```java
 @GetMapping(value = "/api/quotes/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
 public Flux<Quote> quotes() {
     return Flux.interval(Duration.ofMillis(200)).map(i -> new Quote("quote-" + i));
 }
-```
 
 The response stays open and pushes events as the `Flux` produces them — no polling, no WebSocket handshake. Use SSE for feeds, notifications, and live dashboards; use WebSocket when the client must also push back.
 
@@ -101,7 +93,6 @@ The response stays open and pushes events as the `Flux` produces them — no pol
 
 WebFlux supports RFC 7807 problem details like servlet does:
 
-```java
 @RestControllerAdvice
 public class ApiExceptionHandler {
 
@@ -112,7 +103,6 @@ public class ApiExceptionHandler {
         return pd;
     }
 }
-```
 
 `Mono.error(...)` / thrown exceptions in reactive chains are routed to `@RestControllerAdvice` the same way as servlet.
 
@@ -131,3 +121,4 @@ public class ApiExceptionHandler {
 - [WebFlux — Annotated Controllers](https://docs.spring.io/spring-framework/reference/web/webflux-controller.html)
 - [WebFlux — Functional Endpoints](https://docs.spring.io/spring-framework/reference/web/webflux-functional.html)
 - [WebFlux — HTTP Streaming](https://docs.spring.io/spring-framework/reference/web/webflux.html#webflux-codecs-streaming)
+

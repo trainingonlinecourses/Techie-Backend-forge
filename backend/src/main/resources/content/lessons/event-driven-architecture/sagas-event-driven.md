@@ -41,30 +41,36 @@ OrderPlaced ──▶ InventoryService: reserve stock
                       └─ StockUnavailable ──▶ OrderService: MarkOrderCancelled (COMPENSATION)
 ```
 
+
+**What this code does — step by step:**
+
+1. Each participant is a saga step — an event listener doing its local. Transaction, then publishing the next event:
+2. `inventory.reserve(event.items());` — local transaction 1
+3. The failure path publishes a FAILURE event — the. Compensation chain starts here:
+4. THE COMPENSATION — triggered by a later step's failure:
+5. `inventory.release(event.orderId(), event.items());` — undo the reserve
+
+The same code, clean:
+
 ```java
-// Each participant is a saga step — an event listener doing its local
-// transaction, then publishing the next event:
 @Service
 public class InventorySagaStep {
 
     @KafkaListener(topics = "orders")
     public void onOrderPlaced(OrderPlaced event) {
         try {
-            inventory.reserve(event.items());               // local transaction 1
+            inventory.reserve(event.items());
             kafka.send("inventory", event.orderId(),
                        new StockReserved(event.orderId(), event.items()));
         } catch (StockUnavailableException ex) {
-            // The failure path publishes a FAILURE event — the
-            // compensation chain starts here:
             kafka.send("inventory", event.orderId(),
                        new StockUnavailable(event.orderId()));
         }
     }
 
-    // THE COMPENSATION — triggered by a later step's failure:
     @KafkaListener(topics = "payments")
     public void onPaymentFailed(PaymentFailed event) {
-        inventory.release(event.orderId(), event.items());   // undo the reserve
+        inventory.release(event.orderId(), event.items());
     }
 }
 ```
@@ -75,27 +81,36 @@ public class InventorySagaStep {
 
 **Orchestrated sagas** put a **saga orchestrator** (a dedicated component — a state machine) in charge: it *commands* each participant ("reserve stock", "charge card"), waits for the result, and decides the next step or the compensation path:
 
+
+**What this code does — step by step:**
+
+1. The orchestrator — a state machine driving the saga:
+2. States: PENDING -> STOCK_RESERVED -> PAYMENT_CHARGED -> SHIPPING_SCHEDULED -> any step failed -> COMPENSATING -> CANCELLED
+3. Step 1 — command the inventory service:
+4. `inventoryClient.reserveStock(order);` — a COMMAND, not an event
+5. Called by the inventory service's reply:
+6. `paymentClient.charge(result.orderId());` — step 2
+7. `inventoryClient.releaseStock(failure.orderId());` — COMPENSATION
+8. `orderClient.cancelOrder(failure.orderId());` — COMPENSATION
+
+The same code, clean:
+
 ```java
-// The orchestrator — a state machine driving the saga:
 @Service
 public class OrderSagaOrchestrator {
 
-    // States: PENDING -> STOCK_RESERVED -> PAYMENT_CHARGED -> SHIPPING_SCHEDULED
-    //         -> any step failed -> COMPENSATING -> CANCELLED
 
-    // Step 1 — command the inventory service:
     public void start(OrderPlaced order) {
-        inventoryClient.reserveStock(order);      // a COMMAND, not an event
+        inventoryClient.reserveStock(order);
     }
 
-    // Called by the inventory service's reply:
     public void onStockReserved(StockReserved result) {
-        paymentClient.charge(result.orderId());   // step 2
+        paymentClient.charge(result.orderId());
     }
 
     public void onPaymentFailed(PaymentFailed failure) {
-        inventoryClient.releaseStock(failure.orderId());  // COMPENSATION
-        orderClient.cancelOrder(failure.orderId());       // COMPENSATION
+        inventoryClient.releaseStock(failure.orderId());
+        orderClient.cancelOrder(failure.orderId());
     }
 }
 ```
@@ -134,3 +149,4 @@ The layering to notice: sagas are built *on* the event-driven fundamentals — e
 ## Recap
 
 Sagas are the distributed-transaction substitute for multi-service business operations: a sequence of local transactions, each in its own database, with **compensating actions** that unwind the completed steps when a later one fails. **Choreographed sagas** are pure events (each step publishes, failures cascade compensations — simple but implicit); **orchestrated sagas** use a central state-machine coordinator (explicit, traceable, better for complex flows). The reliability requirements are strict: local transactions per step, idempotency everywhere, compensations designed in advance, persistent saga state, and retryable-vs-terminal failure distinction. Sagas aren't magic — they're the disciplined acceptance that cross-service operations are eventually consistent and deliberately unwindable, and that's the honest, production-grade answer to the question ACID can't answer across services.
+

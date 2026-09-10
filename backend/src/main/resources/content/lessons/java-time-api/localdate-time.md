@@ -1,7 +1,7 @@
 ---
 title: LocalDate and LocalTime — Calendar Dates and Clock Times
 module: java-time-api
-order: 2
+order: 3
 minutes: 24
 topics: ["LocalDate", "LocalTime", "calendar arithmetic", "Period", "Duration", "TemporalAdjusters"]
 summary: The word local in LocalDate/LocalTime is the whole story: these types describe a date or time as written on a calendar or clock, with no time zone ...
@@ -35,6 +35,22 @@ Rule: **`Period` for calendar amounts (months, years, days), `Duration` for cloc
 
 ## The Code Walkthrough
 
+
+**What this code does — step by step:**
+
+1. ---- 1. Creating LocalDate / LocalTime ----
+2. `LocalTime alarm = LocalTime.of(6, 30);` — 06:30
+3. `System.out.println(today.isLeapYear());` — false for 2026
+4. `System.out.println(release.getDayOfYear());` — 230 (day number in year)
+5. ---- 2. Calendar arithmetic with Period ----
+6. ---- 3. Elapsed time with Duration ----
+7. `System.out.println("workday minutes: " + workday.toMinutes());` — 510
+8. ---- 4. How many days between two dates? ----
+9. ---- 5. Combining date + time ----
+10. `System.out.println(meeting);` — 2026-08-18T06:30
+
+The same code, clean:
+
 ```java
 import java.time.*;
 import java.time.temporal.TemporalAdjusters;
@@ -42,16 +58,14 @@ import java.time.temporal.TemporalAdjusters;
 public class LocalDateTimeDemo {
 
     public static void main(String[] args) {
-        // ---- 1. Creating LocalDate / LocalTime ----
         LocalDate today = LocalDate.now();
         LocalDate release = LocalDate.of(2026, 8, 18);
-        LocalTime alarm = LocalTime.of(6, 30);           // 06:30
+        LocalTime alarm = LocalTime.of(6, 30);
         LocalTime now = LocalTime.now();
 
-        System.out.println(today.isLeapYear());          // false for 2026
-        System.out.println(release.getDayOfYear());      // 230 (day number in year)
+        System.out.println(today.isLeapYear());
+        System.out.println(release.getDayOfYear());
 
-        // ---- 2. Calendar arithmetic with Period ----
         LocalDate nextMonth = today.plus(Period.ofMonths(1));
         LocalDate lastDay = today.with(TemporalAdjusters.lastDayOfMonth());
         LocalDate nextFriday = today.with(TemporalAdjusters.next(DayOfWeek.FRIDAY));
@@ -60,20 +74,17 @@ public class LocalDateTimeDemo {
         System.out.println("last day of month: " + lastDay);
         System.out.println("next Friday: " + nextFriday);
 
-        // ---- 3. Elapsed time with Duration ----
         LocalTime start = LocalTime.of(9, 0);
         LocalTime end = LocalTime.of(17, 30);
         Duration workday = Duration.between(start, end);
-        System.out.println("workday minutes: " + workday.toMinutes());   // 510
+        System.out.println("workday minutes: " + workday.toMinutes());
 
-        // ---- 4. How many days between two dates? ----
         LocalDate courseStart = LocalDate.of(2026, 1, 5);
         long days = ChronoUnit.DAYS.between(courseStart, today);
         System.out.println("days since course start: " + days);
 
-        // ---- 5. Combining date + time ----
         LocalDateTime meeting = LocalDateTime.of(release, alarm);
-        System.out.println(meeting);                     // 2026-08-18T06:30
+        System.out.println(meeting);
     }
 }
 ```
@@ -106,10 +117,8 @@ public class LocalDateTimeDemo {
 
 `LocalDate` and `LocalTime` implement `Comparable`, so:
 
-```java
 List<LocalDate> dates = List.of(LocalDate.of(2026, 1, 1), LocalDate.of(2025, 12, 31));
 dates.stream().sorted().toList();   // sorts chronologically
-```
 
 `isBefore`, `isAfter`, `isEqual` give boolean comparisons; `compareTo` gives ordering for sorters and streams.
 
@@ -128,3 +137,4 @@ dates.stream().sorted().toList();   // sorts chronologically
 - `TemporalAdjusters` covers next-day, month-end, nth-weekday logic.
 - `ChronoUnit.DAYS.between(a, b)` is the standard "days between" idiom.
 - Combine with `LocalDateTime.of(date, time)` when you need both but no zone.
+

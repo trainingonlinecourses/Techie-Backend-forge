@@ -1,7 +1,7 @@
 ---
 title: Java Serialization — Converting Objects to Bytes
 summary: What serialization is, Serializable vs Externalizable, serialVersionUID, custom read/writeObject, serialization proxies, and when to avoid Java serialization entirely.
-order: 1
+order: 3
 minutes: 25
 topics: [serialization, serializable, externalizable, serialVersionUID, java-io]
 docs:
@@ -12,7 +12,6 @@ docs:
 
 **Serialization** converts an object to a byte stream (for storage, network transfer, or caching). **Deserialization** converts it back:
 
-```java
 // Serialize: Object → byte[]
 User user = new User("Alice", 30);
 ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -24,7 +23,6 @@ byte[] bytes = bos.toByteArray();
 ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
 ObjectInputStream ois = new ObjectInputStream(bis);
 User restored = (User) ois.readObject();
-```
 
 **⚠️ Warning:** Java serialization has known security vulnerabilities. For new projects, use JSON, Protocol Buffers, or records instead.
 
@@ -32,7 +30,6 @@ User restored = (User) ois.readObject();
 
 ## Serializable vs Externalizable
 
-```java
 // Serializable — marker interface, JVM handles everything
 public class User implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -58,23 +55,47 @@ public class User implements Externalizable {
         age = in.readInt();
     }
 }
-```
 
 ---
 
 ## Line-by-Line Walkthrough
+
+
+**What this code does — step by step:**
+
+1. Line 1: Basic Serializable class
+2. `private static final long serialVersionUID = 1L;` — version control
+3. `private transient String password;` — transient = not serialized
+4. Line 2: Serialization with custom logic
+5. `private transient String cachedSummary;` — not serialized
+6. Custom serialization — called during writeObject
+7. `oos.defaultWriteObject();` — serialize normal fields
+8. `oos.writeDouble(total);` — custom: write total explicitly
+9. Custom deserialization — called during readObject
+10. `ois.defaultReadObject();` — deserialize normal fields
+11. `total = ois.readDouble();` — custom: read total
+12. `cachedSummary = items.size() + " items, $" + total;` — rebuild transient
+13. Line 3: Serialization proxy pattern (recommended)
+14. Write a proxy instead of the object itself
+15. `return new Person(name, age);` — reconstruct the real object
+16. Line 4: Utility methods
+17. Line 5: Basic serialization
+18. Note: password is null (transient)
+19. Line 6: Collection serialization
+20. Line 7: Serialization proxy
+
+The same code, clean:
 
 ```java
 import java.io.*;
 import java.util.*;
 
 public class SerializationDemo {
-    // Line 1: Basic Serializable class
     static class User implements Serializable {
-        private static final long serialVersionUID = 1L;  // version control
+        private static final long serialVersionUID = 1L;
         private String name;
         private int age;
-        private transient String password;  // transient = not serialized
+        private transient String password;
 
         User(String name, int age, String password) {
             this.name = name;
@@ -88,29 +109,25 @@ public class SerializationDemo {
         }
     }
 
-    // Line 2: Serialization with custom logic
     static class Order implements Serializable {
         private static final long serialVersionUID = 2L;
         private String orderId;
         private List<String> items;
         private double total;
-        private transient String cachedSummary;  // not serialized
+        private transient String cachedSummary;
 
-        // Custom serialization — called during writeObject
         private void writeObject(ObjectOutputStream oos) throws IOException {
-            oos.defaultWriteObject();  // serialize normal fields
-            oos.writeDouble(total);    // custom: write total explicitly
+            oos.defaultWriteObject();
+            oos.writeDouble(total);
         }
 
-        // Custom deserialization — called during readObject
         private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException {
-            ois.defaultReadObject();  // deserialize normal fields
-            total = ois.readDouble(); // custom: read total
-            cachedSummary = items.size() + " items, $" + total;  // rebuild transient
+            ois.defaultReadObject();
+            total = ois.readDouble();
+            cachedSummary = items.size() + " items, $" + total;
         }
     }
 
-    // Line 3: Serialization proxy pattern (recommended)
     static class Person {
         private final String name;
         private final int age;
@@ -120,7 +137,6 @@ public class SerializationDemo {
             this.age = age;
         }
 
-        // Write a proxy instead of the object itself
         private Object writeReplace() {
             return new SerializationProxy(this);
         }
@@ -136,12 +152,11 @@ public class SerializationDemo {
             }
 
             private Object readResolve() {
-                return new Person(name, age);  // reconstruct the real object
+                return new Person(name, age);
             }
         }
     }
 
-    // Line 4: Utility methods
     static byte[] serialize(Object obj) throws IOException {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         ObjectOutputStream oos = new ObjectOutputStream(bos);
@@ -156,7 +171,6 @@ public class SerializationDemo {
     }
 
     public static void main(String[] args) throws Exception {
-        // Line 5: Basic serialization
         User user = new User("Alice", 30, "secret123");
         System.out.println("Before: " + user);
 
@@ -165,9 +179,7 @@ public class SerializationDemo {
 
         User restored = deserialize(bytes, User.class);
         System.out.println("After: " + restored);
-        // Note: password is null (transient)
 
-        // Line 6: Collection serialization
         List<User> users = List.of(
             new User("Bob", 25, "pass1"),
             new User("Carol", 35, "pass2")
@@ -176,7 +188,6 @@ public class SerializationDemo {
         List<?> restoredUsers = deserialize(userBytes, List.class);
         System.out.println("Restored " + restoredUsers.size() + " users");
 
-        // Line 7: Serialization proxy
         Person person = new Person("Dave", 40);
         byte[] personBytes = serialize(person);
         Person restoredPerson = deserialize(personBytes, Person.class);
@@ -191,7 +202,6 @@ public class SerializationDemo {
 
 ### Scenario 1: Session serialization in web apps
 
-```java
 // HttpSession serializes attributes — make them Serializable
 public class UserSession implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -201,11 +211,9 @@ public class UserSession implements Serializable {
 
     // All fields must be Serializable or transient
 }
-```
 
 ### Scenario 2: Caching with Redis
 
-```java
 // Redis stores serialized objects — ensure Serializable
 @Serializable
 @RedisHash("users")
@@ -215,7 +223,6 @@ public class User implements Serializable {
     private String name;
     // ...
 }
-```
 
 ---
 
@@ -228,3 +235,4 @@ public class User implements Serializable {
 | Serializing non-serializable fields | NotSerializableException | Make all fields Serializable or transient |
 | Using Java serialization for APIs | Security vulnerabilities | Use JSON/Protobuf instead |
 | Circular references | StackOverflow during serialization | Break cycles with transient |
+

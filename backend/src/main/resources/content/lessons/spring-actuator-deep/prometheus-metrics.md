@@ -1,7 +1,7 @@
 ---
 title: Prometheus & Micrometer Metrics — Observability at Scale
 summary: How Micrometer bridges Spring Boot to Prometheus, Grafana, and every monitoring backend, with custom metrics, histograms, and real organizational dashboards.
-order: 3
+order: 4
 minutes: 30
 topics: ["micrometer", "prometheus", "counter", "timer", "gauge", "histogram", "meter registry"]
 docs:
@@ -40,7 +40,6 @@ Your Code → Micrometer API → MeterRegistry → Prometheus → Grafana Dashbo
 
 ## Counter — Counting Things
 
-```java
 package com.example.metrics;
 
 import io.micrometer.core.instrument.Counter;
@@ -77,25 +76,20 @@ public class OrderService {
         }
     }
 }
-```
 
 ### Line-by-Line Breakdown
 
-```java
 this.orderCounter = Counter.builder("orders.created")
     .description("Total orders created")
     .tag("version", "v2")
     .register(registry);
-```
 - `Counter.builder("orders.created")` — Names the metric. In Prometheus this becomes `orders_created_total`
 - `.description(...)` — Human-readable description that appears in the metrics endpoint
 - `.tag("version", "v2")` — A dimension label. You can filter by this in Grafana. Every unique tag combination is a separate time series
 - `.register(registry)` — Connects the counter to the Micrometer registry (which talks to Prometheus)
 
-```java
 orderCounter.increment();  // The counter goes up by 1
 orderCounter.increment(5); // The counter goes up by 5 (bulk increment)
-```
 
 **Prometheus output:**
 ```
@@ -108,6 +102,17 @@ orders_created_total{version="v2",} 142.0
 
 ## Gauge — Measuring Current State
 
+
+**What this code does — step by step:**
+
+1. Gauge: reads the current value of queueDepth
+2. Gauge with tags: one gauge per queue
+3. Gauge from a lambda
+4. `queueDepth.incrementAndGet();` — Gauge goes up
+5. `queueDepth.decrementAndGet();` — Gauge goes down
+
+The same code, clean:
+
 ```java
 @Service
 public class QueueHealthService {
@@ -116,27 +121,24 @@ public class QueueHealthService {
     private final AtomicInteger activeConsumers = new AtomicInteger(0);
 
     public QueueHealthService(MeterRegistry registry) {
-        // Gauge: reads the current value of queueDepth
         Gauge.builder("queue.depth", queueDepth, AtomicLong::get)
             .description("Current message queue depth")
             .register(registry);
 
-        // Gauge with tags: one gauge per queue
         Gauge.builder("queue.depth.byQueue", queueDepth, AtomicLong::get)
             .tag("queue", "orders")
             .register(registry);
 
-        // Gauge from a lambda
         Gauge.builder("queue.consumers", activeConsumers, AtomicInteger::get)
             .register(registry);
     }
 
     public void onMessageReceived() {
-        queueDepth.incrementAndGet();  // Gauge goes up
+        queueDepth.incrementAndGet();
     }
 
     public void onMessageProcessed() {
-        queueDepth.decrementAndGet();  // Gauge goes down
+        queueDepth.decrementAndGet();
     }
 }
 ```
@@ -153,7 +155,6 @@ queue_consumers 3.0
 
 ## Timer — Measuring Duration
 
-```java
 @Service
 public class PaymentService {
 
@@ -194,7 +195,6 @@ public class PaymentService {
         timer.record(() -> emailService.send(order));
     }
 }
-```
 
 ### What Timer Records
 
@@ -258,7 +258,6 @@ payment_processing_seconds_bucket{provider="stripe",status="success",le="0.1",} 
 
 ## Real-World Scenario — Multi-Tenant SaaS Metrics
 
-```java
 @Component
 public class TenantMetrics {
 
@@ -292,7 +291,6 @@ public class TenantMetrics {
             .register(registry);
     }
 }
-```
 
 **This creates metrics like:**
 ```
@@ -329,3 +327,4 @@ tenant_active_users{tenant="acme-corp"} 47
 | Spotify | Feature adoption, playlist creation rate | Grafana + Datadog |
 | Uber | Ride completion rate, driver availability | Prometheus + Grafana |
 | Shopify | Cart conversion, checkout funnel | Datadog |
+

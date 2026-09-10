@@ -1,7 +1,7 @@
 ---
 title: Primitives vs Wrappers — Autoboxing, Nulls and Performance
 summary: int vs Integer, when autoboxing happens, the wrapper pitfalls that cause NPEs, and the nullability conventions organizations enforce.
-order: 29
+order: 65
 minutes: 18
 topics: [primitives, wrappers, autoboxing, npe, nullability, integer-cache, performance]
 docs:
@@ -21,12 +21,10 @@ Java has **eight primitives** (`int`, `long`, `double`, `boolean`, `char`, `byte
 
 **Autoboxing/unboxing** is the compiler inserting the conversion automatically:
 
-```java
 Integer a = 42;          // autobox: int 42  → Integer.valueOf(42)
 int b = a;               // unbox:   Integer → a.intValue()
 Integer c = null;
 int d = c;               // NullPointerException at runtime — unboxing a null
-```
 
 The conversion is invisible in source but real at runtime. That invisibility is exactly why wrapper misuse is a top NPE source.
 
@@ -37,25 +35,31 @@ Production codebases adopt a strict convention, enforced in review and by static
 - **Primitives for values that can never be null** — counters, ids (as `long`), flags, computed numbers.
 - **Wrappers only at boundaries that require null** — JSON fields that may be absent, database columns that are `NULL`, optional query parameters.
 
+
+**What this code does — step by step:**
+
+1. Scenario: an analytics endpoint. "sessions" is always present, "avgDurationSec". Is null when a user has no sessions.
+2. Usage — unbox only after a null check
+3. `long s = a.sessions();` — safe — primitive
+4. `Integer avg = a.avgDurationSec();` — may be null
+5. `long safeAvg = avg == null ? 0 : avg;` — explicit null handling
+
+The same code, clean:
+
 ```java
-// Scenario: an analytics endpoint. "sessions" is always present, "avgDurationSec"
-// is null when a user has no sessions.
 public record Analytics(long sessions, Integer avgDurationSec) {}
 
-// Usage — unbox only after a null check
-long s = a.sessions();                 // safe — primitive
-Integer avg = a.avgDurationSec();      // may be null
-long safeAvg = avg == null ? 0 : avg;  // explicit null handling
+long s = a.sessions();
+Integer avg = a.avgDurationSec();
+long safeAvg = avg == null ? 0 : avg;
 ```
 
 **The classic NPE in the wild:**
 
-```java
 // Long total = orderRepo.sumRevenue();  // NULL when no orders exist
 Long total = orderRepo.sumRevenue();
 // ...
 return total / orderCount;              // NPE if total is null — unboxing happens here!
-```
 
 JPA/Hibernate returns `Long` (nullable) for aggregate queries. Any arithmetic unboxes it. The org rule: `sum()`/`count()` results are treated as nullable, checked, and defaulted — never used directly in arithmetic.
 
@@ -63,12 +67,10 @@ JPA/Hibernate returns `Long` (nullable) for aggregate queries. Any arithmetic un
 
 `Integer.valueOf` caches `-128..127`, so:
 
-```java
 Integer a = 100, b = 100;   // same cached instance
 System.out.println(a == b); // true  — both are the SAME cached object
 Integer c = 200, d = 200;   // two separate objects (outside cache)
 System.out.println(c == d); // false — different instances!
-```
 
 Comparing wrappers with `==` compares **references**, and the result depends on the cache range — pure luck from the reader's perspective. The rules:
 
@@ -79,7 +81,6 @@ Comparing wrappers with `==` compares **references**, and the result depends on 
 
 Each autobox allocates an object. In a hot loop that's garbage pressure plus unboxing overhead:
 
-```java
 // WRONG — boxes and unboxes in every iteration
 long sum = 0;
 for (Long n : bigListOfLongs) {   // unboxes each read
@@ -89,7 +90,6 @@ for (Long n : bigListOfLongs) {   // unboxes each read
 // RIGHT — keep primitives in primitive containers
 long[] raw = ...;                 // long[] is contiguous primitives, zero boxing
 for (long n : raw) sum += n;
-```
 
 For numeric-heavy code (analytics, aggregations), prefer primitive arrays and `IntStream`/`LongStream` over `List<Integer>`/`List<Long>`. This matters most in batch jobs that process millions of rows.
 
@@ -107,3 +107,4 @@ For numeric-heavy code (analytics, aggregations), prefer primitive arrays and `I
 - Compare wrappers with `.equals()`, never `==` (cache makes `==` lie).
 - Boxing allocates: use primitive arrays/streams in hot numeric paths.
 - Let Jackson/JPA nullability drive the choice at boundaries; keep internals primitive.
+

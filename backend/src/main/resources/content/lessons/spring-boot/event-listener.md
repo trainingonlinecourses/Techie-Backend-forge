@@ -1,7 +1,7 @@
 ---
 title: Spring Boot Events and Listeners — ApplicationEvent Deep Dive
 summary: Custom events, @EventListener, @TransactionalEventListener for post-commit hooks, async events, event ordering, and the decoupled communication pattern that replaces tight service coupling.
-order: 44
+order: 27
 minutes: 20
 topics: [application-event, event-listener, transactional-event, async-event, observer-pattern, event-decoupling]
 docs:
@@ -14,7 +14,6 @@ docs:
 
 Spring's **event system** implements the **Observer pattern** — one part of your application publishes an event, and any number of listeners can react to it without the publisher knowing who's listening. This **decouples** your code: the order service doesn't need to know about the notification service, the audit service, or the analytics service.
 
-```java
 // Publisher: "I created an order, someone deal with it"
 applicationEventPublisher.publishEvent(new OrderCreatedEvent(order));
 
@@ -27,7 +26,6 @@ void auditOrder(OrderCreatedEvent event) { /* record audit */ }
 
 @EventListener
 void updateInventory(OrderCreatedEvent event) { /* deduct stock */ }
-```
 
 **Why events over direct method calls?**
 - Adding a new consumer doesn't change the publisher
@@ -41,7 +39,6 @@ void updateInventory(OrderCreatedEvent event) { /* deduct stock */ }
 
 The order service publishes events; other services react independently:
 
-```java
 // Event class — plain POJO with data
 public class OrderCreatedEvent {
     private final String orderId;
@@ -57,9 +54,7 @@ public class OrderCreatedEvent {
     }
     // getters...
 }
-```
 
-```java
 @Service
 public class OrderService {
     private final ApplicationEventPublisher events;
@@ -73,7 +68,6 @@ public class OrderService {
         return order;
     }
 }
-```
 
 ### Scenario 2: Transactional event listeners
 
@@ -81,7 +75,6 @@ public class OrderService {
 
 `@TransactionalEventListener` solves this:
 
-```java
 @Component
 public class OrderNotificationListener {
 
@@ -100,7 +93,6 @@ public class OrderNotificationListener {
         auditService.log("Order lifecycle complete: " + event.getOrderId());
     }
 }
-```
 
 **Phases:**
 - `AFTER_COMMIT` — Runs only if the transaction commits successfully (most common)
@@ -112,7 +104,6 @@ public class OrderNotificationListener {
 
 Non-critical listeners that should not block the request:
 
-```java
 @Component
 public class AnalyticsListener {
 
@@ -125,7 +116,6 @@ public class AnalyticsListener {
         ));
     }
 }
-```
 
 **Important:** `@Async` + `@EventListener` makes the listener run on a separate thread. This means:
 - The event is serialized to JSON (so use Serializable event classes)
@@ -137,7 +127,6 @@ public class AnalyticsListener {
 
 When multiple listeners react to the same event and order matters:
 
-```java
 @Component
 public class InventoryListener {
     @EventListener
@@ -164,13 +153,11 @@ public class NotificationListener {
         emailService.send(event.getCustomerId(), "Order confirmed");
     }
 }
-```
 
 ### Scenario 5: Conditional event listeners
 
 Only listen when certain conditions are met:
 
-```java
 @Component
 public class GoldCustomerListener {
 
@@ -180,7 +167,6 @@ public class GoldCustomerListener {
             event.getTotalAmount().longValue() / 10);
     }
 }
-```
 
 Spring Expression Language (SpEL) in the `condition` attribute evaluates against the event object. This avoids `if/else` in the listener.
 
@@ -188,7 +174,6 @@ Spring Expression Language (SpEL) in the `condition` attribute evaluates against
 
 Spring publishes events automatically that you can listen to:
 
-```java
 @Component
 public class ApplicationEventHandler {
 
@@ -208,22 +193,18 @@ public class ApplicationEventHandler {
         metricsService.incrementActiveSessions();
     }
 }
-```
 
 ## Event pattern: Domain events
 
 Use events as domain language, not technical plumbing:
 
-```java
 // Domain event (immutable, descriptive name)
 public record OrderPlaced(String orderId, String customerId, BigDecimal total) {}
 
 public record OrderCancelled(String orderId, String reason) {}
 
 public record OrderShipped(String orderId, String trackingNumber) {}
-```
 
-```java
 // Publisher — uses domain events as first-class concepts
 @Service
 public class OrderService {
@@ -243,7 +224,6 @@ public class OrderService {
         applicationEventPublisher.publishEvent(new OrderCancelled(orderId, reason));
     }
 }
-```
 
 ## Common mistakes
 
@@ -255,3 +235,4 @@ public class OrderService {
 | Heavy logic in synchronous listeners | Blocks the request thread |
 | Event classes with mutable state | Race conditions in async listeners |
 | Circular event chains (A→B→A) | Stack overflow or infinite loop |
+

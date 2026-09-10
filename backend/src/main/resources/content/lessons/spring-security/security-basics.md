@@ -1,7 +1,7 @@
 ---
 title: The Security Model — Complete Beginner's Guide
 summary: Authentication vs Authorization explained from zero, password hashing, the SecurityContext, and the filter chain that protects every request.
-order: 1
+order: 13
 minutes: 20
 topics: [authentication, authorization, hashing, security-model, security-context, filter-chain]
 docs:
@@ -27,21 +27,29 @@ Request → AUTHENTICATION (who are you?) → AUTHORIZATION (can you do this?) �
 
 Spring Security stores the authenticated user as a **principal** in the `SecurityContext` — held per-request:
 
+
+**What this code does — step by step:**
+
+1. After authentication, the user's identity is stored in SecurityContext
+2. Line 1: @AuthenticationPrincipal extracts the current user from SecurityContext. Line 2: principal contains the user's ID, username, roles, etc.
+3. You can also access it directly:
+4. `SecurityContext ctx = SecurityContextHolder.getContext();` — Line 1: Get the context
+5. `Authentication auth = ctx.getAuthentication();` — Line 2: Get the authentication
+6. `String username = auth.getName();` — Line 3: Get the username
+
+The same code, clean:
+
 ```java
-// After authentication, the user's identity is stored in SecurityContext
 @GetMapping("/me")
 public UserDto me(@AuthenticationPrincipal UserPrincipal principal) {
-    // Line 1: @AuthenticationPrincipal extracts the current user from SecurityContext
-    // Line 2: principal contains the user's ID, username, roles, etc.
     return UserDto.from(principal.user());
 }
 
-// You can also access it directly:
 @GetMapping("/me")
 public UserDto me() {
-    SecurityContext ctx = SecurityContextHolder.getContext();  // Line 1: Get the context
-    Authentication auth = ctx.getAuthentication();             // Line 2: Get the authentication
-    String username = auth.getName();                          // Line 3: Get the username
+    SecurityContext ctx = SecurityContextHolder.getContext();
+    Authentication auth = ctx.getAuthentication();
+    String username = auth.getName();
     return userDtoService.findByUsername(username);
 }
 ```
@@ -60,22 +68,31 @@ Passwords are **hashed one-way** with a slow, salted algorithm — never reversi
 
 **What is hashing?** Hashing converts a password into a fixed-length string. It's one-way: you can't reverse the hash to get the original password. BCrypt adds a random salt and runs the algorithm thousands of times, making it slow to brute-force.
 
+
+**What this code does — step by step:**
+
+1. Spring Boot auto-configures BCrypt — just declare the bean
+2. `return new BCryptPasswordEncoder();` — Line 1: Creates a BCrypt encoder. Line 2: Automatically strengthens over time as hardware gets faster
+3. Hashing a password during registration
+4. `String rawPassword = "hunter2";` — Line 1: The raw password
+5. `String hashedPassword = passwordEncoder.encode(rawPassword);` — Line 2: Hash it
+6. Line 3: Result looks like: $2a$10$N9qo8uLOickgx2ZMRZoMye... (contains salt + cost)
+7. Verifying a password during login
+8. `boolean matches = passwordEncoder.matches("hunter2", hashedPassword);` — Line 1: Re-hash the input
+9. Line 2: Compare with stored hash — returns true if they match
+
+The same code, clean:
+
 ```java
-// Spring Boot auto-configures BCrypt — just declare the bean
 @Bean
 PasswordEncoder passwordEncoder() {
-    return new BCryptPasswordEncoder();     // Line 1: Creates a BCrypt encoder
-    // Line 2: Automatically strengthens over time as hardware gets faster
+    return new BCryptPasswordEncoder();
 }
 
-// Hashing a password during registration
-String rawPassword = "hunter2";                          // Line 1: The raw password
-String hashedPassword = passwordEncoder.encode(rawPassword);  // Line 2: Hash it
-// Line 3: Result looks like: $2a$10$N9qo8uLOickgx2ZMRZoMye... (contains salt + cost)
+String rawPassword = "hunter2";
+String hashedPassword = passwordEncoder.encode(rawPassword);
 
-// Verifying a password during login
-boolean matches = passwordEncoder.matches("hunter2", hashedPassword);  // Line 1: Re-hash the input
-// Line 2: Compare with stored hash — returns true if they match
+boolean matches = passwordEncoder.matches("hunter2", hashedPassword);
 ```
 
 **Why BCrypt?**
@@ -97,30 +114,45 @@ Spring Security supports multiple authentication sources through `Authentication
 | LDAP / Active Directory | `LdapAuthenticationProvider` | Enterprise directory services |
 | SAML / CAS | Dedicated providers | SSO federation |
 
+
+**What this code does — step by step:**
+
+1. Example: JWT-based authentication
+2. `private final JwtDecoder jwtDecoder;` — Line 1: Decodes JWT tokens
+3. `private final UserDetailsService userDetailsService;` — Line 2: Loads user from DB
+4. `String token = extractToken(request);` — Line 1: Get token from header
+5. `Jwt jwt = jwtDecoder.decode(token);` — Line 2: Decode and validate
+6. `String username = jwt.getSubject();` — Line 3: Extract username
+7. `UserDetails user = userDetailsService.loadUserByUsername(username);` — Line 4: Load user
+8. `user, null, user.getAuthorities()` — Line 5: Create authentication object
+9. `SecurityContextHolder.getContext().setAuthentication(auth);` — Line 6: Store in context
+10. `chain.doFilter(request, response);` — Line 7: Continue the filter chain
+
+The same code, clean:
+
 ```java
-// Example: JWT-based authentication
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
-    private final JwtDecoder jwtDecoder;           // Line 1: Decodes JWT tokens
-    private final UserDetailsService userDetailsService;  // Line 2: Loads user from DB
-    
+    private final JwtDecoder jwtDecoder;
+    private final UserDetailsService userDetailsService;
+
     @Override
     protected void doFilterInternal(HttpServletRequest request,
             HttpServletResponse response, FilterChain chain) {
-        
-        String token = extractToken(request);      // Line 1: Get token from header
+
+        String token = extractToken(request);
         if (token != null) {
-            Jwt jwt = jwtDecoder.decode(token);    // Line 2: Decode and validate
-            String username = jwt.getSubject();     // Line 3: Extract username
-            
-            UserDetails user = userDetailsService.loadUserByUsername(username);  // Line 4: Load user
-            
+            Jwt jwt = jwtDecoder.decode(token);
+            String username = jwt.getSubject();
+
+            UserDetails user = userDetailsService.loadUserByUsername(username);
+
             Authentication auth = new UsernamePasswordAuthenticationToken(
-                user, null, user.getAuthorities()   // Line 5: Create authentication object
+                user, null, user.getAuthorities()
             );
-            SecurityContextHolder.getContext().setAuthentication(auth);  // Line 6: Store in context
+            SecurityContextHolder.getContext().setAuthentication(auth);
         }
-        chain.doFilter(request, response);         // Line 7: Continue the filter chain
+        chain.doFilter(request, response);
     }
 }
 ```
@@ -144,68 +176,91 @@ Response
 
 **Line-by-line example:**
 
+
+**What this code does — step by step:**
+
+1. The security configuration defines which filters run
+2. `.csrf(csrf -> csrf.disable())` — Line 1: Disable CSRF for APIs
+3. `.sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))` — Line 2: No sessions
+4. `.authorizeHttpRequests(auth -> auth` — Line 3: Authorization rules
+5. `.requestMatchers("/api/public/**").permitAll()` — Line 4: Public endpoints
+6. `.requestMatchers("/api/admin/**").hasRole("ADMIN")` — Line 5: Admin only
+7. `.anyRequest().authenticated()` — Line 6: Everything else requires login
+8. `.oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))` — Line 7: JWT validation
+9. `.build();` — Line 8: Build the filter chain
+
+The same code, clean:
+
 ```java
-// The security configuration defines which filters run
 @Bean
 public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     return http
-        .csrf(csrf -> csrf.disable())                    // Line 1: Disable CSRF for APIs
-        .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))  // Line 2: No sessions
-        .authorizeHttpRequests(auth -> auth               // Line 3: Authorization rules
-            .requestMatchers("/api/public/**").permitAll()  // Line 4: Public endpoints
-            .requestMatchers("/api/admin/**").hasRole("ADMIN")  // Line 5: Admin only
-            .anyRequest().authenticated()                 // Line 6: Everything else requires login
+        .csrf(csrf -> csrf.disable())
+        .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .authorizeHttpRequests(auth -> auth
+            .requestMatchers("/api/public/**").permitAll()
+            .requestMatchers("/api/admin/**").hasRole("ADMIN")
+            .anyRequest().authenticated()
         )
-        .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))  // Line 7: JWT validation
-        .build();                                         // Line 8: Build the filter chain
+        .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))
+        .build();
 }
 ```
 
 ## Real-world scenario — user registration and login
 
+
+**What this code does — step by step:**
+
+1. Registration flow — line by line
+2. `private final UserRepository userRepo;` — Line 1: Database access
+3. `private final PasswordEncoder encoder;` — Line 2: Password hashing
+4. `private final JwtTokenProvider tokenProvider;` — Line 3: JWT generation
+5. Line 1: Check if username already exists
+6. Line 2: Hash the password (NEVER store plaintext!)
+7. Line 3: Create and save the user
+8. Line 4: Generate JWT token
+9. Line 5: Return token + user info
+10. Login flow — line by line
+11. Line 1: Load user by username
+12. Line 2: Verify password (BCrypt comparison)
+13. Line 3: Generate JWT token
+14. Line 4: Return token + user info
+
+The same code, clean:
+
 ```java
-// Registration flow — line by line
 @Service
 public class AuthService {
-    private final UserRepository userRepo;          // Line 1: Database access
-    private final PasswordEncoder encoder;          // Line 2: Password hashing
-    private final JwtTokenProvider tokenProvider;   // Line 3: JWT generation
-    
+    private final UserRepository userRepo;
+    private final PasswordEncoder encoder;
+    private final JwtTokenProvider tokenProvider;
+
     public AuthResponse register(RegisterRequest req) {
-        // Line 1: Check if username already exists
         if (userRepo.existsByUsername(req.username())) {
             throw new ConflictException("Username taken");
         }
-        
-        // Line 2: Hash the password (NEVER store plaintext!)
+
         String hashedPassword = encoder.encode(req.password());
-        
-        // Line 3: Create and save the user
+
         User user = new User(req.username(), hashedPassword, req.displayName());
         userRepo.save(user);
-        
-        // Line 4: Generate JWT token
+
         String token = tokenProvider.generate(user);
-        
-        // Line 5: Return token + user info
+
         return new AuthResponse(token, UserDto.from(user));
     }
-    
-    // Login flow — line by line
+
     public AuthResponse login(LoginRequest req) {
-        // Line 1: Load user by username
         User user = userRepo.findByUsername(req.username())
             .orElseThrow(() -> new BadCredentialsException("Invalid credentials"));
-        
-        // Line 2: Verify password (BCrypt comparison)
+
         if (!encoder.matches(req.password(), user.getPassword())) {
             throw new BadCredentialsException("Invalid credentials");
         }
-        
-        // Line 3: Generate JWT token
+
         String token = tokenProvider.generate(user);
-        
-        // Line 4: Return token + user info
+
         return new AuthResponse(token, UserDto.from(user));
     }
 }
@@ -230,3 +285,4 @@ public class AuthService {
 - The filter chain runs BEFORE your controller — security is enforced at the entry point
 
 **Official docs:** [Password storage](https://docs.spring.io/spring-security/reference/features/authentication/password-storage.html) · [Architecture](https://docs.spring.io/spring-security/reference/servlet/architecture.html)
+

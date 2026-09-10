@@ -1,7 +1,7 @@
 ---
 title: Backpressure Patterns — Controlling Data Flow
 summary: What backpressure is, why it matters for reactive streams, strategies (buffer, drop, latest), and production patterns for handling slow consumers.
-order: 10
+order: 2
 minutes: 18
 topics: [backpressure, reactive-streams, flow-control, buffer, drop, latest, demand]
 docs:
@@ -19,22 +19,18 @@ docs:
 
 ### The Problem: No Backpressure
 
-```java
 // Without backpressure — 1 million events per second, but consumer handles 100/s
 Flux.range(1, 1_000_000)
     .map(this::processEvent)  // Consumer is overwhelmed!
     .subscribe();             // 💥 Memory overflow after a few seconds
-```
 
 ### The Solution: Backpressure Strategies
 
-```java
 // With backpressure — producer respects consumer's capacity
 Flux.range(1, 1_000_000)
     .onBackpressureBuffer(1000)  // Buffer up to 1000 items
     .map(this::processEvent)     // Consumer processes at its own pace
     .subscribe();
-```
 
 ---
 
@@ -42,20 +38,24 @@ Flux.range(1, 1_000_000)
 
 ### 1. Buffer (Default) — Store Until Processed
 
+
+**What this code does — step by step:**
+
+1. `.onBackpressureBuffer(1000)` — Buffer up to 1000 items
+2. `.map(this::slowProcess)` — Process slowly
+3. When buffer is full: - Buffer overflow strategy: drops oldest items. - Or throws BufferOverflowException
+
+The same code, clean:
+
 ```java
 Flux.range(1, 1_000_000)
-    .onBackpressureBuffer(1000)      // Buffer up to 1000 items
-    .map(this::slowProcess)          // Process slowly
+    .onBackpressureBuffer(1000)
+    .map(this::slowProcess)
     .subscribe();
-
-// When buffer is full:
-// - Buffer overflow strategy: drops oldest items
-// - Or throws BufferOverflowException
 ```
 
 ### 2. Drop — Discard New Items
 
-```java
 Flux.range(1, 1_000_000)
     .onBackpressureDrop()            // Drop items when consumer is busy
     .map(this::processEvent)
@@ -63,11 +63,9 @@ Flux.range(1, 1_000_000)
 
 // If consumer can't keep up, new items are simply discarded
 // Good for: metrics, real-time data where old data doesn't matter
-```
 
 ### 3. Latest — Keep Only the Most Recent
 
-```java
 Flux.range(1, 1_000_000)
     .onBackpressureLatest()          // Keep only the latest item
     .map(this::processEvent)
@@ -75,11 +73,9 @@ Flux.range(1, 1_000_000)
 
 // When consumer catches up, it gets the LATEST item
 // Good for: stock prices, sensor readings where only current value matters
-```
 
 ### 4. Error — Fail on Backpressure
 
-```java
 Flux.range(1, 1_000_000)
     .onBackpressureError()           // Throw exception when backpressured
     .map(this::processEvent)
@@ -87,7 +83,6 @@ Flux.range(1, 1_000_000)
 
 // Throws BackpressureException immediately
 // Good for: systems where data loss is unacceptable
-```
 
 ---
 
@@ -95,7 +90,6 @@ Flux.range(1, 1_000_000)
 
 ### Demand-Driven: Consumer Pulls Data
 
-```java
 // Consumer requests only what it can handle
 Flux.range(1, 1_000_000)
     .limitRate(100)                  // Request 100 items at a time
@@ -104,17 +98,14 @@ Flux.range(1, 1_000_000)
 
 // Consumer processes 100, then requests 100 more
 // Producer never overwhelms consumer
-```
 
 ### Using `publishOn` for Parallel Processing
 
-```java
 Flux.range(1, 1_000_000)
     .publishOn(Schedulers.boundedElastic())  // Process on elastic pool
     .limitRate(100)                           // Request 100 at a time
     .map(this::processEvent)                  // Process in parallel
     .subscribe();
-```
 
 ---
 
@@ -122,27 +113,38 @@ Flux.range(1, 1_000_000)
 
 ### Scenario 1: Log Ingestion Pipeline
 
+
+**What this code does — step by step:**
+
+1. `.map(this::parseLog)` — Parse raw string to LogEntry
+2. `.filter(Objects::nonNull)` — Skip malformed logs
+3. `.onBackpressureBuffer(5000)` — Buffer during traffic spikes
+4. `.flatMap(this::enrichLog, 16)` — Enrich with metadata, 16 concurrent
+5. `.flatMap(this::indexInElasticsearch, 8)` — Index, 8 concurrent
+6. `.onBackpressureLatest();` — Keep only latest if still behind
+
+The same code, clean:
+
 ```java
 @Service
 public class LogIngestionService {
 
     public Flux<LogEntry> ingestLogs(Flux<String> rawLogs) {
         return rawLogs
-            .map(this::parseLog)                    // Parse raw string to LogEntry
-            .filter(Objects::nonNull)                // Skip malformed logs
-            .onBackpressureBuffer(5000)              // Buffer during traffic spikes
-            .flatMap(this::enrichLog, 16)            // Enrich with metadata, 16 concurrent
+            .map(this::parseLog)
+            .filter(Objects::nonNull)
+            .onBackpressureBuffer(5000)
+            .flatMap(this::enrichLog, 16)
             .onBackpressureDrop(dropped ->
                 log.warn("Dropped log entry: {}", dropped))
-            .flatMap(this::indexInElasticsearch, 8)  // Index, 8 concurrent
-            .onBackpressureLatest();                  // Keep only latest if still behind
+            .flatMap(this::indexInElasticsearch, 8)
+            .onBackpressureLatest();
     }
 }
 ```
 
 ### Scenario 2: Real-Time Sensor Data
 
-```java
 @Service
 public class SensorService {
 
@@ -158,9 +160,19 @@ public class SensorService {
             .flatMap(this::storeAndAlert, 4);
     }
 }
-```
 
 ### Scenario 3: Message Queue Consumer
+
+
+**What this code does — step by step:**
+
+1. `.limitRate(50)` — Pull 50 at a time
+2. `.publishOn(Schedulers.boundedElastic())` — Process on elastic threads
+3. `.flatMap(this::processMessage, 10)` — 10 concurrent processors
+4. `.onBackpressureBuffer(1000,` — Buffer during spikes
+5. `.retry(3)` — Retry failed processing
+
+The same code, clean:
 
 ```java
 @Service
@@ -168,12 +180,12 @@ public class MessageConsumer {
 
     public Flux<ProcessedMessage> consumeMessages(Flux<Message> messages) {
         return messages
-            .limitRate(50)                           // Pull 50 at a time
-            .publishOn(Schedulers.boundedElastic())  // Process on elastic threads
-            .flatMap(this::processMessage, 10)       // 10 concurrent processors
-            .onBackpressureBuffer(1000,              // Buffer during spikes
+            .limitRate(50)
+            .publishOn(Schedulers.boundedElastic())
+            .flatMap(this::processMessage, 10)
+            .onBackpressureBuffer(1000,
                 dropped -> auditLog.record("DROPPED", dropped))
-            .retry(3)                                // Retry failed processing
+            .retry(3)
             .onErrorResume(e -> {
                 log.error("Processing failed", e);
                 return Mono.empty();
@@ -206,3 +218,4 @@ public class MessageConsumer {
 | Not using `limitRate` | Producer pushes too fast | Set demand-based pull with `limitRate()` |
 | Mixing reactive and blocking | Backpressure doesn't work with blocking calls | Use R2DBC, never JDBC in reactive chain |
 | Not monitoring buffer size | Can't detect backpressure issues | Add metrics for buffer size, drop count |
+

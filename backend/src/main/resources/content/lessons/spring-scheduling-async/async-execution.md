@@ -1,7 +1,7 @@
 ---
 title: Async Execution with @Async
 module: spring-scheduling-async
-order: 2
+order: 1
 minutes: 22
 topics: ["@Async", "Executor", "CompletableFuture", "async exceptions", "thread pools"]
 summary: @Async moves a method's execution onto a separate thread, freeing the caller immediately. It's the standard way to fireandforget side effects (noti...
@@ -16,12 +16,10 @@ docs:
 
 ## Enabling Async
 
-```java
 @Configuration
 @EnableAsync
 public class AsyncConfig {
 }
-```
 
 `@EnableAsync` registers an `AsyncAnnotationBeanPostProcessor` that detects `@Async` methods and routes them through an `Executor`. Without a custom executor, Spring falls back to `SimpleAsyncTaskExecutor` — which creates a **new thread per task** and never reuses them. That is a production anti-pattern.
 
@@ -29,7 +27,6 @@ public class AsyncConfig {
 
 `SimpleAsyncTaskExecutor` has no queue, no pool, and no backpressure. A burst of 10,000 async calls creates 10,000 threads. The correct default is a bounded `ThreadPoolTaskExecutor`:
 
-```java
 @Configuration
 @EnableAsync
 public class AsyncConfig {
@@ -46,13 +43,11 @@ public class AsyncConfig {
         return executor;
     }
 }
-```
 
 The `CallerRunsPolicy` is important: when the queue is full, the *calling* thread executes the task instead of throwing `RejectedExecutionException`, giving natural backpressure instead of dropped work.
 
 ## Fire-and-Forget
 
-```java
 @Service
 public class NotificationService {
 
@@ -62,28 +57,22 @@ public class NotificationService {
         emailClient.send(userId, "welcome");
     }
 }
-```
 
-```java
 notificationService.sendWelcomeEmail(user.getId());
 log.info("Request finished");  // may log BEFORE the email is sent
-```
 
 The caller never blocks and never sees the result. Exceptions thrown inside the async method do **not** propagate to the caller — they land in the `AsyncUncaughtExceptionHandler`.
 
 ## Capturing Results With CompletableFuture
 
-```java
 @Async
 public CompletableFuture<Order> fetchOrderDetails(String orderId) {
     Order order = orderRepository.findByOrderId(orderId);
     return CompletableFuture.completedFuture(order);
 }
-```
 
 Callers can then compose the futures:
 
-```java
 CompletableFuture<Order> orderFuture = orderService.fetchOrderDetails(id);
 CompletableFuture<Customer> customerFuture = customerService.fetchCustomer(id);
 
@@ -91,7 +80,6 @@ Order order = orderFuture.get();           // blocks, or use join()
 Customer customer = customerFuture.get();
 
 CompletableFuture.allOf(orderFuture, customerFuture).join();
-```
 
 Important contract: when `@Async` returns a `CompletableFuture`, Spring's interceptor **completes** that future when the method returns, and **exceptional completion** when it throws. Only `CompletableFuture` (and its subclass) gets this special treatment — `Future` implementations also work, but plain `void` methods lose all error visibility.
 
@@ -99,7 +87,6 @@ Important contract: when `@Async` returns a `CompletableFuture`, Spring's interc
 
 The proxy is the culprit. `@Async` (like `@Transactional`) works through a **proxy** — Spring wraps the bean and intercepts calls. A call from *inside the same class* bypasses the proxy:
 
-```java
 @Service
 public class OrderService {
 
@@ -110,11 +97,9 @@ public class OrderService {
     @Async
     public void processPayment(OrderDto dto) { ... }
 }
-```
 
 The fix: inject the bean into itself (`@Lazy` self-injection) or move the async method to another bean:
 
-```java
 @Service
 public class OrderService {
 
@@ -128,13 +113,11 @@ public class OrderService {
         self.processPayment(dto);      // ✅ goes through the proxy
     }
 }
-```
 
 ## Handling Async Exceptions
 
 Since exceptions don't reach the caller, register a handler:
 
-```java
 @Configuration
 @EnableAsync
 public class AsyncConfig implements AsyncConfigurer {
@@ -145,7 +128,6 @@ public class AsyncConfig implements AsyncConfigurer {
             log.error("Async method {} threw", method.getName(), throwable);
     }
 }
-```
 
 For `CompletableFuture` return types, the future carries the exception — `future.exceptionally(...)` handles it where the result is consumed, so the global handler only catches `void` methods.
 
@@ -153,7 +135,6 @@ For `CompletableFuture` return types, the future carries the exception — `futu
 
 `@Async` and `@Scheduled` compose. A scheduled method that kicks off heavy work should hand off to the async pool rather than blocking the scheduler thread:
 
-```java
 @Component
 public class NightlyJob {
 
@@ -163,7 +144,6 @@ public class NightlyJob {
         reportService.generateAll();   // runs on async pool
     }
 }
-```
 
 Now the single scheduler thread stays free to fire other jobs, while the report generation runs on the larger async pool.
 
@@ -181,3 +161,4 @@ Now the single scheduler thread stays free to fire other jobs, while the report 
 ## Summary
 
 `@Async` is the simplest way to parallelize and decouple work in Spring — but only correct when paired with a bounded executor, proxy-aware call patterns, and an explicit exception strategy. Combined with `@Scheduled` it gives you the two core primitives of background processing: *when* to run and *where* to run.
+

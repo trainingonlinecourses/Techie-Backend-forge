@@ -1,7 +1,7 @@
 ---
 title: Enum Operations — valueOf, EnumSet, EnumMap and Strategy Patterns
 summary: Using enums beyond simple constants — EnumSet for fast bitset operations, EnumMap for type-safe mapping, abstract methods per constant, and the strategy pattern that replaces whole class hierarchies.
-order: 78
+order: 18
 minutes: 20
 topics: [enumset, enummap, enum-values, enum-valueof, enum-strategy, enum-abstract-method, bitwise-enum]
 docs:
@@ -20,22 +20,36 @@ Beginners use enums as named constants (`Status.ACTIVE`). But enums in Java are 
 
 ## Core enum operations: values() and valueOf()
 
+
+**What this code does — step by step:**
+
+1. values() — returns ALL constants as an array (useful for iteration, validation)
+2. `Status[] all = Status.values();` — [ACTIVE, INACTIVE, PENDING, DELETED]
+3. ACTIVE ordinal 0, INACTIVE ordinal 1, PENDING ordinal 2, DELETED ordinal 3
+4. valueOf(String) — converts a string to the enum constant (throws IllegalArgumentException)
+5. `Status s = Status.valueOf("ACTIVE");` — s == Status.ACTIVE
+6. `Status bad = Status.valueOf("active");` — THROWS IllegalArgumentException!
+7. valueOf is CASE-SENSITIVE — must match the constant name exactly
+
+The same code, clean:
+
 ```java
-public enum Status {
-    ACTIVE, INACTIVE, PENDING, DELETED;
-}
+public class Main {
 
-// values() — returns ALL constants as an array (useful for iteration, validation)
-Status[] all = Status.values();                    // [ACTIVE, INACTIVE, PENDING, DELETED]
-for (Status s : Status.values()) {
-    System.out.println(s.name() + " ordinal " + s.ordinal());
-}
-// ACTIVE ordinal 0, INACTIVE ordinal 1, PENDING ordinal 2, DELETED ordinal 3
+    public static void main(String[] args) {
+        public enum Status {
+            ACTIVE, INACTIVE, PENDING, DELETED;
+        }
 
-// valueOf(String) — converts a string to the enum constant (throws IllegalArgumentException)
-Status s = Status.valueOf("ACTIVE");              // s == Status.ACTIVE
-Status bad = Status.valueOf("active");            // THROWS IllegalArgumentException!
-// valueOf is CASE-SENSITIVE — must match the constant name exactly
+        Status[] all = Status.values();
+        for (Status s : Status.values()) {
+            System.out.println(s.name() + " ordinal " + s.ordinal());
+        }
+
+        Status s = Status.valueOf("ACTIVE");
+        Status bad = Status.valueOf("active");
+    }
+}
 ```
 
 **Line-by-line breakdown:**
@@ -48,24 +62,38 @@ Status bad = Status.valueOf("active");            // THROWS IllegalArgumentExcep
 
 `EnumSet` is a `Set<Enum>` backed by a **bitmask** — each enum constant maps to a bit. This makes it the fastest `Set` implementation for enums (O(1) add/contains/remove, no hashing, no tree balancing).
 
+
+**What this code does — step by step:**
+
+1. Create an EnumSet
+2. `EnumSet<Status> allStatuses = EnumSet.allOf(Status.class);` — every constant
+3. `EnumSet<Status> none = EnumSet.noneOf(Status.class);` — empty set
+4. `EnumSet<Status> range = EnumSet.range(Status.ACTIVE, Status.PENDING);` — ACTIVE, INACTIVE, PENDING
+5. Bitwise operations — the killer feature
+6. `EnumSet<Status> notDeleted = EnumSet.complementOf(deleted);` — ACTIVE, INACTIVE, PENDING
+7. Set operations (all O(1) due to bitmask)
+8. `EnumSet<Status> combined = EnumSet.copyOf(activeStatuses);` — copy
+9. `combined.addAll(EnumSet.of(Status.DELETED));` — union
+10. `combined.retainAll(EnumSet.of(Status.ACTIVE, Status.DELETED));` — intersection
+11. `combined.removeAll(EnumSet.of(Status.ACTIVE));` — difference
+
+The same code, clean:
+
 ```java
 import java.util.EnumSet;
 
-// Create an EnumSet
 EnumSet<Status> activeStatuses = EnumSet.of(Status.ACTIVE, Status.PENDING);
-EnumSet<Status> allStatuses = EnumSet.allOf(Status.class);          // every constant
-EnumSet<Status> none = EnumSet.noneOf(Status.class);                // empty set
-EnumSet<Status> range = EnumSet.range(Status.ACTIVE, Status.PENDING); // ACTIVE, INACTIVE, PENDING
+EnumSet<Status> allStatuses = EnumSet.allOf(Status.class);
+EnumSet<Status> none = EnumSet.noneOf(Status.class);
+EnumSet<Status> range = EnumSet.range(Status.ACTIVE, Status.PENDING);
 
-// Bitwise operations — the killer feature
 EnumSet<Status> deleted = EnumSet.of(Status.DELETED);
-EnumSet<Status> notDeleted = EnumSet.complementOf(deleted);         // ACTIVE, INACTIVE, PENDING
+EnumSet<Status> notDeleted = EnumSet.complementOf(deleted);
 
-// Set operations (all O(1) due to bitmask)
-EnumSet<Status> combined = EnumSet.copyOf(activeStatuses);         // copy
-combined.addAll(EnumSet.of(Status.DELETED));                        // union
-combined.retainAll(EnumSet.of(Status.ACTIVE, Status.DELETED));      // intersection
-combined.removeAll(EnumSet.of(Status.ACTIVE));                      // difference
+EnumSet<Status> combined = EnumSet.copyOf(activeStatuses);
+combined.addAll(EnumSet.of(Status.DELETED));
+combined.retainAll(EnumSet.of(Status.ACTIVE, Status.DELETED));
+combined.removeAll(EnumSet.of(Status.ACTIVE));
 ```
 
 **Line-by-line breakdown:**
@@ -87,22 +115,36 @@ combined.removeAll(EnumSet.of(Status.ACTIVE));                      // differenc
 
 `EnumMap` uses the enum's ordinal as the array index — same bitmask advantage, but for key-value pairs:
 
+
+**What this code does — step by step:**
+
+1. Type-safe — keys must be the enum type
+2. `int activeCount = counts.getOrDefault(Status.ACTIVE, 0);` — 150
+3. `int deletedCount = counts.getOrDefault(Status.DELETED, 0);` — 0 (default)
+4. Iteration order matches declaration order (not HashMap's hash-order)
+5. ACTIVE: 150, PENDING: 23 — guaranteed declaration order
+
+The same code, clean:
+
 ```java
 import java.util.EnumMap;
 
-EnumMap<Status, Integer> counts = new EnumMap<>(Status.class);
-counts.put(Status.ACTIVE, 150);
-counts.put(Status.PENDING, 23);
+public class Main {
 
-// Type-safe — keys must be the enum type
-int activeCount = counts.getOrDefault(Status.ACTIVE, 0);           // 150
-int deletedCount = counts.getOrDefault(Status.DELETED, 0);         // 0 (default)
+    public static void main(String[] args) {
 
-// Iteration order matches declaration order (not HashMap's hash-order)
-for (Map.Entry<Status, Integer> entry : counts.entrySet()) {
-    System.out.println(entry.getKey() + ": " + entry.getValue());
+        EnumMap<Status, Integer> counts = new EnumMap<>(Status.class);
+        counts.put(Status.ACTIVE, 150);
+        counts.put(Status.PENDING, 23);
+
+        int activeCount = counts.getOrDefault(Status.ACTIVE, 0);
+        int deletedCount = counts.getOrDefault(Status.DELETED, 0);
+
+        for (Map.Entry<Status, Integer> entry : counts.entrySet()) {
+            System.out.println(entry.getKey() + ": " + entry.getValue());
+        }
+    }
 }
-// ACTIVE: 150, PENDING: 23 — guaranteed declaration order
 ```
 
 **Line-by-line breakdown:**
@@ -115,7 +157,6 @@ for (Map.Entry<Status, Integer> entry : counts.entrySet()) {
 
 Each enum constant can **override an abstract method**, turning the enum into a strategy pattern without separate classes:
 
-```java
 public enum PaymentMethod {
     CREDIT_CARD {
         @Override
@@ -148,7 +189,6 @@ public enum PaymentMethod {
 // Usage — clean, no switch statement needed
 PaymentMethod method = PaymentMethod.valueOf(userChoice);
 method.process(orderTotal);      // dispatches to the right implementation
-```
 
 **Line-by-line breakdown:**
 - Each constant (`CREDIT_CARD`, `BANK_TRANSFER`, `CRYPTO`) is an **anonymous subclass** of `PaymentMethod` that overrides `process()`
@@ -164,7 +204,6 @@ method.process(orderTotal);      // dispatches to the right implementation
 
 ## Instance fields and constructors in enums
 
-```java
 public enum HttpStatus {
     OK(200, "Success"),
     NOT_FOUND(404, "Not Found"),
@@ -190,7 +229,6 @@ public enum HttpStatus {
         return BY_CODE.getOrDefault(code, INTERNAL_SERVER_ERROR);
     }
 }
-```
 
 **Line-by-line breakdown:**
 - `HttpStatus(200, "Success")` — this is a **constructor call** inside the enum declaration; equivalent to `new HttpStatus(200, "Success")`
@@ -200,7 +238,6 @@ public enum HttpStatus {
 
 ## Comparing enums: == vs .equals()
 
-```java
 Status a = Status.ACTIVE;
 Status b = Status.ACTIVE;
 
@@ -209,13 +246,21 @@ if (a == b) { /* always true for same constant */ }
 
 // .equals() works too but is redundant (and may be overridden by a custom equals — rare but possible)
 if (a.equals(b)) { /* also true, but slower and unnecessary */ }
-```
 
 **Rule:** use `==` for enum comparison. It's null-safe (won't throw NPE if left side is null), faster (no method call), and semantically correct (enums are singletons).
 
 ## Real-world scenarios
 
 **Scenario 1 — Order status with lifecycle enforcement:**
+
+**What this code does — step by step:**
+
+1. Usage — the state machine is the enum itself
+2. `status = status.next();` — CONFIRMED. SHIPPED. DELIVERED
+3. `status = next();` — THROWS IllegalStateException
+
+The same code, clean:
+
 ```java
 public enum OrderStatus {
     CREATED {
@@ -234,16 +279,14 @@ public enum OrderStatus {
     public abstract OrderStatus next();
 }
 
-// Usage — the state machine is the enum itself
 OrderStatus status = OrderStatus.CREATED;
-status = status.next();   // CONFIRMED
-status = status.next();   // SHIPPED
-status = status.next();   // DELIVERED
-status = next();          // THROWS IllegalStateException
+status = status.next();
+status = status.next();
+status = status.next();
+status = next();
 ```
 
 **Scenario 2 — Feature flags using EnumSet:**
-```java
 public enum Feature { DARK_MODE, BETA_FEATURES, ANALYTICS, NOTIFICATIONS }
 
 EnumSet<Feature> enabledFeatures = EnumSet.of(Feature.DARK_MODE, Feature.ANALYTICS);
@@ -252,10 +295,8 @@ EnumSet<Feature> enabledFeatures = EnumSet.of(Feature.DARK_MODE, Feature.ANALYTI
 if (enabledFeatures.contains(Feature.DARK_MODE)) {
     // show dark mode toggle
 }
-```
 
 **Scenario 3 — Permission matrix using EnumMap:**
-```java
 EnumMap<Role, EnumSet<Permission>> permissions = new EnumMap<>(Role.class);
 permissions.put(Role.ADMIN, EnumSet.allOf(Permission.class));
 permissions.put(Role.USER, EnumSet.of(Permission.READ, Permission.WRITE));
@@ -264,7 +305,6 @@ permissions.put(Role.VIEWER, EnumSet.of(Permission.READ));
 // Check permission
 EnumSet<Permission> userPerms = permissions.getOrDefault(Role.USER, EnumSet.noneOf(Permission.class));
 if (userPerms.contains(Permission.DELETE)) { /* denied */ }
-```
 
 ## Common mistakes
 
@@ -286,3 +326,4 @@ if (userPerms.contains(Permission.DELETE)) { /* denied */ }
 - Use `==` for enum comparison; never use `ordinal()` as a persisted or external key.
 
 **Official docs:** [Enum tutorial](https://docs.oracle.com/javase/tutorial/java/javaOO/enum.html) · [EnumSet API](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/EnumSet.html) · [EnumMap API](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/EnumMap.html)
+

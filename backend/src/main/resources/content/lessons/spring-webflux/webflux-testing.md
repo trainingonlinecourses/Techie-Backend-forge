@@ -1,7 +1,7 @@
 ---
 title: Testing Reactive Code — StepVerifier & WebTestClient
 summary: Verifying Mono/Flux with StepVerifier, virtual time, and testing WebFlux endpoints with WebTestClient.
-order: 6
+order: 15
 minutes: 16
 topics: [stepverifier, webtestclient, testing, reactor-test, webflux]
 docs:
@@ -17,7 +17,6 @@ You can't assert on a `Mono`'s value before it arrives, and `block()`-ing your w
 
 ## StepVerifier — assert on the stream
 
-```java
 @Test
 void flux_emits_in_order() {
     StepVerifier.create(Flux.just("a", "b", "c"))
@@ -32,7 +31,6 @@ void error_chain() {
             .expectError(CustomerNotFound.class)
             .verify();
 }
-```
 
 Useful signals:
 
@@ -45,7 +43,6 @@ Useful signals:
 
 `Flux.interval(1s)` in a real test would make you wait forever. `StepVerifier.withVirtualTime` jumps the clock:
 
-```java
 @Test
 void backpressure_ticks() {
     StepVerifier.withVirtualTime(() -> Flux.interval(Duration.ofSeconds(1)).take(3))
@@ -55,11 +52,9 @@ void backpressure_ticks() {
             .expectComplete()
             .verify();
 }
-```
 
 ## WebTestClient — test endpoints like a client
 
-```java
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureWebTestClient
 class CustomerApiTest {
@@ -88,13 +83,11 @@ class CustomerApiTest {
                 .expectBody().jsonPath("$.title").isEqualTo("Customer not found");
     }
 }
-```
 
 `WebTestClient` binds to the running server (RANDOM_PORT) or in-process; it asserts on status, headers, JSON paths, and bodies — and it's fully reactive under the hood.
 
 ## Streaming responses
 
-```java
 @Test
 void sse_stream_emits() {
     Flux<Quote> quotes = client.get().uri("/api/quotes/stream")
@@ -108,7 +101,6 @@ void sse_stream_emits() {
             .expectNextCount(3)
             .verifyComplete();
 }
-```
 
 ## Test slices
 
@@ -131,3 +123,4 @@ void sse_stream_emits() {
 - [Reactor Test — StepVerifier](https://projectreactor.io/docs/test/release/reference/)
 - [Spring Framework — WebTestClient](https://docs.spring.io/spring-framework/reference/testing/webtestclient.html)
 - [Spring Boot — Testing WebFlux](https://docs.spring.io/spring-boot/reference/testing/spring-boot-applications.html#testing.spring-boot-applications.autoconfigured-spring-boot-tests)
+

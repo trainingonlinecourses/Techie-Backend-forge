@@ -12,7 +12,6 @@ docs:
 
 JPMS services let modules expose implementations through interfaces without revealing the implementation class. This is the module system's version of the Service Provider Interface (SPI).
 
-```java
 // Module A: defines the service interface
 module payment.api {
     exports com.payment.api;
@@ -30,33 +29,40 @@ module checkout {
     requires payment.api;
     uses com.payment.api.PaymentProvider;
 }
-```
 
 ---
 
 ## Line-by-Line Walkthrough
 
+
+**What this code does — step by step:**
+
+1. --- Module A: payment-api/src/module-info.java ---
+2. --- PaymentProvider.java (in payment-api) ---
+3. --- Module B: payment-stripe/src/module-info.java ---
+4. --- StripePaymentProvider.java (in payment-stripe) ---
+5. --- Module C: checkout/src/module-info.java ---
+6. --- CheckoutService.java (in checkout) ---
+
+The same code, clean:
+
 ```java
-// --- Module A: payment-api/src/module-info.java ---
 module payment.api {
     exports com.payment.api;
 }
 
-// --- PaymentProvider.java (in payment-api) ---
 package com.payment.api;
 public interface PaymentProvider {
     boolean charge(double amount, String currency);
     String getName();
 }
 
-// --- Module B: payment-stripe/src/module-info.java ---
 module payment.stripe {
     requires payment.api;
     provides com.payment.api.PaymentProvider
         with com.stripe.StripePaymentProvider;
 }
 
-// --- StripePaymentProvider.java (in payment-stripe) ---
 package com.stripe;
 import com.payment.api.PaymentProvider;
 
@@ -71,13 +77,11 @@ public class StripePaymentProvider implements PaymentProvider {
     public String getName() { return "Stripe"; }
 }
 
-// --- Module C: checkout/src/module-info.java ---
 module checkout {
     requires payment.api;
     uses com.payment.api.PaymentProvider;
 }
 
-// --- CheckoutService.java (in checkout) ---
 package com.checkout;
 import com.payment.api.PaymentProvider;
 import java.util.ServiceLoader;
@@ -100,7 +104,6 @@ public class CheckoutService {
 
 ### Scenario 1: Pluggable logging
 
-```java
 module logging.api {
     exports com.logging.api;
 }
@@ -116,17 +119,19 @@ module logging.log4j {
     provides com.logging.api.LoggerProvider
         with com.logging.log4j.Log4jLoggerProvider;
 }
-```
 
 ### Scenario 2: Multiple providers
 
-```java
-// Get all providers, not just the first
-ServiceLoader<PaymentProvider> providers = ServiceLoader.load(PaymentProvider.class);
-for (PaymentProvider provider : providers) {
-    System.out.println("Available: " + provider.getName());
+public class Main {
+
+    public static void main(String[] args) {
+        // Get all providers, not just the first
+        ServiceLoader<PaymentProvider> providers = ServiceLoader.load(PaymentProvider.class);
+        for (PaymentProvider provider : providers) {
+            System.out.println("Available: " + provider.getName());
+        }
+    }
 }
-```
 
 ---
 
@@ -138,3 +143,4 @@ for (PaymentProvider provider : providers) {
 | Wrong class name in `provides` | ServiceLoader throws ServiceConfigurationError | Verify FQCN matches |
 | Not having module-info.java | Module not recognized | Create module-info.java |
 | Forgetting `requires` on service API module | Compilation error | Add `requires service.api` |
+

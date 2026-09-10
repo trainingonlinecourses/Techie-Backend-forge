@@ -1,7 +1,7 @@
 ---
 title: Proxy Mechanics — JDK Dynamic Proxies vs CGLIB
 summary: How Spring creates proxies, JDK interface proxies vs CGLIB subclass proxies, proxyMode choices, and the proxy pitfalls (self-invocation, final classes).
-order: 5
+order: 7
 minutes: 18
 topics: [jdk-proxy, cglib, proxyfactory, proxy-mode, self-invocation, final-class, aop-proxying]
 docs:
@@ -18,7 +18,6 @@ When Spring's AOP (or `@Transactional`, `@Async`, `@Cacheable`, method security)
 - **JDK dynamic proxy** — `java.lang.reflect.Proxy`: implements the bean's *interfaces*, forwards calls through an `InvocationHandler`. Requires the bean to implement at least one interface.
 - **CGLIB proxy** — generates a *subclass* of the bean class at runtime, overriding its methods. Works for classes without interfaces (and for `@Configuration` classes). Since Spring Framework 4.0 (Boot 1.x era), **CGLIB is the default** when no interface is available — and Spring Boot configures `proxyTargetClass=true` by default, so CGLIB is used even when interfaces exist.
 
-```java
 @Service
 public class OrderService implements OrderApi {
     @Transactional
@@ -29,7 +28,6 @@ public class OrderService implements OrderApi {
 //   injected bean = JDK proxy implementing OrderApi
 // With Spring Boot default (proxyTargetClass=true):
 //   injected bean = CGLIB subclass of OrderService
-```
 
 From the caller's side it's transparent — `@Autowired OrderService` receives the proxy. From the *inside* it is not: **calls from within the same object (`this.method()`) bypass the proxy entirely**, because the proxy only intercepts calls that go *through* it.
 
@@ -37,7 +35,6 @@ From the caller's side it's transparent — `@Autowired OrderService` receives t
 
 **Scenario 1 — why self-invocation breaks @Transactional (the classic).**
 
-```java
 @Service
 public class OrderService {
     public void process(Order o) {
@@ -51,11 +48,9 @@ public class OrderService {
 
 // process() calls save() via THIS — no proxy → no transaction.
 // The two DB writes run without a transaction boundary.
-```
 
 Fixes, in org preference order:
 
-```java
 // 1. Inject self (Boot 2.6+): call through the proxy
 @Lazy @Autowired private OrderService self;
 public void process(Order o) { self.save(o); ... }
@@ -64,7 +59,6 @@ public void process(Order o) { self.save(o); ... }
 @Service public class OrderWriter { @Transactional public void save(Order o) {...} }
 
 // 3. Use TransactionTemplate programmatically for the one-off case
-```
 
 **Scenario 2 — final methods and classes.** CGLIB *subclasses* your class — so a `final` method can't be overridden and a `final` class can't be proxied at all. `@Transactional` on a final method **silently doesn't apply** (CGLIB just can't intercept it). The org rule: **don't mark classes/methods final that need AOP/transactions** — or make the class implement an interface and switch to JDK proxies.
 
@@ -74,10 +68,8 @@ public void process(Order o) { self.save(o); ... }
 
 ## proxyTargetClass — choosing the mode
 
-```java
 @EnableAspectJAutoProxy(proxyTargetClass = true)   // default in Boot: CGLIB
 // or explicitly in plain Spring config
-```
 
 | Mode | Mechanism | Requires | Notes |
 |---|---|---|---|
@@ -101,3 +93,4 @@ One subtle JDK-proxy limitation: **only interface methods are intercepted**. If 
 - Self-invocation bypasses the proxy — inject self or split beans for transactional boundaries.
 - `final` classes/methods can't be proxied — advice silently doesn't apply.
 - Expect proxies in logs/reflection; test `isAopProxy` when interception is critical.
+

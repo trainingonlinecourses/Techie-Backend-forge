@@ -1,6 +1,6 @@
 ---
 title: "JAXB Marshalling & Unmarshalling — Turning Objects Into XML and Back"
-order: 1
+order: 2
 minutes: 30
 topics: ["jaxb", "marshalling", "unmarshalling", "@XmlRootElement", "@XmlElement", "@XmlAttribute", "@XmlTransient", "JAXBContext", "Marshaller", "Unmarshaller"]
 summary: "JAXB converts Java objects to XML (marshalling) and XML back to Java objects (unmarshalling) with annotations, making it the standard way to handle XML in Java."
@@ -18,9 +18,7 @@ docs:
 Imagine you have a Java `User` object with a name, email, and address. A third-party system — a legacy payment gateway, a government API, a hospital system — demands XML. Not JSON. XML.
 
 You could build XML strings by hand with `StringBuilder`:
-```java
 String xml = "<user><name>" + user.getName() + "</name><email>" + user.getEmail() + "</email></user>";
-```
 This is fragile, tedious, and error-prone. Forget one angle bracket and the whole thing breaks.
 
 **JAXB (Java Architecture for XML Binding)** solves this by letting you annotate your Java classes, and then it handles the conversion automatically:
@@ -33,14 +31,28 @@ You annotate your POJO, create a `Marshaller`, call `marshal()`, and out comes p
 
 ### Step 1: The Annotated POJO
 
+
+**What this code does — step by step:**
+
+1. `@XmlRootElement(name = "user")` — (1) Root element name in XML
+2. `@XmlAccessorType(XmlAccessType.FIELD)` — (2) Bind fields directly, not getters
+3. `@XmlElement(name = "full-name")` — (3) Custom XML element name
+4. `@XmlAttribute` — (4) This becomes an XML attribute, not element
+5. `@XmlTransient` — (5) Completely excluded from XML
+6. Default constructor — REQUIRED by JAXB (it instantiates via reflection)
+7. All-args constructor for convenience
+8. Getters and setters — JAXB calls these during marshalling/unmarshalling
+
+The same code, clean:
+
 ```java
 import jakarta.xml.bind.annotation.*;
 
-@XmlRootElement(name = "user")                    // (1) Root element name in XML
-@XmlAccessorType(XmlAccessType.FIELD)              // (2) Bind fields directly, not getters
+@XmlRootElement(name = "user")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class User {
 
-    @XmlElement(name = "full-name")                // (3) Custom XML element name
+    @XmlElement(name = "full-name")
     private String name;
 
     @XmlElement
@@ -49,16 +61,14 @@ public class User {
     @XmlElement
     private int age;
 
-    @XmlAttribute                                  // (4) This becomes an XML attribute, not element
+    @XmlAttribute
     private int id;
 
-    @XmlTransient                                  // (5) Completely excluded from XML
+    @XmlTransient
     private String password;
 
-    // Default constructor — REQUIRED by JAXB (it instantiates via reflection)
     public User() {}
 
-    // All-args constructor for convenience
     public User(int id, String name, String email, int age, String password) {
         this.id = id;
         this.name = name;
@@ -67,7 +77,6 @@ public class User {
         this.password = password;
     }
 
-    // Getters and setters — JAXB calls these during marshalling/unmarshalling
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
     public String getEmail() { return email; }
@@ -94,32 +103,38 @@ public class User {
 
 ### Step 2: Marshalling (Object → XML)
 
+
+**What this code does — step by step:**
+
+1. (1) Create the JAXB context — tells JAXB about our User class
+2. (2) Create a marshaller — the object that does the conversion
+3. (3) Pretty-print the XML (otherwise it's one long line)
+4. (4) Create our object
+5. (5) Marshal to a StringWriter
+6. (6) Print the XML
+7. (7) Or marshal directly to System.out
+
+The same code, clean:
+
 ```java
 import jakarta.xml.bind.*;
 import java.io.StringWriter;
 
 public class JaxbDemo {
     public static void main(String[] args) throws JAXBException {
-        // (1) Create the JAXB context — tells JAXB about our User class
         JAXBContext context = JAXBContext.newInstance(User.class);
 
-        // (2) Create a marshaller — the object that does the conversion
         Marshaller marshaller = context.createMarshaller();
 
-        // (3) Pretty-print the XML (otherwise it's one long line)
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 
-        // (4) Create our object
         User user = new User(101, "Alice Johnson", "alice@example.com", 30, "secret123");
 
-        // (5) Marshal to a StringWriter
         StringWriter writer = new StringWriter();
         marshaller.marshal(user, writer);
 
-        // (6) Print the XML
         System.out.println(writer.toString());
 
-        // (7) Or marshal directly to System.out
         marshaller.marshal(user, System.out);
     }
 }
@@ -150,10 +165,24 @@ Notice: `password` is **completely absent** (thanks to `@XmlTransient`), `id` ap
 
 ### Step 3: Unmarshalling (XML → Object)
 
+
+**What this code does — step by step:**
+
+1. The XML we want to parse
+2. (1) Create context
+3. (2) Create unmarshaller
+4. (3) Unmarshal from a StringReader
+5. (4) Use the populated object — just like any Java object
+6. `System.out.println("Name: " + user.getName());` — "Bob Smith"
+7. `System.out.println("Email: " + user.getEmail());` — "bob@example.com"
+8. `System.out.println("Age: " + user.getAge());` — 25
+9. `System.out.println("ID: " + user.getId());` — 202
+
+The same code, clean:
+
 ```java
 public class JaxbUnmarshalDemo {
     public static void main(String[] args) throws JAXBException {
-        // The XML we want to parse
         String xml = """
             <?xml version="1.0" encoding="UTF-8"?>
             <user id="202">
@@ -163,20 +192,16 @@ public class JaxbUnmarshalDemo {
             </user>
             """;
 
-        // (1) Create context
         JAXBContext context = JAXBContext.newInstance(User.class);
 
-        // (2) Create unmarshaller
         Unmarshaller unmarshaller = context.createUnmarshaller();
 
-        // (3) Unmarshal from a StringReader
         User user = (User) unmarshaller.unmarshal(new StringReader(xml));
 
-        // (4) Use the populated object — just like any Java object
-        System.out.println("Name: " + user.getName());       // "Bob Smith"
-        System.out.println("Email: " + user.getEmail());     // "bob@example.com"
-        System.out.println("Age: " + user.getAge());         // 25
-        System.out.println("ID: " + user.getId());           // 202
+        System.out.println("Name: " + user.getName());
+        System.out.println("Email: " + user.getEmail());
+        System.out.println("Age: " + user.getAge());
+        System.out.println("ID: " + user.getId());
     }
 }
 ```
@@ -196,7 +221,6 @@ The `@XmlElement(name = "full-name")` annotation tells JAXB that `<full-name>` i
 
 Real XML has hierarchy — orders contain items, users have addresses. JAXB handles this naturally:
 
-```java
 @XmlRootElement(name = "order")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Order {
@@ -226,7 +250,6 @@ public class OrderItem {
 
     // Getters/setters...
 }
-```
 
 **Resulting XML:**
 ```xml
@@ -258,27 +281,22 @@ public class OrderItem {
 ## Real-World Scenarios
 
 ### Scenario 1: Parsing SOAP responses from a payment gateway
-```java
 // SOAP services return XML — JAXB unmarshals it into typed objects
 SOAPMessage response = callPaymentGateway(request);
 JAXBContext ctx = JAXBContext.newInstance(PaymentResponse.class);
 PaymentResponse result = (PaymentResponse) ctx.createUnmarshaller()
     .unmarshal(response.getSOAPBody().extractContentAsDocument());
 if (result.isApproved()) { ... }
-```
 
 ### Scenario 2: Generating reports in XML format for a government system
-```java
 // Government tax APIs often require XML submissions
 TaxReturn taxReturn = buildTaxReturn(user, deductions);
 JAXBContext ctx = JAXBContext.newInstance(TaxReturn.class);
 Marshaller m = ctx.createMarshaller();
 m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 m.marshal(taxReturn, new File("tax-submission-2024.xml"));
-```
 
 ### Scenario 3: Migrating between XML schemas
-```java
 // Old system uses <usr_name>, new system uses <username>
 // Map both to the same field with @XmlElement
 @XmlRootElement(name = "user")
@@ -286,7 +304,6 @@ public class UnifiedUser {
     @XmlElement(name = "usr_name")      // old schema element name
     private String name;
 }
-```
 
 ## Common Beginner Pitfalls
 
@@ -306,3 +323,4 @@ public class UnifiedUser {
 - **Cache `JAXBContext`** — creating it is expensive; create once per class
 - **`@XmlElementWrapper` + `@XmlElement`** for collections — wraps list in a container element
 - **`@XmlTransient`** excludes fields from serialization — essential for security
+

@@ -179,3 +179,4 @@ jcmd <pid> JFR.start name=io settings=profile duration=60s filename=io.jfr
 - **Most performance problems are code issues**, not JVM settings — profile before you tune.
 
 Official docs: [java tool](https://docs.oracle.com/en/java/javase/21/docs/specs/man/java.html) · [GC Tuning Guide](https://www.oracle.com/java/technologies/gctuning.html)
+

@@ -50,14 +50,15 @@ B can't reach A. B must decide:
 | When the partition heals | Minority data discarded/resynced | Conflicts merged (last-write-wins, versioning) |
 | Use for | Money, locks, coordination | Feeds, caches, shopping carts |
 
-```java
-// A CP choice: the majority must agree before the write is durable
-// (etcd/ZooKeeper quorum writes)
-// A write to the minority side → error, not silent acceptance
 
-// An AP choice: any node accepts the write and replicates async
-// (Cassandra/DynamoDB hinted handoff)
-// Reads may lag — eventual consistency
+**What this code does — step by step:**
+
+1. A CP choice: the majority must agree before the write is durable. (etcd/ZooKeeper quorum writes). A write to the minority side → error, not silent acceptance
+2. An AP choice: any node accepts the write and replicates async. (Cassandra/DynamoDB hinted handoff). Reads may lag — eventual consistency
+
+The same code, clean:
+
+```java
 ```
 
 ## Consistency Models: The Spectrum
@@ -93,30 +94,43 @@ The practical takeaway: even without partitions, you trade consistency for laten
 
 ## Applying This to Your Spring App
 
+
+**What this code does — step by step:**
+
+1. The consistency budget per feature: Strong (DB): money, orders, inventory, auth. Eventual (cache): course listings, leaderboards, metrics
+2. ✅ Money: strong consistency via the DB
+3. `public void transfer(...) { ... }` — linearizable
+4. ✅ Feeds: eventual consistency via Redis
+5. `public List<Entry> leaderboard() { ... }` — stale up to TTL — fine
+
+The same code, clean:
+
 ```java
-// The consistency budget per feature:
-// Strong (DB):      money, orders, inventory, auth
-// Eventual (cache): course listings, leaderboards, metrics
-
-// ✅ Money: strong consistency via the DB
 @Transactional
-public void transfer(...) { ... }   // linearizable
+public void transfer(...) { ... }
 
-// ✅ Feeds: eventual consistency via Redis
 @Cacheable(value = "leaderboard", sync = true)
-public List<Entry> leaderboard() { ... }   // stale up to TTL — fine
+public List<Entry> leaderboard() { ... }
 ```
 
 ## The Anti-Pattern: Pretending There's No Trade
 
+
+**What this code does — step by step:**
+
+1. ❌ "Write to DB + cache + search index, all must be perfect NOW"
+2. `db.save(course);` — strong
+3. `cache.evict(key);` — might fail silently
+4. `searchIndex.index(course);` — async — lag. NO SINGLE OPERATION CAN GUARANTEE ALL THREE ARE IN SYNC
+
+The same code, clean:
+
 ```java
-// ❌ "Write to DB + cache + search index, all must be perfect NOW"
 @Transactional
 public void updateCourse(CourseDto dto) {
-    db.save(course);            // strong
-    cache.evict(key);           // might fail silently
-    searchIndex.index(course);  // async — lag
-    // NO SINGLE OPERATION CAN GUARANTEE ALL THREE ARE IN SYNC
+    db.save(course);
+    cache.evict(key);
+    searchIndex.index(course);
 }
 ```
 
@@ -134,3 +148,4 @@ The fix is a *decision*, not code: the DB is the source of truth (strong), the c
 | In Spring | DB strong, cache/queue eventual — by design |
 
 CAP isn't a pick-two menu at design time — it's a per-operation decision at runtime: which data must be strong, which can lag, and what happens during a partition. Decide the consistency budget for each feature, write it down, and let the DB anchor strong consistency while caches and replicas converge.
+

@@ -1,7 +1,7 @@
 ---
 title: Redis-Backed Sessions — Shared State at Scale
 summary: Configuring Redis as the Spring Session backend with connection pooling, serialization strategies, TTL management, and Redis Cluster support for high-traffic applications.
-order: 2
+order: 1
 minutes: 25
 topics: ["redis session", "connection pooling", "jackson serializer", "session ttl", "redis cluster"]
 docs:
@@ -29,7 +29,6 @@ TTL:   1800 seconds (30 minutes)
 
 ## Complete Configuration
 
-```java
 package com.example.config;
 
 import org.springframework.context.annotation.Bean;
@@ -89,13 +88,11 @@ public class SessionConfig {
         return new GenericJackson2JsonRedisSerializer();
     }
 }
-```
 
 ---
 
 ## Session Repository — Direct Access
 
-```java
 @Service
 public class SessionService {
 
@@ -137,7 +134,6 @@ public class SessionService {
             .forEach(sessionRepo::deleteById);
     }
 }
-```
 
 ---
 
@@ -179,3 +175,4 @@ spring:
 | No Redis TTL | Sessions never expire, Redis memory leaks | Set `maxInactiveIntervalInSeconds` |
 | Storing large objects in session | Redis memory explosion, slow serialization | Store entity IDs, fetch full objects in service |
 | Redis single point of failure | All sessions lost if Redis crashes | Use Redis Sentinel or Cluster |
+

@@ -1,7 +1,7 @@
 ---
 title: Composing Resilience — Timeout, Retry, Breaker, Bulkhead, Fallback
 module: resilience-circuit-breaker
-order: 5
+order: 4
 minutes: 27
 topics: ["pattern composition", "timeout", "fallback", "resilience stack", "degraded responses"]
 summary: No single pattern is enough. A complete resilience story composes five layers, each with a distinct job:
@@ -39,25 +39,35 @@ Each layer answers one question, and together they cover the failure space: slow
 
 ## The Layering Order (and Why)
 
+
+**What this code does — step by step:**
+
+1. Layer 5: FALLBACK - the final safety net
+2. Layer 2+3+4: retry INSIDE breaker, breaker INSIDE bulkhead
+3. `paymentBulkhead.executeSupplier(` — 4: at most N concurrent
+4. `() -> retry.decorateSupplier(` — 2: transient retries
+5. Layer 1: TIMEOUT around the whole thing
+6. `return circuitBreaker.executeSupplier(call);` — 3: the decision-maker
+7. `return fallback.get();` — 5: serve degraded
+
+The same code, clean:
+
 ```java
 public PaymentResult pay(PaymentRequest request) {
 
-    // Layer 5: FALLBACK - the final safety net
     Supplier<PaymentResult> fallback = () -> PaymentResult.declined("temporarily unavailable");
 
-    // Layer 2+3+4: retry INSIDE breaker, breaker INSIDE bulkhead
     Supplier<PaymentResult> call = () ->
-            paymentBulkhead.executeSupplier(          // 4: at most N concurrent
-                    () -> retry.decorateSupplier(    // 2: transient retries
+            paymentBulkhead.executeSupplier(
+                    () -> retry.decorateSupplier(
                             () -> gateway.charge(request)));
 
-    // Layer 1: TIMEOUT around the whole thing
     call = TimeLimiter.decorateSupplier(call, Duration.ofSeconds(5));
 
     try {
-        return circuitBreaker.executeSupplier(call); // 3: the decision-maker
+        return circuitBreaker.executeSupplier(call);
     } catch (Exception e) {
-        return fallback.get();                       // 5: serve degraded
+        return fallback.get();
     }
 }
 ```
@@ -92,7 +102,6 @@ The math forces the discipline: **the layers must fit inside the caller's patien
 
 A good fallback isn't "null". It's the *best valid answer available*:
 
-```java
 // Serve from cache when the source is down:
 public Course getCourse(long id) {
     try {
@@ -106,7 +115,6 @@ public Course getCourse(long id) {
         throw new ServiceUnavailableException("catalog down, no cache");
     }
 }
-```
 
 The rules:
 
@@ -117,7 +125,6 @@ The rules:
 
 ## The Complete Stack in Spring (Resilience4j annotations)
 
-```java
 @Service
 public class TutorService {
 
@@ -132,7 +139,6 @@ public class TutorService {
                 "I couldn't reach the AI service right now — please try again.");
     }
 }
-```
 
 Annotations compose on one method; Resilience4j wraps them in the declared order; one fallback catches all failure modes. Config in properties keeps the numbers tunable per environment.
 
@@ -154,3 +160,4 @@ Annotations compose on one method; Resilience4j wraps them in the declared order
 - Fallbacks serve valid, *marked*, measured, logged degraded responses.
 - Annotations compose in Spring; config stays tunable in properties.
 - Fault-injection testing proves the stack works when it matters.
+

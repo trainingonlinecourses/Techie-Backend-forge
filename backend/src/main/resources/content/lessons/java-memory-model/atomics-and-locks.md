@@ -1,7 +1,7 @@
 ---
 title: Atomics and Locks — Thread-Safe Operations Without Synchronized
 summary: What AtomicInteger/Long/Reference are, CAS operations, ReentrantLock vs synchronized, ReadWriteLock, StampedLock, and how organizations build high-performance concurrent systems.
-order: 2
+order: 1
 minutes: 30
 topics: [atomic, cas, reentrantlock, readwritelock, stampedlock, java-concurrency]
 docs:
@@ -18,17 +18,19 @@ docs:
 
 **Atomic classes** use **Compare-And-Swap (CAS)** — a hardware-level operation that's faster than locking:
 
-```java
-// CAS operation (conceptual):
-// 1. Read current value
-// 2. Compute new value
-// 3. If current value hasn't changed, update it
-// 4. If it changed, retry
 
-// AtomicInteger — lock-free counter
+**What this code does — step by step:**
+
+1. CAS operation (conceptual): 1. Read current value. 2. Compute new value. 3. If current value hasn't changed, update it. 4. If it changed, retry
+2. AtomicInteger — lock-free counter
+3. `counter.incrementAndGet();` — CAS: read 0, compute 1, swap 0→1, return 1. CAS: read 1, compute 2, swap 1→2, return 2
+
+The same code, clean:
+
+```java
 AtomicInteger counter = new AtomicInteger(0);
-counter.incrementAndGet();  // CAS: read 0, compute 1, swap 0→1, return 1
-counter.incrementAndGet();  // CAS: read 1, compute 2, swap 1→2, return 2
+counter.incrementAndGet();
+counter.incrementAndGet();
 ```
 
 **Locks** provide more flexibility than `synchronized`:
@@ -40,12 +42,41 @@ counter.incrementAndGet();  // CAS: read 1, compute 2, swap 1→2, return 2
 
 ## Line-by-Line Walkthrough
 
+
+**What this code does — step by step:**
+
+1. Line 1: AtomicInteger — lock-free counter
+2. `counter.incrementAndGet();` — CAS operation
+3. `System.out.println("Atomic counter: " + counter.get());` — 10000
+4. Line 2: AtomicReference — lock-free object reference
+5. CAS: compare current value and update atomically
+6. `System.out.println("State: " + state.get());` — COMPLETED
+7. Line 3: AtomicReference with complex updates
+8. Retry until CAS succeeds
+9. `break;` — CAS succeeded
+10. CAS failed — another thread modified the account, retry
+11. Line 4: ReentrantLock — more flexible than synchronized
+12. `lock.lock();` — Acquire lock
+13. `lock.unlock();` — Always release in finally
+14. Try to acquire lock without waiting
+15. `if (lock.tryLock()) {` — Non-blocking
+16. `return false;` — Couldn't acquire lock
+17. Timed lock — wait up to 1 second
+18. Line 5: ReadWriteLock — multiple readers OR one writer
+19. Multiple threads can read simultaneously
+20. Only one thread can write (blocks readers)
+21. Line 6: StampedLock — optimistic reading
+22. Optimistic read — doesn't lock, checks for concurrent modification
+23. `long stamp = sl.tryOptimisticRead();` — non-blocking
+24. Concurrent write happened — fall back to read lock
+
+The same code, clean:
+
 ```java
 import java.util.concurrent.atomic.*;
 import java.util.concurrent.locks.*;
 
 public class AtomicsAndLocksDemo {
-    // Line 1: AtomicInteger — lock-free counter
     static AtomicInteger counter = new AtomicInteger(0);
 
     static void atomicExample() throws InterruptedException {
@@ -53,60 +84,53 @@ public class AtomicsAndLocksDemo {
         for (int i = 0; i < 10; i++) {
             threads[i] = new Thread(() -> {
                 for (int j = 0; j < 1000; j++) {
-                    counter.incrementAndGet();  // CAS operation
+                    counter.incrementAndGet();
                 }
             });
             threads[i].start();
         }
         for (Thread t : threads) t.join();
-        System.out.println("Atomic counter: " + counter.get());  // 10000
+        System.out.println("Atomic counter: " + counter.get());
     }
 
-    // Line 2: AtomicReference — lock-free object reference
     static AtomicReference<String> state = new AtomicReference<>("IDLE");
 
     static void atomicReferenceExample() {
-        // CAS: compare current value and update atomically
         state.compareAndSet("IDLE", "PROCESSING");
         state.compareAndSet("PROCESSING", "COMPLETED");
-        System.out.println("State: " + state.get());  // COMPLETED
+        System.out.println("State: " + state.get());
     }
 
-    // Line 3: AtomicReference with complex updates
     static record Balance(double amount) {}
     static AtomicReference<Balance> account = new AtomicReference<>(new Balance(1000));
 
     static void transfer(double amount) {
-        // Retry until CAS succeeds
         while (true) {
             Balance current = account.get();
             Balance updated = new Balance(current.amount - amount);
             if (account.compareAndSet(current, updated)) {
-                break;  // CAS succeeded
+                break;
             }
-            // CAS failed — another thread modified the account, retry
         }
     }
 
-    // Line 4: ReentrantLock — more flexible than synchronized
     static class BankAccount {
         private final ReentrantLock lock = new ReentrantLock();
         private double balance;
 
         public void withdraw(double amount) {
-            lock.lock();  // Acquire lock
+            lock.lock();
             try {
                 if (balance >= amount) {
                     balance -= amount;
                 }
             } finally {
-                lock.unlock();  // Always release in finally
+                lock.unlock();
             }
         }
 
-        // Try to acquire lock without waiting
         public boolean tryWithdraw(double amount) {
-            if (lock.tryLock()) {  // Non-blocking
+            if (lock.tryLock()) {
                 try {
                     if (balance >= amount) {
                         balance -= amount;
@@ -117,10 +141,9 @@ public class AtomicsAndLocksDemo {
                     lock.unlock();
                 }
             }
-            return false;  // Couldn't acquire lock
+            return false;
         }
 
-        // Timed lock — wait up to 1 second
         public void withdrawWithTimeout(double amount) throws InterruptedException {
             if (lock.tryLock(1, java.util.concurrent.TimeUnit.SECONDS)) {
                 try {
@@ -132,12 +155,10 @@ public class AtomicsAndLocksDemo {
         }
     }
 
-    // Line 5: ReadWriteLock — multiple readers OR one writer
     static class CachedData {
         private final ReentrantReadWriteLock rwLock = new ReentrantReadWriteLock();
         private final Map<String, String> cache = new HashMap<>();
 
-        // Multiple threads can read simultaneously
         public String get(String key) {
             rwLock.readLock().lock();
             try {
@@ -147,7 +168,6 @@ public class AtomicsAndLocksDemo {
             }
         }
 
-        // Only one thread can write (blocks readers)
         public void put(String key, String value) {
             rwLock.writeLock().lock();
             try {
@@ -158,7 +178,6 @@ public class AtomicsAndLocksDemo {
         }
     }
 
-    // Line 6: StampedLock — optimistic reading
     static class Point {
         private final StampedLock sl = new StampedLock();
         private double x, y;
@@ -173,13 +192,11 @@ public class AtomicsAndLocksDemo {
             }
         }
 
-        // Optimistic read — doesn't lock, checks for concurrent modification
         public double distanceFromOrigin() {
-            long stamp = sl.tryOptimisticRead();  // non-blocking
+            long stamp = sl.tryOptimisticRead();
             double currentX = x, currentY = y;
 
             if (!sl.validate(stamp)) {
-                // Concurrent write happened — fall back to read lock
                 stamp = sl.readLock();
                 try {
                     currentX = x;
@@ -217,7 +234,6 @@ public class AtomicsAndLocksDemo {
 
 ### Scenario 1: High-performance rate limiter
 
-```java
 public class RateLimiter {
     private final AtomicInteger tokens;
     private final int maxTokens;
@@ -239,11 +255,9 @@ public class RateLimiter {
         }
     }
 }
-```
 
 ### Scenario 2: Reader-writer cache
 
-```java
 public class RWCache<K, V> {
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
     private final Map<K, V> cache = new HashMap<>();
@@ -273,7 +287,6 @@ public class RWCache<K, V> {
         }
     }
 }
-```
 
 ---
 
@@ -286,3 +299,4 @@ public class RWCache<K, V> {
 | Using ReentrantLock when synchronized works | Overhead without benefit | Start with synchronized, upgrade when needed |
 | Not handling interrupted exceptions | tryLock throws InterruptedException | Catch and handle or rethrow |
 | Using StampedLock with virtual threads | Not compatible | Use ReentrantLock with virtual threads |
+

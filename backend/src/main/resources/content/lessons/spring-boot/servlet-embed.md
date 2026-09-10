@@ -1,7 +1,7 @@
 ---
 title: Spring Boot Embedded Servlet Containers — Tomcat, Jetty and Undertow
 summary: Embedded server architecture, switching between Tomcat and Jetty, customizing connectors, SSL/TLS configuration, connection pooling, graceful shutdown hooks, and production hardening of the embedded container.
-order: 49
+order: 45
 minutes: 20
 topics: [embedded-server, tomcat, jetty, undertow, ssl, connector, connection-pool, container-customization]
 docs:
@@ -52,7 +52,6 @@ Spring Boot embeds a web server (Tomcat by default) directly inside your applica
 
 ### Scenario 2: Customizing Tomcat
 
-```java
 @Bean
 public TomcatServletWebServerFactory tomcatFactory() {
     return new TomcatServletWebServerFactory() {
@@ -80,7 +79,6 @@ public WebServerFactoryCustomizer<TomcatServletWebServerFactory> tomcatCustomize
         });
     };
 }
-```
 
 ### Scenario 3: SSL/TLS configuration
 
@@ -97,7 +95,6 @@ server:
     enabled-protocols: TLSv1.2,TLSv1.3
 ```
 
-```java
 // Force HTTP → HTTPS redirect
 @Bean
 public ServletWebServerFactory servletContainer() {
@@ -124,7 +121,6 @@ private Connector httpRedirectConnector() {
     connector.setRedirectPort(8443);
     return connector;
 }
-```
 
 ### Scenario 4: Connection pool tuning
 
@@ -139,7 +135,6 @@ server:
     connection-timeout: 20000  # 20 seconds
 ```
 
-```java
 // Programmatic tuning
 @Bean
 public WebServerFactoryCustomizer<TomcatServletWebServerFactory> connectionPoolCustomizer() {
@@ -152,7 +147,6 @@ public WebServerFactoryCustomizer<TomcatServletWebServerFactory> connectionPoolC
         protocol.setConnectionTimeout(20000);
     });
 }
-```
 
 ### Scenario 5: Graceful shutdown
 
@@ -167,7 +161,6 @@ spring:
     timeout-per-shutdown-phase: 30s  # max wait for in-flight requests
 ```
 
-```java
 // Add a shutdown hook to log and clean up
 @Component
 public class ShutdownHook {
@@ -180,7 +173,6 @@ public class ShutdownHook {
         // but waits up to 30s for existing requests to finish
     }
 }
-```
 
 ## Common mistakes
 
@@ -193,3 +185,4 @@ public class ShutdownHook {
 | Ignoring graceful shutdown | In-flight requests dropped on redeploy |
 | Using default maxPostSize for file uploads | Upload failures over 2MB |
 | Not setting accept-count | 503 errors during traffic spikes |
+

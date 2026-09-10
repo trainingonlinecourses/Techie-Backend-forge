@@ -1,7 +1,7 @@
 ---
 title: Validating JWTs — The Stateless Checkpoint
 module: spring-security-jwt-deep
-order: 3
+order: 4
 minutes: 25
 topics: ["JWT validation", "jjwt parser", "signature verification", "expiry check", "stateless auth"]
 summary: The validation side is the other half of the handshake. On every authenticated request, the server must answer: "is this token genuine, untampered,...
@@ -28,7 +28,6 @@ This is the *stateless* magic: any server instance holding the key can validate 
 
 ## The Code Walkthrough
 
-```java
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -69,7 +68,6 @@ public class TokenValidator {
         }
     }
 }
-```
 
 ### Walking Through Each Part
 
@@ -85,7 +83,6 @@ public class TokenValidator {
 
 Validation happens in a **filter** that runs before your controllers:
 
-```java
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -128,7 +125,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         chain.doFilter(request, response);
     }
 }
-```
 
 ### Walking Through Each Part
 
@@ -167,3 +163,4 @@ The honest limitation: **JWT validation is stateless, so it can't see account ch
 - Validation lives in a security filter that populates the SecurityContext from claims.
 - Failed validation = anonymous request → 401 at authorization.
 - Stateless tokens can't see account changes — bounded staleness is the accepted trade-off.
+

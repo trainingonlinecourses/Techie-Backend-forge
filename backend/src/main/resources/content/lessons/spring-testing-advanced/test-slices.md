@@ -1,7 +1,7 @@
 ---
 title: Spring Boot Test Slices
 module: spring-testing-advanced
-order: 1
+order: 9
 minutes: 20
 topics: ["@WebMvcTest", "@DataJpaTest", "@JsonTest", "test slicing", "context caching", "fast tests"]
 summary: @SpringBootTest boots the whole application — every bean, every autoconfiguration. That's slow (30s+ per context) and brittle. Test slices boot onl...
@@ -16,10 +16,8 @@ docs:
 
 ## The Problem With Full Context
 
-```java
 @SpringBootTest   // boots everything: DB, Redis, Kafka, security, the lot
 class CourseServiceTest { ... }
-```
 
 - 30–120s to start the context
 - Every test run re-initializes all dependencies
@@ -38,7 +36,6 @@ class CourseServiceTest { ... }
 
 ## @WebMvcTest: Test the Controller, Mock the Service
 
-```java
 @WebMvcTest(CourseController.class)
 class CourseControllerTest {
 
@@ -66,7 +63,6 @@ class CourseControllerTest {
             .andExpect(jsonPath("$.detail").value(containsString("not found")));
     }
 }
-```
 
 **What you test here**: mappings, validation, serialization, status codes, error handling — the HTTP contract. **Not**: the service logic (that's mocked).
 
@@ -74,23 +70,18 @@ class CourseControllerTest {
 
 If the app has Spring Security, `@WebMvcTest` loads it — every request is 401 unless you permit:
 
-```java
 @WebMvcTest(CourseController.class)
 @AutoConfigureMockMvc(addFilters = false)      // skip security filters
 class CourseControllerTest { ... }
-```
 
 Or authenticate in tests:
 
-```java
 mockMvc.perform(get("/api/courses/1")
         .with(user("admin").roles("ADMIN")))
     .andExpect(status().isOk());
-```
 
 ## @DataJpaTest: Test the Repository, Real SQL
 
-```java
 @DataJpaTest
 class CourseRepositoryTest {
 
@@ -115,7 +106,6 @@ class CourseRepositoryTest {
         assertTrue(repository.findByTitleContaining("oo").contains(c));
     }
 }
-```
 
 Key facts:
 
@@ -126,7 +116,6 @@ Key facts:
 
 ### Real Postgres in Slices
 
-```java
 @DataJpaTest
 @Testcontainers
 class CourseRepositoryTest {
@@ -137,13 +126,11 @@ class CourseRepositoryTest {
 
     @Autowired CourseRepository repository;
 }
-```
 
 `@ServiceConnection` wires the container into the test context automatically — no config properties needed.
 
 ## @JsonTest: Test Serialization in Isolation
 
-```java
 @JsonTest
 class CourseDtoJsonTest {
 
@@ -166,7 +153,6 @@ class CourseDtoJsonTest {
         assertEquals(Instant.parse("2026-08-18T10:00:00Z"), dto.getPublishedAt());
     }
 }
-```
 
 ## Slices + Context Caching
 
@@ -208,3 +194,4 @@ Slices are the middle tier: fast enough to run constantly, real enough to catch 
 | `@RestClientTest` | HTTP clients | Network |
 
 Test slices give you the speed of unit tests with the confidence of integration tests — boot exactly what you're testing, mock the rest, and your suite stays fast enough to run on every commit.
+

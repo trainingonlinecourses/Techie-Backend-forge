@@ -1,7 +1,7 @@
 ---
 title: Internationalization (i18n) with MessageSource
 summary: Locale-aware messages with MessageSource, message.properties files, parameterized and pluralized text, and locale resolution in Spring MVC.
-order: 12
+order: 13
 minutes: 12
 topics: [i18n, messagesource, locale, resource bundles, localeresolver]
 docs:
@@ -36,7 +36,6 @@ Spring Boot picks up `messages*.properties` automatically (`spring.messages.base
 
 ## Using MessageSource in code
 
-```java
 @Service
 public class NotificationService {
     private final MessageSource messages;
@@ -45,7 +44,6 @@ public class NotificationService {
     String text = messages.getMessage("order.confirmed", new Object[]{orderId, customer},
             LocaleContextHolder.getLocale());
 }
-```
 
 - **Arguments** fill `{0}`, `{1}` placeholders.
 - `LocaleContextHolder.getLocale()` picks up the current request's locale (set by MVC's locale resolution).
@@ -65,7 +63,6 @@ Or use ICU-style with `ResourceBundleMessageSource` — either way, plurals belo
 
 What determines the request's locale?
 
-```java
 // Default: AcceptHeaderLocaleResolver — uses the Accept-Language header.
 // To make it switchable by URL param (…?lang=fr), configure:
 @Bean
@@ -74,13 +71,10 @@ LocaleResolver localeResolver() {
     r.setDefaultLocale(Locale.ENGLISH);
     return r;
 }
-```
 
 `LocaleChangeInterceptor` reads a `lang` request param and updates the resolver:
 
-```java
 registry.addInterceptor(new LocaleChangeInterceptor());  // in WebMvcConfigurer#addInterceptors
-```
 
 The chain: request → `LocaleChangeInterceptor` (param, optional) → `LocaleResolver` (session/header/cookie) → `LocaleContextHolder` → `MessageSource` lookup.
 
@@ -88,12 +82,10 @@ The chain: request → `LocaleChangeInterceptor` (param, optional) → `LocaleRe
 
 Validation constraints use message keys — override any built-in:
 
-```java
 // messages.properties
 NotBlank.customer=Customer name is required
 // or globally:
 jakarta.validation.constraints.NotBlank.message=must not be blank
-```
 
 Custom constraint `message()` values are keys too — your `@StrongPassword(message = "password.weak")` resolves through the same bundle.
 
@@ -111,3 +103,4 @@ Custom constraint `message()` values are keys too — your `@StrongPassword(mess
 - Validation messages, plurals and validation error text all flow through the same bundle.
 
 Official docs: [MessageSource in the Spring context](https://docs.spring.io/spring-framework/reference/core/beans/context-introduction.html#context-functionality-messagesource)
+

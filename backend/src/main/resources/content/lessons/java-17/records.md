@@ -1,7 +1,7 @@
 ---
 title: Records — Immutable Data Classes in One Line
 summary: What records are, how they replace POJOs, canonical constructors, compact constructors, validation, and how organizations use them for DTOs, value objects, and domain models.
-order: 1
+order: 3
 minutes: 28
 topics: [records, immutable-data, value-objects, dto, java17]
 docs:
@@ -13,7 +13,6 @@ docs:
 
 Before Java 16, creating a simple data class required dozens of lines of boilerplate:
 
-```java
 // OLD WAY: A simple Point class
 public final class Point {
     private final int x;
@@ -34,14 +33,11 @@ public final class Point {
 
     @Override public String toString() { return "Point[x=" + x + ", y=" + y + "]"; }
 }
-```
 
 **Records** reduce this to one line:
 
-```java
 // JAVA 16+: Same thing in one line
 public record Point(int x, int y) {}
-```
 
 The compiler automatically generates:
 - **Constructor** with all fields (canonical constructor)
@@ -55,26 +51,35 @@ Records are **immutable** — all fields are `private final`.
 
 ## Anatomy of a Record
 
+
+**What this code does — step by step:**
+
+1. `String name,` — component — becomes a private final field
+2. `String department,` — component
+3. `double salary` — component
+4. This is the compact constructor — validation only. The compiler generates the assignment
+5. `this.department = department.toUpperCase();` — transform!
+6. Custom method
+7. Static factory method
+
+The same code, clean:
+
 ```java
 public record Employee(
-    String name,          // component — becomes a private final field
-    String department,    // component
-    double salary         // component
+    String name,
+    String department,
+    double salary
 ) {
-    // This is the compact constructor — validation only
-    // The compiler generates the assignment
     public Employee {
         Objects.requireNonNull(name, "Name cannot be null");
         if (salary < 0) throw new IllegalArgumentException("Salary cannot be negative");
-        this.department = department.toUpperCase();  // transform!
+        this.department = department.toUpperCase();
     }
 
-    // Custom method
     public boolean isHighEarner() {
         return salary > 100000;
     }
 
-    // Static factory method
     public static Employee of(String name, String dept, double salary) {
         return new Employee(name, dept, salary);
     }
@@ -85,39 +90,60 @@ public record Employee(
 
 ## Line-by-Line Walkthrough
 
+
+**What this code does — step by step:**
+
+1. Line 1: Simple record
+2. Line 2: Record with validation
+3. `this.address = address.toLowerCase();` — normalize in compact constructor
+4. Line 3: Record with computed components
+5. Compact constructor — validation + normalization
+6. `this.currency = currency.toUpperCase();` — always uppercase
+7. Custom factory
+8. Arithmetic (returns new record — immutable)
+9. Line 4: Record implementing interfaces
+10. Line 5: Nested records
+11. Line 6: Creating and using records
+12. `System.out.println(coord.latitude());` — 40.7128
+13. `System.out.println(coord);` — Coordinate[latitude=40.7128, longitude=-74.006]
+14. Line 7: Records work with collections and streams
+15. [Person[name=Alice, age=30], Person[name=Bob, age=25], Person[name=Carol, age=35]]
+16. Line 8: Records as map keys (equals/hashCode auto-generated)
+17. `double price = prices.get(new Coordinate(40.7128, -74.0060));` — works!
+18. Line 9: Record in pattern matching (Java 17+)
+19. `if (obj instanceof Email email) {` — pattern matching
+20. `System.out.println("Email: " + email.address());` — "alice@example.com"
+21. Line 10: Validation example
+
+The same code, clean:
+
 ```java
 import java.util.*;
 import java.util.stream.*;
 
 public class RecordsDemo {
-    // Line 1: Simple record
     record Coordinate(double latitude, double longitude) {}
 
-    // Line 2: Record with validation
     record Email(String address) {
         public Email {
             Objects.requireNonNull(address);
             if (!address.contains("@")) {
                 throw new IllegalArgumentException("Invalid email: " + address);
             }
-            this.address = address.toLowerCase();  // normalize in compact constructor
+            this.address = address.toLowerCase();
         }
     }
 
-    // Line 3: Record with computed components
     record Money(double amount, String currency) {
-        // Compact constructor — validation + normalization
         public Money {
             if (amount < 0) throw new IllegalArgumentException("Amount cannot be negative");
-            this.currency = currency.toUpperCase();  // always uppercase
+            this.currency = currency.toUpperCase();
         }
 
-        // Custom factory
         public static Money of(double amount, String currency) {
             return new Money(amount, currency);
         }
 
-        // Arithmetic (returns new record — immutable)
         public Money add(Money other) {
             if (!this.currency.equals(other.currency)) {
                 throw new IllegalArgumentException("Currency mismatch");
@@ -126,7 +152,6 @@ public class RecordsDemo {
         }
     }
 
-    // Line 4: Record implementing interfaces
     record Person(String name, int age) implements Comparable<Person> {
         @Override
         public int compareTo(Person other) {
@@ -134,17 +159,14 @@ public class RecordsDemo {
         }
     }
 
-    // Line 5: Nested records
     record Address(String street, String city, String zip) {}
     record User(String name, Email email, Address address) {}
 
     public static void main(String[] args) {
-        // Line 6: Creating and using records
         var coord = new Coordinate(40.7128, -74.0060);
-        System.out.println(coord.latitude());    // 40.7128
-        System.out.println(coord);               // Coordinate[latitude=40.7128, longitude=-74.006]
+        System.out.println(coord.latitude());
+        System.out.println(coord);
 
-        // Line 7: Records work with collections and streams
         var people = List.of(
             new Person("Alice", 30),
             new Person("Bob", 25),
@@ -154,20 +176,16 @@ public class RecordsDemo {
         var sortedByName = people.stream()
             .sorted(Comparator.comparing(Person::name))
             .toList();
-        // [Person[name=Alice, age=30], Person[name=Bob, age=25], Person[name=Carol, age=35]]
 
-        // Line 8: Records as map keys (equals/hashCode auto-generated)
         var prices = new LinkedHashMap<Coordinate, Double>();
         prices.put(new Coordinate(40.7128, -74.0060), 100.0);
-        double price = prices.get(new Coordinate(40.7128, -74.0060));  // works!
+        double price = prices.get(new Coordinate(40.7128, -74.0060));
 
-        // Line 9: Record in pattern matching (Java 17+)
         Object obj = new Email("ALICE@EXAMPLE.COM");
-        if (obj instanceof Email email) {       // pattern matching
-            System.out.println("Email: " + email.address());  // "alice@example.com"
+        if (obj instanceof Email email) {
+            System.out.println("Email: " + email.address());
         }
 
-        // Line 10: Validation example
         try {
             new Email("invalid-email");
         } catch (IllegalArgumentException e) {
@@ -183,7 +201,6 @@ public class RecordsDemo {
 
 ### Scenario 1: API DTOs (Data Transfer Objects)
 
-```java
 // Before Java 16: 50+ lines per DTO with Lombok or manual boilerplate
 // After: 1 line each
 
@@ -196,11 +213,9 @@ public ApiResponse<UserResponse> createUser(CreateUserRequest request) {
     var user = userService.create(request.name(), request.email(), request.password());
     return new ApiResponse<>(true, "User created", toResponse(user));
 }
-```
 
 ### Scenario 2: Domain value objects
 
-```java
 record Money(BigDecimal amount, Currency currency) {
     public Money {
         Objects.requireNonNull(amount);
@@ -219,11 +234,9 @@ record Money(BigDecimal amount, Currency currency) {
 // No accidental mutation — ever
 Money price = Money.usd(new BigDecimal("29.99"));
 // price.amount().add(...) would need reassignment, which isn't possible
-```
 
 ### Scenario 3: Event sourcing
 
-```java
 record OrderCreated(String orderId, String customerId, List<String> items, Instant timestamp) {}
 record OrderShipped(String orderId, String trackingNumber, Instant timestamp) {}
 record OrderCancelled(String orderId, String reason, Instant timestamp) {}
@@ -239,7 +252,6 @@ String describeEvent(OrderEvent event) {
         case OrderCancelled e -> "Order " + e.orderId() + " cancelled: " + e.reason();
     };
 }
-```
 
 ---
 
@@ -252,3 +264,4 @@ String describeEvent(OrderEvent event) {
 | Mutable field in record | Records are immutable by design | Use arrays/collections defensively |
 | Using `this.field =` in compact constructor | Can only assign (not `this.field =` for primitives) | Use `this.field = value;` in compact constructor |
 | Records with only one field | Valid but unusual | Consider if a simple class is better |
+

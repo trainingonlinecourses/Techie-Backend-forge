@@ -1,7 +1,7 @@
 ---
 title: Spring Boot Configuration — Properties, YAML, @ConfigurationProperties, and Profiles
 summary: application.properties vs application.yml, binding properties to Java objects with @ConfigurationProperties, profile-specific configs, external configuration sources (env vars, command line, config server), validation, and how organizations manage configuration across environments with line-by-line walkthroughs.
-order: 5
+order: 6
 minutes: 30
 topics: [configuration-properties, application-properties, application-yml, profiles, externalized-config, config-validation, config-binding]
 docs:
@@ -48,39 +48,61 @@ app:
 
 ## Reading properties with @Value
 
+
+**What this code does — step by step:**
+
+1. @Value reads a single property and injects it into a field
+2. `@Value("${app.email.smtp-host}")` — reads app.email.smtp-host from properties
+3. `@Value("${app.email.smtp-port:587}")` — :587 is the DEFAULT value if not set
+4. `@Value("${app.email.enabled:true}")` — default: true
+5. SpEL expressions work too
+6. `@Value("#{${app.email.recipients}.split(',')}")` — splits comma-separated list
+
+The same code, clean:
+
 ```java
-// @Value reads a single property and injects it into a field
 @Service
 public class EmailService {
 
-    @Value("${app.email.smtp-host}")         // reads app.email.smtp-host from properties
+    @Value("${app.email.smtp-host}")
     private String smtpHost;
 
-    @Value("${app.email.smtp-port:587}")     // :587 is the DEFAULT value if not set
+    @Value("${app.email.smtp-port:587}")
     private int smtpPort;
 
-    @Value("${app.email.enabled:true}")      // default: true
+    @Value("${app.email.enabled:true}")
     private boolean enabled;
 
-    // SpEL expressions work too
-    @Value("#{${app.email.recipients}.split(',')}")  // splits comma-separated list
+    @Value("#{${app.email.recipients}.split(',')}")
     private List<String> defaultRecipients;
 }
 ```
 
 ## @ConfigurationProperties — binding entire config blocks
 
+
+**What this code does — step by step:**
+
+1. Instead of multiple @Value annotations, bind an entire prefix to a typed object
+2. `String provider,` — app.storage.provider
+3. `String bucket,` — app.storage.bucket
+4. `int maxFileSize,` — app.storage.max-file-size
+5. `List<String> allowedTypes` — app.storage.allowed-types
+6. OR using @ConfigurationProperties with a class:
+7. getters and setters (or records — no getters/setters needed)
+8. application.yml
+
+The same code, clean:
+
 ```java
-// Instead of multiple @Value annotations, bind an entire prefix to a typed object
 @ConfigurationProperties(prefix = "app.storage")
 public record StorageProperties(
-    String provider,           // app.storage.provider
-    String bucket,             // app.storage.bucket
-    int maxFileSize,           // app.storage.max-file-size
-    List<String> allowedTypes  // app.storage.allowed-types
+    String provider,
+    String bucket,
+    int maxFileSize,
+    List<String> allowedTypes
 ) {}
 
-// OR using @ConfigurationProperties with a class:
 @ConfigurationProperties(prefix = "app.storage")
 public class StorageProperties {
     private String provider;
@@ -88,10 +110,8 @@ public class StorageProperties {
     private int maxFileSize;
     private List<String> allowedTypes;
 
-    // getters and setters (or records — no getters/setters needed)
 }
 
-// application.yml
 app:
   storage:
     provider: s3
@@ -104,7 +124,6 @@ app:
 ```
 
 **Enable the binding:**
-```java
 @SpringBootApplication
 @EnableConfigurationProperties(StorageProperties.class)  // bind StorageProperties
 public class AcademyApplication { ... }
@@ -113,7 +132,6 @@ public class AcademyApplication { ... }
 @SpringBootApplication
 @ConfigurationPropertiesScan    // auto-discovers all @ConfigurationProperties
 public class AcademyApplication { ... }
-```
 
 ## Profile-specific configuration
 
@@ -179,34 +197,38 @@ spring:
 
 Spring Boot checks multiple locations, in this priority order (highest first):
 
+
+**What this code does — step by step:**
+
+1. 1. Command-line arguments (highest priority). Java -jar app.jar --server.port=9090
+2. 2. SPRING_APPLICATION_JSON environment variable. Export SPRING_APPLICATION_JSON='{"server":{"port":9090}}'
+3. 3. OS environment variables. Export SERVER_PORT=9090
+4. 4. application-{profile}.yml. 5. application.yml. 6. @PropertySource annotations. 7. Default properties (lowest priority)
+
+The same code, clean:
+
 ```java
-// 1. Command-line arguments (highest priority)
-// java -jar app.jar --server.port=9090
-
-// 2. SPRING_APPLICATION_JSON environment variable
-// export SPRING_APPLICATION_JSON='{"server":{"port":9090}}'
-
-// 3. OS environment variables
-// export SERVER_PORT=9090
-
-// 4. application-{profile}.yml
-// 5. application.yml
-// 6. @PropertySource annotations
-// 7. Default properties (lowest priority)
 ```
 
-```java
 // Example: environment variable overrides application.yml
 // application.yml says: server.port=8080
 // Environment variable says: SERVER_PORT=9090
 // Result: server runs on 9090 (env var wins!)
-```
 
 ## Validation with @Validated
 
+
+**What this code does — step by step:**
+
+1. `@Validated` — enables Bean Validation on the properties
+2. getters and setters
+3. If validation fails at startup: Binding failure: Invalid value for 'app.payment.provider': must not be blank. Application FAILS TO START — you catch config errors immediately!
+
+The same code, clean:
+
 ```java
 @ConfigurationProperties(prefix = "app.payment")
-@Validated    // enables Bean Validation on the properties
+@Validated
 public class PaymentProperties {
 
     @NotBlank(message = "Payment provider is required")
@@ -218,19 +240,13 @@ public class PaymentProperties {
     @Pattern(regexp = "^sk_(test|live)_.+$", message = "API key must start with sk_test_ or sk_live_")
     private String apiKey;
 
-    // getters and setters
 }
-
-// If validation fails at startup:
-// Binding failure: Invalid value for 'app.payment.provider': must not be blank
-// Application FAILS TO START — you catch config errors immediately!
 ```
 
 ## How we use it in organizations
 
 ### Scenario 1: Feature flags via configuration
 
-```java
 @ConfigurationProperties(prefix = "app.features")
 public record FeatureFlags(
     boolean registrationEnabled,
@@ -267,15 +283,19 @@ app:
 app:
   features:
     max-courses-per-user: 20   # stricter limit in production
-```
 
 ### Scenario 2: Secrets management
 
-```java
-// NEVER put secrets in application.yml (it's in source control!)
-// Use environment variables instead:
 
-// application.yml — reference env vars with ${}
+**What this code does — step by step:**
+
+1. NEVER put secrets in application.yml (it's in source control!). Use environment variables instead:
+2. application.yml — reference env vars with ${}
+3. In Render/Vercel/Heroku, set these as environment variables in the dashboard. They never appear in your code or config files
+
+The same code, clean:
+
+```java
 spring:
   datasource:
     password: ${DB_PASSWORD}     # reads from environment variable at runtime
@@ -283,9 +303,6 @@ spring:
 app:
   openai:
     api-key: ${OPENAI_API_KEY}   # reads from environment variable
-
-// In Render/Vercel/Heroku, set these as environment variables in the dashboard
-// They never appear in your code or config files
 ```
 
 ### Scenario 3: Configuration for multiple environments
@@ -326,3 +343,4 @@ app:
 | Not using profiles | Dev config leaks into production | Always use profile-specific files |
 | Ignoring property override order | Unexpected values at runtime | Understand the priority chain |
 | Using application.properties AND application.yml | Confusing conflicts | Pick one and stick with it |
+

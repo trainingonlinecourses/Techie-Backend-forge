@@ -1,7 +1,7 @@
 ---
 title: ConcurrentHashMap — Thread-Safe Maps
 summary: Segment locking, atomic operations, compute/merge patterns, why Hashtable is dead, and production patterns for concurrent caching.
-order: 6
+order: 4
 minutes: 18
 topics: [concurrent-hashmap, thread-safety, atomic-operations, compute, merge, concurrent-caching]
 docs:
@@ -21,19 +21,28 @@ docs:
 
 ## Why Not HashMap in Multi-Threaded Code?
 
+
+**What this code does — step by step:**
+
+1. ❌ HashMap is NOT thread-safe
+2. Thread 1: reading
+3. `cache.get("key");` — 💥 May throw ConcurrentModificationException
+4. Thread 2: writing simultaneously
+5. `cache.put("key", 42);` — 💥 Data corruption possible
+6. Even worse — compound operations are NOT atomic
+7. `cache.put("key", 1);` — 💥 Race condition: two threads may both put
+
+The same code, clean:
+
 ```java
-// ❌ HashMap is NOT thread-safe
 Map<String, Integer> cache = new HashMap<>();
 
-// Thread 1: reading
-cache.get("key");  // 💥 May throw ConcurrentModificationException
+cache.get("key");
 
-// Thread 2: writing simultaneously
-cache.put("key", 42);  // 💥 Data corruption possible
+cache.put("key", 42);
 
-// Even worse — compound operations are NOT atomic
 if (!cache.containsKey("key")) {
-    cache.put("key", 1);  // 💥 Race condition: two threads may both put
+    cache.put("key", 1);
 }
 ```
 
@@ -43,45 +52,60 @@ if (!cache.containsKey("key")) {
 
 ### Thread-Safe Operations
 
+
+**What this code does — step by step:**
+
+1. ✅ ConcurrentHashMap handles thread safety
+2. Thread-safe put
+3. Thread-safe get
+4. Thread-safe put-if-absent (atomic!)
+5. `cache.putIfAbsent("key", 100);` — Only puts if "key" doesn't exist
+6. Thread-safe remove
+7. Thread-safe replace
+8. `cache.replace("key", 42, 100);` — Only replaces if current value is 42
+
+The same code, clean:
+
 ```java
-// ✅ ConcurrentHashMap handles thread safety
 ConcurrentHashMap<String, Integer> cache = new ConcurrentHashMap<>();
 
-// Thread-safe put
 cache.put("key", 42);
 
-// Thread-safe get
 Integer value = cache.get("key");
 
-// Thread-safe put-if-absent (atomic!)
-cache.putIfAbsent("key", 100);  // Only puts if "key" doesn't exist
+cache.putIfAbsent("key", 100);
 
-// Thread-safe remove
 cache.remove("key");
 
-// Thread-safe replace
-cache.replace("key", 42, 100);  // Only replaces if current value is 42
+cache.replace("key", 42, 100);
 ```
 
 ### Atomic Compound Operations
 
+
+**What this code does — step by step:**
+
+1. computeIfAbsent — atomic "get or compute"
+2. computeIfPresent — atomic "get and update"
+3. compute — atomic "compute and store"
+4. merge — atomic "combine values"
+5. `cache.merge("total", 100, Long::sum);` — Add 100 to existing total
+
+The same code, clean:
+
 ```java
-// computeIfAbsent — atomic "get or compute"
 cache.computeIfAbsent("user:123", id -> loadUser(id));
 
-// computeIfPresent — atomic "get and update"
 cache.computeIfPresent("user:123", (id, user) -> {
     user.setLastAccess(LocalDateTime.now());
     return user;
 });
 
-// compute — atomic "compute and store"
 cache.compute("counter", (key, value) -> {
     return value == null ? 1 : value + 1;
 });
 
-// merge — atomic "combine values"
-cache.merge("total", 100, Long::sum);  // Add 100 to existing total
+cache.merge("total", 100, Long::sum);
 ```
 
 ---
@@ -90,29 +114,37 @@ cache.merge("total", 100, Long::sum);  // Add 100 to existing total
 
 ### Segment Locking (Java 7) vs CAS (Java 8+)
 
-```java
-// Java 7: Segment locking — the map is divided into 16 segments
-// Each segment has its own lock — 16 threads can write simultaneously
-// But only to different segments
 
-// Java 8+: CAS (Compare-And-Swap) — no locking at all!
-// Uses hardware-level atomic operations for individual cells
-// Much faster than segment locking
+**What this code does — step by step:**
+
+1. Java 7: Segment locking — the map is divided into 16 segments. Each segment has its own lock — 16 threads can write simultaneously. But only to different segments
+2. Java 8+: CAS (Compare-And-Swap) — no locking at all! Uses hardware-level atomic operations for individual cells. Much faster than segment locking
+
+The same code, clean:
+
+```java
 ```
 
 ### Reading Is Always Lock-Free
 
+
+**What this code does — step by step:**
+
+1. Reads NEVER block — even during concurrent writes
+2. Thread 1: reading
+3. `User user = users.get("alice");` — No lock needed, instant
+4. Thread 2: writing
+5. `users.put("bob", new User("Bob"));` — Only locks the specific bucket
+6. Thread 1 still reads without waiting!
+
+The same code, clean:
+
 ```java
-// Reads NEVER block — even during concurrent writes
 ConcurrentHashMap<String, User> users = new ConcurrentHashMap<>();
 
-// Thread 1: reading
-User user = users.get("alice");  // No lock needed, instant
+User user = users.get("alice");
 
-// Thread 2: writing
-users.put("bob", new User("Bob"));  // Only locks the specific bucket
-
-// Thread 1 still reads without waiting!
+users.put("bob", new User("Bob"));
 ```
 
 ---
@@ -121,7 +153,6 @@ users.put("bob", new User("Bob"));  // Only locks the specific bucket
 
 ### Scenario 1: Application-Level Cache
 
-```java
 @Service
 public class UserCache {
 
@@ -152,11 +183,9 @@ public class UserCache {
         return cache.size();
     }
 }
-```
 
 ### Scenario 2: Rate Limiter
 
-```java
 @Component
 public class RateLimiter {
 
@@ -186,11 +215,9 @@ public class RateLimiter {
         return current <= MAX_REQUESTS;
     }
 }
-```
 
 ### Scenario 3: Connection Pool Tracker
 
-```java
 @Component
 public class ConnectionPool {
 
@@ -226,7 +253,6 @@ public class ConnectionPool {
         });
     }
 }
-```
 
 ---
 
@@ -251,3 +277,4 @@ public class ConnectionPool {
 | Using `synchronizedMap` instead | Single lock bottleneck | Use `ConcurrentHashMap` for better performance |
 | Modifying values directly | Not thread-safe — only the map operations are atomic | Always use `compute()`, `merge()`, or `replace()` |
 | Not considering memory overhead | ConcurrentHashMap uses more memory | For single-writer scenarios, consider `Collections.synchronizedMap` |
+

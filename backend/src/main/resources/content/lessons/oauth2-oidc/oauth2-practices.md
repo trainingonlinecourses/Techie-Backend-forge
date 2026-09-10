@@ -1,7 +1,7 @@
 ---
 title: OAuth2 Production Practices — Refresh Tokens, Rotation, and Security
 module: oauth2-oidc
-order: 5
+order: 4
 minutes: 26
 topics: ["refresh tokens", "token rotation", "client credentials", "security best practices", "Spring resource server"]
 summary: The previous lessons covered getting tokens. Production is about managing them: what happens when the access token expires (refresh tokens), how to...
@@ -46,17 +46,17 @@ Client continues with the fresh access_token
 
 **The vulnerability without rotation:** a stolen refresh token works forever (until expiry) — the thief keeps minting fresh access tokens, and the legitimate user's session and the thief's are indistinguishable. **Refresh token rotation** fixes it: the auth server issues a *new* refresh token on every refresh and **invalidates the old one**.
 
-```java
-// Client side — with rotation, the refresh becomes a swap:
-// old refresh token is used ONCE; the response carries its replacement.
-OAuth2RefreshToken newRefresh = refresh(oldRefresh);   // old is now DEAD
 
-// Auth server side — the enforcement:
-// 1. Refresh request with token R -> validate R
-// 2. Issue NEW refresh token R' (a fresh random value)
-// 3. INVALIDATE R immediately
-// 4. (Reuse detection) if R is presented again -> it was stolen/copied:
-//    revoke the ENTIRE session (the family of tokens)
+**What this code does — step by step:**
+
+1. Client side — with rotation, the refresh becomes a swap: old refresh token is used ONCE; the response carries its replacement.
+2. `OAuth2RefreshToken newRefresh = refresh(oldRefresh);` — old is now DEAD
+3. Auth server side — the enforcement: 1. Refresh request with token R -> validate R. 2. Issue NEW refresh token R' (a fresh random value). 3. INVALIDATE R immediately. 4. (Reuse detection) if R is presented again -> it was stolen/copied: revoke the ENTIRE session (the family of tokens)
+
+The same code, clean:
+
+```java
+OAuth2RefreshToken newRefresh = refresh(oldRefresh);
 ```
 
 **The reuse-detection bonus:** if an attacker *replays* a rotated-out refresh token, the server sees a token that was already used — a strong theft signal — and can revoke the whole token family (the user's session). This is the current best practice (and the default in Spring Authorization Server) — it converts token theft from "silent and permanent" into "detected and contained."
@@ -65,7 +65,6 @@ OAuth2RefreshToken newRefresh = refresh(oldRefresh);   // old is now DEAD
 
 The most common flow in microservice architectures — no user involved:
 
-```java
 // The client (your backend) authenticates with its OWN credentials:
 POST https://auth.academy.com/oauth2/token
 Content-Type: application/x-www-form-urlencoded
@@ -76,7 +75,6 @@ grant_type=client_credentials
 &scope=read:orders
 
 // Response: { "access_token": "...", "token_type": "Bearer", "expires_in": 3600 }
-```
 
 **The security discipline:**
 - **One client identity per service** — `client_id` identifies *which* service is calling; the auth server's `scope` limits what it may do.
@@ -124,3 +122,4 @@ Spring Security configures both sides from properties: the *client* gets tokens 
 ## Recap
 
 Production OAuth2 is token lifecycle management: short-lived access tokens (minutes) refreshed via long-lived **refresh tokens** — which modern practice makes **single-use with rotation**, converting theft from permanent into detectable. The **client-credentials flow** serves server-to-server calls (one client identity per service, secrets in the vault, cached short-lived tokens). The security checklist — short tokens, rotating refresh tokens, secrets in stores, state/nonce, exact redirect allowlists, JWKS rotation, full claim validation — is the consensus that makes delegation safe at scale. Spring Security configures the client and resource-server sides from properties; this module's lessons are the model that makes those properties comprehensible and debuggable when the tokens misbehave.
+

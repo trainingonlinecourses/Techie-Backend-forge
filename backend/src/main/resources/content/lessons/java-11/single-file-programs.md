@@ -1,7 +1,7 @@
 ---
 title: Single-File Source-Code Programs — Run Java Like a Script
 summary: What single-file programs are, how they work, when to use them, and how they change the Java development experience.
-order: 4
+order: 3
 minutes: 12
 topics: [single-file, script-mode, shebang, java11]
 docs:
@@ -32,14 +32,12 @@ The compiler compiles and runs in one step. This makes Java feel more like a scr
 
 ## How It Works
 
-```java
 // Hello.java — no package declaration needed
 public class Hello {
     public static void main(String[] args) {
         System.out.println("Hello, World!");
     }
 }
-```
 
 ```bash
 # Run it directly
@@ -60,7 +58,6 @@ java Hello.java
 
 You can make Java files executable like shell scripts:
 
-```java
 #!/usr/bin/java --source 11
 // This line above is the shebang — tells the OS to use Java 11 to run this file
 
@@ -74,7 +71,6 @@ public class WeatherCheck {
         System.out.println("Temperature: " + (15 + new Random().nextInt(20)) + "°C");
     }
 }
-```
 
 ```bash
 # Make executable
@@ -90,7 +86,6 @@ chmod +x WeatherCheck.java
 
 ## Line-by-Line Walkthrough
 
-```java
 // File: QuickSort.java — a standalone quicksort implementation
 import java.util.*;
 
@@ -131,7 +126,6 @@ public class QuickSort {
         return i + 1;
     }
 }
-```
 
 ```bash
 # Run with default data
@@ -151,7 +145,6 @@ java QuickSort.java 5 3 8 1 9 2
 
 ### Scenario 1: Quick data processing script
 
-```java
 #!/usr/bin/java --source 11
 import java.nio.file.*;
 import java.util.stream.*;
@@ -173,11 +166,9 @@ public class LogAnalyzer {
             .forEach(e -> System.out.printf("%s: %d errors%n", e.getKey(), e.getValue()));
     }
 }
-```
 
 ### Scenario 2: Testing an algorithm quickly
 
-```java
 #!/usr/bin/java --source 11
 import java.util.*;
 
@@ -190,7 +181,6 @@ public class Fibonacci {
         System.out.println("Fibonacci(" + n + "): " + fib[n-1]);
     }
 }
-```
 
 ```bash
 java Fibonacci.java 30
@@ -207,3 +197,4 @@ java Fibonacci.java 30
 | Using third-party dependencies | Can't resolve without build tool | Stick to JDK classes only |
 | File name mismatch | Can't find main class | Ensure filename matches public class name |
 | Using `--source` without version | `--source 11` required for shebang | Include version in shebang line |
+

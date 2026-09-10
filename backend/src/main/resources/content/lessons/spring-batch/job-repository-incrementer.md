@@ -1,7 +1,7 @@
 ---
 title: Job Repository & Incrementer — Tracking Batch State
 summary: How Spring Batch tracks job execution, job parameters, restart ability, and using incrementers to run jobs with evolving parameters.
-order: 9
+order: 6
 minutes: 16
 topics: [job-repository, job-execution, restart, incrementer, batch-metadata, job-parameters]
 docs:
@@ -38,7 +38,6 @@ Job Instance (definition) → Job Execution (run) → Step Execution (unit of wo
 
 ## Job Parameters
 
-```java
 // Parameters define WHAT to process
 JobParameters params = new JobParametersBuilder()
     .addString("input.file", "/data/orders-2024-01-15.csv")
@@ -48,17 +47,27 @@ JobParameters params = new JobParametersBuilder()
 
 // Launch the job
 JobExecution execution = jobLauncher.run(processOrdersJob, params);
-```
 
 ### Parameter Types
 
+
+**What this code does — step by step:**
+
+1. `.addString("environment", "production")` — String
+2. `.addDate("reportDate", LocalDate.now())` — Date
+3. `.addLong("batchSize", 1000L)` — Long
+4. `.addDouble("threshold", 0.95)` — Double
+5. `.addString("region", "us-east-1")` — String
+
+The same code, clean:
+
 ```java
 JobParameters params = new JobParametersBuilder()
-    .addString("environment", "production")        // String
-    .addDate("reportDate", LocalDate.now())        // Date
-    .addLong("batchSize", 1000L)                   // Long
-    .addDouble("threshold", 0.95)                  // Double
-    .addString("region", "us-east-1")              // String
+    .addString("environment", "production")
+    .addDate("reportDate", LocalDate.now())
+    .addLong("batchSize", 1000L)
+    .addDouble("threshold", 0.95)
+    .addString("region", "us-east-1")
     .toJobParameters();
 ```
 
@@ -72,7 +81,6 @@ JobParameters params = new JobParametersBuilder()
 
 ### RunIdIncrementer (Most Common)
 
-```java
 @Bean
 public Job processOrdersJob(JobRepository jobRepository, Step processStep) {
     return new JobBuilder("processOrders", jobRepository)
@@ -80,7 +88,6 @@ public Job processOrdersJob(JobRepository jobRepository, Step processStep) {
         .incrementer(new RunIdIncrementer())  // Adds unique run.id parameter
         .build();
 }
-```
 
 Each run gets a different `run.id`:
 ```
@@ -91,7 +98,6 @@ Run 3: {input.file: "orders.csv", run.id: 3}
 
 ### Custom Incrementer
 
-```java
 @Component
 public class DailyDateIncrementer implements JobParametersIncrementer {
 
@@ -105,13 +111,11 @@ public class DailyDateIncrementer implements JobParametersIncrementer {
             .toJobParameters();
     }
 }
-```
 
 ---
 
 ## Restart Capability
 
-```java
 // If a job fails, you can restart it from where it stopped
 JobExecution lastExecution = jobRepository.getLastJobExecution(
     jobInstance, jobParameters);
@@ -121,11 +125,9 @@ if (lastExecution != null && lastExecution.getStatus() == BatchStatus.FAILED) {
     // It will restart from the last successful chunk
     jobLauncher.run(failedJob, jobParameters);
 }
-```
 
 ### Controlling Restart
 
-```java
 @Bean
 public Step processStep(JobRepository jobRepository, PlatformTransactionManager txManager) {
     return new StepBuilder("processStep", jobRepository)
@@ -137,7 +139,6 @@ public Step processStep(JobRepository jobRepository, PlatformTransactionManager 
         .startLimit(3)                 // Max 3 attempts total
         .build();
 }
-```
 
 ---
 
@@ -145,7 +146,6 @@ public Step processStep(JobRepository jobRepository, PlatformTransactionManager 
 
 ### Scenario 1: Daily Report Job
 
-```java
 @Component
 public class DailyReportJobConfig {
 
@@ -168,11 +168,9 @@ public class DailyReportJobConfig {
             .build();
     }
 }
-```
 
 ### Scenario 2: Restartable Data Migration
 
-```java
 @Component
 public class DataMigrationConfig {
 
@@ -199,7 +197,6 @@ public class DataMigrationConfig {
             .build();
     }
 }
-```
 
 ---
 
@@ -213,3 +210,4 @@ public class DataMigrationConfig {
 | Not checking job status | Can't tell if job succeeded | Query `JobRepository` for execution status |
 | Using same parameters for different jobs | Confusing job instances | Use incrementer to differentiate runs |
 | Not monitoring job repository | Can't debug failures | Query metadata tables for execution history |
+

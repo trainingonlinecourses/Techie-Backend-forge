@@ -1,7 +1,7 @@
 ---
 title: Hexagonal Architecture (Ports & Adapters)
 module: ddd-architecture
-order: 3
+order: 5
 minutes: 25
 topics: ["hexagonal", "ports", "adapters", "domain isolation", "dependency rule", "Spring wiring"]
 summary: Hexagonal architecture (also called Ports & Adapters) puts the domain at the center, surrounded by ports (interfaces) and adapters (implementations...
@@ -56,7 +56,6 @@ Domain ──▶ RepositoryPort (port) ◀── implemented by JPA adapter
 
 ### Inbound Port: The Use Case
 
-```java
 // Inbound port — what the application can DO
 public interface PlaceOrderUseCase {
     OrderId placeOrder(PlaceOrderCommand command);
@@ -64,11 +63,9 @@ public interface PlaceOrderUseCase {
 
 public record PlaceOrderCommand(Long customerId, List<OrderLineCommand> lines) {}
 public record OrderLineCommand(String productCode, int quantity) {}
-```
 
 ### Outbound Port: The Repository
 
-```java
 // Outbound port — what the domain NEEDS from the outside
 public interface OrderRepositoryPort {
     Order findById(OrderId id);
@@ -79,11 +76,9 @@ public interface OrderRepositoryPort {
 public interface PaymentGatewayPort {
     PaymentResult charge(Money amount, PaymentMethod method);
 }
-```
 
 ## The Domain (no Spring imports!)
 
-```java
 // Pure domain — no annotations, no Spring, no JPA
 public class Order {
     private final OrderId id;
@@ -111,13 +106,11 @@ public class Order {
     public OrderStatus status() { return status; }
     public List<OrderLine> lines() { return List.copyOf(lines); }
 }
-```
 
 **Test this with plain JUnit — no Spring context, no database.** This is the payoff of hexagonal: the core logic is unit-testable in milliseconds.
 
 ## The Domain Service (Use Case Implementation)
 
-```java
 // Inbound port implementation — still pure domain logic
 public class PlaceOrderService implements PlaceOrderUseCase {
 
@@ -144,7 +137,6 @@ public class PlaceOrderService implements PlaceOrderUseCase {
         return orders.save(order);
     }
 }
-```
 
 No annotations — the service is a plain class taking ports as constructor args. Spring just wires it.
 
@@ -152,7 +144,6 @@ No annotations — the service is a plain class taking ports as constructor args
 
 ### Outbound: JPA Repository Adapter
 
-```java
 // JPA-specific — OUTSIDE the hexagon
 @Repository
 public class JpaOrderRepositoryAdapter implements OrderRepositoryPort {
@@ -172,11 +163,9 @@ public class JpaOrderRepositoryAdapter implements OrderRepositoryPort {
         return OrderId.of(jpa.save(mapper.toEntity(order)).getId());
     }
 }
-```
 
 ### Inbound: REST Controller Adapter
 
-```java
 @RestController
 @RequestMapping("/api/orders")
 public class OrderController {        // inbound adapter
@@ -190,13 +179,11 @@ public class OrderController {        // inbound adapter
             .build();
     }
 }
-```
 
 The controller knows the use-case *interface* — never the service class, never the repository.
 
 ## Spring Wiring
 
-```java
 @Configuration
 public class OrderConfig {
 
@@ -212,7 +199,6 @@ public class OrderConfig {
         return new JpaOrderRepositoryAdapter(jpa);
     }
 }
-```
 
 Or use `@Service`/`@Repository` on the adapters and services — Spring's annotations are an implementation detail of the wiring, not the architecture.
 
@@ -243,7 +229,6 @@ com.acme.orders
 
 ## Testing With Fake Ports
 
-```java
 class PlaceOrderServiceTest {
 
     // Fake ports — no Spring, no DB, milliseconds
@@ -263,7 +248,6 @@ class PlaceOrderServiceTest {
         assertEquals(OrderStatus.PLACED, order.status());
     }
 }
-```
 
 ## Summary
 
@@ -277,3 +261,4 @@ class PlaceOrderServiceTest {
 | Wiring | Spring assembles the hexagon |
 
 Hexagonal architecture is the discipline of *depending on abstractions you own*: the domain defines its ports, adapters implement them, and nothing leaks across. The payoff is a domain you can test without Spring and swap without rewrites — the architecture that makes DDD actually sustainable.
+

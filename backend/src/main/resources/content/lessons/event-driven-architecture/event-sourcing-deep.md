@@ -24,20 +24,29 @@ Conventional persistence stores the *current state*: an account row says `balanc
 
 ## The Core Mechanics
 
+
+**What this code does — step by step:**
+
+1. 1. THE EVENT — an immutable fact:
+2. 2. THE AGGREGATE — applies events to produce state:
+3. RECONSTRUCTION — the aggregate is built by replaying its events:
+4. `for (Object e : events) a.apply(e);` — replay, in order
+5. COMMAND -> VALIDATION -> EVENTS:
+6. The method RETURNS events; it does NOT mutate state directly.
+
+The same code, clean:
+
 ```java
-// 1. THE EVENT — an immutable fact:
 public record MoneyDeposited(String accountId, BigDecimal amount, Instant when) { }
 
-// 2. THE AGGREGATE — applies events to produce state:
 public class Account {
     private String id;
     private BigDecimal balance = BigDecimal.ZERO;
     private boolean closed;
 
-    // RECONSTRUCTION — the aggregate is built by replaying its events:
     public static Account replay(List<Object> events) {
         Account a = new Account();
-        for (Object e : events) a.apply(e);   // replay, in order
+        for (Object e : events) a.apply(e);
         return a;
     }
 
@@ -47,11 +56,9 @@ public class Account {
         if (event instanceof AccountClosed c)  closed = true;
     }
 
-    // COMMAND -> VALIDATION -> EVENTS:
     public List<Object> deposit(BigDecimal amount) {
         if (closed) throw new IllegalStateException("account is closed");
         return List.of(new MoneyDeposited(id, amount, Instant.now()));
-        // The method RETURNS events; it does NOT mutate state directly.
     }
 
     public List<Object> withdraw(BigDecimal amount) {
@@ -67,18 +74,23 @@ public class Account {
 - **Commands** (business operations: `deposit`, `withdraw`) *validate* the current state and *return events* — they never write state. `withdraw` checks the balance (derived from replayed events) and produces a `MoneyWithdrawn` — or throws, producing nothing.
 - **Events** are appended to the **event store** (an append-only table/stream). The aggregate's state is always *reconstructed* by `replay(events)` → `apply(event)`.
 
-```java
-// 3. THE STORE — append-only:
-//    An "events" table: aggregate_id, version, event_type, payload, timestamp.
-//    Or Kafka as the event store (events ARE the topic log).
 
-// 4. THE USAGE — the repository reads events and replays:
+**What this code does — step by step:**
+
+1. 3. THE STORE — append-only: An "events" table: aggregate_id, version, event_type, payload, timestamp. Or Kafka as the event store (events ARE the topic log).
+2. 4. THE USAGE — the repository reads events and replays:
+3. `return Account.replay(eventStore.load(id));` — load ALL events, replay
+4. `eventStore.append(id, nextVersion, newEvents);` — append only
+
+The same code, clean:
+
+```java
 public class AccountRepository {
     public Account findById(String id) {
-        return Account.replay(eventStore.load(id));   // load ALL events, replay
+        return Account.replay(eventStore.load(id));
     }
     public void save(Account a, List<Object> newEvents) {
-        eventStore.append(id, nextVersion, newEvents);  // append only
+        eventStore.append(id, nextVersion, newEvents);
     }
 }
 ```
@@ -101,18 +113,20 @@ A scheduled job (or an append-time trigger) snapshots aggregates every N events;
 
 The event log is a poor query model — "give me all accounts with balance > 1000" shouldn't replay every account. **Projections** (a.k.a. read models) are *derived* stores: consumers of the event stream build whatever query-friendly shapes they need:
 
+
+**What this code does — step by step:**
+
+1. A projection: consume events, update a denormalized read model: (with Spring's EventListener / @TransactionalEventListener)
+2. upsert the read model: accounts_summary.updated_at, total deposits...
+3. The read model answers queries directly: "top accounts by deposits" -> SELECT ... FROM accounts_summary ORDER BY ... (no replay needed at query time)
+
+The same code, clean:
+
 ```java
-// A projection: consume events, update a denormalized read model:
-// (with Spring's EventListener / @TransactionalEventListener)
 @EventListener
 public void on(MoneyDeposited e) {
-    // upsert the read model: accounts_summary.updated_at, total deposits...
     summaryRepo.incrementDeposits(e.accountId(), e.amount());
 }
-
-// The read model answers queries directly:
-//   "top accounts by deposits" -> SELECT ... FROM accounts_summary ORDER BY ...
-//   (no replay needed at query time)
 ```
 
 **This is where CQRS enters:** **C**ommand **Q**uery **R**esponsibility **S**egregation — the write side (commands → events, the aggregate) and the read side (projections, the query models) are *separate models and often separate stores*. Event sourcing naturally produces CQRS: the event store is the write model; projections are the read models. The query that "doesn't fit the events" becomes a projection built from them.
@@ -142,3 +156,4 @@ public void on(MoneyDeposited e) {
 ## Recap
 
 Event sourcing stores the history, not the state: commands validate and produce events, the event store appends them immutably, and aggregates reconstruct their state by replay. Snapshots accelerate long replays; projections (read models) make the events queryable — leading naturally to CQRS with the event store as the write side. The gains are profound — complete audit, temporal queries, no lost-update races, events-as-integration — and the costs are real: eventual consistency, event-store infrastructure, schema evolution via upcasting, and genuine complexity. Choose it for the ledger-like cores where history *is* the product, and keep the rest of the system conventionally simple.
+

@@ -1,7 +1,7 @@
 ---
 title: OAuth2 & OpenID Connect
 summary: The OAuth2 grant types, adding social login, and protecting APIs as a resource server with JWT validation.
-order: 6
+order: 10
 minutes: 18
 topics: [oauth2, oidc, resource-server, authorization-code]
 docs:
@@ -48,7 +48,6 @@ spring:
 
 With `spring-boot-starter-oauth2-client`, that gives you the whole redirect/state/code/token dance. Handle the post-login flow:
 
-```java
 @Bean
 SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     http
@@ -56,7 +55,6 @@ SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         .authorizeHttpRequests(a -> a.anyRequest().authenticated());
     return http.build();
 }
-```
 
 ## Resource server: protect your API with a JWT from a provider
 
@@ -70,22 +68,17 @@ spring:
           # Spring auto-fetches the JWK Set from the issuer's metadata
 ```
 
-```java
 http.oauth2ResourceServer(rs -> rs.jwt(Customizer.withDefaults()));
-```
 
 Now your API validates tokens signed by the IdP — no shared secrets, no local user table needed for authn. Claims are available in controllers:
 
-```java
 @GetMapping("/me")
 public Jwt me(@AuthenticationPrincipal Jwt jwt) {
     return jwt;   // sub, email, roles claims from the IdP
 }
-```
 
 ## Client credentials for service accounts
 
-```java
 @Configuration
 public class ServiceClientConfig {
 
@@ -104,7 +97,6 @@ public class ServiceClientConfig {
             .principal("service").build())
             .getAccessToken().getTokenValue();
 }
-```
 
 ## What Spring Security does for you
 
@@ -125,3 +117,4 @@ public class ServiceClientConfig {
 - Spring Boot configures most of it from `issuer-uri`.
 
 **Official docs:** [OAuth2](https://docs.spring.io/spring-security/reference/servlet/oauth2/index.html) · [JWT resource server](https://docs.spring.io/spring-security/reference/servlet/oauth2/resource-server/jwt.html)
+

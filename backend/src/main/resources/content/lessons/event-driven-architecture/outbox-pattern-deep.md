@@ -1,7 +1,7 @@
 ---
 title: The Outbox Pattern — Atomic Writes to the Database and the Broker
 module: event-driven-architecture
-order: 2
+order: 4
 minutes: 27
 topics: ["outbox pattern", "transactional outbox", "atomicity", "dual write", "event publishing", "reliability"]
 summary: When an event must be published because a database row changed, you face the dualwrite problem: two systems (the database and the broker) must both...
@@ -24,7 +24,6 @@ When an event must be published *because* a database row changed, you face the *
 
 **1. The outbox table** — events are written in the *same database transaction* as the business change:
 
-```java
 @Transactional
 public void placeOrder(OrderRequest req) {
     // The business change...
@@ -38,7 +37,6 @@ public void placeOrder(OrderRequest req) {
             OutboxStatus.PENDING));
     // Both commit or both roll back. No window.
 }
-```
 
 The `outbox_events` table:
 
@@ -57,7 +55,6 @@ CREATE TABLE outbox_events (
 
 **2. The relay** — a background process (a scheduled job, or Debezium via CDC) publishes pending events:
 
-```java
 @Scheduled(fixedDelay = 1000)          // every second (or use a relay framework)
 public void publishPending() {
     // Take a batch of PENDING events...
@@ -70,13 +67,11 @@ public void publishPending() {
         outboxRepo.markPublished(event.id);
     }
 }
-```
 
 **The at-least-once contract:** the relay publishes, then marks done. Crash between publish and mark → the event is re-published on the next tick → **duplicates are possible** — which is why consumers must be idempotent (dedupe on event id). The relay can also retry failures with a dead-letter/backoff policy: a permanently-failing event (malformed payload) gets quarantined, not infinitely retried.
 
 **3. Idempotent consumers** — the pattern's completion:
 
-```java
 @KafkaListener(topics = "orders")
 public void onOrderPlaced(OrderPlaced event) {
     // Dedupe on the event id — at-least-once delivery is now harmless:
@@ -84,7 +79,6 @@ public void onOrderPlaced(OrderPlaced event) {
     emailService.sendReceipt(event.customerId());
     processedEvents.record(event.eventId());               // mark handled
 }
-```
 
 ## Why the Outbox Beats the Alternatives
 
@@ -132,3 +126,4 @@ The framework choice is secondary: the *pattern* — write the event in the busi
 ## Recap
 
 The outbox pattern solves the dual-write problem — "change the database AND publish an event, atomically" — by writing the event into an `outbox_events` table *in the same transaction* as the business change, then having a relay publish pending events afterward (a scheduled poller or Debezium's CDC) and mark them done only on broker acknowledgment. The guarantees: no lost events, no phantom events, duplicates possible but harmless with idempotent consumers. It's the pragmatic substitute for distributed transactions — a single local transaction plus a relay — and it's the pattern every reliable event-driven system is built on. The discipline: keep the event in the business transaction, relay with acknowledgment, order by creation, and consume idempotently.
+

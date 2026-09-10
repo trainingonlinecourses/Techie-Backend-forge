@@ -1,7 +1,7 @@
 ---
 title: Java Threads Deep — Lifecycle, States and Coordination
 summary: Thread states from NEW to TERMINATED, synchronized blocks and the monitor, wait/notify protocol, daemon threads, and how production code coordinates thousands of concurrent workers without deadlocks.
-order: 50
+order: 81
 minutes: 25
 topics: [thread-lifecycle, thread-states, synchronized, wait-notify, daemon-threads, thread-groups, monitor]
 docs:
@@ -49,6 +49,19 @@ NEW ──start()──> RUNNABLE ──lock contention──> BLOCKED
 
 A background thread produces data that the main thread consumes. The classic coordination pattern:
 
+
+**What this code does — step by step:**
+
+1. Producer: wait if queue is full
+2. `wait();` — releases the monitor, sleeps until notify()
+3. `notifyAll();` — wake up consumers waiting on empty queue
+4. Consumer: wait if queue is empty
+5. `return null;` — sentinel: no more items coming
+6. `notifyAll();` — wake up producers waiting on full queue
+7. `notifyAll();` — wake up all waiting threads so they can exit
+
+The same code, clean:
+
 ```java
 public class DataQueue<T> {
     private final Queue<T> queue = new LinkedList<>();
@@ -59,31 +72,29 @@ public class DataQueue<T> {
         this.capacity = capacity;
     }
 
-    // Producer: wait if queue is full
     public synchronized void put(T item) throws InterruptedException {
         while (queue.size() == capacity) {
-            wait();  // releases the monitor, sleeps until notify()
+            wait();
         }
         queue.add(item);
-        notifyAll();  // wake up consumers waiting on empty queue
+        notifyAll();
     }
 
-    // Consumer: wait if queue is empty
     public synchronized T take() throws InterruptedException {
         while (queue.isEmpty() && !closed) {
             wait();
         }
         if (queue.isEmpty() && closed) {
-            return null;  // sentinel: no more items coming
+            return null;
         }
         T item = queue.poll();
-        notifyAll();  // wake up producers waiting on full queue
+        notifyAll();
         return item;
     }
 
     public synchronized void close() {
         closed = true;
-        notifyAll();  // wake up all waiting threads so they can exit
+        notifyAll();
     }
 }
 ```
@@ -94,7 +105,6 @@ public class DataQueue<T> {
 
 Daemon threads are threads that do not prevent the JVM from exiting. When all non-daemon (user) threads have finished, the JVM shuts down regardless of whether daemon threads are still running.
 
-```java
 public class CacheEvictionScheduler {
     private final ScheduledExecutorService scheduler;
 
@@ -117,13 +127,24 @@ public class CacheEvictionScheduler {
         scheduler.shutdown();
     }
 }
-```
 
 **When daemon threads are appropriate:** Background tasks like cache eviction, metrics reporting, log flushing, health checks. **Never use daemon threads** for critical work like writing to a database or processing payments — they can be killed mid-operation when the JVM exits.
 
 ### Scenario 3: Thread interruption for cancellation
 
 The standard way to cancel a blocking thread is interruption. A thread checks `Thread.currentThread().isInterrupted()` and responds:
+
+
+**What this code does — step by step:**
+
+1. `LogEntry entry = logQueue.take();` — blocks until available
+2. `Thread.currentThread().interrupt();` — restore interrupted status
+3. `cleanup();` — graceful shutdown
+4. To cancel:
+5. ... later ...
+6. `processor.interrupt();` — signals the thread to stop
+
+The same code, clean:
 
 ```java
 public class LogProcessor implements Runnable {
@@ -132,21 +153,19 @@ public class LogProcessor implements Runnable {
     public void run() {
         try {
             while (!Thread.currentThread().isInterrupted()) {
-                LogEntry entry = logQueue.take();  // blocks until available
+                LogEntry entry = logQueue.take();
                 process(entry);
             }
         } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();  // restore interrupted status
-            cleanup();  // graceful shutdown
+            Thread.currentThread().interrupt();
+            cleanup();
         }
     }
 }
 
-// To cancel:
 Thread processor = new Thread(logProcessor);
 processor.start();
-// ... later ...
-processor.interrupt();  // signals the thread to stop
+processor.interrupt();
 ```
 
 **Key rule:** Never swallow `InterruptedException`. Always either re-throw it or call `Thread.currentThread().interrupt()` to restore the flag.
@@ -155,7 +174,6 @@ processor.interrupt();  // signals the thread to stop
 
 A `CountDownLatch` lets multiple threads wait for a common point — like a "ready, set, go" barrier:
 
-```java
 public class ServiceWarmup {
     private final CountDownLatch ready = new CountDownLatch(3);
 
@@ -173,13 +191,11 @@ public class ServiceWarmup {
         }
     }
 }
-```
 
 ### Scenario 5: Daemon thread naming for debugging
 
 Production systems need every thread named for thread dump analysis:
 
-```java
 public class ThreadPoolFactory {
     public static ExecutorService createPool(String name, int size) {
         return Executors.newFixedThreadPool(size, r -> {
@@ -193,7 +209,6 @@ public class ThreadPoolFactory {
         });
     }
 }
-```
 
 ## Common mistakes
 
@@ -206,3 +221,4 @@ public class ThreadPoolFactory {
 | Creating raw `new Thread()` in production | Unbounded threads, no backpressure |
 | Daemon threads for critical work | Silently killed on JVM shutdown |
 | Using `Thread.sleep()` for timing | Imprecise, blocks the thread entirely |
+

@@ -12,7 +12,6 @@ docs:
 
 Spring Shell provides `CommandRunner` to test commands in integration tests. You simulate user input and verify the output.
 
-```java
 @SpringBootTest
 class GreetingCommandsTest {
 
@@ -25,13 +24,11 @@ class GreetingCommandsTest {
         assertThat(output).contains("Hello, Alice!");
     }
 }
-```
 
 ---
 
 ## Line-by-Line Walkthrough
 
-```java
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -71,7 +68,6 @@ class FileCommandsTest {
         assertThat(output).contains("Username required");
     }
 }
-```
 
 ---
 
@@ -79,7 +75,6 @@ class FileCommandsTest {
 
 ### Scenario 1: Test with mocked dependencies
 
-```java
 @SpringBootTest
 class DeployCommandsTest {
 
@@ -96,18 +91,15 @@ class DeployCommandsTest {
         verifyNoInteractions(deployService);  // dry run shouldn't call service
     }
 }
-```
 
 ### Scenario 2: Test availability
 
-```java
 @Test
 void testAdminCommandUnavailable() {
     // When user is not admin
     String output = runner.call("admin-reset");
     assertThat(output).contains("admin role required");
 }
-```
 
 ---
 
@@ -119,3 +111,4 @@ void testAdminCommandUnavailable() {
 | Forgetting @Out | Can't capture output | Inject Out for verification |
 | Not testing edge cases | Missing validation | Test empty inputs, invalid values |
 | Mocking everything | Tests don't catch real bugs | Use real dependencies where possible |
+

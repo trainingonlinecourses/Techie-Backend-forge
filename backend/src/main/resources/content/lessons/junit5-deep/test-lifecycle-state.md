@@ -24,6 +24,14 @@ Reliable tests share one property: **isolation** — each test runs as if it wer
 
 By default, JUnit creates **a fresh test-class instance for every test method**:
 
+
+**What this code does — step by step:**
+
+1. `assertEquals(1, calls.size());` — 1 — a brand-new instance
+2. `assertEquals(1, calls.size());` — 1 — ANOTHER brand-new instance. If instances were shared, this would be 2 and the test would. Depend on `first` having run — order dependence. The default. Kills that entire class of bugs.
+
+The same code, clean:
+
 ```java
 class IsolationDemo {
     private final List<String> calls = new java.util.ArrayList<>();
@@ -31,16 +39,13 @@ class IsolationDemo {
     @Test
     void first() {
         calls.add("first");
-        assertEquals(1, calls.size());    // 1 — a brand-new instance
+        assertEquals(1, calls.size());
     }
 
     @Test
     void second() {
         calls.add("second");
-        assertEquals(1, calls.size());    // 1 — ANOTHER brand-new instance
-        // If instances were shared, this would be 2 and the test would
-        // depend on `first` having run — order dependence. The default
-        // kills that entire class of bugs.
+        assertEquals(1, calls.size());
     }
 }
 ```
@@ -51,7 +56,6 @@ class IsolationDemo {
 
 Sometimes sharing an instance is the *point* — expensive setup that shouldn't rebuild per test:
 
-```java
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class PerClassDemo {
 
@@ -76,7 +80,6 @@ class PerClassDemo {
     @Test
     void usesClientAgain() { assertTrue(client.isConnected()); }
 }
-```
 
 **The trade-off, stated plainly:** PER_CLASS shares instance state across the class's tests — faster (one setup), but it *reintroduces* the coupling the default removes. The professional rule: use PER_CLASS only for **immutable** shared resources (an expensive client that holds no test-specific state) — never for mutable fields tests write to. If two tests both mutate a shared field, you've recreated the ordering bug in slow motion. (And PER_CLASS enables `@MethodSource` factories that aren't static — a common reason to reach for it.)
 
@@ -84,22 +87,27 @@ class PerClassDemo {
 
 Tests should pass in *any* order. When you need determinism, JUnit 5 gives you explicit control:
 
+
+**What this code does — step by step:**
+
+1. Option 1 — order by method name (alphabetical):
+2. Option 2 — explicit numeric order via @Order:
+3. `@Test @Order(1) void first() { }` — runs first
+4. Option 3 — the standard deterministic choice: the @Order annotations. And everything else in a stable, human-designed sequence.
+
+The same code, clean:
+
 ```java
-// Option 1 — order by method name (alphabetical):
 @TestMethodOrder(MethodOrderer.MethodName.class)
 class OrderedByName { }
 
-// Option 2 — explicit numeric order via @Order:
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class OrderedByAnnotation {
 
     @Test @Order(2) void second() { }
-    @Test @Order(1) void first() { }     // runs first
+    @Test @Order(1) void first() { }
     @Test @Order(3) void third() { }
 }
-
-// Option 3 — the standard deterministic choice: the @Order annotations
-// and everything else in a stable, human-designed sequence.
 ```
 
 **The deeper advice:** ordering is a *code smell* when it's covering for shared state. If tests only pass in a specific order, the real fix is isolation (fresh instances, no shared mutable fields), not ordering. Use `@Order` for *intentional* sequences (integration flows, a "given → when → then" progression) and for deterministic CI output — never as a band-aid over coupling.
@@ -115,11 +123,9 @@ junit.jupiter.execution.parallel.mode.default = concurrent
 junit.jupiter.execution.parallel.mode.classes.default = concurrent
 ```
 
-```java
 // Opt a class OUT if it must run serially:
 @Execution(ExecutionMode.SAME_THREAD)
 class SerialOnlyTest { }
-```
 
 **The contract parallel testing demands:** tests must be *truly independent* — no shared mutable state, no fixed ports, no ordering assumptions. The moment a test touches a shared resource (a static cache, a fixed port, a shared temp file), parallel execution exposes it as flaky failures. Which is the point: **parallel execution is a stress test of your isolation.** Spring Boot tests (which cache a shared context) run parallel safely because the context is read-only after startup; tests that *write* to the context or to shared services need `SAME_THREAD`.
 
@@ -127,15 +133,23 @@ class SerialOnlyTest { }
 
 The complete arsenal for test state:
 
+
+**What this code does — step by step:**
+
+1. 1. Fresh instance per test — the default. Instance fields = per-test.
+2. 2. @TempDir — a per-test temp directory, auto-created and cleaned:
+3. `java.nio.file.Path tempDir;` — unique per test, deleted after
+4. 3. @BeforeEach resets shared-ish state — the sanctioned pattern: (an in-memory list that every test wants to start empty). Private final List<String> db = new ArrayList<>(); @BeforeEach void reset() { db.clear(); }
+
+The same code, clean:
+
 ```java
 class StateToolkit {
 
-    // 1. Fresh instance per test — the default. Instance fields = per-test.
     private final String perTest = "fresh";
 
-    // 2. @TempDir — a per-test temp directory, auto-created and cleaned:
     @TempDir
-    java.nio.file.Path tempDir;    // unique per test, deleted after
+    java.nio.file.Path tempDir;
 
     @Test
     void writesToTempDir() throws Exception {
@@ -144,10 +158,6 @@ class StateToolkit {
         assertTrue(java.nio.file.Files.exists(f));
     }
 
-    // 3. @BeforeEach resets shared-ish state — the sanctioned pattern:
-    //    (an in-memory list that every test wants to start empty)
-    //    private final List<String> db = new ArrayList<>();
-    //    @BeforeEach void reset() { db.clear(); }
 }
 ```
 
@@ -167,3 +177,4 @@ class StateToolkit {
 ## Recap
 
 Reliable tests are isolated tests, and JUnit 5's defaults enforce it: **fresh instances per method** (instance fields are per-test state), with `@TempDir` for per-test files and `@BeforeEach` for resetting shared resources. **PER_CLASS** shares an instance for expensive *immutable* setup — a deliberate trade that reintroduces coupling if abused. **Ordering** (`@Order`, `MethodOrderer`) exists for intentional sequences, not as a fix for shared state. And **parallel execution** — the speed feature — is really the isolation audit: if tests can't run concurrently, they aren't independent. The rule that ties it together: make every test a self-contained experiment, and the suite becomes fast, deterministic, and trustworthy.
+

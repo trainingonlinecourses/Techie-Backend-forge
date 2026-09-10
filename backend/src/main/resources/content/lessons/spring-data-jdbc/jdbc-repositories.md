@@ -1,7 +1,7 @@
 ---
 title: Spring Data JDBC — Repositories Without JPA
 module: spring-data-jdbc
-order: 1
+order: 3
 minutes: 26
 topics: ["Spring Data JDBC", "aggregates", "repositories", "derived queries", "no lazy loading"]
 summary: JPA (covered in the Data JPA module) is a full objectrelational mapper: it manages a persistence context, tracks entity changes, and generates SQL....
@@ -28,7 +28,6 @@ Think of it as: *the ergonomics of Spring Data, the predictability of JDBC.*
 
 In JPA, a `Course` with a list of `Lesson`s uses lazy loading and joins. In Spring Data JDBC, a **Course aggregate** owns its lessons **in the same table rows** — the lesson data is loaded eagerly when the course is loaded:
 
-```java
 // The aggregate root — stored in the 'course' table
 public class Course {
     @Id
@@ -44,11 +43,24 @@ public class Lesson {
     private String title;
     private int minutes;
 }
-```
 
 Spring Data JDBC stores the *whole aggregate*: insert a `Course` → one insert for the course row + inserts for every lesson row. Load a `Course` → one select for the course + one for its lessons (with an `IN` clause). **No lazy loading exists** — aggregates load whole, which is exactly why the aggregate boundary matters: keep aggregates small.
 
 ## The Code Walkthrough
+
+
+**What this code does — step by step:**
+
+1. ---- 1. The aggregate root ----
+2. constructors, getters... (Spring Data JDBC needs immutable-friendly. Construction or setters; records work too with @Id component)
+3. ---- 2. The repository — same interface style as JPA ----
+4. Derived query: SELECT * FROM course WHERE title LIKE ...
+5. Derived query on a nested property: WHERE lesson count matters is NOT derived; but filtering aggregates by a root field works fine:
+6. ---- 3. Explicit SQL when you need it ----
+7. ---- 4. Usage ----
+8. `courses.save(course);` — saves course + lessons atomically (one transaction)
+
+The same code, clean:
 
 ```java
 import org.springframework.data.annotation.Id;
@@ -58,33 +70,24 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-// ---- 1. The aggregate root ----
 public class Course {
     @Id
     private Long id;
     private String title;
     private List<Lesson> lessons = new java.util.ArrayList<>();
 
-    // constructors, getters... (Spring Data JDBC needs immutable-friendly
-    // construction or setters; records work too with @Id component)
 }
 
-// ---- 2. The repository — same interface style as JPA ----
 public interface CourseRepository extends CrudRepository<Course, Long> {
 
-    // Derived query: SELECT * FROM course WHERE title LIKE ...
     List<Course> findByTitleContaining(String keyword);
 
-    // Derived query on a nested property: WHERE lesson count matters is NOT derived;
-    // but filtering aggregates by a root field works fine:
     List<Course> findByLessonsMinutesGreaterThan(int minutes);
 
-    // ---- 3. Explicit SQL when you need it ----
     @Query("SELECT * FROM course WHERE id IN (SELECT course_id FROM course_lesson WHERE title = :lessonTitle)")
     List<Course> findCoursesWithLesson(@Param("lessonTitle") String lessonTitle);
 }
 
-// ---- 4. Usage ----
 @Service
 public class CatalogService {
 
@@ -93,7 +96,7 @@ public class CatalogService {
     public CatalogService(CourseRepository courses) { this.courses = courses; }
 
     public void addCourse(Course course) {
-        courses.save(course);           // saves course + lessons atomically (one transaction)
+        courses.save(course);
     }
 
     public List<Course> search(String q) {
@@ -141,3 +144,4 @@ The famous quote attributed to the Spring team: *"Spring Data JDBC is the right 
 - No lazy loading, no dirty checking, no caching surprises — predictable SQL always.
 - Choose JDBC-style for straightforward domains; JPA for complex object graphs.
 - "What you write is what the database runs" — the debugging story is clean.
+

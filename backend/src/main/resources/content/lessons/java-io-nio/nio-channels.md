@@ -41,6 +41,21 @@ The critical mental model: **flip() and compact()**.
 
 ## The Code Walkthrough
 
+
+**What this code does — step by step:**
+
+1. ---- 1. A tiny ByteBuffer lifecycle ----
+2. Write "hi" into it (2 bytes)
+3. `System.out.println("after put x2:   pos=" + buf.position());` — 2
+4. Switch to read mode
+5. `+ " limit=" + buf.limit());` — 0 / 2
+6. Read both bytes back
+7. ---- 2. Channel + Buffer: write a file, read it back ----
+8. `channel.write(out);` — may write partially — loop until done
+9. `int n = channel.read(in);` — reads into the buffer, returns count
+
+The same code, clean:
+
 ```java
 import java.io.*;
 import java.nio.*;
@@ -50,28 +65,23 @@ import java.nio.charset.StandardCharsets;
 public class NioDemo {
 
     public static void main(String[] args) throws IOException {
-        // ---- 1. A tiny ByteBuffer lifecycle ----
         ByteBuffer buf = ByteBuffer.allocate(32);
         System.out.println("after allocate: pos=" + buf.position()
                 + " limit=" + buf.limit() + " cap=" + buf.capacity());
 
-        // Write "hi" into it (2 bytes)
         buf.put((byte) 'h');
         buf.put((byte) 'i');
-        System.out.println("after put x2:   pos=" + buf.position());  // 2
+        System.out.println("after put x2:   pos=" + buf.position());
 
-        // Switch to read mode
         buf.flip();
         System.out.println("after flip:     pos=" + buf.position()
-                + " limit=" + buf.limit());                            // 0 / 2
+                + " limit=" + buf.limit());
 
-        // Read both bytes back
         while (buf.hasRemaining()) {
             System.out.print((char) buf.get());
         }
         System.out.println();
 
-        // ---- 2. Channel + Buffer: write a file, read it back ----
         Path file = Path.of("nio-demo.txt");
         String content = "NIO channels are fast.";
 
@@ -79,13 +89,13 @@ public class NioDemo {
                 StandardOpenOption.CREATE, StandardOpenOption.WRITE)) {
             ByteBuffer out = ByteBuffer.wrap(content.getBytes(StandardCharsets.UTF_8));
             while (out.hasRemaining()) {
-                channel.write(out);   // may write partially — loop until done
+                channel.write(out);
             }
         }
 
         try (FileChannel channel = FileChannel.open(file, StandardOpenOption.READ)) {
             ByteBuffer in = ByteBuffer.allocate(128);
-            int n = channel.read(in);       // reads into the buffer, returns count
+            int n = channel.read(in);
             System.out.println("read " + n + " bytes");
             in.flip();
             System.out.println(StandardCharsets.UTF_8.decode(in));
@@ -114,7 +124,6 @@ If we had called `get()` without flipping, we'd read zeros from index 2 onward �
 
 The pattern that powers high-concurrency servers:
 
-```java
 Selector selector = Selector.open();
 SocketChannel ch = SocketChannel.open();
 ch.configureBlocking(false);                    // non-blocking mode
@@ -128,7 +137,6 @@ while (true) {
         }
     }
 }
-```
 
 The concept: instead of one thread per connection waiting on a read, one thread calls `select()`, which sleeps until *any* of the thousands of registered channels has data ready. The OS tells the selector which keys are ready; the thread processes just those, then loops. This is the **event loop / reactor** model — one thread serving thousands of connections.
 
@@ -162,3 +170,4 @@ Rule of thumb: **write your app code with blocking I/O**; let the frameworks (To
 - `write`/`read` may transfer partially — loop until done.
 - Selectors let one thread serve thousands of sockets (the reactor pattern).
 - For everyday app code, prefer `java.io` + `Files.*`; NIO is the substrate under high-performance frameworks.
+

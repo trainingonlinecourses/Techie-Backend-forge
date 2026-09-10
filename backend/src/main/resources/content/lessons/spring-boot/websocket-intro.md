@@ -46,60 +46,67 @@ Client: "Hi everyone!" → Server broadcasts to all clients
 
 Spring uses **STOMP** (Simple Text Oriented Messaging Protocol) over WebSockets:
 
+
+**What this code does — step by step:**
+
+1. ↑ Client subscribes to these prefixes. ↑ /topic = broadcast to all subscribers. ↑ /queue = send to specific user
+2. ↑ Client sends messages to these prefixes. ↑ /app/chat.send → handled by @MessageMapping
+3. ↑ WebSocket endpoint URL. ↑ SockJS provides fallback for older browsers
+
+The same code, clean:
+
 ```java
 @Configuration
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
-    
+
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         registry.enableSimpleBroker("/topic", "/queue");
-        // ↑ Client subscribes to these prefixes
-        // ↑ /topic = broadcast to all subscribers
-        // ↑ /queue = send to specific user
-        
+
         registry.setApplicationDestinationPrefixes("/app");
-        // ↑ Client sends messages to these prefixes
-        // ↑ /app/chat.send → handled by @MessageMapping
     }
-    
+
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws")
             .setAllowedOriginPatterns("*")
             .withSockJS();
-        // ↑ WebSocket endpoint URL
-        // ↑ SockJS provides fallback for older browsers
     }
 }
 ```
 
 ### Server-Side Message Handling
 
+
+**What this code does — step by step:**
+
+1. ↑ When client sends to /app/chat.send, this method runs. ↑ @MessageMapping is like @RequestMapping for WebSockets
+2. ↑ The return value is broadcast to all subscribers of /topic/messages
+3. ↑ Spring auto-converts JSON to ChatMessage object
+4. ↑ Return value is sent to ALL subscribers
+5. ↑ Send to a specific user
+6. ↑ Only the authenticated user receives this
+
+The same code, clean:
+
 ```java
 @Controller
 public class ChatController {
-    
+
     @MessageMapping("/chat.send")
-    // ↑ When client sends to /app/chat.send, this method runs
-    // ↑ @MessageMapping is like @RequestMapping for WebSockets
-    
+
     @SendTo("/topic/messages")
-    // ↑ The return value is broadcast to all subscribers of /topic/messages
-    
+
     public ChatMessage sendMessage(ChatMessage message) {
-        // ↑ Spring auto-converts JSON to ChatMessage object
         message.setTimestamp(Instant.now());
         return message;
-        // ↑ Return value is sent to ALL subscribers
     }
-    
+
     @MessageMapping("/chat.private")
-    // ↑ Send to a specific user
-    
+
     @SendToUser("/queue/private")
-    // ↑ Only the authenticated user receives this
-    
+
     public PrivateMessage sendPrivate(PrivateMessage message) {
         return message;
     }
@@ -140,7 +147,6 @@ public class ChatController {
 ### Organization Use Cases
 
 **1. Live Chat Application**
-```java
 @Controller
 public class ChatController {
     @MessageMapping("/chat.send")
@@ -150,10 +156,8 @@ public class ChatController {
         return msg;
     }
 }
-```
 
 **2. Live Dashboard Updates**
-```java
 @Service
 public class DashboardService {
     @Autowired private SimpMessagingTemplate template;
@@ -164,10 +168,8 @@ public class DashboardService {
         // ↑ No polling — clients receive instantly
     }
 }
-```
 
 **3. Notification System**
-```java
 @Service
 public class NotificationService {
     @Autowired private SimpMessagingTemplate template;
@@ -182,7 +184,6 @@ public class NotificationService {
         // ↑ Only that user receives the notification
     }
 }
-```
 
 ### Common Mistakes
 
@@ -196,47 +197,45 @@ public class NotificationService {
 
 ### Line-by-Line Code Explanation
 
+
+**What this code does — step by step:**
+
+1. ↑ Spring configuration class — sets up WebSocket infrastructure
+2. ↑ Enables STOMP message broker — handles routing, subscriptions, sessions
+3. ↑ Implements the configuration interface for WebSocket message broker
+4. ↑ Configure where messages go (broker) and where they come from (client)
+5. ↑ "/topic" = broadcast channel (all subscribers get the message). ↑ "/queue" = point-to-point channel (one user gets the message). ↑ This is an in-memory broker — fine for single-server apps. ↑ For multi-server, use RabbitMQ or Redis as the broker
+6. ↑ Client sends messages to /app/... → routes to @MessageMapping. ↑ Example: client sends to /app/chat.send → routes to @MessageMapping("/chat.send")
+7. ↑ Register the WebSocket endpoint URL
+8. ↑ URL: ws://localhost:8080/ws. ↑ This is the initial HTTP handshake URL
+9. ↑ Allow connections from any origin (dev mode). ↑ In production, specify your frontend domain
+10. ↑ Enable SockJS fallback. ↑ SockJS tries WebSocket first, falls back to HTTP long-polling. ↑ Needed for older browsers and corporate proxies
+
+The same code, clean:
+
 ```java
 @Configuration
-// ↑ Spring configuration class — sets up WebSocket infrastructure
 
 @EnableWebSocketMessageBroker
-// ↑ Enables STOMP message broker — handles routing, subscriptions, sessions
 
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
-    // ↑ Implements the configuration interface for WebSocket message broker
-    
+
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
-        // ↑ Configure where messages go (broker) and where they come from (client)
-        
+
         registry.enableSimpleBroker("/topic", "/queue");
-        // ↑ "/topic" = broadcast channel (all subscribers get the message)
-        // ↑ "/queue" = point-to-point channel (one user gets the message)
-        // ↑ This is an in-memory broker — fine for single-server apps
-        // ↑ For multi-server, use RabbitMQ or Redis as the broker
-        
+
         registry.setApplicationDestinationPrefixes("/app");
-        // ↑ Client sends messages to /app/... → routes to @MessageMapping
-        // ↑ Example: client sends to /app/chat.send → routes to @MessageMapping("/chat.send")
     }
-    
+
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        // ↑ Register the WebSocket endpoint URL
-        
+
         registry.addEndpoint("/ws")
-            // ↑ URL: ws://localhost:8080/ws
-            // ↑ This is the initial HTTP handshake URL
-            
+
             .setAllowedOriginPatterns("*")
-            // ↑ Allow connections from any origin (dev mode)
-            // ↑ In production, specify your frontend domain
-            
+
             .withSockJS();
-            // ↑ Enable SockJS fallback
-            // ↑ SockJS tries WebSocket first, falls back to HTTP long-polling
-            // ↑ Needed for older browsers and corporate proxies
     }
 }
 ```
@@ -254,3 +253,4 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 ### Real-World Organization Scenario
 
 A stock trading platform uses WebSockets to push real-time price updates to 50,000 traders. Each trader subscribes to their watched stocks via `/topic/prices/AAPL`, `/topic/prices/GOOGL`. The server pushes updates every 100ms. Without WebSockets, they'd need 50,000 HTTP polls per second. With WebSockets, they maintain 50,000 persistent connections and push only when prices change.
+

@@ -1,7 +1,7 @@
 ---
 title: Java Language Fundamentals — JVM, JRE, JDK Architecture
 summary: The difference between JVM, JRE and JDK, the classloader subsystem, bytecode verification, the method area, heap, stack, and PC register — why a Java program runs anywhere and what "write once, run anywhere" actually means under the hood.
-order: 1
+order: 3
 minutes: 20
 topics: [jvm, jre, jdk, classloader, bytecode, verification, method-area, heap, stack, pc-register]
 docs:
@@ -43,7 +43,6 @@ The **JVM** (Java Virtual Machine) is the engine. It is a specification (defined
 
 The JVM is the reason for "write once, run anywhere" (WORA). You compile Java source to **bytecode** (`.class` files), and that bytecode is the same on every platform. Each platform (Windows, Linux, macOS, ARM, etc.) has its own JVM implementation that knows how to execute that bytecode on that platform. You do not recompile for each target — the same `.class` file runs on any JVM.
 
-```java
 // Compile once, run anywhere
 // javac Hello.java   produces Hello.class
 // java Hello         runs on any OS with a JVM
@@ -53,7 +52,6 @@ public class Hello {
         System.out.println("Hello, World!");
     }
 }
-```
 
 The bytecode in `Hello.class` is platform-neutral. A Windows JVM reads the same bytecode and produces Windows machine code; a Linux JVM on ARM reads the same bytecode and produces ARM machine code. The JVM is the translator.
 
@@ -65,10 +63,8 @@ Understanding the JVM's internal memory model explains `StackOverflowError`, `Ou
 
 The **heap** is the runtime data area from which memory for all class instances and arrays is allocated. The heap is shared across all threads. When you write `new Customer()`, the object's memory comes from the heap. The heap is managed by the garbage collector — when an object is no longer reachable, the GC reclaims its space.
 
-```java
 // Heap: every 'new' allocates here
 Customer c = new Customer("Alice");   // the Customer object is on the heap
-```
 
 The reference `c` itself (the 4- or 8-byte pointer) is on the stack, but the object it points to is on the heap. This split — reference on the stack, object on the heap — is why two variables can point to the same object, why passing an object to a method lets the method mutate it, and why `null` is a valid value for any reference.
 
@@ -89,14 +85,12 @@ Each thread has its own **Java Virtual Machine Stack**. The stack stores **frame
 
 When you call a method, a new frame is pushed onto the thread's stack. When the method returns, the frame is popped. When the stack runs out of space (e.g., infinite recursion), you get a `StackOverflowError`.
 
-```java
 // Each call adds a frame to the stack
 static void recurse(int n) {
     if (n == 0) return;
     recurse(n - 1);   // each call pushes a new frame
 }
 // recurse(1_000_000)  — eventually StackOverflowError
-```
 
 Local variables live only as long as their frame is on the stack. When `recurse` returns, its local variable `n` is gone. This is why local variables are not shared between threads — each thread has its own stack.
 
@@ -115,22 +109,23 @@ The **method area** is shared across all threads. It stores:
 
 Before Java 8, the method area was called the **Permanent Generation (PermGen)** and was part of the heap; running out of PermGen caused `OutOfMemoryError: PermGen space`. Since Java 8, the method area lives in a native-memory region called **Metaspace**, which is not part of the heap and grows up to a limit (or until the native memory is exhausted). Running out of Metaspace causes `OutOfMemoryError: Metaspace`. The classic cause: loading too many dynamic classes (Proxy classes, reflection-generated classes, classloader leaks in application servers).
 
-```java
 // Every loaded class has metadata in the method area / Metaspace
 // Class.forName("com.example.MyClass") loads the class (if not already loaded)
-```
 
 #### The Constant Pool — the bytecode's symbol table
 
 Every `.class` file has a **constant pool** — a table of constants and symbolic references: string literals, class and interface names, field names and descriptors, method names and descriptors, numeric literals. When the bytecode says `invokevirtual #42`, the `#42` refers to an entry in the constant pool that tells the JVM which method to call. The constant pool is part of the class file, loaded into the method area at runtime. This indirection is how the JVM supports dynamic linking — the actual memory address of a method is not baked into the bytecode; it is resolved at runtime via the constant pool.
 
+
+**What this code does — step by step:**
+
+1. In bytecode, this:
+2. compiles to something like: getstatic #2 // Field java/lang/System.out:LPrintStream; ldc #3 // String hello. Invokevirtual #4 // Method java/io/PrintStream.println:(Ljava/lang/String;)V
+
+The same code, clean:
+
 ```java
-// In bytecode, this:
 System.out.println("hello");
-// compiles to something like:
-//  getstatic  #2            // Field java/lang/System.out:LPrintStream;
-//  ldc #3                   // String hello
-//  invokevirtual #4         // Method java/io/PrintStream.println:(Ljava/lang/String;)V
 ```
 
 The constant pool entries `#2`, `#3`, `#4` are resolved by the JVM at runtime. This is why reflection and dynamic proxies work — the JVM already has the machinery to look up methods by name and descriptor.
@@ -144,15 +139,27 @@ The JVM does not load all classes upfront. It loads them on demand, through a hi
 
 The classloaders form a **delegation hierarchy**: when a classloader is asked to load a class, it first delegates to its parent. The parent delegates to its parent, up to the bootstrap classloader. Only if the parent cannot find the class does the child try to load it itself. This is the **parent-delegation model**, and it is why you cannot easily replace `java.lang.String` with your own class — the bootstrap classloader already loaded the real `java.lang.String`, and the delegation ensures the core classes are always the JDK's.
 
+
+**What this code does — step by step:**
+
+1. ClassLoader delegation in action
+2. cl is the system (application) classloader. Its parent is the platform classloader. Its parent's parent is the bootstrap classloader (often null in Java code)
+3. `System.out.println(cl);` — sun.misc.Launcher$AppClassLoader@...
+4. `System.out.println(cl.getParent());` — platform classloader
+5. `System.out.println(cl.getParent().getParent());` — null (bootstrap is native)
+
+The same code, clean:
+
 ```java
-// ClassLoader delegation in action
-ClassLoader cl = MyClass.class.getClassLoader();
-// cl is the system (application) classloader
-// Its parent is the platform classloader
-// Its parent's parent is the bootstrap classloader (often null in Java code)
-System.out.println(cl);                    // sun.misc.Launcher$AppClassLoader@...
-System.out.println(cl.getParent());        // platform classloader
-System.out.println(cl.getParent().getParent()); // null (bootstrap is native)
+public class Main {
+
+    public static void main(String[] args) {
+        ClassLoader cl = MyClass.class.getClassLoader();
+        System.out.println(cl);
+        System.out.println(cl.getParent());
+        System.out.println(cl.getParent().getParent());
+    }
+}
 ```
 
 #### Custom ClassLoaders
@@ -163,7 +170,6 @@ You can write your own classloader by extending `ClassLoader` and overriding `fi
 - **Hot-reload** in development tools — loading a new version of a class without restarting the JVM.
 - **OSGi, Jigsaw, and dynamic module systems**.
 
-```java
 // A minimal custom classloader that loads a class from a byte array
 class ByteArrayClassLoader extends ClassLoader {
     private final Map<String, byte[]> classes = new HashMap<>();
@@ -184,7 +190,6 @@ class ByteArrayClassLoader extends ClassLoader {
 var loader = new ByteArrayClassLoader();
 loader.store("com.example.Foo", compileSomehow());
 Class<?> foo = loader.loadClass("com.example.Foo");
-```
 
 But be careful: a class is identified by its **fully qualified name AND the classloader that loaded it**. `com.example.Foo` loaded by classloader A is a different type than `com.example.Foo` loaded by classloader B. You cannot cast between them — you get ` ClassCastException` even though the names match. This is the root of many "classloader hell" bugs in application servers.
 
@@ -215,7 +220,6 @@ The JVM starts by interpreting bytecode (slowly). As it runs, the **JIT compiler
 
 This is why Java startup can be slow (the JVM is warming up, interpreting, and profiling) but long-running services are fast — the JIT has optimized the hot paths. It is also why microbenchmarks that run too briefly give misleading results: the JIT has not had time to optimize. (This is the motivation behind **JMH** — the Java Microbenchmark Harness — which ensures the JVM reaches a steady state before measuring.)
 
-```java
 // The JIT eventually inlines and optimizes hot loops
 static long sum(long n) {
     long total = 0;
@@ -226,7 +230,6 @@ static long sum(long n) {
 }
 // After the JIT compiles sum(), the loop may be unrolled, vectorized,
 // or replaced with a closed-form formula (n*(n+1)/2) if the JIT recognizes it.
-```
 
 The end user does not control the JIT directly, but understanding it helps explain performance behavior: don't micro-optimize Java code based on a single short run; write clean code and let the JIT do its job; use JMH for real benchmarks.
 
@@ -239,15 +242,22 @@ The end user does not control the JIT directly, but understanding it helps expla
 
 For a backend API, WORA is huge: build the jar once in CI, deploy the same artifact to dev, staging, and production, regardless of the underlying OS. That is why Java is so popular in server-side environments.
 
-```java
-// Write once, run anywhere — as long as you stay within the JDK
-// BAD: platform-specific path
-File f = new File("data\\customers.txt");   // works on Windows, not Linux
 
-// GOOD: platform-neutral
+**What this code does — step by step:**
+
+1. Write once, run anywhere — as long as you stay within the JDK. BAD: platform-specific path
+2. `File f = new File("data\\customers.txt");` — works on Windows, not Linux
+3. GOOD: platform-neutral
+4. or better, with NIO.2
+5. `Path p = Path.of("data", "customers.txt");` — works everywhere
+
+The same code, clean:
+
+```java
+File f = new File("data\\customers.txt");
+
 File f = new File("data" + File.separator + "customers.txt");
-// or better, with NIO.2
-Path p = Path.of("data", "customers.txt");   // works everywhere
+Path p = Path.of("data", "customers.txt");
 ```
 
 ### The JVM vs. Other Runtimes — Perspective
@@ -283,3 +293,4 @@ In the lab, you will inspect a compiled class file with `javap -c` to read the b
 ## Summary
 
 The JDK is the development kit (compiler + tools + runtime), the JRE is the runtime environment (JVM + core libraries), and the JVM is the virtual machine that loads bytecode, verifies it, executes it (interpreting and JIT-compiling hot methods to native code), and manages memory (heap, stack, method area, PC registers). The heap holds objects and is managed by the garbage collector, usually split into young and old generations; each thread has its own stack of method frames and a PC register; the method area (Metaspace) holds class metadata and static variables. Classes are loaded on demand by a hierarchy of classloaders that delegate to parents, which is why you cannot shadow core JDK classes and why the same class loaded by two different classloaders is two different types. The bytecode verifier ensures loaded bytecode is safe before execution. "Write once, run anywhere" means the same bytecode runs on any platform with a JVM — but only if you avoid platform-specific APIs. Understanding this architecture is the foundation for everything that follows: GC tuning, classloader debugging, reflection, dynamic proxies, and native image compilation.
+

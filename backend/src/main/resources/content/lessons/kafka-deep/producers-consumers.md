@@ -1,7 +1,7 @@
 ---
 title: Producers and Consumers — Configuration, Delivery Semantics, and Idioms
 module: kafka-deep
-order: 2
+order: 5
 minutes: 27
 topics: ["producers", "consumers", "delivery semantics", "acks", "idempotence", "consumer groups"]
 summary: Producers and consumers are the endpoints of the Kafka conversation — and the subtlety of Kafka lives in their configuration: settings that trade t...
@@ -20,30 +20,30 @@ Producers and consumers are the endpoints of the Kafka conversation — and the 
 
 ## Producer Configuration: The Durability Dial
 
+
+**What this code does — step by step:**
+
+1. --- The three big producer settings ---
+2. acks: how many replicas must confirm before the send is "successful". 0 — fire and forget: fastest, may LOSE messages (broker crash). 1 — leader confirmed only: fast, small loss window. all — all in-sync replicas confirmed: no loss on broker crash. DEFAULT-safe choice.
+3. retries: how many times to retry a failed send. With acks=all this. Can produce DUPLICATES unless idempotence is on — hence the next setting.
+4. enable.idempotence=true: the producer tags each batch with a sequence. Number so the broker can DEDUPLICATE retried batches. Result: exactly-once writes INTO Kafka, no dupes despite retries.
+5. Compression: reduces network + disk, big win for JSON/JSONL payloads.
+
+The same code, clean:
+
 ```java
 Properties props = new Properties();
 props.put("bootstrap.servers", "broker1:9092,broker2:9092,broker3:9092");
 props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
 props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
 
-// --- The three big producer settings ---
 
-// acks: how many replicas must confirm before the send is "successful".
-//   0      — fire and forget: fastest, may LOSE messages (broker crash).
-//   1      — leader confirmed only: fast, small loss window.
-//   all    — all in-sync replicas confirmed: no loss on broker crash. DEFAULT-safe choice.
 props.put("acks", "all");
 
-// retries: how many times to retry a failed send. With acks=all this
-// can produce DUPLICATES unless idempotence is on — hence the next setting.
 props.put("retries", Integer.MAX_VALUE);
 
-// enable.idempotence=true: the producer tags each batch with a sequence
-// number so the broker can DEDUPLICATE retried batches.
-// Result: exactly-once writes INTO Kafka, no dupes despite retries.
 props.put("enable.idempotence", "true");
 
-// Compression: reduces network + disk, big win for JSON/JSONL payloads.
 props.put("compression.type", "lz4");
 ```
 
@@ -51,31 +51,44 @@ props.put("compression.type", "lz4");
 
 ## Producer Idioms: Synchronous vs Asynchronous Sends
 
+
+**What this code does — step by step:**
+
+1. Fire-and-forget — fastest, errors only surface in the callback:
+2. Callback — asynchronous with error visibility:
+3. retry, dead-letter, or alert — never silent!
+4. Blocking — for critical writes (payments, audit): producer.send(record).get(); // throws on failure
+
+The same code, clean:
+
 ```java
 try (KafkaProducer<String, String> producer = new KafkaProducer<>(props)) {
 
-    // Fire-and-forget — fastest, errors only surface in the callback:
     producer.send(new ProducerRecord<>("orders", key, value));
 
-    // Callback — asynchronous with error visibility:
     producer.send(new ProducerRecord<>("orders", key, value), (metadata, exception) -> {
         if (exception != null) {
             log.error("Send failed: {}", exception.getMessage());
-            // retry, dead-letter, or alert — never silent!
         } else {
             log.info("Stored in {}-{} at offset {}", metadata.topic(),
                      metadata.partition(), metadata.offset());
         }
     });
 
-    // Blocking — for critical writes (payments, audit):
-    // producer.send(record).get();   // throws on failure
 }
 ```
 
 The `send` is asynchronous; the `get()` (or the callback) is where success or failure surfaces. Production code never ignores the result of `send` for critical data — silent send failures are lost events.
 
 ## Consumer Configuration: The Offset Dial
+
+
+**What this code does — step by step:**
+
+1. Where to START when the group has no committed offset for a partition: earliest — from the beginning (replay the whole topic). Latest — only new events (default)
+2. enable.auto.commit=true -> at-most-once risk window (auto-commit is. Async; crash between poll and commit loses events). Enable.auto.commit=false -> you commit manually -> at-least-once control
+
+The same code, clean:
 
 ```java
 Properties cprops = new Properties();
@@ -84,16 +97,18 @@ cprops.put("group.id", "order-processor");
 cprops.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
 cprops.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
 
-// Where to START when the group has no committed offset for a partition:
-//   earliest — from the beginning (replay the whole topic)
-//   latest   — only new events (default)
 cprops.put("auto.offset.reset", "earliest");
 
-// enable.auto.commit=true  -> at-most-once risk window (auto-commit is
-//                             async; crash between poll and commit loses events)
-// enable.auto.commit=false -> you commit manually -> at-least-once control
 cprops.put("enable.auto.commit", "false");
 ```
+
+
+**What this code does — step by step:**
+
+1. `process(record);` — DO the work. Manual commit AFTER processing: if we crash now, this. Offset is uncommitted -> the event is reprocessed. At-least-once: no loss, possible duplicates.
+2. `consumer.commitSync();` — block until committed
+
+The same code, clean:
 
 ```java
 try (KafkaConsumer<String, String> consumer = new KafkaConsumer<>(cprops)) {
@@ -101,11 +116,8 @@ try (KafkaConsumer<String, String> consumer = new KafkaConsumer<>(cprops)) {
     while (true) {
         ConsumerRecords<String, String> records = consumer.poll(100);
         for (ConsumerRecord<String, String> record : records) {
-            process(record);                    // DO the work
-            // Manual commit AFTER processing: if we crash now, this
-            // offset is uncommitted -> the event is reprocessed.
-            // At-least-once: no loss, possible duplicates.
-            consumer.commitSync();              // block until committed
+            process(record);
+            consumer.commitSync();
         }
     }
 }
@@ -132,7 +144,6 @@ The `while(true) { poll }` loop is the consumer's heartbeat: `poll` fetches even
 3. **Make processing idempotent** — dedupe on an event id (store processed ids, use a unique constraint), so retries are harmless.
 4. **Handle poison messages** — an unparseable event will throw forever and block the partition; catch, log, and skip (or route to a dead-letter topic) rather than crashing the loop.
 
-```java
 // Idempotent processing — the key to safe retries:
 public void process(ConsumerRecord<String, String> record) {
     String eventId = record.headers().lastHeader("eventId") != null
@@ -143,8 +154,8 @@ public void process(ConsumerRecord<String, String> record) {
         log.debug("Duplicate event {} — skipping", eventId);
     }
 }
-```
 
 ## Recap
 
 Producer and consumer configuration is a set of guarantee dials. Producers: `acks=all` + `retries` + `enable.idempotence=true` gives exactly-once *into* the log — the production baseline; never ignore a `send` result for critical events. Consumers: `auto.offset.reset` controls where a fresh group starts; manual commit-after-processing gives at-least-once (no loss, possible duplicates — solved by making consumers idempotent); Kafka transactions give exactly-once end-to-end at real complexity cost. Consumer groups scale by splitting partitions and rebalance when members change — so write partition-agnostic, idempotent consumers and size partitions for the parallelism you need. Internalize the semantics dial and Kafka's guarantees stop being mysterious — they become settings you chose.
+

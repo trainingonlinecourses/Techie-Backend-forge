@@ -1,7 +1,7 @@
 ---
 title: Idempotency in Distributed Systems
 module: distributed-systems
-order: 3
+order: 4
 minutes: 22
 topics: ["idempotency keys", "at-least-once", "deduplication", "unique constraints", "retries", "distributed locks"]
 summary: Retries are a fact of distributed life: timeouts, dead letter reprocessing, and consumer restarts all deliver the same request twice. Idempotency i...
@@ -25,7 +25,6 @@ Without idempotency, *any* retry-able operation can execute twice: payments, ord
 
 ## Mechanism 1: The Idempotency Key
 
-```java
 // Client sends a key on every retry of the same logical request
 POST /api/payments
 Idempotency-Key: 8f14e45f-ea1a-4c2e
@@ -49,7 +48,6 @@ public ResponseEntity<?> createPayment(
     idempotencyService.complete(key, payment);
     return ResponseEntity.created(...).body(payment);
 }
-```
 
 **The atomic claim is the whole trick** — the unique constraint on the key column makes two concurrent retries race safely (one inserts, the other reads the winner).
 
@@ -57,19 +55,24 @@ public ResponseEntity<?> createPayment(
 
 Some operations are *naturally* idempotent — running them twice changes nothing:
 
+
+**What this code does — step by step:**
+
+1. ✅ DELETE: deleting an already-deleted resource is a no-op
+2. ✅ PUT (full replace): same body twice = same result
+3. ✅ Absolute updates: setting balance = 100 twice = 100
+4. ❌ Relative updates are NOT idempotent: balance = balance - 10 run twice = 20 deducted!
+
+The same code, clean:
+
 ```java
-// ✅ DELETE: deleting an already-deleted resource is a no-op
 DELETE /api/courses/{id}    → 204 (even if already gone)
 
-// ✅ PUT (full replace): same body twice = same result
 PUT /api/courses/1
 { "title": "X" }            → twice = still { "title": "X" }
 
-// ✅ Absolute updates: setting balance = 100 twice = 100
 UPDATE accounts SET balance = 100 WHERE id = 1;
 
-// ❌ Relative updates are NOT idempotent:
-//    balance = balance - 10 run twice = 20 deducted!
 UPDATE accounts SET balance = balance - 10 WHERE id = 1;
 ```
 
@@ -79,16 +82,13 @@ UPDATE accounts SET balance = balance - 10 WHERE id = 1;
 
 The database's unique constraint is the ultimate deduplication:
 
-```java
 @Entity
 public class Order {
     // The client-generated idempotency key as a unique business key
     @Column(unique = true)
     private UUID requestId;    // unique constraint → second insert fails
 }
-```
 
-```java
 @Transactional
 public Order createOrder(CreateOrderCommand cmd) {
     try {
@@ -98,7 +98,6 @@ public Order createOrder(CreateOrderCommand cmd) {
         return orderRepository.findByRequestId(cmd.requestId()).orElseThrow();
     }
 }
-```
 
 **This is the pattern the outbox relay uses**: the event id is a unique column; a redelivered event finds the existing row instead of double-processing.
 
@@ -106,7 +105,6 @@ public Order createOrder(CreateOrderCommand cmd) {
 
 Processes with states make duplicates harmless by *rejecting illegal transitions*:
 
-```java
 public enum OrderStatus { DRAFT, PLACED, PAID, CANCELLED }
 
 public class Order {
@@ -121,7 +119,6 @@ public class Order {
         this.status = OrderStatus.PAID;
     }
 }
-```
 
 A duplicate "pay" event arrives → status is already PAID → no-op. The state machine *is* the deduplication.
 
@@ -136,7 +133,6 @@ Message broker (at-least-once) ──▶ Consumer
   └─ Idempotent side effects (state machine, PUTs)   ← safety net
 ```
 
-```java
 @RabbitListener(queues = "orders.new")
 public void onOrderPlaced(OrderPlacedEvent event) {
     // Mechanism 3: unique claim
@@ -149,7 +145,6 @@ public void onOrderPlaced(OrderPlacedEvent event) {
     // Mechanism 2: natural idempotency for side effects (PUT to warehouse)
     warehouseClient.update(absoluteState);
 }
-```
 
 ## Distributed Locks vs. Idempotency
 
@@ -164,7 +159,6 @@ They're complementary: **locks prevent overlap, idempotency makes overlap harmle
 
 ## Testing Idempotency
 
-```java
 @Test
 void retryReturnsSameResult() {
     // First call
@@ -186,7 +180,6 @@ void concurrentRetriesProcessOnce() throws Exception {
 
     assertEquals(1, paymentRepository.count());   // the unique key saved us
 }
-```
 
 ## Summary
 
@@ -199,3 +192,4 @@ void concurrentRetriesProcessOnce() throws Exception {
 | Distributed lock | Prevent overlap | Leader election, job claims |
 
 Idempotency is the distributed-system superpower: it turns retries from a hazard into a convenience. Design operations to be naturally idempotent, add keys where creation is involved, let unique constraints dedup, and let state machines absorb replays — then every retry, replay, and redelivery is a no-op instead of a bug.
+

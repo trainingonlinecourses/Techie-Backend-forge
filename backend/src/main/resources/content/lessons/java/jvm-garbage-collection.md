@@ -1,7 +1,7 @@
 ---
 title: JVM Garbage Collection — How Java Manages Memory
 summary: Generational hypothesis, minor vs major GC, how objects become eligible for collection, and the real-world impact of GC pauses on application performance.
-order: 67
+order: 50
 minutes: 22
 topics: [garbage collection, GC roots, generational, minor GC, major GC, finalize, phantom reference, memory management]
 docs:
@@ -25,21 +25,28 @@ Java solves this with **Garbage Collection (GC)** — the JVM automatically find
 
 An object is eligible for garbage collection when **no live thread can reach it** through any reference chain:
 
+
+**What this code does — step by step:**
+
+1. `Order order = new Order("ORD-001");` — order points to the new Order object. ... use the order ...
+2. `}` — Method ends — the local variable 'order' goes out of scope. The Order object is now unreachable → eligible for GC
+3. `private static List<Order> cache = new ArrayList<>();` — Static — lives forever!
+4. `cache.add(order);` — Now 'order' is reachable through the static list
+5. Even after addToCache returns, the Order is STILL alive. Because 'cache' (static) holds a reference
+
+The same code, clean:
+
 ```java
 public void createAndAbandon() {
-    Order order = new Order("ORD-001");   // order points to the new Order object
-    // ... use the order ...
-}   // Method ends — the local variable 'order' goes out of scope
-    // The Order object is now unreachable → eligible for GC
+    Order order = new Order("ORD-001");
+}
 
 public void leakedReference() {
-    private static List<Order> cache = new ArrayList<>();   // Static — lives forever!
+    private static List<Order> cache = new ArrayList<>();
 
     public void addToCache(Order order) {
-        cache.add(order);   // Now 'order' is reachable through the static list
+        cache.add(order);
     }
-    // Even after addToCache returns, the Order is STILL alive
-    // because 'cache' (static) holds a reference
 }
 ```
 
@@ -71,17 +78,26 @@ The GC's key insight: **most objects die young**. A typical web request creates 
 
 **Old Generation:** Objects that survive multiple minor GCs are promoted here. Major GC runs less frequently but takes longer (50-500ms).
 
+
+**What this code does — step by step:**
+
+1. These live in Young Gen (temporary):
+2. `String temp = "Hello";` — Created, used briefly
+3. `List<String> items = new ArrayList<>();` — Temporary list. After method returns, temp and items → Young Gen garbage
+4. These get promoted to Old Gen (long-lived):
+5. `private static final Config config = new Config();` — Static → lives forever
+6. `private final Cache<String, Order> orderCache;` — Instance field → long-lived
+
+The same code, clean:
+
 ```java
-// These live in Young Gen (temporary):
 public void handleRequest() {
-    String temp = "Hello";                        // Created, used briefly
-    List<String> items = new ArrayList<>();        // Temporary list
-    // After method returns, temp and items → Young Gen garbage
+    String temp = "Hello";
+    List<String> items = new ArrayList<>();
 }
 
-// These get promoted to Old Gen (long-lived):
-private static final Config config = new Config();  // Static → lives forever
-private final Cache<String, Order> orderCache;      // Instance field → long-lived
+private static final Config config = new Config();
+private final Cache<String, Order> orderCache;
 ```
 
 ---
@@ -90,28 +106,34 @@ private final Cache<String, Order> orderCache;      // Instance field → long-l
 
 ### Making Objects Eligible for GC
 
+
+**What this code does — step by step:**
+
+1. 1. Method scope — automatic cleanup
+2. `String name = "Alice";` — 'name' references a String object. ... use name ... When method returns, 'name' goes out of scope → "Alice" becomes garbage
+3. 2. Explicit nulling — immediate eligibility
+4. `byte[] buffer = new byte[1024];` — 1KB buffer allocated
+5. `processBuffer(buffer);` — Use it
+6. `buffer = null;` — NOW it's eligible for GC. Without nulling, 'buffer' keeps the 1KB alive until the method returns
+7. 3. Collection cleanup
+8. `orders.clear();` — Orders are now unreachable. But the ArrayList itself is still alive (just empty). Orders = null; ← would make the ArrayList itself garbage too
+
+The same code, clean:
+
 ```java
 public class MemoryManagement {
 
     public void demonstrateGC() {
-        // 1. Method scope — automatic cleanup
-        String name = "Alice";              // 'name' references a String object
-        // ... use name ...
-        // When method returns, 'name' goes out of scope → "Alice" becomes garbage
+        String name = "Alice";
 
-        // 2. Explicit nulling — immediate eligibility
-        byte[] buffer = new byte[1024];     // 1KB buffer allocated
-        processBuffer(buffer);              // Use it
-        buffer = null;                      // NOW it's eligible for GC
-        // Without nulling, 'buffer' keeps the 1KB alive until the method returns
+        byte[] buffer = new byte[1024];
+        processBuffer(buffer);
+        buffer = null;
 
-        // 3. Collection cleanup
         List<Order> orders = new ArrayList<>();
         orders.add(new Order("1"));
         orders.add(new Order("2"));
-        orders.clear();                     // Orders are now unreachable
-        // But the ArrayList itself is still alive (just empty)
-        // orders = null;   ← would make the ArrayList itself garbage too
+        orders.clear();
     }
 }
 ```
@@ -139,25 +161,34 @@ jstat -gc <pid> 1000
 
 ### Triggering GC Programmatically
 
+
+**What this code does — step by step:**
+
+1. DON'T DO THIS in production:
+2. `System.gc();` — Suggests a Full GC — causes a long pause
+3. Better: let the JVM manage it automatically. The JVM's heuristics are almost always better than manual triggering
+4. BUT: useful in tests or benchmarks:
+5. Create many objects
+6. `System.gc();` — Hint to JVM to collect before assertions
+7. `Thread.sleep(100);` — Give GC time to run
+8. `assertThat(used).isLessThan(50_000_000);` — Less than 50MB used
+
+The same code, clean:
+
 ```java
-// DON'T DO THIS in production:
-System.gc();   // Suggests a Full GC — causes a long pause
+System.gc();
 
-// Better: let the JVM manage it automatically
-// The JVM's heuristics are almost always better than manual triggering
 
-// BUT: useful in tests or benchmarks:
 @Test
 void memoryTest() {
-    // Create many objects
     for (int i = 0; i < 1_000_000; i++) {
         createTemporaryObject();
     }
-    System.gc();         // Hint to JVM to collect before assertions
-    Thread.sleep(100);   // Give GC time to run
+    System.gc();
+    Thread.sleep(100);
 
     long used = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-    assertThat(used).isLessThan(50_000_000);   // Less than 50MB used
+    assertThat(used).isLessThan(50_000_000);
 }
 ```
 
@@ -172,27 +203,35 @@ void memoryTest() {
 
 ### Scenario 1: Memory Leak in a Cache
 
+
+**What this code does — step by step:**
+
+1. THE BUG: cache grows forever
+2. `sessions.put(userId, new Session(userId));` — Never removed!
+3. After 1M logins → 1M entries → heap fills → OOM
+4. THE FIX: Use a cache with eviction
+5. `.maximumSize(10_000)` — Max entries
+6. `.expireAfterAccess(Duration.ofMinutes(30))` — Evict after 30 min idle
+
+The same code, clean:
+
 ```java
-// THE BUG: cache grows forever
 public class UserService {
     private static final Map<String, UserSession> sessions = new HashMap<>();
 
     public void login(String userId) {
-        sessions.put(userId, new Session(userId));   // Never removed!
+        sessions.put(userId, new Session(userId));
     }
-    // After 1M logins → 1M entries → heap fills → OOM
 }
 
-// THE FIX: Use a cache with eviction
 private static final Cache<String, UserSession> sessions = Caffeine.newBuilder()
-    .maximumSize(10_000)                              // Max entries
-    .expireAfterAccess(Duration.ofMinutes(30))        // Evict after 30 min idle
+    .maximumSize(10_000)
+    .expireAfterAccess(Duration.ofMinutes(30))
     .build();
 ```
 
 ### Scenario 2: GC Pause Causing Timeout
 
-```java
 @RestController
 public class OrderController {
     @GetMapping("/orders/{id}")
@@ -203,7 +242,6 @@ public class OrderController {
         return orderService.findById(id);
     }
 }
-```
 
 **Fix options:**
 1. Reduce heap size (smaller heap → faster GC)
@@ -213,33 +251,38 @@ public class OrderController {
 
 ### Scenario 3: Finalizers (The Anti-Pattern)
 
+
+**What this code does — step by step:**
+
+1. OLD WAY (don't do this):
+2. `this.close();` — "Cleanup" when GC collects this object
+3. PROBLEMS with finalizers: 1. Unpredictable — you don't know WHEN finalize() runs. 2. Slow — objects with finalizers take 5-10x longer to collect. 3. Can resurrect — this = this inside finalize() makes it alive again! 4. Thread — runs on a single finalizer thread, can block all collections
+4. NEW WAY (use these instead):
+5. `public void close() {` — Deterministic cleanup
+6. Use try-with-resources:
+7. ... use connection ...
+8. `}` — close() called immediately — no GC needed
+
+The same code, clean:
+
 ```java
-// OLD WAY (don't do this):
 public class DatabaseConnection {
     @Override
     protected void finalize() throws Throwable {
-        this.close();   // "Cleanup" when GC collects this object
+        this.close();
         super.finalize();
     }
 }
 
-// PROBLEMS with finalizers:
-// 1. Unpredictable — you don't know WHEN finalize() runs
-// 2. Slow — objects with finalizers take 5-10x longer to collect
-// 3. Can resurrect — this = this inside finalize() makes it alive again!
-// 4. Thread — runs on a single finalizer thread, can block all collections
 
-// NEW WAY (use these instead):
 public class DatabaseConnection implements AutoCloseable {
     @Override
-    public void close() {        // Deterministic cleanup
+    public void close() {
         connectionPool.release(this);
     }
 }
-// Use try-with-resources:
 try (var conn = getConnection()) {
-    // ... use connection ...
-}   // close() called immediately — no GC needed
+}
 ```
 
 ---
@@ -266,3 +309,4 @@ try (var conn = getConnection()) {
 - **Most "GC problems" are memory leaks** — fix the code that keeps objects alive, don't just tune GC flags.
 
 Official docs: [GC Tuning Guide](https://www.oracle.com/java/technologies/gctuning.html) · [java.lang.ref](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/ref/package-summary.html)
+

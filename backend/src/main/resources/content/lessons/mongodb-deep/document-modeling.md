@@ -111,3 +111,4 @@ Document modeling is *application-driven*: you design for the reads and writes y
 ## Recap
 
 The document model's central design choice is embed vs reference. Embed when related data is small, bounded, and always read/written with its parent; reference when the "many" side is unbounded or independently queried. Denormalize small copies for display-only fields to make reads single-document, but never denormalize integrity-critical data. Remember the two laws: **atomicity follows the document** (update-together data lives together) and **documents have practical size limits** (unbounded arrays belong elsewhere). Model from your access patterns, and the MongoDB design — often derided as "schema-less chaos" — becomes as deliberate as any relational design, just with different trade-offs.
+

@@ -1,7 +1,7 @@
 ---
 title: DevTools & Automatic Restart — Complete Beginner's Guide
 summary: How Spring Boot DevTools works, automatic restart vs LiveReload, what restarts and what doesn't, and the performance trade-offs.
-order: 15
+order: 22
 minutes: 16
 topics: [devtools, automatic restart, livereload, restart classloader, developer tools]
 docs:
@@ -93,14 +93,15 @@ spring:
 
 DevTools automatically detects production and disables itself:
 
-```java
-// DevTools checks for this:
-// 1. Is spring-boot-devtools on the classpath?
-// 2. Is it in the root classloader? (production JAR bundles it in BOOT-INF/lib)
-// 3. Is spring.profiles.active set? (production always sets this)
 
-// Result: DevTools is ONLY active in development
-// In production: no restart overhead, no LiveReload
+**What this code does — step by step:**
+
+1. DevTools checks for this: 1. Is spring-boot-devtools on the classpath? 2. Is it in the root classloader? (production JAR bundles it in BOOT-INF/lib). 3. Is spring.profiles.active set? (production always sets this)
+2. Result: DevTools is ONLY active in development. In production: no restart overhead, no LiveReload
+
+The same code, clean:
+
+```java
 ```
 
 ## When to NOT use DevTools
@@ -150,3 +151,4 @@ DevTools automatically detects production and disables itself:
 - Add `<optional>true</optional>` to exclude from production JAR
 
 **Official docs:** [Spring Boot DevTools](https://docs.spring.io/spring-boot/reference/using/devtools.html)
+

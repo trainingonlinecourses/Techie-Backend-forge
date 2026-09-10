@@ -1,7 +1,7 @@
 ---
 title: Profile-Specific Configuration Properties
 summary: How @ConfigurationProperties interacts with profiles, profile-specific YAML documents, and environment-specific property binding.
-order: 5
+order: 4
 minutes: 15
 topics: [profile-config, yaml-multidoc, environment, conditional-binding, profile-properties]
 docs:
@@ -37,7 +37,6 @@ app:
 
 ## Line-by-Line Walkthrough
 
-```java
 @Data
 @ConfigurationProperties(prefix = "app.cache")
 public class CacheProperties {
@@ -54,7 +53,6 @@ public class CacheProperties {
         private int port = 6379;
     }
 }
-```
 
 ### Per-Profile YAML
 
@@ -106,7 +104,6 @@ app:
 
 ### Scenario 2: Conditional beans based on properties
 
-```java
 @Component
 @ConditionalOnProperty(name = "app.cache.type", havingValue = "redis")
 public class RedisCacheConfig {
@@ -115,7 +112,6 @@ public class RedisCacheConfig {
         return new RedisTemplate<>();
     }
 }
-```
 
 ---
 
@@ -127,3 +123,4 @@ public class RedisCacheConfig {
 | Missing `---` separator in multi-doc | Profile-specific section not activated | Always use `---` between documents |
 | Wrong key casing | Properties not bound | Use kebab-case in YAML |
 | Not testing profile switching | Wrong values in prod | Test each profile explicitly |
+

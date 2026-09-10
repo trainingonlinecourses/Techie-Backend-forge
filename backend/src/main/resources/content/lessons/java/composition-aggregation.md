@@ -1,7 +1,7 @@
 ---
 title: Composition vs Aggregation vs Association
 summary: The three levels of object relationships — when to use has-a vs owns-a, lifecycle management, and real-world organizational design patterns.
-order: 23
+order: 14
 minutes: 15
 topics: [composition, aggregation, association, has-a, object-relationships, solid-principles]
 docs:
@@ -32,7 +32,6 @@ Think of it like relationships between people:
 
 Association simply means **two classes know about each other** but neither owns the other. They interact, but their lifecycles are completely independent.
 
-```java
 // A doctor and a patient know about each other
 // But neither owns the other — both exist independently
 
@@ -65,9 +64,7 @@ class Patient {
         return name;
     }
 }
-```
 
-```java
 // Usage
 Doctor doc = new Doctor("Dr. Smith");
 Patient p1 = new Patient("Alice");
@@ -79,7 +76,6 @@ doc.addPatient(p2);
 // If Doctor is deleted, Patient still exists
 doc = null;  // Doctor is garbage collected
 // Alice and Bob still exist! Nothing breaks.
-```
 
 **Key point**: Neither class manages the lifecycle of the other.
 
@@ -91,7 +87,6 @@ Aggregation is a special type of association where **one class contains the othe
 
 **Think of it as**: "The team has players, but players exist even if the team is disbanded."
 
-```java
 // A Department has Professors, but Professors exist independently
 class Department {
     private String name;
@@ -126,25 +121,31 @@ class Professor {
     public String getName() { return name; }
     public String getSubject() { return subject; }
 }
-```
+
+
+**What this code does — step by step:**
+
+1. Professors are created OUTSIDE the Department
+2. They are added to the department
+3. If the department closes, professors still exist!
+4. Dr. Newton and Dr. Turing are still alive and teaching elsewhere
+5. Same professor can be in multiple departments!
+6. `mathDept.addProfessor(p1);` — Dr. Newton teaches both CS and Math
+
+The same code, clean:
 
 ```java
-// Professors are created OUTSIDE the Department
 Professor p1 = new Professor("Dr. Newton", "Physics");
 Professor p2 = new Professor("Dr. Turing", "CS");
 
-// They are added to the department
 Department csDept = new Department("Computer Science");
 csDept.addProfessor(p1);
 csDept.addProfessor(p2);
 
-// If the department closes, professors still exist!
 csDept = null;
-// Dr. Newton and Dr. Turing are still alive and teaching elsewhere
 
-// Same professor can be in multiple departments!
 Department mathDept = new Department("Mathematics");
-mathDept.addProfessor(p1);  // Dr. Newton teaches both CS and Math
+mathDept.addProfessor(p1);
 ```
 
 ### Visual Clue in UML
@@ -167,24 +168,37 @@ Composition is the **strongest** form of "has-a" relationship. The container **o
 
 **Think of it as**: "A house has rooms. If you demolish the house, the rooms are destroyed too."
 
+
+**What this code does — step by step:**
+
+1. A Car HAS an Engine. The Engine doesn't make sense without the Car.
+2. `private Engine engine;` — Composition: Car creates and owns Engine
+3. `this.engine = new Engine(horsepower);` — Car CREATES the Engine
+4. `this.wheels.add(new Wheel());` — Car CREATES the Wheels
+5. `engine.start();` — Car controls the Engine
+6. When Car is destroyed, Engine and Wheels are destroyed too. There's no way to access the Engine from outside the Car
+7. Package-private constructor — only Car can create an Engine
+8. `this.size = 18;` — Default 18-inch wheels
+
+The same code, clean:
+
 ```java
-// A Car HAS an Engine. The Engine doesn't make sense without the Car.
 class Car {
     private String model;
-    private Engine engine;   // Composition: Car creates and owns Engine
+    private Engine engine;
     private List<Wheel> wheels;
 
     public Car(String model, int horsepower) {
         this.model = model;
-        this.engine = new Engine(horsepower);  // Car CREATES the Engine
+        this.engine = new Engine(horsepower);
         this.wheels = new ArrayList<>();
         for (int i = 0; i < 4; i++) {
-            this.wheels.add(new Wheel());  // Car CREATES the Wheels
+            this.wheels.add(new Wheel());
         }
     }
 
     public void start() {
-        engine.start();  // Car controls the Engine
+        engine.start();
         System.out.println(model + " started with " + engine.getHorsepower() + " HP");
     }
 
@@ -193,15 +207,12 @@ class Car {
         System.out.println(model + " stopped");
     }
 
-    // When Car is destroyed, Engine and Wheels are destroyed too
-    // There's no way to access the Engine from outside the Car
 }
 
 class Engine {
     private int horsepower;
     private boolean running;
 
-    // Package-private constructor — only Car can create an Engine
     Engine(int horsepower) {
         this.horsepower = horsepower;
         this.running = false;
@@ -224,23 +235,28 @@ class Wheel {
     private int size;
 
     Wheel() {
-        this.size = 18;  // Default 18-inch wheels
+        this.size = 18;
     }
 }
 ```
 
+
+**What this code does — step by step:**
+
+1. Usage
+2. `myCar.start();` — Toyota Camry started with 203 HP
+3. You CANNOT do this: myCar.engine.start(); // ❌ Engine is private — not accessible from outside
+4. When Car is garbage collected, Engine and Wheels go with it
+5. Engine and Wheels are now eligible for garbage collection. They cannot be reused by another Car
+
+The same code, clean:
+
 ```java
-// Usage
 Car myCar = new Car("Toyota Camry", 203);
-myCar.start();  // Toyota Camry started with 203 HP
+myCar.start();
 
-// You CANNOT do this:
-// myCar.engine.start();  // ❌ Engine is private — not accessible from outside
 
-// When Car is garbage collected, Engine and Wheels go with it
 myCar = null;
-// Engine and Wheels are now eligible for garbage collection
-// They cannot be reused by another Car
 ```
 
 ### Visual Clue in UML
@@ -260,35 +276,44 @@ Car ◆──── Wheel
 
 ## Side-by-Side Comparison
 
+
+**What this code does — step by step:**
+
+1. AGGREGATION: Library has Books, but Books exist independently
+2. Books come from outside — Library just stores references
+3. Book still exists — it was just borrowed
+4. COMPOSITION: Playlist has Songs, but Playlist creates them
+5. Playlist creates its own Songs
+6. `songs.add(new Song(title, artist));` — Created inside
+7. `songs.clear();` — Songs are destroyed with the playlist
+8. `Song(String title, String artist) {` — Package-private
+
+The same code, clean:
+
 ```java
-// AGGREGATION: Library has Books, but Books exist independently
 class Library {
     private String name;
     private List<Book> books = new ArrayList<>();
 
-    // Books come from outside — Library just stores references
     public void addBook(Book book) {
         books.add(book);
     }
 
     public void removeBook(Book book) {
         books.remove(book);
-        // Book still exists — it was just borrowed
     }
 }
 
-// COMPOSITION: Playlist has Songs, but Playlist creates them
 class Playlist {
     private String name;
     private List<Song> songs = new ArrayList<>();
 
-    // Playlist creates its own Songs
     public void addSong(String title, String artist) {
-        songs.add(new Song(title, artist));  // Created inside
+        songs.add(new Song(title, artist));
     }
 
     public void clearPlaylist() {
-        songs.clear();  // Songs are destroyed with the playlist
+        songs.clear();
     }
 }
 
@@ -306,7 +331,7 @@ class Song {
     private String title;
     private String artist;
 
-    Song(String title, String artist) {  // Package-private
+    Song(String title, String artist) {
         this.title = title;
         this.artist = artist;
     }
@@ -319,20 +344,31 @@ class Song {
 
 ### Scenario 1: E-Commerce Order System (Aggregation)
 
+
+**What this code does — step by step:**
+
+1. An Order contains Products, but Products exist in the catalog independently
+2. `private Customer customer;` — Aggregation — Customer exists independently
+3. `this.customer = customer;` — Customer passed in from outside
+4. `items.add(new OrderItem(product, quantity));` — Composition: OrderItem created here
+5. `private Product product;` — Aggregation — Product exists in catalog
+6. `OrderItem(Product product, int quantity) {` — Created by Order
+
+The same code, clean:
+
 ```java
-// An Order contains Products, but Products exist in the catalog independently
 class Order {
     private String orderId;
     private List<OrderItem> items = new ArrayList<>();
-    private Customer customer;  // Aggregation — Customer exists independently
+    private Customer customer;
 
     public Order(String orderId, Customer customer) {
         this.orderId = orderId;
-        this.customer = customer;  // Customer passed in from outside
+        this.customer = customer;
     }
 
     public void addItem(Product product, int quantity) {
-        items.add(new OrderItem(product, quantity));  // Composition: OrderItem created here
+        items.add(new OrderItem(product, quantity));
     }
 
     public double calculateTotal() {
@@ -343,10 +379,10 @@ class Order {
 }
 
 class OrderItem {
-    private Product product;    // Aggregation — Product exists in catalog
+    private Product product;
     private int quantity;
 
-    OrderItem(Product product, int quantity) {  // Created by Order
+    OrderItem(Product product, int quantity) {
         this.product = product;
         this.quantity = quantity;
     }
@@ -381,33 +417,55 @@ class Customer {
 }
 ```
 
+
+**What this code does — step by step:**
+
+1. Usage
+2. Order aggregates Customer and Products
+3. `order.addItem(laptop, 1);` — OrderItem created by Order (composition)
+4. Total: $1059.97
+5. Delete the order — Products and Customer still exist
+6. laptop, mouse, alice are all still alive!
+
+The same code, clean:
+
 ```java
-// Usage
-Customer alice = new Customer("C001", "Alice");
-Product laptop = new Product("P001", "Laptop", 999.99);
-Product mouse = new Product("P002", "Mouse", 29.99);
+public class Main {
 
-// Order aggregates Customer and Products
-Order order = new Order("ORD-001", alice);
-order.addItem(laptop, 1);  // OrderItem created by Order (composition)
-order.addItem(mouse, 2);
+    public static void main(String[] args) {
+        Customer alice = new Customer("C001", "Alice");
+        Product laptop = new Product("P001", "Laptop", 999.99);
+        Product mouse = new Product("P002", "Mouse", 29.99);
 
-System.out.println("Total: $" + order.calculateTotal());
-// Total: $1059.97
+        Order order = new Order("ORD-001", alice);
+        order.addItem(laptop, 1);
+        order.addItem(mouse, 2);
 
-// Delete the order — Products and Customer still exist
-order = null;
-// laptop, mouse, alice are all still alive!
+        System.out.println("Total: $" + order.calculateTotal());
+
+        order = null;
+    }
+}
 ```
 
 ### Scenario 2: Social Media (Composition)
 
+
+**What this code does — step by step:**
+
+1. A Post has Comments, and Comments don't make sense without the Post
+2. `private List<Comment> comments = new ArrayList<>();` — Composition
+3. `comments.add(new Comment(author, text));` — Post creates Comments
+4. When Post is deleted, Comments go with it
+5. `Comment(String author, String text) {` — Package-private — only Post can create
+
+The same code, clean:
+
 ```java
-// A Post has Comments, and Comments don't make sense without the Post
 class Post {
     private String id;
     private String content;
-    private List<Comment> comments = new ArrayList<>();  // Composition
+    private List<Comment> comments = new ArrayList<>();
 
     public Post(String id, String content) {
         this.id = id;
@@ -415,11 +473,10 @@ class Post {
     }
 
     public void addComment(String author, String text) {
-        comments.add(new Comment(author, text));  // Post creates Comments
+        comments.add(new Comment(author, text));
     }
 
     public void deletePost() {
-        // When Post is deleted, Comments go with it
         comments.clear();
         System.out.println("Post and all " + comments.size() + " comments deleted");
     }
@@ -435,7 +492,7 @@ class Comment {
     private String author;
     private String text;
 
-    Comment(String author, String text) {  // Package-private — only Post can create
+    Comment(String author, String text) {
         this.author = author;
         this.text = text;
     }
@@ -445,27 +502,42 @@ class Comment {
 }
 ```
 
+
+**What this code does — step by step:**
+
+1. Usage
+2. Alice: Great article! Bob: Very helpful!
+3. Post and all 2 comments deleted. Comments cannot exist without the Post
+
+The same code, clean:
+
 ```java
-// Usage
 Post post = new Post("P001", "Learn Java!");
 post.addComment("Alice", "Great article!");
 post.addComment("Bob", "Very helpful!");
 
 post.listComments();
-// Alice: Great article!
-// Bob: Very helpful!
 
 post.deletePost();
-// Post and all 2 comments deleted
-// Comments cannot exist without the Post
 ```
 
 ### Scenario 3: Company Hierarchy (Mixed)
 
+
+**What this code does — step by step:**
+
+1. `private List<Department> departments = new ArrayList<>();` — Composition
+2. `departments.add(dept);` — Company creates Departments
+3. `private List<Employee> employees = new ArrayList<>();` — Aggregation
+4. Employee comes from outside — Department doesn't create them
+5. `employees.remove(employee);` — Employee still exists, just unemployed
+
+The same code, clean:
+
 ```java
 class Company {
     private String name;
-    private List<Department> departments = new ArrayList<>();  // Composition
+    private List<Department> departments = new ArrayList<>();
 
     public Company(String name) {
         this.name = name;
@@ -473,26 +545,25 @@ class Company {
 
     public Department createDepartment(String name) {
         Department dept = new Department(name);
-        departments.add(dept);  // Company creates Departments
+        departments.add(dept);
         return dept;
     }
 }
 
 class Department {
     private String name;
-    private List<Employee> employees = new ArrayList<>();  // Aggregation
+    private List<Employee> employees = new ArrayList<>();
 
     Department(String name) {
         this.name = name;
     }
 
-    // Employee comes from outside — Department doesn't create them
     public void hire(Employee employee) {
         employees.add(employee);
     }
 
     public void fire(Employee employee) {
-        employees.remove(employee);  // Employee still exists, just unemployed
+        employees.remove(employee);
     }
 }
 
@@ -509,23 +580,28 @@ class Employee {
 }
 ```
 
+
+**What this code does — step by step:**
+
+1. Company COMPOSES Departments
+2. Department AGGREGATES Employees
+3. If Google closes, Departments are destroyed (composition). But Employees still exist — they can work elsewhere (aggregation)
+4. Alice and Bob are still alive, just unemployed
+
+The same code, clean:
+
 ```java
-// Company COMPOSES Departments
 Company google = new Company("Google");
 Department engineering = google.createDepartment("Engineering");
 Department marketing = google.createDepartment("Marketing");
 
-// Department AGGREGATES Employees
 Employee alice = new Employee("E001", "Alice");
 Employee bob = new Employee("E002", "Bob");
 
 engineering.hire(alice);
 marketing.hire(bob);
 
-// If Google closes, Departments are destroyed (composition)
-// But Employees still exist — they can work elsewhere (aggregation)
 google = null;
-// Alice and Bob are still alive, just unemployed
 ```
 
 ---
@@ -554,3 +630,4 @@ google = null;
 | Creating objects outside for composition | Ownership confusion | Create composed objects inside the container |
 | Mixing up aggregation and composition | Lifecycle bugs | Ask: "If the parent dies, does the child die?" |
 | Using Association when Aggregation is needed | Loose design, no ownership | Use aggregation when there's a clear "has-a" |
+

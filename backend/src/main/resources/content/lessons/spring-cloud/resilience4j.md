@@ -1,7 +1,7 @@
 ---
 title: Resilience with Resilience4j — Breakers, Retries & Timeouts
 summary: Circuit breaker, retry, time limiter, rate limiter and bulkhead — configured in yml, wired into Feign and Gateway.
-order: 5
+order: 9
 minutes: 22
 topics: [resilience4j, circuit-breaker, retry, timelimiter, fallback]
 docs:
@@ -34,7 +34,6 @@ Spring Cloud wraps Resilience4j (and alternatives) behind a common API. Add the 
 </dependency>
 ```
 
-```java
 @Service
 public class OrderLookup {
 
@@ -49,19 +48,15 @@ public class OrderLookup {
         );
     }
 }
-```
 
 ## Feign + breaker + fallback (the pattern used in the demo)
 
-```java
 @FeignClient(name = "inventory-service", fallback = InventoryClientFallback.class)
 public interface InventoryClient {
     @GetMapping("/api/inventory/{sku}")
     InventoryStock getStock(@PathVariable("sku") String sku);
 }
-```
 
-```java
 @Component
 public class InventoryClientFallback implements InventoryClient {
     @Override
@@ -69,7 +64,6 @@ public class InventoryClientFallback implements InventoryClient {
         return new InventoryStock(sku, 0, "CIRCUIT_OPEN_FALLBACK");
     }
 }
-```
 
 ```yaml
 spring:
@@ -161,3 +155,4 @@ management:
 - Fallbacks return defaults and log — they're the last line, not the answer.
 
 **Official docs:** [Spring Cloud Circuit Breaker](https://docs.spring.io/spring-cloud-circuitbreaker/reference/) · [Resilience4j docs](https://resilience4j.readme.io/)
+

@@ -1,7 +1,7 @@
 ---
 title: WebClient — The Reactive HTTP Client
 summary: Fluent non-blocking HTTP calls, retrieve vs exchange, bodyToMono/bodyToFlux, filters and timeouts.
-order: 4
+order: 13
 minutes: 18
 topics: [webclient, http-client, non-blocking, reactor, resttemplate]
 docs:
@@ -24,7 +24,6 @@ docs:
 
 ## Basic usage
 
-```java
 // Configuration — a shared bean with timeouts (Boot auto-configures WebClient.Builder)
 @Configuration
 public class WebClientConfig {
@@ -37,9 +36,7 @@ public class WebClientConfig {
                 .build();
     }
 }
-```
 
-```java
 @Service
 public class CustomerAggregator {
 
@@ -59,36 +56,30 @@ public class CustomerAggregator {
         return api.get().uri("/customers").retrieve().bodyToFlux(Customer.class);
     }
 }
-```
 
 ## retrieve vs exchange — and error handling
 
 - **`retrieve()`** — the simple path; non-2xx responses throw `WebClientResponseException` (and you can map them with `onStatus`).
 - **`exchangeToMono`/`exchangeToFlux`** — full access to the response (status, headers, body) for custom logic; *slightly* more verbose and easy to leak connections if you don't consume the body.
 
-```java
 Mono<Customer> c = api.get().uri("/customers/{id}", id)
         .retrieve()
         .onStatus(HttpStatusCode::is4xxClientError,
                 res -> Mono.error(new CustomerLookupException("not found: " + id)))
         .bodyToMono(Customer.class);
-```
 
 ## Filters — cross-cutting concern injection
 
-```java
 WebClient client = builder
         .filter((request, next) -> next.exchange(request)          // auth header on every call
                 .doOnNext(res -> log.debug("{} {}", res.statusCode(), request.url())))
         .filter(ExchangeFilterFunctions.basicAuthentication("svc", secret))
         .build();
-```
 
 Filters compose like servlet filters: auth, logging, trace-id propagation, retries.
 
 ## Parallel fan-out — where WebClient shines
 
-```java
 // Fetch all customers' orders concurrently — no thread pool needed:
 Flux<CustomerOrders> enriched = customerIds
         .flatMap(id -> api.get().uri("/customers/{id}/orders", id)
@@ -96,7 +87,6 @@ Flux<CustomerOrders> enriched = customerIds
                 .bodyToFlux(Order.class)
                 .collectList()
                 .map(orders -> new CustomerOrders(id, orders)), 8); // concurrency 8
-```
 
 `flatMap` with a concurrency limit (8) fans out bounded parallel HTTP calls — servlet would need a thread pool of the same size; reactive needs none.
 
@@ -115,3 +105,4 @@ Flux<CustomerOrders> enriched = customerIds
 - [Spring Framework — WebClient](https://docs.spring.io/spring-framework/reference/web/webflux-webclient.html)
 - [Spring Boot — WebClient](https://docs.spring.io/spring-boot/reference/io/webclient.html)
 - [WebClient Exchange vs Retrieve](https://docs.spring.io/spring-framework/reference/web/webflux-webclient.html#webflux-client-builder)
+

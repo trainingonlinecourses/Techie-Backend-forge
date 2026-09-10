@@ -29,26 +29,35 @@ The elegance: **code never cares *where* a value came from.** `@Value("${app.nam
 
 ## The Code Walkthrough
 
+
+**What this code does — step by step:**
+
+1. ---- 1. Load an extra properties file ----
+2. `@PropertySource("classpath:extra-config.properties")` — adds a source
+3. `private final Environment env;` — inject the Environment
+4. ---- 2. Query with defaults ----
+5. `String flag = env.getProperty("feature.x", "false");` — default if missing
+6. ---- 3. Check where a value came from ----
+
+The same code, clean:
+
 ```java
 import org.springframework.core.env.Environment;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 
-// ---- 1. Load an extra properties file ----
 @Component
-@PropertySource("classpath:extra-config.properties")     // adds a source
+@PropertySource("classpath:extra-config.properties")
 public class FeatureConfig {
 
-    private final Environment env;                        // inject the Environment
+    private final Environment env;
 
     public FeatureConfig(Environment env) { this.env = env; }
 
     public void report() {
-        // ---- 2. Query with defaults ----
-        String flag = env.getProperty("feature.x", "false");      // default if missing
+        String flag = env.getProperty("feature.x", "false");
         int max = env.getProperty("feature.max", Integer.class, 10);
 
-        // ---- 3. Check where a value came from ----
         System.out.println("feature.x = " + flag);
         System.out.println("feature.max = " + max);
         System.out.println("feature.x origin: "
@@ -104,7 +113,6 @@ Two rules make this usable:
 
 A `PropertySource` is a `Map`-like over keys; you can implement one backed by anything (a database, an HTTP endpoint, a vault):
 
-```java
 import org.springframework.core.env.PropertySource;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.context.annotation.Bean;
@@ -122,7 +130,6 @@ public class DbPropertySourceConfig {
     // Register it FIRST so it beats application.properties:
     // (via EnvironmentPostProcessor or ApplicationContextInitializer in real apps)
 }
-```
 
 This is how Spring Cloud Config works: the config client registers a remote-backed property source, and every `${...}` in your app resolves against it — your code never knows the config came from a server. Same abstraction, different backing.
 
@@ -150,3 +157,4 @@ This is how Spring Cloud Config works: the config client registers a remote-back
 - `env.getProperty(key, type, default)` is programmatic lookup; origin-walking debugs "where did this come from".
 - Custom `PropertySource`s (DB, config server, vault) plug into the same abstraction.
 - Precedence ladder rules everything: env > system props > profile files > base files > defaults.
+

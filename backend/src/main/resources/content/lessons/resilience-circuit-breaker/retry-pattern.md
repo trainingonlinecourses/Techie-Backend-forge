@@ -1,7 +1,7 @@
 ---
 title: Retry — Recovering From Transient Failures
 module: resilience-circuit-breaker
-order: 3
+order: 5
 minutes: 25
 topics: ["retry", "backoff", "jitter", "idempotency", "exponential backoff", "Resilience4j Retry"]
 summary: Not all failures are outages. A database briefly restarts; a network packet drops; a service is momentarily overloaded (503). These transient failu...
@@ -33,6 +33,19 @@ The three controls: **what** to retry (only transient failures), **how many** at
 
 ## The Code Walkthrough
 
+
+**What this code does — step by step:**
+
+1. `.maxAttempts(4)` — original + 3 retries
+2. `.waitDuration(Duration.ofMillis(250))` — base backoff
+3. `2.0,` — multiplier
+4. `Duration.ofSeconds(5)))` — cap
+5. `return t instanceof org.springframework.web.client.HttpServerErrorException` — 5xx
+6. `|| t instanceof java.net.SocketTimeoutException` — timeout
+7. `|| t instanceof java.net.ConnectException;` — connection
+
+The same code, clean:
+
 ```java
 import io.github.resilience4j.retry.Retry;
 import io.github.resilience4j.retry.RetryConfig;
@@ -48,12 +61,12 @@ public class NotificationService {
 
     public NotificationService() {
         this.retry = Retry.of("email-sender", RetryConfig.custom()
-                .maxAttempts(4)                               // original + 3 retries
-                .waitDuration(Duration.ofMillis(250))         // base backoff
+                .maxAttempts(4)
+                .waitDuration(Duration.ofMillis(250))
                 .intervalFunction(RetryConfig.IntervalFunction
                         .ofExponentialRandomBackoff(Duration.ofMillis(250),
-                                2.0,                          // multiplier
-                                Duration.ofSeconds(5)))       // cap
+                                2.0,
+                                Duration.ofSeconds(5)))
                 .retryOnException(this::isTransient)
                 .build());
     }
@@ -63,9 +76,9 @@ public class NotificationService {
     }
 
     private boolean isTransient(Throwable t) {
-        return t instanceof org.springframework.web.client.HttpServerErrorException   // 5xx
-                || t instanceof java.net.SocketTimeoutException                       // timeout
-                || t instanceof java.net.ConnectException;                            // connection
+        return t instanceof org.springframework.web.client.HttpServerErrorException
+                || t instanceof java.net.SocketTimeoutException
+                || t instanceof java.net.ConnectException;
     }
 }
 ```
@@ -93,14 +106,12 @@ Exponential gives the server room to recover; jitter prevents synchronized waves
 
 The danger case: a POST that creates a resource. Request succeeds server-side but the response is lost (timeout). Retrying creates a **duplicate**.
 
-```java
 // The fix: an idempotency key the server dedupes by
 public void charge(ChargeRequest request) {
     request.setIdempotencyKey(UUID.randomUUID().toString());   // one key per logical operation
     retry.executeRunnable(() -> gateway.charge(request));
     // Server: "have I seen this key? -> return the original result, don't charge again"
 }
-```
 
 With idempotency keys (or naturally idempotent operations like `UPDATE SET balance = balance - x` with a unique operation id), retries become safe: the second attempt returns the *same* result instead of creating a second effect.
 
@@ -108,12 +119,10 @@ With idempotency keys (or naturally idempotent operations like `UPDATE SET balan
 
 The composition question: retry first or breaker first? The standard layering:
 
-```java
 // Breaker OUTSIDE: decides whether to attempt at all (after failures accumulate)
 // Retry INSIDE: tries multiple times within one breaker-permitted call
 Supplier<Response> call = () -> retry.decorateSupplier(() -> client.get());
 Response r = circuitBreaker.executeSupplier(call);
-```
 
 - The **breaker** stops the retry storm: when the dependency is down, the breaker opens and *no* retries happen (fast-fail).
 - The **retry** handles blips *within* a breaker-closed period.
@@ -138,3 +147,4 @@ Order matters: breaker-outside means an open breaker prevents even the first att
 - Compose breaker-outside, retry-inside: the breaker stops the storm, the retry handles blips.
 - After max attempts, surface the failure — fallback, log, alert.
 - The discipline is what makes retry resilience instead of amplification.
+

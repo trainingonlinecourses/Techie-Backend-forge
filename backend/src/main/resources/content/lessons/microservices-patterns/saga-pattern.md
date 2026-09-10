@@ -1,7 +1,7 @@
 ---
 title: The Saga Pattern
 summary: Distributed transactions without distributed locks — choreographed and orchestrated sagas, compensation, and the failure scenarios that define the design.
-order: 1
+order: 4
 minutes: 15
 topics: [saga, distributed transactions, compensation, choreography, orchestration]
 docs:
@@ -63,13 +63,23 @@ OrderSaga (orchestrator):
 
 A saga without persisted state is a saga that forgets. Production sagas persist:
 
+
+**What this code does — step by step:**
+
+1. saga state in the orchestrator's own DB (each saga instance is a row):
+2. `@Id String sagaId;` — correlation id — same id in every service call/event
+3. `String step;` — which step is next / waiting
+4. `String status;` — RUNNING | COMPLETED | FAILED | COMPENSATING
+5. `String payloadJson;` — the order context to resume with
+
+The same code, clean:
+
 ```java
-// saga state in the orchestrator's own DB (each saga instance is a row):
 @Entity class SagaState {
-    @Id String sagaId;         // correlation id — same id in every service call/event
-    String step;               // which step is next / waiting
-    String status;             // RUNNING | COMPLETED | FAILED | COMPENSATING
-    String payloadJson;        // the order context to resume with
+    @Id String sagaId;
+    String step;
+    String status;
+    String payloadJson;
 }
 ```
 
@@ -107,3 +117,4 @@ Sagas don't replace the outbox — **they run on top of it**: the outbox guarant
 - Design the failure matrix up front; run sagas on outbox-grade reliable events.
 
 Official docs: [Saga (microservices.io)](https://microservices.io/patterns/data/saga.html)
+

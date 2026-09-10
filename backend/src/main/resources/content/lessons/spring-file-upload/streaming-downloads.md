@@ -1,7 +1,7 @@
 ---
 title: Streaming Downloads — Serving Files Efficiently
 summary: How to serve files as downloads, streaming large files without buffering in memory, Content-Disposition headers, and range requests for partial downloads.
-order: 5
+order: 6
 minutes: 15
 topics: [streaming, download, content-disposition, range-requests, large-files]
 docs:
@@ -12,7 +12,6 @@ docs:
 
 Streaming downloads send file data directly from source to client without loading the entire file into memory. This is essential for large files.
 
-```java
 @GetMapping("/download/{id}")
 public ResponseEntity<Resource> download(@PathVariable Long id) {
     Resource resource = new FileSystemResource(file);
@@ -20,13 +19,11 @@ public ResponseEntity<Resource> download(@PathVariable Long id) {
         .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
         .body(resource);
 }
-```
 
 ---
 
 ## Line-by-Line Walkthrough
 
-```java
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.*;
@@ -112,7 +109,6 @@ public class DownloadController {
             .body(new FileSystemResource(file));
     }
 }
-```
 
 ---
 
@@ -124,3 +120,4 @@ public class DownloadController {
 | Missing Content-Disposition | Browser displays instead of downloads | Always set attachment header |
 | Not setting Content-Length | No progress bar for client | Calculate and set size |
 | Not flushing output stream | Client hangs waiting | Flush after each chunk |
+

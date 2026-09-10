@@ -1,7 +1,7 @@
 ---
 title: Secure Coding — Deserialization, SSRF, Logging, and Secrets
 module: owasp-security
-order: 5
+order: 4
 minutes: 27
 topics: ["deserialization", "SSRF", "secure logging", "secrets management", "input validation", "secure defaults"]
 summary: Injection, XSS, and access control get the attention; the quieter vulnerabilities get the breaches. This lesson covers four productioncritical area...
@@ -22,20 +22,15 @@ Injection, XSS, and access control get the attention; the quieter vulnerabilitie
 
 **The danger:** deserialization reconstructs *objects* from bytes — and object construction can *execute code*. The classic attack: a serialized object whose class has a dangerous `readObject`/gadget chain runs arbitrary commands the moment it's deserialized. Java's native `ObjectInputStream` + `Serializable` is the highest-risk combo — which is why the ecosystem moved away from it.
 
-```java
-// VULNERABLE pattern — deserializing untrusted input with the JDK:
-// ObjectInputStream in = new ObjectInputStream(untrustedStream);
-// Object obj = in.readObject();      // could be an attack gadget!
 
-// The mitigations, in order:
-// 1. DON'T use Java serialization for untrusted input. Use safe formats:
-//    JSON (Jackson) / Protobuf / etc. — data, not executable objects.
-// 2. If you MUST deserialize, validate the stream's classes against an
-//    ALLOWLIST (not a denylist) before constructing:
-//    in.setObjectInputFilter(Filter.classNameMatches("com.academy.**")
-//                            .maxDepth(10).maxArrayLength(1000).build());
-// 3. Never accept serialized objects from clients — serialization is for
-//    your own trusted persistence, not for network boundaries.
+**What this code does — step by step:**
+
+1. VULNERABLE pattern — deserializing untrusted input with the JDK: ObjectInputStream in = new ObjectInputStream(untrustedStream); Object obj = in.readObject(); // could be an attack gadget!
+2. The mitigations, in order: 1. DON'T use Java serialization for untrusted input. Use safe formats: JSON (Jackson) / Protobuf / etc. — data, not executable objects. 2. If you MUST deserialize, validate the stream's classes against an. ALLOWLIST (not a denylist) before constructing: in.setObjectInputFilter(Filter.classNameMatches("com.academy.**"). .maxDepth(10).maxArrayLength(1000).build()); 3. Never accept serialized objects from clients — serialization is for. Your own trusted persistence, not for network boundaries.
+
+The same code, clean:
+
+```java
 ```
 
 **The practical rules:** JSON APIs (the norm in Spring) don't hit the `readObject` danger — Jackson builds POJOs from typed, bounded data. The risk returns with: Java serialization over the wire, unsafe `yaml.load` of untrusted YAML (snakeyaml gadgets), and unsafe deserialization of RMI/JMX payloads. The single rule that covers them all: **never deserialize untrusted input with a format that can instantiate arbitrary classes.** Jackson's `DefaultTyping` (polymorphic typing) is the subtle one — enable it only with a strict allowlist.
@@ -44,24 +39,28 @@ Injection, XSS, and access control get the attention; the quieter vulnerabilitie
 
 **Server-Side Request Forgery:** the application fetches a URL *the attacker chose* — and the server's network position (inside the firewall, with cloud credentials) makes the fetch dangerous: reaching internal services (`http://localhost:5432`, `http://10.0.0.5/...`), the cloud metadata endpoint (`http://169.254.169.254/latest/meta-data/` — AWS credentials!), or the internal network.
 
+
+**What this code does — step by step:**
+
+1. VULNERABLE — the URL comes straight from the request:
+2. GET /fetch?url=http://169.254.169.254/latest/meta-data/iam/security-credentials -> the server fetches the CLOUD METADATA endpoint — credential theft!
+3. SAFE — allowlist the destinations; never raw user URLs:
+4. 1. Only internal, approved hosts are reachable:
+5. 2. Or: resolve the host and REJECT private/loopback/link-local IPs. (DNS rebinding aware), and block the metadata endpoints explicitly.
+
+The same code, clean:
+
 ```java
-// VULNERABLE — the URL comes straight from the request:
 @GetMapping("/fetch")
 public String fetch(@RequestParam String url) {
-    // GET /fetch?url=http://169.254.169.254/latest/meta-data/iam/security-credentials
-    // -> the server fetches the CLOUD METADATA endpoint — credential theft!
     return restClient.get().uri(url).retrieve().body(String.class);
 }
 
-// SAFE — allowlist the destinations; never raw user URLs:
 @GetMapping("/fetch")
 public String fetch(@RequestParam String path) {
-    // 1. Only internal, approved hosts are reachable:
     if (!path.startsWith("/public-assets/")) throw new ForbiddenException();
     return restClient.get().uri("https://assets.academy.com" + path)
                      .retrieve().body(String.class);
-    // 2. Or: resolve the host and REJECT private/loopback/link-local IPs
-    //    (DNS rebinding aware), and block the metadata endpoints explicitly.
 }
 ```
 
@@ -71,21 +70,28 @@ public String fetch(@RequestParam String path) {
 
 Logging cuts both ways: **not enough** logging hides attacks (A09); **too much** logging leaks secrets. The discipline:
 
+
+**What this code does — step by step:**
+
+1. NEVER log:
+2. `log.info("User logged in: {}", user.getPassword());` — password!
+3. `log.info("Token: {}", authHeader);` — credentials!
+4. (and never log credit cards, SSNs, full addresses by default)
+5. The habits: 1. Log what's USEFUL for incident response:
+6. `log.info("Login success: user={}, ip={}", user.getId(), ip);` — who, from where
+7. `log.error("Payment failed: txn={}, reason={}", txnId, reason);` — traceable, not sensitive
+8. 2. Sanitize structured logs (Logback + JSON encoder): mask fields. 3. Centralize + alert (the ELK/Prometheus story from observability).
+
+The same code, clean:
+
 ```java
-// NEVER log:
-log.info("User logged in: {}", user.getPassword());        // password!
-log.info("Token: {}", authHeader);                          // credentials!
+log.info("User logged in: {}", user.getPassword());
+log.info("Token: {}", authHeader);
 log.info("DB connection: {}", datasourceUrl + ":" + dbPassword);
-// (and never log credit cards, SSNs, full addresses by default)
 
-// The habits:
-// 1. Log what's USEFUL for incident response:
-log.info("Login success: user={}, ip={}", user.getId(), ip);       // who, from where
+log.info("Login success: user={}, ip={}", user.getId(), ip);
 log.warn("Login failed: user={}, ip={}, reason={}", user, ip, "bad password");
-log.error("Payment failed: txn={}, reason={}", txnId, reason);      // traceable, not sensitive
-
-// 2. Sanitize structured logs (Logback + JSON encoder): mask fields.
-// 3. Centralize + alert (the ELK/Prometheus story from observability).
+log.error("Payment failed: txn={}, reason={}", txnId, reason);
 ```
 
 **The incident-response test:** if an account is compromised, can your logs answer *who, when, from where, and what they did* — without *also* revealing credentials? Logins, failures, permission denials, admin actions, and data exports are the events that matter.
@@ -131,3 +137,4 @@ The meta-pattern behind every lesson in this module:
 ## Recap
 
 Beyond the headline vulnerabilities: **deserialization** must never reconstruct arbitrary classes from untrusted input (JSON/typed formats over Java serialization; allowlists over denylists); **SSRF** means no server-side fetch of user-chosen URLs (allowlist destinations, block private/metadata addresses); **secure logging** records who/when/from-where for incident response while never leaking credentials; and **secrets** live in deploy-time environment stores, never in repos or logs. The mindset uniting them — deny by default, least privilege, fail closed, validate at the boundary, defend in depth — is what makes a codebase *secure by design* rather than secure by patching. Run every feature through the audit checklist, and the quiet vulnerabilities stop being quiet surprises.
+

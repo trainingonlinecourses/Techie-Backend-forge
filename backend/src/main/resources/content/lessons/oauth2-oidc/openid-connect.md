@@ -1,7 +1,7 @@
 ---
 title: OpenID Connect — OAuth2 Plus Identity
 module: oauth2-oidc
-order: 4
+order: 5
 minutes: 26
 topics: ["OpenID Connect", "ID token", "discovery", "userinfo", "claims", "authentication"]
 summary: OAuth2 answers "what can this app do for the user?" — but it famously does not answer "who is the user?" A resource server can verify a token's val...
@@ -112,7 +112,6 @@ spring.security.oauth2.client.registration.google.scope=openid,profile,email
 spring.security.oauth2.client.provider.google.issuer-uri=https://accounts.google.com
 ```
 
-```java
 // The authenticated user arrives with identity claims available:
 @GetMapping("/me")
 public Map<String, Object> me(Authentication authentication) {
@@ -123,7 +122,6 @@ public Map<String, Object> me(Authentication authentication) {
         "name", idToken.get("name"),
         "email", idToken.get("email"));
 }
-```
 
 Spring Security's OAuth2 *client* support (with `spring-boot-starter-oauth2-client`) runs the entire flow — discovery, code exchange, ID-token validation (including nonce), and UserInfo — and presents the user as an `OidcUser` carrying the claims. The pattern for your app: store the `sub` + email on first login, upsert into your users table, and treat subsequent logins as identity confirmation.
 
@@ -137,3 +135,4 @@ Spring Security's OAuth2 *client* support (with `spring-boot-starter-oauth2-clie
 ## Recap
 
 OpenID Connect layers authentication on OAuth2: the **ID token** (a JWT whose *audience is the client*, asserting the user's identity via `sub`, `email`, `name`) plus **discovery** (one well-known URL exposing every endpoint) and the **UserInfo** endpoint. The `openid` scope is the switch that activates it; the ID token's validation (signature, `iss`, `aud` = your client id, `exp`, **nonce**) is what makes the identity trustworthy. Spring Security's OAuth2 client runs the whole flow from an issuer URI, handing you an `OidcUser` with the claims. The mental model to keep: **access token = what the app may do (OAuth2); ID token = who the user is (OIDC)** — two tokens, one login, complementary jobs.
+

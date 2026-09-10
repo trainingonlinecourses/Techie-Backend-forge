@@ -1,7 +1,7 @@
 ---
 title: Authentication and Authorization — Broken Access Control and Auth Failures
 module: owasp-security
-order: 4
+order: 1
 minutes: 26
 topics: ["broken access control", "IDOR", "authentication failures", "session management", "authorization", "Spring Security"]
 summary: Two separate jobs, one acronym away from each other, and both in the Top 10: authentication — proving who you are (A07, Identification and Authenti...
@@ -22,30 +22,33 @@ Two separate jobs, one acronym away from each other, and both in the Top 10: **a
 
 ## IDOR: The #1 Real-World Bug
 
+
+**What this code does — step by step:**
+
+1. VULNERABLE — classic IDOR:
+2. Any authenticated user can read ANY user's progress by. Changing the id: /api/users/1/progress, /api/users/2/progress...
+3. SAFE — bind the resource to the caller's identity:
+4. Rule 1: only your own progress (self-service):
+5. Rule 2 (the general form): the RESOURCE belongs to the caller: Progress p = progressService.findByUserId(id); if (!p.getOwnerId().equals(callerId)) throw new ForbiddenException();
+
+The same code, clean:
+
 ```java
 @RestController
 public class LessonController {
 
-    // VULNERABLE — classic IDOR:
     @GetMapping("/api/users/{id}/progress")
     public ProgressDto getProgress(@PathVariable Long id) {
-        // Any authenticated user can read ANY user's progress by
-        // changing the id: /api/users/1/progress, /api/users/2/progress...
         return progressService.findByUserId(id);
     }
 
-    // SAFE — bind the resource to the caller's identity:
     @GetMapping("/api/users/{id}/progress")
     public ProgressDto getProgress(@PathVariable Long id,
                                    Authentication authentication) {
         String callerId = authentication.getName();
-        // Rule 1: only your own progress (self-service):
         if (!String.valueOf(id).equals(callerId)) {
             throw new ForbiddenException("not your progress");
         }
-        // Rule 2 (the general form): the RESOURCE belongs to the caller:
-        // Progress p = progressService.findByUserId(id);
-        // if (!p.getOwnerId().equals(callerId)) throw new ForbiddenException();
         return progressService.findByUserId(id);
     }
 }
@@ -57,23 +60,28 @@ public class LessonController {
 
 Spring Security gives you the enforcement layers:
 
+
+**What this code does — step by step:**
+
+1. 1. URL-level (coarse) — in the SecurityFilterChain:
+2. `.anyRequest().denyAll())` — deny-by-default!
+3. 2. Method-level (fine) — on the service methods:
+4. 3. Object-level (the IDOR fix) — expression referencing the args:
+5. 4. Deny-by-default — the meta-rule: every endpoint must have an EXPLICIT rule; anything unlisted is denied.
+
+The same code, clean:
+
 ```java
-// 1. URL-level (coarse) — in the SecurityFilterChain:
 .authorizeHttpRequests(auth -> auth
     .requestMatchers("/api/admin/**").hasRole("ADMIN")
     .requestMatchers("/api/lessons/**").authenticated()
-    .anyRequest().denyAll())                    // deny-by-default!
+    .anyRequest().denyAll())
 
-// 2. Method-level (fine) — on the service methods:
 @PreAuthorize("hasRole('ADMIN')")
 public void deleteUser(Long id) { ... }
 
-// 3. Object-level (the IDOR fix) — expression referencing the args:
 @PreAuthorize("hasRole('ADMIN') or #progress.ownerId == authentication.name")
 public ProgressDto getProgress(@P("progress") Progress progress) { ... }
-
-// 4. Deny-by-default — the meta-rule:
-//    every endpoint must have an EXPLICIT rule; anything unlisted is denied.
 ```
 
 **The three habits that prevent the class:** **deny-by-default** (`anyRequest().denyAll()` — an unlisted endpoint is *denied*, not open), **authorization at the resource** (method-level checks where the object is known, not just at the URL), and **ownership checks for every object reference** (the IDOR fix). The layered shape: URL rules for coarse routes, `@PreAuthorize` for fine-grained service rules, and ownership logic for per-object access.
@@ -84,12 +92,10 @@ A07 covers the ways "proving who you are" goes wrong:
 
 **1. Weak credential handling.** Passwords stored in plaintext or weak hashes (MD5/SHA1 — fast to brute-force). **The fix:** hash with bcrypt/Argon2 (deliberately slow), unique salt per password — Spring Security's `BCryptPasswordEncoder`:
 
-```java
 @Bean
 PasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder();   // salts automatically, ~100ms per hash
 }
-```
 
 **2. Credential stuffing.** Attackers replay passwords leaked from other sites (users reuse passwords). **The fixes:** rate-limit login attempts, lock out/throttle after failures, require MFA for sensitive actions, and check breached-password lists.
 
@@ -104,13 +110,15 @@ Beyond IDOR, broken access control has more faces:
 - **Horizontal escalation** — same role, other users' data (the IDOR case above).
 - **Vertical escalation** — a lower role reaching higher privileges: calling an admin URL directly, replaying an admin's request with your cookie, or *manipulating claims* — a client that *sends* its role and the server trusts it:
 
-```java
-// VULNERABLE — the client declares its own role:
-// POST /api/login  body: { user: "ada", role: "ADMIN" }
-// -> the server stores role: ADMIN for the session.
 
-// SAFE — roles come from the SERVER's authority (the DB, the token), never
-// from client-supplied input.
+**What this code does — step by step:**
+
+1. VULNERABLE — the client declares its own role: POST /api/login body: { user: "ada", role: "ADMIN" } -> the server stores role: ADMIN for the session.
+2. SAFE — roles come from the SERVER's authority (the DB, the token), never. From client-supplied input.
+
+The same code, clean:
+
+```java
 ```
 
 - **Missing function-level checks** — the admin *button* is hidden in the UI, but the admin *endpoint* is open. UI hiding is not security; the server must enforce.
@@ -130,3 +138,4 @@ Beyond IDOR, broken access control has more faces:
 ## Recap
 
 Authentication (who you are) and authorization (what you may do) are separate jobs with separate failure modes. **Broken access control** — the #1 risk — is almost always **IDOR**: trusting a client-supplied id without checking ownership. The fix is defense in depth: deny-by-default routing, `@PreAuthorize` at the resource, and ownership checks for every object reference — with roles coming from the server, never the client. **Authentication failures** are weak credential handling (bcrypt/Argon2, never plaintext), credential stuffing (rate limits, MFA), and weak sessions (HttpOnly/Secure/SameSite, rotation, timeouts — Spring's defaults). The habit that prevents the whole class: **after every authentication check, ask the authorization question — "and should THIS caller do THIS thing to THIS object?" — and let the code answer explicitly.**
+

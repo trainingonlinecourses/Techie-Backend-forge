@@ -1,7 +1,7 @@
 ---
 title: Delegation Pattern — Composition Over Inheritance Done Right
 summary: What delegation really is, when to use it instead of inheritance, the decorator pattern as its cousin, and how Spring itself is built on delegation.
-order: 83
+order: 17
 minutes: 18
 topics: [delegation, composition-over-inheritance, decorator, forwarding, spring-context]
 docs:
@@ -23,18 +23,30 @@ This is the practical expression of **composition over inheritance** — one of 
 
 Delegation is not a special language feature — it's a **design pattern** implemented with interfaces and composition:
 
+
+**What this code does — step by step:**
+
+1. Step 1: Define the behavior contract
+2. Step 2: Create concrete implementations
+3. Real implementation: connect to SMTP, build MIME message, send
+4. Real implementation: connect to Twilio API, send SMS
+5. Step 3: The delegating class holds a reference and forwards calls
+6. `private final MessageSender sender;` — <-- the delegate
+7. Constructor injection: caller decides which sender to use
+8. Delegation: NotificationService doesn't know HOW to send,. It just forwards the call to the delegate
+9. `sender.send(email, message);` — <-- delegation happens here
+
+The same code, clean:
+
 ```java
-// Step 1: Define the behavior contract
 public interface MessageSender {
     void send(String to, String message);
 }
 
-// Step 2: Create concrete implementations
 public class EmailSender implements MessageSender {
     @Override
     public void send(String to, String message) {
         System.out.println("Email to " + to + ": " + message);
-        // Real implementation: connect to SMTP, build MIME message, send
     }
 }
 
@@ -42,24 +54,19 @@ public class SmsSender implements MessageSender {
     @Override
     public void send(String to, String message) {
         System.out.println("SMS to " + to + ": " + message);
-        // Real implementation: connect to Twilio API, send SMS
     }
 }
 
-// Step 3: The delegating class holds a reference and forwards calls
 public class NotificationService {
-    private final MessageSender sender;  // <-- the delegate
+    private final MessageSender sender;
 
-    // Constructor injection: caller decides which sender to use
     public NotificationService(MessageSender sender) {
         this.sender = sender;
     }
 
-    // Delegation: NotificationService doesn't know HOW to send,
-    // it just forwards the call to the delegate
     public void notifyUser(String userId, String message) {
         String email = lookupEmail(userId);
-        sender.send(email, message);  // <-- delegation happens here
+        sender.send(email, message);
     }
 
     private String lookupEmail(String userId) {
@@ -82,23 +89,29 @@ public class NotificationService {
 
 ## Delegation vs Inheritance
 
+
+**What this code does — step by step:**
+
+1. INHERITANCE approach (rigid, fragile):
+2. This forces EmailNotificationService to BE an EmailSender. What if we want SMS? We'd need to create a SEPARATE class. What if we want BOTH email AND SMS? Multiple inheritance — not possible in Java
+3. DELEGATION approach (flexible, composable):
+4. `private final MessageSender sender;` — can be EmailSender, SmsSender, or BOTH
+5. Can even combine multiple delegates:
+6. `this.senders = senders;` — send via ALL channels
+
+The same code, clean:
+
 ```java
-// INHERITANCE approach (rigid, fragile):
 public class EmailNotificationService extends EmailSender {
-    // This forces EmailNotificationService to BE an EmailSender
-    // What if we want SMS? We'd need to create a SEPARATE class
-    // What if we want BOTH email AND SMS? Multiple inheritance — not possible in Java
 }
 
-// DELEGATION approach (flexible, composable):
 public class NotificationService {
-    private final MessageSender sender;  // can be EmailSender, SmsSender, or BOTH
+    private final MessageSender sender;
 
-    // Can even combine multiple delegates:
     private final List<MessageSender> senders;
 
     public NotificationService(List<MessageSender> senders) {
-        this.senders = senders;  // send via ALL channels
+        this.senders = senders;
     }
 
     public void notifyUser(String userId, String message) {
@@ -121,9 +134,21 @@ public class NotificationService {
 
 Decorators wrap an object and add behavior before/after forwarding:
 
+
+**What this code does — step by step:**
+
+1. `private final MessageSender delegate;` — wraps another sender
+2. `delegate.send(to, message);` — delegate the actual work
+3. Usage: stack decorators
+4. `MessageSender sender = new LoggingSender(` — outer: logging
+5. `new RetrySender(` — middle: retry logic
+6. `new EmailSender()));` — inner: actual send
+
+The same code, clean:
+
 ```java
 public class LoggingSender implements MessageSender {
-    private final MessageSender delegate;  // wraps another sender
+    private final MessageSender delegate;
 
     public LoggingSender(MessageSender delegate) {
         this.delegate = delegate;
@@ -134,17 +159,16 @@ public class LoggingSender implements MessageSender {
         long start = System.currentTimeMillis();
         System.out.println("[LOG] Sending to " + to);
 
-        delegate.send(to, message);  // delegate the actual work
+        delegate.send(to, message);
 
         long elapsed = System.currentTimeMillis() - start;
         System.out.println("[LOG] Sent in " + elapsed + "ms");
     }
 }
 
-// Usage: stack decorators
-MessageSender sender = new LoggingSender(           // outer: logging
-                        new RetrySender(            // middle: retry logic
-                            new EmailSender()));    // inner: actual send
+MessageSender sender = new LoggingSender(
+                        new RetrySender(
+                            new EmailSender()));
 ```
 
 **Each decorator adds one concern:**
@@ -158,30 +182,30 @@ You can stack them in any order, add new ones without modifying existing code �
 
 Spring is built on delegation. Understanding this pattern helps you understand how the framework works:
 
+
+**What this code does — step by step:**
+
+1. 1. HandlerMapping delegates to HandlerAdapter. Spring MVC doesn't hard-code how to invoke controllers. HandlerMapping finds the right controller, HandlerAdapter delegates the invocation.
+2. 2. BeanPostProcessor delegates to custom processors. Spring doesn't hard-code what to do after creating a bean. It delegates to every registered BeanPostProcessor.
+3. 3. DataSource delegates to connection pool. Your application calls dataSource.getConnection(). But the actual connection comes from HikariCP, not the DataSource itself.
+4. 4. Your Repository delegates to JdbcTemplate
+5. `private final JdbcTemplate jdbc;` — delegate
+6. `this.jdbc = jdbc;` — Spring injects the delegate
+7. `return jdbc.queryForObject(` — delegation
+
+The same code, clean:
+
 ```java
-// 1. HandlerMapping delegates to HandlerAdapter
-// Spring MVC doesn't hard-code how to invoke controllers.
-// HandlerMapping finds the right controller, HandlerAdapter delegates the invocation.
-
-// 2. BeanPostProcessor delegates to custom processors
-// Spring doesn't hard-code what to do after creating a bean.
-// It delegates to every registered BeanPostProcessor.
-
-// 3. DataSource delegates to connection pool
-// Your application calls dataSource.getConnection()
-// but the actual connection comes from HikariCP, not the DataSource itself.
-
-// 4. Your Repository delegates to JdbcTemplate
 @Repository
 public class UserRepository {
-    private final JdbcTemplate jdbc;  // delegate
+    private final JdbcTemplate jdbc;
 
     public UserRepository(JdbcTemplate jdbc) {
-        this.jdbc = jdbc;  // Spring injects the delegate
+        this.jdbc = jdbc;
     }
 
     public User findById(Long id) {
-        return jdbc.queryForObject(  // delegation
+        return jdbc.queryForObject(
             "SELECT * FROM users WHERE id = ?", new UserRowMapper(), id);
     }
 }
@@ -220,3 +244,4 @@ public class UserRepository {
 - Use delegation when you need flexibility; use inheritance only for true "is-a" relationships
 
 Official docs: [Delegation Pattern](https://en.wikipedia.org/wiki/Delegation_pattern) · [Java Guides](https://www.javaguides.net/2019/09/delegation-pattern-in-java.html)
+

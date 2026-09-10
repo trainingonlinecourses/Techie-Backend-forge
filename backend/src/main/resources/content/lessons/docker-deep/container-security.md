@@ -1,7 +1,7 @@
 ---
 title: Container Security — Hardening Your Images
 module: docker-deep
-order: 5
+order: 1
 minutes: 25
 topics: ["non-root", "image scanning", "secrets", "supply chain", "distroless", "least privilege"]
 summary: Containers provide isolation — but the isolation has limits: the kernel is shared with the host, and a compromised container is a beachhead for the...
@@ -144,3 +144,4 @@ Every image you pull is software you're trusting: base images, apt packages, dep
 - Minimal surface: multi-stage, slim/distroless, few ports, read-only, dropped caps.
 - Pin versions and trust your supply chain; the base image is your software too.
 - Defense in depth: isolation alone is not security.
+

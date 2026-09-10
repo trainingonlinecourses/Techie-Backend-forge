@@ -1,7 +1,7 @@
 ---
 title: Thymeleaf — Server-Side HTML Templates in Spring Boot
 summary: How Thymeleaf renders HTML on the server with natural templating, th:text vs th:utext security, iteration and conditionals, form binding to objects, and when organizations choose it over a JS frontend.
-order: 52
+order: 51
 minutes: 24
 topics: [thymeleaf, server-side-rendering, templates, form-binding, fragments]
 docs:
@@ -29,7 +29,6 @@ The clever part ("natural templating"): open the file directly in a browser with
 
 ### The controller side
 
-```java
 @Controller                                     // NOT @RestController — returns view names, not data
 public class GreetingController {
 
@@ -40,7 +39,6 @@ public class GreetingController {
         return "greeting";                      // logical view name → templates/greeting.html
     }
 }
-```
 
 Line by line:
 
@@ -63,13 +61,11 @@ Line by line:
 
 ## Iteration & Conditionals
 
-```java
 @GetMapping("/orders")
 public String orders(Model model) {
     model.addAttribute("orders", orderService.findAll());
     return "order-list";
 }
-```
 
 ```html
 <tr th:each="order : ${orders}">                        <!-- loop over the list -->
@@ -93,21 +89,32 @@ public String orders(Model model) {
 
 ## Form Binding — Objects Round-Tripping
 
+
+**What this code does — step by step:**
+
+1. `model.addAttribute("user", new RegisterForm());` — backing object for the form
+2. `public String register(@Valid @ModelAttribute("user") RegisterForm user,` — binds submitted fields
+3. `BindingResult errors) {` — collects validation failures
+4. `return "register";` — re-render form WITH error messages attached
+5. `return "redirect:/welcome";` — POST-redirect-GET pattern prevents double submits
+
+The same code, clean:
+
 ```java
 @GetMapping("/register")
 public String showForm(Model model) {
-    model.addAttribute("user", new RegisterForm());   // backing object for the form
+    model.addAttribute("user", new RegisterForm());
     return "register";
 }
 
 @PostMapping("/register")
-public String register(@Valid @ModelAttribute("user") RegisterForm user,  // binds submitted fields
-                       BindingResult errors) {                             // collects validation failures
+public String register(@Valid @ModelAttribute("user") RegisterForm user,
+                       BindingResult errors) {
     if (errors.hasErrors()) {
-        return "register";             // re-render form WITH error messages attached
+        return "register";
     }
     userService.create(user);
-    return "redirect:/welcome";        // POST-redirect-GET pattern prevents double submits
+    return "redirect:/welcome";
 }
 ```
 
@@ -153,3 +160,4 @@ Fragments are how template projects get a shared navbar/footer without a JS fram
 | `th:utext` on user content | Stored XSS | Always `th:text`; sanitize before ever using utext |
 | Forgetting the no-arg constructor on form DTOs | Cryptic binding 500s | Forms need default construction (or records with matching binder) |
 | Rendering after POST without redirect | Refresh resubmits the form | POST-redirect-GET pattern |
+

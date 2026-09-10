@@ -33,11 +33,9 @@ gRPC and REST are both service-to-service protocols — but they optimize for di
 
 ### 1. Internal Service-to-Service Traffic
 
-```java
 // Typed, fast, streamable — ideal between backend services
 CourseServiceGrpc.CourseServiceBlockingStub stub;
 CourseReply reply = stub.getCourse(request);
-```
 
 - Typed contracts — compile-time safety across teams
 - 6–10× smaller payloads, faster parsing
@@ -45,11 +43,9 @@ CourseReply reply = stub.getCourse(request);
 
 ### 2. Streaming Workloads
 
-```java
 // gRPC: first-class bidi streaming
 StreamObserver<Event> observer = asyncStub.subscribe(handler);
 // REST: SSE/WebSocket bolted on, no standard contract
-```
 
 ### 3. Polyglot Service Meshes
 
@@ -59,11 +55,9 @@ The .proto compiles to Java, Go, Python, Node, C# — one contract, every langua
 
 ### 1. Browser and Mobile Clients
 
-```java
 // REST: any browser can call it directly
 fetch('/api/courses/1').then(r => r.json());
 // gRPC: needs a gRPC-Web proxy in front
-```
 
 ### 2. Public APIs
 
@@ -163,3 +157,4 @@ Both can coexist on one Spring Boot app (Tomcat on 8080, gRPC on 9090).
 | Best for | Service meshes, streaming, polyglot | Public APIs, quick iteration |
 
 There's no universal winner — there's a per-boundary choice. REST stays for the edges (browsers, partners); gRPC shines inside the mesh (typed, fast, streaming, polyglot). Most mature systems end up with a REST gateway in front of gRPC services — the strengths of both, the weaknesses of neither.
+

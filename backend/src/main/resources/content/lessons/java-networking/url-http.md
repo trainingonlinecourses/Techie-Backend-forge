@@ -1,7 +1,7 @@
 ---
 title: URL and HttpURLConnection — Talking to Web Servers
 module: java-networking
-order: 2
+order: 5
 minutes: 24
 topics: ["URL", "HttpURLConnection", "HTTP client", "requests", "responses"]
 summary: The previous lesson built a raw socket conversation. HTTP — the protocol of the web — is nothing more than a specific dialect spoken over that same...
@@ -22,6 +22,21 @@ The previous lesson built a raw socket conversation. HTTP — the protocol of th
 
 ## Anatomy of a URL
 
+
+**What this code does — step by step:**
+
+1. `System.out.println("Protocol : " + url.getProtocol());` — https
+2. `System.out.println("Host     : " + url.getHost());` — api.example.com
+3. `System.out.println("Port     : " + url.getPort());` — 8443
+4. `System.out.println("Path     : " + url.getPath());` — /users
+5. `System.out.println("Query    : " + url.getQuery());` — page=2&size=10
+6. `System.out.println("Fragment : " + url.getRef());` — top
+7. A default port (80 for http, 443 for https) reports -1:
+8. `System.out.println("Default port: " + plain.getPort());` — -1
+9. openConnection() hands you a connection OBJECT (not yet connected). It's a URLConnection; for http/https you cast to HttpURLConnection.
+
+The same code, clean:
+
 ```java
 import java.net.*;
 
@@ -29,19 +44,16 @@ public class UrlDemo {
     public static void main(String[] args) throws Exception {
         URL url = new URL("https://api.example.com:8443/users?page=2&size=10#top");
 
-        System.out.println("Protocol : " + url.getProtocol());    // https
-        System.out.println("Host     : " + url.getHost());        // api.example.com
-        System.out.println("Port     : " + url.getPort());        // 8443
-        System.out.println("Path     : " + url.getPath());        // /users
-        System.out.println("Query    : " + url.getQuery());       // page=2&size=10
-        System.out.println("Fragment : " + url.getRef());         // top
+        System.out.println("Protocol : " + url.getProtocol());
+        System.out.println("Host     : " + url.getHost());
+        System.out.println("Port     : " + url.getPort());
+        System.out.println("Path     : " + url.getPath());
+        System.out.println("Query    : " + url.getQuery());
+        System.out.println("Fragment : " + url.getRef());
 
-        // A default port (80 for http, 443 for https) reports -1:
         URL plain = new URL("https://example.com/");
-        System.out.println("Default port: " + plain.getPort());   // -1
+        System.out.println("Default port: " + plain.getPort());
 
-        // openConnection() hands you a connection OBJECT (not yet connected).
-        // It's a URLConnection; for http/https you cast to HttpURLConnection.
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         System.out.println("Connection class: " + conn.getClass().getName());
     }
@@ -52,6 +64,21 @@ public class UrlDemo {
 
 ## Making a GET Request, End to End
 
+
+**What this code does — step by step:**
+
+1. 1. Open the connection and configure it.
+2. `conn.setRequestMethod("GET");` — which verb
+3. `conn.setConnectTimeout(5000);` — 5s to establish TCP
+4. `conn.setReadTimeout(5000);` — 5s to receive data
+5. `conn.setRequestProperty("Accept", "application/json");` — headers
+6. 2. Send the request and read the status.
+7. `int status = conn.getResponseCode();` — e.g., 200, 404
+8. 3. Read the response body. Streams: error bodies come from getErrorStream(), success. Bodies from getInputStream(). A common gotcha.
+9. 4. Disconnect (releases the connection back to the pool).
+
+The same code, clean:
+
 ```java
 import java.io.*;
 import java.net.*;
@@ -60,20 +87,15 @@ public class GetDemo {
     public static void main(String[] args) throws IOException {
         URL url = new URL("https://api.example.com/users?page=1");
 
-        // 1. Open the connection and configure it.
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        conn.setRequestMethod("GET");                 // which verb
-        conn.setConnectTimeout(5000);                 // 5s to establish TCP
-        conn.setReadTimeout(5000);                    // 5s to receive data
-        conn.setRequestProperty("Accept", "application/json"); // headers
+        conn.setRequestMethod("GET");
+        conn.setConnectTimeout(5000);
+        conn.setReadTimeout(5000);
+        conn.setRequestProperty("Accept", "application/json");
 
-        // 2. Send the request and read the status.
-        int status = conn.getResponseCode();          // e.g., 200, 404
+        int status = conn.getResponseCode();
         System.out.println("Status: " + status + " " + conn.getResponseMessage());
 
-        // 3. Read the response body.
-        //    Streams: error bodies come from getErrorStream(), success
-        //    bodies from getInputStream(). A common gotcha.
         InputStream body = status >= 400
                 ? conn.getErrorStream() : conn.getInputStream();
 
@@ -85,7 +107,6 @@ public class GetDemo {
             System.out.println("Body: " + sb);
         }
 
-        // 4. Disconnect (releases the connection back to the pool).
         conn.disconnect();
     }
 }
@@ -105,7 +126,6 @@ public class GetDemo {
 
 ## POSTing JSON Data
 
-```java
 import java.io.*;
 import java.net.*;
 
@@ -141,7 +161,6 @@ public class PostDemo {
         conn.disconnect();
     }
 }
-```
 
 **Walking through it:** `setDoOutput(true)` tells the connection you'll write a body (it switches the method semantics for POST/PUT). The `Content-Type: application/json` header declares the body's format — servers use it to parse. Writing to `getOutputStream()` and closing it sends the request. This is exactly what every HTTP client library does internally — including the modern `HttpClient`, just with cleaner syntax.
 
@@ -156,3 +175,4 @@ public class PostDemo {
 ## Recap
 
 `URL` parses web addresses into components; `HttpURLConnection` performs HTTP requests over the underlying sockets. The flow is always the same: open → configure (method, timeouts, headers) → send → check status → read the success or error stream → disconnect. The two gotchas that trip everyone are the **error-stream split** (error bodies come from `getErrorStream()`) and **missing timeouts** (hanging threads). Modern production code prefers `java.net.http.HttpClient` for its cleaner API, HTTP/2 support, and async modes — which is the next lesson — but the mechanics you just learned are exactly what that client automates.
+

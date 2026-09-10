@@ -1,7 +1,7 @@
 ---
 title: Lombok Annotations — Eliminate Boilerplate
 summary: @Data, @Getter/@Setter, @Builder, @Value, @Slf4j, @ToString, @EqualsAndHashCode, and how Lombok generates code at compile time.
-order: 2
+order: 1
 minutes: 20
 topics: [lombok, @Data, @Getter, @Setter, @Builder, @Value, @Slf4j, boilerplate]
 docs:
@@ -12,7 +12,6 @@ docs:
 
 Lombok generates getters, setters, constructors, and more at compile time via annotation processing. You write one annotation; Lombok generates 50+ lines of code.
 
-```java
 // Without Lombok
 public class User {
     private String name;
@@ -34,7 +33,6 @@ public class User {
     private String name;
     private int age;
 }
-```
 
 ---
 
@@ -42,7 +40,6 @@ public class User {
 
 ### @Getter / @Setter
 
-```java
 @Getter
 @Setter
 public class User {
@@ -51,11 +48,9 @@ public class User {
 }
 
 // Generates: getName(), setName(), getAge(), setAge()
-```
 
 ### @Data (combines everything)
 
-```java
 @Data
 public class User {
     private String name;
@@ -63,11 +58,9 @@ public class User {
 }
 
 // Generates: getters, setters, toString, equals, hashCode, requiredArgsConstructor
-```
 
 ### @Value (immutable)
 
-```java
 @Value
 public class Money {
     double amount;
@@ -75,11 +68,9 @@ public class Money {
 }
 
 // Generates: getters only, final fields, all-args constructor, toString, equals, hashCode
-```
 
 ### @Builder
 
-```java
 @Builder
 public class User {
     private String name;
@@ -88,11 +79,9 @@ public class User {
 }
 
 // Usage: User.builder().name("Alice").age(30).email("alice@example.com").build()
-```
 
 ### @Slf4j
 
-```java
 @Slf4j
 public class MyService {
     public void doSomething() {
@@ -101,11 +90,24 @@ public class MyService {
 }
 
 // Generates: private static final Logger log = LoggerFactory.getLogger(MyService.class);
-```
 
 ---
 
 ## Line-by-Line Walkthrough
+
+
+**What this code does — step by step:**
+
+1. Usage
+2. Builder pattern
+3. Getters/setters
+4. `System.out.println(user.getName());` — "Alice"
+5. toString
+6. User(id=null, name=Alice, email=alice@example.com, age=31, role=ADMIN)
+7. equals + hashCode (based on all fields)
+8. `System.out.println(user.equals(same));` — true
+
+The same code, clean:
 
 ```java
 import lombok.*;
@@ -124,10 +126,8 @@ public class User {
     public enum Role { USER, ADMIN }
 }
 
-// Usage
 public class LombokDemo {
     public static void main(String[] args) {
-        // Builder pattern
         User user = User.builder()
             .name("Alice")
             .email("alice@example.com")
@@ -135,18 +135,14 @@ public class LombokDemo {
             .role(User.Role.ADMIN)
             .build();
 
-        // Getters/setters
-        System.out.println(user.getName());  // "Alice"
+        System.out.println(user.getName());
         user.setAge(31);
 
-        // toString
         System.out.println(user);
-        // User(id=null, name=Alice, email=alice@example.com, age=31, role=ADMIN)
 
-        // equals + hashCode (based on all fields)
         User same = User.builder().name("Alice").email("alice@example.com")
             .age(31).role(User.Role.ADMIN).build();
-        System.out.println(user.equals(same));  // true
+        System.out.println(user.equals(same));
     }
 }
 ```
@@ -157,7 +153,6 @@ public class LombokDemo {
 
 ### Scenario 1: DTO with validation
 
-```java
 @Data
 @Builder
 public class CreateOrderRequest {
@@ -167,11 +162,9 @@ public class CreateOrderRequest {
     private int quantity;
     private String notes;  // optional
 }
-```
 
 ### Scenario 2: Entity with selective mutation
 
-```java
 @Getter
 @ToString
 @EqualsAndHashCode(of = "id")
@@ -192,7 +185,6 @@ public class Order {
         this.status = OrderStatus.PENDING;
     }
 }
-```
 
 ---
 
@@ -204,3 +196,4 @@ public class Order {
 | @Builder without @NoArgsConstructor | Can't deserialize from JSON | Add @NoArgsConstructor |
 | @ToString logging sensitive data | Passwords in logs | Use @ToString.Exclude |
 | @Data on records | Records already generate everything | Don't use Lombok with records |
+

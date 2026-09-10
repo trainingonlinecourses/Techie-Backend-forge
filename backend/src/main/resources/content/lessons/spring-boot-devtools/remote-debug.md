@@ -107,3 +107,4 @@ spring:
 | Using default devtools secret | Unauthorized remote restart | Set a strong secret |
 | Forgetting suspend=n | App hangs waiting for debugger | Use suspend=n unless you need early breakpoints |
 | Not disabling in production | Performance + security risk | DevTools auto-disables in production (JAR packaging) |
+

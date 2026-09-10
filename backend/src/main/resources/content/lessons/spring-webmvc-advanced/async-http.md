@@ -1,7 +1,7 @@
 ---
 title: Async Requests — Callable, DeferredResult, StreamingResponseBody and SSE
 summary: When async HTTP helps, Callable vs DeferredResult vs StreamingResponseBody, thread-pool implications, and the streaming/SSE scenarios in production.
-order: 10
+order: 2
 minutes: 18
 topics: [async, callable, deferredresult, streamingresponsebody, sse, servlet-async, non-blocking]
 docs:
@@ -24,31 +24,26 @@ A servlet container (Tomcat) has a **bounded pool of request threads** (default 
 
 ## Callable — the simplest async handler
 
-```java
 @GetMapping("/api/report")
 public Callable<Report> report() {
     return () -> reportService.generate();   // Spring runs this on a task executor
 }
-```
 
 The servlet thread returns immediately; Spring's `WebMvcAsyncTask` runs the `Callable` on its async executor and completes the response when it finishes. **The catch:** you've moved the thread from the servlet pool to *another* pool — total threads in play may actually *rise* if the executor is unbounded. Async helps latency *under load* only when work is I/O-bound and the executor is sized sensibly.
 
 ## DeferredResult — completion from anywhere
 
-```java
 @GetMapping("/api/order/{id}/status")
 public DeferredResult<OrderStatus> status(@PathVariable Long id) {
     DeferredResult<OrderStatus> result = new DeferredResult<>(30_000L);  // timeout 30s
     orderStatusService.subscribe(id, status -> result.setResult(status)); // callback fires later
     return result;    // returns immediately; no thread is held while waiting
 }
-```
 
 This is the pattern for **long-polling**, event-driven completion (message consumer, webhook, another service's callback), and queues: the servlet thread is released, and `setResult` (from *any* thread) completes the response. A timeout value prevents a hung handler from holding the connection forever; `onTimeout`/`onError` handlers let you react.
 
 ## Streaming and Server-Sent Events
 
-```java
 @GetMapping("/api/export.csv")
 public StreamingResponseBody export() {
     return out -> {
@@ -67,7 +62,6 @@ public SseEmitter feed() {
     feedService.register(emitter);           // emitter.send(event) pushes to the client
     return emitter;
 }
-```
 
 - `StreamingResponseBody` streams a large generated body (CSV/JSON-lines/PDF) without buffering it all in memory — a big win for exports of millions of rows.
 - `SseEmitter` is one-way push: the client opens a normal HTTP connection and the server pushes events (`data:` lines). Perfect for notifications, job progress, price ticks — anything where the server has new data to send as it appears. (Bidirectional push = WebSockets; SSE is simpler and rides on plain HTTP.)
@@ -82,13 +76,11 @@ public SseEmitter feed() {
 
 **Scenario 4 — fan-out of slow external calls.** Instead of one handler calling three slow APIs sequentially (holding a thread 3×), parallelize with `CompletableFuture` and complete a `DeferredResult` when all three land:
 
-```java
 CompletableFuture.allOf(callA, callB, callC)
     .thenApply(v -> combine(callA.join(), callB.join(), callC.join()))
     .whenComplete((r, ex) -> {
         if (ex != null) result.setErrorResult(ex); else result.setResult(r);
     });
-```
 
 ## Pitfalls
 
@@ -106,3 +98,4 @@ CompletableFuture.allOf(callA, callB, callC)
 - `StreamingResponseBody` streams large bodies without buffering; `SseEmitter` is one-way push over HTTP.
 - Set timeouts and cleanup on every deferred/emitter; know your thread-local propagation.
 - Use async where slow I/O meets concurrency — not as a default for every endpoint.
+

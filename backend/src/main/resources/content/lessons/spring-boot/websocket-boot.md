@@ -1,7 +1,7 @@
 ---
 title: WebSocket with Spring Boot — Real-Time Bidirectional Communication
 summary: STOMP vs raw WebSocket, SockJS fallback, message broker configuration, @MessageMapping, room-based broadcasting, and how organizations build live dashboards and chat systems.
-order: 34
+order: 55
 minutes: 22
 topics: [websocket, stomp, sockjs, message-mapping, simpbroker, broadcast, realtime, live-dashboard]
 docs:
@@ -24,7 +24,6 @@ Spring supports two WebSocket styles:
 
 ## Configuration
 
-```java
 @Configuration
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
@@ -42,7 +41,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
             .withSockJS();  // SockJS fallback for older browsers
     }
 }
-```
 
 **Message flow:**
 - Client subscribes to `/topic/orders` — receives broadcasts.
@@ -51,7 +49,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
 ## Server-side message handler
 
-```java
 @Controller
 public class OrderWebSocketHandler {
 
@@ -76,7 +73,6 @@ public class OrderWebSocketHandler {
         return new OrderCreatedEvent(order.id(), order.status(), Instant.now());
     }
 }
-```
 
 ## Client-side (JavaScript)
 
@@ -109,7 +105,6 @@ stompClient.connect({}, (frame) => {
 
 ## Room-based broadcasting
 
-```java
 @Controller
 public class ChatHandler {
 
@@ -127,11 +122,9 @@ public class ChatHandler {
             new ChatMessage(message.roomId(), message.sender(), "joined the room"));
     }
 }
-```
 
 ## Security with WebSocket
 
-```java
 @Override
 public void configureClientInboundChannel(ChannelRegistration registration) {
     registration.interceptors(new ChannelInterceptor() {
@@ -149,13 +142,11 @@ public void configureClientInboundChannel(ChannelRegistration registration) {
         }
     });
 }
-```
 
 ## How we use it in organizations
 
 ### Scenario 1: live order dashboard
 
-```java
 @Service
 public class OrderService {
 
@@ -174,11 +165,9 @@ public class OrderService {
         return saved;
     }
 }
-```
 
 ### Scenario 2: real-time collaborative document
 
-```java
 @Controller
 public class DocumentHandler {
 
@@ -190,7 +179,6 @@ public class DocumentHandler {
         messaging.convertAndSend("/topic/doc." + edit.documentId(), edit);
     }
 }
-```
 
 ## Common mistakes
 
@@ -201,3 +189,4 @@ public class DocumentHandler {
 | Not authenticating WebSocket connections | Anonymous users receive authorized data |
 | Using raw WebSocket instead of STOMP | No built-in topic/queue semantics |
 | Missing SockJS fallback | Incompatible with corporate proxies |
+

@@ -1,7 +1,7 @@
 ---
 title: The Final Keyword — Variables, Methods, and Classes
 summary: What final actually guarantees at the JVM level, final vs effectively-final for lambdas, final fields and safe publication, and why some teams ban final locals while others require it everywhere.
-order: 40
+order: 22
 minutes: 18
 topics: [final-variable, final-method, final-class, effectively-final, immutability, safe-publication]
 docs:
@@ -29,15 +29,12 @@ When a `final` field is set in a constructor, the Java Memory Model (JMM) guaran
 
 This is why immutable value objects almost always use `final` fields:
 
-```java
 public record Money(BigDecimal amount, Currency currency) {
     // record fields are implicitly final — safe publication guaranteed
 }
-```
 
 Even pre-Java-16, the pattern was:
 
-```java
 public class Money {
     private final BigDecimal amount;   // safe publication
     private final Currency currency;   // safe publication
@@ -50,7 +47,6 @@ public class Money {
     public BigDecimal amount() { return amount; }
     public Currency currency() { return currency; }
 }
-```
 
 If `amount` were not `final`, a thread reading `money.amount()` from a different thread could see `null` even after the constructor completed — the JMM has no obligation to reorder the writes for visibility.
 
@@ -58,7 +54,6 @@ If `amount` were not `final`, a thread reading `money.amount()` from a different
 
 When a method is `final`, subclasses cannot override it. This is a design contract: "this method's correctness depends on invariants that subclasses might violate."
 
-```java
 public class BankAccount {
 
     private BigDecimal balance = BigDecimal.ZERO;
@@ -77,9 +72,7 @@ public class BankAccount {
         balance = balance.add(amount);
     }
 }
-```
 
-```java
 // This compiles, but withdraw() is inherited — cannot be overridden
 public class PremiumAccount extends BankAccount {
     private BigDecimal overdraftLimit;
@@ -93,7 +86,6 @@ public class PremiumAccount extends BankAccount {
 
     // public void withdraw(BigDecimal amount) { }  ← WON'T COMPILE
 }
-```
 
 **Why make `withdraw` final?** Because it contains critical logic (balance check + audit). If a subclass could override it, it might skip the audit or the balance check, breaking financial invariants.
 
@@ -101,7 +93,6 @@ public class PremiumAccount extends BankAccount {
 
 A `final` class cannot be subclassed. The JDK uses this extensively: `String`, `Integer`, `LocalDate` are all `final`.
 
-```java
 public final class UserId {
     private final String value;
 
@@ -123,7 +114,6 @@ public final class UserId {
     @Override
     public String toString() { return "UserId(" + value + ")"; }
 }
-```
 
 **Why `final`?** Because `equals`/`hashCode`/`toString` are defined on the assumption that `value` never changes and no subclass alters behavior. If someone extended `UserId` and added a field, `equals` might not compare it, leading to hidden bugs in hash maps.
 
@@ -131,15 +121,29 @@ public final class UserId {
 
 Java lambdas can capture local variables, but the variable must be **effectively final** — never reassigned after initialization:
 
-```java
-// Works: count is effectively final
-int count = 0;
-Runnable r = () -> System.out.println(count);  // ✅
 
-// Doesn't compile: count is reassigned
-int count = 0;
-count++;                                        // reassigned
-Runnable r = () -> System.out.println(count);  // ❌ compile error
+**What this code does — step by step:**
+
+1. Works: count is effectively final
+2. `Runnable r = () -> System.out.println(count);` — ✅
+3. Doesn't compile: count is reassigned
+4. `count++;` — reassigned
+5. `Runnable r = () -> System.out.println(count);` — ❌ compile error
+
+The same code, clean:
+
+```java
+public class Main {
+
+    public static void main(String[] args) {
+        int count = 0;
+        Runnable r = () -> System.out.println(count);
+
+        int count = 0;
+        count++;
+        Runnable r = () -> System.out.println(count);
+    }
+}
 ```
 
 This is because the lambda captures a *copy* of the value. If the variable could be reassigned, the lambda and the surrounding code would see different values — a source of subtle bugs.
@@ -148,7 +152,6 @@ This is because the lambda captures a *copy* of the value. If the variable could
 
 ### Scenario: final fields in a configuration POJO
 
-```java
 @ConfigurationProperties(prefix = "payment")
 public record PaymentProperties(
     @DefaultValue("3") int retryAttempts,
@@ -156,19 +159,16 @@ public record PaymentProperties(
     @DefaultValue("false") boolean sandboxMode,
     List<String> supportedCurrencies
 ) {}
-```
 
 Records make every field `final`. This means the configuration is **immutable after construction** — no thread can accidentally mutate it. Spring's `@ConfigurationProperties` binding creates the object once at startup; `final` guarantees no thread can change `retryAttempts` mid-request.
 
 ### Scenario: final local for lambda capture
 
-```java
 public List<Order> filterOrders(List<Order> orders, OrderStatus status) {
     return orders.stream()
         .filter(order -> order.status() == status)  // status must be effectively final
         .toList();
 }
-```
 
 ## Best practices
 
@@ -179,3 +179,4 @@ public List<Order> filterOrders(List<Order> orders, OrderStatus status) {
 | Make value classes `final` | Prevents subclass `equals`/`hashCode` violations |
 | Don't ban `final` locals | Readability and lambda capture safety |
 | Don't overuse `final` on class-level | `final` class prevents mocking; consider package-private constructors instead |
+

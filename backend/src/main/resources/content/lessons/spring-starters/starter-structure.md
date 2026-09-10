@@ -1,7 +1,7 @@
 ---
 title: Starter Structure — Anatomy of a Spring Boot Starter
 summary: The directory layout, META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports, dependency management, and how starters compose together.
-order: 3
+order: 2
 minutes: 15
 topics: [starter-structure, auto-configuration, imports, dependency-management, layout]
 docs:
@@ -53,7 +53,6 @@ com.example.auto.MyAutoConfiguration
 
 ### Configuration Class
 
-```java
 package com.example.auto;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -71,7 +70,6 @@ public class MyAutoConfiguration {
         return new MyService();
     }
 }
-```
 
 ### pom.xml
 
@@ -107,3 +105,4 @@ public class MyAutoConfiguration {
 | Not conditional on missing bean | User can't override | Always use @ConditionalOnMissingBean |
 | Too many required dependencies | Starter bloats classpath | Make optional deps optional |
 | Not version-managing dependencies | Version conflicts | Use BOM or dependency management |
+

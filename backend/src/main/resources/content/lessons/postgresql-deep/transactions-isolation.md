@@ -1,7 +1,7 @@
 ---
 title: Transactions and Isolation in Postgres
 module: postgresql-deep
-order: 3
+order: 4
 minutes: 28
 topics: ["MVCC", "isolation levels", "read committed", "repeatable read", "serializable", "row locking", "FOR UPDATE"]
 summary: Postgres implements transactions with MVCC (MultiVersion Concurrency Control): readers never block writers, writers never block readers. This lesso...
@@ -71,7 +71,6 @@ COMMIT;
 
 Postgres doesn't lock everything — it runs transactions concurrently and **aborts the loser** with `40001` (serialization_failure). Your application must retry:
 
-```java
 // Spring + SERIALIZABLE requires retry logic
 @Transactional(isolation = Isolation.SERIALIZABLE)
 public void reconcile() { ... }
@@ -85,7 +84,6 @@ for (int attempt = 0; attempt < 3; attempt++) {
         // retry — the loser of the race
     }
 }
-```
 
 ## Row-Level Locking: SELECT FOR UPDATE
 
@@ -98,11 +96,9 @@ UPDATE accounts SET balance = balance - 100 WHERE id = 1;
 COMMIT;                                           -- lock released
 ```
 
-```java
 @Lock(LockModeType.PESSIMISTIC_WRITE)
 @Query("select a from Account a where a.id = :id")
 Optional<Account> findByIdForUpdate(Long id);
-```
 
 **The transfer-without-lost-update pattern**:
 
@@ -143,14 +139,11 @@ Spring's `@Transactional(readOnly = true)`:
 - Sets REPEATABLE READ semantics per statement via the snapshot
 - Never sends writes — misuse fails loudly on most setups
 
-```java
 @Transactional(readOnly = true)
 public List<Course> search(String q) { ... }   // routes to the replica
-```
 
 ## Testing Isolation Behavior
 
-```java
 @SpringBootTest
 @Testcontainers
 class IsolationTest {
@@ -171,7 +164,6 @@ class IsolationTest {
         assertEquals(0, accountRepository.sumBalances());
     }
 }
-```
 
 ## Summary
 
@@ -186,3 +178,4 @@ class IsolationTest {
 | readOnly | Snapshot, replica routing hint |
 
 Postgres's concurrency model is MVCC + row locks: reads are always consistent snapshots, writes serialize on row locks, and SERIALIZABLE enforces full serialization by aborting races. Match your isolation level to the anomaly you actually face, use FOR UPDATE for read-then-write, and build retry into SERIALIZABLE paths.
+

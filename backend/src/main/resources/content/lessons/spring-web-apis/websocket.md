@@ -1,7 +1,7 @@
 ---
 title: WebSockets & STOMP in Spring
 summary: Full-duplex browser-server communication — STOMP over WebSocket, @MessageMapping handlers, broker configuration, and when WebSocket beats polling and SSE.
-order: 7
+order: 9
 minutes: 15
 topics: [websocket, stomp, messaging, spring websocket, realtime]
 docs:
@@ -23,7 +23,6 @@ WebSocket is a **persistent, bidirectional TCP-ish connection** from the browser
 
 ## Wiring STOMP
 
-```java
 @Configuration
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
@@ -40,13 +39,11 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         // SockJS: fallback transport (XHR/JSONP) for browsers/clients without raw WebSocket
     }
 }
-```
 
 The path model: client sends to `/app/...` (handled by your controllers), server publishes to `/topic/...` (broadcast) or `/queue/...` (one user). The broker (simple in-memory, or a real one like RabbitMQ/ActiveMQ) routes messages.
 
 ## Handling messages server-side
 
-```java
 @Controller
 public class ChatController {
 
@@ -62,15 +59,12 @@ public class ChatController {
         // → /user/{username}/queue/reply, the authenticated user's private queue
     }
 }
-```
 
 - `@MessageMapping` mirrors `@RequestMapping` for STOMP destinations; `@SendTo` routes the return value.
 - **`SimpMessagingTemplate`** (`convertAndSend`, `convertAndSendToUser`) lets *any* bean push — a service notifying a room when an order ships:
 
-```java
 simpMessagingTemplate.convertAndSend("/topic/orders/" + orderId,
     new OrderEvent(orderId, "SHIPPED"));
-```
 
 - `convertAndSendToUser` needs the authenticated user: with Spring Security, the session's `Principal` is attached — **STOMP over a WebSocket authenticates like any Spring Security request** (your JWT/Session filter applies; `@PreAuthorize` works on message mappings).
 
@@ -91,10 +85,8 @@ stomp.connect({}, () => {
 
 1. **Multi-instance**: the in-memory simple broker is per-JVM — a message published on instance A never reaches subscribers on instance B. Scale-out requires a **shared broker** (RabbitMQ/ActiveMQ STOMP) or a Redis pub/sub relay:
 
-```java
 registry.enableStompBrokerRelay("/topic", "/queue")
     .setRelayHost("rabbit.internal");
-```
 
 2. **Authentication over WebSocket**: the `Authorization` header isn't sent on the initial handshake the way REST sends it — wire the token via query param/cookie in the SockJS handshake and validate it (Spring Security's `WebSocketConfigurer`-level auth). Never accept an unauthenticated upgrade.
 3. **Heartbeats & disconnects**: idle connections die at proxies; configure STOMP heartbeats so both sides notice dead sockets.
@@ -113,3 +105,4 @@ registry.enableStompBrokerRelay("/topic", "/queue")
 - Secure the handshake, configure heartbeats, and monitor sessions.
 
 Official docs: [WebSocket support](https://docs.spring.io/spring-framework/reference/web/websocket.html) · [STOMP](https://docs.spring.io/spring-framework/reference/web/websocket/stomp.html)
+

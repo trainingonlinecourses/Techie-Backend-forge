@@ -1,7 +1,7 @@
 ---
 title: OAuth2 — Building a Resource Server
 summary: Securing APIs with Bearer tokens — JWT validation against a JWKS endpoint, opaque-token introspection, and scopes/claims mapped to authorities.
-order: 2
+order: 3
 minutes: 15
 topics: [oauth2 resource server, jwt validation, jwks, bearer token, scopes]
 docs:
@@ -27,7 +27,6 @@ spring:
           # or explicitly: jwk-set-uri: https://auth.example.com/oauth2/jwks
 ```
 
-```java
 @Configuration
 @EnableWebSecurity
 public class ResourceServerConfig {
@@ -42,7 +41,6 @@ public class ResourceServerConfig {
         return http.build();
     }
 }
-```
 
 What happens per request: extract `Authorization: Bearer <jwt>` → verify signature against the **JWKS** public key → check `exp`/`iss`/`aud` → build the `Authentication` with claims. Stateless, fast, no AS round trip.
 
@@ -50,12 +48,9 @@ What happens per request: extract `Authorization: Bearer <jwt>` → verify signa
 
 The token's **`scope` claim** is the authorization contract. Map scopes to authorities and enforce with the tools you know:
 
-```java
 .oauth2ResourceServer(rs -> rs.jwt(jwt -> jwt.jwtAuthenticationConverter(
     jwt -> new JwtAuthenticationToken(jwt, extractAuthorities(jwt)))))
-```
 
-```java
 List<GrantedAuthority> extractAuthorities(Jwt jwt) {
     return jwt.getClaimAsStringList("scope").stream()
         .map(s -> new SimpleGrantedAuthority("SCOPE_" + s))   // SCOPE_orders.read
@@ -64,7 +59,6 @@ List<GrantedAuthority> extractAuthorities(Jwt jwt) {
 
 @PreAuthorize("hasAuthority('SCOPE_orders.read')")
 public List<Order> listOrders() { ... }      // method security on the resource
-```
 
 Convention: `SCOPE_<scope>` as the authority name (Spring's default). A token with only `profile` scope can't read orders — **authorization is scope-based, not role-based**, because the RS knows nothing about the user's roles inside the client's session.
 
@@ -86,10 +80,8 @@ spring.security.oauth2.resourceserver.opaquetoken:
   client-secret: ${RS_SECRET}
 ```
 
-```java
 .oauth2ResourceServer(rs -> rs.opaqueToken(Customizer.withDefaults()))
 // Authentication built from introspection response (active, scope, sub…)
-```
 
 JWT is usually preferable (no per-request call, works offline), but opaque tokens win when **revocation must be immediate** (a JWT lives until `exp`; an opaque token dies the moment you revoke it at the AS).
 
@@ -103,7 +95,6 @@ The full architecture: **SPA → AS (login, PKCE) → RS (Bearer)**.
 
 ## Testing the resource server
 
-```java
 // Generate a signed JWT in the test and hit the endpoint:
 @Test
 void tokenWithScopeCanRead() {
@@ -114,7 +105,6 @@ void tokenWithScopeCanRead() {
 
 @Test
 void noTokenIsRejected() { mockMvc.perform(get("/api/orders")).andExpect(status().isUnauthorized()); }
-```
 
 Test both sides of the coin: valid-scope success and missing/invalid-token rejection — the security-testing lesson's patterns apply unchanged.
 
@@ -126,3 +116,4 @@ Test both sides of the coin: valid-scope success and missing/invalid-token rejec
 - The SPA↔RS trust boundary is the token, never cookies.
 
 Official docs: [OAuth2 Resource Server](https://docs.spring.io/spring-security/reference/servlet/oauth2/resource-server/index.html) · [JWT specifics](https://docs.spring.io/spring-security/reference/servlet/oauth2/resource-server/jwt.html)
+

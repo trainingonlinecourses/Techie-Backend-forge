@@ -1,7 +1,7 @@
 ---
 title: Consumers, Groups & Partitioning
 summary: How consumer groups split partitions, offsets and rebalancing work, and how to get ordering + idempotency right.
-order: 3
+order: 1
 minutes: 20
 topics: [kafka, consumer-groups, partitions, offsets, rebalancing, idempotency]
 docs:
@@ -56,7 +56,6 @@ Getting ordering wrong usually looks like: "the `OrderUpdated` event was process
 
 ## Idempotency in Spring Kafka
 
-```java
 @Component
 public class OrderEventConsumer {
 
@@ -73,7 +72,6 @@ public class OrderEventConsumer {
         }
     }
 }
-```
 
 The `record` + unique constraint is the backbone: it converts at-least-once into effectively-once for your business state.
 
@@ -100,3 +98,4 @@ Raising partitions later is a **breaking change** (ordering for existing keys sh
 - [Apache Kafka — Consumers (groups, offsets)](https://kafka.apache.org/documentation/#intro_consumers)
 - [Spring Kafka — Receiving Messages](https://docs.spring.io/spring-kafka/reference/kafka/receiving-messages/receiving-messages.html)
 - [Kafka rebalancing & cooperative sticky assignor](https://kafka.apache.org/34/documentation/#consumer_rebalance)
+

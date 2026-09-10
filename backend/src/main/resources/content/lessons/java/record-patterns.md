@@ -1,7 +1,7 @@
 ---
 title: Record Patterns and Pattern Matching — Destructuring Data in Java
 summary: How record patterns deconstruct nested data, pattern matching with switch, sealed class exhaustiveness, and the elimination of verbose instanceof chains.
-order: 60
+order: 66
 minutes: 18
 topics: [records, pattern matching, sealed classes, switch expressions, destructuring, Java 21]
 docs:
@@ -17,30 +17,32 @@ Pattern matching lets you check the type of an object and extract its components
 
 ## Record patterns in instanceof
 
-```java
-// BEFORE pattern matching (verbose)
-if (obj instanceof Point) {
-    Point p = (Point) obj;
-    return p.x() + p.y();
-}
+public class Main {
 
-// AFTER pattern matching (concise)
-if (obj instanceof Point(int x, int y)) {
-    return x + y;
-}
+    public static void main(String[] args) {
+        // BEFORE pattern matching (verbose)
+        if (obj instanceof Point) {
+            Point p = (Point) obj;
+            return p.x() + p.y();
+        }
 
-// Nested destructuring
-record Address(String city, String zip) {}
-record User(String name, Address address) {}
+        // AFTER pattern matching (concise)
+        if (obj instanceof Point(int x, int y)) {
+            return x + y;
+        }
 
-if (user instanceof User(String name, Address(String city, String zip))) {
-    System.out.println(name + " lives in " + city);
+        // Nested destructuring
+        record Address(String city, String zip) {}
+        record User(String name, Address address) {}
+
+        if (user instanceof User(String name, Address(String city, String zip))) {
+            System.out.println(name + " lives in " + city);
+        }
+    }
 }
-```
 
 ## Pattern matching with switch
 
-```java
 // Sealed interface + records = exhaustive pattern matching
 sealed interface Shape permits Circle, Rectangle, Triangle {}
 record Circle(double radius) implements Shape {}
@@ -58,13 +60,11 @@ double area(Shape shape) {
         // No default needed — sealed interface guarantees exhaustiveness
     };
 }
-```
 
 **The org power:** the compiler enforces that every case is handled. Add a new record to the sealed interface, and the compiler tells you exactly which switches need updating. No missed cases at runtime.
 
 ## Guarded patterns — conditions within cases
 
-```java
 String describe(int value) {
     return switch (value) {
         case int n when n < 0  -> "negative: " + n;
@@ -82,13 +82,11 @@ String categorize(Package pkg) {
         case Package(String name, double weight)                   -> "standard: " + name;
     };
 }
-```
 
 ## Sealed classes — the exhaustiveness engine
 
 Sealed classes restrict which classes can implement them. Combined with pattern matching, the compiler knows the full set of possibilities:
 
-```java
 // Java 17+ sealed interface
 public sealed interface PaymentResult
     permits PaymentSuccess, PaymentFailure, PaymentPending {}
@@ -106,11 +104,9 @@ String display(PaymentResult result) {
     };
     // If you add a new permit, every switch that doesn't handle it fails to compile
 }
-```
 
 ## Nested patterns — deep destructuring
 
-```java
 record Order(String id, Customer customer, List<LineItem> items) {}
 record Customer(String name, Address address) {}
 record Address(String city) {}
@@ -128,13 +124,11 @@ void process(Order order) {
             id, name, city, qty, product, cents);
     }
 }
-```
 
 ## org patterns
 
 **API response handling:**
 
-```java
 sealed interface ApiResponse<T> permits Success, Error, Loading {}
 record Success<T>(T data) implements ApiResponse<T> {}
 record Error<T>(String message, int status) implements ApiResponse<T> {}
@@ -147,11 +141,9 @@ record Loading<T>() implements ApiResponse<T> {}
         case Loading()          -> "Loading...";
     };
 }
-```
 
 **Configuration validation:**
 
-```java
 record ServerConfig(String host, int port, boolean ssl) {}
 
 String validate(ServerConfig config) {
@@ -167,7 +159,6 @@ String validate(ServerConfig config) {
             -> "OK";
     };
 }
-```
 
 ## Key takeaways
 
@@ -176,3 +167,4 @@ String validate(ServerConfig config) {
 - Guarded patterns (`case X(var n) when n > 0`) add conditions to cases, replacing if-else chains.
 - Deep nesting (`case Order(_, Customer(String name, Address(String city)), _)`) handles complex data in one expression.
 - Use sealed interfaces + records + pattern matching for domain models that need exhaustive handling.
+

@@ -1,7 +1,7 @@
 ---
 title: Spring Boot HTTP Interface Clients — Declarative REST
 summary: The declarative HTTP interface pattern, @HttpExchange, WebClient for reactive clients, RestTemplate evolution, interceptors, error handling, and how organizations build resilient service-to-service communication.
-order: 45
+order: 31
 minutes: 20
 topics: [http-interface, declarative-client, resttemplate, webclient, http-exchange, service-client, resilience]
 docs:
@@ -14,7 +14,6 @@ docs:
 
 Instead of manually constructing HTTP requests with `RestTemplate` or `WebClient`, you define an **interface** that describes the remote API. Spring generates a proxy implementation that translates your method calls into HTTP requests. This is the same pattern Feign, Retrofit, and gRPC use — declare what you want, let the framework handle the plumbing.
 
-```java
 // Declare the remote API as a Java interface
 @HttpExchange
 public interface UserClient {
@@ -36,7 +35,6 @@ public class ClientConfig {
                 .build());
     }
 }
-```
 
 **Why declare interfaces instead of using RestTemplate directly?**
 - **Type safety** — Method signature enforces request/response shapes at compile time
@@ -59,7 +57,6 @@ public class ClientConfig {
 
 Call the user service to fetch profile data:
 
-```java
 @HttpExchange
 public interface UserClient {
     @GetExchange("/api/users/{userId}")
@@ -68,9 +65,7 @@ public interface UserClient {
     @GetExchange("/api/users/{userId}/permissions")
     List<String> getPermissions(@PathVariable String userId);
 }
-```
 
-```java
 @Service
 public class AuthorizationService {
     private final UserClient userClient;
@@ -84,13 +79,11 @@ public class AuthorizationService {
         return permissions.contains(requiredPermission);
     }
 }
-```
 
 ### Scenario 2: Resilient client with Circuit Breaker
 
 Wrap the client with resilience patterns:
 
-```java
 @CircuitBreaker(name = "payment-service", fallbackMethod = "paymentFallback")
 @Retry(name = "payment-service")
 @TimeLimiter(name = "payment-service")
@@ -99,9 +92,7 @@ public interface PaymentClient {
     @PostExchange("/api/payments")
     PaymentResult processPayment(@RequestBody PaymentRequest request);
 }
-```
 
-```java
 @Service
 public class PaymentFacade {
     private final PaymentClient paymentClient;
@@ -117,13 +108,11 @@ public class PaymentFacade {
         return PaymentResult.pending("Payment queued — will process when service recovers");
     }
 }
-```
 
 ### Scenario 3: WebClient for streaming responses
 
 When you need to stream large responses (SSE, paginated data):
 
-```java
 @Component
 public class DataStreamClient {
     private final WebClient webClient;
@@ -146,13 +135,11 @@ public class DataStreamClient {
             .bodyToMono(byte[].class);
     }
 }
-```
 
 ### Scenario 4: Interceptors for authentication
 
 Attach JWT tokens to every request:
 
-```java
 @Component
 public class ServiceAuthInterceptor implements ClientHttpRequestInterceptor {
 
@@ -167,13 +154,11 @@ public class ServiceAuthInterceptor implements ClientHttpRequestInterceptor {
         return execution.execute(request, body);
     }
 }
-```
 
 ### Scenario 5: Error handling with custom exceptions
 
 Transform HTTP errors into domain exceptions:
 
-```java
 @Component
 public class ClientErrorHandler implements ClientHttpResponseErrorHandler {
 
@@ -197,7 +182,6 @@ public class ClientErrorHandler implements ClientHttpResponseErrorHandler {
         throw new ExternalServiceException("Client error: " + status);
     }
 }
-```
 
 ## Common mistakes
 
@@ -209,3 +193,4 @@ public class ClientErrorHandler implements ClientHttpResponseErrorHandler {
 | No circuit breaker on external calls | Cascading failures when dependency dies |
 | Large request/response bodies without streaming | Memory explosion |
 | Creating new WebClient per request | Socket leak, connection pool exhaustion |
+

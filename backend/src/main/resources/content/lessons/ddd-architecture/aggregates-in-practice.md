@@ -1,7 +1,7 @@
 ---
 title: Aggregates in Practice
 module: ddd-architecture
-order: 2
+order: 1
 minutes: 25
 topics: ["aggregate design", "consistency boundary", "transaction scope", "aggregate size", "JPA mapping", "domain events"]
 summary: The aggregate is DDD's most consequential (and most misused) idea: it defines the consistency boundary — the set of objects that change together at...
@@ -32,17 +32,27 @@ An aggregate is a cluster of domain objects treated as one unit:
 
 ## The Reference Rule
 
+
+**What this code does — step by step:**
+
+1. ✅ Correct: cross-aggregate references are by ID
+2. `private Long customerId;` — NOT a Customer object!
+3. `private Long productId;` — NOT a Product object!
+4. ❌ Anti-pattern: holding object references to other aggregates
+5. `private Customer customer;` — loads the whole customer into the order's tx
+6. `private Product product;` — widens the consistency boundary
+
+The same code, clean:
+
 ```java
-// ✅ Correct: cross-aggregate references are by ID
 public class Order {
-    private Long customerId;      // NOT a Customer object!
-    private Long productId;       // NOT a Product object!
+    private Long customerId;
+    private Long productId;
 }
 
-// ❌ Anti-pattern: holding object references to other aggregates
 public class Order {
-    private Customer customer;    // loads the whole customer into the order's tx
-    private Product product;      // widens the consistency boundary
+    private Customer customer;
+    private Product product;
 }
 ```
 
@@ -66,25 +76,20 @@ Cross-aggregate references by id keep aggregates small and transactions short. L
 
 Ask: *can this rule be violated if two parts change in different transactions?*
 
-```java
 // If lines and total could change separately, the invariant breaks:
 public class Invoice {
     private List<InvoiceLine> lines;
     private Money total;          // MUST be consistent with lines
     // → lines and total must be in the SAME aggregate
 }
-```
 
-```java
 // If customer email and order status are independent, they can be separate:
 // Customer.email — its own aggregate
 // Order.status — its own aggregate
 // (no invariant spans them)
-```
 
 ## Designing the Root: Guard Everything
 
-```java
 public class Order {
     private OrderStatus status = OrderStatus.DRAFT;
     private final List<OrderLine> lines = new ArrayList<>();
@@ -107,11 +112,9 @@ public class Order {
 
     // No setters that bypass the rules. The root IS the API.
 }
-```
 
 ## The Transaction Rule
 
-```java
 // ONE aggregate per transaction
 @Transactional
 public void placeOrder(Long orderId) {
@@ -120,13 +123,11 @@ public void placeOrder(Long orderId) {
     orderRepository.save(order);
     // don't ALSO update the Customer aggregate in this tx
 }
-```
 
 When two aggregates must change together, the options are: domain events (eventual consistency) or a saga — never one fat transaction.
 
 ## Domain Events: Aggregate → Aggregate Communication
 
-```java
 public class Order {
 
     private final List<Object> domainEvents = new ArrayList<>();
@@ -143,9 +144,7 @@ public class Order {
         return events;
     }
 }
-```
 
-```java
 @Transactional
 public void placeOrder(Long orderId) {
     Order order = orderRepository.findById(orderId).orElseThrow();
@@ -161,13 +160,11 @@ public void placeOrder(Long orderId) {
             }
         });
 }
-```
 
 The customer aggregate (loyalty points, notifications) reacts to the event — its own transaction, its own aggregate.
 
 ## JPA Mapping of Aggregates
 
-```java
 @Entity
 public class OrderEntity {                  // aggregate root entity
 
@@ -179,7 +176,6 @@ public class OrderEntity {                  // aggregate root entity
     @Embedded
     private MoneyValue total;               // value object embedded
 }
-```
 
 - `cascade = ALL` — inner entities live and die with the root
 - `orphanRemoval = true` — removed lines are deleted
@@ -187,12 +183,10 @@ public class OrderEntity {                  // aggregate root entity
 
 ## Repository Scope
 
-```java
 public interface OrderRepository extends JpaRepository<OrderEntity, Long> {
     // One repository per aggregate root
     // NO OrderLineRepository — lines are inside Order
 }
-```
 
 ## Aggregate Rules Checklist
 
@@ -217,3 +211,4 @@ public interface OrderRepository extends JpaRepository<OrderEntity, Long> {
 | Persistence | Repository per root, cascade inner |
 
 The aggregate is where DDD meets the database: size it by *invariant*, reference by *id*, communicate by *events*, and transact by *one*. Teams that respect the boundary get clean concurrency and testable domain logic; teams that blur it get fat transactions and lock contention.
+

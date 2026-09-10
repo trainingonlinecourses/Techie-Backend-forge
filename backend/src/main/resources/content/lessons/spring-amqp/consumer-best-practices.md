@@ -1,7 +1,7 @@
 ---
 title: Consumer Concurrency & Best Practices
 module: spring-amqp
-order: 5
+order: 1
 minutes: 22
 topics: ["concurrency", "prefetch", "message ordering", "batching", "backpressure", "consumer tuning"]
 summary: A listener that processes one message at a time wastes the broker and your database. A listener with the wrong concurrency settings floods memory o...
@@ -43,7 +43,6 @@ A 100-message prefetch of 10KB messages = 1MB buffered *per consumer thread*. Wi
 
 ## Concurrency
 
-```java
 @Bean
 public SimpleRabbitListenerContainerFactory factory(ConnectionFactory connectionFactory) {
     SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
@@ -54,7 +53,6 @@ public SimpleRabbitListenerContainerFactory factory(ConnectionFactory connection
     factory.setBatchListener(true);               // batch mode (below)
     return factory;
 }
-```
 
 `maxConcurrentConsumers` only grows when the queue is busy — Spring monitors queue depth and scales the pool up and down. Start at 1–4 concurrent consumers; scale with load tests, not guesswork.
 
@@ -69,20 +67,16 @@ Consumer 1 takes A, Consumer 2 takes B → B may finish before A
 
 **If order matters** (money movements, state machines):
 
-```java
 // Option 1: one consumer per queue
 factory.setConcurrentConsumers(1);
 
 // Option 2: partition by key — one queue per partition (like Kafka)
 //   routing key = orderId → all events for one order hit one queue
-```
 
-```java
 public void orderEvent(OrderEvent event) {
     String partition = "orders." + (event.orderId().hashCode() % 8);
     template.convertAndSend("orders.exchange", partition, event);
 }
-```
 
 Per-key partitioning with 8 queues gives parallelism *and* per-order ordering. The universal rule: **order only matters within the same key; partition by key.**
 
@@ -90,12 +84,10 @@ Per-key partitioning with 8 queues gives parallelism *and* per-order ordering. T
 
 Even with perfect ordering, redelivery can reorder (a requeued message goes to the back). Idempotent consumers make "out of order" harmless:
 
-```java
 @RabbitListener(queues = "orders.new")
 public void onOrderCreated(OrderEvent event) {
     orderStateMachine.apply(event);   // state machine rejects stale transitions
 }
-```
 
 A state machine that only accepts legal transitions (NEW → PAID, never PAID → NEW) tolerates duplicates and reordering gracefully.
 
@@ -103,12 +95,10 @@ A state machine that only accepts legal transitions (NEW → PAID, never PAID �
 
 Spring AMQP supports batch listeners that receive arrays of messages:
 
-```java
 @RabbitListener(queues = "audit.logs")
 public void onBatch(List<AuditEvent> events) {
     auditRepository.saveAll(events);       // one DB batch instead of N inserts
 }
-```
 
 ```yaml
 spring:
@@ -146,7 +136,6 @@ If each message takes 50ms of DB time, the DB sees 80/50ms = 1600 msg/s max — 
 
 ## The ErrorHandler
 
-```java
 @Bean
 public RabbitListenerErrorHandler rabbitErrorHandler(MeterRegistry registry) {
     return (amqpMessage, message, listenerException) -> {
@@ -157,11 +146,8 @@ public RabbitListenerErrorHandler rabbitErrorHandler(MeterRegistry registry) {
         throw listenerException;   // → retry ladder / DLQ
     };
 }
-```
 
-```java
 factory.setErrorHandler(rabbitErrorHandler);
-```
 
 The error handler sees every listener failure — the perfect place for metrics and alerting.
 
@@ -189,3 +175,4 @@ Alert on:
 | Observability | Error handler counters + queue-depth alerts |
 
 Consumer tuning is a balance: threads for parallelism, prefetch for memory and backpressure, partitioning for ordering, and idempotency so the rest can fail safely. Measure, tune, and re-measure — the broker will tell you the truth.
+

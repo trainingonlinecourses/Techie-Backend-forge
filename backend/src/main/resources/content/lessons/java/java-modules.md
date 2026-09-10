@@ -1,7 +1,7 @@
 ---
 title: Java Platform Module System (JPMS) — Java 9+ Modules
 summary: What modules solve (the JAR hell), module-info.java anatomy, automatic vs named modules, and how organizations modularize large codebases. Beginner-friendly with line-by-line code.
-order: 85
+order: 38
 minutes: 20
 topics: [JPMS, modules, module-info.java, requires, exports, automatic module, module path, encapsulation]
 docs:
@@ -32,29 +32,46 @@ Think of it like an apartment building:
 
 Every module has a `module-info.java` at the root of its source tree:
 
+
+**What this code does — step by step:**
+
+1. File: src/main/java/module-info.java
+2. `module com.myapp.orders {` — Module name
+3. === WHAT THIS MODULE NEEDS ===
+4. `requires java.sql;` — Needs JDBC APIs
+5. `requires java.net.http;` — Needs HttpClient
+6. `requires spring.context;` — Needs Spring DI
+7. `requires spring.web;` — Needs Spring MVC
+8. `requires static org.slf4j;` — Compile-only dependency (optional)
+9. === WHAT THIS MODULE PROVIDES ===
+10. `exports com.myapp.orders.api;` — Public API — other modules can use this
+11. `exports com.myapp.orders.model;` — Public models. Note: com.myapp.orders.internal is NOT exported — private to this module
+12. === SERVICE PROVIDERS ===
+13. `provides com.myapp.common.spi.PaymentProcessor` — Implements this service interface
+14. `with com.myapp.orders.StripePaymentProcessor;` — The implementation class
+15. === OPENS (for reflection — Spring needs this) ===
+16. `opens com.myapp.orders.model;` — Allow reflection on these classes
+17. `opens com.myapp.orders.service;` — Spring can inject into these
+
+The same code, clean:
+
 ```java
-// File: src/main/java/module-info.java
-module com.myapp.orders {                            // Module name
+module com.myapp.orders {
 
-    // === WHAT THIS MODULE NEEDS ===
-    requires java.sql;                               // Needs JDBC APIs
-    requires java.net.http;                          // Needs HttpClient
-    requires spring.context;                         // Needs Spring DI
-    requires spring.web;                             // Needs Spring MVC
-    requires static org.slf4j;                       // Compile-only dependency (optional)
+    requires java.sql;
+    requires java.net.http;
+    requires spring.context;
+    requires spring.web;
+    requires static org.slf4j;
 
-    // === WHAT THIS MODULE PROVIDES ===
-    exports com.myapp.orders.api;                    // Public API — other modules can use this
-    exports com.myapp.orders.model;                  // Public models
-    // Note: com.myapp.orders.internal is NOT exported — private to this module
+    exports com.myapp.orders.api;
+    exports com.myapp.orders.model;
 
-    // === SERVICE PROVIDERS ===
-    provides com.myapp.common.spi.PaymentProcessor    // Implements this service interface
-        with com.myapp.orders.StripePaymentProcessor; // The implementation class
+    provides com.myapp.common.spi.PaymentProcessor
+        with com.myapp.orders.StripePaymentProcessor;
 
-    // === OPENS (for reflection — Spring needs this) ===
-    opens com.myapp.orders.model;                    // Allow reflection on these classes
-    opens com.myapp.orders.service;                  // Spring can inject into these
+    opens com.myapp.orders.model;
+    opens com.myapp.orders.service;
 }
 ```
 
@@ -72,7 +89,6 @@ module com.myapp.orders {                            // Module name
 
 ### Module Dependencies
 
-```java
 // In a module that USES the orders module:
 module com.myapp.api {
     requires com.myapp.orders;      // Need the orders module
@@ -80,14 +96,11 @@ module com.myapp.api {
 
     // Now you can import and use the exported classes:
 }
-```
 
-```java
 // In a class inside com.myapp.api:
 import com.myapp.orders.api.OrderService;      // ✅ This package is exported
 import com.myapp.orders.model.Order;           // ✅ This package is exported
 import com.myapp.orders.internal.CacheManager; // ❌ COMPILE ERROR — not exported!
-```
 
 ### Automatic Modules (Legacy JARs)
 
@@ -98,13 +111,11 @@ When you put a regular JAR (without `module-info.java`) on the module path, it b
 orders-service-1.0.jar  →  module orders.service   (dots from dashes, version stripped)
 ```
 
-```java
 // An automatic module "reads" all other modules:
 module orders.service {   // Auto-generated name
     // Implicitly requires EVERY module on the module path
     // No exports — all packages are exported
 }
-```
 
 **Line-by-line explained:**
 - Automatic modules are a **migration bridge** — they let you use non-modular JARs in a modular system.
@@ -116,7 +127,6 @@ module orders.service {   // Auto-generated name
 
 ### Scenario 1: Clean API Boundaries
 
-```java
 // Module: com.myapp.payment
 module com.myapp.payment {
     exports com.myapp.payment.api;      // Public: PaymentService, PaymentResult
@@ -125,9 +135,7 @@ module com.myapp.payment {
     provides com.myapp.payment.api.PaymentProcessor
         with com.myapp.payment.stripe.StripeProcessor;   // Stripe is the implementation
 }
-```
 
-```java
 // Module: com.myapp.orders (uses payment)
 module com.myapp.orders {
     requires com.myapp.payment;         // Can use the exported API
@@ -135,37 +143,62 @@ module com.myapp.orders {
     // Can import: PaymentService, PaymentResult ✅
     // Cannot import: StripeProcessor ❌ (internal, not exported)
 }
-```
 
 **Benefit:** The Orders module depends on the Payment **API**, not the Stripe implementation. You can swap Stripe for PayPal by changing the `provides` declaration — Orders doesn't know or care.
 
 ### Scenario 2: Spring Boot Application
 
+
+**What this code does — step by step:**
+
+1. `requires spring.boot;` — Spring Boot starter
+2. `requires spring.context;` — Spring DI
+3. `requires spring.web;` — Spring MVC
+4. `requires spring.data.jpa;` — Spring Data JPA
+5. `requires java.sql;` — JDBC
+6. `requires static org.mapstruct;` — Compile-time only
+7. `opens com.myapp.controller;` — Spring MVC needs reflection
+8. `opens com.myapp.service;` — Spring DI needs reflection
+9. `opens com.myapp.model;` — JPA needs reflection
+10. `exports com.myapp;` — Main module
+
+The same code, clean:
+
 ```java
 module com.myapp {
-    requires spring.boot;              // Spring Boot starter
-    requires spring.context;           // Spring DI
-    requires spring.web;               // Spring MVC
-    requires spring.data.jpa;          // Spring Data JPA
-    requires java.sql;                 // JDBC
-    requires static org.mapstruct;     // Compile-time only
+    requires spring.boot;
+    requires spring.context;
+    requires spring.web;
+    requires spring.data.jpa;
+    requires java.sql;
+    requires static org.mapstruct;
 
-    opens com.myapp.controller;        // Spring MVC needs reflection
-    opens com.myapp.service;           // Spring DI needs reflection
-    opens com.myapp.model;             // JPA needs reflection
-    exports com.myapp;                 // Main module
+    opens com.myapp.controller;
+    opens com.myapp.service;
+    opens com.myapp.model;
+    exports com.myapp;
 }
 ```
 
 ### Scenario 3: Testing Modules
 
+
+**What this code does — step by step:**
+
+1. Test module (src/test/java/module-info.java):
+2. `requires com.myapp;` — Test the main module
+3. `requires org.junit.jupiter;` — JUnit 5
+4. `requires spring.test;` — Spring Test
+5. `opens com.myapp.controller;` — @WebMvcTest needs reflection
+
+The same code, clean:
+
 ```java
-// Test module (src/test/java/module-info.java):
 open module com.myapp.test {
-    requires com.myapp;                // Test the main module
-    requires org.junit.jupiter;        // JUnit 5
-    requires spring.test;              // Spring Test
-    opens com.myapp.controller;        // @WebMvcTest needs reflection
+    requires com.myapp;
+    requires org.junit.jupiter;
+    requires spring.test;
+    opens com.myapp.controller;
 }
 ```
 
@@ -192,3 +225,4 @@ open module com.myapp.test {
 - **Spring Boot + modules**: always add `opens` for packages with DI/ORM annotations.
 
 Official docs: [JPMS Tutorial](https://docs.oracle.com/en/java/javase/21/language/java-platform-module-system.html) · [Project Jigsaw](https://openjdk.org/projects/jigsaw/)
+

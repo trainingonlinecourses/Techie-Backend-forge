@@ -1,7 +1,7 @@
 ---
 title: The Aggregation Framework — Pipelines, Grouping, and Joins
 module: mongodb-deep
-order: 4
+order: 1
 minutes: 26
 topics: ["aggregation", "pipelines", "group", "unwind", "lookup", "project"]
 summary: MongoDB's find handles simple queries, but real reporting needs aggregation: grouping, summing, averaging, counting, joining collections, reshaping...
@@ -94,7 +94,6 @@ The result: each order carries its customer's name — a join, server-side. The 
 
 Spring Data MongoDB wraps pipelines with `Aggregation` builders:
 
-```java
 import org.springframework.data.mongodb.core.aggregation.*;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
@@ -118,10 +117,10 @@ public class ReportingService {
         return mongo.aggregate(agg, "orders", StatusRevenue.class).getMappedResults();
     }
 }
-```
 
 Every stage has a builder method mirroring the shell operator: `match`, `unwind`, `project`, `group`, `sort`, `lookup`. The pipeline you designed in the shell translates nearly 1:1 — same stages, same order, Java syntax. `mongo.aggregate(...)` runs it and maps results into your DTO/record.
 
 ## Recap
 
 The aggregation framework is MongoDB's answer to reporting and analytics: a pipeline of stages (`$match` → `$unwind` → `$project` → `$group` → `$sort`), each transforming the document stream. `$match` filters early, `$unwind` flattens arrays into rows, `$project` shapes and computes, `$group` aggregates with accumulators, and `$lookup` joins collections. The performance rules are filter-early, index-your-match, and beware memory-heavy stages. Spring Data MongoDB mirrors every stage with builder methods, so the pipeline you prototype in `mongosh` ports directly into `MongoTemplate` code. Master the pipeline and "can MongoDB do this report?" stops being a question — it becomes a sequence of stages.
+

@@ -1,7 +1,7 @@
 ---
 title: @ConfigurationProperties — Type-Safe Configuration
 summary: What @ConfigurationProperties is, binding rules, nested properties, validation, defaults, and how organizations manage configuration safely.
-order: 1
+order: 2
 minutes: 20
 topics: [@configurationproperties, type-safe-config, validation, defaults, spring-boot]
 docs:
@@ -26,7 +26,6 @@ app:
     rate-limit: 1000
 ```
 
-```java
 @ConfigurationProperties(prefix = "app")
 public record AppProperties(
     String name,
@@ -40,11 +39,24 @@ public record AppProperties(
 }
 
 // Access: appProperties.database().pool().maxSize() → 20
-```
 
 ---
 
 ## Line-by-Line Walkthrough
+
+
+**What this code does — step by step:**
+
+1. Line 1: Basic @ConfigurationProperties
+2. Nested records for complex configuration
+3. Line 2: Enable configuration properties
+4. Line 3: Using configuration properties
+5. Production-specific logic
+6. Line 4: Map-based properties (flexible)
+7. getters and setters
+8. application.yml. App: metrics: tags: env: production. Region: us-east-1. Enabled: jvm: true. Http: true
+
+The same code, clean:
 
 ```java
 import jakarta.validation.constraints.*;
@@ -52,7 +64,6 @@ import org.springframework.boot.context.properties.*;
 import org.springframework.boot.context.properties.bind.DefaultValue;
 import org.springframework.validation.annotation.Validated;
 
-// Line 1: Basic @ConfigurationProperties
 @ConfigurationProperties(prefix = "app")
 @Validated
 public record AppProperties(
@@ -61,7 +72,6 @@ public record AppProperties(
     ServerProperties server,
     DatabaseProperties database
 ) {
-    // Nested records for complex configuration
     public record ServerProperties(
         @DefaultValue("8080") int port,
         @DefaultValue("localhost") String host,
@@ -76,7 +86,6 @@ public record AppProperties(
     ) {}
 }
 
-// Line 2: Enable configuration properties
 @SpringBootApplication
 @EnableConfigurationProperties(AppProperties.class)
 public class Application {
@@ -85,7 +94,6 @@ public class Application {
     }
 }
 
-// Line 3: Using configuration properties
 @Service
 public class OrderService {
     private final AppProperties properties;
@@ -96,29 +104,16 @@ public class OrderService {
 
     public void createOrder(Order order) {
         if (properties.database().url().contains("prod")) {
-            // Production-specific logic
         }
     }
 }
 
-// Line 4: Map-based properties (flexible)
 @ConfigurationProperties(prefix = "app.metrics")
 public class MetricsProperties {
     private Map<String, String> tags = new HashMap<>();
     private Map<String, Boolean> enabled = new HashMap<>();
 
-    // getters and setters
 }
-
-// application.yml
-// app:
-//   metrics:
-//     tags:
-//       env: production
-//       region: us-east-1
-//     enabled:
-//       jvm: true
-//       http: true
 ```
 
 ---
@@ -164,14 +159,12 @@ app:
       timeout: 15s
 ```
 
-```java
 @ConfigurationProperties(prefix = "app.external-apis")
 public record ExternalApisProperties(
     Map<String, ApiConfig> apis
 ) {
     public record ApiConfig(String url, String key, Duration timeout, int retryAttempts) {}
 }
-```
 
 ---
 
@@ -184,3 +177,4 @@ public record ExternalApisProperties(
 | Not validating required fields | Null values at runtime | Add `@NotBlank`, `@NotNull` |
 | Using mutable properties | Thread safety issues | Use records or immutable objects |
 | Not providing defaults | Configuration required for every env | Add `@DefaultValue` |
+

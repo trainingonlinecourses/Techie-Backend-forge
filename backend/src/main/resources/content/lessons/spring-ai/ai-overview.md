@@ -1,7 +1,7 @@
 ---
 title: Spring AI — Integrating AI into Your Application
 summary: Spring AI's abstraction over LLM providers, chat models, embeddings, vector stores, and how organizations build AI-powered features. Beginner-friendly with line-by-line code.
-order: 1
+order: 4
 minutes: 20
 topics: [Spring AI, LLM, chat model, embeddings, vector store, RAG, prompt engineering, AI integration]
 docs:
@@ -53,6 +53,21 @@ spring:
 
 ### 2. Chat Model (Basic AI Interaction)
 
+
+**What this code does — step by step:**
+
+1. `this.chatClient = ChatClient.create(chatModel);` — Create a chat client from the model
+2. Simple chat:
+3. `.user(question)` — The user's message
+4. `.content();` — Get the response as a String
+5. Chat with system prompt (set the AI's role):
+6. `.user("Explain " + topic + " in detail")` — User message — the question
+7. Chat with conversation history:
+8. `messages.add(new UserMessage(newMessage));` — Add the new user message
+9. `.messages(messages)` — Pass full conversation
+
+The same code, clean:
+
 ```java
 @Service
 public class AiTutorService {
@@ -60,18 +75,16 @@ public class AiTutorService {
     private final ChatClient chatClient;
 
     public AiTutorService(ChatModel chatModel) {
-        this.chatClient = ChatClient.create(chatModel);     // Create a chat client from the model
+        this.chatClient = ChatClient.create(chatModel);
     }
 
-    // Simple chat:
     public String askQuestion(String question) {
         return chatClient.prompt()
-            .user(question)                                  // The user's message
+            .user(question)
             .call()
-            .content();                                      // Get the response as a String
+            .content();
     }
 
-    // Chat with system prompt (set the AI's role):
     public String explainConcept(String topic) {
         return chatClient.prompt()
             .system("""
@@ -80,18 +93,17 @@ public class AiTutorService {
                 Use beginner-friendly language.
                 Always include a real-world analogy.
                 """)                                         // System message — sets behavior
-            .user("Explain " + topic + " in detail")        // User message — the question
+            .user("Explain " + topic + " in detail")
             .call()
             .content();
     }
 
-    // Chat with conversation history:
     public String chatWithHistory(List<Message> history, String newMessage) {
         List<Message> messages = new ArrayList<>(history);
-        messages.add(new UserMessage(newMessage));           // Add the new user message
+        messages.add(new UserMessage(newMessage));
 
         return chatClient.prompt()
-            .messages(messages)                              // Pass full conversation
+            .messages(messages)
             .call()
             .content();
     }
@@ -107,7 +119,6 @@ public class AiTutorService {
 
 ### 3. Structured Output (Parse AI Responses)
 
-```java
 // Define what you want the AI to return:
 public record LessonSummary(
     String title,
@@ -131,9 +142,20 @@ public class LessonService {
             .entity(LessonSummary.class);                   // Parse response into this record
     }
 }
-```
 
 ### 4. Embeddings (Semantic Search)
+
+
+**What this code does — step by step:**
+
+1. Convert text to a vector (array of numbers):
+2. Store documents with embeddings:
+3. `vectorStore.add(documents);` — Auto-generates embeddings
+4. Semantic search (find similar content):
+5. `.withTopK(topK)` — Return top K results
+6. `.withSimilarityThreshold(0.7);` — Minimum similarity score
+
+The same code, clean:
 
 ```java
 @Service
@@ -142,26 +164,23 @@ public class SearchService {
     private final EmbeddingModel embeddingModel;
     private final VectorStore vectorStore;
 
-    // Convert text to a vector (array of numbers):
     public float[] embed(String text) {
         EmbeddingResponse response = embeddingModel.call(
             new EmbeddingRequest(List.of(new TextObservation(text)), null));
         return response.getResult().getOutput().getEmbedding();
     }
 
-    // Store documents with embeddings:
     public void indexLesson(String lessonId, String content) {
         List<Document> documents = List.of(
             new Document(lessonId, content)
         );
-        vectorStore.add(documents);                          // Auto-generates embeddings
+        vectorStore.add(documents);
     }
 
-    // Semantic search (find similar content):
     public List<Document> searchSimilar(String query, int topK) {
         SearchRequest request = SearchRequest.query(query)
-            .withTopK(topK)                                  // Return top K results
-            .withSimilarityThreshold(0.7);                   // Minimum similarity score
+            .withTopK(topK)
+            .withSimilarityThreshold(0.7);
 
         return vectorStore.similaritySearch(request);
     }
@@ -174,7 +193,6 @@ public class SearchService {
 
 ### Scenario 1: AI-Powered Tutor (RAG Pattern)
 
-```java
 @Service
 public class AiTutorRAG {
 
@@ -207,11 +225,9 @@ public class AiTutorRAG {
             .content();
     }
 }
-```
 
 ### Scenario 2: Code Review Assistant
 
-```java
 public CodeReviewResult reviewCode(String code) {
     return chatClient.prompt()
         .system("""
@@ -227,11 +243,9 @@ public CodeReviewResult reviewCode(String code) {
         .call()
         .entity(CodeReviewResult.class);
 }
-```
 
 ### Scenario 3: Content Generation
 
-```java
 public List<String> generateQuizQuestions(String topic, int count) {
     return chatClient.prompt()
         .system("Generate quiz questions about Java/Spring topics.")
@@ -240,7 +254,6 @@ public List<String> generateQuizQuestions(String topic, int count) {
         .call()
         .entity(new ParameterizedTypeReference<List<QuizQuestion>>() {});
 }
-```
 
 ---
 
@@ -265,3 +278,4 @@ public List<String> generateQuizQuestions(String topic, int count) {
 - **Temperature** controls creativity: low = deterministic, high = creative.
 
 Official docs: [Spring AI](https://docs.spring.io/spring-ai/reference/) · [Spring AI Project](https://spring.io/projects/spring-ai)
+

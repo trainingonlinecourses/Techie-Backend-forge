@@ -1,7 +1,7 @@
 ---
 title: "DTO Pattern — Never Expose Your Entities to the Outside World"
 summary: "What DTOs are, why you need them, how to map entities to DTOs and back, and how organizations use them to decouple internal models from API contracts."
-order: 54
+order: 24
 minutes: 22
 topics: [dto, data-transfer-object, entity-mapping, record-dto, mapstruct, api-contract]
 docs:
@@ -17,19 +17,28 @@ docs:
 
 **Why not just return entities directly?**
 
+
+**What this code does — step by step:**
+
+1. BAD — exposing your database entity
+2. `private String passwordHash;` — ⚠️ SECURITY RISK — exposed to client!
+3. `private String ssn;` — ⚠️ SECURITY RISK — exposed to client!
+4. `private boolean deleted;` — ⚠️ Internal field — should not be visible
+5. The client receives passwordHash and SSN!
+
+The same code, clean:
+
 ```java
-// BAD — exposing your database entity
 @Entity
 public class User {
     @Id private Long id;
     private String name;
     private String email;
-    private String passwordHash;  // ⚠️ SECURITY RISK — exposed to client!
-    private String ssn;           // ⚠️ SECURITY RISK — exposed to client!
-    private boolean deleted;      // ⚠️ Internal field — should not be visible
+    private String passwordHash;
+    private String ssn;
+    private boolean deleted;
 }
 
-// The client receives passwordHash and SSN!
 @GetMapping("/api/users/{id}")
 public User getUser(@PathVariable Long id) {
     return userRepository.findById(id).orElseThrow();
@@ -38,7 +47,6 @@ public User getUser(@PathVariable Long id) {
 
 **DTOs fix this by giving you a separate, controlled view:**
 
-```java
 // GOOD — DTO controls what's exposed
 public record UserResponse(
     Long id,
@@ -54,7 +62,6 @@ public UserResponse getUser(@PathVariable Long id) {
     return new UserResponse(user.getId(), user.getName(), user.getEmail());
     // Only safe fields are returned
 }
-```
 
 ### Why DTOs Exist
 
@@ -66,24 +73,32 @@ public UserResponse getUser(@PathVariable Long id) {
 
 ### DTO Types
 
+
+**What this code does — step by step:**
+
+1. 1. Response DTO — sent to the client
+2. 2. Request DTO — received from the client
+3. 3. Update DTO — partial updates
+4. `String name,` — null = don't change
+5. `String email` — null = don't change
+6. 4. List DTO — paginated results
+
+The same code, clean:
+
 ```java
-// 1. Response DTO — sent to the client
 public record UserResponse(Long id, String name, String email) {}
 
-// 2. Request DTO — received from the client
 public record CreateUserRequest(
     @NotBlank String name,
     @Email String email,
     @NotBlank @Size(min = 8) String password
 ) {}
 
-// 3. Update DTO — partial updates
 public record UpdateUserRequest(
-    String name,      // null = don't change
-    String email      // null = don't change
+    String name,
+    String email
 ) {}
 
-// 4. List DTO — paginated results
 public record PagedResponse<T>(
     List<T> content,
     int page,
@@ -95,7 +110,6 @@ public record PagedResponse<T>(
 ### Mapping Entities to DTOs
 
 **Option 1: Manual mapping (simple, explicit)**
-```java
 @Service
 public class UserService {
     public UserResponse toResponse(User entity) {
@@ -114,36 +128,44 @@ public class UserService {
         return user;
     }
 }
-```
 
 **Option 2: MapStruct (automatic, type-safe)**
+
+**What this code does — step by step:**
+
+1. `@Mapping(target = "id", ignore = true)` — ID is generated
+2. `@Mapping(target = "passwordHash", ignore = true)` — Never map password
+3. Usage:
+4. `User entity = mapper.toEntity(request);` — Auto-mapped
+5. `return mapper.toResponse(entity);` — Auto-mapped
+
+The same code, clean:
+
 ```java
 @Mapper(componentModel = "spring")
 public interface UserMapper {
-    @Mapping(target = "id", ignore = true)  // ID is generated
-    @Mapping(target = "passwordHash", ignore = true)  // Never map password
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "passwordHash", ignore = true)
     User toEntity(CreateUserRequest request);
-    
+
     UserResponse toResponse(User entity);
-    
+
     List<UserResponse> toResponseList(List<User> entities);
 }
 
-// Usage:
 @Service
 public class UserService {
     @Autowired private UserMapper mapper;
-    
+
     public UserResponse createUser(CreateUserRequest request) {
-        User entity = mapper.toEntity(request);     // Auto-mapped
+        User entity = mapper.toEntity(request);
         entity = userRepository.save(entity);
-        return mapper.toResponse(entity);            // Auto-mapped
+        return mapper.toResponse(entity);
     }
 }
 ```
 
 **Option 3: Java Records with factory methods**
-```java
 public record UserResponse(Long id, String name, String email) {
     // Factory method — converts entity to DTO
     public static UserResponse from(User entity) {
@@ -157,46 +179,51 @@ public record UserResponse(Long id, String name, String email) {
 
 // Usage:
 return UserResponse.from(userRepository.findById(id).orElseThrow());
-```
 
 ### Full CRUD with DTOs
+
+
+**What this code does — step by step:**
+
+1. CREATE — accepts request DTO, returns response DTO
+2. READ — returns response DTO
+3. LIST — returns paged response DTO
+4. UPDATE — accepts update DTO, returns response DTO
+5. DELETE — no DTO needed
+
+The same code, clean:
 
 ```java
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
-    
+
     private final UserService userService;
-    
-    // CREATE — accepts request DTO, returns response DTO
+
     @PostMapping
     public ResponseEntity<UserResponse> create(@Valid @RequestBody CreateUserRequest request) {
         UserResponse created = userService.createUser(request);
         return ResponseEntity.status(201).body(created);
     }
-    
-    // READ — returns response DTO
+
     @GetMapping("/{id}")
     public UserResponse getOne(@PathVariable Long id) {
         return userService.getUser(id);
     }
-    
-    // LIST — returns paged response DTO
+
     @GetMapping
     public PagedResponse<UserResponse> getAll(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
         return userService.getUsers(page, size);
     }
-    
-    // UPDATE — accepts update DTO, returns response DTO
+
     @PutMapping("/{id}")
     public UserResponse update(@PathVariable Long id, 
                                @Valid @RequestBody UpdateUserRequest request) {
         return userService.updateUser(id, request);
     }
-    
-    // DELETE — no DTO needed
+
     @DeleteMapping("/{id}")
     @ResponseStatus(204)
     public void delete(@PathVariable Long id) {
@@ -217,47 +244,46 @@ public class UserController {
 
 ### Line-by-Line Code Explanation
 
+
+**What this code does — step by step:**
+
+1. ↑ Java Record — immutable, auto-generates constructor, getters, equals, hashCode. ↑ This is a REQUEST DTO — data coming FROM the client
+2. ↑ Validation: name cannot be null, empty, or whitespace-only
+3. ↑ Simple String field — the user's display name
+4. ↑ Validation: must match email format (user@domain.com)
+5. ↑ Email field — validated by @Email
+6. ↑ Two validations: required AND length 8-100
+7. ↑ Password field — will be hashed before saving to database. ↑ NEVER store plain text passwords!
+8. ↑ Empty body — record auto-generates everything. ↑ This DTO ONLY has fields the client should send. ↑ No 'id', no 'createdAt', no 'deleted' — those are server-managed
+
+The same code, clean:
+
 ```java
 public record CreateUserRequest(
-    // ↑ Java Record — immutable, auto-generates constructor, getters, equals, hashCode
-    // ↑ This is a REQUEST DTO — data coming FROM the client
-    
+
     @NotBlank(message = "Name is required")
-    // ↑ Validation: name cannot be null, empty, or whitespace-only
-    
+
     String name,
-    // ↑ Simple String field — the user's display name
-    
+
     @Email(message = "Email must be valid")
-    // ↑ Validation: must match email format (user@domain.com)
-    
+
     String email,
-    // ↑ Email field — validated by @Email
-    
+
     @NotBlank(message = "Password is required")
     @Size(min = 8, max = 100, message = "Password must be 8-100 characters")
-    // ↑ Two validations: required AND length 8-100
-    
+
     String password
-    // ↑ Password field — will be hashed before saving to database
-    // ↑ NEVER store plain text passwords!
 ) {}
-// ↑ Empty body — record auto-generates everything
-// ↑ This DTO ONLY has fields the client should send
-// ↑ No 'id', no 'createdAt', no 'deleted' — those are server-managed
 ```
 
 ### Organization Use Cases
 
 **1. E-Commerce Product API**
-```java
 public record ProductResponse(Long id, String name, String description, 
     BigDecimal price, String imageUrl, List<String> categories) {}
 // ^ Only safe, useful fields — no internal stock counts, no supplier info
-```
 
 **2. Banking Transaction API**
-```java
 public record TransactionRequest(
     @NotNull Long fromAccountId,
     @NotNull Long toAccountId,
@@ -265,14 +291,11 @@ public record TransactionRequest(
     String description
 ) {}
 // ^ Client sends only what's needed — server adds timestamp, generates ID
-```
 
 **3. Social Media Post API**
-```java
 public record PostResponse(Long id, String content, String authorName,
     Instant createdAt, int likeCount, boolean isLikedByMe) {}
 // ^ Includes computed fields (likeCount, isLikedByMe) — not in database
-```
 
 ### Key Takeaways
 
@@ -291,3 +314,4 @@ A fintech startup exposes a REST API for account management. Initially, they ret
 - `CreateAccountRequest` validates all required fields before processing
 
 The API contract is now independent of the database schema — they can refactor entities without breaking clients.
+

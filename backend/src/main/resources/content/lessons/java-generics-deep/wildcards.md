@@ -1,7 +1,7 @@
 ---
 title: Wildcards — ? extends, ? super, and Unbounded
 module: java-generics-deep
-order: 2
+order: 5
 minutes: 27
 topics: ["wildcards", "covariance", "contravariance", "producer extends", "consumer super"]
 summary: In the previous lesson we learned that List<String is not a subtype of List<Object. That rule protects type safety, but it creates an everyday prob...
@@ -18,11 +18,9 @@ docs:
 
 In the previous lesson we learned that `List<String>` is **not** a subtype of `List<Object>`. That rule protects type safety, but it creates an everyday problem. Suppose you write a method that prints any list:
 
-```java
 public static void printAll(List<Object> list) {
     for (Object o : list) System.out.println(o);
 }
-```
 
 You naturally want to call `printAll` with a `List<String>`, a `List<Integer>`, or a `List<Book>`. But the compiler refuses: `printAll` demands exactly `List<Object>`, and `List<String>` is not one. The method is needlessly rigid — it only *reads* from the list, so letting it accept lists of any element type would be perfectly safe.
 
@@ -40,19 +38,24 @@ The direction of the bound encodes what you are allowed to do: extends gives you
 
 Let's look at the classic case — a method that reads numbers and computes a total:
 
+
+**What this code does — step by step:**
+
+1. Accepts a list of Number, or any list whose elements are a. Subtype of Number: List<Integer>, List<Double>, List<Long>, ...
+2. We can safely READ from the list. Every element is. Guaranteed to be a Number (or a subtype), so the compiler. Lets us call Number's methods on each element.
+3. `System.out.println(sum(ints));` — 10.0 — List<Integer> accepted!
+4. `System.out.println(sum(dbls));` — 4.0 — List<Double> accepted!
+
+The same code, clean:
+
 ```java
 import java.util.List;
 import java.util.Arrays;
 
 public class WildcardsDemo {
 
-    // Accepts a list of Number, or any list whose elements are a
-    // subtype of Number: List<Integer>, List<Double>, List<Long>, ...
     public static double sum(List<? extends Number> numbers) {
         double total = 0.0;
-        // We can safely READ from the list. Every element is
-        // guaranteed to be a Number (or a subtype), so the compiler
-        // lets us call Number's methods on each element.
         for (Number n : numbers) {
             total += n.doubleValue();
         }
@@ -63,8 +66,8 @@ public class WildcardsDemo {
         List<Integer> ints = Arrays.asList(1, 2, 3, 4);
         List<Double> dbls = Arrays.asList(1.5, 2.5);
 
-        System.out.println(sum(ints));  // 10.0 — List<Integer> accepted!
-        System.out.println(sum(dbls));  // 4.0  — List<Double> accepted!
+        System.out.println(sum(ints));
+        System.out.println(sum(dbls));
     }
 }
 ```
@@ -77,17 +80,25 @@ public class WildcardsDemo {
 
 The mirror image: a method that *fills* a list. Suppose you want to add several `Integer` values to a list:
 
+
+**What this code does — step by step:**
+
+1. Accepts a list that can hold Integer: List<Integer>, List<Number>,. Or List<Object>. The list must be able to CONSUME integers.
+2. Safe: wherever the list's element type is, it is a supertype. Of Integer, so an Integer is always a valid element.
+3. `fill(objects);` — legal — Object can hold Integer
+4. `fill(numbers);` — legal — Number can hold Integer
+5. `fill(integers);` — legal — Integer can hold Integer
+6. `System.out.println(numbers);` — [10, 20, 30]
+
+The same code, clean:
+
 ```java
 import java.util.List;
 import java.util.ArrayList;
 
 public class SuperDemo {
 
-    // Accepts a list that can hold Integer: List<Integer>, List<Number>,
-    // or List<Object>. The list must be able to CONSUME integers.
     public static void fill(List<? super Integer> sink) {
-        // Safe: wherever the list's element type is, it is a supertype
-        // of Integer, so an Integer is always a valid element.
         sink.add(10);
         sink.add(20);
         sink.add(30);
@@ -98,11 +109,11 @@ public class SuperDemo {
         List<Number> numbers = new ArrayList<>();
         List<Integer> integers = new ArrayList<>();
 
-        fill(objects);   // legal — Object can hold Integer
-        fill(numbers);   // legal — Number can hold Integer
-        fill(integers);  // legal — Integer can hold Integer
+        fill(objects);
+        fill(numbers);
+        fill(integers);
 
-        System.out.println(numbers); // [10, 20, 30]
+        System.out.println(numbers);
     }
 }
 ```
@@ -145,3 +156,4 @@ Reading signatures with PECS in mind turns cryptic API types into plain English:
 ## Recap
 
 Wildcards exist to let one method serve many instantiations while preserving safety. The rule to memorize: **PECS — Producer extends, Consumer super.** If your code only reads values from a structure, bound with `extends`; if it only writes values, bound with `super`; if it does neither, use `?`. Whenever the compiler rejects a wildcard use, ask yourself which direction the data flows — the answer will tell you which bound you actually need, and the error message will make sense instead of feeling like a wall.
+

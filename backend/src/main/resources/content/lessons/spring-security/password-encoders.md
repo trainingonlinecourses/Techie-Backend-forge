@@ -1,7 +1,7 @@
 ---
 title: Password Storage — BCrypt, Argon2 and DelegatingPasswordEncoder
 summary: Why plaintext and hashes without salt fail, BCrypt/Argon2 semantics, the {id} encoded-password format, and the upgrade path for legacy systems.
-order: 12
+order: 11
 minutes: 18
 topics: [password-storage, bcrypt, argon2, delegatingpasswordencoder, salting, hash, password-upgrade]
 docs:
@@ -23,12 +23,10 @@ The OWASP standard today: **Argon2id** (modern) or **BCrypt** (ubiquitous, battl
 
 ## How Spring Security encodes
 
-```java
 @Bean
 public PasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder(12);   // work factor 12 — ~200-400ms per hash
 }
-```
 
 `BCryptPasswordEncoder.encode(raw)` returns a **self-describing string**:
 
@@ -51,7 +49,6 @@ The cost and salt are embedded in the hash — so `matches(raw, hash)` can alway
 
 `encode()` always produces the **strongest** algorithm you configured; `matches()` reads the `{id}` prefix and dispatches to the right encoder — so old users verify against their legacy format while new hashes are strong. The pattern for a legacy system:
 
-```java
 @Bean
 public PasswordEncoder passwordEncoder() {
     String idForEncode = "bcrypt";
@@ -63,7 +60,6 @@ public PasswordEncoder passwordEncoder() {
     );
     return new DelegatingPasswordEncoder(idForEncode, encoders);
 }
-```
 
 **The migration play:** keep legacy ids registered so old users can log in, and add a re-hash-on-login step — when a user authenticates successfully with a legacy hash, re-encode with bcrypt and update the row. Over time the `{noop}`/`{MD5}` population drains to zero and you delete those encoders.
 
@@ -71,7 +67,6 @@ public PasswordEncoder passwordEncoder() {
 
 **Scenario 1 — user registration and login.** The service layer never sees the raw password outside the encode/verify boundary:
 
-```java
 @Service
 public class UserService {
     private final PasswordEncoder encoder;
@@ -85,11 +80,9 @@ public class UserService {
         return encoder.matches(raw, storedHash);         // constant-time-ish comparison inside
     }
 }
-```
 
 **Scenario 2 — re-hash on login (drain legacy):**
 
-```java
 public User authenticate(String email, String raw) {
     User u = userRepo.findByEmail(email).orElseThrow();
     if (!encoder.matches(raw, u.passwordHash())) throw new BadCredentialsException("bad");
@@ -99,7 +92,6 @@ public User authenticate(String email, String raw) {
     }
     return u;
 }
-```
 
 **Scenario 3 — import from an old system.** During a migration, imports come as `{MD5}` or `{noop}` hashes *temporarily* — the delegating encoder lets them sign in, and the login-time rehash upgrades them without a forced password reset (force-reset only the `{noop}` population, since plaintext imports are genuinely dangerous).
 
@@ -119,3 +111,4 @@ public User authenticate(String email, String raw) {
 - `DelegatingPasswordEncoder` with `{id}` prefixes is the standard upgrade path for legacy systems.
 - Re-hash on successful login to drain legacy formats; delete `{noop}` encoders once migrated.
 - Hash at the service boundary, verify with `matches`, and rate-limit login attempts.
+

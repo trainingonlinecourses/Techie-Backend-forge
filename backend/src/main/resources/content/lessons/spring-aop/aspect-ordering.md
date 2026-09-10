@@ -1,7 +1,7 @@
 ---
 title: Aspect Ordering — When Multiple Aspects Intersect
 summary: How Spring resolves aspect execution order, @Order annotation, conflict resolution, and why ordering matters for security + transaction + logging aspects. Beginner-friendly with line-by-line code.
-order: 6
+order: 4
 minutes: 18
 topics: [aspect ordering, @Order, aspect priority, transaction security ordering, advice ordering, conflict resolution]
 docs:
@@ -35,17 +35,27 @@ Response ← [Logging Aspect] ← [Transaction Aspect] ← [Security Aspect] ←
 
 ### Using @Order to Control Aspect Priority
 
+
+**What this code does — step by step:**
+
+1. `@Order(100)` — Lower number = higher priority = runs FIRST
+2. Validate JWT, check roles, etc.
+3. `Object result = joinPoint.proceed();` — Continue to next aspect / target method
+4. `@Order(200)` — Runs AFTER SecurityAspect (100 < 200)
+5. `@Order(300)` — Runs AFTER TransactionAspect (200 < 300)
+
+The same code, clean:
+
 ```java
 @Aspect
 @Component
-@Order(100)        // Lower number = higher priority = runs FIRST
+@Order(100)
 public class SecurityAspect {
 
     @Around("@annotation(RequiresRole)")
     public Object checkAccess(ProceedingJoinPoint joinPoint) throws Throwable {
         System.out.println("1. Security check — before anything else");
-        // Validate JWT, check roles, etc.
-        Object result = joinPoint.proceed();    // Continue to next aspect / target method
+        Object result = joinPoint.proceed();
         System.out.println("6. Security cleanup — after everything");
         return result;
     }
@@ -53,7 +63,7 @@ public class SecurityAspect {
 
 @Aspect
 @Component
-@Order(200)        // Runs AFTER SecurityAspect (100 < 200)
+@Order(200)
 public class TransactionAspect {
 
     @Around("@annotation(Transactional)")
@@ -75,7 +85,7 @@ public class TransactionAspect {
 
 @Aspect
 @Component
-@Order(300)        // Runs AFTER TransactionAspect (200 < 300)
+@Order(300)
 public class LoggingAspect {
 
     @Around("execution(* com.example.service.*.*(..))")
@@ -109,14 +119,12 @@ public class LoggingAspect {
 
 ### Default Ordering (Without @Order)
 
-```java
 @Aspect
 @Component
 // No @Order — default priority is LOWEST (runs last among ordered aspects)
 public class MetricsAspect {
     // ...
 }
-```
 
 **Default rules:**
 1. Aspects with `@Order` run first, sorted by value (lower = first)
@@ -129,28 +137,39 @@ public class MetricsAspect {
 
 ### Scenario 1: Security → Transaction → Audit Chain
 
+
+**What this code does — step by step:**
+
+1. `@Order(100)` — First: security check
+2. `auditLog.record(new AuditEvent(user, action, Instant.now()));` — Log BEFORE execution
+3. `return joinPoint.proceed();` — Let other aspects run
+4. `@Order(200)` — Second: transaction
+5. `@Order(300)` — Third: performance monitoring
+
+The same code, clean:
+
 ```java
 @Aspect
 @Component
-@Order(100)    // First: security check
+@Order(100)
 public class SecurityAuditAspect {
     @Around("@annotation(Auditable)")
     public Object audit(ProceedingJoinPoint joinPoint) throws Throwable {
         String user = SecurityContextHolder.getContext().getAuthentication().getName();
         String action = joinPoint.getSignature().getName();
-        auditLog.record(new AuditEvent(user, action, Instant.now()));   // Log BEFORE execution
-        return joinPoint.proceed();                                      // Let other aspects run
+        auditLog.record(new AuditEvent(user, action, Instant.now()));
+        return joinPoint.proceed();
     }
 }
 
 @Aspect
 @Component
-@Order(200)    // Second: transaction
+@Order(200)
 public class TransactionAspect { ... }
 
 @Aspect
 @Component
-@Order(300)    // Third: performance monitoring
+@Order(300)
 public class PerformanceAspect {
     @Around("@annotation(Timed)")
     public Object time(ProceedingJoinPoint joinPoint) throws Throwable {
@@ -165,7 +184,6 @@ public class PerformanceAspect {
 
 ### Scenario 2: Aspect Conflict (Same Order)
 
-```java
 @Aspect
 @Component
 @Order(100)    // Both have order 100 — which runs first?
@@ -176,13 +194,11 @@ public class AspectA { ... }
 @Order(100)    // Ambiguous! Spring uses alphabetical order of class names
 public class AspectB { ... }
 // AspectA runs first (A < B alphabetically)
-```
 
 **Fix:** Give them distinct order values: `@Order(100)` and `@Order(200)`.
 
 ### Scenario 3: Combining with Spring's Built-in Aspects
 
-```java
 // Spring's @Transactional has default order = LOWEST_PRECEDENCE
 // Your custom aspects with @Order(100) run BEFORE @Transactional
 
@@ -191,7 +207,6 @@ public class AspectB { ... }
 @Component
 @Order(Ordered.LOWEST_PRECEDENCE - 10)   // Just before the default
 public class AfterTransactionAspect { ... }
-```
 
 ---
 
@@ -216,3 +231,4 @@ public class AfterTransactionAspect { ... }
 - **Give each aspect a unique order value** — avoid ambiguity.
 
 Official docs: [Advice Ordering](https://docs.spring.io/spring-framework/reference/core/aop/ataspectj/advice.html) · [AOP](https://docs.spring.io/spring-framework/reference/core/aop.html)
+

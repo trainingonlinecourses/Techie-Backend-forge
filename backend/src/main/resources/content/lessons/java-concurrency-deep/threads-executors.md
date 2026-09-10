@@ -1,7 +1,7 @@
 ---
 title: Threads and ExecutorService
 module: java-concurrency-deep
-order: 1
+order: 8
 minutes: 28
 topics: ["Thread", "Runnable", "Callable", "ExecutorService", "thread pools", "Future", "shutdown"]
 summary: Threads are Java's unit of concurrent execution — and the most misused abstraction in the language. Creating threads directly is almost always wron...
@@ -16,45 +16,53 @@ Threads are Java's unit of concurrent execution — and the most misused abstrac
 
 ## Threads: The Raw Material
 
+
+**What this code does — step by step:**
+
+1. Direct thread — you almost never want this
+2. The problems: - One OS thread per task → thousands of threads = chaos. - No lifecycle management, no timeout, no result. - A leaked thread is permanent (cannot be restarted)
+
+The same code, clean:
+
 ```java
-// Direct thread — you almost never want this
 Thread t = new Thread(() -> {
     doWork();
 });
 t.start();
-
-// The problems:
-// - One OS thread per task → thousands of threads = chaos
-// - No lifecycle management, no timeout, no result
-// - A leaked thread is permanent (cannot be restarted)
 ```
 
 ## Runnable vs Callable
 
-```java
 Runnable task = () -> System.out.println("no result");        // void
 Callable<Integer> c = () -> compute();                        // returns a value, can throw
-```
 
 `Callable` is the useful one — it returns results and throws exceptions, which `Future` then captures.
 
 ## ExecutorService: The Pool
 
+
+**What this code does — step by step:**
+
+1. Fire and forget
+2. With a result
+3. With a Callable
+4. Future API
+5. `int result = future.get();` — blocks
+6. `int result = future.get(5, TimeUnit.SECONDS);` — blocks with timeout — PREFERRED
+
+The same code, clean:
+
 ```java
 ExecutorService pool = Executors.newFixedThreadPool(8);
 
-// Fire and forget
 pool.execute(() -> log("job done"));
 
-// With a result
 Future<Integer> future = pool.submit(() -> compute());
 
-// With a Callable
 Future<Report> report = pool.submit(() -> reportGenerator.generate(id));
 
-// Future API
-int result = future.get();                    // blocks
-int result = future.get(5, TimeUnit.SECONDS); // blocks with timeout — PREFERRED
+int result = future.get();
+int result = future.get(5, TimeUnit.SECONDS);
 boolean done = future.isDone();
 future.cancel(true);
 ```
@@ -73,13 +81,24 @@ future.cancel(true);
 
 **Never use `Executors.newFixedThreadPool` without thinking about the queue** — the default is an *unbounded* LinkedBlockingQueue. A slow consumer + a flood of tasks = unbounded memory. Production pools are built explicitly:
 
+
+**What this code does — step by step:**
+
+1. `4,` — core threads
+2. `16,` — max threads
+3. `60, TimeUnit.SECONDS,` — keep-alive for extra threads
+4. `new ArrayBlockingQueue<>(200),` — bounded queue = backpressure
+5. `new ThreadPoolExecutor.CallerRunsPolicy());` — saturation → caller runs
+
+The same code, clean:
+
 ```java
 ExecutorService pool = new ThreadPoolExecutor(
-    4,                          // core threads
-    16,                         // max threads
-    60, TimeUnit.SECONDS,       // keep-alive for extra threads
-    new ArrayBlockingQueue<>(200),   // bounded queue = backpressure
-    new ThreadPoolExecutor.CallerRunsPolicy());  // saturation → caller runs
+    4,
+    16,
+    60, TimeUnit.SECONDS,
+    new ArrayBlockingQueue<>(200),
+    new ThreadPoolExecutor.CallerRunsPolicy());
 ```
 
 ## The ThreadPoolExecutor Mechanics
@@ -103,20 +122,26 @@ submit(task)
 
 ## Shutdown: The Graceful Dance
 
+
+**What this code does — step by step:**
+
+1. Phase 1: stop accepting new tasks
+2. Phase 2: wait for in-flight + queued tasks (with a cap!)
+3. Phase 3: force-stop stragglers
+4. tasks interrupted; queued tasks returned
+5. Phase 4: always close (try-with-resources, Java 19+)
+6. ... auto-shutdown at end of block
+
+The same code, clean:
+
 ```java
-// Phase 1: stop accepting new tasks
 pool.shutdown();
 
-// Phase 2: wait for in-flight + queued tasks (with a cap!)
 if (!pool.awaitTermination(30, TimeUnit.SECONDS)) {
-    // Phase 3: force-stop stragglers
     pool.shutdownNow();
-    // tasks interrupted; queued tasks returned
 }
 
-// Phase 4: always close (try-with-resources, Java 19+)
 try (ExecutorService pool = Executors.newFixedThreadPool(4)) {
-    // ... auto-shutdown at end of block
 }
 ```
 
@@ -124,7 +149,6 @@ try (ExecutorService pool = Executors.newFixedThreadPool(4)) {
 
 ## Naming Threads
 
-```java
 ThreadFactory named = new ThreadFactory() {
     private final AtomicInteger counter = new AtomicInteger();
     public Thread newThread(Runnable r) {
@@ -134,13 +158,11 @@ ThreadFactory named = new ThreadFactory() {
     }
 };
 ExecutorService pool = Executors.newFixedThreadPool(4, named);
-```
 
 Named threads turn "which thread is stuck?" from a mystery into a log line. Guava's `ThreadFactoryBuilder` does this in one line if you use Guava.
 
 ## Executors in Spring
 
-```java
 @Configuration
 public class AsyncConfig {
 
@@ -156,7 +178,6 @@ public class AsyncConfig {
         return executor;
     }
 }
-```
 
 Used by `@Async("reportExecutor")` — the pool becomes a Spring bean with a name, a prefix, and a policy. (Full coverage in the scheduling module.)
 
@@ -171,7 +192,6 @@ Used by `@Async("reportExecutor")` — the pool becomes a Spring bean with a nam
 | Unnamed threads | Untraceable stacks |
 | Silent task exceptions | Lost failures (log them!) |
 
-```java
 // Exceptions in Runnable are swallowed — log explicitly
 pool.execute(() -> {
     try {
@@ -180,7 +200,6 @@ pool.execute(() -> {
         log.error("Task failed", e);   // without this: silently lost
     }
 });
-```
 
 ## Summary
 
@@ -195,3 +214,4 @@ pool.execute(() -> {
 | Task errors | Catch and log inside the task |
 
 Threads are a finite, expensive resource — the pool is the discipline. Size it for the workload, bound the queue, time-box the waits, and shut it down gracefully. The next lessons build on this: locks and atomicity, CompletableFuture, and virtual threads.
+

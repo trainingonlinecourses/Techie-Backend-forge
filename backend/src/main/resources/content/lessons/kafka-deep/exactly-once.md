@@ -1,7 +1,7 @@
 ---
 title: Exactly-Once Semantics — Transactions, Idempotence, and Real Trade-offs
 module: kafka-deep
-order: 4
+order: 2
 minutes: 27
 topics: ["exactly-once", "transactions", "idempotence", "EOS", "Kafka transactions", "delivery semantics"]
 summary: "Every event processed exactly once, no losses, no duplicates." That's the promise behind exactlyonce semantics (EOS) — and for most of distributed...
@@ -38,33 +38,47 @@ Kafka attacks the problem in layers:
 
 ## Kafka Transactions in Practice
 
+
+**What this code does — step by step:**
+
+1. 1. Configure a TRANSACTIONAL producer:
+2. `props.put("transactional.id", "order-pipeline-1");` — MUST be stable
+3. `props.put("enable.idempotence", "true");` — required with transactions
+4. `producer.initTransactions();` — register the transactional id
+5. 2. In the consumer loop, wrap each consume-process-produce cycle. In a transaction:
+6. `producer.beginTransaction();` — start the atomic unit
+7. `String result = process(r.value());` — your business logic
+8. `producer.sendOffsetsToTransaction(` — commit the OFFSET
+9. `consumer.position(r),` — atomically WITH
+10. `consumer.groupMetadata());` — the produced results
+11. `producer.commitTransaction();` — both the results AND the offset
+12. `producer.abortTransaction();` — results discarded, offset NOT advanced -> the same records will be re-read -> no loss, no partial effect
+
+The same code, clean:
+
 ```java
-// 1. Configure a TRANSACTIONAL producer:
 Properties props = new Properties();
 props.put("bootstrap.servers", "localhost:9092");
-props.put("transactional.id", "order-pipeline-1");   // MUST be stable
-props.put("enable.idempotence", "true");             // required with transactions
+props.put("transactional.id", "order-pipeline-1");
+props.put("enable.idempotence", "true");
 
 KafkaProducer<String, String> producer = new KafkaProducer<>(props);
-producer.initTransactions();   // register the transactional id
+producer.initTransactions();
 
-// 2. In the consumer loop, wrap each consume-process-produce cycle
-//    in a transaction:
 while (true) {
     ConsumerRecords<String, String> records = consumer.poll(100);
-    producer.beginTransaction();              // start the atomic unit
+    producer.beginTransaction();
     try {
         for (ConsumerRecord<String, String> r : records) {
-            String result = process(r.value());          // your business logic
+            String result = process(r.value());
             producer.send(new ProducerRecord<>("results", r.key(), result));
-            producer.sendOffsetsToTransaction(          // commit the OFFSET
-                    consumer.position(r),                // atomically WITH
-                    consumer.groupMetadata());           // the produced results
+            producer.sendOffsetsToTransaction(
+                    consumer.position(r),
+                    consumer.groupMetadata());
         }
-        producer.commitTransaction();         // both the results AND the offset
+        producer.commitTransaction();
     } catch (Exception e) {
-        producer.abortTransaction();         // results discarded, offset NOT advanced
-        // -> the same records will be re-read -> no loss, no partial effect
+        producer.abortTransaction();
     }
 }
 ```
@@ -103,3 +117,4 @@ Here's the engineering judgment the books skip: **most real systems don't need K
 ## Recap
 
 Exactly-once semantics break into three promises — at-most-once (loss possible), at-least-once (duplicates possible), exactly-once (neither). Kafka provides the building blocks: idempotent producers (no duplicates into the log), transactions (atomic multi-partition writes with fencing), and the transactional consume-process-produce cycle (results and offsets committed atomically — the closest thing to true EOS). But the engineering wisdom is that **at-least-once + idempotence usually delivers the observable behavior you need at a fraction of the cost and complexity** — reserve Kafka transactions for the narrow cases where outputs genuinely can't tolerate duplicates. Know the semantics dial, know the idempotence shortcut, and choose deliberately.
+

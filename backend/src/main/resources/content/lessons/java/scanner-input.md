@@ -1,7 +1,7 @@
 ---
 title: Scanner & User Input — Reading Data the Safe Way
 summary: How Scanner tokenizes input, the notorious nextInt-vs-nextLine newline trap, validation loops, and why server-side Java reads configuration instead of keyboards.
-order: 72
+order: 68
 minutes: 16
 topics: [scanner, user-input, nextline-trap, console, input-validation]
 docs:
@@ -12,7 +12,6 @@ docs:
 
 Every program eventually needs data from outside itself. In desktop tools and coding exercises that data comes from **standard input** (the keyboard). Java's most beginner-friendly tool for it is `java.util.Scanner` — a text parser that breaks an incoming stream into **tokens** (words, numbers, lines) and converts them to typed values.
 
-```java
 import java.util.Scanner;                       // bring in the class
 
 public class Greeter {
@@ -23,7 +22,6 @@ public class Greeter {
         System.out.println("Hello, " + name + "!");
     }
 }
-```
 
 Line by line:
 
@@ -36,25 +34,26 @@ Line by line:
 
 This trips up virtually every beginner. Watch:
 
-```java
-Scanner sc = new Scanner(System.in);
+public class Main {
 
-System.out.print("Age: ");
-int age = sc.nextInt();          // reads digits "25" but leaves the trailing '\n' in the stream!
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
 
-System.out.print("Name: ");
-String name = sc.nextLine();     // returns "" instantly — it consumed the leftover '\n'!
-```
+        System.out.print("Age: ");
+        int age = sc.nextInt();          // reads digits "25" but leaves the trailing '\n' in the stream!
+
+        System.out.print("Name: ");
+        String name = sc.nextLine();     // returns "" instantly — it consumed the leftover '\n'!
+    }
+}
 
 Why: `nextInt()` stops as soon as it has a valid number. The **newline you typed is still sitting in the buffer**, and the very next `nextLine()` sees it as "user pressed Enter on an empty line."
 
 The standard fix — clear the leftovers:
 
-```java
 int age = sc.nextInt();
 sc.nextLine();                   // consume the dangling '\n' — throw the empty token away
 String name = sc.nextLine();     // now this genuinely waits for a name
-```
 
 ## Reading Different Types
 
@@ -68,17 +67,33 @@ String name = sc.nextLine();     // now this genuinely waits for a name
 
 ### A robust validation loop
 
+
+**What this code does — step by step:**
+
+1. `while (true) {` — loop until we get valid data
+2. `if (sc.hasNextInt()) {` — peek: is the next token really an integer?
+3. `age = sc.nextInt();` — safe to read now
+4. `if (age >= 0 && age <= 130) break;` — domain check too, not just type check
+5. `String bad = sc.next();` — MUST consume the bad token or we loop forever on it
+
+The same code, clean:
+
 ```java
-Scanner sc = new Scanner(System.in);
-int age;
-while (true) {                          // loop until we get valid data
-    System.out.print("Enter your age: ");
-    if (sc.hasNextInt()) {              // peek: is the next token really an integer?
-        age = sc.nextInt();             // safe to read now
-        if (age >= 0 && age <= 130) break;  // domain check too, not just type check
-    } else {
-        String bad = sc.next();         // MUST consume the bad token or we loop forever on it
-        System.out.println("'" + bad + "' isn't a number.");
+public class Main {
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        int age;
+        while (true) {
+            System.out.print("Enter your age: ");
+            if (sc.hasNextInt()) {
+                age = sc.nextInt();
+                if (age >= 0 && age <= 130) break;
+            } else {
+                String bad = sc.next();
+                System.out.println("'" + bad + "' isn't a number.");
+            }
+        }
     }
 }
 ```
@@ -89,14 +104,23 @@ The `else` branch matters: `hasNextInt()` only *peeks*. If you don't consume the
 
 `Scanner` parses **any** text source — that's its real power:
 
-```java
-// Parse a CSV-ish string instead of user input
-Scanner rowParser = new Scanner("42,true,hello");
-rowParser.useDelimiter(",");            // split on commas rather than whitespace
-int id = rowParser.nextInt();           // 42
-boolean flag = rowParser.nextBoolean(); // true
 
-// Read a file token by token
+**What this code does — step by step:**
+
+1. Parse a CSV-ish string instead of user input
+2. `rowParser.useDelimiter(",");` — split on commas rather than whitespace
+3. `int id = rowParser.nextInt();` — 42
+4. `boolean flag = rowParser.nextBoolean();` — true
+5. Read a file token by token
+
+The same code, clean:
+
+```java
+Scanner rowParser = new Scanner("42,true,hello");
+rowParser.useDelimiter(",");
+int id = rowParser.nextInt();
+boolean flag = rowParser.nextBoolean();
+
 try (Scanner fileScanner = new Scanner(new File("data.txt"))) {
     while (fileScanner.hasNextLine()) {
         process(fileScanner.nextLine());
@@ -123,3 +147,4 @@ try (Scanner fileScanner = new Scanner(new File("data.txt"))) {
 | Validation loop without consuming bad tokens | Infinite loop printing same error | Call `sc.next()` in the else branch |
 | Never closing Scanner wrapping System.in | Warning; closing can also kill stdin for the JVM | Fine to leave open for System.in; close file-based scanners |
 | Assuming `hasNextInt()` consumed anything | Double-read bugs | It only peeks — pair with an actual read |
+

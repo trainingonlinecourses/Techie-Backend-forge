@@ -1,7 +1,7 @@
 ---
 title: Docker Compose — Multi-Service Application Orchestration
 summary: How Docker Compose defines and runs multi-container applications — networking, volumes, environment variables, and real-world stack configurations for Spring Boot + databases + caches.
-order: 1
+order: 2
 minutes: 28
 topics: [docker-compose, multi-container, networking, volumes, environment-variables, profiles]
 docs:
@@ -416,3 +416,4 @@ services:
 docker compose up -d                    # Only app + db
 docker compose --profile debug up -d    # App + db + debug-tools
 ```
+

@@ -1,7 +1,7 @@
 ---
 title: Contract-First Design — The API as the Agreement
 module: openapi-rest-docs
-order: 4
+order: 2
 minutes: 24
 topics: ["contract-first", "API design", "spec-first", "code generation", "breaking changes"]
 summary: Most APIs are built codefirst: the backend team writes controllers, then (maybe) documentation follows. The frontend team waits, guesses, and chase...
@@ -97,7 +97,6 @@ openapi-generator generate \
 
 ### Step 3 — Implement against the generated interface
 
-```java
 // GENERATED: the interface IS the contract
 public interface CoursesApi {
     CoursePage listCourses(Integer page);
@@ -112,7 +111,6 @@ public class CourseController implements CoursesApi {
         return service.list(page == null ? 0 : page);
     }
 }
-```
 
 ### Walking Through Each Part
 
@@ -138,7 +136,6 @@ The discipline: **compatible changes never bump the version; breaking changes al
 
 ## Contract Tests — Does Reality Match the Spec?
 
-```java
 // Verify the running API satisfies the spec (e.g., with spring-cloud-contract
 // or a spec-based schema validator):
 @SpringBootTest(webEnvironment = RANDOM_PORT)
@@ -155,7 +152,6 @@ class ContractVerificationTest {
         // -> if the response shape deviates from the spec, the test fails
     }
 }
-```
 
 Contract tests sit between unit and end-to-end: they verify the *shape* matches the agreement without testing every behavior.
 
@@ -176,3 +172,4 @@ Contract tests sit between unit and end-to-end: they verify the *shape* matches 
 - Breaking changes become visible, reviewable spec changes — version them deliberately.
 - Contract tests verify the running API matches the agreed schema.
 - Author the spec by hand once; treat generated code as build output.
+

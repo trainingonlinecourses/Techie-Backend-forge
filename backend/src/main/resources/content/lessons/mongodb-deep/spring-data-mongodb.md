@@ -1,7 +1,7 @@
 ---
 title: Spring Data MongoDB — Repositories, Queries, and Mapping
 module: mongodb-deep
-order: 3
+order: 5
 minutes: 27
 topics: ["Spring Data MongoDB", "MongoRepository", "query methods", "@Document", "MongoTemplate"]
 summary: Spring Data MongoDB brings the familiar Spring Data contract to MongoDB: repositories with derived queries, entity mapping via annotations, and a M...
@@ -35,7 +35,6 @@ Spring Data MongoDB brings the familiar Spring Data contract to MongoDB: **repos
 spring.data.mongodb.uri=mongodb://localhost:27017/academy
 ```
 
-```java
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -49,9 +48,7 @@ public class Product {
 
     // getters/setters (or use a record/immutable style with Jackson)
 }
-```
 
-```java
 import org.springframework.data.mongodb.repository.MongoRepository;
 import java.util.List;
 
@@ -68,7 +65,6 @@ public interface ProductRepository extends MongoRepository<Product, String> {
     // Sorting and paging are parameters, not name parts:
     List<Product> findByInStockTrueOrderByPriceAsc();
 }
-```
 
 **Walking through it:** `@Document` declares the collection; `@Id` declares the primary key (Spring fills a generated ObjectId if null). The repository interface inherits `save`, `findById`, `findAll`, `deleteById`, `count` — and every `findBy...` method name compiles into a query. The method-name grammar: property paths (`findByPriceLessThan` → `{price: {$lt: ...}}`), boolean suffixes (`True`/`False`), array operators (`Containing` → `$in`), and ordering suffixes (`OrderByPriceAsc`). Get the property name or type slightly wrong and the app fails at *startup* with a clear parse error — Spring validates these eagerly, which is a feature.
 
@@ -91,7 +87,6 @@ Nested properties use dot-path names in the method: `findByAddressCity` reads `a
 
 For complex queries, annotate with raw MongoDB query JSON:
 
-```java
 public interface ProductRepository extends MongoRepository<Product, String> {
 
     // Direct MongoDB query document. ?0 = first parameter.
@@ -106,7 +101,6 @@ public interface ProductRepository extends MongoRepository<Product, String> {
     })
     List<CategoryTotal> totalValueByCategory();
 }
-```
 
 `@Query` takes a real MongoDB query document with positional parameters (`?0`); `@Aggregation` runs a full pipeline — the same aggregation framework as the shell, from Spring. This is the escape hatch when method names would be unreadable.
 
@@ -114,7 +108,6 @@ public interface ProductRepository extends MongoRepository<Product, String> {
 
 Repositories cover 90% of needs. For ad-hoc operations, updates with operators, and dynamic queries, `MongoTemplate` gives imperative control:
 
-```java
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.*;
 
@@ -141,7 +134,6 @@ public class InventoryService {
         return mongo.find(Query.query(c), Product.class);
     }
 }
-```
 
 `Query`/`Criteria`/`Update` are the Java face of MongoDB's query and update documents. The `$inc` update is atomic — exactly the concurrency-safe decrement you'd want for stock counters, mirroring the shell operator from the basics lesson.
 
@@ -158,16 +150,15 @@ public class InventoryService {
 
 MongoDB supports multi-document transactions (replica sets required). Spring Data integrates them with the same `@Transactional` you know from JPA:
 
-```java
 @Transactional
 public void placeOrder(String customerId, Order order) {
     orderRepo.save(order);
     customerRepo.incrementOrderCount(customerId);  // atomic together
 }
-```
 
 Spring maps `@Transactional` onto MongoDB's session-based transactions. Still, the document-model discipline stands: prefer designing for single-document atomicity (embed what must update together), and use transactions for the rare multi-document invariants.
 
 ## Recap
 
 Spring Data MongoDB gives JPA-style development on documents: `@Document` classes, `MongoRepository` interfaces with derived query methods (`findByPriceLessThan`, `findByTagsContaining`), `@Query`/`@Aggregation` for complex pipelines, and `MongoTemplate` for imperative atomic operations. The mapping annotations (`@Id`, `@Field`, `@Indexed`, `@Version`) bring the schema discipline the database doesn't enforce, and `@Transactional` bridges multi-document transactions. The skill transfer from JPA is nearly free — the differences (nested property paths, array operators, atomic `$inc` updates, optimistic locking) come from the document model itself. Choose repositories for standard CRUD, `MongoTemplate` for dynamic or atomic operations, and keep modeling around single-document atomicity.
+

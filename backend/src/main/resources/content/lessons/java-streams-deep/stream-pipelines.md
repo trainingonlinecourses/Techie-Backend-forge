@@ -1,7 +1,7 @@
 ---
 title: Stream Pipelines Under the Hood
 module: java-streams-deep
-order: 1
+order: 4
 minutes: 25
 topics: ["lazy evaluation", "intermediate operations", "terminal operations", "short-circuiting", "pipeline stages"]
 summary: Streams look like fluent chains — but understanding them as lazy, pullbased pipelines is what separates working code from code that's correct by ac...
@@ -16,12 +16,23 @@ Streams look like fluent chains — but understanding them as **lazy, pull-based
 
 ## The Execution Model
 
+
+**What this code does — step by step:**
+
+1. `courses.stream()` — source
+2. `.filter(c -> c.published())` — intermediate (lazy)
+3. `.map(Course::title)` — intermediate (lazy)
+4. `.limit(10)` — intermediate (lazy)
+5. `.toList();` — terminal (eager — runs everything)
+
+The same code, clean:
+
 ```java
-courses.stream()                                    // source
-    .filter(c -> c.published())                     // intermediate (lazy)
-    .map(Course::title)                             // intermediate (lazy)
-    .limit(10)                                      // intermediate (lazy)
-    .toList();                                      // terminal (eager — runs everything)
+courses.stream()
+    .filter(c -> c.published())
+    .map(Course::title)
+    .limit(10)
+    .toList();
 ```
 
 **Nothing runs until the terminal operation.** `.filter` doesn't filter; it *records* a filter. The chain is a recipe; `toList()` cooks it.
@@ -37,23 +48,19 @@ Source ──▶ Stage 1 (filter) ──▶ Stage 2 (map) ──▶ Stage 3 (lim
 
 Each stage pulls from the previous. Elements flow through **one at a time**, vertically:
 
-```java
 // Execution order for 3 elements with filter+map+limit(2):
 //   pull c1 → filter(c1)? yes → map(c1) → emit
 //   pull c2 → filter(c2)? no  → pull c3
 //   pull c3 → filter(c3)? yes → map(c3) → emit → limit reached, STOP
-```
 
 `limit(2)` stops pulling entirely once two elements are emitted — the source may never be fully consumed. This is why `findFirst()` on an infinite stream works.
 
 ## Lazy + Short-Circuit
 
-```java
 // This never hangs — the pipeline pulls only until the first match
 Optional<Course> first = Stream.generate(() -> expensiveLoad())
     .filter(c -> c.isLong())
     .findFirst();
-```
 
 Short-circuiting terminal ops: `findFirst`, `findAny`, `anyMatch`, `allMatch`, `noneMatch`, `limit`.
 
@@ -61,11 +68,9 @@ Short-circuiting terminal ops: `findFirst`, `findAny`, `anyMatch`, `allMatch`, `
 
 **A stream can be traversed once.** After a terminal op, it's consumed:
 
-```java
 Stream<String> s = courses.stream().map(Course::title);
 List<String> a = s.toList();     // consumes
 List<String> b = s.toList();     // ❌ IllegalStateException: stream has already been operated upon
-```
 
 Sources (`List.stream()`) are reusable; the *pipeline* isn't. Re-create the stream for each use.
 
@@ -77,23 +82,19 @@ Sources (`List.stream()`) are reusable; the *pipeline* isn't. Re-create the stre
 
 Stateless stages process one element independently. **Stateful stages buffer**: `sorted()` must see the *entire* stream before emitting the first element; `distinct()` holds a set as it goes.
 
-```java
 // sorted() buffers EVERYTHING before emitting — O(n) memory
 courses.stream()
     .sorted(Comparator.comparing(Course::title))
     .limit(5)                    // still sorts all before taking 5
     .toList();
-```
 
 ## peek: The Debugging Tool
 
-```java
 courses.stream()
     .peek(c -> log.debug("before filter: {}", c.id()))
     .filter(c -> c.published())
     .peek(c -> log.debug("after filter: {}", c.id()))
     .toList();
-```
 
 `peek` is for debugging — it runs the consumer when the element passes that stage. Don't use it for side effects in production (it's not guaranteed to run without a terminal op, and its timing is unspecified).
 
@@ -113,7 +114,6 @@ courses.stream()
 
 ## reduce: The General Fold
 
-```java
 // Sum with reduce
 int total = courses.stream()
     .mapToInt(Course::minutes)
@@ -123,13 +123,11 @@ int total = courses.stream()
 String joined = courses.stream()
     .map(Course::title)
     .reduce("", (a, b) -> a + ", " + b);
-```
 
 `reduce(identity, accumulator)` — identity is the result for an empty stream. For most cases, specialized ops (`sum`, `collect(joining())`) are clearer, but reduce is the escape hatch.
 
 ## mapToInt and Primitive Streams
 
-```java
 // Boxing avoided: IntStream, LongStream, DoubleStream
 int totalMinutes = courses.stream()
     .mapToInt(Course::minutes)
@@ -144,7 +142,6 @@ IntSummaryStatistics stats = courses.stream()
     .mapToInt(Course::minutes)
     .summaryStatistics();
 // count, sum, min, max, average in one pass
-```
 
 Primitive streams are both faster (no boxing) and have the numeric ops you need.
 
@@ -171,3 +168,4 @@ Primitive streams are both faster (no boxing) and have the numeric ops you need.
 | Primitives | IntStream etc. avoid boxing |
 
 Streams are a *pull-based pipeline*, not a loop with method syntax. Think in stages: what does each element pass through, what buffers, what stops early. Master the model and every pipeline you write becomes predictable — including the ones you debug at 2 AM.
+

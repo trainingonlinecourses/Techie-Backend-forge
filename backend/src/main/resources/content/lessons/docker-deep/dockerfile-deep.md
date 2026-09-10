@@ -1,7 +1,7 @@
 ---
 title: The Dockerfile — Building Reproducible Images
 module: docker-deep
-order: 1
+order: 3
 minutes: 26
 topics: ["Dockerfile", "multi-stage builds", "base images", "layers", "build context"]
 summary: A Docker image is a frozen snapshot of an application and everything it needs to run: the OS libraries, the runtime (JRE), the app's code, the conf...
@@ -142,3 +142,4 @@ The build context is sent to the Docker daemon — a `target/` directory full of
 - Multi-stage builds: build fat, ship slim (JDK → JRE).
 - `.dockerignore` keeps the build context lean and safe.
 - The image is the machine — that's why "works on my machine" dies.
+

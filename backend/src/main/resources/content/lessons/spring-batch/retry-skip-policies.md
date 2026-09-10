@@ -1,7 +1,7 @@
 ---
 title: Retry & Skip Policies — Fault Tolerance
 summary: Handle transient failures with retry, skip bad records without stopping the batch, and configure exception-based policies for production robustness.
-order: 8
+order: 7
 minutes: 18
 topics: [retry, skip, fault-tolerance, exception-handling, batch-reliability, dead-letter]
 docs:
@@ -27,7 +27,6 @@ In batch processing, things **will** fail:
 
 ### Basic Retry
 
-```java
 @Bean
 public Step processStep(JobRepository jobRepository, PlatformTransactionManager txManager) {
     return new StepBuilder("processStep", jobRepository)
@@ -40,11 +39,9 @@ public Step processStep(JobRepository jobRepository, PlatformTransactionManager 
         .retryLimit(3)                         // Try up to 3 times
         .build();
 }
-```
 
 ### Retry Specific Exceptions
 
-```java
 @Bean
 public Step processStep(JobRepository jobRepository, PlatformTransactionManager txManager) {
     return new StepBuilder("processStep", jobRepository)
@@ -58,11 +55,9 @@ public Step processStep(JobRepository jobRepository, PlatformTransactionManager 
         .retryLimit(5)                              // 5 attempts total
         .build();
 }
-```
 
 ### Custom Retry with Backoff
 
-```java
 @Bean
 public RetryPolicy retryPolicy() {
     SimpleRetryPolicy policy = new SimpleRetryPolicy();
@@ -95,7 +90,6 @@ public Step processStep(JobRepository jobRepository, PlatformTransactionManager 
         .backOffPolicy(backOffPolicy())
         .build();
 }
-```
 
 ---
 
@@ -103,7 +97,6 @@ public Step processStep(JobRepository jobRepository, PlatformTransactionManager 
 
 ### Basic Skip
 
-```java
 @Bean
 public Step processStep(JobRepository jobRepository, PlatformTransactionManager txManager) {
     return new StepBuilder("processStep", jobRepository)
@@ -116,11 +109,9 @@ public Step processStep(JobRepository jobRepository, PlatformTransactionManager 
         .skipLimit(50)                        // Skip up to 50 records
         .build();
 }
-```
 
 ### Skip Specific Exceptions
 
-```java
 @Bean
 public Step processStep(JobRepository jobRepository, PlatformTransactionManager txManager) {
     return new StepBuilder("processStep", jobRepository)
@@ -135,11 +126,9 @@ public Step processStep(JobRepository jobRepository, PlatformTransactionManager 
         .skipLimit(100)                            // Allow up to 100 skips
         .build();
 }
-```
 
 ### Skip Listener (Log Skipped Records)
 
-```java
 @Component
 public class SkipLogger implements SkipListener<InputRecord, OutputRecord> {
 
@@ -166,13 +155,11 @@ public class SkipLogger implements SkipListener<InputRecord, OutputRecord> {
         log.warn("Skipping record in WRITE: id={}, error={}", item.getId(), t.getMessage());
     }
 }
-```
 
 ---
 
 ## Combined Retry + Skip
 
-```java
 @Bean
 public Step robustStep(JobRepository jobRepository, PlatformTransactionManager txManager) {
     return new StepBuilder("robustStep", jobRepository)
@@ -195,7 +182,6 @@ public Step robustStep(JobRepository jobRepository, PlatformTransactionManager t
         .listener(skipLogger())
         .build();
 }
-```
 
 ---
 
@@ -203,7 +189,6 @@ public Step robustStep(JobRepository jobRepository, PlatformTransactionManager t
 
 ### Scenario 1: API Integration with Rate Limits
 
-```java
 @Component
 public class ExternalApiProcessor implements ItemProcessor<Order, ProcessedOrder> {
 
@@ -220,11 +205,9 @@ public class ExternalApiProcessor implements ItemProcessor<Order, ProcessedOrder
         return new ProcessedOrder(order, result.getTransactionId());
     }
 }
-```
 
 ### Scenario 2: File Import with Bad Records
 
-```java
 @Component
 public class CsvImportProcessor implements ItemProcessor<String, Customer> {
 
@@ -248,11 +231,9 @@ public class CsvImportProcessor implements ItemProcessor<String, Customer> {
         }
     }
 }
-```
 
 ### Scenario 3: Database Write with Dead Letter
 
-```java
 @Component
 public class OrderWriter implements ItemWriter<ProcessedOrder> {
 
@@ -274,7 +255,6 @@ public class OrderWriter implements ItemWriter<ProcessedOrder> {
         }
     }
 }
-```
 
 ---
 
@@ -288,3 +268,4 @@ public class OrderWriter implements ItemWriter<ProcessedOrder> {
 | No dead letter queue | Skipped records lost forever | Save skipped records for later review |
 | Retrying in writer without transaction | Partial writes | Ensure writer handles transactions properly |
 | Not testing fault tolerance | Failures only found in production | Test with fault injection |
+

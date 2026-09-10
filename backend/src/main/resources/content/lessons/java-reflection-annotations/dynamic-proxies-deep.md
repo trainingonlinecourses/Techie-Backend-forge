@@ -1,7 +1,7 @@
 ---
 title: Dynamic Proxies — Intercepting Every Call
 module: java-reflection-annotations
-order: 3
+order: 2
 minutes: 27
 topics: ["dynamic proxies", "InvocationHandler", "AOP", "interception", "Spring proxies"]
 summary: A dynamic proxy is an object created at runtime that implements one or more interfaces you name, but with no handwritten class behind it. Instead, ...
@@ -26,17 +26,31 @@ A **dynamic proxy** is an object created *at runtime* that implements one or mor
 
 The machinery: `Proxy.newProxyInstance(classLoader, interfaces, handler)`. Let's build a logging proxy around a service interface:
 
+
+**What this code does — step by step:**
+
+1. 1. An interface — proxies can only proxy interfaces (or JDK classes. That are interfaces). This is the contract the proxy implements.
+2. 2. The REAL implementation the proxy will delegate to.
+3. 3. The InvocationHandler — called for EVERY method on the proxy.
+4. Before-delegation logic: log the call.
+5. Delegate to the real object.
+6. After-delegation logic: timing.
+7. `return result;` — pass the real result back to the caller
+8. 4. Create the proxy. It implements Greeter — usable anywhere a. Greeter is expected, but every call goes through `handler`.
+9. 5. Call through the proxy — observer the interleaving:
+10. >> calling greet. Hello, Alice! << greet took 0 ms
+11. >> calling farewell. Goodbye, Bob. << farewell took 0 ms
+
+The same code, clean:
+
 ```java
 import java.lang.reflect.*;
 
-// 1. An interface — proxies can only proxy interfaces (or JDK classes
-//    that are interfaces). This is the contract the proxy implements.
 interface Greeter {
     String greet(String name);
     void farewell(String name);
 }
 
-// 2. The REAL implementation the proxy will delegate to.
 class RealGreeter implements Greeter {
     public String greet(String name) {
         return "Hello, " + name + "!";
@@ -50,38 +64,25 @@ public class ProxyDemo {
     public static void main(String[] args) {
         RealGreeter real = new RealGreeter();
 
-        // 3. The InvocationHandler — called for EVERY method on the proxy.
         InvocationHandler handler = (proxy, method, methodArgs) -> {
-            // Before-delegation logic: log the call.
             long start = System.nanoTime();
             System.out.println(">> calling " + method.getName());
 
-            // Delegate to the real object.
             Object result = method.invoke(real, methodArgs);
 
-            // After-delegation logic: timing.
             long ms = (System.nanoTime() - start) / 1_000_000;
             System.out.println("<< " + method.getName() + " took " + ms + " ms");
-            return result;   // pass the real result back to the caller
+            return result;
         };
 
-        // 4. Create the proxy. It implements Greeter — usable anywhere a
-        //    Greeter is expected, but every call goes through `handler`.
         Greeter proxied = (Greeter) Proxy.newProxyInstance(
                 Greeter.class.getClassLoader(),
                 new Class<?>[] { Greeter.class },
                 handler);
 
-        // 5. Call through the proxy — observer the interleaving:
         System.out.println(proxied.greet("Alice"));
-        //   >> calling greet
-        //   Hello, Alice!
-        //   << greet took 0 ms
 
         proxied.farewell("Bob");
-        //   >> calling farewell
-        //   Goodbye, Bob
-        //   << farewell took 0 ms
     }
 }
 ```
@@ -100,7 +101,6 @@ public class ProxyDemo {
 
 The before/after structure above generalizes to every cross-cutting concern:
 
-```java
 InvocationHandler txHandler = (proxy, method, args) -> {
     if (method.isAnnotationPresent(Transactional.class)) {
         beginTransaction();
@@ -116,7 +116,6 @@ InvocationHandler txHandler = (proxy, method, args) -> {
     // Methods without the annotation pass straight through:
     return method.invoke(target, args);
 };
-```
 
 This is a miniature `@Transactional` — Spring's actual implementation does exactly this (plus more sophisticated proxy factories). The *same* pattern, with different before/after logic, produces: `@Async` (run on a thread pool), `@Cacheable` (check cache, then delegate, then populate cache), `@Secured` (check the current user's authorities before delegating), and audit logging (record who did what).
 
@@ -139,3 +138,4 @@ JDK dynamic proxies are the pure-reflection path — but they only do interfaces
 ## Recap
 
 A dynamic proxy is a runtime-generated stand-in for an interface that routes every call through an `InvocationHandler`, letting you add before/after behavior — logging, transactions, caching, security — without touching the business class. It's the engine of Spring AOP: `@Transactional`, `@Async`, and `@Cacheable` are all proxies. The trade-offs to respect: interfaces only (for JDK proxies), self-invocation bypasses the proxy, final/private methods are invisible to it, and identity shifts. Understand the proxy and Spring's "magic" becomes a concrete, debuggable mechanism — and the classic `@Transactional`-not-working bugs become predictable.
+

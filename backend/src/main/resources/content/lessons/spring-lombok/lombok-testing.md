@@ -1,7 +1,7 @@
 ---
 title: Lombok with Testing — Mockito, Jackson, and JPA
 summary: How Lombok annotations interact with testing frameworks, common pitfalls with @MockBean, JSON serialization, and JPA entity mapping.
-order: 4
+order: 5
 minutes: 15
 topics: [lombok-testing, jackson, jpa, mockito, deserialization, entity-mapping]
 docs:
@@ -12,7 +12,6 @@ docs:
 
 Lombok works great with testing frameworks, but there are specific gotchas with Jackson (JSON), JPA (entities), and Mockito (mocking). Here's how to avoid them.
 
-```java
 // ✅ Good: DTO with Jackson
 @Data @Builder @NoArgsConstructor @AllArgsConstructor
 public class UserDto {
@@ -28,11 +27,26 @@ public class User {
     private Long id;
     private String name;
 }
-```
 
 ---
 
 ## Line-by-Line Walkthrough
+
+
+**What this code does — step by step:**
+
+1. 1. DTO: @Data + @Builder + @NoArgsConstructor + @AllArgsConstructor
+2. 2. Response DTO with Jackson
+3. `@JsonProperty("email_address")` — Jackson annotation on Lombok field
+4. 3. JPA Entity: selective annotations
+5. `@Getter @Setter @ToString(exclude = "password")` — exclude sensitive field
+6. `@Setter(AccessLevel.NONE)` — id set by JPA, not by caller
+7. 4. JSON serialization test
+8. {"name":"Alice","email":"alice@example.com","age":30}
+9. 5. Builder + equals test
+10. `assertEquals(a, b);` — @Data generates equals
+
+The same code, clean:
 
 ```java
 import lombok.*;
@@ -43,7 +57,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class LombokTestingDemo {
 
-    // 1. DTO: @Data + @Builder + @NoArgsConstructor + @AllArgsConstructor
     @Data @Builder @NoArgsConstructor @AllArgsConstructor
     public static class CreateUserRequest {
         private String name;
@@ -51,21 +64,19 @@ public class LombokTestingDemo {
         private int age;
     }
 
-    // 2. Response DTO with Jackson
     @Data @Builder
     public static class UserResponse {
         private Long id;
         private String name;
-        @JsonProperty("email_address")  // Jackson annotation on Lombok field
+        @JsonProperty("email_address")
         private String email;
     }
 
-    // 3. JPA Entity: selective annotations
-    @Getter @Setter @ToString(exclude = "password")  // exclude sensitive field
+    @Getter @Setter @ToString(exclude = "password")
     @NoArgsConstructor
     @AllArgsConstructor
     public static class UserEntity {
-        @Setter(AccessLevel.NONE)  // id set by JPA, not by caller
+        @Setter(AccessLevel.NONE)
         private Long id;
         private String name;
         private String email;
@@ -80,7 +91,6 @@ public class LombokTestingDemo {
         }
     }
 
-    // 4. JSON serialization test
     @Test
     void testJsonSerialization() throws Exception {
         ObjectMapper mapper = new ObjectMapper();
@@ -93,18 +103,16 @@ public class LombokTestingDemo {
 
         String json = mapper.writeValueAsString(request);
         System.out.println(json);
-        // {"name":"Alice","email":"alice@example.com","age":30}
 
         CreateUserRequest deserialized = mapper.readValue(json, CreateUserRequest.class);
         assertEquals("Alice", deserialized.getName());
     }
 
-    // 5. Builder + equals test
     @Test
     void testBuilderEquality() {
         UserDto a = UserDto.builder().name("Alice").age(30).build();
         UserDto b = UserDto.builder().name("Alice").age(30).build();
-        assertEquals(a, b);  // @Data generates equals
+        assertEquals(a, b);
     }
 }
 ```
@@ -115,7 +123,6 @@ public class LombokTestingDemo {
 
 ### Scenario 1: Test data builder
 
-```java
 @Data @Builder @NoArgsConstructor @AllArgsConstructor
 public class TestOrder {
     private Long id;
@@ -136,11 +143,9 @@ public class TestData {
 
 // In tests
 TestOrder order = TestData.anOrder().id(1L).build();
-```
 
 ### Scenario 2: JPA entity with Lombok
 
-```java
 @Entity
 @Getter @Setter
 @EqualsAndHashCode(of = "id")  // only use ID for equality
@@ -163,7 +168,6 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Role role;
 }
-```
 
 ---
 
@@ -175,3 +179,4 @@ public class User {
 | Forgetting @NoArgsConstructor | Jackson deserialization fails | Add @NoArgsConstructor to entities |
 | @ToString on password field | Password in logs | Use @ToString.Exclude |
 | Using @Builder on entity without @NoArgsConstructor | JPA proxy creation fails | Always add @NoArgsConstructor |
+

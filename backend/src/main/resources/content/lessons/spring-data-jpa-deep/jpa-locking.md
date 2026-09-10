@@ -1,7 +1,7 @@
 ---
 title: JPA Locking — Optimistic and Pessimistic Concurrency Control
 summary: Lost updates, @Version optimistic locking, pessimistic locks and their isolation cost, and the scenario-driven choice of which to use.
-order: 7
+order: 5
 minutes: 20
 topics: [locking, optimistic, pessimistic, version, lost-update, lockmodetype, concurrency]
 docs:
@@ -29,7 +29,6 @@ JPA offers two strategies:
 
 ## Optimistic locking with @Version
 
-```java
 @Entity
 public class Account {
     @Id @GeneratedValue private Long id;
@@ -38,7 +37,6 @@ public class Account {
     @Version
     private long version;        // Hibernate maintains this
 }
-```
 
 **How it works:** every row carries a version number. On `UPDATE`, Hibernate includes `WHERE version = ?`; if the version changed since the entity was read, **zero rows match**, and Hibernate throws `OptimisticLockException` (often surfaced as `ObjectOptimisticLockingFailureException`). The update *fails* — the losing transaction must re-read and retry.
 
@@ -51,7 +49,6 @@ User B: UPDATE account SET balance=130, version=2 WHERE id=7 AND version=1  → 
 
 **Org pattern — the retry:**
 
-```java
 @Transactional
 public void transfer(TransferRequest r) {
     // ... business logic that reads + writes the account ...
@@ -66,13 +63,11 @@ for (int attempt = 0; attempt < 3; attempt++) {
     }
 }
 throw new ConflictException("Too many concurrent edits — please retry");
-```
 
 ## Pessimistic locking — LockModeType
 
 When optimistic retry is unacceptable (long-running workflows, high-contention records, money-critical paths), lock the row **at read time** so concurrent readers block instead of fail:
 
-```java
 @Lock(LockModeType.PESSIMISTIC_WRITE)      // SELECT ... FOR UPDATE
 @Query("select a from Account a where a.id = :id")
 Optional<Account> findByIdForUpdate(@Param("id") Long id);
@@ -83,7 +78,6 @@ public void adjustBalance(Long id, BigDecimal delta) {
     a.setBalance(a.getBalance().add(delta));                       // no one else can touch it
     // lock released at COMMIT — keep the transaction short!
 }
-```
 
 `PESSIMISTIC_WRITE` issues `SELECT ... FOR UPDATE`, holding the lock until commit/rollback. `PESSIMISTIC_READ` issues `FOR SHARE`. Two variants to know:
 
@@ -125,3 +119,4 @@ The general rule teams teach: **optimistic by default; pessimistic only where th
 - `PESSIMISTIC_WRITE` = `SELECT ... FOR UPDATE`; keep the transaction short and consistent in lock order.
 - Optimistic by default; pessimistic for short, high-stakes writes; retry at the operation boundary.
 - Understand lock scope (transaction) and detached-entity version semantics.
+

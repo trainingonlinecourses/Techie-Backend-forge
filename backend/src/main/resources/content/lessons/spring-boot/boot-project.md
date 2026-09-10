@@ -1,7 +1,7 @@
 ---
 title: Spring Boot Project Structure — The Complete Guide
 summary: How a Spring Boot project is organized — src/main/java, src/main/resources, src/test, the role of pom.xml/build.gradle, and how to structure a real enterprise application. Beginner-friendly with line-by-line explanations.
-order: 2
+order: 10
 minutes: 20
 topics: [project structure, pom.xml, build.gradle, src layout, application.properties, profiles, enterprise structure]
 docs:
@@ -70,18 +70,20 @@ techie-backend-forge/
 
 ### The Main Application Class
 
+
+**What this code does — step by step:**
+
+1. `@SpringBootApplication` — Combines @Configuration + @EnableAutoConfiguration + @ComponentScan
+2. This single line: 1. Creates the Spring ApplicationContext. 2. Scans all packages under com.example.academy for components. 3. Auto-configures DataSource, Tomcat, Jackson, etc. 4. Starts the embedded Tomcat server. 5. Your app is now serving HTTP requests!
+
+The same code, clean:
+
 ```java
-@SpringBootApplication       // Combines @Configuration + @EnableAutoConfiguration + @ComponentScan
+@SpringBootApplication
 public class AcademyApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(AcademyApplication.class, args);
-        // This single line:
-        // 1. Creates the Spring ApplicationContext
-        // 2. Scans all packages under com.example.academy for components
-        // 3. Auto-configures DataSource, Tomcat, Jackson, etc.
-        // 4. Starts the embedded Tomcat server
-        // 5. Your app is now serving HTTP requests!
     }
 }
 ```
@@ -269,3 +271,4 @@ parent-pom/
 - **Thin controllers, fat services** — controllers handle HTTP, services handle business logic.
 
 Official docs: [Using Spring Boot](https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#using.spring-boot) · [Code Structure](https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#structuring.your.code)
+

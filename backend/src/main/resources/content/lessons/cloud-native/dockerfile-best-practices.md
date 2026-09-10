@@ -1,7 +1,7 @@
 ---
 title: Dockerfile Best Practices & Multi-Stage Builds
 summary: Builders and runners, layer caching, .dockerignore, image size and the exact Dockerfile pattern for a Spring Boot app.
-order: 2
+order: 3
 minutes: 14
 topics: [dockerfile, multi-stage build, layer caching, dockerignore, image size]
 docs:
@@ -97,3 +97,4 @@ The `ENTRYPOINT` exec-form note matters for Kubernetes: exec form runs java as P
 - Exec-form ENTRYPOINT, non-root user, pinned base, config via env — the production baseline.
 
 Official docs: [Dockerfile best practices](https://docs.docker.com/build/building/best-practices/) · [Spring Boot container images](https://docs.spring.io/spring-boot/reference/packaging/container-images.html)
+

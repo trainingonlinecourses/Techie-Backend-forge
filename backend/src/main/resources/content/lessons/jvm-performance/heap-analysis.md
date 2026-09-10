@@ -1,7 +1,7 @@
 ---
 title: Heap Analysis — Finding Memory Leaks
 summary: How to analyze heap dumps to find memory leaks, identify the biggest objects, and trace why they're still alive. Beginner-friendly with step-by-step walkthroughs.
-order: 3
+order: 2
 minutes: 22
 topics: [heap dump, memory leak, MAT, Eclipse Memory Analyzer, dominator tree, leak suspects, GC roots]
 docs:
@@ -111,7 +111,6 @@ This tells you: the `UserSession` is alive because it's referenced by a static f
 
 ### Scenario 1: Cache Without Eviction
 
-```java
 // The leak — cache grows forever
 public class CacheService {
     private static final Map<String, byte[]> cache = new HashMap<>();
@@ -120,7 +119,6 @@ public class CacheService {
         return cache.computeIfAbsent(key, this::loadFromDB);   // Never evicted!
     }
 }
-```
 
 Heap dump shows:
 ```
@@ -134,7 +132,6 @@ Fix: Use Caffeine or Guava Cache with `maximumSize` and `expireAfterWrite`.
 
 ### Scenario 2: EntityManager First-Level Cache
 
-```java
 // JPA caches every entity you load in a transaction
 @Transactional
 public void processAllOrders() {
@@ -144,13 +141,11 @@ public void processAllOrders() {
     }
     // If this processes 1M orders, L1 cache holds 1M entities → OOM
 }
-```
 
 Fix: Use `@Transactional(propagation = Propagation.NOT_SUPPORTED)` and batch processing, or periodically `entityManager.clear()`.
 
 ### Scenario 3: ThreadLocal Leaks
 
-```java
 // ThreadLocal values survive thread reuse in thread pools
 public class UserService {
     private static final ThreadLocal<UserContext> currentUser = new ThreadLocal<>();
@@ -164,7 +159,6 @@ public class UserService {
         }
     }
 }
-```
 
 Heap dump shows: thread pool threads holding stale `ThreadLocal` values from previous requests.
 
@@ -207,3 +201,4 @@ This is the fastest way to find a **memory leak** (something that grows continuo
 - **Most common leaks**: static collections without eviction, JPA L1 cache, ThreadLocal not removed, unclosed resources.
 
 Official docs: [jcmd GC.heap_dump](https://docs.oracle.com/en/java/javase/21/docs/specs/man/jcmd.html) · [Eclipse MAT](https://eclipse.dev/mat/)
+

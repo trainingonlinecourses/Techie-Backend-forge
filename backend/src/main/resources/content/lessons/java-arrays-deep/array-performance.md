@@ -1,7 +1,7 @@
 ---
 title: Array Performance — Cache Locality, Memory Layout, and SIMD
 summary: Why arrays are faster than ArrayLists for primitive data, how CPU cache lines affect array traversal performance, and when to use arrays over collections.
-order: 4
+order: 2
 minutes: 18
 topics: [array-performance, cache-locality, memory-layout, simd, primitive-arrays]
 docs:
@@ -18,10 +18,21 @@ With ArrayList<Integer>, each Integer object is a separate heap allocation. The 
 
 ## The Code
 
+
+**What this code does — step by step:**
+
+1. Slow: ArrayList with boxing
+2. `sum += list.get(i);` — Unboxing: Integer → int
+3. Fast: primitive array, cache-friendly
+4. `sum += arr[i];` — Direct memory read
+5. Primitive array: ~5ms
+6. ArrayList: ~50ms (10x slower)
+
+The same code, clean:
+
 ```java
 public class ArrayPerformance {
 
-    // Slow: ArrayList with boxing
     public static long sumArrayList() {
         ArrayList<Integer> list = new ArrayList<>();
         for (int i = 0; i < 10_000_000; i++) {
@@ -29,12 +40,11 @@ public class ArrayPerformance {
         }
         long sum = 0;
         for (int i = 0; i < list.size(); i++) {
-            sum += list.get(i);  // Unboxing: Integer → int
+            sum += list.get(i);
         }
         return sum;
     }
 
-    // Fast: primitive array, cache-friendly
     public static long sumPrimitiveArray() {
         int[] arr = new int[10_000_000];
         for (int i = 0; i < arr.length; i++) {
@@ -42,19 +52,17 @@ public class ArrayPerformance {
         }
         long sum = 0;
         for (int i = 0; i < arr.length; i++) {
-            sum += arr[i];  // Direct memory read
+            sum += arr[i];
         }
         return sum;
     }
 
     public static void main(String[] args) {
-        // Primitive array: ~5ms
         long start = System.nanoTime();
         long result1 = sumPrimitiveArray();
         long elapsed1 = System.nanoTime() - start;
         System.out.printf("Primitive array: %d ns, sum=%d%n", elapsed1, result1);
 
-        // ArrayList: ~50ms (10x slower)
         start = System.nanoTime();
         long result2 = sumArrayList();
         long elapsed2 = System.nanoTime() - start;
@@ -79,3 +87,4 @@ public class ArrayPerformance {
 3. **Use arrays** for hot loops, numeric computation, and buffer management
 4. **Use ArrayList** for general-purpose, dynamic-size collections
 5. **Avoid Integer[] in performance-critical code** — use int[] instead
+

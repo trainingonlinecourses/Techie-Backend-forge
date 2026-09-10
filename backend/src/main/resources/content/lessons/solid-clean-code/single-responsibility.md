@@ -1,7 +1,7 @@
 ---
 title: SRP — Single Responsibility Principle
 module: solid-clean-code
-order: 1
+order: 5
 minutes: 22
 topics: ["SRP", "single responsibility", "cohesion", "class design", "refactoring"]
 summary: The Single Responsibility Principle (the S in SOLID) says: a class should have one reason to change. It should do one job — and do it completely — ...
@@ -26,16 +26,27 @@ When one class must change for all three reasons, every modification risks break
 
 ## The God Class — What SRP Prevents
 
+
+**What this code does — step by step:**
+
+1. The "God class" anti-pattern — one class doing everything:
+2. `validate(order);` — business logic
+3. `saveToDatabase(order);` — persistence
+4. `sendConfirmationEmail(order);` — email
+5. `updateInventory(order);` — inventory
+6. `writeAuditLog(order);` — auditing
+
+The same code, clean:
+
 ```java
-// The "God class" anti-pattern — one class doing everything:
 class OrderProcessor {
 
     void process(Order order) {
-        validate(order);                  // business logic
-        saveToDatabase(order);            // persistence
-        sendConfirmationEmail(order);     // email
-        updateInventory(order);           // inventory
-        writeAuditLog(order);             // auditing
+        validate(order);
+        saveToDatabase(order);
+        sendConfirmationEmail(order);
+        updateInventory(order);
+        writeAuditLog(order);
     }
 
     void validate(Order o) { /* rules */ }
@@ -50,13 +61,27 @@ Five reasons to change, five audiences, one class. Changing email logic means to
 
 ## The Refactored Version
 
+
+**What this code does — step by step:**
+
+1. 1. Business logic — validates and orchestrates (the "what")
+2. `private final OrderRepository repository;` — persistence (injected)
+3. `private final EmailService email;` — notification (injected)
+4. `private final InventoryService inventory;` — inventory (injected)
+5. `private final AuditLogger audit;` — auditing (injected)
+6. 2. Persistence — "how orders are stored" (one audience: DB)
+7. 3. Notification — "how customers are told" (one audience: email team)
+8. 4. Inventory — "how stock is tracked" (one audience: warehouse)
+9. 5. Auditing — "how events are recorded" (one audience: compliance)
+
+The same code, clean:
+
 ```java
-// 1. Business logic — validates and orchestrates (the "what")
 class OrderService {
-    private final OrderRepository repository;      // persistence (injected)
-    private final EmailService email;              // notification (injected)
-    private final InventoryService inventory;      // inventory (injected)
-    private final AuditLogger audit;               // auditing (injected)
+    private final OrderRepository repository;
+    private final EmailService email;
+    private final InventoryService inventory;
+    private final AuditLogger audit;
 
     OrderService(OrderRepository r, EmailService e, InventoryService i, AuditLogger a) {
         this.repository = r; this.email = e; this.inventory = i; this.audit = a;
@@ -73,22 +98,18 @@ class OrderService {
     private void validate(Order o) { /* rules live HERE — one audience */ }
 }
 
-// 2. Persistence — "how orders are stored" (one audience: DB)
 class OrderRepository {
     void save(Order o) { /* JPA code */ }
 }
 
-// 3. Notification — "how customers are told" (one audience: email team)
 class EmailService {
     void sendConfirmation(Order o) { /* SMTP code */ }
 }
 
-// 4. Inventory — "how stock is tracked" (one audience: warehouse)
 class InventoryService {
     void reserve(List<Item> items) { /* warehouse API */ }
 }
 
-// 5. Auditing — "how events are recorded" (one audience: compliance)
 class AuditLogger {
     void record(String msg) { /* log code */ }
 }
@@ -147,3 +168,4 @@ When you see a Spring controller with 40 endpoints across four domains, that's S
 - High cohesion = members share one purpose; the God class is the anti-pattern.
 - Refactor by Extract Class: split concerns, inject the new collaborators.
 - Testability is the canary: hard-to-test classes are usually multi-responsibility classes.
+

@@ -1,7 +1,7 @@
 ---
 title: RAG — Retrieval-Augmented Generation
 summary: The full RAG pipeline — ingest, chunk, embed, retrieve, prompt — and how to ground model answers in your own data.
-order: 5
+order: 9
 minutes: 20
 topics: [rag, retrieval, grounding, qa-pattern]
 docs:
@@ -32,7 +32,6 @@ Models know what they were trained on — not *your* codebase, docs, or policies
 
 ## The manual RAG pipeline (clear, explicit)
 
-```java
 @Service
 public class RagService {
 
@@ -63,13 +62,11 @@ public class RagService {
                 .content();
     }
 }
-```
 
 That's the whole pattern. The production version adds: chunking, metadata filters, reranking, citation parsing.
 
 ## The production RAG pattern (the one Spring AI recommends)
 
-```java
 @Configuration
 public class RagConfig {
 
@@ -86,7 +83,6 @@ public class RagConfig {
                 .build();
     }
 }
-```
 
 `QuestionAnswerAdvisor` does retrieve + stuff + generate for you — the query is embedded, matched, injected, and the answer returned. This is the RAG advisor in action (more advisors in the next lesson).
 
@@ -102,13 +98,11 @@ public class RagConfig {
 
 ## Citations: the trust layer
 
-```java
 public record CitedAnswer(String answer, List<String> sources) {}
 
 // collect which lessons/docs the model used, return them to the UI:
 List<String> sourcesUsed = relevant.stream().map(d -> (String) d.getMetadata().get("lesson")).toList();
 return new CitedAnswer(answer, sourcesUsed);
-```
 
 Users (and auditors) can verify: *the assistant says X, citing lesson Y.* This academy's own chat assistant returns `sources` exactly this way.
 
@@ -128,3 +122,4 @@ Users (and auditors) can verify: *the assistant says X, citing lesson Y.* This a
 - Always return sources; evaluate against a golden set.
 
 **Official docs:** [RAG](https://docs.spring.io/spring-ai/reference/api/rag.html) · [QuestionAnswerAdvisor](https://docs.spring.io/spring-ai/reference/api/advisors.html)
+

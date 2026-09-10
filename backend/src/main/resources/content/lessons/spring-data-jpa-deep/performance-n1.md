@@ -1,7 +1,7 @@
 ---
 title: N+1 Queries and Fetch Strategies
 module: spring-data-jpa-deep
-order: 3
+order: 10
 minutes: 28
 topics: ["N+1 problem", "fetch joins", "EntityGraph", "batch fetching", "lazy loading", "session per request"]
 summary: The N+1 problem is the most common JPA performance killer: one query for the parent, then N queries for each child. This lesson covers how N+1 happ...
@@ -16,7 +16,6 @@ The N+1 problem is the most common JPA performance killer: one query for the par
 
 ## What N+1 Looks Like
 
-```java
 // The innocent-looking code
 List<Course> courses = courseRepository.findAll();
 for (Course c : courses) {
@@ -24,7 +23,6 @@ for (Course c : courses) {
         process(l);
     }
 }
-```
 
 ```sql
 -- What actually hits the DB:
@@ -56,14 +54,12 @@ logging:
 
 ## Fix 1: The Fetch Join (JPQL)
 
-```java
 @Query("""
     select distinct c from Course c
     join fetch c.lessons
     where c.published = true
     """)
 List<Course> findAllPublishedWithLessons();
-```
 
 One query, lessons loaded eagerly for this query only. **Caveats**:
 - `distinct` matters — the join multiplies rows
@@ -72,24 +68,20 @@ One query, lessons loaded eagerly for this query only. **Caveats**:
 
 ## Fix 2: @EntityGraph (declarative)
 
-```java
 @EntityGraph(attributePaths = {"lessons", "lessons.quiz"})
 @Query("select c from Course c where c.published = true")
 List<Course> findAllWithLessonsAndQuizzes();
-```
 
 Same effect as the fetch join, declared on the method. Supports nested paths — the cleanest option for multi-level graphs.
 
 ## Fix 3: Batch Fetching (the global fix)
 
-```java
 # application.yml
 spring:
   jpa:
     properties:
       hibernate:
         default_batch_fetch_size: 50
-```
 
 With batch fetching, lazy collections load **in batches**:
 
@@ -104,12 +96,10 @@ SELECT * FROM lessons WHERE course_id IN (1, 2, 3, ..., 50);   -- 2 queries for 
 
 For read-heavy, rarely-changing data, cache the entities:
 
-```java
 @Entity
 @Cacheable
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Course { ... }
-```
 
 ```yaml
 spring:
@@ -124,18 +114,22 @@ Add `hibernate-jcache` + a provider (Caffeine/Ehcache). The second-level cache s
 
 ## The Lazy Initialization Trap
 
+
+**What this code does — step by step:**
+
+1. LazyInitializationException: no Session
+2. ...return courses directly?
+3. ✅ mapped INSIDE the transaction — lessons load fine
+4. ❌ Outside the transaction: CourseDto dto = courseService.listUnwrapped(); // touching lessons → LazyInitializationException
+
+The same code, clean:
+
 ```java
-// LazyInitializationException: no Session
 @Transactional
 public List<CourseDto> list() {
     List<Course> courses = courseRepository.findAll();
-    // ...return courses directly? 
     return courses.stream().map(c -> new CourseDto(c, c.getLessons().size())).toList();
-    // ✅ mapped INSIDE the transaction — lessons load fine
 }
-
-// ❌ Outside the transaction:
-// CourseDto dto = courseService.listUnwrapped();  // touching lessons → LazyInitializationException
 ```
 
 **Rules**:
@@ -156,7 +150,6 @@ public List<CourseDto> list() {
 
 ## Measuring the Fix
 
-```java
 @DataJpaTest
 @Testcontainers
 class FetchStrategyTest {
@@ -176,7 +169,6 @@ class FetchStrategyTest {
         assertEquals(1, stats.getQueryExecutionCount());   // ONE query
     }
 }
-```
 
 ## The Complete Performance Checklist
 
@@ -199,3 +191,4 @@ class FetchStrategyTest {
 | Projections | Wide entities | More methods to write |
 
 N+1 is the difference between "works in dev" and "melts in prod" — every parent-child list is a hidden query explosion. Set batch fetching as the baseline, use EntityGraphs for the hot paths, keep lazy access inside transactions, and verify with query-count tests. The database will thank you.
+

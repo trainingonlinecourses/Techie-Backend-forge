@@ -1,7 +1,7 @@
 ---
 title: Static in Depth — Blocks, Nested Classes, and Imports
 summary: Static fields, static blocks (initialization order), static nested classes, static imports, and why static + mutable state is the most common source of test pollution in enterprise Java.
-order: 41
+order: 72
 minutes: 20
 topics: [static-field, static-block, static-nested, static-import, initialization-order, test-pollution]
 docs:
@@ -29,19 +29,16 @@ There are five distinct uses of `static`:
 
 **Good: immutable constants**
 
-```java
 public class OrderConstants {
     public static final String STATUS_CREATED = "CREATED";
     public static final String STATUS_PAID = "PAID";
     public static final int MAX_LINE_ITEMS = 50;
 }
-```
 
 Safe because `final` prevents reassignment, and `String`/`int` are immutable.
 
 **Dangerous: mutable static state**
 
-```java
 public class ConnectionPool {
     // DANGER: mutable static state
     private static ConnectionPool instance;
@@ -58,13 +55,11 @@ public class ConnectionPool {
         activeConnections++;  // thread-unsafe even with synchronized getInstance()
     }
 }
-```
 
 The `activeConnections++` is **not atomic** and is not protected by any lock. Two threads can read the same value, both increment, and store the same result — losing a count. This is a classic race condition.
 
 **The fix: avoid mutable statics entirely. Use dependency injection:**
 
-```java
 @Component
 public class ConnectionPool {
     private final AtomicInteger activeConnections = new AtomicInteger(0);
@@ -74,7 +69,6 @@ public class ConnectionPool {
         // ...
     }
 }
-```
 
 Spring manages the lifecycle; no static state; testable; thread-safe.
 
@@ -82,7 +76,6 @@ Spring manages the lifecycle; no static state; testable; thread-safe.
 
 A `static` block runs **once** when the class is first loaded. It executes in order, top to bottom, with the static fields.
 
-```java
 public class CacheConfig {
 
     private static final Map<String, String> CACHE;
@@ -99,7 +92,6 @@ public class CacheConfig {
         return CACHE.getOrDefault(key, "10m");
     }
 }
-```
 
 **Initialization order rules:**
 
@@ -108,7 +100,6 @@ public class CacheConfig {
 3. The class loads only once per classloader.
 4. If a static block throws an exception, the class becomes unusable (`ExceptionInInitializerError`).
 
-```java
 public class OrderService {
 
     private static final ConnectionPool POOL;
@@ -121,13 +112,11 @@ public class OrderService {
         }
     }
 }
-```
 
 ## Static nested classes — logical grouping without the trap
 
 A **static nested class** does not hold an implicit reference to the enclosing class. A **non-static inner class** does — every inner class instance carries a hidden `OuterClass.this` pointer.
 
-```java
 // GOOD: static nested — no hidden reference
 public class Order {
     private String orderId;
@@ -151,7 +140,6 @@ public class Order {
         private String productId;
     }
 }
-```
 
 **Why this matters:** if you serialize an inner `Item`, you serialize the *entire* `Order` too (because of the hidden reference). If you store `Item` instances in a static collection, you prevent the `Order` from being garbage collected.
 
@@ -161,7 +149,6 @@ public class Order {
 
 ## Static imports — constants and utilities
 
-```java
 // Without static import
 import com.myapp.domain.OrderStatus;
 if (status == OrderStatus.CREATED) { ... }
@@ -169,7 +156,6 @@ if (status == OrderStatus.CREATED) { ... }
 // With static import
 import static com.myapp.domain.OrderStatus.*;
 if (status == CREATED) { ... }
-```
 
 Static imports are syntactic sugar. They improve readability for frequently used constants (`HttpStatus.OK`, `Assertions.assertEquals`, `TimeUnit.SECONDS`).
 
@@ -179,7 +165,6 @@ Static imports are syntactic sugar. They improve readability for frequently used
 
 ### Scenario: static utility class (no instance needed)
 
-```java
 public final class MoneyUtils {
 
     private MoneyUtils() {}  // prevent instantiation
@@ -192,11 +177,9 @@ public final class MoneyUtils {
         return actual.subtract(expected).abs().compareTo(tolerance) <= 0;
     }
 }
-```
 
 ### Scenario: static factory method (instead of constructor)
 
-```java
 public class OrderResult {
 
     private final boolean success;
@@ -219,11 +202,9 @@ public class OrderResult {
 
 // Usage — readable without looking up the constructor
 OrderResult result = OrderResult.success("Order placed");
-```
 
 ### Scenario: static test pollution
 
-```java
 // PROBLEM: mutable static state leaks between tests
 public class FeatureFlags {
     private static Map<String, Boolean> flags = new HashMap<>();
@@ -234,7 +215,6 @@ public class FeatureFlags {
 
 // Test 1 enables a flag
 // Test 2 runs — flag is still enabled → flaky test
-```
 
 **Fix:** replace the static map with an injected bean, or reset state in `@BeforeEach`.
 
@@ -247,3 +227,4 @@ public class FeatureFlags {
 | Static block that does I/O | Class loading becomes slow and failure-prone |
 | Static import of non-constant | Reduced readability, ambiguous references |
 | Forgetting initialization order | NullPointerException in static fields |
+

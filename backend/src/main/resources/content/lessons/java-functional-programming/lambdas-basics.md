@@ -1,7 +1,7 @@
 ---
 title: Lambda Expressions — Passing Behavior as Data
 module: java-functional-programming
-order: 1
+order: 4
 minutes: 26
 topics: ["lambdas", "anonymous classes", "behavior passing", "syntax", "effectively final"]
 summary: Imagine a cooking show. The host doesn't tell you exactly how to chop every vegetable each episode — she says "and now, chop the onions" and hands ...
@@ -18,7 +18,6 @@ Imagine a cooking show. The host doesn't tell you *exactly* how to chop every ve
 
 **Lambda expressions** are Java's way of passing **behavior** (a small piece of code) as a value — like passing a function. Instead of writing a 6-line anonymous class to say "sort by name", you write one line:
 
-```java
 // Old way — an anonymous class that implements Comparator
 names.sort(new Comparator<String>() {
     @Override
@@ -29,7 +28,6 @@ names.sort(new Comparator<String>() {
 
 // Lambda way — just the behavior
 names.sort((a, b) -> a.compareTo(b));
-```
 
 Same meaning, radically less ceremony. The lambda `(a, b) -> a.compareTo(b)` *is* the comparator's logic, delivered without the wrapper class boilerplate.
 
@@ -60,6 +58,20 @@ A lambda is *not* a new kind of object you can inspect — it's a **compact impl
 
 ## The Code Walkthrough
 
+
+**What this code does — step by step:**
+
+1. 1. Sort with a lambda (Comparator)
+2. `names.sort((a, b) -> a.length() - b.length());` — shortest first
+3. 2. Filter with a lambda (Predicate)
+4. `names.removeIf(name -> name.length() < 4);` — drop short names
+5. 3. Transform each element (Function)
+6. 4. Iterate (Consumer)
+7. 5. Lambdas capture surrounding variables (effectively final)
+8. prefix must NOT be reassigned afterwards — that's "effectively final"
+
+The same code, clean:
+
 ```java
 import java.util.*;
 import java.util.function.*;
@@ -69,22 +81,16 @@ public class LambdaDemo {
     public static void main(String[] args) {
         List<String> names = new ArrayList<>(List.of("Sateesh", "Aisha", "Bob", "Chen"));
 
-        // 1. Sort with a lambda (Comparator)
-        names.sort((a, b) -> a.length() - b.length());      // shortest first
+        names.sort((a, b) -> a.length() - b.length());
 
-        // 2. Filter with a lambda (Predicate)
-        names.removeIf(name -> name.length() < 4);          // drop short names
+        names.removeIf(name -> name.length() < 4);
 
-        // 3. Transform each element (Function)
         names.replaceAll(name -> name.toUpperCase());
 
-        // 4. Iterate (Consumer)
         names.forEach(name -> System.out.println("Hello, " + name));
 
-        // 5. Lambdas capture surrounding variables (effectively final)
         String prefix = "Student: ";
         names.forEach(name -> System.out.println(prefix + name));
-        // prefix must NOT be reassigned afterwards — that's "effectively final"
     }
 }
 ```
@@ -103,13 +109,11 @@ public class LambdaDemo {
 
 ## When to Use a Lambda vs a Loop
 
-```java
 // Loop — fine when you need early exit, index, or mutation-heavy logic
 for (String n : names) { if (n.length() > 3) total += n.length(); }
 
 // Lambda/stream — expressive when you're transforming a collection
 long total = names.stream().filter(n -> n.length() > 3).mapToLong(String::length).sum();
-```
 
 Neither is "always better". Loops win for: early `break`, `continue`, index access, exceptions with precise control. Lambdas/streams win for: filtering/mapping/collecting pipelines, passing behavior as a parameter, and avoiding mutable loop state. In later lessons you'll combine them with the Stream API.
 
@@ -129,3 +133,4 @@ Neither is "always better". Loops win for: early `break`, `continue`, index acce
 - `sort`/`removeIf`/`replaceAll`/`forEach` are the everyday lambda consumers.
 - Captured variables must be effectively final.
 - Lambdas are the building block for the Stream API and functional interfaces (next lesson).
+

@@ -24,8 +24,19 @@ This is what "is-a" inheritance is *supposed* to mean. The moment a subclass bre
 
 ## The Classic Violation — The Square/Rectangle Problem
 
+
+**What this code does — step by step:**
+
+1. The parent: a rectangle whose width and height are settable
+2. The "subtype": a square — but squares can't have independent width & height!
+3. `this.height = w;` — force square-ness
+4. This method works PERFECTLY for any Rectangle... until a Square shows up.
+5. `resizeAndPrint(new Rectangle());` — Expected area 20, got 20 ✓
+6. `resizeAndPrint(new Square());` — Expected area 20, got 25 ✗ BROKEN!
+
+The same code, clean:
+
 ```java
-// The parent: a rectangle whose width and height are settable
 class Rectangle {
     protected int width;
     protected int height;
@@ -35,12 +46,11 @@ class Rectangle {
     public int area() { return width * height; }
 }
 
-// The "subtype": a square — but squares can't have independent width & height!
 class Square extends Rectangle {
     @Override
     public void setWidth(int w) {
         this.width = w;
-        this.height = w;        // force square-ness
+        this.height = w;
     }
 
     @Override
@@ -52,7 +62,6 @@ class Square extends Rectangle {
 
 public class LspDemo {
 
-    // This method works PERFECTLY for any Rectangle... until a Square shows up.
     static void resizeAndPrint(Rectangle r) {
         r.setWidth(4);
         r.setHeight(5);
@@ -60,8 +69,8 @@ public class LspDemo {
     }
 
     public static void main(String[] args) {
-        resizeAndPrint(new Rectangle());   // Expected area 20, got 20   ✓
-        resizeAndPrint(new Square());      // Expected area 20, got 25   ✗ BROKEN!
+        resizeAndPrint(new Rectangle());
+        resizeAndPrint(new Square());
     }
 }
 ```
@@ -77,7 +86,6 @@ A Square is *mathematically* a rectangle, but as *mutable classes with setters*,
 
 ## The Better Design — Composition Over Broken Inheritance
 
-```java
 // Option A: Square as an independent class (no inheritance)
 class Square {
     private int side;
@@ -98,7 +106,6 @@ record Rectangle(int width, int height) implements Shape {
 record Square(int side) implements Shape {
     public int area() { return side * side; }
 }
-```
 
 With **immutable** shapes there is no "set width" to break — a `Square` is simply a `Shape` with one dimension. The whole class of violations evaporates. This is a general lesson: LSP violations are often born from *mutable state* in inheritance — the subclass can't honor the parent's mutation contract.
 
@@ -106,7 +113,6 @@ With **immutable** shapes there is no "set width" to break — a `Square` is sim
 
 ### 1. The "throws" widening
 
-```java
 // Parent contract: load never throws checked exceptions the caller must handle
 class Loader {
     Data load() { ... }
@@ -120,13 +126,11 @@ class RemoteLoader extends Loader {
         return ...;
     }
 }
-```
 
 If callers weren't told "load may throw", any code that assumed success breaks. (Checked exceptions in the signature are a *compiled* contract; runtime throws are a *silent* one — the latter is the danger.)
 
 ### 2. The "weakened guarantee"
 
-```java
 class SortedList {
     void add(String s) { ... }    // contract: stays sorted
 }
@@ -135,11 +139,9 @@ class WeirdList extends SortedList {
     @Override
     void add(String s) { list.add(s); }   // NOT sorted anymore — contract broken
 }
-```
 
 ### 3. The "impossible operation"
 
-```java
 class Bird {
     void fly() { ... }
 }
@@ -148,7 +150,6 @@ class Penguin extends Bird {
     @Override
     void fly() { throw new UnsupportedOperationException(); }   // penguins can't fly
 }
-```
 
 A `List<Bird>` containing a `Penguin` breaks any code that calls `fly()` on everything. The fix: don't put `fly()` on the base `Bird` — model capability separately (`interface Flyable { void fly(); }`).
 
@@ -173,3 +174,4 @@ Also worth remembering: **prefer interfaces over inheritance for behavior sharin
 - Common violations: throwing where the parent wouldn't, weakening guarantees, impossible operations.
 - Prefer interfaces + composition + immutable types over fragile inheritance.
 - The "is-a" test is about *behavior*, not real-world analogy.
+

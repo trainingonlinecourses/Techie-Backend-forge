@@ -1,7 +1,7 @@
 ---
 title: Authentication — Users, Password Encoding & Providers
 summary: UserDetailsService, DaoAuthenticationProvider, AuthenticationManager and how username/password auth really works.
-order: 3
+order: 2
 minutes: 18
 topics: [userdetailsservice, authenticationmanager, daoauthenticationprovider]
 docs:
@@ -29,7 +29,6 @@ LoginController → AuthenticationManager.authenticate(UsernamePasswordAuthentic
 
 ## UserDetailsService: where users come from
 
-```java
 @Service
 public class AppUserDetailsService implements UserDetailsService {
 
@@ -42,9 +41,7 @@ public class AppUserDetailsService implements UserDetailsService {
         return new UserPrincipal(user);          // adapts your entity to UserDetails
     }
 }
-```
 
-```java
 public class UserPrincipal implements UserDetails {
     private final User user;
 
@@ -54,11 +51,9 @@ public class UserPrincipal implements UserDetails {
     @Override public String getPassword() { return user.getPassword(); }   // the BCrypt hash
     @Override public String getUsername() { return user.getUsername(); }
 }
-```
 
 ## Wiring the provider and manager
 
-```java
 @Bean
 DaoAuthenticationProvider authenticationProvider(UserDetailsService uds, PasswordEncoder encoder) {
     DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
@@ -71,13 +66,11 @@ DaoAuthenticationProvider authenticationProvider(UserDetailsService uds, Passwor
 AuthenticationManager authenticationManager(DaoAuthenticationProvider provider) {
     return new ProviderManager(provider);
 }
-```
 
 `DaoAuthenticationProvider` does the security-critical part: it loads the user, runs `passwordEncoder.matches(raw, hash)` (constant-time comparison), and rejects on failure.
 
 ## Using it in a login endpoint
 
-```java
 @PostMapping("/login")
 public AuthResponse login(@Valid @RequestBody LoginRequest req) {
     var auth = authenticationManager.authenticate(
@@ -86,11 +79,9 @@ public AuthResponse login(@Valid @RequestBody LoginRequest req) {
     String token = jwtService.issue(principal.user());     // → next lesson
     return new AuthResponse(token, UserDto.from(principal.user()));
 }
-```
 
 ## Registration: encode before saving
 
-```java
 @Transactional
 public AuthResponse register(RegisterRequest req) {
     if (users.existsByUsername(req.username())) {
@@ -102,7 +93,6 @@ public AuthResponse register(RegisterRequest req) {
     users.save(user);
     return new AuthResponse(jwtService.issue(user), UserDto.from(user));
 }
-```
 
 ## Failure modes to know
 
@@ -120,3 +110,4 @@ public AuthResponse register(RegisterRequest req) {
 - `@AuthenticationPrincipal` hands you your principal in controllers.
 
 **Official docs:** [Authentication](https://docs.spring.io/spring-security/reference/servlet/authentication/index.html) · [Passwords](https://docs.spring.io/spring-security/reference/servlet/authentication/passwords/index.html)
+

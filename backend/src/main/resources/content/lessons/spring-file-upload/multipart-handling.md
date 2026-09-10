@@ -1,7 +1,7 @@
 ---
 title: Multipart File Upload — Handling File Submissions
 summary: How Spring Boot handles multipart uploads, MultipartFile API, configuration limits, storage strategies, and controller patterns for file handling.
-order: 2
+order: 5
 minutes: 20
 topics: [multipart, file-upload, MultipartFile, storage, limits, controller]
 docs:
@@ -12,7 +12,6 @@ docs:
 
 Multipart is the HTTP standard for uploading files. Spring Boot wraps the raw multipart data in `MultipartFile` objects that are easy to work with.
 
-```java
 @PostMapping("/upload")
 public ResponseEntity<?> upload(@RequestParam("file") MultipartFile file) {
     String name = file.getOriginalFilename();
@@ -20,7 +19,6 @@ public ResponseEntity<?> upload(@RequestParam("file") MultipartFile file) {
     byte[] bytes = file.getBytes();
     return ResponseEntity.ok("Uploaded: " + name + " (" + size + " bytes)");
 }
-```
 
 ---
 
@@ -41,6 +39,18 @@ spring:
 
 ## Line-by-Line Walkthrough
 
+
+**What this code does — step by step:**
+
+1. 1. Single file upload
+2. Validate
+3. Save to disk
+4. 2. Multiple file upload
+5. 3. Form data with file + metadata
+6. Process metadata + file together
+
+The same code, clean:
+
 ```java
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.bind.annotation.*;
@@ -54,17 +64,14 @@ public class FileUploadController {
 
     private final Path uploadDir = Paths.get("./uploads");
 
-    // 1. Single file upload
     @PostMapping("/single")
     public ResponseEntity<?> uploadSingle(
             @RequestParam("file") MultipartFile file) throws IOException {
 
-        // Validate
         if (file.isEmpty()) {
             return ResponseEntity.badRequest().body("File is empty");
         }
 
-        // Save to disk
         String filename = System.currentTimeMillis() + "_" + file.getOriginalFilename();
         Path target = uploadDir.resolve(filename);
         Files.createDirectories(uploadDir);
@@ -77,7 +84,6 @@ public class FileUploadController {
         ));
     }
 
-    // 2. Multiple file upload
     @PostMapping("/multiple")
     public ResponseEntity<?> uploadMultiple(
             @RequestParam("files") MultipartFile[] files) throws IOException {
@@ -93,14 +99,12 @@ public class FileUploadController {
         return ResponseEntity.ok(Map.of("uploaded", saved));
     }
 
-    // 3. Form data with file + metadata
     @PostMapping("/document")
     public ResponseEntity<?> uploadDocument(
             @RequestParam("file") MultipartFile file,
             @RequestParam("title") String title,
             @RequestParam(value = "description", required = false) String desc) throws IOException {
 
-        // Process metadata + file together
         String filename = saveFile(file);
         return ResponseEntity.ok(Map.of(
             "id", filename,
@@ -123,7 +127,6 @@ public class FileUploadController {
 
 ### Scenario 1: Image upload with validation
 
-```java
 @PostMapping("/avatar")
 public ResponseEntity<?> uploadAvatar(@RequestParam("file") MultipartFile file) {
     // Validate file type
@@ -148,11 +151,9 @@ public ResponseEntity<?> uploadAvatar(@RequestParam("file") MultipartFile file) 
     // ... save to storage
     return ResponseEntity.ok(Map.of("filename", filename));
 }
-```
 
 ### Scenario 2: Streaming large files
 
-```java
 @PostMapping("/large")
 public ResponseEntity<?> uploadLarge(@RequestParam("file") MultipartFile file) throws IOException {
     // Don't load entire file into memory
@@ -162,7 +163,6 @@ public ResponseEntity<?> uploadLarge(@RequestParam("file") MultipartFile file) t
     }
     return ResponseEntity.ok("Uploaded");
 }
-```
 
 ---
 
@@ -174,3 +174,4 @@ public ResponseEntity<?> uploadLarge(@RequestParam("file") MultipartFile file) t
 | Loading huge files into memory | OutOfMemoryError | Use streaming or temp files |
 | Not validating file type | Security risk — could upload executable | Validate MIME type + extension |
 | Using original filename directly | Path traversal attacks | Use UUID-based filenames |
+

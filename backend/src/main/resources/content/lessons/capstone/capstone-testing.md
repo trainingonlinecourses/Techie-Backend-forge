@@ -16,7 +16,6 @@ Open `projects/payments-api/src/test/java/` — every test below is in the proje
 
 ## 1. Unit tests: the money math
 
-```java
 package com.example.payments.money;
 
 import org.junit.jupiter.api.Test;
@@ -50,13 +49,11 @@ class MoneyTest {
                 .isEqualByComparingTo(new BigDecimal("1.01"));   // HALF_UP rounding
     }
 }
-```
 
 Plain JUnit + AssertJ, no Spring — the fastest tests in the suite, covering the most critical code.
 
 ## 2. Service unit test: transfer rules
 
-```java
 class TransferServiceTest {
 
     @Test
@@ -74,11 +71,9 @@ class TransferServiceTest {
         verify(transfers, never()).save(any());
     }
 }
-```
 
 ## 3. Integration test: the full transaction
 
-```java
 @SpringBootTest
 @AutoConfigureMockMvc
 class TransferApiIntegrationTest {
@@ -125,7 +120,6 @@ class TransferApiIntegrationTest {
                 .andExpect(status().isUnauthorized());
     }
 }
-```
 
 ## 4. The Dockerfile
 
@@ -191,3 +185,4 @@ Every PR runs: compile → unit tests → integration tests → dependency scan.
 - CI = `mvn verify` + dependency scan on every PR.
 
 **Official docs:** [Testing](https://docs.spring.io/spring-boot/reference/testing/index.html) · [Deployment](https://docs.spring.io/spring-boot/reference/deployment/index.html)
+

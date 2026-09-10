@@ -1,7 +1,7 @@
 ---
 title: Git Basics — The Snapshot Machine
 module: git-github-basics
-order: 1
+order: 2
 minutes: 25
 topics: ["git", "commits", "staging", "repositories", "history", "version control"]
 summary: The core mental model — Git stores snapshots, not changes:
@@ -126,3 +126,4 @@ dist/
 - `git restore` discards uncommitted changes; `git reset --hard` is the nuclear option.
 - `.gitignore` keeps generated files and secrets out of history.
 - Small, coherent, well-messaged commits make the history readable and the time machine useful.
+

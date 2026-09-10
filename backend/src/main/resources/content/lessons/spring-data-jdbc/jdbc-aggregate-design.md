@@ -1,7 +1,7 @@
 ---
 title: Aggregate Design — Choosing the Boundaries
 module: spring-data-jdbc
-order: 2
+order: 1
 minutes: 25
 topics: ["aggregates", "aggregate root", "boundaries", "value objects", "references"]
 summary: The central design decision in Spring Data JDBC is the aggregate: the cluster of objects that are loaded, saved, and deleted as one unit. The term ...
@@ -33,6 +33,21 @@ The **aggregate root** (`Order`) is the only object with an identity that outsid
 
 ## The Code Walkthrough
 
+
+**What this code does — step by step:**
+
+1. ---- Value objects: no identity, embedded in the aggregate ----
+2. ---- Child entity: no own id, lives inside the order ----
+3. getters, constructors...
+4. ---- Aggregate root: THE object with identity ----
+5. `private Long id;` — the only identity in this aggregate
+6. `private Long customerId;` — reference to ANOTHER aggregate (by id only)
+7. consistency inside the aggregate is YOUR code's job
+8. getters...
+9. ---- Repository: one per aggregate root ----
+
+The same code, clean:
+
 ```java
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
@@ -40,23 +55,19 @@ import org.springframework.data.relational.core.mapping.Table;
 import java.util.ArrayList;
 import java.util.List;
 
-// ---- Value objects: no identity, embedded in the aggregate ----
 public record Money(java.math.BigDecimal amount, String currency) {}
 
-// ---- Child entity: no own id, lives inside the order ----
 public class OrderLine {
     private String productName;
     private int quantity;
     private Money price;
 
-    // getters, constructors...
 }
 
-// ---- Aggregate root: THE object with identity ----
 public class Order {
     @Id
-    private Long id;                  // the only identity in this aggregate
-    private Long customerId;          // reference to ANOTHER aggregate (by id only)
+    private Long id;
+    private Long customerId;
     private List<OrderLine> lines = new ArrayList<>();
     private Money total;
 
@@ -66,7 +77,6 @@ public class Order {
     }
 
     private void recomputeTotal() {
-        // consistency inside the aggregate is YOUR code's job
         this.total = new Money(
                 lines.stream()
                         .map(l -> l.price().amount().multiply(java.math.BigDecimal.valueOf(l.quantity())))
@@ -74,10 +84,8 @@ public class Order {
                 "USD");
     }
 
-    // getters...
 }
 
-// ---- Repository: one per aggregate root ----
 public interface OrderRepository extends CrudRepository<Order, Long> {
 }
 ```
@@ -96,7 +104,6 @@ public interface OrderRepository extends CrudRepository<Order, Long> {
 
 ## Two Aggregates, Two Tables, One Workflow
 
-```java
 @Service
 public class OrderService {
 
@@ -115,7 +122,6 @@ public class OrderService {
         return orders.save(order);
     }
 }
-```
 
 `Order` and `Customer` evolve independently; each repository manages its own aggregate; the workflow composes them at the service layer.
 
@@ -145,3 +151,4 @@ Signs your aggregate is mis-designed:
 - Value objects (records) make ideal children; domain rules live in the root.
 - One repository per aggregate root — the service composes aggregates.
 - Smaller aggregates load faster, contend less, and stay honest.
+

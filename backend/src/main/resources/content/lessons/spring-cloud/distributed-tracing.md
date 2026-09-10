@@ -87,7 +87,6 @@ logging:
     level: '%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]'   # MDC fields
 ```
 
-```java
 @RestController
 public class OrderController {
 
@@ -100,7 +99,6 @@ public class OrderController {
         ...
     }
 }
-```
 
 Now any log aggregator (ELK, Loki, CloudWatch) can filter **by trace id** and rebuild the whole request across all services.
 
@@ -108,14 +106,12 @@ Now any log aggregator (ELK, Loki, CloudWatch) can filter **by trace id** and re
 
 Instrumentation is automatic for HTTP; add spans for meaningful boundaries (DB queries, cache, business steps):
 
-```java
 Span span = tracer.nextSpan().name("cache.lookup").start();
 try (Tracer.SpanInScope ws = tracer.withSpan(span)) {
     Order order = cache.get(id);
 } finally {
     span.end();
 }
-```
 
 Keep custom spans minimal — automatic HTTP/DB spans cover 90% of debugging.
 
@@ -148,3 +144,4 @@ A trace id is the *join key*: alert on metrics → read logs with that trace id 
 - Metrics alert, logs explain, traces locate — one trace id connects them.
 
 **Official docs:** [Boot tracing](https://docs.spring.io/spring-boot/reference/actuator/tracing.html) · [Micrometer Tracing](https://micrometer.io/docs/tracing) · [OpenTelemetry](https://opentelemetry.io/docs/)
+

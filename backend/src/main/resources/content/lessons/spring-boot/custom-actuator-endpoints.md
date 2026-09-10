@@ -1,7 +1,7 @@
 ---
 title: Custom Actuator Endpoints & Health Indicators — Ops Visibility
 summary: Building custom HealthIndicator beans, custom @Endpoint operations, and the metrics patterns that make an app's operational state visible.
-order: 22
+order: 20
 minutes: 17
 topics: [actuator, healthindicator, custom-endpoint, metrics, readiness, liveness, ops]
 docs:
@@ -20,7 +20,6 @@ Spring Boot Actuator exposes the app's operational state as HTTP endpoints: `/ac
 
 ## HealthIndicator — the pattern
 
-```java
 @Component
 public class PaymentGatewayHealthIndicator implements HealthIndicator {
     private final PaymentGatewayClient client;
@@ -37,7 +36,6 @@ public class PaymentGatewayHealthIndicator implements HealthIndicator {
         }
     }
 }
-```
 
 - The aggregate `/actuator/health` returns `UP` only when **all** indicators are up (or `OUT_OF_SERVICE` for statuses you set).
 - **Details are hidden by default** — `management.endpoint.health.show-details=when-authorized` (or `always` for internal networks) controls whether the per-component details are visible.
@@ -45,7 +43,6 @@ public class PaymentGatewayHealthIndicator implements HealthIndicator {
 
 ## Custom endpoints — the pattern
 
-```java
 @Component
 @Endpoint(id = "queueDepth")                                // → /actuator/queueDepth
 public class QueueDepthEndpoint {
@@ -65,7 +62,6 @@ public class QueueDepthEndpoint {
     public void purge() { ... }                              // DELETE — purge the queue
     public record QueueDepthInfo(long pending, int consumers) {}
 }
-```
 
 Operations: `@ReadOperation` (GET), `@WriteOperation` (POST), `@DeleteOperation` (DELETE). Custom endpoints are how teams expose *their* knobs: cache eviction, feature-flag refresh, job triggers, queue stats — visible to ops without a bespoke admin UI.
 
@@ -89,13 +85,11 @@ management.endpoint.health.probes.enabled=true
 
 **Scenario 2 — a manual "reload config" knob.** `@WriteOperation` on a config endpoint: ops POSTs to refresh a feature flag without restarting:
 
-```java
 @Component @Endpoint(id = "featureFlags")
 public class FeatureFlagEndpoint {
     @WriteOperation
     public void refresh(@Selector String name) { flagService.reload(name); }
 }
-```
 
 **Scenario 3 — cache statistics for capacity planning.** A `@ReadOperation` exposing hit-rate, size, and eviction counts — the data that tells you when a cache needs a bigger limit.
 
@@ -116,3 +110,4 @@ public class FeatureFlagEndpoint {
 - Liveness = restart me; readiness = stop routing to me — keep dependency failures on readiness.
 - Keep probes cheap and fast; secure sensitive endpoints; hide details by default.
 - Health indicators are the source of truth for Kubernetes probes and ops dashboards alike.
+

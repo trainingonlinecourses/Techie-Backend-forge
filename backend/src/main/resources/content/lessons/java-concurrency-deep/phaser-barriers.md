@@ -1,7 +1,7 @@
 ---
 title: Phaser, CountDownLatch & CyclicBarrier — Thread Coordination
 summary: When threads need to synchronize at specific points, barrier-based coordination, phased computation, and production patterns for parallel processing.
-order: 9
+order: 6
 minutes: 18
 topics: [phaser, countDownLatch, cyclicBarrier, thread-coordination, barrier, parallel-processing, phased-computation]
 docs:
@@ -33,32 +33,47 @@ Java provides three tools for this:
 
 ### Basic Usage
 
+
+**What this code does — step by step:**
+
+1. "Wait until 3 tasks complete"
+2. `CountDownLatch latch = new CountDownLatch(3);` — Count = 3
+3. Worker threads count down when done
+4. `doWork();` — Do some work
+5. `latch.countDown();` — Decrement count
+6. `latch.countDown();` — Still count down on error
+7. Main thread waits until count reaches 0
+8. `latch.await();` — Blocks until all 3 workers call countDown()
+
+The same code, clean:
+
 ```java
-// "Wait until 3 tasks complete"
-CountDownLatch latch = new CountDownLatch(3);  // Count = 3
+public class Main {
 
-// Worker threads count down when done
-ExecutorService executor = Executors.newFixedThreadPool(3);
+    public static void main(String[] args) {
+        CountDownLatch latch = new CountDownLatch(3);
 
-for (int i = 0; i < 3; i++) {
-    executor.submit(() -> {
-        try {
-            doWork();  // Do some work
-            latch.countDown();  // Decrement count
-        } catch (Exception e) {
-            latch.countDown();  // Still count down on error
+        ExecutorService executor = Executors.newFixedThreadPool(3);
+
+        for (int i = 0; i < 3; i++) {
+            executor.submit(() -> {
+                try {
+                    doWork();
+                    latch.countDown();
+                } catch (Exception e) {
+                    latch.countDown();
+                }
+            });
         }
-    });
-}
 
-// Main thread waits until count reaches 0
-latch.await();  // Blocks until all 3 workers call countDown()
-System.out.println("All workers finished!");
+        latch.await();
+        System.out.println("All workers finished!");
+    }
+}
 ```
 
 ### Real Example: Parallel API Calls
 
-```java
 @Service
 public class MultiSourceAggregator {
 
@@ -103,7 +118,6 @@ public class MultiSourceAggregator {
         return new AggregatedResult(user.get(), orders.get(), profile.get());
     }
 }
-```
 
 ---
 
@@ -111,26 +125,39 @@ public class MultiSourceAggregator {
 
 ### Basic Usage
 
-```java
-// "4 threads must all reach this point before any can proceed"
-CyclicBarrier barrier = new CyclicBarrier(4, () -> {
-    System.out.println("All threads reached the barrier!");
-    // Runs ONCE when all threads arrive
-});
 
-// Each thread does some work, then waits at the barrier
-for (int i = 0; i < 4; i++) {
-    executor.submit(() -> {
-        doPhase1Work();       // Each thread does its part
-        barrier.await();      // Wait for others
-        doPhase2Work();       // All start phase 2 together
-    });
+**What this code does — step by step:**
+
+1. "4 threads must all reach this point before any can proceed"
+2. Runs ONCE when all threads arrive
+3. Each thread does some work, then waits at the barrier
+4. `doPhase1Work();` — Each thread does its part
+5. `barrier.await();` — Wait for others
+6. `doPhase2Work();` — All start phase 2 together
+
+The same code, clean:
+
+```java
+public class Main {
+
+    public static void main(String[] args) {
+        CyclicBarrier barrier = new CyclicBarrier(4, () -> {
+            System.out.println("All threads reached the barrier!");
+        });
+
+        for (int i = 0; i < 4; i++) {
+            executor.submit(() -> {
+                doPhase1Work();
+                barrier.await();
+                doPhase2Work();
+            });
+        }
+    }
 }
 ```
 
 ### Real Example: Parallel Data Processing
 
-```java
 public class ParallelProcessor {
 
     private final CyclicBarrier barrier;
@@ -160,7 +187,6 @@ public class ParallelProcessor {
         });
     }
 }
-```
 
 ---
 
@@ -168,17 +194,26 @@ public class ParallelProcessor {
 
 ### Basic Usage
 
-```java
-// Phaser is like a CyclicBarrier but more flexible
-Phaser phaser = new Phaser(3);  // 3 parties registered
 
-// Each thread registers itself
+**What this code does — step by step:**
+
+1. Phaser is like a CyclicBarrier but more flexible
+2. `Phaser phaser = new Phaser(3);` — 3 parties registered
+3. Each thread registers itself
+4. `doWork(phase, p);` — Do work for this phase
+5. `phaser.arriveAndAwaitAdvance();` — Wait for all threads
+
+The same code, clean:
+
+```java
+Phaser phaser = new Phaser(3);
+
 for (int i = 0; i < 3; i++) {
     final int phase = i;
     new Thread(() -> {
         for (int p = 0; p < 3; p++) {
-            doWork(phase, p);      // Do work for this phase
-            phaser.arriveAndAwaitAdvance();  // Wait for all threads
+            doWork(phase, p);
+            phaser.arriveAndAwaitAdvance();
         }
     }).start();
 }
@@ -186,29 +221,56 @@ for (int i = 0; i < 3; i++) {
 
 ### Dynamic Registration
 
+
+**What this code does — step by step:**
+
+1. `Phaser phaser = new Phaser(1);` — Start with 1 (main thread)
+2. Dynamically add workers
+3. `phaser.register();` — Add a party
+4. `phaser.arriveAndDeregister();` — Done — remove myself
+5. `phaser.arriveAndDeregister();` — Still remove on error
+6. Main thread waits for all workers
+
+The same code, clean:
+
 ```java
-Phaser phaser = new Phaser(1);  // Start with 1 (main thread)
+public class Main {
 
-// Dynamically add workers
-for (int i = 0; i < 5; i++) {
-    phaser.register();  // Add a party
-    final int workerId = i;
-    new Thread(() -> {
-        try {
-            doWork(workerId);
-            phaser.arriveAndDeregister();  // Done — remove myself
-        } catch (Exception e) {
-            phaser.arriveAndDeregister();  // Still remove on error
+    public static void main(String[] args) {
+        Phaser phaser = new Phaser(1);
+
+        for (int i = 0; i < 5; i++) {
+            phaser.register();
+            final int workerId = i;
+            new Thread(() -> {
+                try {
+                    doWork(workerId);
+                    phaser.arriveAndDeregister();
+                } catch (Exception e) {
+                    phaser.arriveAndDeregister();
+                }
+            }).start();
         }
-    }).start();
-}
 
-// Main thread waits for all workers
-phaser.arriveAndAwaitAdvance();
-System.out.println("All dynamic workers finished!");
+        phaser.arriveAndAwaitAdvance();
+        System.out.println("All dynamic workers finished!");
+    }
+}
 ```
 
 ### Phase-Based Processing
+
+
+**What this code does — step by step:**
+
+1. Phase 0: Data Loading
+2. `phaser.arriveAndAwaitAdvance();` — Wait for all
+3. Phase 1: Processing
+4. `phaser.arriveAndAwaitAdvance();` — Wait for all
+5. Phase 2: Cleanup
+6. `phaser.arriveAndDeregister();` — Done
+
+The same code, clean:
 
 ```java
 public class MultiPhaseProcessor {
@@ -223,17 +285,14 @@ public class MultiPhaseProcessor {
         for (int i = 0; i < 3; i++) {
             final int workerId = i;
             new Thread(() -> {
-                // Phase 0: Data Loading
                 loadData(workerId);
-                phaser.arriveAndAwaitAdvance();  // Wait for all
+                phaser.arriveAndAwaitAdvance();
 
-                // Phase 1: Processing
                 processData(workerId);
-                phaser.arriveAndAwaitAdvance();  // Wait for all
+                phaser.arriveAndAwaitAdvance();
 
-                // Phase 2: Cleanup
                 cleanup(workerId);
-                phaser.arriveAndDeregister();     // Done
+                phaser.arriveAndDeregister();
             }).start();
         }
     }
@@ -246,7 +305,6 @@ public class MultiPhaseProcessor {
 
 ### Scenario 1: Parallel Report Generation
 
-```java
 @Service
 public class ReportGenerator {
 
@@ -283,11 +341,9 @@ public class ReportGenerator {
         return new Report(financial.get(), employees.get(), projects.get(), metrics.get());
     }
 }
-```
 
 ### Scenario 2: Batch Processing in Waves
 
-```java
 public class WaveProcessor {
 
     private final CyclicBarrier barrier;
@@ -324,7 +380,6 @@ public class WaveProcessor {
         System.out.println("Wave completed! Starting next wave...");
     }
 }
-```
 
 ---
 
@@ -351,3 +406,4 @@ public class WaveProcessor {
 | Using `await()` without timeout | Blocks forever if a thread dies | Use `await(timeout, unit)` |
 | Not registering all parties in Phaser | Phaser completes prematurely | Register all parties before they start |
 | Creating too many barriers | Complex, hard to maintain | Use a single barrier per synchronization point |
+

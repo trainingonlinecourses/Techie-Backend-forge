@@ -1,7 +1,7 @@
 ---
 title: Profiles — Environment-Specific Behavior
 module: spring-configuration
-order: 2
+order: 3
 minutes: 24
 topics: ["@Profile", "profiles", "environment-specific config", "active profiles", "conditional beans"]
 summary: Dev, test, staging, production — each environment wants slightly different behavior: dev uses an inmemory H2 database and fake email; production us...
@@ -41,21 +41,31 @@ Platforms like Render/Railway set `SPRING_PROFILES_ACTIVE` as an env var on the 
 
 ## The Code Walkthrough
 
+
+**What this code does — step by step:**
+
+1. ---- 1. Profile-specific properties ----. Application-dev.properties:
+2. application-prod.properties:
+3. `spring.datasource.url=jdbc:postgresql:` — ${DB_HOST}/academy
+4. ---- 2. Profile-scoped beans ----
+5. Fake emailer — used only in dev/test
+6. Real emailer — used in prod
+7. ---- 3. Profile logic in @Configuration ----
+8. `return new HikariDataSource();` — in-memory
+9. `return new HikariDataSource();` — from env vars
+
+The same code, clean:
+
 ```java
-// ---- 1. Profile-specific properties ----
-// application-dev.properties:
 spring.datasource.url=jdbc:h2:mem:academy
 app.email.enabled=false
 
-// application-prod.properties:
-spring.datasource.url=jdbc:postgresql://${DB_HOST}/academy
+spring.datasource.url=jdbc:postgresql:
 app.email.enabled=true
 
-// ---- 2. Profile-scoped beans ----
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
-// Fake emailer — used only in dev/test
 @Service
 @Profile("dev")
 public class FakeEmailService implements EmailService {
@@ -64,27 +74,25 @@ public class FakeEmailService implements EmailService {
     }
 }
 
-// Real emailer — used in prod
 @Service
 @Profile("prod")
 public class SmtpEmailService implements EmailService {
     public void send(String to, String body) { /* real SMTP */ }
 }
 
-// ---- 3. Profile logic in @Configuration ----
 @Configuration
 public class DataSourceConfig {
 
     @Bean
     @Profile("dev")
     public DataSource h2DataSource() {
-        return new HikariDataSource();      // in-memory
+        return new HikariDataSource();
     }
 
     @Bean
     @Profile("prod")
     public DataSource postgresDataSource() {
-        return new HikariDataSource();      // from env vars
+        return new HikariDataSource();
     }
 }
 ```
@@ -103,11 +111,9 @@ public class DataSourceConfig {
 - **A profile is active or not** — there's no "else" syntax. The pattern for "dev OR test but not prod" is `@Profile({"dev", "test"})`.
 - **Negative matching** — `@Profile("!prod")` registers the bean in *every* environment except prod. Useful for a fallback:
 
-```java
 @Service
 @Profile("!prod")
 public class ConsoleNotifier implements Notifier { ... }   // anything not prod
-```
 
 ## Grouping and Inheritance
 
@@ -124,7 +130,6 @@ Activating `prod` activates the whole group — a tidy way to compose environmen
 
 ## Testing with Profiles
 
-```java
 @SpringBootTest
 @ActiveProfiles("test")          // activates the test profile for the whole test
 class UserServiceTest { ... }
@@ -133,7 +138,6 @@ class UserServiceTest { ... }
 @Test
 @ActiveProfiles("dev")
 void devBehavior() { ... }
-```
 
 `@ActiveProfiles` is how tests pick their environment — test DB, test mocks, faster config — without touching the real profiles.
 
@@ -155,3 +159,4 @@ void devBehavior() { ... }
 - Use groups to compose reusable profile pieces; `!prod` for fallbacks.
 - `@ActiveProfiles` in tests picks the environment per test.
 - The same jar + different profiles = dev, test, and prod behavior from one build.
+

@@ -1,7 +1,7 @@
 ---
 title: Nested Configuration Properties — Complex Config Structures
 summary: How to bind nested YAML/properties into Java objects, @Validated nested objects, map-based config, and list binding.
-order: 4
+order: 3
 minutes: 15
 topics: [nested-properties, list-binding, map-binding, complex-config, groups]
 docs:
@@ -22,7 +22,6 @@ app:
       protocol: TLS
 ```
 
-```java
 @Data
 @ConfigurationProperties(prefix = "app.mail")
 public class MailProperties {
@@ -36,13 +35,11 @@ public class MailProperties {
         private String protocol;
     }
 }
-```
 
 ---
 
 ## Line-by-Line Walkthrough
 
-```java
 @Data
 @ConfigurationProperties(prefix = "app")
 public class AppProperties {
@@ -85,7 +82,6 @@ public class AppProperties {
         private int port;
     }
 }
-```
 
 ### YAML Configuration
 
@@ -128,3 +124,4 @@ app:
 | Wrong key names | Properties not bound | Match YAML keys exactly (kebab-case) |
 | Forgetting @Data on nested class | Getters/setters missing | Add @Data to all nested classes |
 | Using lists without defaults | Empty list, not null | Initialize with `new ArrayList<>()` |
+

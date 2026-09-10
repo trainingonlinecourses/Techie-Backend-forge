@@ -1,7 +1,7 @@
 ---
 title: HttpMessageConverters — JSON, XML and Custom Serialization
 summary: The converter chain for @RequestBody/@ResponseBody, Jackson configuration in Boot, and custom converters for niche formats.
-order: 12
+order: 8
 minutes: 17
 topics: [message-converters, jackson, objectmapper, httpmessageconverter, serialization, content-negotiation]
 docs:
@@ -29,7 +29,6 @@ The default Boot converter list includes Jackson (JSON), `StringHttpMessageConve
 
 Almost every backend needs a shared Jackson configuration: the `ObjectMapper` is a bean, so customize it once and every converter uses it:
 
-```java
 @Configuration
 public class JacksonConfig {
     @Bean
@@ -41,7 +40,6 @@ public class JacksonConfig {
             .modules(new JavaTimeModule());                             // java.time support (Boot adds it)
     }
 }
-```
 
 The three settings that matter most:
 
@@ -55,13 +53,11 @@ Also common: `@JsonFormat`/`@JsonIgnore` per field, and `@JsonCreator`/`@JsonPro
 
 Global config sets the defaults; per-field annotations override:
 
-```java
 public record OrderDto(
     @JsonProperty("id") Long orderId,          // rename for the wire
     @JsonIgnore String internalNote,            // never expose internally
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ssXXX") Instant createdAt  // explicit format
 ) {}
-```
 
 The org rule: **global config for system-wide policy** (null handling, money, unknown fields); **annotations for per-contract decisions** (names, ignored fields, formats). Annotations beat config when the same type appears in different shapes on different endpoints.
 
@@ -75,7 +71,6 @@ The org rule: **global config for system-wide policy** (null handling, money, un
 
 **Scenario 4 — a custom converter for a niche format.** A vendor sends `application/x-fixed-width`:
 
-```java
 @Component
 public class FixedWidthConverter extends AbstractHttpMessageConverter<LedgerEntry> {
     public FixedWidthConverter() {
@@ -86,7 +81,6 @@ public class FixedWidthConverter extends AbstractHttpMessageConverter<LedgerEntr
     @Override protected void writeInternal(LedgerEntry entry, ...) { /* format */ }
 }
 // Registered automatically as a bean — appended to the converter chain
-```
 
 ## The converter chain in practice
 
@@ -109,3 +103,4 @@ public class FixedWidthConverter extends AbstractHttpMessageConverter<LedgerEntr
 - Annotations per contract (`@JsonProperty`, `@JsonIgnore`, `@JsonFormat`); global config for policy.
 - Custom converters extend the chain for niche formats — register as beans.
 - Content type/accept drive converter selection (415/406); test the wire format, not just the object.
+

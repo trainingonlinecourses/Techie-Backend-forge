@@ -1,7 +1,7 @@
 ---
 title: Synchronized and Monitors — Java's Built-in Locking
 summary: The monitor lock, synchronized blocks vs methods, lock contention, reentrant locking, the wait/notify protocol, and why organizations prefer ReentrantLock for production systems.
-order: 46
+order: 78
 minutes: 22
 topics: [synchronized, monitor, lock-contention, reentrant, wait-notify, intrinsic-lock, lock-word]
 docs:
@@ -17,7 +17,6 @@ docs:
 
 There are two forms:
 
-```java
 // 1. Synchronized method — locks on 'this'
 public synchronized void increment() {
     count++;
@@ -32,7 +31,6 @@ public void transfer(Account from, Account to, BigDecimal amount) {
         }
     }
 }
-```
 
 **Reentrant:** a thread that already holds a monitor can re-enter it without deadlocking. This is why `synchronized` methods can call other `synchronized` methods on the same object.
 
@@ -46,7 +44,6 @@ Every object has a **wait set** in addition to its monitor. When a thread calls 
 
 **Critical rule:** you must hold the monitor before calling `wait()` or `notify()`, and you must check the condition in a `while` loop (not `if`) because of **spurious wakeups**.
 
-```java
 public class OrderQueue {
 
     private final Queue<Order> queue = new LinkedList<>();
@@ -69,7 +66,6 @@ public class OrderQueue {
         notifyAll();  // wake ALL waiting consumers so they can exit
     }
 }
-```
 
 **Why `while` and not `if`?** Because a thread can wake up without being notified (spurious wakeup), or another thread may have consumed the item between `notify()` and this thread running. The `while` loop re-checks the condition.
 
@@ -77,7 +73,6 @@ public class OrderQueue {
 
 `synchronized` has a performance cost: the JVM must acquire and release the monitor, and contended locks force threads to queue. Modern JVMs optimize uncontended locks aggressively (biased locking, thin locks), but **contention is the killer**.
 
-```java
 // Contented: 10,000 threads all calling increment()
 public class Counter {
     private long count = 0;
@@ -86,11 +81,9 @@ public class Counter {
         count++;  // every thread queues on this monitor
     }
 }
-```
 
 **The fix:** reduce lock scope or use a lock-free alternative.
 
-```java
 // Fix 1: narrow the synchronized block
 public class Counter {
     private long count = 0;
@@ -112,13 +105,11 @@ public class Counter {
         count.incrementAndGet();  // CAS operation — no lock
     }
 }
-```
 
 ## How we use it in organizations
 
 ### Scenario 1: synchronized for simple thread-safe singleton
 
-```java
 public class DatabaseConnection {
     private static DatabaseConnection instance;
 
@@ -129,11 +120,9 @@ public class DatabaseConnection {
         return instance;
     }
 }
-```
 
 **Problem:** every thread pays the lock cost even after initialization. Better: double-checked locking with `volatile` or use an enum/holder class.
 
-```java
 // Better: holder idiom — lazy initialization without locks
 public class DatabaseConnection {
     private DatabaseConnection() {}
@@ -146,11 +135,9 @@ public class DatabaseConnection {
         return Holder.INSTANCE;  // class loading is thread-safe in Java
     }
 }
-```
 
 ### Scenario 2: wait/notify for a work queue
 
-```java
 public class WorkQueue<T> {
 
     private final Queue<T> items = new LinkedList<>();
@@ -182,11 +169,9 @@ queue.submit(processOrder);
 while ((order = queue.take()) != null) {
     processOrder(order);
 }
-```
 
 ### Scenario 3: synchronized block for bank transfer (deadlock avoidance)
 
-```java
 public void transfer(Account from, Account to, BigDecimal amount) {
     // Always lock in a consistent order (by ID) to prevent deadlock
     Account first  = from.id().compareTo(to.id()) < 0 ? from : to;
@@ -199,7 +184,6 @@ public void transfer(Account from, Account to, BigDecimal amount) {
         }
     }
 }
-```
 
 If thread A locks `from` then tries `to`, and thread B locks `to` then tries `from`, you get a deadlock. Locking in consistent order prevents this.
 
@@ -207,7 +191,6 @@ If thread A locks `from` then tries `to`, and thread B locks `to` then tries `fr
 
 `java.util.concurrent.locks.ReentrantLock` provides the same mutual exclusion as `synchronized` but with additional features:
 
-```java
 private final ReentrantLock lock = new ReentrantLock();
 private final Condition notEmpty = lock.newCondition();
 
@@ -232,7 +215,6 @@ public T dequeue() throws InterruptedException {
         lock.unlock();
     }
 }
-```
 
 **When to prefer ReentrantLock over synchronized:**
 
@@ -255,3 +237,4 @@ public T dequeue() throws InterruptedException {
 | Locking on `String` literals or boxed types | Shared across codebase — unexpected contention |
 | Nested `synchronized` blocks in wrong order | Deadlock — two threads hold the other's lock |
 | Using `notify()` when multiple threads wait | Only one wakes — use `notifyAll()` for correctness |
+

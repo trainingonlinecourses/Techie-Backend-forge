@@ -1,7 +1,7 @@
 ---
 title: String Comparison — equals, ==, compareTo and ContentEquals
 summary: Why == fails on strings, the equals/equalsIgnoreCase/compareTo/contentEquals family, locale-aware comparison, and the identity-comparison pattern.
-order: 37
+order: 73
 minutes: 18
 topics: [string-comparison, equals, compareto, contentequals, equalsignorecase, locale, identity]
 docs:
@@ -15,12 +15,15 @@ docs:
 
 The single most common beginner bug in Java — and it appears in production code far more often than it should:
 
-```java
-String a = "hello";
-String b = new String("hello");
-System.out.println(a == b);       // false!  two different objects
-System.out.println(a.equals(b));  // true    same characters
-```
+public class Main {
+
+    public static void main(String[] args) {
+        String a = "hello";
+        String b = new String("hello");
+        System.out.println(a == b);       // false!  two different objects
+        System.out.println(a.equals(b));  // true    same characters
+    }
+}
 
 `==` on two references asks "are these the *same object*?" — it does not compare content. Strings compare content with **`equals`** (and the variants below). The confusion persists because the **string pool** makes `==` *appear* to work for literals: `"hello" == "hello"` is true (both point at the pooled literal), so the bug hides until a string comes from user input, a database, or `new`.
 
@@ -28,22 +31,34 @@ System.out.println(a.equals(b));  // true    same characters
 
 ## The comparison family — picking the right one
 
+
+**What this code does — step by step:**
+
+1. Content equality — the default
+2. `a.equals(b)` — exact, case-sensitive
+3. Case-insensitive content equality
+4. `a.equalsIgnoreCase(b)` — "Status" vs "status" → equal
+5. Ordering — for sorting and range checks
+6. `a.compareTo(b)` — <0, 0, >0 — lexicographic (unicode), case-sensitive
+7. `a.compareToIgnoreCase(b)` — ordering without case weight
+8. Same content as a CharSequence (StringBuilder, char[]) — avoids building a String
+9. `a.contentEquals(new StringBuilder("hello"))` — true — compares without toString()
+10. null-safe comparison
+11. `Objects.equals(a, b)` — true if both null; equals if both non-null
+
+The same code, clean:
+
 ```java
-// Content equality — the default
-a.equals(b)                              // exact, case-sensitive
+a.equals(b)
 
-// Case-insensitive content equality
-a.equalsIgnoreCase(b)                    // "Status" vs "status" → equal
+a.equalsIgnoreCase(b)
 
-// Ordering — for sorting and range checks
-a.compareTo(b)                           // <0, 0, >0 — lexicographic (unicode), case-sensitive
-a.compareToIgnoreCase(b)                 // ordering without case weight
+a.compareTo(b)
+a.compareToIgnoreCase(b)
 
-// Same content as a CharSequence (StringBuilder, char[]) — avoids building a String
-a.contentEquals(new StringBuilder("hello"))   // true — compares without toString()
+a.contentEquals(new StringBuilder("hello"))
 
-// null-safe comparison
-Objects.equals(a, b)                     // true if both null; equals if both non-null
+Objects.equals(a, b)
 ```
 
 **`equals` vs `compareTo`:** `equals` answers "same value?"; `compareTo` answers "which comes first?" — it's what `TreeSet`/`TreeMap`/`Collections.sort` and the `Comparator` interface use. Two strings can be `equals` and still have `compareTo != 0`? No — for `String`, `compareTo == 0` implies `equals` (it's consistent), but don't rely on that for arbitrary types.
@@ -52,44 +67,36 @@ Objects.equals(a, b)                     // true if both null; equals if both no
 
 **Scenario 1 — status/state matching.** The canonical org code:
 
-```java
 if ("PAID".equals(order.getStatus())) { ... }          // literal FIRST — null-safe!
 if (order.getStatus().equals("PAID")) { ... }           // NPE if status is null!
 
 // The literal-first idiom ("Yoda") exists for a reason: "PAID".equals(x) never NPEs
-```
 
 Teams standardize on **`"constant".equals(variable)`** so a null variable can't throw. Same pattern for `case`-style matching with `equalsIgnoreCase` when input case varies (user-typed values, external codes).
 
 **Scenario 2 — ordering with collation.** `compareTo` is *code-point* ordering — not human/alphabetical for accented text:
 
-```java
 // Wrong for user-facing sorting: "é" vs "e", "ä" vs "a" order by code point, not language
 list.sort(Comparator.comparing(Person::name));          // code-point order — ok for ASCII codes
 
 // Right for display: locale-aware collation
 Collator collator = Collator.getInstance(Locale.GERMAN);
 list.sort(Comparator.comparing(Person::name, collator::compare));
-```
 
 The org rule: **ASCII/code/identifier ordering → `compareTo`; human-language sorting → `Collator`.** For backend code comparing status codes, ids, or enum names, `compareTo` is correct.
 
 **Scenario 3 — the identity-comparison exception.** There is *one* legitimate `==` on strings: when you've **guaranteed interning** — `String.intern()` or literals — and want reference equality for speed:
 
-```java
 // Rare, deliberate — a hot path comparing pooled literals
 if (status == Status.PAID_NAME) { ... }   // only safe if both are interned/literals
-```
 
 This is an optimization for ultra-hot loops; teams generally ban it in review because the guarantee is fragile. Use `equals`.
 
 **Scenario 4 — input normalization before comparison.** The robust pattern: normalize once at the boundary, then compare confidently:
 
-```java
 // In a request DTO setter / validator:
 String normalized = raw.trim().toLowerCase(Locale.ROOT);   // Locale.ROOT avoids Turkish-i surprises
 if (normalized.equals("admin")) { ... }
-```
 
 `toLowerCase()` *without* a locale uses the default locale — the classic **Turkish-i bug** (`"I".toLowerCase()` becomes `ı` in Turkish locale). Always pass `Locale.ROOT` for code/identifier normalization.
 
@@ -108,3 +115,4 @@ if (normalized.equals("admin")) { ... }
 - Literal-first (`"PAID".equals(x)`) is the null-safe org standard.
 - Human-language ordering needs `Collator`; code/identifier ordering uses `compareTo`.
 - Normalize at the boundary with `Locale.ROOT` to avoid locale bugs.
+

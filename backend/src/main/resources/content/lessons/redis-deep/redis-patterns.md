@@ -1,7 +1,7 @@
 ---
 title: Redis Patterns — Caching, Rate Limiting, Queues, Distributed Locks
 module: redis-deep
-order: 5
+order: 3
 minutes: 28
 topics: ["cache-aside", "rate limiting", "queues", "distributed locks", "Redis patterns", "counter"]
 summary: Redis's structures are ingredients; patterns are the recipes — proven arrangements of structures and commands that solve recurring production probl...
@@ -22,24 +22,32 @@ Redis's structures are ingredients; **patterns** are the recipes — proven arra
 
 The most common pattern in the world: serve reads from Redis, fall back to the database, and populate the cache on a miss.
 
+
+**What this code does — step by step:**
+
+1. The flow: read cache -> miss? load DB -> store with TTL -> return.
+2. 1. Try the cache.
+3. `return deserialize(cached);` — hit — done, fast path
+4. 2. Cache miss: load the authoritative source.
+5. 3. Populate the cache with a TTL so it can't go stale forever.
+6. `redis.setex(key, 300, serialize(product));` — 5 minutes
+
+The same code, clean:
+
 ```java
 public class CacheAside {
-    // The flow: read cache -> miss? load DB -> store with TTL -> return.
     public Product getProduct(Long id) {
         String key = "product:" + id;
 
-        // 1. Try the cache.
         String cached = redis.get(key);
         if (cached != null) {
-            return deserialize(cached);          // hit — done, fast path
+            return deserialize(cached);
         }
 
-        // 2. Cache miss: load the authoritative source.
         Product product = database.loadProduct(id);
         if (product == null) return null;
 
-        // 3. Populate the cache with a TTL so it can't go stale forever.
-        redis.setex(key, 300, serialize(product)); // 5 minutes
+        redis.setex(key, 300, serialize(product));
         return product;
     }
 }
@@ -51,7 +59,6 @@ public class CacheAside {
 
 Cache-aside handles reads; *writes* need a decision. Two classic approaches:
 
-```java
 // Option A — invalidate on write: let the next read repopulate.
 public void updateProduct(Long id, Product p) {
     database.save(p);
@@ -63,7 +70,6 @@ public void updateProductWriteThrough(Long id, Product p) {
     database.save(p);
     redis.setex("product:" + id, 300, serialize(p));
 }
-```
 
 **Invalidation (A) is usually the better default:** deleting is idempotent and avoids the "write the cache but crash before the DB" inconsistency window. The subtle bug to avoid: updating the cache *before* the DB commit can leave the cache ahead of the DB if the commit fails. Delete-after-commit sidesteps the whole class.
 
@@ -71,7 +77,6 @@ public void updateProductWriteThrough(Long id, Product p) {
 
 Rate limiting with Redis uses atomic increments. The **fixed window** is the simplest:
 
-```java
 // Allow at most 10 requests per minute per user.
 public boolean allowRequest(String userId) {
     String key = "ratelimit:" + userId + ":" + currentMinute();
@@ -79,7 +84,6 @@ public boolean allowRequest(String userId) {
     if (count == 1) redis.expire(key, 60); // first hit sets the TTL
     return count <= 10;
 }
-```
 
 `incr` is atomic — under any concurrency, no two threads can read the same count. The first increment establishes the key and arms its 60-second expiry (setting expire only on first hit avoids resetting the window on every call).
 
@@ -89,14 +93,12 @@ The **sliding window / token bucket** is smoother (no cliff at minute boundaries
 
 Lists give FIFO queues; the **blocking variant** gives reliable worker coordination:
 
-```java
 // Producer — push work to the tail:
 redis.rpush("queue:emails", json);
 
 // Consumer — block up to 30s waiting for work from the head:
 List<String> job = redis.blpop(30, "queue:emails");
 // blpop blocks the thread until work arrives or timeout — no busy-polling.
-```
 
 `BLPOP` is the key: instead of polling (`LPOP` in a tight loop — wasteful and racy), workers *block* on the list, waking only when a producer pushes. Multiple workers `BLPOP` the same list and Redis hands each job to exactly one of them — natural load balancing without locks. For *durable* queues (survive Redis restart and consumer crash), **Redis Streams** (`XADD`/`XREADGROUP` with consumer groups and acknowledgments) is the modern upgrade — the basis of the `spring-data-redis` stream support and a legitimate lightweight alternative to Kafka for modest volumes.
 
@@ -104,20 +106,25 @@ List<String> job = redis.blpop(30, "queue:emails");
 
 A lock that works across *multiple application instances* — the distributed lock — is the classic hard problem. Redis's answer, with the right care, is **SET with NX and expiry** (the Redlock-family approach; the community-validated variant is the Redisson `RLock`):
 
+
+**What this code does — step by step:**
+
+1. Acquire: SET key value NX EX ttl — succeeds only if key ABSENT,. And always expires (so a crashed holder can't hold it forever).
+2. `SetArgs.setArgs().nx().ex(10)));` — 10s lease
+3. Release must be SAFE: only the holder may delete — compare the. Token with an atomic Lua script (GET + DEL as one operation).
+
+The same code, clean:
+
 ```java
-// Acquire: SET key value NX EX ttl — succeeds only if key ABSENT,
-// and always expires (so a crashed holder can't hold it forever).
 String token = UUID.randomUUID().toString();
 boolean acquired = "OK".equals(redis.set(
         "lock:payment:" + orderId, token,
-        SetArgs.setArgs().nx().ex(10)));   // 10s lease
+        SetArgs.setArgs().nx().ex(10)));
 
 if (acquired) {
     try {
         doCriticalWork();
     } finally {
-        // Release must be SAFE: only the holder may delete — compare the
-        // token with an atomic Lua script (GET + DEL as one operation).
         String script = "if redis.call('get', KEYS[1]) == ARGV[1] " +
                         "then return redis.call('del', KEYS[1]) else return 0 end";
         redis.eval(script, List.of("lock:payment:" + orderId), List.of(token));
@@ -129,7 +136,6 @@ if (acquired) {
 
 ## Pattern 6: Atomic Counters and Leaderboards
 
-```java
 // Page views — atomic, concurrent-safe:
 redis.incr("stats:page:home");
 
@@ -137,7 +143,6 @@ redis.incr("stats:page:home");
 redis.zincrby("leaderboard", 1, "user:" + userId);
 // Top 10 instantly:
 Set<String> top = redis.zrevrange("leaderboard", 0, 9);
-```
 
 `incr` and `zincrby` are single atomic commands — no read-modify-write races under load, no lost updates. This is the pattern behind every "views", "likes", "wins" counter and ranking in production systems.
 
@@ -152,3 +157,4 @@ Set<String> top = redis.zrevrange("leaderboard", 0, 9);
 ## Recap
 
 The Redis patterns are recipes over its structures: cache-aside for reads (with TTL-bounded staleness and a correct DB fallback), delete-on-write for invalidation, atomic `INCR` with TTL for rate limiting, `BLPOP` lists (or Streams) for queues, `SET NX EX` + tokenized compare-and-delete for distributed locks, and atomic counters for rankings. Each pattern exists because a naive version fails under concurrency or crashes — the Redis commands are atomic precisely so the patterns can be. Apply them with TTLs, blocking calls, and the DB-as-truth discipline, and you have the production Redis playbook.
+

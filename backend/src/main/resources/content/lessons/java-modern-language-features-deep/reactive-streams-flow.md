@@ -1,7 +1,7 @@
 ---
 title: Reactive Streams in the JDK — java.util.concurrent.Flow
 summary: Java 9 introduced java.util.concurrent.Flow, a standard API for reactive streams — asynchronous streams of data with backpressure. The JDK includes the interfaces (Publisher, Subscriber, Subscription, Processor) and a base implementation (SubmissionPublisher). This lesson explains the reactive streams model, the four interfaces, how backpressure works through the Subscription, and how to use SubmissionPublisher to build a simple reactive pipeline.
-order: 5
+order: 2
 minutes: 24
 topics: [reactive-streams, flow, publisher, subscriber, subscription, processor, backpressure, submission-publisher, java9, asynchronous, non-blocking]
 docs:
@@ -32,9 +32,7 @@ Without backpressure, a fast publisher can flood a slow subscriber, and the subs
 
 A `Publisher<T>` is something that produces items of type `T` for subscribers. Its main method is:
 
-```java
 void subscribe(Subscriber<? super T> subscriber);
-```
 
 When a subscriber calls `subscribe`, the publisher creates a `Subscription` for that subscriber and calls the subscriber's `onSubscribe(subscription)`. Then the publisher may start sending items via `onNext`, and eventually calls `onComplete` (if it finishes normally) or `onError` (if it fails).
 
@@ -44,12 +42,10 @@ A publisher can have multiple subscribers. Each subscriber gets its own subscrip
 
 A `Subscriber<T>` consumes items of type `T`. Its methods:
 
-```java
 void onSubscribe(Subscription subscription);
 void onNext(T item);
 void onError(Throwable throwable);
 void onComplete();
-```
 
 - **`onSubscribe`** — called when the publisher is ready to send items. The subscriber receives the `Subscription` here and should store it so it can request items later.
 - **`onNext`** — called for each item. The subscriber processes the item. If the subscriber has requested only N items, it should receive at most N `onNext` calls before it requests more.
@@ -62,10 +58,8 @@ A common mistake is to request all items at once (`subscription.request(Long.MAX
 
 A `Subscription` represents the link between one publisher and one subscriber. Its methods:
 
-```java
 void request(long n);
 void cancel();
-```
 
 - **`request(n)`** — the subscriber asks the publisher to send up to `n` more items (via `onNext`). The publisher should respect this and not send more than `n` items until the subscriber requests more.
 - **`cancel()`** — the subscriber tells the publisher to stop sending items. After this, the publisher should not send more `onNext`, `onError`, or `onComplete` to this subscriber.
@@ -76,12 +70,10 @@ The `request` method is the backpressure mechanism. A subscriber that wants to c
 
 A `Processor<T, R>` is both a `Subscriber<T>` and a `Publisher<R>`. It sits in the middle of a pipeline: it subscribes to an upstream publisher of `T`, transforms or filters the items, and publishes `R` items to a downstream subscriber.
 
-```java
 interface Processor<T, R> extends Subscriber<T>, Publisher<R> {
     // inherits subscribe(Subscriber<? super R>) from Publisher
     // inherits onSubscribe, onNext, onError, onComplete from Subscriber
 }
-```
 
 A processor is a way to build a transformation stage in a reactive pipeline. For example, a processor might take `String` items, parse each one into an `Integer`, and publish `Integer` items downstream.
 
@@ -89,13 +81,24 @@ A processor is a way to build a transformation stage in a reactive pipeline. For
 
 Here is a simple example of backpressure. A `SubmissionPublisher` (a concrete `Publisher` provided by the JDK) publishes items, and a subscriber requests them one at a time.
 
+
+**What this code does — step by step:**
+
+1. A subscriber that requests items one at a time — backpressure in action
+2. Start by requesting one item
+3. After processing one item, request the next one
+4. A publisher that can publish strings
+5. Publish some items
+6. `publisher.close();` — signals onComplete to subscribers
+
+The same code, clean:
+
 ```java
 import java.util.concurrent.Flow.*;
 import java.util.concurrent.SubmissionPublisher;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-// A subscriber that requests items one at a time — backpressure in action
 class OneAtATimeSubscriber implements Subscriber<String> {
     private Subscription subscription;
     private final String name;
@@ -107,14 +110,12 @@ class OneAtATimeSubscriber implements Subscriber<String> {
     @Override
     public void onSubscribe(Subscription subscription) {
         this.subscription = subscription;
-        // Start by requesting one item
         subscription.request(1);
     }
 
     @Override
     public void onNext(String item) {
         System.out.println(name + " received: " + item);
-        // After processing one item, request the next one
         subscription.request(1);
     }
 
@@ -131,18 +132,16 @@ class OneAtATimeSubscriber implements Subscriber<String> {
 
 public class ReactiveDemo {
     public static void main(String[] args) {
-        // A publisher that can publish strings
         try (SubmissionPublisher<String> publisher =
                      new SubmissionPublisher<>()) {
 
             publisher.subscribe(new OneAtATimeSubscriber("A"));
             publisher.subscribe(new OneAtATimeSubscriber("B"));
 
-            // Publish some items
             for (int i = 1; i <= 5; i++) {
                 publisher.submit("item-" + i);
             }
-            publisher.close();   // signals onComplete to subscribers
+            publisher.close();
         }
     }
 }
@@ -173,7 +172,6 @@ Key points about `SubmissionPublisher`:
 - If you submit an item after closing, it throws an error.
 - It uses the provided executor (or a default one) to deliver items asynchronously. This means `onNext` calls happen on a thread from the executor, not necessarily the thread that called `submit`.
 
-```java
 import java.util.concurrent.Flow.Subscriber;
 import java.util.concurrent.Flow.Subscription;
 import java.util.concurrent.SubmissionPublisher;
@@ -217,7 +215,6 @@ public class SubmissionPublisherDemo {
         }   // close() called here — subscribers get onComplete
     }
 }
-```
 
 In this example, the subscriber requests two items at a time, processes them, then requests two more. This is a simple pacing strategy — not as fine-grained as "one at a time," but still shows backpressure.
 
@@ -225,12 +222,23 @@ In this example, the subscriber requests two items at a time, processes them, th
 
 A `Processor` sits between a publisher and a subscriber and transforms or filters items. The JDK does not provide many concrete processors, but you can implement one yourself. Here is a simple processor that filters out items that do not match a predicate and passes the rest through.
 
+
+**What this code does — step by step:**
+
+1. A processor that filters items by a predicate
+2. Create a downstream publisher for the filtered items
+3. Subscribe a simple pass-through subscriber to the downstream
+4. Forward all requests from the final subscriber
+5. Pass the item to the final subscriber. (in a real processor, you would manage backpressure more carefully)
+6. If the predicate does not match, the item is dropped
+
+The same code, clean:
+
 ```java
 import java.util.concurrent.Flow.*;
 import java.util.concurrent.SubmissionPublisher;
 import java.util.function.Predicate;
 
-// A processor that filters items by a predicate
 class FilterProcessor<T> implements Processor<T, T> {
     private final Predicate<T> predicate;
     private Subscription subscription;
@@ -243,19 +251,14 @@ class FilterProcessor<T> implements Processor<T, T> {
     @Override
     public void onSubscribe(Subscription subscription) {
         this.subscription = subscription;
-        // Create a downstream publisher for the filtered items
         this.downstream = new SubmissionPublisher<>();
-        // Subscribe a simple pass-through subscriber to the downstream
         downstream.subscribe(new Subscriber<T>() {
             @Override
             public void onSubscribe(Subscription s) {
-                // Forward all requests from the final subscriber
                 s.request(Long.MAX_VALUE);
             }
             @Override
             public void onNext(T item) {
-                // Pass the item to the final subscriber
-                // (in a real processor, you would manage backpressure more carefully)
             }
             @Override
             public void onError(Throwable t) {
@@ -273,7 +276,6 @@ class FilterProcessor<T> implements Processor<T, T> {
         if (predicate.test(item)) {
             downstream.submit(item);
         }
-        // If the predicate does not match, the item is dropped
     }
 
     @Override
@@ -311,6 +313,20 @@ But for real reactive programming — rich operators, composition, error handlin
 
 This example builds a small pipeline: a `SubmissionPublisher` produces strings, a custom filter processor drops some, and a subscriber prints what it receives. This shows publisher, processor, and subscriber working together.
 
+
+**What this code does — step by step:**
+
+1. A simple filter processor — drops items that do not match the predicate
+2. Subscribe to upstream — request all (simple, not backpressure-aware)
+3. else: drop the item
+4. A subscriber that prints what it receives
+5. `sub.request(Long.MAX_VALUE);` — request all — no backpressure in this demo
+6. Build the pipeline: source -> filter -> subscriber
+7. Submit items — some match the filter, some do not
+8. `}` — close() — subscribers get onComplete
+
+The same code, clean:
+
 ```java
 import java.util.concurrent.Flow.*;
 import java.util.concurrent.SubmissionPublisher;
@@ -318,7 +334,6 @@ import java.util.function.Predicate;
 
 public class PipelineDemo {
 
-    // A simple filter processor — drops items that do not match the predicate
     static class SimpleFilter<T> implements Processor<T, T> {
         private final Predicate<T> predicate;
         private Subscription upstream;
@@ -332,7 +347,6 @@ public class PipelineDemo {
         public void onSubscribe(Subscription s) {
             this.upstream = s;
             this.downstream = new SubmissionPublisher<>();
-            // Subscribe to upstream — request all (simple, not backpressure-aware)
             s.request(Long.MAX_VALUE);
         }
 
@@ -341,7 +355,6 @@ public class PipelineDemo {
             if (predicate.test(item)) {
                 downstream.submit(item);
             }
-            // else: drop the item
         }
 
         @Override
@@ -360,14 +373,13 @@ public class PipelineDemo {
         }
     }
 
-    // A subscriber that prints what it receives
     static class PrintSubscriber implements Subscriber<String> {
         private Subscription sub;
 
         @Override
         public void onSubscribe(Subscription s) {
             this.sub = s;
-            sub.request(Long.MAX_VALUE);   // request all — no backpressure in this demo
+            sub.request(Long.MAX_VALUE);
         }
 
         @Override
@@ -389,18 +401,16 @@ public class PipelineDemo {
     public static void main(String[] args) {
         try (var source = new SubmissionPublisher<String>()) {
 
-            // Build the pipeline: source -> filter -> subscriber
             var filter = new SimpleFilter<String>(s -> !s.startsWith("skip-"));
             source.subscribe(filter);
             filter.subscribe(new PrintSubscriber());
 
-            // Submit items — some match the filter, some do not
             source.submit("apple");
             source.submit("skip-banana");
             source.submit("cherry");
             source.submit("skip-date");
             source.submit("elderberry");
-        }   // close() — subscribers get onComplete
+        }
     }
 }
 ```
@@ -448,3 +458,4 @@ In the lab, you will see a starter with a `SubmissionPublisher` that subscribes 
 ## Summary
 
 Java 9 introduced `java.util.concurrent.Flow`, a standard API for reactive streams — asynchronous streams with backpressure. The four interfaces are `Publisher` (produces items), `Subscriber` (consumes items and requests them via a `Subscription`), `Subscription` (the link between publisher and subscriber, with `request(n)` for backpressure and `cancel()` to stop), and `Processor` (both a subscriber and a publisher, for transformation stages). The JDK provides `SubmissionPublisher` as a concrete publisher. Backpressure is the subscriber's way of controlling the pace — by calling `subscription.request(n)`, the subscriber tells the publisher how many more items it can handle. Requesting `Long.MAX_VALUE` disables backpressure. The JDK's `Flow` is the base standard that libraries like Project Reactor implement, but it does not provide rich operators — for a full reactive programming model, use a library like Project Reactor (the basis of Spring WebFlux) or RxJava. Understanding the JDK's `Flow` interfaces is the foundation for understanding reactive streams in Java.
+

@@ -1,7 +1,7 @@
 ---
 title: Health Indicators & Readiness
 module: observability
-order: 2
+order: 3
 minutes: 20
 topics: ["HealthIndicator", "readiness vs liveness", "custom indicators", "HealthContributor", "probes"]
 summary: /actuator/health is the first thing every orchestrator, load balancer, and uptime monitor checks. Making it accurate — reporting real dependency he...
@@ -66,7 +66,6 @@ management:
 
 An indicator for *your* dependency — the payments gateway:
 
-```java
 @Component
 public class PaymentGatewayHealthIndicator implements HealthIndicator {
 
@@ -87,7 +86,6 @@ public class PaymentGatewayHealthIndicator implements HealthIndicator {
         }
     }
 }
-```
 
 ```json
 {
@@ -112,15 +110,12 @@ Four statuses are first-class:
 | `OUT_OF_SERVICE` | Intentionally stopped (maintenance) | Stop routing, don't restart |
 | `UNKNOWN` | Can't determine | Treat as unhealthy |
 
-```java
 Health.outOfService().withDetail("reason", "scheduled maintenance").build();
-```
 
 ## Timeout Discipline
 
 Health checks run on the scheduler thread; a slow dependency makes health checks pile up. Always bound the check:
 
-```java
 @Override
 public Health health() {
     try {
@@ -130,7 +125,6 @@ public Health health() {
         return Health.down().withDetail("reason", "timeout after 1.5s").build();
     }
 }
-```
 
 ## Health Groups
 
@@ -154,7 +148,6 @@ management:
 
 Beyond indicators, a bean can block readiness until initialized. Implement `ReadinessStateContributor` or use `ApplicationAvailability`:
 
-```java
 @Component
 public class CacheWarmupReadiness implements ApplicationListener<ApplicationReadyEvent> {
 
@@ -167,11 +160,9 @@ public class CacheWarmupReadiness implements ApplicationListener<ApplicationRead
         availability.getReadinessState();
     }
 }
-```
 
 Better: use `AvailabilityChangeEvent` to flip readiness:
 
-```java
 @Component
 public class StartupGate {
 
@@ -191,11 +182,9 @@ public class StartupGate {
         }
     }
 }
-```
 
 ## Testing Health
 
-```java
 @SpringBootTest
 @AutoConfigureMockMvc
 class HealthTest {
@@ -215,7 +204,6 @@ class HealthTest {
             .andExpect(jsonPath("$.components.paymentGateway.status").exists());
     }
 }
-```
 
 ## Summary
 
@@ -229,3 +217,4 @@ class HealthTest {
 | Consumers | Health groups per audience (platform vs uptime monitor) |
 
 An accurate health endpoint is cheap to build and priceless in production: it's the difference between a platform that self-heals and one that restarts healthy pods forever.
+

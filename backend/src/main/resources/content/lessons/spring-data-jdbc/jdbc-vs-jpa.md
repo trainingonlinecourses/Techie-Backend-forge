@@ -1,7 +1,7 @@
 ---
 title: Spring Data JDBC vs JPA — Choosing Your Persistence
 module: spring-data-jdbc
-order: 4
+order: 5
 minutes: 25
 topics: ["JDBC vs JPA", "persistence choice", "ORM trade-offs", "lazy loading", "when to pick"]
 summary: Both Spring Data JDBC and Spring Data JPA give you repositories, derived queries, and transactions. But underneath, they answer the fundamental que...
@@ -39,7 +39,6 @@ Neither is "better" — they're different contracts with different failure modes
 
 ## The Code Contrast
 
-```java
 // ---- JPA: relationship-driven ----
 @Entity
 public class Course {
@@ -58,15 +57,15 @@ public class Course {
     private List<Lesson> lessons = new ArrayList<>();
     // Loads the whole aggregate eagerly; no lazy, no cache
 }
-```
+
+
+**What this code does — step by step:**
+
+1. The N+1 story: JPA: courseRepository.findAll() then course.getLessons() per course -> N extra queries (unless you fetch-join) — the classic N+1. . JDBC: courseRepository.findAll() loads course + lessons in 2 queries total -> the aggregate IS the fetch unit — N+1 by construction impossible
+
+The same code, clean:
 
 ```java
-// The N+1 story:
-// JPA: courseRepository.findAll() then course.getLessons() per course
-//      -> N extra queries (unless you fetch-join) — the classic N+1
-//
-// JDBC: courseRepository.findAll() loads course + lessons in 2 queries total
-//      -> the aggregate IS the fetch unit — N+1 by construction impossible
 ```
 
 That contrast is the whole decision: JPA gives you power over *relationships* but you must master fetch strategies (see the N+1 lesson in the Data JPA module); JDBC gives you predictability — the aggregate is the unit, period.
@@ -122,3 +121,4 @@ For *new* projects: start with Spring Data JDBC; escalate to JPA only when the d
 - The aggregate boundary in JDBC is your main design lever — keep aggregates small.
 - Hybrid stacks are normal: JPA for the rich core, JDBC/JdbcTemplate for hot read paths.
 - Know which philosophy you're in — the failure modes are entirely different.
+

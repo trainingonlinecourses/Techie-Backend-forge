@@ -1,7 +1,7 @@
 ---
 title: Custom Health Indicators — Beyond /actuator/health
 summary: Building custom HealthIndicator beans for database connections, message queues, and external services, plus readiness vs liveness probe patterns for Kubernetes.
-order: 4
+order: 2
 minutes: 20
 topics: [health-indicator, readiness-probe, liveness-probe, kubernetes-health, custom-health]
 docs:
@@ -17,7 +17,6 @@ A HealthIndicator is a plugin that adds one specific check to the health endpoin
 ## The Code
 
 ### Custom Health Indicator
-```java
 @Component
 public class ExternalApiHealthIndicator implements HealthIndicator {
 
@@ -54,10 +53,8 @@ public class ExternalApiHealthIndicator implements HealthIndicator {
         }
     }
 }
-```
 
 ### Separate Liveness & Readiness
-```java
 // Liveness: Is the process alive?
 @Component
 public class LivenessIndicator implements HealthIndicator {
@@ -105,7 +102,6 @@ public class ReadinessIndicator implements HealthIndicator {
         }
     }
 }
-```
 
 ### Kubernetes Configuration
 ```yaml
@@ -134,3 +130,4 @@ readinessProbe:
 3. **Readiness** = "can I handle traffic?" — remove from load balancer if false
 4. **Always include latency** in health details for monitoring dashboards
 5. **Kubernetes uses both probes** to decide restart vs traffic routing
+

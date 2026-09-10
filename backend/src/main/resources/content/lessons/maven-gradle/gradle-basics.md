@@ -1,7 +1,7 @@
 ---
 title: Gradle: The Modern Alternative
 module: maven-gradle
-order: 4
+order: 2
 minutes: 25
 topics: ["Gradle", "build.gradle", "Groovy vs Kotlin DSL", "tasks", "dependency configurations", "incremental build"]
 summary: Gradle is the build tool of Android and a growing share of the JVM world. Where Maven is XML and fixed lifecycles, Gradle is a programmable build w...
@@ -221,3 +221,4 @@ tasks.bootRun {
 | Boot | `bootRun`, `bootJar` plugins |
 
 Gradle is Maven's programmable, incremental successor: a task graph instead of a lifecycle, code instead of XML, and build speed that compounds daily. Choose it for new projects with complex builds or large multi-module codebases; Maven stays a perfectly good default when conventions and familiarity matter more.
+

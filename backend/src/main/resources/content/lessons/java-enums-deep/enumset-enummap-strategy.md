@@ -1,7 +1,7 @@
 ---
 title: EnumSet, EnumMap & Strategy Pattern — Enums Beyond Basics
 summary: Using EnumSet for bit-vector-fast set operations, EnumMap for enum-keyed performance, and implementing the Strategy pattern with enums that have abstract methods.
-order: 2
+order: 4
 minutes: 22
 topics: [enumset, enummap, strategy-pattern, enum-abstract-methods, enum-state-machine]
 docs:
@@ -25,80 +25,102 @@ Java enums are not just named constants — they are **full classes** that can h
 
 ### Creating EnumSets
 
+
+**What this code does — step by step:**
+
+1. Empty set
+2. Full set (all constants)
+3. Single value
+4. Multiple values
+5. Range (inclusive start, exclusive end)
+6. Result: {READ, WRITE, EXECUTE}
+7. Complement (everything NOT in the set)
+8. Result: {EXECUTE, DELETE, ADMIN}
+
+The same code, clean:
+
 ```java
 public enum Permission {
     READ, WRITE, EXECUTE, DELETE, ADMIN
 }
 
-// Empty set
 EnumSet<Permission> none = EnumSet.noneOf(Permission.class);
 
-// Full set (all constants)
 EnumSet<Permission> all = EnumSet.allOf(Permission.class);
 
-// Single value
 EnumSet<Permission> read = EnumSet.of(Permission.READ);
 
-// Multiple values
 EnumSet<Permission> readWrite = EnumSet.of(Permission.READ, Permission.WRITE);
 
-// Range (inclusive start, exclusive end)
 EnumSet<Permission> basic = EnumSet.range(Permission.READ, Permission.EXECUTE);
-// Result: {READ, WRITE, EXECUTE}
 
-// Complement (everything NOT in the set)
 EnumSet<Permission> restricted = EnumSet.complementOf(readWrite);
-// Result: {EXECUTE, DELETE, ADMIN}
 ```
 
 ### Set Operations
+
+
+**What this code does — step by step:**
+
+1. Union
+2. Result: {READ, WRITE, DELETE, ADMIN}
+3. Intersection
+4. Result: {READ, WRITE}
+5. Difference
+6. Result: {DELETE, ADMIN}
+7. Membership check — O(1), uses bit position
+8. `boolean canDelete = userPerms.contains(Permission.DELETE);` — false
+
+The same code, clean:
 
 ```java
 EnumSet<Permission> userPerms = EnumSet.of(Permission.READ, Permission.WRITE);
 EnumSet<Permission> adminPerms = EnumSet.of(Permission.READ, Permission.WRITE, Permission.DELETE, Permission.ADMIN);
 
-// Union
 EnumSet<Permission> combined = EnumSet.copyOf(userPerms);
 combined.addAll(adminPerms);
-// Result: {READ, WRITE, DELETE, ADMIN}
 
-// Intersection
 EnumSet<Permission> common = EnumSet.copyOf(userPerms);
 common.retainAll(adminPerms);
-// Result: {READ, WRITE}
 
-// Difference
 EnumSet<Permission> onlyAdmin = EnumSet.copyOf(adminPerms);
 onlyAdmin.removeAll(userPerms);
-// Result: {DELETE, ADMIN}
 
-// Membership check — O(1), uses bit position
-boolean canDelete = userPerms.contains(Permission.DELETE);  // false
+boolean canDelete = userPerms.contains(Permission.DELETE);
 ```
 
 ### Line-by-Line Walkthrough of the Internals
 
+
+**What this code does — step by step:**
+
+1. What EnumSet looks like internally (simplified). For 64 or fewer enum constants, it uses a single long:
+2. `long elements;` — Bit vector! Each bit = one enum constant
+3. Adding: just set a bit
+4. `elements |= (1L << e.ordinal());` — Bitwise OR — one CPU instruction!
+5. Contains: just test a bit
+6. `return (elements & (1L << ((Enum<?>)e).ordinal())) != 0;` — Bitwise AND
+7. Size: popcount (count set bits)
+8. `return Long.bitCount(elements);` — Hardware-level instruction
+
+The same code, clean:
+
 ```java
-// What EnumSet looks like internally (simplified)
-// For 64 or fewer enum constants, it uses a single long:
 class SmallEnumSet<E extends Enum<E>> extends AbstractEnumSet<E> {
-    long elements;  // Bit vector! Each bit = one enum constant
-    
-    // Adding: just set a bit
+    long elements;
+
     public boolean add(E e) {
         long oldElements = elements;
-        elements |= (1L << e.ordinal());  // Bitwise OR — one CPU instruction!
+        elements |= (1L << e.ordinal());
         return elements != oldElements;
     }
-    
-    // Contains: just test a bit
+
     public boolean contains(Object e) {
-        return (elements & (1L << ((Enum<?>)e).ordinal())) != 0;  // Bitwise AND
+        return (elements & (1L << ((Enum<?>)e).ordinal())) != 0;
     }
-    
-    // Size: popcount (count set bits)
+
     public int size() {
-        return Long.bitCount(elements);  // Hardware-level instruction
+        return Long.bitCount(elements);
     }
 }
 ```
@@ -109,42 +131,55 @@ class SmallEnumSet<E extends Enum<E>> extends AbstractEnumSet<E> {
 
 ## EnumMap — The Fastest Map for Enum Keys
 
+
+**What this code does — step by step:**
+
+1. Create an EnumMap
+2. Put values
+3. Get — uses ordinal as array index, no hashing
+4. `String room = meetingRooms.get(Day.WEDNESDAY);` — "Room A"
+5. Iteration order follows enum declaration order (MONDAY → SUNDAY)
+6. Output: MONDAY: Room A, TUESDAY: Room B, WEDNESDAY: Room A, ...
+
+The same code, clean:
+
 ```java
-public enum Day {
-    MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY
+public class Main {
+
+    public static void main(String[] args) {
+        public enum Day {
+            MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY
+        }
+
+        EnumMap<Day, String> meetingRooms = new EnumMap<>(Day.class);
+
+        meetingRooms.put(Day.MONDAY, "Room A");
+        meetingRooms.put(Day.TUESDAY, "Room B");
+        meetingRooms.put(Day.WEDNESDAY, "Room A");
+        meetingRooms.put(Day.THURSDAY, "Room C");
+        meetingRooms.put(Day.FRIDAY, "Room B");
+
+        String room = meetingRooms.get(Day.WEDNESDAY);
+
+        for (Map.Entry<Day, String> entry : meetingRooms.entrySet()) {
+            System.out.println(entry.getKey() + ": " + entry.getValue());
+        }
+    }
 }
-
-// Create an EnumMap
-EnumMap<Day, String> meetingRooms = new EnumMap<>(Day.class);
-
-// Put values
-meetingRooms.put(Day.MONDAY, "Room A");
-meetingRooms.put(Day.TUESDAY, "Room B");
-meetingRooms.put(Day.WEDNESDAY, "Room A");
-meetingRooms.put(Day.THURSDAY, "Room C");
-meetingRooms.put(Day.FRIDAY, "Room B");
-
-// Get — uses ordinal as array index, no hashing
-String room = meetingRooms.get(Day.WEDNESDAY);  // "Room A"
-
-// Iteration order follows enum declaration order (MONDAY → SUNDAY)
-for (Map.Entry<Day, String> entry : meetingRooms.entrySet()) {
-    System.out.println(entry.getKey() + ": " + entry.getValue());
-}
-// Output: MONDAY: Room A, TUESDAY: Room B, WEDNESDAY: Room A, ...
 ```
 
 ### Why EnumMap Wins Over HashMap
 
+
+**What this code does — step by step:**
+
+1. HashMap: hash the key → find bucket → handle collisions → compare keys. EnumMap: enum.ordinal() → array[ordinal] → done
+2. Memory: HashMap stores Entry objects with hash, key, value, next pointer. EnumMap stores a flat array of values (null for missing entries)
+3. Benchmark: EnumMap.put() is ~3x faster than HashMap.put() for enum keys. Benchmark: EnumMap.get() is ~4x faster than HashMap.get() for enum keys
+
+The same code, clean:
+
 ```java
-// HashMap: hash the key → find bucket → handle collisions → compare keys
-// EnumMap: enum.ordinal() → array[ordinal] → done
-
-// Memory: HashMap stores Entry objects with hash, key, value, next pointer
-// EnumMap stores a flat array of values (null for missing entries)
-
-// Benchmark: EnumMap.put() is ~3x faster than HashMap.put() for enum keys
-// Benchmark: EnumMap.get() is ~4x faster than HashMap.get() for enum keys
 ```
 
 ---
@@ -153,88 +188,100 @@ for (Map.Entry<Day, String> entry : meetingRooms.entrySet()) {
 
 This is where enums become truly powerful. Instead of creating separate classes for each strategy, each enum constant **IS** the strategy:
 
-```java
-// Without enums: you'd need an interface + 3 classes
-// With enums: each constant implements the abstract method
 
-public enum DiscountStrategy {
-    // Each constant overrides calculateDiscount
-    FLAT_10 {
-        @Override
-        public double calculate(double price) {
-            return price - 10.0;
+**What this code does — step by step:**
+
+1. Without enums: you'd need an interface + 3 classes. With enums: each constant implements the abstract method
+2. Each constant overrides calculateDiscount
+3. `return price * 0.75;` — Average of full + half price
+4. Abstract method — each constant MUST implement this
+5. Convenience method for the entire list
+6. Usage:
+7. `double discounted = strategy.calculate(100.0);` — 80.0
+8. FLAT_10: $100.00 → $90.00. PERCENT_20: $100.00 → $80.00. BUY_ONE_GET_HALF: $100.00 → $75.00
+
+The same code, clean:
+
+```java
+public class Main {
+
+    public static void main(String[] args) {
+        public enum DiscountStrategy {
+            FLAT_10 {
+                @Override
+                public double calculate(double price) {
+                    return price - 10.0;
+                }
+            },
+
+            PERCENT_20 {
+                @Override
+                public double calculate(double price) {
+                    return price * 0.80;
+                }
+            },
+
+            BUY_ONE_GET_HALF {
+                @Override
+                public double calculate(double price) {
+                    return price * 0.75;
+                }
+            };
+
+            public abstract double calculate(double price);
+
+            public static void applyAll(double price) {
+                for (DiscountStrategy strategy : values()) {
+                    System.out.printf("%s: $%.2f → $%.2f%n", 
+                        strategy.name(), price, strategy.calculate(price));
+                }
+            }
         }
-    },
-    
-    PERCENT_20 {
-        @Override
-        public double calculate(double price) {
-            return price * 0.80;
-        }
-    },
-    
-    BUY_ONE_GET_HALF {
-        @Override
-        public double calculate(double price) {
-            return price * 0.75;  // Average of full + half price
-        }
-    };
-    
-    // Abstract method — each constant MUST implement this
-    public abstract double calculate(double price);
-    
-    // Convenience method for the entire list
-    public static void applyAll(double price) {
-        for (DiscountStrategy strategy : values()) {
-            System.out.printf("%s: $%.2f → $%.2f%n", 
-                strategy.name(), price, strategy.calculate(price));
-        }
+
+        DiscountStrategy strategy = DiscountStrategy.PERCENT_20;
+        double discounted = strategy.calculate(100.0);
+
+        DiscountStrategy.applyAll(100.0);
     }
 }
-
-// Usage:
-DiscountStrategy strategy = DiscountStrategy.PERCENT_20;
-double discounted = strategy.calculate(100.0);  // 80.0
-
-DiscountStrategy.applyAll(100.0);
-// FLAT_10: $100.00 → $90.00
-// PERCENT_20: $100.00 → $80.00
-// BUY_ONE_GET_HALF: $100.00 → $75.00
 ```
 
 ### State Machine with Enums
 
-```java
-public enum OrderState {
-    CREATED {
-        public OrderState next() { return PAID; }
-        public String describe() { return "Order placed, waiting for payment"; }
-    },
-    PAID {
-        public OrderState next() { return SHIPPED; }
-        public String describe() { return "Payment received, preparing for shipment"; }
-    },
-    SHIPPED {
-        public OrderState next() { return DELIVERED; }
-        public String describe() { return "Package in transit"; }
-    },
-    DELIVERED {
-        public OrderState next() { return this; }  // Terminal state
-        public String describe() { return "Package delivered successfully"; }
-    };
-    
-    public abstract OrderState next();
-    public abstract String describe();
-}
+public class Main {
 
-// Usage:
-OrderState state = OrderState.CREATED;
-while (state != state.next()) {
-    System.out.println(state.describe());
-    state = state.next();
+    public static void main(String[] args) {
+        public enum OrderState {
+            CREATED {
+                public OrderState next() { return PAID; }
+                public String describe() { return "Order placed, waiting for payment"; }
+            },
+            PAID {
+                public OrderState next() { return SHIPPED; }
+                public String describe() { return "Payment received, preparing for shipment"; }
+            },
+            SHIPPED {
+                public OrderState next() { return DELIVERED; }
+                public String describe() { return "Package in transit"; }
+            },
+            DELIVERED {
+                public OrderState next() { return this; }  // Terminal state
+                public String describe() { return "Package delivered successfully"; }
+            };
+    
+            public abstract OrderState next();
+            public abstract String describe();
+        }
+
+        // Usage:
+        OrderState state = OrderState.CREATED;
+        while (state != state.next()) {
+            System.out.println(state.describe());
+            state = state.next();
+        }
+        System.out.println(state.describe());
+    }
 }
-System.out.println(state.describe());
-```
 
 ---
 
@@ -242,7 +289,6 @@ System.out.println(state.describe());
 
 ### Scenario 1: Role-Based Access Control
 
-```java
 public enum Role {
     GUEST(Permission.READ),
     USER(Permission.READ, Permission.WRITE),
@@ -269,11 +315,9 @@ Role userRole = Role.USER;
 if (userRole.can(Permission.DELETE)) {
     // Never enters here — USER doesn't have DELETE
 }
-```
 
 ### Scenario 2: Metric Collection with EnumMap
 
-```java
 public enum MetricType {
     REQUEST_COUNT, ERROR_COUNT, RESPONSE_TIME, ACTIVE_CONNECTIONS
 }
@@ -295,7 +339,6 @@ public class MetricsCollector {
         return metrics.get(type).get();
     }
 }
-```
 
 ---
 
@@ -308,3 +351,4 @@ public class MetricsCollector {
 | Enums with mutable fields | Thread-safety nightmare | Keep enum fields `final` |
 | Enum constructor with side effects | Enums are singletons — constructor runs at class load | Keep constructors pure |
 | Forgetting enum is a class | Can't extend classes, limited inheritance | Use composition if needed |
+

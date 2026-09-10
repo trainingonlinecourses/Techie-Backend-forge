@@ -1,7 +1,7 @@
 ---
 title: Configuration Best Practices — Designing for Operability
 module: spring-configuration
-order: 5
+order: 1
 minutes: 24
 topics: ["config design", "secrets management", "12-factor", "fail-fast", "documentation"]
 summary: Every config decision you make shapes how your app behaves in production — and whether your ops team (or future you) can operate it. Bad config des...
@@ -27,46 +27,55 @@ Good config design is boring, deliberate, and follows a few durable rules. This 
 
 ### 1. Everything that varies per environment is a property — nothing else
 
+
+**What this code does — step by step:**
+
+1. BAD — environment-specific values hardcoded
+2. GOOD — externalized, with defaults only for non-secrets. Application.yml: app: db-url: ${DB_URL:jdbc:postgresql://localhost:5432/academy}. Api-key: ${API_KEY} # NO default — fail fast if missing. Max-retries: 3
+
+The same code, clean:
+
 ```java
-// BAD — environment-specific values hardcoded
 class Config {
     static final String DB_URL = "jdbc:postgresql://localhost:5432/academy";
     static final String API_KEY = "sk-live-xxxxxxxx";
     static final int MAX_RETRIES = 3;
 }
-
-// GOOD — externalized, with defaults only for non-secrets
-// application.yml:
-//   app:
-//     db-url: ${DB_URL:jdbc:postgresql://localhost:5432/academy}
-//     api-key: ${API_KEY}          # NO default — fail fast if missing
-//     max-retries: 3
 ```
 
 The test: *"would this value change if I deployed to another environment?"* If yes, it's a property.
 
 ### 2. Secrets fail fast when missing
 
-```java
 // BAD — secret defaults let misconfig slip through
 private final String apiKey = "dev-key-placeholder";     // goes to prod as-is!
 
 // GOOD — no default: startup fails with a clear error if unset
 //   app.api-key: ${API_KEY}
-```
 
 A secret with a default is a **silent security hole** — the app starts with the placeholder and "works" until it hits the real API and gets 401s. Require secrets via a placeholder with **no default** so boot fails loudly in an environment that forgot to provide them.
 
 ### 3. Group related settings into `@ConfigurationProperties`
 
+
+**What this code does — step by step:**
+
+1. `String dbUrl,` — app.db-url
+2. `String apiKey,` — app.api-key
+3. `int maxRetries,` — app.max-retries
+4. `Duration timeout,` — app.timeout
+5. `List<String> admins) {}` — app.admins
+
+The same code, clean:
+
 ```java
 @ConfigurationProperties(prefix = "app")
 public record AppProperties(
-        String dbUrl,          // app.db-url
-        String apiKey,         // app.api-key
-        int maxRetries,        // app.max-retries
-        Duration timeout,      // app.timeout
-        List<String> admins) {}   // app.admins
+        String dbUrl,
+        String apiKey,
+        int maxRetries,
+        Duration timeout,
+        List<String> admins) {}
 ```
 
 One typed object per *domain* (mail, datasource, ai, retry) — not one class per property, not 50 `@Value`s scattered. Validation (`@Validated`, `@NotBlank`, `@Min`) turns bad config into a startup error.
@@ -102,7 +111,6 @@ Production overrides come from **env vars** (platform secret managers), not from
 
 ### 6. Fail fast — validate at startup
 
-```java
 // Use a startup validator so misconfiguration never reaches users:
 @ConfigurationProperties(prefix = "app")
 @Validated
@@ -110,7 +118,6 @@ public record AppProperties(
         @NotBlank String dbUrl,
         @NotBlank String apiKey,
         @Min(1) int maxRetries) {}
-```
 
 Boot validation + `@Validated` = the app **refuses to start** with invalid config. A 10-second startup failure is a gift compared to a 2 AM outage from a bad value discovered at runtime.
 
@@ -154,3 +161,4 @@ Before you call config "done", verify:
 - Fail at startup, not at first request — validation is the safety net.
 - `/actuator/env` and `/actuator/configprops` are the production debuggers.
 - Config is code: document it, review it, treat it with the same rigor.
+

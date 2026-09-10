@@ -1,7 +1,7 @@
 ---
 title: Variables and Primitive Types — The Building Blocks of State
 summary: Every Java program stores data in variables, and every variable has a type. The eight primitive types — byte, short, int, long, float, double, char, boolean — are the only types that are not objects. This lesson explains each one, the ranges they cover, the default values they get, and the mistakes that come from treating them as interchangeable.
-order: 3
+order: 4
 minutes: 22
 topics: [variables, primitives, int, long, float, double, char, boolean, byte, short, default-values, memory]
 docs:
@@ -56,20 +56,30 @@ When you declare a field (a variable that belongs to a class, outside any method
 
 These defaults are why a field like `private int count;` is legal without assignment — Java fills it with `0` when the object is created. For local variables (variables declared inside a method), there is no default — you must assign a value before you use them, or the compiler complains.
 
+
+**What this code does — step by step:**
+
+1. fields get default values
+2. `int count;` — 0
+3. `boolean active;` — false
+4. `char c;` — '\u0000'
+5. local variables: NO default — must be assigned first
+6. `int x;` — not assigned. System.out.println(x); // compilation error — variable x might not have been initialized
+7. `int y = 0;` — assigned — OK
+
+The same code, clean:
+
 ```java
 class Demo {
-    // fields get default values
-    int count;        // 0
-    boolean active;   // false
-    char c;           // '\u0000'
+    int count;
+    boolean active;
+    char c;
 }
 
 public class Main {
     public static void main(String[] args) {
-        // local variables: NO default — must be assigned first
-        int x;            // not assigned
-        // System.out.println(x);   // compilation error — variable x might not have been initialized
-        int y = 0;        // assigned — OK
+        int x;
+        int y = 0;
         System.out.println(y);
     }
 }
@@ -88,14 +98,27 @@ A literal is the way you write a value directly in the source code. Each primiti
 - **`char`** — single quotes around a single character: `'A'`, `'€'`, `'\n'`. Escape sequences are allowed.
 - **`boolean`** — only `true` or `false`. These are the only two boolean literals, and they are not numbers — you cannot write `if (1)` in Java; it must be `if (true)` or `if (x > 0)`.
 
+
+**What this code does — step by step:**
+
+1. `int     i = 42;` — int literal
+2. `long    l = 42L;` — long literal — the L matters
+3. `float   f = 3.14f;` — float literal — the f matters
+4. `double  d = 3.14;` — double literal (default)
+5. `char    c = 'A';` — char literal
+6. `boolean b = true;` — boolean literal
+7. `int     million = 1_000_000;` — underscores for readability (Java 7+)
+
+The same code, clean:
+
 ```java
-int     i = 42;          // int literal
-long    l = 42L;         // long literal — the L matters
-float   f = 3.14f;       // float literal — the f matters
-double  d = 3.14;        // double literal (default)
-char    c = 'A';         // char literal
-boolean b = true;        // boolean literal
-int     million = 1_000_000;   // underscores for readability (Java 7+)
+int     i = 42;
+long    l = 42L;
+float   f = 3.14f;
+double  d = 3.14;
+char    c = 'A';
+boolean b = true;
+int     million = 1_000_000;
 ```
 
 The suffixes matter because of the type system. `3.14` is a `double`. Writing `float f = 3.14;` is a compilation error because a `double` literal does not fit into a `float` without an explicit cast (and even then, you lose precision). Writing `float f = 3.14f;` is correct.
@@ -113,37 +136,40 @@ These four types hold whole numbers of different sizes. The choice between them 
 
 A key rule: integer arithmetic wraps around on overflow. If you add 1 to `Integer.MAX_VALUE` (2,147,483,647), you get `Integer.MIN_VALUE` (-2,147,483,648) — not an error. This is a common source of bugs.
 
-```java
 int max = Integer.MAX_VALUE;   // 2,147,483,647
 int overflow = max + 1;        // -2,147,483,648 — wraps, does not throw
 System.out.println(overflow);   // -2147483648
-```
 
 The JVM does not throw on integer overflow by default. In safety-critical code, you can check for overflow explicitly or use `Math.addExact`, which throws an `ArithmeticException` on overflow:
 
-```java
 int safe = Math.addExact(max, 1);   // throws ArithmeticException — overflow
-```
 
 ### The Floating-Point Types — float, double
 
 `float` and `double` hold decimal numbers, but they do it in binary floating-point, which means many decimal values cannot be represented exactly. This is the source of the classic "why is 0.1 + 0.2 not 0.3?" surprise.
 
-```java
-double a = 0.1;
-double b = 0.2;
-System.out.println(a + b);          // 0.30000000000000004 — not 0.3
-```
+public class Main {
+
+    public static void main(String[] args) {
+        double a = 0.1;
+        double b = 0.2;
+        System.out.println(a + b);          // 0.30000000000000004 — not 0.3
+    }
+}
 
 This is not a Java problem — it is how binary floating-point works, and it affects Python, C, JavaScript, and most languages. The fix for money and other exact decimal values is `BigDecimal`, not `float` or `double`.
 
-```java
 import java.math.BigDecimal;
 
-BigDecimal x = new BigDecimal("0.1");
-BigDecimal y = new BigDecimal("0.2");
-System.out.println(x.add(y));        // 0.3 exactly
-```
+public class Main {
+
+    public static void main(String[] args) {
+
+        BigDecimal x = new BigDecimal("0.1");
+        BigDecimal y = new BigDecimal("0.2");
+        System.out.println(x.add(y));        // 0.3 exactly
+    }
+}
 
 Use `double` for measurements, scientific calculations, and cases where tiny imprecision is acceptable. Use `BigDecimal` for money, percentages that must be exact, and any calculation where the decimal value matters exactly.
 
@@ -153,10 +179,8 @@ Use `double` for measurements, scientific calculations, and cases where tiny imp
 
 This means a Java `String`'s `length()` is the number of `char`s, not the number of visible characters. An emoji can have `length()` 2.
 
-```java
 String emoji = "😀";
 System.out.println(emoji.length());   // 2 — one emoji, two char values (surrogate pair)
-```
 
 Do not use `char` as a small integer. If you need a small integer, use `short` or `byte`. If you need a character, use `char`. If you need a string, use `String`. The types are not interchangeable even though they all hold numbers under the hood.
 
@@ -164,17 +188,20 @@ Do not use `char` as a small integer. If you need a small integer, use `short` o
 
 `boolean` holds `true` or `false`. It is the type of every condition. Unlike C and some other languages, Java does not let you use numbers as booleans — `if (1)` is an error, and you must write `if (true)` or `if (x > 0)`.
 
-```java
-boolean isLoggedIn = true;
-boolean hasAccess = user.getRoles().contains("ADMIN");
+public class Main {
 
-if (isLoggedIn && hasAccess) {
-    System.out.println("welcome");
+    public static void main(String[] args) {
+        boolean isLoggedIn = true;
+        boolean hasAccess = user.getRoles().contains("ADMIN");
+
+        if (isLoggedIn && hasAccess) {
+            System.out.println("welcome");
+        }
+
+        // This is an error in Java:
+        // if (1) { ... }   // compilation error — int cannot be converted to boolean
+    }
 }
-
-// This is an error in Java:
-// if (1) { ... }   // compilation error — int cannot be converted to boolean
-```
 
 `boolean` values are the result of comparisons: `x > 0`, `name.equals("Alice")`, `list.isEmpty()`, `number % 2 == 0`. Every condition in every `if`, `while`, `for`, and `switch` boils down to a `boolean`.
 
@@ -182,29 +209,36 @@ if (isLoggedIn && hasAccess) {
 
 Java allows some automatic conversions between primitives, called **widening primitive conversions**. These are safe because the destination type can hold all values of the source type.
 
+
+**What this code does — step by step:**
+
+1. `short   s = b;` — OK — byte fits in short
+2. `int     i = s;` — OK
+3. `long    l = i;` — OK
+4. `float   f = i;` — OK — int to float (can lose precision for very large ints)
+5. `double  d = f;` — OK
+
+The same code, clean:
+
 ```java
 byte    b = 5;
-short   s = b;     // OK — byte fits in short
-int     i = s;     // OK
-long    l = i;     // OK
-float   f = i;     // OK — int to float (can lose precision for very large ints)
-double  d = f;     // OK
+short   s = b;
+int     i = s;
+long    l = i;
+float   f = i;
+double  d = f;
 ```
 
 Narrowing conversions — going the other way — are not automatic, because they can lose information.
 
-```java
 int i = 1000;
 // short s = i;        // compilation error — int might not fit in short
 short s = (short) i;   // explicit cast — the compiler says "I trust you"
-```
 
 For integers, narrowing casts truncate. For floating-point, casting to an integer discards the fractional part.
 
-```java
 double d = 3.99;
 int n = (int) d;   // 3 — not 4, the fractional part is discarded
-```
 
 ### Variable Scope — Where a Variable Lives
 
@@ -214,23 +248,36 @@ A variable's scope is the region of the program where it is accessible.
 - **Method parameters** — visible throughout the method.
 - **Local variables** — visible from their declaration to the end of the block `{ ... }` they are in. A variable declared in an `if` block is not visible after the `if`.
 
+
+**What this code does — step by step:**
+
+1. `int outside = 1;` — visible throughout the method
+2. `int inside = 2;` — visible only inside this if block
+3. `System.out.println(outside);` — OK — outside is in scope
+4. `System.out.println(outside);` — OK. System.out.println(inside); // compilation error — inside is out of scope
+
+The same code, clean:
+
 ```java
-public void process() {
-    int outside = 1;          // visible throughout the method
+public class Main {
 
-    if (true) {
-        int inside = 2;       // visible only inside this if block
-        System.out.println(outside);  // OK — outside is in scope
+    public static void main(String[] args) {
+        public void process() {
+            int outside = 1;
+
+            if (true) {
+                int inside = 2;
+                System.out.println(outside);
+            }
+
+            System.out.println(outside);
+        }
     }
-
-    System.out.println(outside);  // OK
-    // System.out.println(inside); // compilation error — inside is out of scope
 }
 ```
 
 Shadowing happens when a local variable or parameter has the same name as a field. The local one hides the field inside its scope, which is a common source of bugs.
 
-```java
 class User {
     private String name = "default";
 
@@ -239,35 +286,66 @@ class User {
         this.name = name;  // 'this.name' is the field; 'name' is the parameter
     }
 }
-```
 
 ## A Code Example — Declaring and Using Variables
 
 This example shows the eight primitives being declared, used, and printed, plus a few of the rules in action.
 
+
+**What this code does — step by step:**
+
+1. Fields — get default values if not assigned
+2. `byte    byteField;` — 0
+3. `short   shortField;` — 0
+4. `int     intField;` — 0
+5. `long    longField;` — 0L
+6. `float   floatField;` — 0.0f
+7. `double  doubleField;` — 0.0
+8. `char    charField;` — '\u0000'
+9. `boolean boolField;` — false
+10. Local variables — must be assigned before use
+11. `long    l = 100_000_000_000L;` — underscores for readability; L suffix
+12. `float   f = 3.14f;` — f suffix required
+13. `double  d = 2.718;` — default decimal literal
+14. `char    c = 'A';` — char literal
+15. `boolean flag = true;` — only true or false
+16. Type conversions
+17. `int fromLong = (int) l;` — narrowing cast
+18. `double fromInt = i;` — widening — automatic
+19. `float fromDouble = (float) d;` — narrowing cast
+20. Integer overflow does not throw
+21. `System.out.println("overflow: " + overflow);` — -2147483648
+22. Safe addition
+23. `int safe = Math.addExact(Integer.MAX_VALUE, 1);` — throws ArithmeticException
+24. Floating-point imprecision
+25. `System.out.println("0.1 + 0.2 = " + sum);` — 0.30000000000000004
+26. boolean conditions
+27. char is a number under the hood
+28. `char nextLetter = (char) (c + 1);` — 'B'
+
+The same code, clean:
+
 ```java
 public class PrimitivesDemo {
-    // Fields — get default values if not assigned
-    byte    byteField;      // 0
-    short   shortField;     // 0
-    int     intField;       // 0
-    long    longField;      // 0L
-    float   floatField;     // 0.0f
-    double  doubleField;    // 0.0
-    char    charField;      // '\u0000'
-    boolean boolField;      // false
+    byte    byteField;
+    short   shortField;
+    int     intField;
+    long    longField;
+    float   floatField;
+    double  doubleField;
+    char    charField;
+    boolean boolField;
 
     public static void main(String[] args) {
 
-        // Local variables — must be assigned before use
         byte    b = 10;
         short   s = 1000;
         int     i = 42;
-        long    l = 100_000_000_000L;   // underscores for readability; L suffix
-        float   f = 3.14f;              // f suffix required
-        double  d = 2.718;             // default decimal literal
-        char    c = 'A';               // char literal
-        boolean flag = true;          // only true or false
+        long    l = 100_000_000_000L;
+        float   f = 3.14f;
+        double  d = 2.718;
+        char    c = 'A';
+        boolean flag = true;
 
         System.out.println("byte:    " + b);
         System.out.println("short:   " + s);
@@ -278,28 +356,22 @@ public class PrimitivesDemo {
         System.out.println("char:    " + c);
         System.out.println("boolean: " + flag);
 
-        // Type conversions
-        int fromLong = (int) l;          // narrowing cast
-        double fromInt = i;             // widening — automatic
-        float fromDouble = (float) d;   // narrowing cast
+        int fromLong = (int) l;
+        double fromInt = i;
+        float fromDouble = (float) d;
 
-        // Integer overflow does not throw
         int overflow = Integer.MAX_VALUE + 1;
-        System.out.println("overflow: " + overflow);   // -2147483648
+        System.out.println("overflow: " + overflow);
 
-        // Safe addition
-        int safe = Math.addExact(Integer.MAX_VALUE, 1); // throws ArithmeticException
+        int safe = Math.addExact(Integer.MAX_VALUE, 1);
 
-        // Floating-point imprecision
         double sum = 0.1 + 0.2;
-        System.out.println("0.1 + 0.2 = " + sum);      // 0.30000000000000004
+        System.out.println("0.1 + 0.2 = " + sum);
 
-        // boolean conditions
         boolean isEven = i % 2 == 0;
         System.out.println("is " + i + " even? " + isEven);
 
-        // char is a number under the hood
-        char nextLetter = (char) (c + 1);   // 'B'
+        char nextLetter = (char) (c + 1);
         System.out.println("next after 'A': " + nextLetter);
     }
 }
@@ -351,3 +423,4 @@ In the lab, you will see a starter `VariablesExercise.java` with several deliber
 ## Summary
 
 Java has eight primitive types: `byte`, `short`, `int`, `long` (integers), `float`, `double` (floating-point), `char` (16-bit Unicode), and `boolean` (true/false). They are not objects and hold their values directly. Fields get default values (0, 0.0, false, '\u0000'); local variables do not and must be assigned before use. Integer arithmetic wraps on overflow silently unless you use `Math.addExact`; floating-point arithmetic is not exact for many decimal values, so money belongs in `BigDecimal`. The `char` type is a 16-bit Unicode code unit, not a small integer, and a `String`'s `length()` counts `char` values, not visible characters. The choice of primitive is a choice about range, precision, memory, and correctness — and getting it wrong is how subtle production bugs happen.
+

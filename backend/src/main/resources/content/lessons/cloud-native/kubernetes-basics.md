@@ -1,7 +1,7 @@
 ---
 title: Kubernetes Basics
 summary: Pods, Deployments, Services, namespaces and the reconciliation loop — the vocabulary and mental model of running containers at scale.
-order: 3
+order: 6
 minutes: 16
 topics: [kubernetes, pods, deployments, services, control plane, declarative]
 docs:
@@ -103,3 +103,4 @@ kubectl rollout undo deploy/academy-api       # instant rollback to the previous
 - The controller self-heals (pods replaced, rollouts rolled back); learn `describe`/`events` for diagnosis.
 
 Official docs: [Kubernetes Concepts](https://kubernetes.io/docs/concepts/) · [Kubernetes Basics tutorial](https://kubernetes.io/docs/tutorials/kubernetes-basics/)
+

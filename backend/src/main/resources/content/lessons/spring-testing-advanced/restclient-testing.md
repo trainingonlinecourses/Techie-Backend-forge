@@ -1,7 +1,7 @@
 ---
 title: Testing HTTP Clients (RestClient/WebClient)
 module: spring-testing-advanced
-order: 3
+order: 6
 minutes: 20
 topics: ["MockRestServiceServer", "@RestClientTest", "MockWebServer", "stubbing", "verification"]
 summary: Your service calls other services. Those calls must be tested — but never against the real network. This lesson covers the three ways to stub HTTP:...
@@ -16,20 +16,17 @@ Your service calls other services. Those calls must be tested — but never agai
 
 ## @RestClientTest: The Slice for Clients
 
-```java
 @RestClientTest(PaymentGatewayClient.class)
 class PaymentGatewayClientTest {
 
     @Autowired PaymentGatewayClient client;
     @Autowired MockRestServiceServer server;
 }
-```
 
 `@RestClientTest` wires a `MockRestServiceServer` bound to your client's `RestTemplate`/`RestClient` — no real HTTP, no configuration.
 
 ## Stubbing Responses
 
-```java
 @Test
 void chargesCardSuccessfully() {
     server.expect(requestTo("/v1/charges"))
@@ -46,13 +43,11 @@ void chargesCardSuccessfully() {
     assertEquals("succeeded", charge.status());
     server.verify();   // all expectations met
 }
-```
 
 ## Expecting the Request: Assertions on What You Send
 
 The `.andExpect(...)` block asserts the **outgoing** request — the strongest value of `MockRestServiceServer`:
 
-```java
 server.expect(requestTo("/v1/charges"))
     .andExpect(method(HttpMethod.POST))
     .andExpect(header("Authorization", startsWith("Bearer")))
@@ -60,13 +55,11 @@ server.expect(requestTo("/v1/charges"))
     .andExpect(content().contentType(MediaType.APPLICATION_JSON))
     .andExpect(jsonPath("$.amount").value(2500))
     .andExpect(jsonPath("$.currency").value("USD"));
-```
 
 If your client stops sending the auth header or the idempotency key, the test fails — that's a regression guard no real-API test can give you.
 
 ## Responding With Errors
 
-```java
 @Test
 void handlesGatewayTimeout() {
     server.expect(requestTo("/v1/charges"))
@@ -86,7 +79,6 @@ void retriesOn502() {
     assertEquals("ch_2", charge.id());
     server.verify();   // both requests happened
 }
-```
 
 ## MockWebServer (OkHttp) — For Raw Control
 
@@ -100,7 +92,6 @@ void retriesOn502() {
 </dependency>
 ```
 
-```java
 class WebClientIntegrationTest {
 
     private MockWebServer server;
@@ -140,13 +131,11 @@ class WebClientIntegrationTest {
         assertEquals("GET", request.getMethod());
     }
 }
-```
 
 ## Testing Retry and Circuit Breaker
 
 The real value of stubbed HTTP: test the resilience logic deterministically.
 
-```java
 @Test
 void circuitBreakerOpensAfterFailures() {
     // 3 failures → breaker opens
@@ -158,11 +147,9 @@ void circuitBreakerOpensAfterFailures() {
     // next call short-circuits: no request should reach the server
     assertThrows(CircuitOpenException.class, () -> client.charge(1, "tok"));
 }
-```
 
 ## Timeouts
 
-```java
 @Test
 void timesOutWhenServerIsSlow() {
     server.expect(requestTo("/slow"))
@@ -173,11 +160,9 @@ void timesOutWhenServerIsSlow() {
     assertThrows(ResourceAccessException.class,
         () -> slowClient.fetch());
 }
-```
 
 ## Testing the Client's Error Mapping
 
-```java
 @Test
 void maps404ToNotFoundDomainException() {
     server.expect(requestTo("/v1/courses/999"))
@@ -196,15 +181,12 @@ void mapsValidation422ToClientError() {
     assertThrows(CardDeclinedException.class,
         () -> client.charge(2500, "tok_visa"));
 }
-```
 
 ## Verification: The Secret Weapon
 
-```java
 server.verify();                    // all expectations consumed, in order
 server.verify(1, requestTo("/x"));  // exactly one request to /x
 server.verify(0, requestTo("/y"));  // never called /y
-```
 
 `verify(0, ...)` is how you assert *absence* — "the client did NOT retry after success", "the client did NOT call the legacy endpoint".
 
@@ -221,3 +203,4 @@ server.verify(0, requestTo("/y"));  // never called /y
 ## Summary
 
 `MockRestServiceServer` + `@RestClientTest` give you request-level assertions with zero network. `MockWebServer` gives raw control for WebClient/raw clients. Together they test the whole client contract: what you send, how you handle every response, and whether retries and circuit breakers behave — deterministically, in milliseconds.
+

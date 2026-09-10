@@ -1,7 +1,7 @@
 ---
 title: File Upload and Download — Multipart, Storage, and Streaming
 summary: MultipartFile handling, file size limits, streaming large files to S3/local disk, download with Content-Disposition, and how organizations handle file uploads safely without running out of memory.
-order: 32
+order: 7
 minutes: 20
 topics: [multipart, file-upload, file-download, multipartfile, content-disposition, streaming-upload, file-storage]
 docs:
@@ -30,7 +30,6 @@ spring:
 
 ## Upload: controller and service
 
-```java
 @RestController
 @RequestMapping("/api/files")
 public class FileUploadController {
@@ -54,9 +53,7 @@ public class FileUploadController {
         return ResponseEntity.ok(metadata);
     }
 }
-```
 
-```java
 @Service
 public class FileStorageService {
 
@@ -82,11 +79,9 @@ public class FileStorageService {
         return new FileMetadata(filename, file.getContentType(), file.getSize(), category);
     }
 }
-```
 
 ## Download: streaming with Content-Disposition
 
-```java
 @GetMapping("/download/{category}/{filename}")
 public ResponseEntity<Resource> download(
         @PathVariable String category,
@@ -106,11 +101,9 @@ public ResponseEntity<Resource> download(
             "attachment; filename=\"" + filename + "\"")
         .body(resource);
 }
-```
 
 ## Upload to S3 — streaming without buffering the entire file
 
-```java
 @Service
 public class S3FileStorageService {
 
@@ -142,7 +135,6 @@ public class S3FileStorageService {
         }
     }
 }
-```
 
 `RequestBody.fromInputStream()` streams directly to S3 without buffering the full file. The `file.getSize()` lets S3 set the `Content-Length` header.
 
@@ -164,7 +156,6 @@ fetch('/api/files/upload', {
 
 ### Scenario 1: profile picture upload with validation
 
-```java
 @PostMapping("/profile/picture")
 public ResponseEntity<Void> uploadProfilePicture(
         @RequestParam("file") MultipartFile file) {
@@ -182,11 +173,9 @@ public ResponseEntity<Void> uploadProfilePicture(
     storageService.store(file, "profile-pictures");
     return ResponseEntity.ok().build();
 }
-```
 
 ### Scenario 2: bulk CSV import with streaming
 
-```java
 @PostMapping("/import/orders")
 public ResponseEntity<ImportResult> importOrders(@RequestParam("file") MultipartFile file) {
     if (!"text/csv".equals(file.getContentType())) {
@@ -207,11 +196,9 @@ public ResponseEntity<ImportResult> importOrders(@RequestParam("file") Multipart
         return ResponseEntity.ok(result);
     }
 }
-```
 
 ### Scenario 3: presigned URL for direct client-to-S3 upload
 
-```java
 @PostMapping("/presigned-url")
 public ResponseEntity<PresignedUrl> getPresignedUploadUrl(
         @RequestParam String filename,
@@ -233,7 +220,6 @@ public ResponseEntity<PresignedUrl> getPresignedUploadUrl(
         presigned.expiration().toEpochMilli()
     ));
 }
-```
 
 The client uploads directly to S3 using the presigned URL — the file never touches your server.
 
@@ -256,3 +242,4 @@ The client uploads directly to S3 using the presigned URL — the file never tou
 | Storing files in webroot | Security bypass, accidental deletion on redeploy |
 | Reading entire file into `byte[]` | OOM for large files |
 | Not checking `file.isEmpty()` | Stores empty files |
+

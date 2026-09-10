@@ -1,7 +1,7 @@
 ---
 title: MongoDB Basics — Documents, Collections, and the Document Model
 module: mongodb-deep
-order: 1
+order: 3
 minutes: 25
 topics: ["MongoDB", "documents", "collections", "BSON", "NoSQL", "document model"]
 summary: For decades, the relational model was the only game in town: tables, rows, columns, and joins enforced by rigid schemas. MongoDB is the most popula...
@@ -110,7 +110,6 @@ The practical pattern: **many systems run both** — Postgres for relational cor
 
 ## Spring Data MongoDB: The First Glimpse
 
-```java
 @Document("products")               // this class maps to the products collection
 public record Product(
         @Id String id,              // maps to _id
@@ -123,10 +122,10 @@ public interface ProductRepository extends MongoRepository<Product, String> {
     List<Product> findByPriceLessThan(double maxPrice);
     List<Product> findByInStockTrue();
 }
-```
 
 `MongoRepository` gives you `save`, `findById`, `findAll`, `deleteById` out of the box, and method names like `findByPriceLessThan` generate queries automatically — the same derived-query magic as JPA, against MongoDB. `@Document` maps the class; `@Id` maps to `_id`. That's the whole onboarding: a repository interface, and CRUD works.
 
 ## Recap
 
 MongoDB is a document database: self-contained BSON documents in collections, with `_id` keys, rich types, nested structures, and no enforced table schema. The document model shines for hierarchical, object-shaped data read as a whole — and demands schema discipline from the application layer since the DB won't enforce it. The CRUD vocabulary (`find`, `$set`, `$push`, `$lt`) maps directly onto Spring Data MongoDB's repositories and query methods. Choose it for the datasets that are naturally documents; keep relational databases for the join-heavy, integrity-critical core. And remember the design principle that shapes everything else in this module: **the document is the unit of atomicity** — model data so that what you update together lives together.
+

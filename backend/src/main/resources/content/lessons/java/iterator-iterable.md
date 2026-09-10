@@ -1,7 +1,7 @@
 ---
 title: Iterator and Iterable — Making Custom Collections ForEach-able
 summary: The Iterable contract, writing custom iterators, Iterator vs Spliterator, fail-fast vs fail-safe, and how this pattern powers Java Streams and Spring Data repositories.
-order: 44
+order: 29
 minutes: 18
 topics: [iterator, iterable, spliterator, fail-fast, for-each, custom-collection, streaming-pattern]
 docs:
@@ -17,26 +17,22 @@ Java's `for-each` loop (`for (Item item : items)`) does not require an array —
 
 Behind the scenes, `for (Item item : items)` is syntactic sugar for:
 
-```java
 Iterator<Item> it = items.iterator();
 while (it.hasNext()) {
     Item item = it.next();
     // body
 }
-```
 
 **Why this matters:** if you implement `Iterable` on your custom collection, it becomes compatible with `for-each`, `StreamSupport.stream()`, `Stream.of()`, `Collection.addAll()`, and every library that accepts `Iterable<T>` (Spring's `JpaRepository`, Guava's `Lists.newArrayList()`, etc.).
 
 ## The Iterator contract
 
-```java
 public interface Iterator<T> {
     boolean hasNext();  // returns true if more elements
     T next();           // returns the next element, throws NoSuchElementException if none
     default void remove() { throw new UnsupportedOperationException(); }
     default void forEachRemaining(Consumer<? super T> action) { /* optimized iteration */ }
 }
-```
 
 **Fail-fast:** most JDK iterators throw `ConcurrentModificationException` if the underlying collection is modified structurally (add/remove) during iteration. They do this by tracking a `modCount` — the collection increments it on every structural modification; the iterator checks it on every `next()`.
 
@@ -48,7 +44,6 @@ public interface Iterator<T> {
 
 A database query returns 100K records, but loading them all into memory causes an OOM. Solution: a custom `Iterator` that fetches pages on demand.
 
-```java
 public class PagedEntityIterator<T> implements Iterator<T> {
 
     private final Function<Integer, Page<T>> pageFetcher;
@@ -80,9 +75,7 @@ public class PagedEntityIterator<T> implements Iterator<T> {
         return currentBatch.next();
     }
 }
-```
 
-```java
 // Usage: process 100K orders without loading all into memory
 public void processAllOrders() {
     PagedEntityIterator<Order> iterator = new PagedEntityIterator<>(
@@ -94,11 +87,9 @@ public void processAllOrders() {
         processOrder(order);  // each page fetched on demand
     }
 }
-```
 
 ### Scenario 2: Iterable on a service result — bulk operations
 
-```java
 public class AuditLogBatch implements Iterable<AuditEntry> {
 
     private final List<AuditEntry> entries;
@@ -124,18 +115,14 @@ public class AuditLogBatch implements Iterable<AuditEntry> {
         return new SendResult(sent);
     }
 }
-```
 
-```java
 // Spring Data works with Iterable — JPA repositories accept Iterable<T> for batch delete
 auditLogRepository.deleteAll(auditLogBatch);  // our Iterable, not a List
-```
 
 ### Scenario 3: Iterator pattern in Stream API
 
 The `Stream` API is built on `Spliterator` — the successor to `Iterator` that supports parallel iteration. When you call `stream()` on a collection, the collection's `spliterator()` is called:
 
-```java
 List<Order> orders = List.of(order1, order2, order3);
 
 // Equivalent under the hood:
@@ -151,11 +138,9 @@ public class OrderQueue implements Iterable<Order> {
     // Automatically works with streams:
     // orderQueue.stream() → StreamSupport.stream(orderQueue.spliterator(), false)
 }
-```
 
 ## Fail-fast behavior
 
-```java
 List<String> names = new ArrayList<>(List.of("Alice", "Bob", "Charlie"));
 
 for (String name : names) {
@@ -163,11 +148,9 @@ for (String name : names) {
         names.remove(name);  // ConcurrentModificationException!
     }
 }
-```
 
 The iterator detects that `names` was structurally modified and throws. **Safe alternatives:**
 
-```java
 // Option 1: use Iterator.remove()
 Iterator<String> it = names.iterator();
 while (it.hasNext()) {
@@ -183,7 +166,6 @@ names.removeIf(name -> name.equals("Bob"));
 List<String> filtered = names.stream()
     .filter(name -> !name.equals("Bob"))
     .toList();
-```
 
 ## Common mistakes
 
@@ -194,3 +176,4 @@ List<String> filtered = names.stream()
 | Returning same `Iterator` instance | Second call gets empty iterator — iterator is single-use |
 | Not implementing `remove()` in custom iterator | Default throws `UnsupportedOperationException` |
 | Using `for-each` on a very large `Iterable` | Entire sequence loaded — use `Spliterator` or manual paging |
+

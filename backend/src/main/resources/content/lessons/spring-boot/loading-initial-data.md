@@ -1,7 +1,7 @@
 ---
 title: Loading Initial Data with Spring Boot
 summary: CommandLineRunner data seeding, data.sql and schema.sql, Flyway migrations, ApplicationRunner, and profile-specific seeders.
-order: 29
+order: 36
 minutes: 14
 topics: [data-seeding, commandline-runner, flyway, data-sql, application-runner, profiles]
 docs:
@@ -26,7 +26,6 @@ There are several ways to do this in Spring Boot.
 
 ## Method 1: CommandLineRunner (Most Common)
 
-```java
 @Component
 @Order(1)
 public class DataSeeder implements CommandLineRunner {
@@ -69,7 +68,6 @@ public class DataSeeder implements CommandLineRunner {
         System.out.println("✅ Admin user created: admin@example.com");
     }
 }
-```
 
 ---
 
@@ -158,7 +156,6 @@ spring:
 
 ## Method 4: ApplicationRunner (Structured Args)
 
-```java
 @Component
 public class DevDataLoader implements ApplicationRunner {
 
@@ -189,13 +186,11 @@ public class DevDataLoader implements ApplicationRunner {
         System.out.println("✅ Development data seeded: " + products.size() + " products");
     }
 }
-```
 
 ---
 
 ## Method 5: Spring Profiles for Environment-Specific Data
 
-```java
 @Component
 @Profile("dev")
 public class DevDataSeeder implements CommandLineRunner {
@@ -228,7 +223,6 @@ public class ProdDataSeeder implements CommandLineRunner {
         // Only seed essential roles and admin user
     }
 }
-```
 
 ```bash
 # Run with a specific profile
@@ -253,7 +247,6 @@ java -jar app.jar --spring.profiles.active=dev
 
 ### Scenario 1: Multi-Tenant SaaS Application
 
-```java
 @Component
 @Order(1)
 public class TenantInitializer implements CommandLineRunner {
@@ -284,11 +277,9 @@ public class TenantInitializer implements CommandLineRunner {
         System.out.println("✅ Initialized " + tenants.size() + " tenants");
     }
 }
-```
 
 ### Scenario 2: Feature Flags from Database
 
-```java
 @Component
 @Order(2)
 public class FeatureFlagLoader implements CommandLineRunner {
@@ -308,7 +299,6 @@ public class FeatureFlagLoader implements CommandLineRunner {
         System.out.println("✅ Loaded " + flags.size() + " feature flags");
     }
 }
-```
 
 ---
 
@@ -322,3 +312,4 @@ public class FeatureFlagLoader implements CommandLineRunner {
 | Seeding data before migrations | Table doesn't exist yet | Use `@Order` or Flyway |
 | Not using profiles | Same data in all environments | Use `@Profile` for environment-specific data |
 | Hardcoding passwords in seed data | Security risk | Use environment variables or config |
+

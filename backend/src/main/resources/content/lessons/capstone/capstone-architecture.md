@@ -1,7 +1,7 @@
 ---
 title: Capstone — Payments API: Architecture & Layering
 summary: The full project we build together — a layered payments API with JWT security, JPA, tests and Docker.
-order: 1
+order: 2
 minutes: 15
 topics: [capstone, architecture, layering, project-structure]
 capstone: true
@@ -97,3 +97,4 @@ curl localhost:8081/api/accounts -H "Authorization: Bearer $TOKEN"
 - The project is real — open `projects/payments-api` and follow along.
 
 **Official docs:** [Spring Boot reference](https://docs.spring.io/spring-boot/reference/)
+

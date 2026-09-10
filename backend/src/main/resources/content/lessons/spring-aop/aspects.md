@@ -1,7 +1,7 @@
 ---
 title: Creating and Configuring Aspects
 module: spring-aop
-order: 4
+order: 5
 minutes: 25
 topics: ["@Aspect", "aspect instantiation", "aspect lifecycle", "aspect scoping", "aspect configuration"]
 summary: Aspects are the building blocks of AOP — they combine pointcuts with advice to create modular, reusable crosscutting concerns. This lesson covers h...
@@ -20,7 +20,6 @@ An aspect is a class annotated with `@Aspect`. In Spring AOP, aspects are typica
 
 ### Basic Aspect Structure
 
-```java
 @Aspect
 @Component
 public class LoggingAspect {
@@ -42,13 +41,11 @@ public class LoggingAspect {
         log.info("Completed: {}", joinPoint.getSignature().getName());
     }
 }
-```
 
 ### Aspect with Dependencies
 
 Aspects are Spring beans, so they can have dependencies injected:
 
-```java
 @Aspect
 @Component
 public class SecurityAspect {
@@ -77,11 +74,9 @@ public class SecurityAspect {
         }
     }
 }
-```
 
 ### Aspect with Configuration Properties
 
-```java
 @Aspect
 @Component
 @ConfigurationProperties(prefix = "app.aspect.logging")
@@ -104,7 +99,6 @@ public class ConfigurableLoggingAspect {
         log.info("Method called: {}", methodName);
     }
 }
-```
 
 ## Aspect Instantiation Models
 
@@ -114,65 +108,54 @@ Spring AOP supports different instantiation models for aspects:
 
 The aspect is instantiated once and shared across the application:
 
-```java
 @Aspect
 @Component
 public class SingletonAspect {
     // Created once, shared across all proxies
     // Thread-safe by default
 }
-```
 
 ### Per-Prototype
 
 A new aspect instance is created for each proxy:
 
-```java
 @Aspect
 @Component
 @Scope("prototype")
 public class PrototypeAspect {
     // New instance for each target bean
 }
-```
 
 ### Per-Request (via Scope)
 
-```java
 @Aspect
 @Component
 @Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class RequestScopedAspect {
     // New instance for each HTTP request
 }
-```
 
 ### Per-Session (via Scope)
 
-```java
 @Aspect
 @Component
 @Scope(value = "session", proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class SessionScopedAspect {
     // New instance for each HTTP session
 }
-```
 
 ## Aspect Configuration Options
 
 ### Enabling AOP Proxying
 
-```java
 @Configuration
 @EnableAspectJAutoProxy
 public class AopConfig {
     // Enables Spring AOP support
 }
-```
 
 ### Advanced Configuration
 
-```java
 @Configuration
 @EnableAspectJAutoProxy(
     proxyTargetClass = true,  // Use CGLIB proxies
@@ -180,7 +163,6 @@ public class AopConfig {
     optimize = false           // Optimize for final classes
 )
 public class AdvancedAopConfig {}
-```
 
 ### Configuration Properties
 
@@ -196,7 +178,6 @@ spring:
 
 ### Using @Order
 
-```java
 @Aspect
 @Component
 @Order(1)
@@ -217,7 +198,6 @@ public class LoggingAspect {
 public class PerformanceAspect {
     // Runs third
 }
-```
 
 ### Ordering Rules
 
@@ -225,7 +205,6 @@ public class PerformanceAspect {
 2. **@After** advice: Lower order runs last (reverse order)
 3. **@Around** advice: Lower order wraps higher order
 
-```java
 @Aspect
 @Component
 @Order(1)
@@ -251,7 +230,6 @@ public class InnerAspect {
         return result;
     }
 }
-```
 
 Output:
 ```
@@ -264,20 +242,17 @@ Outer after
 
 ### Custom Ordering with @Priority
 
-```java
 @Aspect
 @Component
 @Priority(value = 1)
 public class HighPriorityAspect {
     // Runs first
 }
-```
 
 ## Aspect Lifecycle Hooks
 
 ### @PostConstruct
 
-```java
 @Aspect
 @Component
 public class LifecycleAspect {
@@ -305,11 +280,9 @@ public class LifecycleAspect {
         });
     }
 }
-```
 
 ### @PreDestroy
 
-```java
 @Aspect
 @Component
 public class ResourceAspect {
@@ -335,7 +308,6 @@ public class ResourceAspect {
         }
     }
 }
-```
 
 ## Aspect Scoping and Proxies
 
@@ -343,17 +315,14 @@ public class ResourceAspect {
 
 When you annotate a class with `@Aspect`, Spring creates a proxy around it. The proxy type depends on your configuration:
 
-```java
 // CGLIB proxy (default)
 @EnableAspectJAutoProxy(proxyTargetClass = true)
 
 // JDK dynamic proxy
 @EnableAspectJAutoProxy(proxyTargetClass = false)
-```
 
 ### Aspect with Interface
 
-```java
 @Aspect
 @Component
 public class AuditableAspect implements Ordered {
@@ -368,24 +337,20 @@ public class AuditableAspect implements Ordered {
         // Implementation
     }
 }
-```
 
 ### Aspect without Interface (CGLIB Required)
 
-```java
 @Aspect
 @Component
 public class NonInterfaceAspect {
     // Requires CGLIB proxy since no interface
     // proxyTargetClass = true must be set
 }
-```
 
 ## Shared Pointcuts
 
 ### Pointcut Composition
 
-```java
 @Aspect
 @Component
 public class ComposedAspect {
@@ -412,11 +377,9 @@ public class ComposedAspect {
         log.info("Auditable service call: {}", jp.getSignature().getName());
     }
 }
-```
 
 ### Pointcut in Separate Class
 
-```java
 // Pointcuts.java - reusable pointcut definitions
 public class Pointcuts {
     
@@ -445,11 +408,9 @@ public class LoggingAspect {
         log.info("DAO: {}", jp.getSignature().getName());
     }
 }
-```
 
 ### Pointcut with Parameters
 
-```java
 @Aspect
 @Component
 public class ParameterizedAspect {
@@ -471,43 +432,48 @@ public class ParameterizedAspect {
         return jp.proceed();
     }
 }
-```
 
 ## Aspect Testing
 
 ### Unit Testing Aspects
 
+
+**What this code does — step by step:**
+
+1. Given
+2. When
+3. Then
+4. Given
+5. When
+6. Then
+
+The same code, clean:
+
 ```java
 @SpringBootTest
 class LoggingAspectTest {
-    
+
     @Autowired
     private UserService userService;
-    
+
     @Autowired
     private LoggingAspect loggingAspect;
-    
+
     @Test
     void shouldLogMethodCall() {
-        // Given
         when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
-        
-        // When
+
         userService.findById(1L);
-        
-        // Then
+
         verify(log).info(argThat(s -> s.contains("findById")));
     }
-    
+
     @Test
     void shouldLogMethodCompletion() {
-        // Given
         when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
-        
-        // When
+
         userService.findById(1L);
-        
-        // Then
+
         verify(log).info(argThat(s -> s.contains("Completed")));
     }
 }
@@ -515,7 +481,6 @@ class LoggingAspectTest {
 
 ### Integration Testing Aspects
 
-```java
 @SpringBootTest
 @Transactional
 class SecurityAspectIntegrationTest {
@@ -536,11 +501,9 @@ class SecurityAspectIntegrationTest {
                      () -> userService.deleteUser(1L));
     }
 }
-```
 
 ### Mocking Aspect Dependencies
 
-```java
 @SpringBootTest
 class AspectWithMockedDependenciesTest {
     
@@ -558,37 +521,41 @@ class AspectWithMockedDependenciesTest {
         verify(auditService).logSecurityCheck(any(), any());
     }
 }
-```
 
 ## Aspect Best Practices
 
 ### 1. Keep Aspects Focused
 
+
+**What this code does — step by step:**
+
+1. GOOD — Single responsibility
+2. Only handles logging
+3. Only handles security
+4. BAD — Multiple responsibilities
+5. Handles logging, security, and transactions
+
+The same code, clean:
+
 ```java
-// GOOD — Single responsibility
 @Aspect
 @Component
 public class LoggingAspect {
-    // Only handles logging
 }
 
 @Aspect
 @Component
 public class SecurityAspect {
-    // Only handles security
 }
 
-// BAD — Multiple responsibilities
 @Aspect
 @Component
 public class MultiPurposeAspect {
-    // Handles logging, security, and transactions
 }
 ```
 
 ### 2. Use Named Pointcuts
 
-```java
 // GOOD — Reusable and readable
 @Aspect
 @Component
@@ -614,11 +581,9 @@ public class LoggingAspect {
     @After("execution(* com.acme.service.*.*(..))")
     public void logAfter(JoinPoint jp) { ... }
 }
-```
 
 ### 3. Handle Exceptions Properly
 
-```java
 @Aspect
 @Component
 public class ErrorHandlingAspect {
@@ -636,11 +601,9 @@ public class ErrorHandlingAspect {
         }
     }
 }
-```
 
 ### 4. Avoid Circular Dependencies
 
-```java
 // BAD — Circular dependency
 @Aspect
 @Component
@@ -666,23 +629,19 @@ public class AspectA {
         this.serviceB = serviceB;
     }
 }
-```
 
 ### 5. Use Appropriate Proxy Type
 
-```java
 // For interfaces — JDK proxy is fine
 @EnableAspectJAutoProxy(proxyTargetClass = false)
 
 // For concrete classes — CGLIB required
 @EnableAspectJAutoProxy(proxyTargetClass = true)
-```
 
 ## Common Pitfalls
 
 ### 1. Self-Invocation
 
-```java
 @Service
 public class UserService {
     
@@ -697,11 +656,9 @@ public class UserService {
         // This won't be cached when called from methodA
     }
 }
-```
 
 **Solution:** Inject the proxy or use `AopContext.currentProxy()`:
 
-```java
 @Service
 public class UserService {
     
@@ -712,33 +669,26 @@ public class UserService {
         proxy.methodB(); // This will be intercepted
     }
 }
-```
 
 ### 2. Final Methods
 
-```java
 // CGLIB cannot proxy final methods
 public final void method() { ... }
 
 // This will fail at startup
-```
 
 ### 3. Private Methods
 
-```java
 // AOP cannot intercept private methods
 private void method() { ... }
 
 // execution(private * *(..)) doesn't work
-```
 
 ### 4. Package-private Methods
 
-```java
 // AOP can intercept package-private methods
 // But only if CGLIB proxy is used
 void method() { ... }
-```
 
 ## Summary
 

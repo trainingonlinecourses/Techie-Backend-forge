@@ -1,7 +1,7 @@
 ---
 title: Microservices & Spring Cloud — The Big Picture
 summary: Why teams split monoliths, the platform pieces Spring Cloud provides, and when microservices are the wrong call.
-order: 1
+order: 4
 minutes: 18
 topics: [microservices, spring-cloud, architecture, distributed-systems]
 docs:
@@ -105,3 +105,4 @@ Mismatched Boot/Cloud versions are the #1 cause of "Spring Cloud doesn't start" 
 - The demo project runs the whole stack locally.
 
 **Official docs:** [Spring Cloud reference](https://docs.spring.io/spring-cloud/reference/) · [12-factor](https://12factor.net)
+

@@ -1,7 +1,7 @@
 ---
 title: HTTP Client API — Modern HTTP in the JDK
 summary: What the new HttpClient replaces, building requests, synchronous vs asynchronous calls, WebSocket support, and how organizations use it for microservice communication.
-order: 1
+order: 2
 minutes: 30
 topics: [http-client, httprequest, httpresponse, async-http, websocket, java11]
 docs:
@@ -14,7 +14,6 @@ Before Java 11, making HTTP requests in Java was painful. `HttpURLConnection` wa
 
 Java 11 introduced `java.net.http.HttpClient` — a modern, fluent HTTP client built into the JDK:
 
-```java
 // OLD: HttpURLConnection — verbose, error-prone
 URL url = new URL("https://api.example.com/users");
 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -35,13 +34,11 @@ HttpRequest request = HttpRequest.newBuilder()
 HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 int status = response.statusCode();
 String body = response.body();
-```
 
 ---
 
 ## Building Requests
 
-```java
 // GET request
 HttpRequest get = HttpRequest.newBuilder()
     .uri(URI.create("https://api.example.com/users/123"))
@@ -74,40 +71,56 @@ HttpRequest delete = HttpRequest.newBuilder()
     .uri(URI.create("https://api.example.com/users/123"))
     .DELETE()
     .build();
-```
 
 ---
 
 ## Synchronous vs Asynchronous
 
-```java
-HttpClient client = HttpClient.newHttpClient();
+public class Main {
 
-// SYNCHRONOUS — blocks the current thread
-HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-System.out.println(response.statusCode());
-System.out.println(response.body());
+    public static void main(String[] args) {
+        HttpClient client = HttpClient.newHttpClient();
 
-// ASYNCHRONOUS — returns CompletableFuture, non-blocking
-client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
-    .thenApply(HttpResponse::body)
-    .thenAccept(System.out::println)
-    .join();  // blocks only at .join()
+        // SYNCHRONOUS — blocks the current thread
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        System.out.println(response.statusCode());
+        System.out.println(response.body());
 
-// ASYNCHRONOUS with chaining
-client.sendAsync(getUserRequest, HttpResponse.BodyHandlers.ofString())
-    .thenApply(response -> parseUser(response.body()))
-    .thenCompose(user -> client.sendAsync(
-        getOrdersRequest(user.id()), HttpResponse.BodyHandlers.ofString()
-    ))
-    .thenApply(response -> parseOrders(response.body()))
-    .thenAccept(orders -> processOrders(orders))
-    .join();
-```
+        // ASYNCHRONOUS — returns CompletableFuture, non-blocking
+        client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+            .thenApply(HttpResponse::body)
+            .thenAccept(System.out::println)
+            .join();  // blocks only at .join()
+
+        // ASYNCHRONOUS with chaining
+        client.sendAsync(getUserRequest, HttpResponse.BodyHandlers.ofString())
+            .thenApply(response -> parseUser(response.body()))
+            .thenCompose(user -> client.sendAsync(
+                getOrdersRequest(user.id()), HttpResponse.BodyHandlers.ofString()
+            ))
+            .thenApply(response -> parseOrders(response.body()))
+            .thenAccept(orders -> processOrders(orders))
+            .join();
+    }
+}
 
 ---
 
 ## Line-by-Line Walkthrough
+
+
+**What this code does — step by step:**
+
+1. Line 1: Create a reusable client with timeout and version
+2. `.connectTimeout(Duration.ofSeconds(10))` — connection timeout
+3. `.version(HttpClient.Version.HTTP_2)` — prefer HTTP/2
+4. `.followRedirects(HttpClient.Redirect.NORMAL)` — follow 3xx redirects
+5. Line 2: Synchronous GET
+6. `HttpResponse.BodyHandlers.ofString()` — handle body as String
+7. Line 3: Asynchronous POST with JSON
+8. Line 4: Chained async — fetch user, then their orders
+
+The same code, clean:
 
 ```java
 import java.net.URI;
@@ -115,14 +128,12 @@ import java.net.http.*;
 import java.time.Duration;
 
 public class HttpClientDemo {
-    // Line 1: Create a reusable client with timeout and version
     private final HttpClient client = HttpClient.newBuilder()
-        .connectTimeout(Duration.ofSeconds(10))      // connection timeout
-        .version(HttpClient.Version.HTTP_2)           // prefer HTTP/2
-        .followRedirects(HttpClient.Redirect.NORMAL)  // follow 3xx redirects
+        .connectTimeout(Duration.ofSeconds(10))
+        .version(HttpClient.Version.HTTP_2)
+        .followRedirects(HttpClient.Redirect.NORMAL)
         .build();
 
-    // Line 2: Synchronous GET
     public String fetchUser(String userId) throws Exception {
         HttpRequest request = HttpRequest.newBuilder()
             .uri(URI.create("https://api.example.com/users/" + userId))
@@ -133,7 +144,7 @@ public class HttpClientDemo {
 
         HttpResponse<String> response = client.send(
             request,
-            HttpResponse.BodyHandlers.ofString()     // handle body as String
+            HttpResponse.BodyHandlers.ofString()
         );
 
         if (response.statusCode() == 200) {
@@ -143,7 +154,6 @@ public class HttpClientDemo {
         }
     }
 
-    // Line 3: Asynchronous POST with JSON
     public CompletableFuture<User> createUser(CreateUserRequest req) {
         HttpRequest request = HttpRequest.newBuilder()
             .uri(URI.create("https://api.example.com/users"))
@@ -160,7 +170,6 @@ public class HttpClientDemo {
             });
     }
 
-    // Line 4: Chained async — fetch user, then their orders
     public CompletableFuture<List<Order>> fetchUserOrders(String userId) {
         return client.sendAsync(
                 HttpRequest.newBuilder()
@@ -185,7 +194,6 @@ public class HttpClientDemo {
 
 ### Scenario 1: Microservice-to-microservice communication
 
-```java
 @Service
 public class OrderServiceClient {
     private final HttpClient client;
@@ -212,11 +220,9 @@ public class OrderServiceClient {
         return Optional.empty();
     }
 }
-```
 
 ### Scenario 2: Webhook receiver with async processing
 
-```java
 public CompletableFuture<Void> processWebhook(String payload) {
     return client.sendAsync(
             HttpRequest.newBuilder()
@@ -231,7 +237,6 @@ public CompletableFuture<Void> processWebhook(String payload) {
             }
         });
 }
-```
 
 ---
 
@@ -244,3 +249,4 @@ public CompletableFuture<Void> processWebhook(String payload) {
 | Blocking async calls | `.get()` blocks; use `.join()` | Use `.join()` or `.whenComplete()` |
 | Not reusing clients | Creates new connections each time | Create one `HttpClient` and reuse it |
 | Ignoring HTTP status codes | Silent failures | Always check `response.statusCode()` |
+

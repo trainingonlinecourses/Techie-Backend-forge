@@ -1,7 +1,7 @@
 ---
 title: Bean Validation and Custom Constraints — Beyond @NotNull
 summary: @Valid vs @Validated, validation groups, custom constraint annotations with Validator implementation, nested object validation, and how organizations enforce data quality at the API boundary.
-order: 30
+order: 53
 minutes: 20
 topics: [bean-validation, custom-constraint, @valid, @validated, validation-groups, nested-validation, hibernate-validator]
 docs:
@@ -32,7 +32,6 @@ Use `@Valid` for simple cases. Use `@Validated` when you need **validation group
 
 Define a custom constraint with `@Constraint`:
 
-```java
 @Target({ElementType.FIELD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = ValidOrderStateValidator.class)
@@ -41,11 +40,9 @@ public @interface ValidOrderState {
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }
-```
 
 The validator checks the business rule:
 
-```java
 public class ValidOrderStateValidator implements ConstraintValidator<ValidOrderState, String> {
 
     private static final Set<String> VALID_STATES = Set.of(
@@ -58,21 +55,17 @@ public class ValidOrderStateValidator implements ConstraintValidator<ValidOrderS
         return VALID_STATES.contains(value.toUpperCase());
     }
 }
-```
 
-```java
 public record OrderRequest(
     @NotNull String customerId,
     @ValidOrderState String status,
     @Positive BigDecimal amount
 ) {}
-```
 
 ## Validation groups
 
 Different operations have different rules:
 
-```java
 public interface CreateGroup {}
 public interface UpdateGroup {}
 
@@ -86,9 +79,7 @@ public record UserRequest(
     @Size(min = 8, groups = CreateGroup.class)  // password required on create
     String password
 ) {}
-```
 
-```java
 @PostMapping
 public ResponseEntity<Void> create(@Validated(CreateGroup.class) @RequestBody UserRequest req) {
     // id, email, password all validated
@@ -99,13 +90,11 @@ public ResponseEntity<Void> update(@PathVariable String id,
                                    @Validated(UpdateGroup.class) @RequestBody UserRequest req) {
     // only email validated — id comes from path, password not required
 }
-```
 
 ## Nested validation
 
 `@Valid` cascades validation into nested objects:
 
-```java
 public record OrderRequest(
     @NotNull String customerId,
     @Valid @NotNull List<@Valid OrderLineItem> items,  // each item is validated
@@ -124,7 +113,6 @@ public record Address(
     @Pattern(regexp = "^[A-Z]{2}$") String state,  // two-letter state code
     @NotBlank String zipCode
 ) {}
-```
 
 When `OrderRequest` is validated, Spring validates `shippingAddress` and every item in `items` — recursively.
 
@@ -132,7 +120,6 @@ When `OrderRequest` is validated, Spring validates `shippingAddress` and every i
 
 ### Scenario 1: custom constraint for currency code
 
-```java
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = ValidCurrencyValidator.class)
@@ -154,11 +141,9 @@ public class ValidCurrencyValidator implements ConstraintValidator<ValidCurrency
         return CURRENCIES.contains(value.toUpperCase());
     }
 }
-```
 
 ### Scenario 2: cross-field validation with a class-level constraint
 
-```java
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = ValidPaymentRequestValidator.class)
@@ -187,11 +172,9 @@ public class ValidPaymentRequestValidator implements ConstraintValidator<ValidPa
         return true;
     }
 }
-```
 
 ### Scenario 3: validation error response contract
 
-```java
 @RestControllerAdvice
 public class ValidationExceptionHandler {
 
@@ -207,7 +190,6 @@ public class ValidationExceptionHandler {
     public record ValidationError(String message, List<FieldError> errors) {}
     public record FieldError(String field, String message) {}
 }
-```
 
 ```json
 {
@@ -240,3 +222,4 @@ public class ValidationExceptionHandler {
 | Returning raw `ConstraintViolationException` | Leaks internal field names to client |
 | Validating everything at the API layer only | Invalid data reaches the database |
 | Over-validating (too many annotations) | Hard to maintain, confusing error messages |
+

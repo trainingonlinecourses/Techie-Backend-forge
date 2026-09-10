@@ -1,7 +1,7 @@
 ---
 title: Starter Versioning — Dependency Management and BOMs
 summary: How to version your starter, dependency management with BOMs, avoiding version conflicts, and aligning with Spring Boot's version strategy.
-order: 5
+order: 4
 minutes: 15
 topics: [versioning, bom, dependency-management, version-conflict, spring-boot-bom]
 docs:
@@ -132,3 +132,4 @@ my-starter/
 | Mixing Spring Boot versions | Dependency conflicts | Align with one Spring Boot version |
 | Not following SemVer | Confusing upgrade path | Use MAJOR.MINOR.PATCH |
 | Hardcoding dependency versions | Version conflicts | Use properties + dependency management |
+

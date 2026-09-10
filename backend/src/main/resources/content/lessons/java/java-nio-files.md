@@ -1,7 +1,7 @@
 ---
 title: NIO.2: Files, Paths & Non-blocking I/O
 summary: The modern file and I/O API — Path, Files, streams of lines, memory-mapped and asynchronous channels, and when NIO beats classic java.io.
-order: 16
+order: 40
 minutes: 17
 topics: [nio, path, files, channels, async-io, memory-mapped]
 docs:
@@ -24,34 +24,43 @@ The rule of thumb: **`Files` + `Path` for everything file-system-shaped**, `java
 
 ## Path & the 10 Files methods you'll actually use
 
+
+**What this code does — step by step:**
+
+1. `Path data = Path.of("data", "academy", "report.csv");` — varargs, OS-correct separator
+2. `Path abs = data.toAbsolutePath().normalize();` — resolve "." and ".."
+3. `Files.readString(path);` — small files, whole file
+4. `Files.move(src, dst, AtomicMoveNotSupportedException.class);` — atomic where possible
+5. `Files.createDirectories(Path.of("a", "b", "c"));` — missing parents too
+6. `Files.walk(root)` — Stream<Path> of the tree
+
+The same code, clean:
+
 ```java
-Path data = Path.of("data", "academy", "report.csv");     // varargs, OS-correct separator
-Path abs = data.toAbsolutePath().normalize();              // resolve "." and ".."
+Path data = Path.of("data", "academy", "report.csv");
+Path abs = data.toAbsolutePath().normalize();
 
 Files.exists(path);
-Files.readString(path);                                    // small files, whole file
+Files.readString(path);
 Files.writeString(path, "hello", StandardOpenOption.APPEND);
 Files.readAllLines(path);
 Files.copy(src, dst, StandardCopyOption.REPLACE_EXISTING);
-Files.move(src, dst, AtomicMoveNotSupportedException.class); // atomic where possible
+Files.move(src, dst, AtomicMoveNotSupportedException.class);
 Files.deleteIfExists(path);
-Files.createDirectories(Path.of("a", "b", "c"));           // missing parents too
-Files.walk(root)                                           // Stream<Path> of the tree
+Files.createDirectories(Path.of("a", "b", "c"));
+Files.walk(root)
 ```
 
 ## Streaming a large file without loading it
 
-```java
 try (Stream<String> lines = Files.lines(Path.of("big.csv"))) {
     long count = lines.filter(l -> l.startsWith("ERROR")).count();
 } // try-with-resources closes the underlying reader — don't skip this!
-```
 
 `Files.lines` reads lazily — gigabytes can be scanned with constant memory.
 
 ## Channels & ByteBuffer (bulk/zero-copy I/O)
 
-```java
 // Copy with a channel — the OS does the heavy lifting (zero-copy transfer)
 try (FileChannel in = FileChannel.open(Path.of("in.bin"));
      FileChannel out = FileChannel.open(Path.of("out.bin"), WRITE, CREATE)) {
@@ -63,11 +72,9 @@ try (FileChannel ch = FileChannel.open(Path.of("db.bin"))) {
     MappedByteBuffer buf = ch.map(FileChannel.MapMode.READ_ONLY, 0, ch.size());
     byte b = buf.get(1000);
 }
-```
 
 ## Asynchronous file I/O
 
-```java
 AsynchronousFileChannel ch = AsynchronousFileChannel.open(
         Path.of("log.bin"), StandardOpenOption.READ);
 ByteBuffer buf = ByteBuffer.allocate(4096);
@@ -76,7 +83,6 @@ ch.read(buf, 0, null, new CompletionHandler<Integer, Void>() {
     public void failed(Throwable e, Void attach) { ... }
 });
 // Or the future style: Future<Integer> f = ch.read(buf, 0);
-```
 
 Use async channels when a **single thread** must juggle many I/O operations (high-concurrency gateways). For ordinary applications, blocking I/O on a bounded thread pool is simpler and often faster.
 
@@ -94,3 +100,4 @@ Use async channels when a **single thread** must juggle many I/O operations (hig
 - Reach for async/memory-mapped I/O only when profiling says blocking I/O is the bottleneck.
 
 Official docs: [java.nio.file package](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/nio/file/package-summary.html) · [File I/O tutorial](https://docs.oracle.com/javase/tutorial/essential/io/fileio.html)
+

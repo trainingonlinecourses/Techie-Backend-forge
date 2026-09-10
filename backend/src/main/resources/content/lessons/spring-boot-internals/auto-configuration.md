@@ -1,7 +1,7 @@
 ---
 title: Auto-Configuration — How Spring Boot Configures Itself
 module: spring-boot-internals
-order: 1
+order: 2
 minutes: 26
 topics: ["auto-configuration", "@ConditionalOnClass", "@EnableAutoConfiguration", "spring.factories", "starters"]
 summary: When you add springbootstarterweb and write a @RestController, Spring Boot magically sets up an embedded Tomcat, Jackson JSON, an error handler, a ...
@@ -28,11 +28,9 @@ It's a giant library of "if you have X, here's a sensible default configuration 
 
 Every auto-configuration is guarded by `@Conditional` annotations. The most important:
 
-```java
 @ConditionalOnClass(DataSource.class)          // only if the class is on the classpath
 @ConditionalOnMissingBean(DataSource.class)    // only if the USER hasn't defined one already
 class DataSourceAutoConfiguration { ... }
-```
 
 Two rules make it safe:
 
@@ -43,6 +41,16 @@ That second rule is why the magic never fights you: you can override anything by
 
 ## The Code Walkthrough
 
+
+**What this code does — step by step:**
+
+1. ---- A custom auto-configuration (what Boot itself looks like) ----
+2. `@ConditionalOnClass(name = "com.example.some.Library")` — only if the library is present
+3. `@ConditionalOnMissingBean` — back off if the user defined their own
+4. ---- Properties bound from application.properties ----. My.library.base-url=https://api.example.com. My.library.enabled=true
+
+The same code, clean:
+
 ```java
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -50,14 +58,13 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-// ---- A custom auto-configuration (what Boot itself looks like) ----
 
 @Configuration
-@ConditionalOnClass(name = "com.example.some.Library")     // only if the library is present
+@ConditionalOnClass(name = "com.example.some.Library")
 public class MyLibraryAutoConfiguration {
 
     @Bean
-    @ConditionalOnMissingBean        // back off if the user defined their own
+    @ConditionalOnMissingBean
     public MyLibraryClient myLibraryClient(MyLibraryProperties props) {
         return new MyLibraryClient(props.getBaseUrl());
     }
@@ -68,10 +75,6 @@ public class MyLibraryAutoConfiguration {
         return () -> client.isHealthy() ? Health.up().build() : Health.down().build();
     }
 }
-
-// ---- Properties bound from application.properties ----
-// my.library.base-url=https://api.example.com
-// my.library.enabled=true
 ```
 
 ### Walking Through Each Part
@@ -130,3 +133,4 @@ Starter + auto-config = "add one dependency, get a working subsystem." `spring-b
 - Your explicit beans and properties always override auto-configuration.
 - Starters bundle dependencies; auto-configuration reacts to them.
 - The conditions evaluation report (`--debug`) explains every "matched"/"not matched" decision — use it when behavior surprises you.
+

@@ -1,7 +1,7 @@
 ---
 title: Distributed Transactions and the Outbox
 module: spring-transactions-deep
-order: 4
+order: 1
 minutes: 28
 topics: ["2PC", "XA", "saga", "outbox pattern", "eventual consistency", "transactional outbox"]
 summary: A transaction spanning two databases, or a database plus a message broker, cannot use a single ACID transaction. This lesson covers why 2PC/XA most...
@@ -16,7 +16,6 @@ A transaction spanning two databases, or a database plus a message broker, canno
 
 ## The Problem: Two Systems, One Operation
 
-```java
 // This CANNOT be one ACID transaction:
 @Transactional
 public void placeOrder(OrderDto dto) {
@@ -24,7 +23,6 @@ public void placeOrder(OrderDto dto) {
     paymentService.charge(dto.amount());     // HTTP call to payments service
     kafkaTemplate.send("orders", event);     // message broker
 }
-```
 
 Three systems, one logical operation. If the Kafka send fails after the DB commit, you have an order with no event — and no way to roll back the committed row.
 
@@ -68,7 +66,6 @@ The insight: **the DB write and the "message" live in the SAME local transaction
    Kafka / RabbitMQ / HTTP (at-least-once)
 ```
 
-```java
 @Entity
 public class OutboxEvent {
     @Id private UUID id;
@@ -79,9 +76,7 @@ public class OutboxEvent {
     private Instant createdAt;
     private Instant publishedAt;      // null = pending
 }
-```
 
-```java
 @Transactional
 public void placeOrder(OrderDto dto) {
     Order order = orderRepository.save(toEntity(dto));
@@ -89,13 +84,11 @@ public void placeOrder(OrderDto dto) {
         "ORDER_PLACED", json(eventFrom(order))));
     // COMMIT: order + outbox row are atomic
 }
-```
 
 **The guarantee**: either the order AND the event both exist, or neither does. No half-states.
 
 ## The Outbox Relay
 
-```java
 @Component
 public class OutboxRelay {
 
@@ -119,7 +112,6 @@ public class OutboxRelay {
         }
     }
 }
-```
 
 **The ordering trap**: the relay itself has a mini distributed transaction (DB claim + broker send). The robust pattern is **claim → send → mark-published** with retry and idempotency:
 
@@ -155,7 +147,6 @@ Inventory Service: reserve (commit)       → on failure: REFUND (compensate)
 Shipment Service: ship (commit)           → on failure: UNRESERVE + REFUND
 ```
 
-```java
 // Choreography: each service reacts to events and emits the next
 @Component
 public class OrderSaga {
@@ -170,7 +161,6 @@ public class OrderSaga {
         orderService.cancel(e.orderId());       // compensation
     }
 }
-```
 
 **Key principle**: every step commits independently; failures trigger **compensating actions** (refund, cancel, unreserve) — not rollback.
 
@@ -185,7 +175,6 @@ public class OrderSaga {
 
 ## The Outbox vs. Direct Send
 
-```java
 // ❌ Direct send: event lost if the broker is down after commit
 @Transactional
 public void placeOrder(OrderDto dto) {
@@ -199,11 +188,9 @@ public void placeOrder(OrderDto dto) {
     orderRepository.save(toEntity(dto));
     outboxRepository.save(OutboxEvent.of(...));   // atomic with the order
 }
-```
 
 ## Testing the Outbox
 
-```java
 @SpringBootTest
 @Testcontainers
 class OutboxTest {
@@ -228,7 +215,6 @@ class OutboxTest {
         assertEquals(0, outboxRepository.countByPublishedAtIsNull());  // drained
     }
 }
-```
 
 ## Summary
 
@@ -241,3 +227,4 @@ class OutboxTest {
 | Legacy | 2PC/XA — avoid for new systems |
 
 Distributed transactions aren't about making the impossible possible — they're about **making partial failure safe**: the outbox makes the DB+broker boundary atomic, sagas make multi-service failures recoverable, and idempotency makes retries harmless. Every pattern trades global atomicity for reliability + eventual consistency, which is the right trade in distributed systems.
+

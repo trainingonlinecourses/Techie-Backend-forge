@@ -1,7 +1,7 @@
 ---
 title: Stream Gatherers — Custom Intermediate Operations
 summary: The Gatherer API (JEP 461) lets you create custom intermediate stream operations, replacing complex flatMap chains and enabling streaming pagination, windowing, and stateful transformations.
-order: 4
+order: 2
 minutes: 22
 topics: [stream-gatherers, gatherer, intermediate-operations, custom-streams]
 docs:
@@ -18,27 +18,39 @@ Think of it this way: `map` transforms one element to one element, `flatMap` tra
 
 ## The Code
 
+
+**What this code does — step by step:**
+
+1. Custom Gatherer: window elements into groups of N
+2. Initial state: an ArrayList buffer
+3. Integrator: add element to buffer, emit when full
+4. `return true;` — keep processing
+5. Finisher: emit remaining elements if buffer isn't empty
+6. Custom Gatherer: sliding window average
+7. Window: group numbers into pairs
+8. Output: [1, 2, 3] [4, 5, 6] [7]
+9. Sliding average of stock prices
+10. Output: 102.33 105.00 106.67 108.33
+
+The same code, clean:
+
 ```java
 import java.util.stream.Gatherer;
 import java.util.stream.Stream;
 
 public class GathererDemo {
 
-    // Custom Gatherer: window elements into groups of N
     public static <T> Gatherer<T, ?, Stream<T>> window(int size) {
         return Gatherer.of(
-            // Initial state: an ArrayList buffer
             () -> new ArrayList<T>(),
-            // Integrator: add element to buffer, emit when full
             (buffer, element, downstream) -> {
                 buffer.add(element);
                 if (buffer.size() == size) {
                     downstream.push(List.copyOf(buffer));
                     buffer.clear();
                 }
-                return true; // keep processing
+                return true;
             },
-            // Finisher: emit remaining elements if buffer isn't empty
             (buffer, downstream) -> {
                 if (!buffer.isEmpty()) {
                     downstream.push(List.copyOf(buffer));
@@ -47,7 +59,6 @@ public class GathererDemo {
         );
     }
 
-    // Custom Gatherer: sliding window average
     public static Gatherer<Double, ?, Double> slidingAverage(int windowSize) {
         return Gatherer.of(
             () -> new ArrayDeque<Double>(),
@@ -67,17 +78,13 @@ public class GathererDemo {
     }
 
     public static void main(String[] args) {
-        // Window: group numbers into pairs
         Stream.of(1, 2, 3, 4, 5, 6, 7)
             .gather(window(3))
             .forEach(System.out::println);
-        // Output: [1, 2, 3] [4, 5, 6] [7]
 
-        // Sliding average of stock prices
         Stream.of(100.0, 105.0, 102.0, 108.0, 110.0, 107.0)
             .gather(slidingAverage(3))
             .forEach(avg -> System.out.printf("%.2f%n", avg));
-        // Output: 102.33 105.00 106.67 108.33
     }
 }
 ```
@@ -99,24 +106,19 @@ public class GathererDemo {
 ## Real-World Scenarios
 
 **Scenario 1: Paginated API processing**
-```java
 // Process 100 users at a time for bulk email
 users.stream()
     .gather(window(100))
     .forEach(batch -> emailService.sendBatch(batch));
-```
 
 **Scenario 2: Real-time sensor averaging**
-```java
 // Average temperature readings over 5-minute windows
 sensorReadings.stream()
     .gather(window(300))  // 5 per second × 300 = 5 min
     .map(GathererDemo::averageTemperature)
     .forEach(alertService::checkThreshold);
-```
 
 **Scenario 3: Deduplication with state**
-```java
 // Deduplicate while preserving order
 Stream.of("a", "b", "a", "c", "b", "d")
     .gather(Gatherer.of(
@@ -128,7 +130,6 @@ Stream.of("a", "b", "a", "c", "b", "d")
     ))
     .forEach(System.out::println);
 // Output: a b c d
-```
 
 ## Key Takeaways
 
@@ -137,3 +138,4 @@ Stream.of("a", "b", "a", "c", "b", "d")
 3. **State is per-pipeline** — each stream gets its own state instance
 4. **Return false from integrator** to short-circuit (like takeWhile)
 5. **Works with parallel streams** when the state is thread-safe
+

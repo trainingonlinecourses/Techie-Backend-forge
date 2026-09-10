@@ -1,7 +1,7 @@
 ---
 title: Spring Boot 3 & Java 21 — The Modern Stack
 summary: Virtual threads, records and pattern matching with Spring, Docker Compose support, Problem Details, and the modernization checklist orgs follow.
-order: 23
+order: 14
 minutes: 18
 topics: [spring-boot-3, java-21, virtual-threads, records, docker-compose, problem-details, modernization]
 docs:
@@ -19,13 +19,11 @@ Spring Boot 3.x (jakarta namespace, Java 17+) and Java 21 (the current LTS) toge
 
 Java 21's **virtual threads** are lightweight threads that let a service handle **thousands of concurrent blocking I/O operations** with a handful of platform threads:
 
-```java
 // Classic: one platform thread per request — a thread pool limits concurrency
 // With virtual threads: thread-per-request WITHOUT the pool ceiling
 
 // Spring Boot 3.2+ — one property enables virtual threads for MVC:
 spring.threads.virtual.enabled=true
-```
 
 **Why it matters:** a blocking call (DB, HTTP client) no longer consumes a scarce platform thread. Under I/O-bound load, virtual-thread apps sustain far higher concurrency than a fixed pool. The trade-offs to know:
 
@@ -37,7 +35,6 @@ spring.threads.virtual.enabled=true
 
 Java 21 + Spring Boot 3 make **records the default DTO/domain-value type**:
 
-```java
 @RestController
 public class OrderController {
     @PostMapping("/api/orders")
@@ -50,18 +47,15 @@ public class OrderController {
 public record CreateOrderRequest(@NotBlank String customerId,
                                  @NotNull @Min(1) BigDecimal amount,
                                  String note) { }
-```
 
 And **pattern matching** cleans up instanceof chains (e.g., in exception handlers and event listeners):
 
-```java
 if (obj instanceof Order order && order.status().equals("PAID")) { ... }
 // switch expressions over sealed types give exhaustive, checked dispatch:
 return switch (event) {
     case PaymentEvent p -> handlePayment(p);
     case RefundEvent r -> handleRefund(r);
 };
-```
 
 Spring's own code accepts records naturally: `@ConfigurationProperties` with constructor binding, repository projections, event payloads.
 
@@ -120,3 +114,4 @@ Developers get a one-command reproducible stack (`docker compose up` or just run
 - Records + constructor binding replace DTO boilerplate; sealed types + switch give exhaustive dispatch.
 - Docker Compose integration gives reproducible dev/CI stacks.
 - Modernize incrementally: migrate namespace/properties first, then adopt features per service.
+

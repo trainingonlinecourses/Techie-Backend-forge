@@ -1,7 +1,7 @@
 ---
 title: GraphQL Errors — Field-Scoped Failure
 module: graphql-deep
-order: 4
+order: 2
 minutes: 24
 topics: ["GraphQL errors", "error extensions", "partial results", "error classification", "exception handling"]
 summary: REST errors are wholeresponse: a 500 or 400 kills everything. GraphQL errors are fieldscoped: one field can fail while its siblings succeed, and th...
@@ -45,8 +45,18 @@ The contract: `data` contains what resolved; `errors` explains what didn't, each
 
 ## The Code Walkthrough
 
+
+**What this code does — step by step:**
+
+1. ---- 1. Throw typed exceptions; let the framework map them ----
+2. A domain exception with a code
+3. ---- 2. A global handler: domain exceptions -> structured GraphQL errors ----
+4. Unknown: generic message — never leak internals
+5. ---- 3. The resolver throws the domain exception ----
+
+The same code, clean:
+
 ```java
-// ---- 1. Throw typed exceptions; let the framework map them ----
 import graphql.GraphQLError;
 import graphql.GraphqlErrorBuilder;
 import graphql.execution.DataFetcherExceptionHandler;
@@ -54,12 +64,10 @@ import graphql.execution.DataFetcherExceptionHandlerResult;
 import graphql.execution.DataFetcherExceptionHandlerParameters;
 import org.springframework.stereotype.Component;
 
-// A domain exception with a code
 class CourseNotFoundException extends RuntimeException {
     CourseNotFoundException(Long id) { super("Course " + id + " not found"); }
 }
 
-// ---- 2. A global handler: domain exceptions -> structured GraphQL errors ----
 @Component
 public class GraphQlExceptionHandler implements DataFetcherExceptionHandler {
 
@@ -85,7 +93,6 @@ public class GraphQlExceptionHandler implements DataFetcherExceptionHandler {
                     .extensions(java.util.Map.of("code", "VALIDATION_ERROR"))
                     .build();
         } else {
-            // Unknown: generic message — never leak internals
             error = GraphqlErrorBuilder.newError()
                     .message("Internal server error")
                     .path(params.getPath())
@@ -97,7 +104,6 @@ public class GraphQlExceptionHandler implements DataFetcherExceptionHandler {
     }
 }
 
-// ---- 3. The resolver throws the domain exception ----
 @QueryMapping
 public Course course(@Argument Long id) {
     return service.get(id).orElseThrow(() -> new CourseNotFoundException(id));
@@ -142,7 +148,6 @@ Codes are additive and versioned like the schema: adding codes is safe; renaming
 
 GraphQL validates input *before* resolvers run (the schema's types). For deeper validation (business rules), throw with structured details:
 
-```java
 class InvalidInputException extends RuntimeException {
     private final Map<String, String> fieldErrors;
     InvalidInputException(Map<String, String> fieldErrors) {
@@ -160,7 +165,6 @@ error = GraphqlErrorBuilder.newError()
                 "code", "VALIDATION_ERROR",
                 "fieldErrors", ((InvalidInputException) ex).fieldErrors()))
         .build();
-```
 
 Clients map `fieldErrors` onto form fields — the GraphQL equivalent of REST's `400` + field messages.
 
@@ -190,3 +194,4 @@ Clients map `fieldErrors` onto form fields — the GraphQL equivalent of REST's 
 - Validation details ride in `extensions.fieldErrors` for form-level display.
 - Never leak internals; log them instead.
 - Partial success is the design — not a bug to paper over.
+

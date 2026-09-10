@@ -13,7 +13,6 @@ docs:
 
 ## The architecture test (recap, the non-negotiable)
 
-```java
 @SpringBootTest
 class ModulithArchitectureTests {
     @Test
@@ -21,7 +20,6 @@ class ModulithArchitectureTests {
         ApplicationModules.of(Application.class).verify();
     }
 }
-```
 
 This test is the contract that keeps the module map honest — dependency rules, API-only access, no cycles. **It must run in CI**, and it must be allowed to fail the build: its entire value is that an illegal dependency is a *build failure*, not a code-review comment.
 
@@ -29,7 +27,6 @@ This test is the contract that keeps the module map honest — dependency rules,
 
 Spring Modulith's slice-test style for modules — boots the context for a single module (and its dependencies), with the rest mocked:
 
-```java
 @ApplicationModuleTest
 class BillingModuleTests {
 
@@ -43,13 +40,11 @@ class BillingModuleTests {
                 assertThat(publications).hasSize(1));
     }
 }
-```
 
 **`Scenario`** is the killer feature: a DSL for cross-module event flows. `stimulate(...)` performs an action, `andWaitForEventOfType(...).toArrive()` awaits the resulting application event, and `andVerify(...)` inspects the event + publication state. It's the in-process replacement for "start Kafka, publish, consume, assert".
 
 ## The scenario DSL in practice
 
-```java
 @ApplicationModuleTest
 class BillingFulfillmentIntegration {
 
@@ -71,7 +66,6 @@ class BillingFulfillmentIntegration {
                 assertThat(pubs).allMatch(p -> !p.isCompleted()));
     }
 }
-```
 
 This is the reliability contract as a test: **"a failed listener must leave evidence, not silence."** The same scenario DSL doubles as the documentation of each module's public behavior.
 
@@ -79,13 +73,11 @@ This is the reliability contract as a test: **"a failed listener must leave evid
 
 Modulith reads the module map and renders it — no diagramming tool:
 
-```java
 // A test (or CI job) that emits the docs:
 ApplicationModules.of(Application.class).forEach(System.out::println);
 
 // Or the Maven plugin:
 mvn -Pmodulith modulith:documentation
-```
 
 Output: **C4-style PlantUML component diagrams** (modules + allowed dependencies + events between them) and an HTML module reference — the architecture document that can't go stale, because it's generated from the code and verified by the test. The module map you show stakeholders *is* the code.
 
@@ -109,3 +101,4 @@ The loop that makes it stick: **write the module → test it in isolation → ve
 - Documentation is generated (C4/PlantUML) from the verified module map — architecture docs that can't drift.
 
 Official docs: [Spring Modulith — Testing](https://docs.spring.io/spring-modulith/reference/testing.html) · [Documentation](https://docs.spring.io/spring-modulith/reference/documentation.html)
+

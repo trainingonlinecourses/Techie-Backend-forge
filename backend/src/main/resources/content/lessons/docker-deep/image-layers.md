@@ -1,7 +1,7 @@
 ---
 title: Image Layers — How Docker Stores and Shares
 module: docker-deep
-order: 2
+order: 4
 minutes: 23
 topics: ["layers", "union filesystem", "image sharing", "copy-on-write", "image size"]
 summary: Every Dockerfile instruction that adds data (RUN, COPY, ENV) creates a layer — an immutable filesystem delta. The final image is a stack of layers,...
@@ -107,3 +107,4 @@ RUN mvn package
 - `docker history` shows the size budget; slim bases and multi-stage shrink it.
 - Containers start fast because they don't copy the image.
 - Rebuild from the recipe; never `docker commit` ad-hoc state.
+

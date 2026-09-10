@@ -1,7 +1,7 @@
 ---
 title: Locks, Atomicity and Visibility
 module: java-concurrency-deep
-order: 2
+order: 5
 minutes: 30
 topics: ["synchronized", "ReentrantLock", "atomic classes", "volatile", "visibility", "deadlock", "happens-before"]
 summary: Concurrency bugs are invisible: no compile error, no crash — just wrong results under load. This lesson covers the three pillars — atomicity (indiv...
@@ -22,7 +22,6 @@ Concurrency bugs are invisible: no compile error, no crash — just wrong result
 
 ## volatile: Visibility Only
 
-```java
 // volatile = visibility guarantee: reads always see the latest write
 private volatile boolean running = true;
 
@@ -31,11 +30,9 @@ public void stop() { running = false; }   // another thread's while loop sees th
 public void run() {
     while (running) { work(); }            // won't spin forever
 }
-```
 
 `volatile` guarantees visibility and ordering, but **not atomicity**:
 
-```java
 // ❌ NOT atomic — two threads can both read 5 and write 6
 private volatile int counter;
 counter++;     // read, add, write — three steps, racy
@@ -43,13 +40,11 @@ counter++;     // read, add, write — three steps, racy
 // ✅ atomic
 private final AtomicInteger counter = new AtomicInteger();
 counter.incrementAndGet();
-```
 
 **Rule**: `volatile` for flags and published immutable references; `Atomic*` for counters and single-value updates.
 
 ## synchronized: Mutual Exclusion
 
-```java
 public class Counter {
     private int count;
 
@@ -61,7 +56,6 @@ public class Counter {
         return count;
     }
 }
-```
 
 - Every object has an intrinsic lock (`monitor`).
 - `synchronized` on a method = lock the `this` object for the call.
@@ -70,7 +64,6 @@ public class Counter {
 
 ### The Static Method Lock
 
-```java
 public class Registry {
     private static final Map<String, Entry> entries = new HashMap<>();
 
@@ -78,11 +71,9 @@ public class Registry {
         entries.put(key, e);    // locks the Class object, not an instance
     }
 }
-```
 
 ## The synchronized Block
 
-```java
 // Lock a smaller critical section — less contention
 public void transfer(Account from, Account to, BigDecimal amount) {
     synchronized (from) {
@@ -92,22 +83,18 @@ public void transfer(Account from, Account to, BigDecimal amount) {
         }
     }
 }
-```
 
 This is where **deadlock** is born: two threads transferring in opposite directions each hold one account and wait for the other. The fix — always lock in a **global order**:
 
-```java
 // Lock by id order — no cycle possible
 Account first = from.id() < to.id() ? from : to;
 Account second = from.id() < to.id() ? to : from;
 synchronized (first) {
     synchronized (second) { ... }
 }
-```
 
 ## ReentrantLock: The Explicit Lock
 
-```java
 private final ReentrantLock lock = new ReentrantLock();
 
 public void process() {
@@ -118,7 +105,6 @@ public void process() {
         lock.unlock();              // ALWAYS in finally
     }
 }
-```
 
 ReentrantLock's advantages over synchronized:
 
@@ -130,7 +116,6 @@ ReentrantLock's advantages over synchronized:
 | Fairness | ❌ (mostly) | `new ReentrantLock(true)` |
 | Multiple conditions | ❌ | `newCondition()` |
 
-```java
 // The production pattern: non-blocking with timeout
 if (lock.tryLock(5, TimeUnit.SECONDS)) {
     try {
@@ -141,25 +126,33 @@ if (lock.tryLock(5, TimeUnit.SECONDS)) {
 } else {
     log.warn("Lock not acquired in 5s — proceeding with stale state");
 }
-```
 
 ## The Atomic Classes
 
+
+**What this code does — step by step:**
+
+1. `counter.incrementAndGet();` — +1, returns new value
+2. `counter.getAndIncrement();` — +1, returns old value
+3. `counter.compareAndSet(expected, update);` — CAS — the primitive of all atomics
+4. `counter.updateAndGet(x -> Math.max(x, 10));` — functional update
+5. Specialized:
+
+The same code, clean:
+
 ```java
 AtomicInteger counter = new AtomicInteger();
-counter.incrementAndGet();                  // +1, returns new value
-counter.getAndIncrement();                  // +1, returns old value
-counter.compareAndSet(expected, update);    // CAS — the primitive of all atomics
-counter.updateAndGet(x -> Math.max(x, 10)); // functional update
+counter.incrementAndGet();
+counter.getAndIncrement();
+counter.compareAndSet(expected, update);
+counter.updateAndGet(x -> Math.max(x, 10));
 
-// Specialized:
 AtomicLong, AtomicBoolean, AtomicReference<T>
 AtomicLongArray, LongAdder, LongAccumulator
 ```
 
 ### CAS: Compare-And-Set
 
-```java
 // What incrementAndGet does under the hood:
 public int incrementAndGet() {
     for (;;) {
@@ -168,13 +161,11 @@ public int incrementAndGet() {
         if (compareAndSet(current, next)) return next;   // retry on contention
     }
 }
-```
 
 CAS is a hardware primitive (LOCK CMPXCHG) — **lock-free**: no blocking, no deadlock, no context switch. Contended CAS retries, which is why `LongAdder` exists for high contention.
 
 ## AtomicReference: Lock-Free State
 
-```java
 public class LeaderElection {
     private final AtomicReference<String> leader = new AtomicReference<>();
 
@@ -182,7 +173,6 @@ public class LeaderElection {
         return leader.compareAndSet(null, nodeId);   // exactly one wins
     }
 }
-```
 
 ## The Happens-Before Rules
 
@@ -208,7 +198,6 @@ Every synchronization mechanism above is really a happens-before edge — this i
 
 ## Testing Concurrency
 
-```java
 @Test
 void counterIsCorrectUnderContention() throws Exception {
     Counter counter = new Counter();
@@ -222,7 +211,6 @@ void counterIsCorrectUnderContention() throws Exception {
 
     assertEquals(10_000, counter.get());   // would fail with plain int
 }
-```
 
 ## Summary
 
@@ -235,3 +223,4 @@ void counterIsCorrectUnderContention() throws Exception {
 | `LongAdder` | High-contention counters | Metrics, stats |
 
 Atomicity, visibility, and ordering are the entire game. Pick the *smallest* tool that gives the guarantee you need — volatile for flags, atomics for counters, synchronized/locks for compound operations — and remember every tool is really a happens-before edge. The next lessons extend this to CompletableFuture composition and virtual threads.
+

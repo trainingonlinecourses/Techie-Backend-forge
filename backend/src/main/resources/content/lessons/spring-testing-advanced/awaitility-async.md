@@ -1,7 +1,7 @@
 ---
 title: Awaitility — Testing Asynchronous Code
 summary: Why Thread.sleep is wrong, how Awaitility polls conditions, and the patterns for testing async operations, message queues, and event-driven systems. Beginner-friendly with line-by-line code.
-order: 7
+order: 1
 minutes: 18
 topics: [Awaitility, async testing, polling, condition, eventual consistency, Thread.sleep, asynchronous assertions]
 docs:
@@ -15,13 +15,11 @@ docs:
 
 When testing async operations (message listeners, scheduled tasks, event processing), you need to wait for the result. The naive approach:
 
-```java
 // ❌ THE WRONG WAY:
 orderService.processPayment(orderId);
 Thread.sleep(5000);                                    // Wait 5 seconds
 Order order = orderRepository.findById(orderId).orElseThrow();
 assertThat(order.getStatus()).isEqualTo(OrderStatus.PAID);   // Check result
-```
 
 **Problems with Thread.sleep:**
 1. **Too short**: If the operation takes 6 seconds, the test fails (flaky!)
@@ -36,22 +34,30 @@ assertThat(order.getStatus()).isEqualTo(OrderStatus.PAID);   // Check result
 
 ### Basic Awaitility Pattern
 
+
+**What this code does — step by step:**
+
+1. Arrange
+2. Act
+3. Assert: poll until the condition is true (max 10 seconds)
+4. `.atMost(Duration.ofSeconds(10))` — Give up after 10 seconds
+5. `.until(() -> {` — Poll this condition
+
+The same code, clean:
+
 ```java
 import org.awaitility.Awaitility;
 import java.time.Duration;
 
 @Test
 void shouldProcessPayment() {
-    // Arrange
     String orderId = orderService.createOrder(List.of(item1));
 
-    // Act
     orderService.processPayment(orderId);
 
-    // Assert: poll until the condition is true (max 10 seconds)
     Awaitility.await()
-        .atMost(Duration.ofSeconds(10))         // Give up after 10 seconds
-        .until(() -> {                          // Poll this condition
+        .atMost(Duration.ofSeconds(10))
+        .until(() -> {
             Order order = orderRepository.findById(orderId).orElseThrow();
             return order.getStatus() == OrderStatus.PAID;
         });
@@ -66,14 +72,25 @@ void shouldProcessPayment() {
 
 ### Polling Configuration
 
+
+**What this code does — step by step:**
+
+1. `.atMost(Duration.ofSeconds(30))` — Max wait: 30 seconds
+2. `.pollInterval(Duration.ofSeconds(2))` — Check every 2 seconds (instead of default 100ms)
+3. `.pollDelay(Duration.ofSeconds(1))` — Wait 1 second before first check
+4. `.untilAsserted(() -> {` — Run assertions inside the polling loop
+5. `assertThat(orders).isEmpty();` — No orders should be processing
+
+The same code, clean:
+
 ```java
 Awaitility.await()
-    .atMost(Duration.ofSeconds(30))             // Max wait: 30 seconds
-    .pollInterval(Duration.ofSeconds(2))         // Check every 2 seconds (instead of default 100ms)
-    .pollDelay(Duration.ofSeconds(1))            // Wait 1 second before first check
-    .untilAsserted(() -> {                       // Run assertions inside the polling loop
+    .atMost(Duration.ofSeconds(30))
+    .pollInterval(Duration.ofSeconds(2))
+    .pollDelay(Duration.ofSeconds(1))
+    .untilAsserted(() -> {
         List<Order> orders = orderRepository.findByStatus(OrderStatus.PROCESSING);
-        assertThat(orders).isEmpty();            // No orders should be processing
+        assertThat(orders).isEmpty();
     });
 ```
 
@@ -84,7 +101,6 @@ Awaitility.await()
 
 ### Testing Message Queue Consumers
 
-```java
 @Test
 void shouldProcessOrderEvent() {
     // Send a message to the queue
@@ -100,26 +116,35 @@ void shouldProcessOrderEvent() {
                    order.get().getConfirmationEmailSent();
         });
 }
-```
 
 ### Testing Scheduled Tasks
+
+
+**What this code does — step by step:**
+
+1. Create old orders that should be cleaned up
+2. `orderRepository.save(createOldOrder(90));` — 90 days old
+3. `orderRepository.save(createOldOrder(30));` — 30 days old (should NOT be cleaned)
+4. Trigger the scheduled task
+5. Verify old orders are deleted
+6. `assertThat(orderRepository.findById("old-90")).isEmpty();` — Deleted
+7. `assertThat(orderRepository.findById("old-30")).isPresent();` — Still exists
+
+The same code, clean:
 
 ```java
 @Test
 void shouldRunDailyCleanup() {
-    // Create old orders that should be cleaned up
-    orderRepository.save(createOldOrder(90));    // 90 days old
-    orderRepository.save(createOldOrder(30));    // 30 days old (should NOT be cleaned)
+    orderRepository.save(createOldOrder(90));
+    orderRepository.save(createOldOrder(30));
 
-    // Trigger the scheduled task
     cleanupTask.runDailyCleanup();
 
-    // Verify old orders are deleted
     Awaitility.await()
         .atMost(Duration.ofSeconds(5))
         .untilAsserted(() -> {
-            assertThat(orderRepository.findById("old-90")).isEmpty();     // Deleted
-            assertThat(orderRepository.findById("old-30")).isPresent();  // Still exists
+            assertThat(orderRepository.findById("old-90")).isEmpty();
+            assertThat(orderRepository.findById("old-30")).isPresent();
         });
 }
 ```
@@ -130,7 +155,6 @@ void shouldRunDailyCleanup() {
 
 ### Scenario 1: Event-Driven Architecture
 
-```java
 @Test
 void shouldPropagateEventAcrossServices() {
     // User places an order
@@ -148,11 +172,9 @@ void shouldPropagateEventAcrossServices() {
                 && order.isConfirmationSent();
         });
 }
-```
 
 ### Scenario 2: Cache Invalidation
 
-```java
 @Test
 void shouldInvalidateCacheAfterUpdate() {
     // Cache has old data
@@ -170,11 +192,9 @@ void shouldInvalidateCacheAfterUpdate() {
             return "New Name".equals(fresh.getName());
         });
 }
-```
 
 ### Scenario 3: Database Replication Lag
 
-```java
 @Test
 void shouldReadFromReplicaAfterWrite() {
     // Write to primary
@@ -185,7 +205,6 @@ void shouldReadFromReplicaAfterWrite() {
         .atMost(Duration.ofSeconds(5))
         .until(() -> userRepository.findByUsernameFromReplica("user-1").isPresent());
 }
-```
 
 ---
 
@@ -210,3 +229,4 @@ void shouldReadFromReplicaAfterWrite() {
 - **Always set `atMost()`** — prevent tests from hanging forever.
 
 Official docs: [Awaitility](https://www.awaitility.org/) · [Documentation](https://www.awaitility.org/documentation.html)
+

@@ -1,7 +1,7 @@
 ---
 title: HTTP Caching — Serving Old Responses When They're Still True
 module: http-basics
-order: 5
+order: 1
 minutes: 24
 topics: ["Cache-Control", "ETag", "conditional requests", "expiration", "revalidation"]
 summary: Most HTTP responses don't change every second. The curriculum, a course's metadata, a logo — fetching them from the server on every page view waste...
@@ -68,6 +68,19 @@ The `304` response is the genius: the server says "still valid" with a few hundr
 
 ## The Code Walkthrough — Caching in Spring
 
+
+**What this code does — step by step:**
+
+1. `private String etagCache = "v1";` — in reality: derived from content hash
+2. ---- 1. Expiration-based caching for stable content ----
+3. `.cachePublic())` — CDN-cacheable: public data
+4. ---- 2. ETag-based revalidation for per-user-ish data ----
+5. `String etag = "\"" + user.version() + "\"";` — e.g., a content hash
+6. `return ResponseEntity.status(304).build();` — "unchanged — keep your copy"
+7. `.eTag(etag)` — sets the ETag header
+
+The same code, clean:
+
 ```java
 import org.springframework.http.CacheControl;
 import org.springframework.http.ResponseEntity;
@@ -80,31 +93,29 @@ import java.time.Duration;
 public class ContentController {
 
     private final ContentService content;
-    private String etagCache = "v1";          // in reality: derived from content hash
+    private String etagCache = "v1";
 
     public ContentController(ContentService content) { this.content = content; }
 
-    // ---- 1. Expiration-based caching for stable content ----
     @GetMapping(value = "/curriculum", produces = "application/json")
     public ResponseEntity<Curriculum> curriculum() {
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.maxAge(Duration.ofMinutes(5))
-                        .cachePublic())              // CDN-cacheable: public data
+                        .cachePublic())
                 .body(content.curriculum());
     }
 
-    // ---- 2. ETag-based revalidation for per-user-ish data ----
     @GetMapping("/me")
     public ResponseEntity<UserDto> me(@RequestHeader(value = "If-None-Match",
                                                     required = false) String ifNoneMatch) {
         UserDto user = userService.current();
-        String etag = "\"" + user.version() + "\"";      // e.g., a content hash
+        String etag = "\"" + user.version() + "\"";
 
         if (etag.equals(ifNoneMatch)) {
-            return ResponseEntity.status(304).build();   // "unchanged — keep your copy"
+            return ResponseEntity.status(304).build();
         }
         return ResponseEntity.ok()
-                .eTag(etag)                              // sets the ETag header
+                .eTag(etag)
                 .body(user);
     }
 }
@@ -148,3 +159,4 @@ public class ContentController {
 - Never cache auth/personal data (`no-store`).
 - Fingerprint static assets so long caches are safe.
 - The web is a cache — declare the policy, or the infrastructure will guess.
+

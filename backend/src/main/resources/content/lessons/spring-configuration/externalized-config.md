@@ -1,7 +1,7 @@
 ---
 title: Externalized Configuration — One App, Many Environments
 module: spring-configuration
-order: 1
+order: 2
 minutes: 25
 topics: ["externalized config", "property sources", "precedence", "env vars", "command line"]
 summary: A deployed application is a generic machine: the same jar runs in dev, staging, and production. What differs is configuration — database URLs, API ...
@@ -37,25 +37,25 @@ The golden rule: **defaults live in code; files provide overrides; environment v
 
 ## The Code Walkthrough
 
-```java
 // application.properties — the base defaults
 server.port=8080
 app.name=BackendForge
 spring.datasource.url=jdbc:postgresql://localhost:5432/academy
-```
+
+
+**What this code does — step by step:**
+
+1. Production overrides via environment variables (Render/Railway style): SERVER_PORT=8080. APP_NAME=BackendForge Academy. SPRING_DATASOURCE_URL=jdbc:postgresql://dpg-xxxx.oregon-postgres.render.com/academy. DB_PASSWORD=... (mapped to spring.datasource.password)
+2. A value that may come from any source in the ladder
+3. `@Value("${app.name:BackendForge}")` — default in the expression itself
+
+The same code, clean:
 
 ```java
-// Production overrides via environment variables (Render/Railway style):
-// SERVER_PORT=8080
-// APP_NAME=BackendForge Academy
-// SPRING_DATASOURCE_URL=jdbc:postgresql://dpg-xxxx.oregon-postgres.render.com/academy
-// DB_PASSWORD=...     (mapped to spring.datasource.password)
-
 @Service
 public class AppInfo {
 
-    // A value that may come from any source in the ladder
-    @Value("${app.name:BackendForge}")            // default in the expression itself
+    @Value("${app.name:BackendForge}")
     private String appName;
 
     @Value("${spring.datasource.url}")
@@ -121,3 +121,4 @@ When a value surprises you, this endpoint tells you exactly which source won.
 - Secrets live in env vars/secret managers, never in the committed jar.
 - `/actuator/env` shows the winning source for any property — the debugging tool.
 - Defaults in code; files override; env rules in production.
+

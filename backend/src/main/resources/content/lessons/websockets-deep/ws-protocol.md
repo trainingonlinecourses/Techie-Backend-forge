@@ -1,7 +1,7 @@
 ---
 title: The WebSocket Protocol — Full-Duplex Over One Connection
 module: websockets-deep
-order: 1
+order: 3
 minutes: 26
 topics: ["WebSocket", "handshake", "frames", "full-duplex", "vs HTTP polling", "connection lifecycle"]
 summary: HTTP is a requestresponse protocol: the client asks, the server answers, the connection closes (or idles). For realtime features — chat, live notif...
@@ -57,7 +57,6 @@ A message may span multiple frames (fragmentation) and frames may be **masked** 
 
 ## The Code Walkthrough — Spring's WebSocket Handler
 
-```java
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.*;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
@@ -95,7 +94,6 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
         System.out.println("disconnected: " + session.getId());
     }
 }
-```
 
 ### Walking Through Each Part
 
@@ -109,7 +107,6 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 
 ## Spring Wiring — The Config
 
-```java
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.config.annotation.*;
 
@@ -127,7 +124,6 @@ public class WebSocketConfig implements WebSocketConfigurer {
                 .setAllowedOrigins("https://academy.example.com");   // CORS for WS
     }
 }
-```
 
 The handler is registered at the `/ws/chat` path; clients connect with `new WebSocket("wss://.../ws/chat")`. `setAllowedOrigins` is the WebSocket equivalent of CORS — without it (or with `*`), any website can open a socket to your server.
 
@@ -170,3 +166,4 @@ ws.onmessage = (event) => console.log('server pushed:', event.data);
 - Restrict origins; authenticate at the handshake; ping to defeat proxy timeouts.
 - Server-push-only needs → SSE; two-way needs → WebSocket.
 - Sessions are in-memory per instance — multi-instance scaling needs a broker.
+

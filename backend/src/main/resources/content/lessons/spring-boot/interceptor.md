@@ -1,7 +1,7 @@
 ---
 title: Spring Boot Interceptors — HandlerInterceptor Deep Dive
 summary: Pre and post request processing with HandlerInterceptor, HandlerInterceptorAdapter, registration patterns, order of execution vs filters, and real-world interceptor use cases.
-order: 42
+order: 32
 minutes: 20
 topics: [handler-interceptor, prehandle, posthandle, aftercompletion, interceptor-registration, request-timing, cross-cutting]
 docs:
@@ -38,7 +38,6 @@ Request → DispatcherServlet → Interceptor.preHandle() → Controller → Int
 
 Measure how long each controller method takes:
 
-```java
 @Component
 public class RequestTimingInterceptor implements HandlerInterceptor {
 
@@ -69,13 +68,11 @@ public class RequestTimingInterceptor implements HandlerInterceptor {
         startTime.remove();  // prevent ThreadLocal leak
     }
 }
-```
 
 ### Scenario 2: Authentication interceptor
 
 Check JWT tokens before controller execution:
 
-```java
 @Component
 public class AuthInterceptor implements HandlerInterceptor {
 
@@ -106,13 +103,11 @@ public class AuthInterceptor implements HandlerInterceptor {
         return true;
     }
 }
-```
 
 ### Scenario 3: Response header interceptor
 
 Add common headers to all API responses:
 
-```java
 @Component
 public class ResponseHeadersInterceptor implements HandlerInterceptor {
 
@@ -125,11 +120,9 @@ public class ResponseHeadersInterceptor implements HandlerInterceptor {
         response.setHeader("X-Content-Type-Options", "nosniff");
     }
 }
-```
 
 ## Registration and ordering
 
-```java
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
@@ -150,7 +143,6 @@ public class WebConfig implements WebMvcConfigurer {
             .order(3);
     }
 }
-```
 
 **Execution order for each request:**
 1. `ResponseHeadersInterceptor.preHandle()` (order 1)
@@ -172,3 +164,4 @@ public class WebConfig implements WebMvcConfigurer {
 | Heavy logic in postHandle | Blocks response from being sent |
 | Not handling exceptions in afterCompletion | Silent failures |
 | Forgetting to register the interceptor | Code never runs |
+

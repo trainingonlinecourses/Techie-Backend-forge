@@ -1,7 +1,7 @@
 ---
 title: OAuth2 Overview — Roles, Grants, and the Protocol
 module: oauth2-oidc
-order: 1
+order: 3
 minutes: 27
 topics: ["OAuth2", "authorization server", "resource server", "scopes", "grants", "tokens"]
 summary: The worst way to let an app access your data on another service is to hand over your password — the app then has total, permanent, unrevocable acce...
@@ -107,3 +107,4 @@ OAuth2 is *authorization* — "what can this app do?" **OpenID Connect (OIDC)** 
 ## Recap
 
 OAuth2 is delegated authorization: a resource owner grants a client limited, revocable, scoped access to a resource server's data through a trusted authorization server — without ever sharing a password. The four roles (owner, client, auth server, resource server) and the token (with its scopes, expiry, and audience) are the vocabulary; the grant types (authorization code, client credentials, refresh, PKCE) are the flows suited to each client type; and the protocol's genius is keeping credentials at the auth server while everything downstream works with tokens. Master the roles and the flows, and Spring Security's OAuth2 support — and the "sign in with Google" everywhere — becomes a protocol you can read, not a black box.
+

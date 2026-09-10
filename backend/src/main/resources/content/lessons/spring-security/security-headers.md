@@ -1,7 +1,7 @@
 ---
 title: Security Headers — HTTP Headers That Protect Your Users
 summary: Content-Security-Policy, HSTS, X-Frame-Options, X-Content-Type-Options, and more — the HTTP headers that prevent XSS, clickjacking, and MIME sniffing attacks. Beginner-friendly with line-by-line code.
-order: 10
+order: 15
 minutes: 20
 topics: [security headers, CSP, HSTS, X-Frame-Options, X-Content-Type-Options, CORS, Referrer-Policy, Permissions-Policy]
 docs:
@@ -35,6 +35,31 @@ Without security headers, your site is vulnerable to attacks like XSS (Cross-Sit
 
 ### Spring Security Default Headers
 
+
+**What this code does — step by step:**
+
+1. Content Security Policy — controls what resources the browser can load
+2. `"default-src 'self'; " +` — Only load from own domain
+3. `"script-src 'self' https://cdn.example.com; " +` — Scripts from CDN allowed
+4. `"style-src 'self' 'unsafe-inline'; " +` — Inline styles allowed
+5. `"img-src 'self' data: https:; " +` — Images from HTTPS sources
+6. `"font-src 'self' https://fonts.gstatic.com; "` — Google Fonts
+7. HSTS — force HTTPS for all future requests
+8. `.includeSubDomains(true)` — Apply to all subdomains
+9. `.maxAgeInSeconds(31536000)` — 1 year — browser remembers
+10. `.preload(true)` — Can be submitted to browser preload lists
+11. Prevent MIME sniffing — browser must respect Content-Type header
+12. Prevent clickjacking — don't allow this site in iframes
+13. `.sameOrigin()` — Only same-origin iframes allowed. .deny() // No iframes at all (strictest). .allowFrom("https://trusted.com") // Deprecated — use CSP instead
+14. XSS Protection (legacy browsers)
+15. Block mode: browser renders nothing instead of sanitizing
+16. Control referrer information
+17. Send full URL for same-origin, only origin for cross-origin
+18. Control browser features
+19. Disable: geolocation, camera, microphone, payment APIs
+
+The same code, clean:
+
 ```java
 @Configuration
 @EnableWebSecurity
@@ -44,50 +69,38 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .headers(headers -> headers
-                // Content Security Policy — controls what resources the browser can load
                 .contentSecurityPolicy(csp -> csp
                     .policyDirectives(
-                        "default-src 'self'; " +                           // Only load from own domain
-                        "script-src 'self' https://cdn.example.com; " +   // Scripts from CDN allowed
-                        "style-src 'self' 'unsafe-inline'; " +            // Inline styles allowed
-                        "img-src 'self' data: https:; " +                 // Images from HTTPS sources
-                        "font-src 'self' https://fonts.gstatic.com; "     // Google Fonts
+                        "default-src 'self'; " +
+                        "script-src 'self' https://cdn.example.com; " +
+                        "style-src 'self' 'unsafe-inline'; " +
+                        "img-src 'self' data: https:; " +
+                        "font-src 'self' https://fonts.gstatic.com; "
                     )
                 )
 
-                // HSTS — force HTTPS for all future requests
                 .httpStrictTransportSecurity(hsts -> hsts
-                    .includeSubDomains(true)      // Apply to all subdomains
-                    .maxAgeInSeconds(31536000)     // 1 year — browser remembers
-                    .preload(true)                // Can be submitted to browser preload lists
+                    .includeSubDomains(true)
+                    .maxAgeInSeconds(31536000)
+                    .preload(true)
                 )
 
-                // Prevent MIME sniffing — browser must respect Content-Type header
                 .contentTypeOptions(Customizer.withDefaults())
 
-                // Prevent clickjacking — don't allow this site in iframes
                 .frameOptions(frame -> frame
-                    .sameOrigin()                 // Only same-origin iframes allowed
-                    // .deny()                    // No iframes at all (strictest)
-                    // .allowFrom("https://trusted.com")  // Deprecated — use CSP instead
+                    .sameOrigin()
                 )
 
-                // XSS Protection (legacy browsers)
                 .xssProtection(xss -> xss
                     .headerValue(XXssProtectionHeaderWriter.HeaderValue.ENABLED_MODE_BLOCK)
-                    // Block mode: browser renders nothing instead of sanitizing
                 )
 
-                // Control referrer information
                 .referrerPolicy(referrer -> referrer
                     .policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN)
-                    // Send full URL for same-origin, only origin for cross-origin
                 )
 
-                // Control browser features
                 .permissionsPolicy(permissions -> permissions
                     .policy("geolocation=(), camera=(), microphone=(), payment=()")
-                    // Disable: geolocation, camera, microphone, payment APIs
                 )
             );
 
@@ -107,19 +120,33 @@ public class SecurityConfig {
 
 ### Custom CSP for a SPA (Single Page Application)
 
+
+**What this code does — step by step:**
+
+1. For React/Angular/Vue SPAs that load from a CDN:
+2. `"script-src 'self' https://cdn.jsdelivr.net; " +` — JS from jsDelivr CDN
+3. `"style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +` — Google Fonts CSS
+4. `"font-src 'self' https://fonts.gstatic.com; " +` — Google Fonts files
+5. `"img-src 'self' data: https:; " +` — Images from HTTPS
+6. `"connect-src 'self' https://api.myapp.com; " +` — API calls to your backend
+7. `"frame-ancestors 'none' " +` — No iframes (stricter than X-Frame-Options)
+8. `"base-uri 'self' " +` — Prevent base tag injection
+9. `"form-action 'self'"` — Forms can only submit to self
+
+The same code, clean:
+
 ```java
-// For React/Angular/Vue SPAs that load from a CDN:
 .contentSecurityPolicy(csp -> csp
     .policyDirectives(
         "default-src 'self'; " +
-        "script-src 'self' https://cdn.jsdelivr.net; " +        // JS from jsDelivr CDN
-        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +  // Google Fonts CSS
-        "font-src 'self' https://fonts.gstatic.com; " +         // Google Fonts files
-        "img-src 'self' data: https:; " +                       // Images from HTTPS
-        "connect-src 'self' https://api.myapp.com; " +          // API calls to your backend
-        "frame-ancestors 'none' " +                              // No iframes (stricter than X-Frame-Options)
-        "base-uri 'self' " +                                     // Prevent base tag injection
-        "form-action 'self'"                                     // Forms can only submit to self
+        "script-src 'self' https://cdn.jsdelivr.net; " +
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
+        "font-src 'self' https://fonts.gstatic.com; " +
+        "img-src 'self' data: https:; " +
+        "connect-src 'self' https://api.myapp.com; " +
+        "frame-ancestors 'none' " +
+        "base-uri 'self' " +
+        "form-action 'self'"
     )
 )
 ```
@@ -197,3 +224,4 @@ Content-Security-Policy: script-src 'self'
 - **Defense in depth**: headers + input validation + output encoding = layered XSS protection.
 
 Official docs: [Security Headers (Spring)](https://docs.spring.io/spring-security/reference/servlet/exploits/headers.html) · [OWASP Secure Headers](https://owasp.org/www-project-secure-headers/)
+

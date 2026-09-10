@@ -1,7 +1,7 @@
 ---
 title: JUnit 5 Architecture — Jupiter, Platform, and Vintage
 module: junit5-deep
-order: 1
+order: 3
 minutes: 24
 topics: ["JUnit 5", "Jupiter", "Platform", "Vintage", "test lifecycle", "annotations"]
 summary: JUnit 5 isn't one library — it's an architecture of three cooperating projects, and understanding the split explains almost every "why is my test n...
@@ -26,7 +26,6 @@ JUnit 5 isn't one library — it's an *architecture* of three cooperating projec
 
 ## The Test Lifecycle: What Runs and When
 
-```java
 import org.junit.jupiter.api.*;
 
 class LifecycleDemo {
@@ -61,7 +60,6 @@ class LifecycleDemo {
     @Test
     void secondTest() { System.out.println("test 2"); }
 }
-```
 
 **Walking through the lifecycle:**
 
@@ -74,7 +72,6 @@ The lifecycle is *the* contract of test isolation: each test starts clean, and `
 
 ## The Core Annotations
 
-```java
 import org.junit.jupiter.api.*;
 
 class AnnotationDemo {
@@ -101,11 +98,23 @@ class AnnotationDemo {
     @RepeatedTest(3)
     void repeatedTest() { }      // runs 3 times (RepetitionInfo available)
 }
-```
 
 **The everyday set:** `@Test` (the test itself), `@Disabled` (temporarily off, with a reason — the reason is *required* discipline so nobody forgets why), `@DisplayName` (report/IDE readability), `@Tag` (the grouping mechanism — run "fast" tests in CI, exclude "slow" ones), `@Timeout` (the hang-guard — a test that blocks forever fails instead of hanging the build), `@RepeatedTest` (flakiness detection). The philosophical point: JUnit 5 treats *test structure as API* — display names, tags, and timeouts are first-class, not comments.
 
 ## Assertions: The Verification Language
+
+
+**What this code does — step by step:**
+
+1. Equality:
+2. Truthiness:
+3. Nulls:
+4. Collections/arrays:
+5. Exceptions — the "this SHOULD throw" assertion:
+6. Timeouts:
+7. Failure with a message (the modern style — supplier = lazy):
+
+The same code, clean:
 
 ```java
 import org.junit.jupiter.api.Test;
@@ -115,32 +124,25 @@ class AssertionDemo {
 
     @Test
     void assertions() {
-        // Equality:
         assertEquals(4, 2 + 2);
         assertNotEquals(5, 2 + 2);
 
-        // Truthiness:
         assertTrue(4 > 2);
         assertFalse(4 < 2);
 
-        // Nulls:
         assertNull(null);
         assertNotNull("value");
 
-        // Collections/arrays:
         assertArrayEquals(new int[]{1, 2, 3}, new int[]{1, 2, 3});
         assertIterableEquals(java.util.List.of(1, 2), java.util.List.of(1, 2));
 
-        // Exceptions — the "this SHOULD throw" assertion:
         assertThrows(IllegalArgumentException.class, () -> {
             new PaymentService().charge(null, null);
         });
 
-        // Timeouts:
         assertTimeoutPreemptively(java.time.Duration.ofMillis(500),
                 () -> slowOperation());
 
-        // Failure with a message (the modern style — supplier = lazy):
         assertTrue(4 > 2, () -> "4 should be greater than 2, but math broke");
     }
 
@@ -157,7 +159,6 @@ class AssertionDemo {
 
 ## Nested Tests: Structure Within a Class
 
-```java
 import org.junit.jupiter.api.*;
 
 class StackTest {
@@ -190,10 +191,10 @@ class StackTest {
         void popsLastIn() { assertEquals("a", stack.pop()); }
     }
 }
-```
 
 `@Nested` inner classes group tests by *scenario*, each with its own `@BeforeEach` — the spec-style "when empty / when not empty" structure. This is how JUnit 5 turns a flat list of test methods into readable behavior documentation. (Inner classes must be non-static, and they inherit the outer lifecycle.)
 
 ## Recap
 
 JUnit 5's architecture is Platform (the runner) + Jupiter (the new API) + Vintage (JUnit 4 compat) — which explains both how tests run and why the ecosystem (Surefire, Gradle, IDEs) all speak one language. The lifecycle — per-test instances, `@BeforeAll` once, `@BeforeEach`/`@AfterEach` per test — is the isolation contract; the annotations (`@Test`, `@Disabled`, `@DisplayName`, `@Tag`, `@Timeout`, `@Nested`) structure and describe tests; and assertions (`assertEquals`, `assertThrows`, lazy messages, delta-based doubles) are the verification vocabulary. Master these and you have the *foundation* — the next lessons build parameterized tests and extensions on top.
+

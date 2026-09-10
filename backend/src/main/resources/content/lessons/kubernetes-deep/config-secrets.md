@@ -1,7 +1,7 @@
 ---
 title: ConfigMaps and Secrets — Configuration Without Rebuilding Images
 module: kubernetes-deep
-order: 4
+order: 1
 minutes: 25
 topics: ["ConfigMap", "Secrets", "configuration", "environment variables", "mounted volumes"]
 summary: The worst deployment antipattern is baking configuration into the image: change a database URL, a feature flag, a log level → rebuild and redeploy ...
@@ -131,3 +131,4 @@ The one thing to *avoid*: putting secrets in `application.properties` inside the
 ## Recap
 
 ConfigMaps and Secrets decouple configuration from images: the same container runs everywhere, differing only in injected config. ConfigMaps hold non-sensitive settings (injected as env vars via `envFrom`/`configMapKeyRef` or as mounted files — Spring Boot's `application.yaml` idiom); Secrets hold sensitive values with identical mechanics — but are only base64-obfuscated by default, so real protection means encryption at rest and a secret manager (External Secrets, Vault, Sealed Secrets), never secrets in Git. Spring Boot's externalized-config design makes this native: env vars map to properties automatically. The payoff is the 12-factor ideal — one immutable image, configuration as data, environments as views.
+

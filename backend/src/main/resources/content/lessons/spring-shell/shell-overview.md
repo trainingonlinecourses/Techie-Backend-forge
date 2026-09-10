@@ -1,7 +1,7 @@
 ---
 title: Spring Shell — Building Interactive CLI Applications
 summary: How to build command-line tools with Spring Shell: defining commands, handling options and arguments, availability conditions, and building production CLIs for DevOps and data migration.
-order: 1
+order: 3
 minutes: 25
 topics: ["spring shell", "shell command", "@ShellMethod", "@ShellOption", "availability", "CLI"]
 docs:
@@ -38,7 +38,6 @@ Spring Shell lets you build **interactive command-line applications** using the 
 </dependency>
 ```
 
-```java
 package com.example.cli;
 
 import org.springframework.boot.SpringApplication;
@@ -50,13 +49,11 @@ public class CliApplication {
         SpringApplication.run(CliApplication.class, args);
     }
 }
-```
 
 ---
 
 ## Your First Command
 
-```java
 package com.example.cli.commands;
 
 import org.springframework.shell.standard.ShellComponent;
@@ -80,7 +77,6 @@ public class GreetingCommands {
         return "Hello, " + name + "!";
     }
 }
-```
 
 **Running it:**
 ```
@@ -99,7 +95,6 @@ greet - Greet a user
 
 ## Commands with Options and Arguments
 
-```java
 @ShellComponent
 public class UserCommands {
 
@@ -189,7 +184,6 @@ public class UserCommands {
             .orElse("User not found: " + id);
     }
 }
-```
 
 ---
 
@@ -197,7 +191,6 @@ public class UserCommands {
 
 Commands can be conditionally available based on bean states:
 
-```java
 @ShellComponent
 public class DatabaseCommands {
 
@@ -224,7 +217,6 @@ public class DatabaseCommands {
         }
     }
 }
-```
 
 ---
 
@@ -232,25 +224,31 @@ public class DatabaseCommands {
 
 Spring Shell automatically converts string arguments to Java types:
 
+
+**What this code does — step by step:**
+
+1. String — no conversion needed
+2. Integer — auto-parsed from "42"
+3. Boolean — "true"/"false"/"yes"/"no"
+4. File — auto-parsed from file path
+5. Enum — auto-matched by name
+6. List — comma-separated "a,b,c"
+7. Duration — ISO-8601 "PT30M" or "30m"
+
+The same code, clean:
+
 ```java
 @ShellComponent
 public class ConversionExamples {
 
     @ShellMethod(value = "Type conversion demo", key = "demo")
     public String demo(
-            // String — no conversion needed
             @ShellOption String name,
-            // Integer — auto-parsed from "42"
             @ShellOption Integer count,
-            // Boolean — "true"/"false"/"yes"/"no"
             @ShellOption boolean verbose,
-            // File — auto-parsed from file path
             @ShellOption File inputFile,
-            // Enum — auto-matched by name
             @ShellOption LogLevel level,
-            // List — comma-separated "a,b,c"
             @ShellOption List<String> tags,
-            // Duration — ISO-8601 "PT30M" or "30m"
             @ShellOption Duration timeout) {
         return "Received: " + name + ", count=" + count;
     }
@@ -270,3 +268,4 @@ public class ConversionExamples {
 | Mutable state in commands | Race conditions in interactive mode | Use `@ShellMethod` without shared mutable state |
 | Missing availability checks | Commands fail at runtime | Add `availability` parameter to `@ShellMethod` |
 | Not implementing `toString()` | Output shows object reference | Override `toString()` in domain objects |
+

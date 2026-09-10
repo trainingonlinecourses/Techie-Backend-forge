@@ -1,7 +1,7 @@
 ---
 title: WebSocket Client Patterns — Reconnection, Heartbeats, Backpressure
 module: websockets-deep
-order: 3
+order: 2
 minutes: 23
 topics: ["reconnection", "heartbeats", "backpressure", "client design", "SockJS"]
 summary: Servers treat sockets as disposable — they restart, deploy, and drain instances constantly (see the scaling lesson). The client decides whether use...
@@ -169,3 +169,4 @@ SockJS (from the STOMP lesson) bundles *some* of this: it provides HTTP fallback
 - Bound inbound queues; drop-oldest for real-time feeds; count overflows.
 - Re-subscribe after reconnect; treat messages as at-least-once (idempotent handlers).
 - Surface connection state to the UI — "connected" should be true.
+

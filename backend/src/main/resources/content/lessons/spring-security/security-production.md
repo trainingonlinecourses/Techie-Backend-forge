@@ -39,7 +39,6 @@ spring:
     require-ssl: true
 ```
 
-```java
 // Or programmatically:
 @Bean
 public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -51,9 +50,20 @@ public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Excepti
     ;
     return http.build();
 }
-```
 
 ### 2. Secure Cookies
+
+
+**What this code does — step by step:**
+
+1. `.name("SESSIONID")` — Custom cookie name (don't reveal framework)
+2. `.httpOnly(true)` — JavaScript can't read the cookie
+3. `.secure(true)` — Only sent over HTTPS
+4. `.sameSite("Lax")` — CSRF protection
+5. `.maxAge(Duration.ofMinutes(30))` — Cookie expires in 30 minutes
+6. `.path("/")` — Apply to all paths
+
+The same code, clean:
 
 ```java
 @Bean
@@ -62,12 +72,12 @@ public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Excepti
         .sessionManagement(session -> session
             .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
             .sessionCookie(cookie -> cookie
-                .name("SESSIONID")                   // Custom cookie name (don't reveal framework)
-                .httpOnly(true)                      // JavaScript can't read the cookie
-                .secure(true)                        // Only sent over HTTPS
-                .sameSite("Lax")                     // CSRF protection
-                .maxAge(Duration.ofMinutes(30))       // Cookie expires in 30 minutes
-                .path("/")                           // Apply to all paths
+                .name("SESSIONID")
+                .httpOnly(true)
+                .secure(true)
+                .sameSite("Lax")
+                .maxAge(Duration.ofMinutes(30))
+                .path("/")
             )
         );
     return http.build();
@@ -82,11 +92,22 @@ public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Excepti
 
 ### 3. Rate Limiting
 
+
+**What this code does — step by step:**
+
+1. `private final RateLimiter rateLimiter = RateLimiter.create(100.0);` — 100 requests/second
+2. `if (!rateLimiter.tryAcquire(Duration.ofMillis(100))) {` — Wait up to 100ms
+3. `response.setStatus(429);` — Too Many Requests
+4. `return;` — Don't process the request
+5. `filterChain.doFilter(request, response);` — Continue processing
+
+The same code, clean:
+
 ```java
 @Component
 public class RateLimitFilter extends OncePerRequestFilter {
 
-    private final RateLimiter rateLimiter = RateLimiter.create(100.0);  // 100 requests/second
+    private final RateLimiter rateLimiter = RateLimiter.create(100.0);
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -95,21 +116,20 @@ public class RateLimitFilter extends OncePerRequestFilter {
 
         String clientIp = request.getRemoteAddr();
 
-        if (!rateLimiter.tryAcquire(Duration.ofMillis(100))) {    // Wait up to 100ms
-            response.setStatus(429);                              // Too Many Requests
+        if (!rateLimiter.tryAcquire(Duration.ofMillis(100))) {
+            response.setStatus(429);
             response.setContentType("application/json");
             response.getWriter().write("{\"error\":\"Rate limit exceeded\",\"retryAfter\":1}");
-            return;                                               // Don't process the request
+            return;
         }
 
-        filterChain.doFilter(request, response);                  // Continue processing
+        filterChain.doFilter(request, response);
     }
 }
 ```
 
 ### 4. Audit Logging
 
-```java
 @Component
 public class SecurityAuditListener {
 
@@ -134,7 +154,6 @@ public class SecurityAuditListener {
         return ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
     }
 }
-```
 
 ---
 
@@ -142,23 +161,33 @@ public class SecurityAuditListener {
 
 ### Scenario 1: Secrets Management
 
+
+**What this code does — step by step:**
+
+1. ❌ NEVER DO THIS:
+2. `private static final String DB_PASSWORD = "admin123";` — Hardcoded in source
+3. `private static final String API_KEY = "sk_live_abc123";` — In git history forever
+4. ✅ CORRECT: Environment variables
+5. `private String dbPassword;` — From environment
+6. ✅ BETTER: Secrets manager (Vault, AWS Secrets Manager)
+7. `.get("password");` — Rotated automatically
+
+The same code, clean:
+
 ```java
-// ❌ NEVER DO THIS:
-private static final String DB_PASSWORD = "admin123";           // Hardcoded in source
-private static final String API_KEY = "sk_live_abc123";         // In git history forever
+private static final String DB_PASSWORD = "admin123";
+private static final String API_KEY = "sk_live_abc123";
 
-// ✅ CORRECT: Environment variables
 @Value("${database.password}")
-private String dbPassword;                                      // From environment
+private String dbPassword;
 
-// ✅ BETTER: Secrets manager (Vault, AWS Secrets Manager)
 @Autowired
 private VaultTemplate vault;
 
 public String getDbPassword() {
     return vault.read("secret/data/db-password")
         .getData()
-        .get("password");                                       // Rotated automatically
+        .get("password");
 }
 ```
 
@@ -177,7 +206,6 @@ management.endpoints.shutdown.enabled=false                    # No remote shutd
 
 ### Scenario 3: Input Validation
 
-```java
 @RestController
 public class UserController {
 
@@ -193,7 +221,6 @@ public record UserRequest(
     @Email @NotBlank String email,                            // Must be valid email
     @Size(max = 200) String bio                               // Optional, max 200 chars
 ) {}
-```
 
 ---
 
@@ -220,3 +247,4 @@ public record UserRequest(
 - **Disable debug endpoints** in production — Actuator endpoints are powerful and dangerous.
 
 Official docs: [Spring Security Production](https://docs.spring.io/spring-security/reference/servlet/exploits/headers.html) · [OWASP Top 10](https://owasp.org/www-project-top-ten/)
+

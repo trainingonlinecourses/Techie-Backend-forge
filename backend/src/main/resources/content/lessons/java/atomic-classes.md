@@ -1,7 +1,7 @@
 ---
 title: Atomic Classes — Lock-Free Thread Safety with CAS
 summary: AtomicInteger, AtomicReference, LongAdder, and the compare-and-swap mechanism that lets you write lock-free concurrent code — when to use atomics instead of synchronized.
-order: 80
+order: 9
 minutes: 20
 topics: [atomic-integer, atomic-reference, long-adder, compare-and-swap, cas, lock-free, volatile]
 docs:
@@ -20,17 +20,28 @@ A `volatile int` is visible across threads, but `count++` is **three operations*
 
 ## AtomicInteger — the lock-free counter
 
+
+**What this code does — step by step:**
+
+1. Atomic operations — no locks, no lost updates
+2. `counter.incrementAndGet();` — ++counter: returns 1
+3. `counter.getAndIncrement();` — counter++: returns 1, then increments
+4. `counter.addAndGet(5);` — counter += 5: returns 6
+5. `counter.compareAndSet(6, 10);` — if counter == 6, set to 10; returns true/false
+6. `int val = counter.get();` — read current value (always consistent with last write)
+
+The same code, clean:
+
 ```java
 import java.util.concurrent.atomic.AtomicInteger;
 
 AtomicInteger counter = new AtomicInteger(0);
 
-// Atomic operations — no locks, no lost updates
-counter.incrementAndGet();           // ++counter: returns 1
-counter.getAndIncrement();           // counter++: returns 1, then increments
-counter.addAndGet(5);                // counter += 5: returns 6
-counter.compareAndSet(6, 10);        // if counter == 6, set to 10; returns true/false
-int val = counter.get();             // read current value (always consistent with last write)
+counter.incrementAndGet();
+counter.getAndIncrement();
+counter.addAndGet(5);
+counter.compareAndSet(6, 10);
+int val = counter.get();
 ```
 
 **Line-by-line breakdown:**
@@ -41,7 +52,6 @@ int val = counter.get();             // read current value (always consistent wi
 - `get()` — volatile read; always sees the latest committed value
 
 **How CAS works internally (simplified):**
-```java
 // AtomicInteger.incrementAndGet() pseudocode:
 public int incrementAndGet() {
     int old, new;
@@ -51,13 +61,11 @@ public int incrementAndGet() {
     } while (!compareAndSet(old, new)); // CAS: if old is still current, set new; else retry
     return new;
 }
-```
 
 **The CAS retry loop:** if thread A reads `old=5`, then thread B changes it to `6` before A's CAS, A's CAS fails (expected 5, found 6). A re-reads (`old=6`), computes `new=7`, and retries CAS. Under low contention, the retry almost always succeeds on the first try.
 
 ## AtomicReference — lock-free object references
 
-```java
 import java.util.concurrent.atomic.AtomicReference;
 
 AtomicReference<UserSession> currentSession = new AtomicReference<>();
@@ -71,10 +79,8 @@ UserSession expected = currentSession.get();
 UserSession updated = new UserSession(expected.username(), Instant.now());
 boolean success = currentSession.compareAndSet(expected, updated);
 // success == false means another thread changed it between get() and CAS()
-```
 
 **Real-world scenario — optimistic lock for a config object:**
-```java
 AtomicReference<AppConfig> config = new AtomicReference<>(AppConfig.defaultConfig());
 
 // Hot-reload: atomically swap config if it hasn't changed since we read it
@@ -86,24 +92,33 @@ void reloadConfig() {
         log.info("Config already reloaded by another thread");
     }
 }
-```
 
 ## LongAdder — high-contention counters
 
 `AtomicInteger` uses a single CAS target — under high contention (many threads incrementing simultaneously), CAS retries pile up. `LongAdder` distributes the counter across **multiple cells** (one per thread/CPU), then sums them on demand:
+
+
+**What this code does — step by step:**
+
+1. Each thread increments its own cell — no contention
+2. `requestCounter.increment();` — O(1), no CAS retry
+3. `requestCounter.add(5);` — batch increment
+4. Sum all cells — expensive, but only needed for reporting
+5. `long total = requestCounter.sum();` — not atomic — reads all cells
+6. `long snapshot = requestCounter.sumThenReset();` — sum + reset cells to zero
+
+The same code, clean:
 
 ```java
 import java.util.concurrent.atomic.LongAdder;
 
 LongAdder requestCounter = new LongAdder();
 
-// Each thread increments its own cell — no contention
-requestCounter.increment();          // O(1), no CAS retry
-requestCounter.add(5);              // batch increment
+requestCounter.increment();
+requestCounter.add(5);
 
-// Sum all cells — expensive, but only needed for reporting
-long total = requestCounter.sum();           // not atomic — reads all cells
-long snapshot = requestCounter.sumThenReset(); // sum + reset cells to zero
+long total = requestCounter.sum();
+long snapshot = requestCounter.sumThenReset();
 ```
 
 **Line-by-line breakdown:**
@@ -123,7 +138,6 @@ long snapshot = requestCounter.sumThenReset(); // sum + reset cells to zero
 
 The **ABA problem:** thread A reads value `X`, thread B changes it to `Y` then back to `X`, thread A's CAS succeeds (seeing `X` again) — but the state has actually changed. `AtomicStampedReference` adds a **stamp** (version number) that changes on every modification:
 
-```java
 import java.util.concurrent.atomic.AtomicStampedReference;
 
 AtomicStampedReference<String> ref = new AtomicStampedReference<>("A", 0);
@@ -134,13 +148,11 @@ String current = ref.get(stampHolder);    // current = "A", stamp = 0
 // CAS with stamp — fails if either value OR stamp changed
 boolean success = ref.compareAndSet("A", "B", stampHolder[0], stampHolder[0] + 1);
 // success == false if another thread changed the value or incremented the stamp
-```
 
 **When you need it:** linked-lock-free data structures (ConcurrentLinkedQueue uses stamps internally), and scenarios where value recycling (ABA) is possible. Most application code doesn't need this — plain `AtomicReference` suffices.
 
 ## AtomicReferenceFieldUpdater — update a single field without wrapping the whole object
 
-```java
 public class Order {
     volatile String status;  // volatile is required for the updater
 
@@ -151,7 +163,6 @@ public class Order {
         return STATUS_UPDATER.compareAndSet(this, expected, newStatus);
     }
 }
-```
 
 **Why it exists:** wrapping every mutable field in an `AtomicReference<Order>` is wasteful (one extra object per field). The updater lets you do CAS on a single `volatile` field of an existing object — memory-efficient for high-cardinality objects.
 
@@ -187,3 +198,4 @@ public class Order {
 - Use atomics for single-variable updates; use locks for multi-variable invariants.
 
 **Official docs:** [Atomic package](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/atomic/package-summary.html) · [AtomicInteger API](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/atomic/AtomicInteger.html) · [LongAdder API](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/atomic/LongAdder.html)
+

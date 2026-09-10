@@ -71,7 +71,6 @@ ON orders (customer_id, created_at DESC);
 
 ### 2. Select * (the payload bloat)
 
-```java
 // ❌ JPA fetches every column, including @Lob bodies
 List<Course> courses = repository.findAll();
 
@@ -81,22 +80,17 @@ public interface CourseSummary {
     String getTitle();
 }
 List<CourseSummary> findTop100ByOrderByCreatedAtDesc();
-```
 
 ### 3. N+1 Queries (the JPA trap)
 
-```java
 // ❌ 1 course + N lessons = N+1 queries
 for (Course c : courses) {
     c.getLessons().size();      // triggers a query per course
 }
-```
 
-```java
 // ✅ Fetch join or @EntityGraph — 1 query
 @EntityGraph(attributePaths = "lessons")
 List<Course> findAllWithLessons();
-```
 
 ### 4. Connection Pool Exhaustion
 
@@ -174,7 +168,6 @@ It's the single best tool for finding the real slow queries in production.
 
 ## Spring Boot Integration
 
-```java
 @Configuration
 public class DatabaseMonitoringConfig {
 
@@ -183,7 +176,6 @@ public class DatabaseMonitoringConfig {
         return new PostgresqlDatabaseMetrics(dataSource);   // Micrometer → Prometheus
     }
 }
-```
 
 Plus Spring Boot Actuator's `db` health indicator and HikariCP metrics — connection pool usage, active/idle, waits — all in Grafana.
 
@@ -210,3 +202,4 @@ Plus Spring Boot Actuator's `db` health indicator and HikariCP metrics — conne
 | Process | EXPLAIN ANALYZE → fix → re-measure |
 
 Performance tuning is a loop of measurement and targeted fixes: EXPLAIN ANALYZE shows the plan, the five killers explain most slowness, and pg_stat_statements finds what's actually slow in production. Index first, fetch less, and let the numbers — not intuition — drive the changes.
+

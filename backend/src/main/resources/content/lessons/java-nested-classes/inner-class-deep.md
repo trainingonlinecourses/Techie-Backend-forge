@@ -1,7 +1,7 @@
 ---
 title: Inner Classes — Accessing the Outer World
 summary: What inner classes are, how they hold a reference to the outer instance, memory implications, and when to use them vs static nested classes.
-order: 2
+order: 1
 minutes: 22
 topics: [inner-class, member-class, outer-reference, memory-leak, encapsulation]
 docs:
@@ -14,7 +14,6 @@ An **inner class** (also called a member inner class) is a non-static class defi
 
 Think of it like this: an inner class is like a room inside a house. The room can access the house's kitchen, bathroom, and living room directly. But this also means the room can't exist without the house — if the house is destroyed, the room goes with it.
 
-```java
 public class House {
     private String address = "123 Main St";
     
@@ -39,48 +38,57 @@ public class House {
         room.describe();  // "Bedroom is in house at 123 Main St"
     }
 }
-```
 
 ---
 
 ## How the Reference Works
 
+
+**What this code does — step by step:**
+
+1. This compiles but has hidden outer reference
+2. What the compiler actually generates (simplified): class Department {. Final Company this$0; // HIDDEN reference to outer! . Department(Company outer, String deptName) {. This.this$0 = outer; // Stored automatically. This.deptName = deptName; }. . Void printInfo() {. System.out.println(deptName + " at " + this$0.name); }. }
+
+The same code, clean:
+
 ```java
 public class Company {
     private String name = "Acme Corp";
-    
+
     public class Department {
         String deptName;
-        
+
         Department(String deptName) {
             this.deptName = deptName;
         }
-        
+
         void printInfo() {
-            // This compiles but has hidden outer reference
             System.out.println(deptName + " at " + name);
         }
     }
 }
-
-// What the compiler actually generates (simplified):
-// class Department {
-//     final Company this$0;  // HIDDEN reference to outer!
-//     
-//     Department(Company outer, String deptName) {
-//         this.this$0 = outer;  // Stored automatically
-//         this.deptName = deptName;
-//     }
-//     
-//     void printInfo() {
-//         System.out.println(deptName + " at " + this$0.name);
-//     }
-// }
 ```
 
 ---
 
 ## Line-by-Line Walkthrough
+
+
+**What this code does — step by step:**
+
+1. Line 1: Constructor
+2. Line 2: Inner class — registered as a callback
+3. Line 3: Accesses outer's private field
+4. Line 4: Accesses outer's method
+5. Line 5: Factory method — inner class created with outer reference
+6. Line 6: Outer instance created first
+7. Line 7: Inner class needs outer instance
+8. Line 8: Inner class methods access outer state
+9. `System.out.println("Attendees: " + handler.getAttendeeCount());` — 2
+10. Line 9: Multiple inner instances share same outer
+11. `System.out.println("Total: " + handler.getAttendeeCount());` — 3
+
+The same code, clean:
 
 ```java
 import java.util.ArrayList;
@@ -89,53 +97,44 @@ import java.util.List;
 public class EventManager {
     private String eventName;
     private List<String> attendees = new ArrayList<>();
-    
-    // Line 1: Constructor
+
     public EventManager(String eventName) {
         this.eventName = eventName;
     }
-    
-    // Line 2: Inner class — registered as a callback
+
     public class RegistrationHandler {
         private String handlerName;
-        
+
         public RegistrationHandler(String handlerName) {
             this.handlerName = handlerName;
         }
-        
-        // Line 3: Accesses outer's private field
+
         public void onRegister(String attendee) {
             attendees.add(attendee);
             System.out.println(handlerName + " registered " + attendee + " for " + eventName);
         }
-        
-        // Line 4: Accesses outer's method
+
         public int getAttendeeCount() {
             return attendees.size();
         }
     }
-    
-    // Line 5: Factory method — inner class created with outer reference
+
     public RegistrationHandler createHandler(String name) {
         return new RegistrationHandler(name);
     }
-    
+
     public static void main(String[] args) {
-        // Line 6: Outer instance created first
         EventManager event = new EventManager("Java Conference");
-        
-        // Line 7: Inner class needs outer instance
+
         EventManager.RegistrationHandler handler = event.createHandler("Desk 1");
-        
-        // Line 8: Inner class methods access outer state
+
         handler.onRegister("Alice");
         handler.onRegister("Bob");
-        System.out.println("Attendees: " + handler.getAttendeeCount());  // 2
-        
-        // Line 9: Multiple inner instances share same outer
+        System.out.println("Attendees: " + handler.getAttendeeCount());
+
         EventManager.RegistrationHandler handler2 = event.createHandler("Desk 2");
         handler2.onRegister("Charlie");
-        System.out.println("Total: " + handler.getAttendeeCount());  // 3
+        System.out.println("Total: " + handler.getAttendeeCount());
     }
 }
 ```
@@ -146,7 +145,6 @@ public class EventManager {
 
 ### Scenario 1: Builder pattern with inner class
 
-```java
 public class HttpRequest {
     private final String url;
     private final String method;
@@ -201,11 +199,9 @@ public class HttpRequest {
             .build();
     }
 }
-```
 
 ### Scenario 2: Iterator implementation
 
-```java
 public class ShoppingCart {
     private List<String> items = new ArrayList<>();
     
@@ -250,11 +246,9 @@ public class ShoppingCart {
         }
     }
 }
-```
 
 ### Scenario 3: Event listener pattern
 
-```java
 public class Button {
     private String label;
     private List<ClickListener> listeners = new ArrayList<>();
@@ -296,7 +290,6 @@ public class Button {
         saveButton.click();  // "Button Save clicked!"
     }
 }
-```
 
 ---
 
@@ -314,27 +307,37 @@ public class Button {
 
 ## Inner Class vs Static Nested — When to Use Which
 
+
+**What this code does — step by step:**
+
+1. Use INNER when you need access to outer instance
+2. `System.out.println(outerField);` — ✅ Works
+3. `System.out.println(staticField);` — ✅ Works
+4. Use STATIC NESTED when you don't need outer instance
+5. System.out.println(outerField); // ❌ Compile error
+6. `System.out.println(staticField);` — ✅ Works
+
+The same code, clean:
+
 ```java
 public class Outer {
     private int outerField = 10;
     private static int staticField = 20;
-    
-    // Use INNER when you need access to outer instance
+
     public class Inner {
         void doSomething() {
-            System.out.println(outerField);   // ✅ Works
-            System.out.println(staticField);  // ✅ Works
+            System.out.println(outerField);
+            System.out.println(staticField);
         }
     }
-    
-    // Use STATIC NESTED when you don't need outer instance
+
     public static class StaticNested {
         void doSomething() {
-            // System.out.println(outerField);   // ❌ Compile error
-            System.out.println(staticField);     // ✅ Works
+            System.out.println(staticField);
         }
     }
 }
 ```
 
 **Rule of thumb:** If the inner class doesn't use any instance members of the outer class, make it `static nested` to avoid the hidden reference and potential memory leaks.
+

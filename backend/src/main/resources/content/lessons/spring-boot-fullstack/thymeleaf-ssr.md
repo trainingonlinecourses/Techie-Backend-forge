@@ -1,7 +1,7 @@
 ---
 title: Full-Stack with Thymeleaf — Server-Side Rendering in Spring Boot
 summary: Building a complete web application with Thymeleaf templates, form handling, Spring Data JPA, and Spring Security — when you want HTML served from Java, not a separate frontend.
-order: 3
+order: 4
 minutes: 26
 topics: [thymeleaf, server-side-rendering, form-handling, template-engine, mvc]
 docs:
@@ -48,7 +48,6 @@ While React/Angular/Vue handle rendering in the browser, **Thymeleaf** renders H
 
 ### Step 2: Entity (same as REST version)
 
-```java
 @Entity
 @Table(name = "tasks")
 public class Task {
@@ -70,58 +69,66 @@ public class Task {
     public enum Priority { LOW, MEDIUM, HIGH }
     public enum Status { TODO, IN_PROGRESS, DONE }
 }
-```
 
 ### Step 3: Repository
 
-```java
 @Repository
 public interface TaskRepository extends JpaRepository<Task, Long> {
     List<Task> findByOrderByCreatedAtDesc();
     List<Task> findByStatusOrderByPriorityDesc(Task.Status status);
 }
-```
 
 ### Step 4: Controller (Web MVC, not REST)
+
+
+**What this code does — step by step:**
+
+1. Show all tasks
+2. `return "task-list";` — Maps to src/main/resources/templates/task-list.html
+3. Show create form
+4. Handle form submission
+5. `return "task-form";` — Re-show form with errors
+6. `return "redirect:/";` — PRG pattern — redirect after POST
+7. Show edit form
+8. Update task
+9. Delete task
+
+The same code, clean:
 
 ```java
 @Controller
 public class TaskController {
-    
+
     private final TaskRepository taskRepo;
-    
+
     public TaskController(TaskRepository taskRepo) {
         this.taskRepo = taskRepo;
     }
-    
-    // Show all tasks
+
     @GetMapping("/")
     public String listTasks(Model model) {
         model.addAttribute("tasks", taskRepo.findByOrderByCreatedAtDesc());
         model.addAttribute("statuses", Task.Status.values());
         model.addAttribute("priorities", Task.Priority.values());
-        return "task-list";  // Maps to src/main/resources/templates/task-list.html
+        return "task-list";
     }
-    
-    // Show create form
+
     @GetMapping("/tasks/new")
     public String showCreateForm(Model model) {
         model.addAttribute("task", new Task());
         model.addAttribute("priorities", Task.Priority.values());
         return "task-form";
     }
-    
-    // Handle form submission
+
     @PostMapping("/tasks")
     public String createTask(@Valid @ModelAttribute Task task, BindingResult result) {
         if (result.hasErrors()) {
-            return "task-form";  // Re-show form with errors
+            return "task-form";
         }
         taskRepo.save(task);
-        return "redirect:/";  // PRG pattern — redirect after POST
+        return "redirect:/";
     }
-    
-    // Show edit form
+
     @GetMapping("/tasks/{id}/edit")
     public String showEditForm(@PathVariable Long id, Model model) {
         Task task = taskRepo.findById(id)
@@ -131,8 +138,7 @@ public class TaskController {
         model.addAttribute("statuses", Task.Status.values());
         return "task-form";
     }
-    
-    // Update task
+
     @PostMapping("/tasks/{id}")
     public String updateTask(@PathVariable Long id, @Valid @ModelAttribute Task task, 
                             BindingResult result) {
@@ -143,8 +149,7 @@ public class TaskController {
         taskRepo.save(task);
         return "redirect:/";
     }
-    
-    // Delete task
+
     @PostMapping("/tasks/{id}/delete")
     public String deleteTask(@PathVariable Long id) {
         taskRepo.deleteById(id);
@@ -271,7 +276,6 @@ public class TaskController {
 
 ### Step 6: Security Configuration
 
-```java
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -296,7 +300,6 @@ public class SecurityConfig {
         return http.build();
     }
 }
-```
 
 ---
 
@@ -347,3 +350,4 @@ public class SecurityConfig {
 | Forgetting `th:field` | Form data doesn't bind back on error | Always use `th:field="*{fieldName}"` |
 | JavaScript in templates | Thymeleaf may escape it | Use `th:inline="javascript"` |
 | Modifying data in GET | Violates HTTP semantics, bookmark issues | Only read in GET, write in POST/PUT/DELETE |
+

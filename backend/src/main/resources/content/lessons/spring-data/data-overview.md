@@ -1,7 +1,7 @@
 ---
 title: Spring Data — The Complete Guide
 summary: Spring Data's repository abstraction, JPA repositories, method name query derivation, QueryDSL, auditing, and how to build data access layers that scale from simple CRUD to complex queries. Beginner-friendly with line-by-line code.
-order: 2
+order: 4
 minutes: 22
 topics: [Spring Data, repositories, CRUD, method name queries, QueryDSL, auditing, paging, sorting, projections]
 docs:
@@ -33,15 +33,19 @@ Repository (marker interface)
 
 ### 1. Define a Repository Interface
 
+
+**What this code does — step by step:**
+
+1. You write THIS — Spring Data generates the implementation at runtime:
+2. JpaRepository<Order, Long> means: Order = the entity type. Long = the ID type (primary key)
+3. That's it — you get save(), findById(), findAll(), delete(), count() for FREE!
+
+The same code, clean:
+
 ```java
-// You write THIS — Spring Data generates the implementation at runtime:
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
-    // JpaRepository<Order, Long> means:
-    //   Order = the entity type
-    //   Long = the ID type (primary key)
 
-    // That's it — you get save(), findById(), findAll(), delete(), count() for FREE!
 }
 ```
 
@@ -54,62 +58,68 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
 Spring Data can generate queries from **method names**. It parses the method name and translates it to SQL:
 
+
+**What this code does — step by step:**
+
+1. Simple property queries:
+2. → SELECT * FROM orders WHERE status = ?
+3. → SELECT * FROM orders WHERE order_number = ? LIMIT 1
+4. AND conditions:
+5. → SELECT * FROM orders WHERE status = ? AND customer_id = ?
+6. OR conditions:
+7. → SELECT * FROM orders WHERE status = ? OR priority = ?
+8. Comparison operators:
+9. → SELECT * FROM orders WHERE total > ?
+10. → SELECT * FROM orders WHERE created_date BETWEEN ? AND ?
+11. Pattern matching:
+12. → SELECT * FROM orders WHERE customer_name LIKE '%?%'
+13. → SELECT * FROM orders WHERE customer_name LIKE '?%'
+14. Ordering:
+15. → SELECT * FROM orders WHERE status = ? ORDER BY created_date DESC
+16. Pagination:
+17. → SELECT * FROM orders WHERE status = ? LIMIT ? OFFSET ?
+18. Counting:
+19. → SELECT COUNT(*) FROM orders WHERE status = ?
+20. Existence check:
+21. → SELECT COUNT(*) > 0 FROM orders WHERE order_number = ?
+22. Delete:
+23. → DELETE FROM orders WHERE status = ?
+24. Chained property access (nested objects):
+25. → SELECT o.* FROM orders o JOIN customers c ON o.customer_id = c.id WHERE c.email = ?
+
+The same code, clean:
+
 ```java
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
-    // Simple property queries:
     List<Order> findByStatus(OrderStatus status);
-    // → SELECT * FROM orders WHERE status = ?
 
     Optional<Order> findByOrderNumber(String orderNumber);
-    // → SELECT * FROM orders WHERE order_number = ? LIMIT 1
 
-    // AND conditions:
     List<Order> findByStatusAndCustomerId(OrderStatus status, Long customerId);
-    // → SELECT * FROM orders WHERE status = ? AND customer_id = ?
 
-    // OR conditions:
     List<Order> findByStatusOrPriority(OrderStatus status, Priority priority);
-    // → SELECT * FROM orders WHERE status = ? OR priority = ?
 
-    // Comparison operators:
     List<Order> findByTotalGreaterThan(BigDecimal amount);
-    // → SELECT * FROM orders WHERE total > ?
 
     List<Order> findByCreatedDateBetween(LocalDateTime start, LocalDateTime end);
-    // → SELECT * FROM orders WHERE created_date BETWEEN ? AND ?
 
-    // Pattern matching:
     List<Order> findByCustomerNameContaining(String namePart);
-    // → SELECT * FROM orders WHERE customer_name LIKE '%?%'
 
     List<Order> findByCustomerNameStartingWith(String prefix);
-    // → SELECT * FROM orders WHERE customer_name LIKE '?%'
 
-    // Ordering:
     List<Order> findByStatusOrderByCreatedDateDesc(OrderStatus status);
-    // → SELECT * FROM orders WHERE status = ? ORDER BY created_date DESC
 
-    // Pagination:
     Page<Order> findByStatus(OrderStatus status, Pageable pageable);
-    // → SELECT * FROM orders WHERE status = ? LIMIT ? OFFSET ?
 
-    // Counting:
     long countByStatus(OrderStatus status);
-    // → SELECT COUNT(*) FROM orders WHERE status = ?
 
-    // Existence check:
     boolean existsByOrderNumber(String orderNumber);
-    // → SELECT COUNT(*) > 0 FROM orders WHERE order_number = ?
 
-    // Delete:
     void deleteByStatus(OrderStatus status);
-    // → DELETE FROM orders WHERE status = ?
 
-    // Chained property access (nested objects):
     List<Order> findByCustomerEmail(String email);
-    // → SELECT o.* FROM orders o JOIN customers c ON o.customer_id = c.id WHERE c.email = ?
 }
 ```
 
@@ -122,7 +132,6 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
 When method names aren't enough, write your own query with `@Query`:
 
-```java
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
@@ -147,7 +156,6 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     int bulkUpdateStatus(@Param("oldStatus") OrderStatus oldStatus,
                          @Param("newStatus") OrderStatus newStatus);
 }
-```
 
 **Line-by-line explained:**
 - `@Query("SELECT o FROM Order o WHERE...")` — JPQL uses entity/field names, not table/column names. It's portable across databases.
@@ -157,7 +165,6 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
 ### 4. Pagination and Sorting
 
-```java
 // Controller endpoint with pagination:
 @GetMapping("/api/orders")
 public Page<Order> getOrders(
@@ -175,7 +182,6 @@ public Page<Order> getOrders(
     return orderRepository.findByStatus(OrderStatus.ACTIVE, pageable);
     // Returns: { content: [...], totalElements: 150, totalPages: 8, currentPage: 0 }
 }
-```
 
 **Line-by-line explained:**
 - `PageRequest.of(0, 20, sort)` — Page 0 (first page), 20 items per page, sorted by the specified field.
@@ -188,7 +194,6 @@ public Page<Order> getOrders(
 
 ### Scenario 1: E-Commerce Order Search
 
-```java
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
@@ -213,43 +218,50 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
                        @Param("minTotal") BigDecimal minTotal,
                        Pageable pageable);
 }
-```
 
 ### Scenario 2: Auditing (Created/Updated Timestamps)
 
+
+**What this code does — step by step:**
+
+1. `@EntityListeners(AuditingEntityListener.class)` — Enable auditing for this entity
+2. `@CreatedDate` — Auto-set on creation
+3. `@LastModifiedDate` — Auto-set on every update
+4. `@CreatedBy` — Auto-set to current user
+5. `@Version` — Optimistic locking
+
+The same code, clean:
+
 ```java
 @Entity
-@EntityListeners(AuditingEntityListener.class)    // Enable auditing for this entity
+@EntityListeners(AuditingEntityListener.class)
 public class Order {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @CreatedDate                           // Auto-set on creation
+    @CreatedDate
     private LocalDateTime createdAt;
 
-    @LastModifiedDate                      // Auto-set on every update
+    @LastModifiedDate
     private LocalDateTime updatedAt;
 
-    @CreatedBy                             // Auto-set to current user
+    @CreatedBy
     private String createdBy;
 
-    @Version                               // Optimistic locking
+    @Version
     private Long version;
 }
 ```
 
-```java
 @Configuration
 @EnableJpaAuditing                           // Enable auditing globally
 public class JpaConfig {
 }
-```
 
 ### Scenario 3: Custom Repository Implementation
 
-```java
 // When method names and @Query aren't enough:
 public interface OrderRepositoryCustom {
     List<OrderSummary> findOrderSummariesByRegion(String region);
@@ -278,7 +290,6 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
 public interface OrderRepository extends JpaRepository<Order, Long>, OrderRepositoryCustom {
     // Has both standard CRUD + custom methods
 }
-```
 
 ---
 
@@ -303,3 +314,4 @@ public interface OrderRepository extends JpaRepository<Order, Long>, OrderReposi
 - **Auditing is free** — `@CreatedDate`, `@LastModifiedDate`, `@CreatedBy` with `@EnableJpaAuditing`.
 
 Official docs: [Spring Data JPA](https://spring.io/projects/spring-data-jpa) · [Query Methods](https://docs.spring.io/spring-data/jpa/docs/current/reference/html/#repositories.query-methods)
+

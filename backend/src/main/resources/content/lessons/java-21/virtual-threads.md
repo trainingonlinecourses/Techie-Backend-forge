@@ -33,7 +33,6 @@ The problem is **thread-per-request** architecture. When a web server gets 10,00
 
 ### How Virtual Threads Differ from Platform Threads
 
-```java
 public class ThreadComparison {
     public static void main(String[] args) {
         // Platform thread — expensive, OS-managed
@@ -50,20 +49,28 @@ public class ThreadComparison {
         // But virtual threads use ~1000x less memory
     }
 }
-```
 
 ### Creating Virtual Threads
+
+
+**What this code does — step by step:**
+
+1. Method 1: Thread.ofVirtual()
+2. Method 2: VirtualThreadPool (ExecutorService)
+3. `}` — All 100,000 tasks complete — no thread exhaustion
+4. Method 3: Virtual thread factory
+5. 10 platform threads, unlimited virtual threads
+
+The same code, clean:
 
 ```java
 public class CreatingVirtualThreads {
     public static void main(String[] args) throws Exception {
-        // Method 1: Thread.ofVirtual()
         Thread vt1 = Thread.ofVirtual().name("vt-1").start(() -> {
             System.out.println("Hello from virtual thread!");
         });
         vt1.join();
-        
-        // Method 2: VirtualThreadPool (ExecutorService)
+
         try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
             IntStream.range(0, 100_000).forEach(i -> {
                 executor.submit(() -> {
@@ -71,12 +78,10 @@ public class CreatingVirtualThreads {
                     return i;
                 });
             });
-        } // All 100,000 tasks complete — no thread exhaustion
-        
-        // Method 3: Virtual thread factory
+        }
+
         var factory = Thread.ofVirtual().name("vt-", 0).factory();
         try (var executor = Executors.newFixedThreadPool(10, factory)) {
-            // 10 platform threads, unlimited virtual threads
         }
     }
 }
@@ -86,23 +91,29 @@ public class CreatingVirtualThreads {
 
 Virtual threads have one important limitation: **pinning**. When a virtual thread holds a `synchronized` block or native method, it cannot be unmounted from its platform thread:
 
+
+**What this code does — step by step:**
+
+1. This virtual thread is PINNED to its platform thread. It cannot be unmounted during this block. If the thread sleeps here, the platform thread is wasted
+2. `Thread.sleep(Duration.ofSeconds(1));` — BAD — pinning
+3. No synchronized block — virtual thread can be unmounted
+4. `Thread.sleep(Duration.ofSeconds(1));` — GOOD — not pinned
+
+The same code, clean:
+
 ```java
 public class PinningDemo {
     private static final Object lock = new Object();
-    
+
     static void pinnedVirtualThread() {
         synchronized (lock) {
-            // This virtual thread is PINNED to its platform thread
-            // It cannot be unmounted during this block
-            // If the thread sleeps here, the platform thread is wasted
-            Thread.sleep(Duration.ofSeconds(1)); // BAD — pinning
+            Thread.sleep(Duration.ofSeconds(1));
         }
     }
-    
+
     static void unpinnedVirtualThread() {
         try (var guard = ScopedValue.where(...). ...) {
-            // No synchronized block — virtual thread can be unmounted
-            Thread.sleep(Duration.ofSeconds(1)); // GOOD — not pinned
+            Thread.sleep(Duration.ofSeconds(1));
         }
     }
 }
@@ -121,7 +132,6 @@ Virtual threads work best with **structured concurrency** — a way to manage co
 2. **Error propagation** — failures in child tasks propagate to the parent
 3. **No thread leaks** — tasks cannot outlive their scope
 
-```java
 import jdk.incubator.concurrent.StructuredTaskScope;
 
 public class StructuredConcurrencyDemo {
@@ -144,28 +154,33 @@ public class StructuredConcurrencyDemo {
         }
     }
 }
-```
 
 ### ScopedValues (Context Propagation)
 
 Scoped values replace `ThreadLocal` for passing context to virtual threads:
 
+
+**What this code does — step by step:**
+
+1. Define a scoped value — like ThreadLocal but for virtual threads
+2. Set the scoped value for this scope
+3. All code in this scope (and child virtual threads). Can read CURRENT_USER.get()
+4. `User user = CURRENT_USER.get();` — Accessible!
+
+The same code, clean:
+
 ```java
 public class ScopedValueDemo {
-    // Define a scoped value — like ThreadLocal but for virtual threads
     private static final ScopedValue<User> CURRENT_USER = ScopedValue.newInstance();
-    
+
     static String processRequest(User user) {
-        // Set the scoped value for this scope
         return ScopedValue.where(CURRENT_USER, user).run(() -> {
-            // All code in this scope (and child virtual threads)
-            // can read CURRENT_USER.get()
             return handleRequest();
         });
     }
-    
+
     static String handleRequest() {
-        User user = CURRENT_USER.get(); // Accessible!
+        User user = CURRENT_USER.get();
         return "Processing for " + user.name();
     }
 }
@@ -185,28 +200,27 @@ public class ScopedValueDemo {
 ### Organization Use Cases
 
 **1. Web Server Request Handling**
-```java
 // Spring Boot automatically uses virtual threads with this config
 spring.threads.virtual.enabled=true
 
 // Every HTTP request gets its own virtual thread
 // Thousands of concurrent requests? No problem.
-```
 
 **2. Database Connection Pool Efficiency**
-```java
-// Before: 200 platform threads, 200 DB connections
-// After: 10,000 virtual threads, 200 DB connections
 
+**What this code does — step by step:**
+
+1. Before: 200 platform threads, 200 DB connections. After: 10,000 virtual threads, 200 DB connections
+2. 10,000 concurrent DB queries. Only 200 actual DB connections. Virtual threads wait for connections without blocking OS threads
+
+The same code, clean:
+
+```java
 try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
-    // 10,000 concurrent DB queries
-    // Only 200 actual DB connections
-    // Virtual threads wait for connections without blocking OS threads
 }
 ```
 
 **3. Microservice Fan-Out**
-```java
 public CompletableFuture<UserDashboard> getDashboard(long userId) {
     try (var scope = new StructuredTaskScope.ShutdownOnFailure()) {
         var userTask = scope.fork(() -> userService.getUser(userId));
@@ -220,7 +234,6 @@ public CompletableFuture<UserDashboard> getDashboard(long userId) {
         );
     }
 }
-```
 
 ### Common Mistakes
 
@@ -234,38 +247,37 @@ public CompletableFuture<UserDashboard> getDashboard(long userId) {
 
 ### Line-by-Line Code Explanation
 
+
+**What this code does — step by step:**
+
+1. ↑ Import structured concurrency — only available with --enable-preview in Java 21. ↑ Will be finalized in a future Java version
+2. ↑ Main class demonstrating virtual threads
+3. ↑ Method that fetches multiple URLs concurrently
+4. ↑ Creates an ExecutorService with virtual threads. ↑ "per task" = each submitted task gets its own virtual thread. ↑ try-with-resources = auto-closes when done
+5. ↑ Each URL fetch runs on its own virtual thread. ↑ Virtual threads are cheap — 10,000 URLs? No problem
+6. ↑ .get() blocks until the result is ready. ↑ If this was platform threads, we'd need 10,000 OS threads. ↑ With virtual threads, the OS threads are freed during waits
+7. ↑ All virtual threads are cancelled when the executor closes. ↑ No thread leaks — structured lifecycle management
+
+The same code, clean:
+
 ```java
 import jdk.incubator.concurrent.StructuredTaskScope;
-// ↑ Import structured concurrency — only available with --enable-preview in Java 21
-// ↑ Will be finalized in a future Java version
 
 public class VirtualThreadDemo {
-    // ↑ Main class demonstrating virtual threads
-    
+
     static void fetchMultipleUrls(List<String> urls) throws Exception {
-        // ↑ Method that fetches multiple URLs concurrently
-        
+
         try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
-            // ↑ Creates an ExecutorService with virtual threads
-            // ↑ "per task" = each submitted task gets its own virtual thread
-            // ↑ try-with-resources = auto-closes when done
-            
+
             List<Future<String>> futures = urls.stream()
                 .map(url -> executor.submit(() -> fetchUrl(url)))
-                // ↑ Each URL fetch runs on its own virtual thread
-                // ↑ Virtual threads are cheap — 10,000 URLs? No problem
-                
+
                 .toList();
-            
+
             for (Future<String> future : futures) {
                 System.out.println(future.get());
-                // ↑ .get() blocks until the result is ready
-                // ↑ If this was platform threads, we'd need 10,000 OS threads
-                // ↑ With virtual threads, the OS threads are freed during waits
             }
         }
-        // ↑ All virtual threads are cancelled when the executor closes
-        // ↑ No thread leaks — structured lifecycle management
     }
 }
 ```
@@ -283,3 +295,4 @@ public class VirtualThreadDemo {
 ### Real-World Organization Scenario
 
 A SaaS platform handles 50,000 concurrent WebSocket connections. With platform threads, they needed 50,000 threads (~50GB RAM). Switching to virtual threads reduced memory to ~50GB → ~50MB, and the server now handles 500,000 connections on the same hardware. The key change: replacing `synchronized` blocks with `ReentrantLock` to avoid pinning.
+

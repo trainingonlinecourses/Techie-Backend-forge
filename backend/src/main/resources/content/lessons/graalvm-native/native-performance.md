@@ -1,7 +1,7 @@
 ---
 title: GraalVM Native Image — Java Without the JVM
 summary: Ahead-of-time compilation, build-time reflection, native executables, and how organizations deploy Spring Boot apps as instant-startup containers. Beginner-friendly with line-by-line code.
-order: 5
+order: 3
 minutes: 20
 topics: [GraalVM, native image, AOT compilation, build-time reflection, startup time, container deployment, Spring Native]
 docs:
@@ -81,14 +81,20 @@ Traditional Java runs on the JVM — you compile `.java` to `.class` to `.jar`, 
 
 ### Handling Reflection (The Big Challenge)
 
+
+**What this code does — step by step:**
+
+1. Native image needs to know about reflection at BUILD TIME, not runtime.
+2. This works on JVM but FAILS on native image:
+3. `User user = (User) objectMapper.readValue(json, User.class);` — Runtime reflection
+4. SOLUTION 1: Register reflection configuration. In src/main/resources/META-INF/native-image/reflect-config.json:
+5. SOLUTION 2: Use Spring's built-in AOT processing (preferred). Spring Boot's native support automatically registers reflection for: - @Entity classes. - @Configuration classes. - @Component classes. - @JsonProperty annotations. You don't need to manually configure reflection for Spring-managed beans
+
+The same code, clean:
+
 ```java
-// Native image needs to know about reflection at BUILD TIME, not runtime.
+User user = (User) objectMapper.readValue(json, User.class);
 
-// This works on JVM but FAILS on native image:
-User user = (User) objectMapper.readValue(json, User.class);   // Runtime reflection
-
-// SOLUTION 1: Register reflection configuration
-// In src/main/resources/META-INF/native-image/reflect-config.json:
 [
   {
     "name": "com.example.academy.model.User",
@@ -97,17 +103,21 @@ User user = (User) objectMapper.readValue(json, User.class);   // Runtime reflec
     "allPublicFields": true
   }
 ]
-
-// SOLUTION 2: Use Spring's built-in AOT processing (preferred)
-// Spring Boot's native support automatically registers reflection for:
-// - @Entity classes
-// - @Configuration classes
-// - @Component classes
-// - @JsonProperty annotations
-// You don't need to manually configure reflection for Spring-managed beans
 ```
 
 ### Custom Native Configuration
+
+
+**What this code does — step by step:**
+
+1. Register resources that should be included in the native image
+2. `hints.resources().registerPattern("content/lessons/**");` — Include lesson files
+3. `hints.resources().registerPattern("templates/**");` — Include templates
+4. `hints.resources().registerPattern("static/**");` — Include static assets
+5. Register reflection for classes not managed by Spring
+6. Register proxy interfaces
+
+The same code, clean:
 
 ```java
 @Configuration
@@ -118,16 +128,13 @@ public class NativeConfig {
     RuntimeHints runtimeHints() {
         RuntimeHints hints = new RuntimeHints();
 
-        // Register resources that should be included in the native image
-        hints.resources().registerPattern("content/lessons/**");       // Include lesson files
-        hints.resources().registerPattern("templates/**");             // Include templates
-        hints.resources().registerPattern("static/**");                // Include static assets
+        hints.resources().registerPattern("content/lessons/**");
+        hints.resources().registerPattern("templates/**");
+        hints.resources().registerPattern("static/**");
 
-        // Register reflection for classes not managed by Spring
         hints.reflection().registerType(ExternalApiClient.class,
             MemberInferenceCategory.ALL_DECLARED_CONSTRUCTORS);
 
-        // Register proxy interfaces
         hints.proxies().registerJdkProxy(OrderService.class);
 
         return hints;
@@ -141,7 +148,6 @@ public class NativeConfig {
 
 ### Scenario 1: Serverless (AWS Lambda)
 
-```java
 // With JVM: cold start = 3-5 seconds (unacceptable for API gateway)
 // With native image: cold start = 50ms (imperceptible to users)
 
@@ -159,29 +165,22 @@ public class OrderHandler implements RequestHandler<APIGatewayProxyRequestEvent,
             .withBody(objectMapper.writeValueAsString(order));
     }
 }
-```
 
 ### Scenario 2: Fast Auto-Scaling
 
-```java
-// Kubernetes HPA (Horizontal Pod Autoscaler) scales based on CPU/memory
-// Native image: starts in 50ms → new pod serves traffic almost immediately
-// JVM: starts in 5 seconds → traffic backs up while waiting
 
-// In k8s deployment:
-// spec:
-//   containers:
-//     - name: academy
-//       image: academy-native:latest     # GraalVM native image
-//       resources:
-//         limits:
-//           memory: "128Mi"              # Only needs 128MB (vs 512MB for JVM)
-//           cpu: "200m"                  # Low CPU (starts so fast, no burst needed)
+**What this code does — step by step:**
+
+1. Kubernetes HPA (Horizontal Pod Autoscaler) scales based on CPU/memory. Native image: starts in 50ms → new pod serves traffic almost immediately. JVM: starts in 5 seconds → traffic backs up while waiting
+2. In k8s deployment: spec: containers: - name: academy. Image: academy-native:latest # GraalVM native image. Resources: limits: memory: "128Mi" # Only needs 128MB (vs 512MB for JVM). Cpu: "200m" # Low CPU (starts so fast, no burst needed)
+
+The same code, clean:
+
+```java
 ```
 
 ### Scenario 3: CLI Tool
 
-```java
 @SpringBootApplication
 public class AcademyCli implements CommandLineRunner {
 
@@ -196,7 +195,6 @@ public class AcademyCli implements CommandLineRunner {
         System.out.println("All lessons validated successfully.");
     }
 }
-```
 
 ---
 
@@ -221,3 +219,4 @@ public class AcademyCli implements CommandLineRunner {
 - **Best for**: serverless, auto-scaling microservices, CLI tools, container environments.
 
 Official docs: [GraalVM](https://www.graalvm.org/latest/docs/getting-started/) · [Spring Boot Native](https://docs.spring.io/spring-boot/reference/packaging/native-image/introducing-graalvm-native-images.html)
+

@@ -1,7 +1,7 @@
 ---
 title: Actuator, Metrics & Observability
 summary: Health checks, metrics, info, Micrometer, logging best practices and the golden signals.
-order: 8
+order: 1
 minutes: 16
 topics: [actuator, metrics, health, micrometer, logging]
 docs:
@@ -44,7 +44,6 @@ management:
 
 ## Health checks you control
 
-```java
 @Component
 public class DbPingHealthIndicator implements HealthIndicator {
     private final JdbcTemplate jdbc;
@@ -59,13 +58,11 @@ public class DbPingHealthIndicator implements HealthIndicator {
         }
     }
 }
-```
 
 ## Micrometer: metrics with standard names
 
 Micrometer is the metrics facade — your code is vendor-neutral, the registry decides where it goes (Prometheus, Datadog, CloudWatch, ...):
 
-```java
 @Service
 public class PaymentService {
     private final MeterRegistry registry;
@@ -86,7 +83,6 @@ public class PaymentService {
         });
     }
 }
-```
 
 ```xml
 <dependency>
@@ -98,7 +94,6 @@ public class PaymentService {
 
 ## Logging: the debugging contract
 
-```java
 @Slf4j   // or private static final Logger log = LoggerFactory.getLogger(...)
 @Service
 public class AccountService {
@@ -108,7 +103,6 @@ public class AccountService {
         catch (Exception e) { log.error("failed to load account iban={}", iban, e); }  // + stack trace
     }
 }
-```
 
 Rules: parameterized messages only (`log.info("x={}", x)` — lazy, no garbage), include the correlation/trace id in the pattern, `log.error` with the exception as the last arg, and never log secrets (passwords, tokens, card numbers).
 
@@ -126,3 +120,4 @@ Track these per service: **latency** (p50/p95/p99), **traffic** (requests/sec), 
 - Log parameterized, never log secrets, always include the exception.
 
 **Official docs:** [Actuator](https://docs.spring.io/spring-boot/reference/actuator/index.html) · [Endpoints](https://docs.spring.io/spring-boot/reference/actuator/endpoints.html)
+

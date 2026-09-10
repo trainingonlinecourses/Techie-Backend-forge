@@ -1,7 +1,7 @@
 ---
 title: Spring Caching In Depth — @Cacheable, Eviction, and Cache Providers
 summary: Cache abstraction, @Cacheable vs @CacheEvict vs @CachePut, cache key generation, conditional caching, Caffeine/Redis/EhCache providers, and how organizations prevent stale data in cached systems.
-order: 36
+order: 15
 minutes: 20
 topics: [spring-cache, cacheable, cacheevict, cacheput, cache-key, caffeine, redis-cache, conditional-cache, cache-eviction]
 docs:
@@ -15,12 +15,10 @@ docs:
 
 Spring's cache abstraction adds caching to any method with annotations. It does not provide a cache implementation — it delegates to providers like Caffeine (in-process), Redis (distributed), or EhCache.
 
-```java
 @Cacheable("products")
 public Product findById(String id) {
     return repository.findById(id).orElseThrow();
 }
-```
 
 The first call queries the database. The result is stored in the "products" cache. The second call with the same `id` returns the cached value without touching the database.
 
@@ -33,33 +31,40 @@ The first call queries the database. The result is stored in the "products" cach
 | `@CacheEvict` | Remove entry from cache |
 | `@Caching` | Combine multiple cache operations |
 
+
+**What this code does — step by step:**
+
+1. Cache result; skip cache if product is out of stock
+2. Always execute; update cache
+3. Evict on delete
+4. Evict entire cache
+5. `@Scheduled(fixedRate = 3600000)` — every hour
+6. cache is cleared; next access repopulates
+
+The same code, clean:
+
 ```java
 @Service
 public class ProductService {
 
-    // Cache result; skip cache if product is out of stock
     @Cacheable(value = "products", condition = "#result.inStock == true")
     public Product findById(String id) {
         return repository.findById(id).orElseThrow();
     }
 
-    // Always execute; update cache
     @CachePut(value = "products", key = "#product.id")
     public Product update(Product product) {
         return repository.save(product);
     }
 
-    // Evict on delete
     @CacheEvict(value = "products", key = "#id")
     public void delete(String id) {
         repository.deleteById(id);
     }
 
-    // Evict entire cache
     @CacheEvict(value = "products", allEntries = true)
-    @Scheduled(fixedRate = 3600000)  // every hour
+    @Scheduled(fixedRate = 3600000)
     public void evictAll() {
-        // cache is cleared; next access repopulates
     }
 }
 ```
@@ -68,7 +73,6 @@ public class ProductService {
 
 By default, Spring generates the key from all method parameters using a `SimpleKeyGenerator`. For custom keys:
 
-```java
 @Cacheable(value = "products", key = "#id")
 public Product findById(String id) { ... }
 
@@ -77,11 +81,9 @@ public List<Order> findByCustomerAndStatus(String customerId, String status) { .
 
 @Cacheable(value = "reports", key = "T(java.util.Objects).hash(#req)")
 public Report generate(ReportRequest req) { ... }
-```
 
 ## Conditional caching
 
-```java
 // Only cache if the result is not null
 @Cacheable(value = "users", unless = "#result == null")
 public User findById(String id) { ... }
@@ -89,7 +91,6 @@ public User findById(String id) { ... }
 // Only cache for admin users
 @Cacheable(value = "admin-data", condition = "#role == 'ADMIN'")
 public AdminData getAdminData(String role) { ... }
-```
 
 ## Cache providers
 
@@ -103,7 +104,6 @@ spring:
       spec: maximumSize=500,expireAfterWrite=10m
 ```
 
-```java
 @Bean
 public CaffeineCacheManager cacheManager() {
     CaffeineCacheManager manager = new CaffeineCacheManager();
@@ -113,7 +113,6 @@ public CaffeineCacheManager cacheManager() {
         .recordStats());  // enable hit/miss statistics
     return manager;
 }
-```
 
 ### Redis (distributed, shared across instances)
 
@@ -126,7 +125,6 @@ spring:
       cache-null-values: false
 ```
 
-```java
 @Bean
 public RedisCacheManager cacheManager(RedisConnectionFactory factory) {
     RedisCacheConfiguration config = RedisCacheConfiguration.defaultCacheConfig()
@@ -139,13 +137,11 @@ public RedisCacheManager cacheManager(RedisConnectionFactory factory) {
             RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofMinutes(30)))
         .build();
 }
-```
 
 ## How we use it in organizations
 
 ### Scenario 1: product catalog with time-based eviction
 
-```java
 @Service
 public class ProductCatalogService {
 
@@ -160,11 +156,9 @@ public class ProductCatalogService {
         return productRepository.save(product);
     }
 }
-```
 
 ### Scenario 2: user session cache
 
-```java
 @Service
 public class UserSessionService {
 
@@ -178,11 +172,9 @@ public class UserSessionService {
         sessionRepository.deleteByToken(token);
     }
 }
-```
 
 ### Scenario 3: multi-level cache (L1 Caffeine + L2 Redis)
 
-```java
 @Configuration
 public class MultiLevelCacheConfig {
 
@@ -199,7 +191,6 @@ public class MultiLevelCacheConfig {
         return new CompositeCacheManager(l1, l2);
     }
 }
-```
 
 ## Cache pitfalls
 
@@ -220,3 +211,4 @@ public class MultiLevelCacheConfig {
 | Using `@Cacheable` without `key` | All calls with different params share one cache entry |
 | Caching in cluster without distributed cache | Each node has its own cache — inconsistent |
 | `allEntries = true` without reason | Evicts everything on every call — defeats caching |
+

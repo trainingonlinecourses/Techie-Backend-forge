@@ -1,7 +1,7 @@
 ---
 title: DDD Building Blocks
 module: ddd-architecture
-order: 1
+order: 3
 minutes: 30
 topics: ["domain model", "entities", "value objects", "aggregates", "repositories", "domain services", "ubiquitous language"]
 summary: DomainDriven Design is about putting the business rules in the code — not in a service layer full of getters and setters. The building blocks (enti...
@@ -22,7 +22,6 @@ The core practice: the business's words are the code's names. If the business sa
 
 An entity has an **identity that persists across changes** — two orders with the same id are the same order even if every field differs.
 
-```java
 @Entity
 public class Order {
 
@@ -55,7 +54,6 @@ public class Order {
             .reduce(Money.ZERO, Money::add);
     }
 }
-```
 
 **The rule**: entities protect their invariants. `addLine` refuses to modify a placed order; `confirm` refuses an empty one. The business rules live *here*, not in a service that mutates fields freely.
 
@@ -63,7 +61,6 @@ public class Order {
 
 A value object has no identity — two objects with the same values are interchangeable.
 
-```java
 public record Money(BigDecimal amount, Currency currency) {
 
     public Money {
@@ -84,7 +81,6 @@ public record Money(BigDecimal amount, Currency currency) {
         return new Money(amount.multiply(BigDecimal.valueOf(quantity)), currency);
     }
 }
-```
 
 **Value-object rules**:
 - Immutable
@@ -98,14 +94,24 @@ public record Money(BigDecimal amount, Currency currency) {
 
 An aggregate is a **cluster of entities treated as one unit** — with one root that guards all invariants.
 
+
+**What this code does — step by step:**
+
+1. `public class Order {` — AGGREGATE ROOT
+2. `private List<OrderLine> lines = new ArrayList<>();` — part of the aggregate
+3. Invariants enforced at the ROOT only
+4. OrderLine is NOT a root — it's only reachable through Order
+5. no repository for OrderLine — ever
+
+The same code, clean:
+
 ```java
 @Entity
-public class Order {                       // AGGREGATE ROOT
+public class Order {
 
     @OneToMany(cascade = ALL, orphanRemoval = true)
-    private List<OrderLine> lines = new ArrayList<>();   // part of the aggregate
+    private List<OrderLine> lines = new ArrayList<>();
 
-    // Invariants enforced at the ROOT only
     public void addLine(Product product, int qty) {
         if (status != OrderStatus.DRAFT) throw new IllegalStateException(...);
         lines.add(new OrderLine(product, qty));
@@ -113,10 +119,8 @@ public class Order {                       // AGGREGATE ROOT
     }
 }
 
-// OrderLine is NOT a root — it's only reachable through Order
 @Entity
 public class OrderLine {
-    // no repository for OrderLine — ever
 }
 ```
 
@@ -130,13 +134,11 @@ public class OrderLine {
 
 A repository per **aggregate root** — not per table, not per entity:
 
-```java
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
     // Query methods return aggregates
     List<Order> findByCustomerIdAndStatus(Long customerId, OrderStatus status);
 }
-```
 
 - One repository per aggregate root
 - Returns whole aggregates (with their invariants intact)
@@ -146,7 +148,6 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
 When a rule involves multiple aggregates, it doesn't belong in any one — it becomes a **domain service** (not an application service):
 
-```java
 @Service
 public class OrderPricingService {     // DOMAIN service — pure business logic
 
@@ -156,7 +157,6 @@ public class OrderPricingService {     // DOMAIN service — pure business logic
         return base.subtract(discount);
     }
 }
-```
 
 ## The Layers
 
@@ -174,7 +174,6 @@ Controller (HTTP) ──▶ Application Service (use cases, transactions)
 - **Domain**: business rules — the meat
 - **Repository**: persistence — one per aggregate
 
-```java
 // Application service — thin, transactional
 @Service
 public class OrderApplicationService {
@@ -189,11 +188,9 @@ public class OrderApplicationService {
         repository.save(order);           // persistence
     }
 }
-```
 
 ## Building a Domain Model: The Example
 
-```java
 // The full model in action
 @Service
 public class OrderApplicationService {
@@ -208,13 +205,11 @@ public class OrderApplicationService {
         return orderRepository.save(order);
     }
 }
-```
 
 No status flags set directly, no business rules in the service — the order *is* the rules.
 
 ## Testing the Domain
 
-```java
 // Pure unit tests — no Spring needed for the domain
 class OrderTest {
 
@@ -234,7 +229,6 @@ class OrderTest {
         assertThrows(IllegalStateException.class, order::confirm);
     }
 }
-```
 
 Domain tests run in milliseconds — no context, no DB — and they *are* the business rules documented as code.
 
@@ -249,3 +243,4 @@ Domain tests run in milliseconds — no context, no DB — and they *are* the bu
 | Repository | — | — | Per aggregate |
 
 The building blocks are a discipline: entities guard their invariants, value objects validate themselves, aggregates bound consistency, repositories store aggregates, and services orchestrate. Put the rules in the domain and the service layer becomes a thin translation layer — which is exactly where it belongs.
+

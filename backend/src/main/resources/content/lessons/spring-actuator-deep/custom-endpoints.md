@@ -1,7 +1,7 @@
 ---
 title: Custom Actuator Endpoints — Exposing Your Own Health and Metrics
 summary: How to create custom @Endpoint, @ReadOperation, @WriteOperation, and @DeleteOperation beans that plug into Spring Boot Actuator, with real-world organizational examples.
-order: 2
+order: 1
 minutes: 25
 topics: ["@Endpoint", "@ReadOperation", "@WriteOperation", "@DeleteOperation", "custom health indicators", "custom metrics"]
 docs:
@@ -41,7 +41,6 @@ Every custom endpoint is a Spring bean annotated with `@Endpoint`. Inside it, yo
 
 Let's build an endpoint that monitors a message queue:
 
-```java
 package com.example.actuator;
 
 import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
@@ -132,44 +131,33 @@ public class QueueHealthEndpoint {
         return monitor.purge(queueName);
     }
 }
-```
 
 ### Line-by-Line Breakdown
 
-```java
 @Component
 @Endpoint(id = "queueHealth")  // The "id" becomes the URL path segment
 public class QueueHealthEndpoint {
-```
 - `@Component` — Registers this as a Spring bean so it gets picked up automatically
 - `@Endpoint(id = "queueHealth")` — Tells Actuator this is a custom endpoint. The `id` becomes the URL: `/actuator/queueHealth`
 
-```java
     private final QueueMonitor monitor;
 
     public QueueHealthEndpoint(QueueMonitor monitor) {
         this.monitor = monitor;
     }
-```
 - Constructor injection of your `QueueMonitor` service. This is how your endpoint accesses real application data.
 
-```java
     @ReadOperation
     public Map<String, Object> getAllQueues() {
-```
 - `@ReadOperation` — Maps to HTTP GET. Actuator will call this method when someone hits `GET /actuator/queueHealth`
 - Return type `Map<String, Object>` — Actuator serializes this to JSON automatically
 
-```java
     @ReadOperation
     public Map<String, Object> getQueueHealth(@Selector String queueName) {
-```
 - `@Selector` — Binds a path segment to the method parameter. `GET /actuator/queueHealth/orders` → `queueName = "orders"`
 
-```java
     @WriteOperation
     public boolean pauseQueue(@Selector String queueName) {
-```
 - `@WriteOperation` — Maps to HTTP POST. Use for actions that change state.
 - Returns `boolean` — Actuator serializes `{"paused": true}` or `{"paused": false}`
 
@@ -196,7 +184,6 @@ management:
 
 A common pattern is using `@Selector` with path variables:
 
-```java
 /**
  * Hierarchical endpoint:
  *   GET /actuator/queueHealth              → all queues
@@ -218,7 +205,6 @@ public class QueueHealthEndpoint {
             @Selector String name,
             @Selector String metric) { ... }
 }
-```
 
 ---
 
@@ -226,7 +212,6 @@ public class QueueHealthEndpoint {
 
 A company needs to expose their API rate limiter status:
 
-```java
 @Component
 @Endpoint(id = "rateLimiter")
 public class RateLimiterEndpoint {
@@ -263,7 +248,6 @@ public class RateLimiterEndpoint {
         return limiter.resetClient(clientId);
     }
 }
-```
 
 ---
 
@@ -282,7 +266,6 @@ public class RateLimiterEndpoint {
 
 ## Testing Custom Endpoints
 
-```java
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class QueueHealthEndpointTest {
 
@@ -313,4 +296,4 @@ class QueueHealthEndpointTest {
             .body("queue", equalTo("orders"));
     }
 }
-```
+

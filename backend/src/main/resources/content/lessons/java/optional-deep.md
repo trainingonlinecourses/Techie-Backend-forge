@@ -1,7 +1,7 @@
 ---
 title: "Optional — Null Safety Without the NullPointerException"
 summary: "What Optional is, why it exists, how to use it correctly, common mistakes, and how organizations eliminate NullPointerExceptions."
-order: 72
+order: 61
 minutes: 18
 topics: [optional, null-safety, optional-get, optional-orElse, optional-map, optional-flatmap]
 docs:
@@ -14,22 +14,17 @@ docs:
 
 `NullPointerException` is the most common Java error. It happens when you call a method on a null reference:
 
-```java
 String name = user.getName();  // What if user is null?
 int length = name.length();    // NullPointerException!
-```
 
 **Optional** makes you handle the "maybe null" case explicitly:
 
-```java
 Optional<String> name = Optional.ofNullable(user.getName());
 int length = name.map(String::length).orElse(0);
 // ↑ No NPE — returns 0 if name is null
-```
 
 ### Creating Optionals
 
-```java
 // 1. Never null
 Optional<String> present = Optional.of("Hello");
 
@@ -38,31 +33,37 @@ Optional<String> maybe = Optional.ofNullable(getNameOrNull());
 
 // 3. Always empty
 Optional<String> empty = Optional.empty();
-```
 
 ### Getting Values Safely
+
+
+**What this code does — step by step:**
+
+1. orElse — return default if empty
+2. orElseGet — compute default lazily
+3. orElseThrow — throw exception if empty
+4. isPresent — check before getting (avoid this pattern)
+5. `String value = name.get();` — Works but is imperative
+6. ifPresent — run code only if present (functional style)
+7. ifPresentOrElse — handle both cases
+
+The same code, clean:
 
 ```java
 Optional<String> name = Optional.ofNullable(user.getName());
 
-// orElse — return default if empty
 String result1 = name.orElse("Anonymous");
 
-// orElseGet — compute default lazily
 String result2 = name.orElseGet(() -> "User-" + userId);
 
-// orElseThrow — throw exception if empty
 String result3 = name.orElseThrow(() -> new RuntimeException("Name required"));
 
-// isPresent — check before getting (avoid this pattern)
 if (name.isPresent()) {
-    String value = name.get();  // Works but is imperative
+    String value = name.get();
 }
 
-// ifPresent — run code only if present (functional style)
 name.ifPresent(n -> log.info("Name: {}", n));
 
-// ifPresentOrElse — handle both cases
 name.ifPresentOrElse(
     n -> log.info("Name: {}", n),
     () -> log.warn("No name found")
@@ -71,35 +72,51 @@ name.ifPresentOrElse(
 
 ### Transforming Optionals
 
+
+**What this code does — step by step:**
+
+1. map — transform the value
+2. Optional.of(5)
+3. flatMap — transform that returns Optional
+4. Optional.of("ALICE")
+5. filter — keep only if condition matches
+6. Optional.of("Alice") — length 5 > 3
+7. Optional.empty() — "Alice" is not > 10 chars
+
+The same code, clean:
+
 ```java
 Optional<String> name = Optional.of("Alice");
 
-// map — transform the value
 Optional<Integer> length = name.map(String::length);
-// Optional.of(5)
 
-// flatMap — transform that returns Optional
 Optional<String> upper = name.flatMap(n -> Optional.of(n.toUpperCase()));
-// Optional.of("ALICE")
 
-// filter — keep only if condition matches
 Optional<String> filtered = name.filter(n -> n.length() > 3);
-// Optional.of("Alice") — length 5 > 3
 
 Optional<String> tooShort = name.filter(n -> n.length() > 10);
-// Optional.empty() — "Alice" is not > 10 chars
 ```
 
 ### Chaining Operations
 
+
+**What this code does — step by step:**
+
+1. Real-world example: find user's order total
+2. `.map(Order::getItems)` — List<OrderItem>
+3. `.flatMap(items -> items.stream()` — Stream<OrderItem>
+4. `.findFirst())` — Optional<OrderItem>
+5. `.map(OrderItem::getPrice);` — Optional<BigDecimal>
+
+The same code, clean:
+
 ```java
-// Real-world example: find user's order total
 Optional<Order> order = orderRepository.findLatest(userId);
 Optional<BigDecimal> total = order
-    .map(Order::getItems)                    // List<OrderItem>
-    .flatMap(items -> items.stream()         // Stream<OrderItem>
-        .findFirst())                        // Optional<OrderItem>
-    .map(OrderItem::getPrice);               // Optional<BigDecimal>
+    .map(Order::getItems)
+    .flatMap(items -> items.stream()
+        .findFirst())
+    .map(OrderItem::getPrice);
 
 BigDecimal amount = total.orElse(BigDecimal.ZERO);
 ```
@@ -131,3 +148,4 @@ An e-commerce platform uses Optional throughout the codebase:
 - `paymentGateway.getReceipt()` returns `Optional<Receipt>`
 
 Every method chain uses map/flatMap/orElse — no null checks, no NPEs. The codebase went from 50+ NPEs per week to zero.
+

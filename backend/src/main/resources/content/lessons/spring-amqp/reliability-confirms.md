@@ -1,7 +1,7 @@
 ---
 title: Publisher Confirms & Reliability
 module: spring-amqp
-order: 2
+order: 3
 minutes: 22
 topics: ["publisher confirms", "mandatory", "returned messages", "transactions", "idempotent consumers"]
 summary: "Sent" is not "delivered". Without confirms, a publish that hits a downed broker, a full queue, or a missing exchange silently disappears. Publishe...
@@ -33,7 +33,6 @@ spring:
     publisher-returns: true
 ```
 
-```java
 @Configuration
 public class RabbitConfig {
 
@@ -61,13 +60,11 @@ public class RabbitConfig {
         return template;
     }
 }
-```
 
 ## Correlation Data: Tracking the Outcome
 
 Correlate a publish to its confirmation:
 
-```java
 public void orderCreated(Order order) {
     CorrelationData correlation = new CorrelationData(order.getId().toString());
 
@@ -85,7 +82,6 @@ public void orderCreated(Order order) {
         }
     });
 }
-```
 
 The `CorrelationData.getFuture()` completes when the broker confirms — asynchronous certainty.
 
@@ -116,7 +112,6 @@ Spring AMQP: `rabbitTemplate.setChannelTransacted(true)` enables transactions; b
 
 Redelivery happens (requeue, consumer crash after ack-less processing, DLQ reprocessing). **Consumers must be idempotent** — the third pillar:
 
-```java
 @RabbitListener(queues = "orders.new")
 public void onOrderCreated(OrderEvent event) {
     // Claim pattern: insert-if-absent in the DB
@@ -128,7 +123,6 @@ public void onOrderCreated(OrderEvent event) {
     }
     inventoryService.reserve(event.orderId());
 }
-```
 
 A unique constraint on the processed-id table turns redelivery into a no-op.
 
@@ -144,7 +138,6 @@ Production default: **at-least-once + idempotency** = effectively exactly-once f
 
 ## The Full Reliable Pipeline
 
-```java
 @Service
 public class ReliablePublisher {
 
@@ -165,13 +158,11 @@ public class ReliablePublisher {
         });
     }
 }
-```
 
 The failed-publish table + a replay scheduler gives you the transactional-outbox guarantee without the outbox boilerplate.
 
 ## Testing Reliability
 
-```java
 @Test
 void confirmCallbackFiresOnAck() {
     CorrelationData cd = new CorrelationData("order-1");
@@ -189,7 +180,6 @@ void mandatoryReturnsUndeliverableMessage() {
     await().atMost(Duration.ofSeconds(5))
         .untilAsserted(() -> assertNotNull(testReturn.get()));
 }
-```
 
 ## Summary
 
@@ -203,3 +193,4 @@ void mandatoryReturnsUndeliverableMessage() {
 | Crash safety net | Persist failed publishes for replay |
 
 Reliability is a chain: confirms tell you the broker accepted, returns tell you routing failed, acks tell you the consumer finished, and idempotency makes every retry harmless. Build all four and "at-least-once" becomes "effectively exactly-once".
+

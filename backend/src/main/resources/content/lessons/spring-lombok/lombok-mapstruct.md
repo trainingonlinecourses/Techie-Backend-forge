@@ -1,7 +1,7 @@
 ---
 title: Lombok & MapStruct — Eliminate Boilerplate Code
 summary: What Lombok and MapStruct are, @Data, @Builder, @Value, @Slf4j, MapStruct mappers, and how organizations use them to write clean, maintainable code.
-order: 1
+order: 4
 minutes: 30
 topics: [lombok, mapstruct, @Data, @Builder, @Value, @Slf4j, mappers, boilerplate]
 docs:
@@ -15,7 +15,6 @@ docs:
 
 Lombok is a Java library that **generates boilerplate code at compile time**. Instead of writing getters, setters, constructors, equals/hashCode, toString, and builders by hand, Lombok generates them for you.
 
-```java
 // WITHOUT Lombok — you write 100+ lines
 public class User {
     private String name;
@@ -48,13 +47,11 @@ public class User {
     private String email;
     private int age;
 }
-```
 
 ### What is MapStruct?
 
 MapStruct is a code generator that creates **type-safe mapping code** between Java objects. Instead of manually copying fields from one object to another, MapStruct generates the mapping code at compile time.
 
-```java
 // WITHOUT MapStruct — manual mapping
 public UserDTO toDTO(User user) {
     UserDTO dto = new UserDTO();
@@ -69,7 +66,6 @@ public UserDTO toDTO(User user) {
 public interface UserMapper {
     UserDTO toDTO(User user);
 }
-```
 
 ---
 
@@ -77,14 +73,24 @@ public interface UserMapper {
 
 ### @Data — The All-in-One
 
+
+**What this code does — step by step:**
+
+1. `@Data` — Generates: getters, setters, equals, hashCode, toString
+2. `@AllArgsConstructor` — Generates: constructor with all fields
+3. `@NoArgsConstructor` — Generates: no-arg constructor
+4. What Lombok generates (you don't write this): public Long getId() { return id; }. Public void setId(Long id) { this.id = id; }. Public boolean equals(Object o) { /* field comparison */ }. Public int hashCode() { /* based on fields */ }. Public String toString() { /* "Employee(id=1, name=John, ...)" */ }
+
+The same code, clean:
+
 ```java
 import lombok.Data;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
-@Data  // Generates: getters, setters, equals, hashCode, toString
-@AllArgsConstructor  // Generates: constructor with all fields
-@NoArgsConstructor   // Generates: no-arg constructor
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class Employee {
     private Long id;
     private String name;
@@ -92,18 +98,10 @@ public class Employee {
     private double salary;
     private LocalDate hireDate;
 }
-
-// What Lombok generates (you don't write this):
-// public Long getId() { return id; }
-// public void setId(Long id) { this.id = id; }
-// public boolean equals(Object o) { /* field comparison */ }
-// public int hashCode() { /* based on fields */ }
-// public String toString() { /* "Employee(id=1, name=John, ...)" */ }
 ```
 
 ### @Builder — Fluent Object Creation
 
-```java
 import lombok.Builder;
 import lombok.Data;
 
@@ -132,11 +130,9 @@ Order order = Order.builder()
 Order updated = order.toBuilder()
     .shippingAddress("456 Oak Ave")
     .build();
-```
 
 ### @Value — Immutable Objects
 
-```java
 import lombok.Value;
 
 @Value  // Like @Data but immutable (all fields are final, no setters)
@@ -155,11 +151,9 @@ public class Money {
 // Usage
 Money price = new Money(new BigDecimal("29.99"), Currency.USD);
 // price.setAmount(...) — COMPILE ERROR: no setter!
-```
 
 ### @Slf4j — Automatic Logger
 
-```java
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j  // Generates: private static final Logger log = LoggerFactory.getLogger(UserService.class);
@@ -181,11 +175,9 @@ public class UserService {
         log.info("User deleted: {}", id);
     }
 }
-```
 
 ### @ToString — Debug-Friendly Output
 
-```java
 import lombok.ToString;
 
 @ToString(exclude = {"password", "creditCard"})  // Exclude sensitive fields
@@ -198,11 +190,9 @@ public class Customer {
     // toString() outputs: "Customer(name=John, email=john@example.com)"
     // password and creditCard are NOT included
 }
-```
 
 ### @EqualsAndHashCode — Proper Object Comparison
 
-```java
 import lombok.EqualsAndHashCode;
 
 @EqualsAndHashCode(callSuper = true)  // Include parent class fields
@@ -213,54 +203,75 @@ public class PremiumCustomer extends Customer {
 
 // Two PremiumCustomer objects are equal if ALL fields match
 // (including inherited fields from Customer)
-```
 
 ---
 
 ## Line-by-Line Walkthrough
 
+
+**What this code does — step by step:**
+
+1. Line 1: Complete Lombok-annotated entity
+2. `@Data` — getters, setters, equals, hashCode, toString
+3. `@Builder` — fluent builder pattern
+4. `@AllArgsConstructor` — constructor with all fields
+5. `@NoArgsConstructor` — no-arg constructor
+6. `@ToString(exclude = {"password"})` — exclude sensitive field from toString
+7. `@Slf4j` — automatic logger
+8. `@NonNull` — Generates null check in constructor/setter
+9. `@Builder.Default` — Default value when using builder
+10. `@EqualsAndHashCode.Exclude` — Don't include in equals/hashCode
+11. Line 2: Custom method alongside generated code
+12. Line 3: Using the builder
+13. `.role(UserRole.ADMIN)` — Override default
+14. Line 4: Using the all-args constructor
+15. Line 5: toString excludes password
+16. Output: User(name=Admin User, email=admin@example.com, role=ADMIN, lastLogin=null)
+17. Line 6: equals/hashCode work automatically
+18. `System.out.println(users.size());` — 2 — different users
+19. Line 7: Lombok with inheritance
+20. Line 8: Lombok with static factory methods
+
+The same code, clean:
+
 ```java
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
-// Line 1: Complete Lombok-annotated entity
-@Data                    // getters, setters, equals, hashCode, toString
-@Builder                 // fluent builder pattern
-@AllArgsConstructor      // constructor with all fields
-@NoArgsConstructor       // no-arg constructor
-@ToString(exclude = {"password"})  // exclude sensitive field from toString
-@Slf4j                   // automatic logger
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@ToString(exclude = {"password"})
+@Slf4j
 public class User {
-    
-    @NonNull              // Generates null check in constructor/setter
+
+    @NonNull
     private String name;
-    
+
     @NonNull
     private String email;
-    
+
     private String password;
-    
-    @Builder.Default       // Default value when using builder
+
+    @Builder.Default
     private UserRole role = UserRole.USER;
-    
-    @EqualsAndHashCode.Exclude  // Don't include in equals/hashCode
+
+    @EqualsAndHashCode.Exclude
     private LocalDateTime lastLogin;
-    
-    // Line 2: Custom method alongside generated code
+
     public boolean isAdmin() {
         return this.role == UserRole.ADMIN;
     }
 }
 
-// Line 3: Using the builder
 User admin = User.builder()
     .name("Admin User")
     .email("admin@example.com")
     .password("secret123")
-    .role(UserRole.ADMIN)     // Override default
+    .role(UserRole.ADMIN)
     .build();
 
-// Line 4: Using the all-args constructor
 User regular = new User(
     "Regular User",
     "user@example.com",
@@ -269,17 +280,13 @@ User regular = new User(
     null
 );
 
-// Line 5: toString excludes password
 System.out.println(admin);
-// Output: User(name=Admin User, email=admin@example.com, role=ADMIN, lastLogin=null)
 
-// Line 6: equals/hashCode work automatically
 Set<User> users = new HashSet<>();
 users.add(admin);
 users.add(regular);
-System.out.println(users.size());  // 2 — different users
+System.out.println(users.size());
 
-// Line 7: Lombok with inheritance
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class PremiumUser extends User {
@@ -287,7 +294,6 @@ public class PremiumUser extends User {
     private String membershipTier;
 }
 
-// Line 8: Lombok with static factory methods
 @RequiredArgsConstructor(staticName = "of")
 public class Pair<A, B> {
     private final A first;
@@ -303,73 +309,77 @@ Pair<String, Integer> pair = Pair.of("age", 25);
 
 ### Basic Mapping
 
+
+**What this code does — step by step:**
+
+1. Line 1: Simple one-to-one mapping
+2. `@Mapper(componentModel = "spring")` — Creates Spring bean
+3. `UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);` — For non-Spring
+4. Line 2: DTO to Entity
+5. `@Mapping(target = "id", ignore = true)` — Don't map ID (generated by DB)
+6. `@Mapping(target = "createdAt", ignore = true)` — Don't map createdAt
+7. Line 3: Entity to DTO
+8. Line 4: Custom field mapping
+9. Line 5: What MapStruct generates (you don't write this): @Component. Public class UserMapperImpl implements UserMapper {. @Override. Public User toEntity(UserDTO dto) {. User user = new User(); user.setName(dto.getName()); user.setEmail(dto.getEmail()); // id and createdAt are ignored. Return user; }. }
+
+The same code, clean:
+
 ```java
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
-// Line 1: Simple one-to-one mapping
-@Mapper(componentModel = "spring")  // Creates Spring bean
+@Mapper(componentModel = "spring")
 public interface UserMapper {
-    
-    UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);  // For non-Spring
-    
-    // Line 2: DTO to Entity
-    @Mapping(target = "id", ignore = true)  // Don't map ID (generated by DB)
-    @Mapping(target = "createdAt", ignore = true)  // Don't map createdAt
+
+    UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
     User toEntity(UserDTO dto);
-    
-    // Line 3: Entity to DTO
+
     UserDTO toDTO(User entity);
-    
-    // Line 4: Custom field mapping
+
     @Mapping(source = "firstName", target = "name")
     @Mapping(source = "emailAddress", target = "email")
     UserProfileDTO toProfileDTO(User user);
 }
-
-// Line 5: What MapStruct generates (you don't write this):
-// @Component
-// public class UserMapperImpl implements UserMapper {
-//     @Override
-//     public User toEntity(UserDTO dto) {
-//         User user = new User();
-//         user.setName(dto.getName());
-//         user.setEmail(dto.getEmail());
-//         // id and createdAt are ignored
-//         return user;
-//     }
-// }
 ```
 
 ### Complex Mappings
 
+
+**What this code does — step by step:**
+
+1. Line 1: Nested object mapping
+2. Line 2: List mapping
+3. Line 3: Custom mapping method
+4. Line 4: Date formatting
+5. Line 5: Default values
+
+The same code, clean:
+
 ```java
 @Mapper(componentModel = "spring")
 public interface OrderMapper {
-    
-    // Line 1: Nested object mapping
+
     @Mapping(source = "customer.name", target = "customerName")
     @Mapping(source = "customer.email", target = "customerEmail")
     @Mapping(source = "items", target = "orderItems")
     OrderDTO toDTO(Order order);
-    
-    // Line 2: List mapping
+
     List<OrderDTO> toDTOList(List<Order> orders);
-    
-    // Line 3: Custom mapping method
+
     @Mapping(target = "status", expression = "java(mapStatus(order.getStatus()))")
     OrderSummaryDTO toSummary(Order order);
-    
+
     default String mapStatus(OrderStatus status) {
         return status.name().toLowerCase();
     }
-    
-    // Line 4: Date formatting
+
     @Mapping(source = "createdAt", target = "createdDate", dateFormat = "yyyy-MM-dd")
     OrderDTO toDTOWithDates(Order order);
-    
-    // Line 5: Default values
+
     @Mapping(target = "discount", defaultValue = "0.0")
     OrderDTO toDTOWithDefaults(Order order);
 }
@@ -377,7 +387,6 @@ public interface OrderMapper {
 
 ### Reverse Mapping
 
-```java
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface ProductMapper {
     
@@ -391,7 +400,6 @@ public interface ProductMapper {
     @Mapping(target = "category", expression = "java(dto.getCategoryId() != null ? categoryRepository.findById(dto.getCategoryId()).orElse(null) : null)")
     Product toEntity(ProductDTO dto);
 }
-```
 
 ---
 
@@ -399,8 +407,19 @@ public interface ProductMapper {
 
 ### Scenario 1: Complete REST API with Lombok & MapStruct
 
+
+**What this code does — step by step:**
+
+1. Entity
+2. DTO
+3. Mapper
+4. Service
+5. `@RequiredArgsConstructor` — Lombok: constructor injection
+6. Controller
+
+The same code, clean:
+
 ```java
-// Entity
 @Data
 @Builder
 @NoArgsConstructor
@@ -411,35 +430,34 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
     @Column(nullable = false)
     private String name;
-    
+
     @Column(nullable = false, unique = true)
     private String email;
-    
+
     @Column(nullable = false)
     private String password;
-    
+
     @Enumerated(EnumType.STRING)
     private UserRole role;
-    
+
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    
+
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
     }
-    
+
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
 }
 
-// DTO
 @Data
 @Builder
 @NoArgsConstructor
@@ -453,68 +471,65 @@ public class UserDTO {
     private String updatedAt;
 }
 
-// Mapper
 @Mapper(componentModel = "spring")
 public interface UserMapper {
-    
+
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     User toEntity(CreateUserRequest request);
-    
+
     UserDTO toDTO(User entity);
-    
+
     List<UserDTO> toDTOList(List<User> users);
-    
+
     default String map(LocalDateTime dateTime) {
         return dateTime != null ? dateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME) : null;
     }
-    
+
     default String mapEnum(UserRole role) {
         return role != null ? role.name() : null;
     }
 }
 
-// Service
 @Service
-@RequiredArgsConstructor  // Lombok: constructor injection
+@RequiredArgsConstructor
 @Slf4j
 public class UserService {
-    
+
     private final UserRepository userRepository;
     private final UserMapper userMapper;
-    
+
     public UserDTO createUser(CreateUserRequest request) {
         log.info("Creating user with email: {}", request.getEmail());
-        
+
         User user = userMapper.toEntity(request);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-        
+
         User saved = userRepository.save(user);
         log.info("User created with ID: {}", saved.getId());
-        
+
         return userMapper.toDTO(saved);
     }
-    
+
     public List<UserDTO> getAllUsers() {
         return userMapper.toDTOList(userRepository.findAll());
     }
 }
 
-// Controller
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
 public class UserController {
-    
+
     private final UserService userService;
-    
+
     @PostMapping
     public ResponseEntity<UserDTO> createUser(@RequestBody @Valid CreateUserRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED)
             .body(userService.createUser(request));
     }
-    
+
     @GetMapping
     public ResponseEntity<List<UserDTO>> getAllUsers() {
         return ResponseEntity.ok(userService.getAllUsers());
@@ -524,7 +539,6 @@ public class UserController {
 
 ### Scenario 2: Lombok with Spring Data JPA
 
-```java
 @Data
 @Builder
 @NoArgsConstructor
@@ -616,7 +630,6 @@ public class ProductService {
             .collect(Collectors.toList());
     }
 }
-```
 
 ---
 
@@ -637,8 +650,18 @@ public class ProductService {
 
 ## When to Use What
 
+
+**What this code does — step by step:**
+
+1. Entity: @Data + @Builder + @NoArgsConstructor + @AllArgsConstructor
+2. Value Object: @Value (immutable)
+3. DTO: @Data + @Builder
+4. Service: @RequiredArgsConstructor + @Slf4j
+5. Config: @Value (Lombok) or @ConfigurationProperties
+
+The same code, clean:
+
 ```java
-// Entity: @Data + @Builder + @NoArgsConstructor + @AllArgsConstructor
 @Data
 @Builder
 @NoArgsConstructor
@@ -646,25 +669,21 @@ public class ProductService {
 @Entity
 public class Order { ... }
 
-// Value Object: @Value (immutable)
 @Value
 public class Money {
     BigDecimal amount;
     Currency currency;
 }
 
-// DTO: @Data + @Builder
 @Data
 @Builder
 public class OrderDTO { ... }
 
-// Service: @RequiredArgsConstructor + @Slf4j
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class OrderService { ... }
 
-// Config: @Value (Lombok) or @ConfigurationProperties
 @Configuration
 @RequiredArgsConstructor
 public class AppConfig {
@@ -672,3 +691,4 @@ public class AppConfig {
     private final String appName;
 }
 ```
+

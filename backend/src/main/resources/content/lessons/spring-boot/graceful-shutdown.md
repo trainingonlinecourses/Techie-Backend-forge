@@ -1,7 +1,7 @@
 ---
 title: Graceful Shutdown — Draining Traffic Without Dropping Work
 summary: Why hard kills lose requests, how server.shutdown=graceful and lifecycle hooks drain in-flight work, and the org patterns for zero-downtime deploys.
-order: 16
+order: 30
 minutes: 18
 topics: [graceful-shutdown, draining, lifecycle, preDestroy, sigterm, zero-downtime, kubernetes]
 docs:
@@ -39,7 +39,6 @@ JVM exits (or waits for non-daemon threads)
 
 `@PreDestroy` is where your beans do their cleanup — and it's the inverse of `@PostConstruct`:
 
-```java
 @Component
 public class MessagePoller {
     private ExecutorService workers;
@@ -69,7 +68,6 @@ public class MessagePoller {
         }
     }
 }
-```
 
 The pattern — a **volatile flag + `shutdown()` + `awaitTermination`** — is the standard way to make any executor-based worker drain cleanly instead of dropping the message it was processing.
 
@@ -110,3 +108,4 @@ Set `server.shutdown=graceful`, keep the lifecycle timeout (say 30s) *under* the
 - Use readiness probes + preStop so no *new* traffic arrives while draining.
 - Drain custom workers with flag + `shutdown()` + `awaitTermination` in `@PreDestroy`.
 - Graceful shutdown is a cap, not a guarantee — design idempotent consumers so interrupted work can resume.
+

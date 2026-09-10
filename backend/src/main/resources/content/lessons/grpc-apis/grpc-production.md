@@ -1,7 +1,7 @@
 ---
 title: gRPC in Production
 module: grpc-apis
-order: 5
+order: 2
 minutes: 22
 topics: ["TLS", "load balancing", "gRPC-Web", "observability", "health checks", "reflection"]
 summary: The .proto is done and the calls work locally. Production gRPC adds five concerns: TLS, load balancing (HTTP/2 changes everything), browser access ...
@@ -16,7 +16,6 @@ The .proto is done and the calls work locally. Production gRPC adds five concern
 
 ## TLS: Never Plaintext in Production
 
-```java
 // Server
 @Bean
 public GrpcServerConfigurer serverConfigurer() {
@@ -30,7 +29,6 @@ ManagedChannel channel = ManagedChannelBuilder
     .forAddress(host, 443)
     .useTransportSecurity()                            // TLS by default
     .build();
-```
 
 Or via properties:
 
@@ -56,7 +54,6 @@ HTTP/2 multiplexes many streams over one connection. Classic round-robin load ba
 | **xDS** | Envoy/control-plane-driven — the modern service-mesh answer |
 | **DNS** | Client resolves DNS and round-robins (works for simple cases) |
 
-```java
 // Client-side round robin over multiple addresses
 NameResolverRegistry.getDefaultRegistry().register(
     new StaticNameResolverProvider(List.of(
@@ -67,7 +64,6 @@ ManagedChannel channel = ManagedChannelBuilder
     .forTarget("static:///backends")
     .defaultLoadBalancingPolicy("round_robin")
     .build();
-```
 
 **The rule**: with HTTP/2 + gRPC, load balancing moves to the client or to a proxy like Envoy — plain TCP round-robin won't spread load correctly.
 
@@ -100,7 +96,6 @@ grpc:
     interceptors: [com.acme.GrpcMetricsInterceptor]
 ```
 
-```java
 @Component
 public class GrpcMetricsInterceptor implements ClientInterceptor {
 
@@ -128,7 +123,6 @@ public class GrpcMetricsInterceptor implements ClientInterceptor {
         };
     }
 }
-```
 
 ### Tracing
 
@@ -147,7 +141,6 @@ logging:
 
 gRPC has a standard health service (`grpc.health.v1.Health`) — Kubernetes probes can use it:
 
-```java
 // Server: register the health service
 @Bean
 public GrpcServerConfigurer healthConfigurer() {
@@ -157,7 +150,6 @@ public GrpcServerConfigurer healthConfigurer() {
 // Update status per dependency
 healthStatusManager.setStatus("", HealthCheckResponse.ServingStatus.SERVING);
 healthStatusManager.setStatus("course-db", HealthCheckResponse.ServingStatus.NOT_SERVING);
-```
 
 ```yaml
 # Kubernetes probe via grpc_health_probe
@@ -173,13 +165,11 @@ readinessProbe:
 
 gRPC reflection lets tools (grpcurl, Postman) discover services without the .proto:
 
-```java
 @Bean
 public GrpcServerConfigurer reflectionConfigurer() {
     return builder -> builder.addService(
         ServerReflectionUtil.createProtoReflectionService());
 }
-```
 
 ```bash
 grpcurl -plaintext localhost:9090 list
@@ -213,3 +203,4 @@ grpcurl -plaintext -d '{"id": 1}' localhost:9090 academy.v1.CourseService/GetCou
 | Discovery | Reflection + grpcurl |
 
 gRPC is production-ready out of the box — but only with the hardening layer: TLS, real load balancing (the HTTP/2 trap), deadlines, observability interceptors, and the health service. Add these and gRPC becomes your fastest, most reliable service-to-service protocol.
+

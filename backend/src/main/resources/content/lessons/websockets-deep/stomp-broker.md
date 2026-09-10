@@ -1,7 +1,7 @@
 ---
 title: STOMP — Messaging Semantics on Top of WebSocket
 module: websockets-deep
-order: 2
+order: 1
 minutes: 25
 topics: ["STOMP", "message broker", "destinations", "subscriptions", "@MessageMapping", "@SendTo"]
 summary: Raw WebSockets give you frames — but no routing, no topics, no requestreply, no "subscribe to a channel". You end up handrolling a miniprotocol (th...
@@ -43,6 +43,17 @@ Browser (STOMP over WebSocket)
 
 ## The Code Walkthrough
 
+
+**What this code does — step by step:**
+
+1. ---- 1. Receiving + replying: request-reply style ----
+2. `@MessageMapping("/chat.send")` — client SENDs to /app/chat.send
+3. `@SendTo("/topic/chat")` — result goes to all subscribers
+4. ---- 2. Server-push at any time (not just in response) ----
+5. Called from ANYWHERE in the app (a service, a scheduler, an event listener):
+
+The same code, clean:
+
 ```java
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
@@ -52,27 +63,23 @@ import org.springframework.stereotype.Controller;
 @Controller
 public class ChatController {
 
-    // ---- 1. Receiving + replying: request-reply style ----
-    @MessageMapping("/chat.send")                    // client SENDs to /app/chat.send
-    @SendTo("/topic/chat")                           // result goes to all subscribers
+    @MessageMapping("/chat.send")
+    @SendTo("/topic/chat")
     public ChatMessage broadcast(ChatMessage message) {
         return new ChatMessage(message.from(), message.text());
     }
 
-    // ---- 2. Server-push at any time (not just in response) ----
     private final SimpMessagingTemplate template;
 
     public ChatController(SimpMessagingTemplate template) { this.template = template; }
 
     public void notifyNewLesson(String courseTitle) {
-        // Called from ANYWHERE in the app (a service, a scheduler, an event listener):
         template.convertAndSend("/topic/announcements",
                 "New lesson published: " + courseTitle);
     }
 }
 ```
 
-```java
 // The config: enable STOMP with an in-memory broker
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
@@ -93,7 +100,6 @@ public class StompConfig implements WebSocketMessageBrokerConfigurer {
         registry.addEndpoint("/ws").withSockJS();          // the connect URL
     }
 }
-```
 
 ### Walking Through Each Part
 
@@ -159,3 +165,4 @@ The browser subscribes and sends through one connection; the server routes via d
 - SockJS gives HTTP fallbacks when WebSocket is unavailable.
 - Multi-instance production needs a real broker, not the in-memory simple broker.
 - Secure subscriptions: not every client should see every topic.
+

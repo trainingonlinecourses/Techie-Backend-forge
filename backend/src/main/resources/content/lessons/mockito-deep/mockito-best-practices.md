@@ -1,7 +1,7 @@
 ---
 title: Mockito Best Practices — Design, Strictness, and Testability
 module: mockito-deep
-order: 5
+order: 3
 minutes: 24
 topics: ["best practices", "testability", "strict stubs", "design for testing", "anti-patterns", "mockito hygiene"]
 summary: Here's the uncomfortable truth about mocking: how much mocking your tests require is a direct measurement of your code's design. Code with clear se...
@@ -20,28 +20,34 @@ Here's the uncomfortable truth about mocking: **how much mocking your tests requ
 
 ## Rule 1: Constructor Injection Is the Testability Foundation
 
+
+**What this code does — step by step:**
+
+1. HARD to test — the dependency is created inside the method:
+2. `EmailClient client = new EmailClient();` — no seam!
+3. EASY to test — the dependency arrives via the constructor:
+4. `public EasyToTestService(EmailClient client) {` — the seam
+5. The test then needs ONE line: EasyToTestService service = new EasyToTestService(mockClient);
+
+The same code, clean:
+
 ```java
-// HARD to test — the dependency is created inside the method:
 class HardToTestService {
     public void sendReport() {
-        EmailClient client = new EmailClient();   // no seam!
+        EmailClient client = new EmailClient();
         client.send("report");
     }
 }
 
-// EASY to test — the dependency arrives via the constructor:
 class EasyToTestService {
     private final EmailClient client;
-    public EasyToTestService(EmailClient client) {  // the seam
+    public EasyToTestService(EmailClient client) {
         this.client = client;
     }
     public void sendReport() {
         client.send("report");
     }
 }
-
-// The test then needs ONE line:
-// EasyToTestService service = new EasyToTestService(mockClient);
 ```
 
 **The rule:** dependencies enter through the **constructor** (or an explicit setter — never via `new` inside methods or static singletons). This is the single highest-leverage testability practice, and it's exactly what Spring's constructor injection enforces in production code — the framework's design philosophy *is* the testability philosophy. When you see a class that's awkward to mock, the fix is usually in the class, not the test.
@@ -50,7 +56,6 @@ class EasyToTestService {
 
 Mockito's JUnit 5 extension defaults to **strict stubs** — and you should keep it that way:
 
-```java
 @ExtendWith(MockitoExtension.class)   // strict by default
 class ServiceTest {
     @Mock Collaborator collab;
@@ -63,23 +68,27 @@ class ServiceTest {
         //    the unused stub is dead code in the test, hiding rot.
     }
 }
-```
 
 **Why strictness matters:** an unused stub means the test's *setup describes behavior the code no longer performs* — a stale expectation that will eventually mislead (the stub "documents" a call that doesn't happen, and a future refactor may silently break the real contract). Strict stubs fail the test immediately, forcing cleanup. The rule: **stub exactly what the path under test uses** — no more. (The escape hatch for genuinely conditional stubs is `lenient()`: `lenient().when(...)...` — use it sparingly and knowingly.)
 
 ## Rule 3: Verify Behavior, Not Implementation
 
+
+**What this code does — step by step:**
+
+1. GOOD — verifies the OBSERVABLE contract:
+2. QUESTIONABLE — verifies incidental implementation details:
+3. `verify(repo, times(1)).findById(1L);` — does the call count matter?
+4. `verify(metrics).record("cache.hit");` — implementation detail?
+5. The test should pin the BEHAVIOR ("a pending order was saved"),. Not the internal choreography. Over-verification makes every. Refactor break tests that weren't testing anything real.
+
+The same code, clean:
+
 ```java
-// GOOD — verifies the OBSERVABLE contract:
 verify(repo).save(argThat(o -> o.status().equals("PENDING")));
 
-// QUESTIONABLE — verifies incidental implementation details:
-verify(repo, times(1)).findById(1L);       // does the call count matter?
-verify(metrics).record("cache.hit");       // implementation detail?
-
-// The test should pin the BEHAVIOR ("a pending order was saved"),
-// not the internal choreography. Over-verification makes every
-// refactor break tests that weren't testing anything real.
+verify(repo, times(1)).findById(1L);
+verify(metrics).record("cache.hit");
 ```
 
 **The discipline:** verify interactions that are *contractual* — "the payment was captured," "the audit entry was written," "the cache was invalidated." Skip the incidental — helper call counts, intermediate method invocations, logging. When a refactor that changes no behavior breaks your tests, the tests were over-verified.
@@ -99,20 +108,28 @@ The smell: `mock(TransactionManager.class)` to "test" your transaction logic —
 
 A test's structure should be *mostly real, thinly mocked*:
 
+
+**What this code does — step by step:**
+
+1. REAL: value objects, DTOs, the class under test.
+2. MOCKED: the boundary.
+3. REAL: the behavior under test.
+4. `assertTrue(ok);` — assert the outcome...
+5. `verify(orderRepo).save(order);` — ...and the contract
+
+The same code, clean:
+
 ```java
 @Test
 void placesOrder() {
-    // REAL: value objects, DTOs, the class under test.
     Order order = new Order("c1", 25.0);
 
-    // MOCKED: the boundary.
     when(payments.charge("c1", 25.0)).thenReturn(true);
 
-    // REAL: the behavior under test.
     boolean ok = service.placeOrder(order);
 
-    assertTrue(ok);                     // assert the outcome...
-    verify(orderRepo).save(order);      // ...and the contract
+    assertTrue(ok);
+    verify(orderRepo).save(order);
 }
 ```
 
@@ -138,3 +155,4 @@ If a test needs mocks for *everything* and asserts on *nothing real* (all outcom
 ## Recap
 
 Mockito best practices are really design practices: **constructor injection** creates the seams that make mocking trivial; **strict stubs** act as a linter against dead expectations; **verify contracts not implementation** keeps tests refactor-proof; and **mock only boundaries** — never value objects, never your own logic, never the database when you're testing queries. Keep tests mostly real and thinly mocked, inject clocks and executors instead of mocking time, and treat elaborate mocking as a design signal. The professional insight: a test suite that mocks gracefully isn't a suite with good Mockito skills — it's a suite whose *code* was designed for testing, and Mockito is simply the tool that makes the seams pay off.
+

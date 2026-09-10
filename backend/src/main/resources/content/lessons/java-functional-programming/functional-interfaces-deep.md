@@ -20,12 +20,10 @@ Think of it like a job posting: "We need a person who can do *one task*: `apply`
 
 The annotation `@FunctionalInterface` makes the contract explicit and asks the compiler to verify it:
 
-```java
 @FunctionalInterface
 interface Greeter {
     String greet(String name);     // exactly ONE abstract method
 }
-```
 
 If you add a second abstract method, the compiler refuses to compile — the interface is no longer functional, and lambdas can't target it.
 
@@ -47,6 +45,24 @@ Primitive variants (`IntPredicate`, `LongFunction`, `DoubleSupplier`...) avoid b
 
 ## The Code Walkthrough
 
+
+**What this code does — step by step:**
+
+1. ---- 1. Predicate: a condition ----
+2. `System.out.println(isLong.test("Spring"));` — true
+3. ---- 2. Function: a transform ----
+4. `System.out.println(wordCount.apply("Java and Spring"));` — 3
+5. ---- 3. Consumer: a side effect ----
+6. ---- 4. Supplier: lazy production ----
+7. `Supplier<Double> random = () -> Math.random();` — nothing in, value out
+8. ---- 5. Composing with andThen / compose ----
+9. `System.out.println(doubleThenAdd.apply(5));` — 11 (5*2=10, then +1)
+10. ---- 6. Default methods — predicates combine ----
+11. `System.out.println(both.test("Apple"));` — true (A + long)
+12. `System.out.println(both.test("xyz"));` — true (or branch)
+
+The same code, clean:
+
 ```java
 import java.util.function.*;
 import java.util.*;
@@ -54,34 +70,28 @@ import java.util.*;
 public class FunctionalInterfaceDemo {
 
     public static void main(String[] args) {
-        // ---- 1. Predicate: a condition ----
         Predicate<String> isLong = s -> s.length() > 5;
-        System.out.println(isLong.test("Spring"));     // true
+        System.out.println(isLong.test("Spring"));
 
-        // ---- 2. Function: a transform ----
         Function<String, Integer> wordCount = s -> s.split("\\s+").length;
-        System.out.println(wordCount.apply("Java and Spring"));   // 3
+        System.out.println(wordCount.apply("Java and Spring"));
 
-        // ---- 3. Consumer: a side effect ----
         Consumer<String> logger = s -> System.out.println("[log] " + s);
         logger.accept("booted");
 
-        // ---- 4. Supplier: lazy production ----
-        Supplier<Double> random = () -> Math.random();     // nothing in, value out
+        Supplier<Double> random = () -> Math.random();
         System.out.println(random.get());
 
-        // ---- 5. Composing with andThen / compose ----
         Function<Integer, Integer> doubleIt = x -> x * 2;
         Function<Integer, Integer> addOne = x -> x + 1;
         Function<Integer, Integer> doubleThenAdd = doubleIt.andThen(addOne);
-        System.out.println(doubleThenAdd.apply(5));        // 11  (5*2=10, then +1)
+        System.out.println(doubleThenAdd.apply(5));
 
-        // ---- 6. Default methods — predicates combine ----
         Predicate<String> startsWithA = s -> s.startsWith("A");
         Predicate<String> longEnough = s -> s.length() > 3;
         Predicate<String> both = startsWithA.and(longEnough).or(s -> s.equals("xyz"));
-        System.out.println(both.test("Apple"));            // true (A + long)
-        System.out.println(both.test("xyz"));              // true (or branch)
+        System.out.println(both.test("Apple"));
+        System.out.println(both.test("xyz"));
     }
 }
 ```
@@ -102,7 +112,6 @@ public class FunctionalInterfaceDemo {
 
 ## Writing Your Own Functional Interface
 
-```java
 @FunctionalInterface
 interface Transformer<T> {
     T transform(T value);
@@ -112,7 +121,6 @@ interface Transformer<T> {
         return value -> after.transform(transform(value));
     }
 }
-```
 
 Rules for a functional interface:
 
@@ -126,12 +134,10 @@ Rules for a functional interface:
 
 When a method is overloaded with different functional interfaces, the compiler can't always tell which lambda type you meant:
 
-```java
 // Both take a functional interface — ambiguous!
 // void handle(Function<String,Integer> f) {...}
 // void handle(Consumer<String> c) {...}
 // handle(s -> s.length());   // COMPILE ERROR: which one?
-```
 
 Fix: cast to the target type (`handle((Function<String,Integer>) s -> s.length())`) or rename the methods. In practice this is rare — just know it exists.
 
@@ -151,3 +157,4 @@ Fix: cast to the target type (`handle((Function<String,Integer>) s -> s.length()
 - `andThen`/`compose`/`and`/`or` let small functions combine into bigger ones.
 - `@FunctionalInterface` turns the rule into a compile-time check.
 - Lambdas take their type from context — the interface, not the lambda, has the name.
+

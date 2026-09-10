@@ -36,6 +36,19 @@ Without correlation ids, there's no way to know which reply belongs to which req
 
 ## The Code Walkthrough
 
+
+**What this code does — step by step:**
+
+1. ---- 1. The request-reply gateway ----
+2. Callers get a synchronous answer:
+3. ---- 2. The service that answers ----
+4. simulate work (in a real app: pricing engine, possibly async)
+5. ---- 3. Manual request-reply (async, with explicit correlation) ----
+6. `.setHeader("correlationId", correlationId)` — the matching token
+7. Each request gets its own reply channel wired to a future
+
+The same code, clean:
+
 ```java
 import org.springframework.integration.annotation.Gateway;
 import org.springframework.integration.annotation.MessagingGateway;
@@ -47,27 +60,22 @@ import org.springframework.stereotype.Component;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
-// ---- 1. The request-reply gateway ----
 @MessagingGateway
 public interface QuoteGateway {
 
-    // Callers get a synchronous answer:
     @Gateway(requestChannel = "quotes.in", replyChannel = "quotes.out")
     Quote requestQuote(Order order);
 }
 
-// ---- 2. The service that answers ----
 @Component
 public class QuoteService {
 
     @org.springframework.integration.annotation.ServiceActivator(inputChannel = "quotes.in")
     public Quote answer(Order order) {
-        // simulate work (in a real app: pricing engine, possibly async)
         return new Quote(order.id(), order.total().multiply(java.math.BigDecimal.valueOf(0.10)));
     }
 }
 
-// ---- 3. Manual request-reply (async, with explicit correlation) ----
 @Component
 public class AsyncQuoteClient {
 
@@ -80,7 +88,7 @@ public class AsyncQuoteClient {
         String correlationId = UUID.randomUUID().toString();
 
         Message<Order> request = MessageBuilder.withPayload(order)
-                .setHeader("correlationId", correlationId)      // the matching token
+                .setHeader("correlationId", correlationId)
                 .setHeader("replyChannel", replyChannel(correlationId, future))
                 .build();
 
@@ -88,7 +96,6 @@ public class AsyncQuoteClient {
         return future;
     }
 
-    // Each request gets its own reply channel wired to a future
     private MessageChannel replyChannel(String correlationId,
                                         CompletableFuture<Quote> future) {
         return message -> {
@@ -148,3 +155,4 @@ A request-reply flow can hang: the answer never comes (consumer down, message lo
 - Manual pattern: per-request reply channel + `CompletableFuture`, completed when the matching reply arrives.
 - The same pattern crosses transports: RabbitMQ `reply_to`/`correlation_id` RPC, Kafka header correlation.
 - Always bound timeouts; expire stale requests; complete futures with errors on failure.
+

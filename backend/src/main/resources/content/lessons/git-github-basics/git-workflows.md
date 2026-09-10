@@ -1,7 +1,7 @@
 ---
 title: Git Workflows — How Teams Actually Use Git
 module: git-github-basics
-order: 5
+order: 3
 minutes: 26
 topics: ["GitHub Flow", "Git Flow", "pull requests", "code review", "CI", "trunk-based development"]
 summary: Git gives you branches, merges, and remotes — but how a team uses them is the workflow: which branches exist, when things merge, who reviews, where...
@@ -162,3 +162,4 @@ This academy's repo demonstrates the pattern: CI builds and tests on every push;
 - Git Flow fits scheduled releases; trunk-based fits fast CI/CD cultures.
 - Protect main: require reviews, CI, and up-to-date branches.
 - Start with GitHub Flow; add ceremony only when releases demand it.
+

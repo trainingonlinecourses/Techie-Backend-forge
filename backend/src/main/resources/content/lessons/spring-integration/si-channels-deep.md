@@ -22,12 +22,10 @@ The channel is the *pipe* of the integration — but not all pipes behave alike.
 
 ## DirectChannel: The Synchronous Default
 
-```java
 @Bean
 MessageChannel ordersChannel() {
     return MessageChannels.direct().get();
 }
-```
 
 **The semantics:** the sender invokes the receiver *in the same thread* — a synchronous method call through the message abstraction. `channel.send(message)` blocks until the (single) subscriber's endpoint finishes.
 
@@ -35,14 +33,12 @@ MessageChannel ordersChannel() {
 
 ## QueueChannel: The Async Buffer
 
-```java
 @Bean
 MessageChannel emailOutbox() {
     // A bounded queue: 100 pending messages. The sender never blocks
     // (until full); a consumer drains at its own pace.
     return MessageChannels.queue(100).get();
 }
-```
 
 **The semantics:** `send` enqueues and returns immediately; a consumer (a poller on a downstream endpoint, or `@ServiceActivator(inputChannel=..., poller=...)`) dequeues when ready. The producer and consumer are decoupled — different threads, different paces.
 
@@ -53,7 +49,6 @@ MessageChannel emailOutbox() {
 
 ## PublishSubscribeChannel: The Broadcast
 
-```java
 @Bean
 MessageChannel auditEvents() {
     // EVERY subscriber receives every message — independently.
@@ -66,30 +61,34 @@ public void auditToDatabase(Object payload) { ... }
 
 @ServiceActivator(inputChannel = "auditEvents")
 public void auditToKafka(Object payload) { ... }
-```
 
 **The semantics:** one message in, N copies out — each subscriber processes independently, in its own error context. This is the event-driven "multiple reactions to one fact" pattern in channel form. **The distinctions that matter:** a *direct* channel with two subscribers is an error (only one receives); a publish-subscribe channel *requires* multiple subscribers to earn its name; and each subscriber's failure is isolated (one subscriber throwing doesn't stop the others). For true fan-out to *systems* (Kafka topics, webhooks), the `@Poller`-less pub-sub channel dispatches to each subscriber's endpoint directly.
 
 ## The Other Channel Flavors
 
+
+**What this code does — step by step:**
+
+1. Priority channel — dequeue by a priority header, not FIFO:
+2. `Integer.compare(priorityOf(m2), priorityOf(m1))).get();` — highest first
+3. Rendezvous channel — the rarest: send BLOCKS until the receiver. Takes the message (a hand-off, no buffering). Useful for a strict. "wait until consumed" handshake.
+4. Executor channel — async dispatch to a task executor (thread pool):
+5. Like a queue channel, but with an explicit executor you control.
+
+The same code, clean:
+
 ```java
-// Priority channel — dequeue by a priority header, not FIFO:
 @Bean
 MessageChannel jobsChannel() {
     return MessageChannels.priority(100, (m1, m2) ->
-        Integer.compare(priorityOf(m2), priorityOf(m1))).get();   // highest first
+        Integer.compare(priorityOf(m2), priorityOf(m1))).get();
 }
 
-// Rendezvous channel — the rarest: send BLOCKS until the receiver
-// takes the message (a hand-off, no buffering). Useful for a strict
-// "wait until consumed" handshake.
 
-// Executor channel — async dispatch to a task executor (thread pool):
 @Bean
 MessageChannel slowTasks() {
     return MessageChannels.executor(Executors.newFixedThreadPool(4)).get();
 }
-// Like a queue channel, but with an explicit executor you control.
 ```
 
 **The family portrait:** direct (sync, transactional), queue (async, buffered, bounded), executor (async, thread-pooled), priority (async, ordered by priority), rendezvous (blocking hand-off), and publish-subscribe (broadcast). Most integrations need one of the first three plus pub-sub for fan-out — the others are the specialized tools.
@@ -98,7 +97,6 @@ MessageChannel slowTasks() {
 
 A queue channel's consumer doesn't run by itself — it needs a **poller**:
 
-```java
 @Bean
 public IntegrationFlow processEmail() {
     return IntegrationFlow
@@ -107,7 +105,6 @@ public IntegrationFlow processEmail() {
             .handle("emailService", "send")
             .get();
 }
-```
 
 `fixedDelay(100)` polls every 100ms; `maxMessagesPerPoll` bounds the batch (backpressure in batches). The poller *is* the consumer's heartbeat — and its `taskExecutor` (a `TaskExecutor` you can supply) decides whether polling blocks the integration thread. The poller + queue combination is Spring Integration's built-in async engine: producer threads enqueue, a poller thread drains, bounded by `maxMessagesPerPoll` and the queue's capacity.
 
@@ -127,3 +124,4 @@ public IntegrationFlow processEmail() {
 ## Recap
 
 Message channels are the pipes that define the integration's semantics: **direct** (synchronous, transactional, in-thread — the default), **queue** (async buffered — bounded, with a poller as the consumer engine), **publish-subscribe** (every subscriber gets everything, independently), plus priority, executor, and rendezvous flavors. The production discipline: use direct for transactional chains, bounded queues/executors where speed must decouple, pub-sub for fan-out — and remember that in-memory channels serve in-process integration, while durable cross-restart messaging belongs to a real broker through an adapter. The channel you choose *is* the behavior you get: blocking vs buffering, one receiver vs many, FIFO vs priority.
+

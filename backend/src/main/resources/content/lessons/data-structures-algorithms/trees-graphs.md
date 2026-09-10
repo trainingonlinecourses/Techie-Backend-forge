@@ -1,7 +1,7 @@
 ---
 title: Trees and Graphs — Hierarchies and Networks
 module: data-structures-algorithms
-order: 4
+order: 5
 minutes: 28
 topics: ["binary trees", "BST", "tree traversal", "graphs", "BFS", "DFS"]
 summary: Lists and maps organize data linearly. Trees and graphs organize relationships — and they're everywhere in software: file systems (directories nest...
@@ -28,6 +28,21 @@ Lists and maps organize data *linearly*. **Trees and graphs** organize *relation
 
 A **binary tree** is a tree where each node has at most two children (left/right). The most important variant is the **binary search tree (BST)**: left child < parent < right child, at every node. That ordering is what makes searching O(log n) — at each node you discard half the remaining tree:
 
+
+**What this code does — step by step:**
+
+1. Insert following the BST invariant: smaller goes left, larger right.
+2. `if (node == null) return new Node(value);` — found the spot
+3. `return node;` — duplicate: ignore
+4. Search: at each node, go left/right — halving the space each time.
+5. `if (node == null) return false;` — not present
+6. In-order traversal: left, self, right -> yields SORTED order.
+7. `System.out.println(contains(root, 40));` — true
+8. `System.out.println(contains(root, 41));` — false
+9. `inOrder(root);` — 20 30 40 50 60 70 80 — sorted!
+
+The same code, clean:
+
 ```java
 class Node {
     int value;
@@ -36,24 +51,21 @@ class Node {
 }
 
 public class BstDemo {
-    // Insert following the BST invariant: smaller goes left, larger right.
     static Node insert(Node node, int value) {
-        if (node == null) return new Node(value);       // found the spot
+        if (node == null) return new Node(value);
         if (value < node.value) node.left = insert(node.left, value);
         else if (value > node.value) node.right = insert(node.right, value);
-        return node;                                    // duplicate: ignore
+        return node;
     }
 
-    // Search: at each node, go left/right — halving the space each time.
     static boolean contains(Node node, int value) {
-        if (node == null) return false;                 // not present
+        if (node == null) return false;
         if (value == node.value) return true;
         return value < node.value
                 ? contains(node.left, value)
                 : contains(node.right, value);
     }
 
-    // In-order traversal: left, self, right -> yields SORTED order.
     static void inOrder(Node node) {
         if (node == null) return;
         inOrder(node.left);
@@ -66,9 +78,9 @@ public class BstDemo {
         for (int v : new int[]{50, 30, 70, 20, 40, 60, 80}) {
             root = insert(root, v);
         }
-        System.out.println(contains(root, 40));   // true
-        System.out.println(contains(root, 41));   // false
-        inOrder(root);                            // 20 30 40 50 60 70 80 — sorted!
+        System.out.println(contains(root, 40));
+        System.out.println(contains(root, 41));
+        inOrder(root);
     }
 }
 ```
@@ -88,11 +100,23 @@ public class BstDemo {
 
 A graph is nodes + edges. The two fundamental explorations:
 
+
+**What this code does — step by step:**
+
+1. Adjacency list: node -> list of neighbors.
+2. BFS: explore level by level using a QUEUE. Finds the SHORTEST path (in unweighted graphs).
+3. `Map<String, String> cameFrom = new HashMap<>();` — path reconstruction
+4. `if (visited.add(neighbor)) {` — not seen before?
+5. DFS: explore one branch fully before backtracking, using a STACK. (or recursion). Good for "does a path exist", mazes, topology.
+6. `System.out.println(bfs("A", "F"));` — [A, C, F] — shortest
+7. `System.out.println(dfs("A", "F", new HashSet<>()));` — true
+
+The same code, clean:
+
 ```java
 import java.util.*;
 
 public class GraphDemo {
-    // Adjacency list: node -> list of neighbors.
     static Map<String, List<String>> graph = new HashMap<>();
 
     static {
@@ -104,11 +128,9 @@ public class GraphDemo {
         graph.put("F", List.of("C", "E"));
     }
 
-    // BFS: explore level by level using a QUEUE.
-    // Finds the SHORTEST path (in unweighted graphs).
     static List<String> bfs(String start, String target) {
         Queue<String> queue = new ArrayDeque<>();
-        Map<String, String> cameFrom = new HashMap<>();   // path reconstruction
+        Map<String, String> cameFrom = new HashMap<>();
         Set<String> visited = new HashSet<>();
 
         queue.add(start);
@@ -119,7 +141,7 @@ public class GraphDemo {
             if (node.equals(target)) break;
 
             for (String neighbor : graph.getOrDefault(node, List.of())) {
-                if (visited.add(neighbor)) {        // not seen before?
+                if (visited.add(neighbor)) {
                     cameFrom.put(neighbor, node);
                     queue.add(neighbor);
                 }
@@ -128,8 +150,6 @@ public class GraphDemo {
         return reconstruct(start, target, cameFrom);
     }
 
-    // DFS: explore one branch fully before backtracking, using a STACK
-    // (or recursion). Good for "does a path exist", mazes, topology.
     static boolean dfs(String node, String target, Set<String> visited) {
         if (node.equals(target)) return true;
         visited.add(node);
@@ -149,8 +169,8 @@ public class GraphDemo {
     }
 
     public static void main(String[] args) {
-        System.out.println(bfs("A", "F"));        // [A, C, F] — shortest
-        System.out.println(dfs("A", "F", new HashSet<>()));  // true
+        System.out.println(bfs("A", "F"));
+        System.out.println(dfs("A", "F", new HashSet<>()));
     }
 }
 ```
@@ -171,3 +191,4 @@ Graphs are stored two ways, and the choice matters:
 ## Recap
 
 Trees are rooted hierarchies with one parent per node and no cycles; binary search trees impose ordering (left < node < right) to get O(log n) search and sorted in-order traversal — provided they stay balanced (that's what red-black trees and B-trees do). Graphs are unrestricted networks explored by BFS (queue, shortest paths, O(V+E)) or DFS (stack/recursion, path existence, cycles), represented as adjacency lists or matrices. Every "dependency", "route", and "hierarchy" problem in software is one of these two shapes — and choosing the right traversal and representation is most of the battle.
+

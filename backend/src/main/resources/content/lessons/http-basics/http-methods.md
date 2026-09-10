@@ -1,7 +1,7 @@
 ---
 title: HTTP Methods — The Verbs of the Web
 module: http-basics
-order: 1
+order: 4
 minutes: 25
 topics: ["HTTP methods", "GET POST PUT DELETE PATCH", "idempotency", "safe methods", "HTTP semantics"]
 summary: HTTP is a requestresponse protocol with a small set of methods (verbs) that say what the client wants done with the resource at the URL. The URL na...
@@ -50,41 +50,50 @@ Why idempotency matters: **retries**. If a request times out and the client retr
 
 ## The Code Walkthrough — Methods in Spring
 
+
+**What this code does — step by step:**
+
+1. GET /api/courses — read, safe, cacheable
+2. GET /api/courses/{id} — read one
+3. POST /api/courses — create (NOT idempotent: each call makes a new course)
+4. `@ResponseStatus(HttpStatus.CREATED)` — 201: a resource was created
+5. PUT /api/courses/{id} — full replace (idempotent)
+6. `return service.replace(id, req);` — the body IS the whole new course
+7. PATCH /api/courses/{id} — partial update
+8. DELETE /api/courses/{id} — remove (idempotent: repeat is harmless)
+9. `@ResponseStatus(HttpStatus.NO_CONTENT)` — 204: done, no body
+
+The same code, clean:
+
 ```java
 @RestController
 @RequestMapping("/api/courses")
 public class CourseController {
 
-    // GET /api/courses — read, safe, cacheable
     @GetMapping
     public List<CourseDto> list() { return service.list(); }
 
-    // GET /api/courses/{id} — read one
     @GetMapping("/{id}")
     public CourseDto get(@PathVariable long id) { return service.get(id); }
 
-    // POST /api/courses — create (NOT idempotent: each call makes a new course)
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)          // 201: a resource was created
+    @ResponseStatus(HttpStatus.CREATED)
     public CourseDto create(@RequestBody @Valid CourseRequest req) {
         return service.create(req);
     }
 
-    // PUT /api/courses/{id} — full replace (idempotent)
     @PutMapping("/{id}")
     public CourseDto replace(@PathVariable long id, @RequestBody CourseRequest req) {
-        return service.replace(id, req);          // the body IS the whole new course
+        return service.replace(id, req);
     }
 
-    // PATCH /api/courses/{id} — partial update
     @PatchMapping("/{id}")
     public CourseDto update(@PathVariable long id, @RequestBody Map<String, Object> changes) {
         return service.partialUpdate(id, changes);
     }
 
-    // DELETE /api/courses/{id} — remove (idempotent: repeat is harmless)
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)        // 204: done, no body
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable long id) { service.delete(id); }
 }
 ```
@@ -133,3 +142,4 @@ The classic beginner question: "should I use POST or PUT to update?" — Update-
 - POST is neither — the danger case for retries (use idempotency keys).
 - Choose the verb for the intent; the framework annotations map one-to-one.
 - Never put side effects in GET; never send partial bodies to PUT.
+

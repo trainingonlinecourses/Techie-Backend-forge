@@ -1,7 +1,7 @@
 ---
 title: OpenAPI & API Documentation with springdoc
 summary: Self-documenting REST APIs — OpenAPI 3 descriptors, springdoc-openapi annotations, Swagger UI, and generating typed clients from the contract.
-order: 2
+order: 5
 minutes: 13
 topics: [openapi, swagger, springdoc, api documentation, api contract]
 docs:
@@ -34,7 +34,6 @@ No annotations needed for the basics: `@RestController` + DTOs + `@Valid` constr
 
 The generated descriptor is only as good as the metadata you add:
 
-```java
 @Operation(summary = "Create an order", description = "Validates stock and reserves payment")
 @ApiResponses({
     @ApiResponse(responseCode = "201", description = "Order created", content = @Content(schema = @Schema(implementation = OrderDto.class))),
@@ -50,7 +49,6 @@ public record CreateOrderRequest(
     @Schema(minimum = "0.01")
     @Positive BigDecimal amount
 ) {}
-```
 
 - `@Schema` adds examples/descriptions to DTOs — examples make the UI (and your testers) far more useful.
 - Constraint annotations (`@NotNull`, `@Size`, `@Email`) are **translated into the schema** automatically (required, min/max length, format) — one more reason to validate with Bean Validation.
@@ -91,3 +89,4 @@ Swagger UI in production is a choice: it's a read-only documentation surface (no
 - Decide the production exposure policy (docs on, or gated by auth) explicitly.
 
 Official docs: [springdoc-openapi](https://springdoc.org/) · [OpenAPI Specification](https://swagger.io/specification/)
+

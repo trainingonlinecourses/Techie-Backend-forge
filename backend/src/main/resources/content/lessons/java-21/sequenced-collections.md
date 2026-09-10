@@ -1,7 +1,7 @@
 ---
 title: Sequenced Collections — First, Last, and Reversed
 summary: What SequencedCollection, SequencedSet, and SequencedMap are, how they unify first/last/reversed operations, and how organizations use them.
-order: 2
+order: 4
 minutes: 15
 topics: [sequenced-collection, sequenced-set, sequenced-map, reversed, java21]
 docs:
@@ -12,7 +12,6 @@ docs:
 
 Before Java 21, getting the first or last element of a collection required awkward workarounds:
 
-```java
 // Getting the first element — verbose
 String first = list.isEmpty() ? null : list.get(0);
 
@@ -21,16 +20,13 @@ String last = list.isEmpty() ? null : list.get(list.size() - 1);
 
 // Reversing a list
 Collections.reverse(list);  // mutates the original!
-```
 
 Java 21 introduced the **SequencedCollection** interface with clean methods:
 
-```java
 // JAVA 21: Clean, readable, safe
 String first = list.getFirst();    // throws NoSuchElementException if empty
 String last = list.getLast();
 SequencedCollection<String> reversed = list.reversed();  // returns a VIEW, doesn't mutate
-```
 
 ---
 
@@ -46,37 +42,64 @@ SequencedCollection<E> — getFirst(), getLast(), addFirst(), addLast(), reverse
 
 ## Line-by-Line Walkthrough
 
+
+**What this code does — step by step:**
+
+1. Line 1: SequencedCollection — List implements it
+2. `System.out.println("First: " + list.getFirst());` — "A"
+3. `System.out.println("Last: " + list.getLast());` — "E"
+4. `list.addFirst("Z");` — [Z, A, B, C, D, E]
+5. `list.addLast("F");` — [Z, A, B, C, D, E, F]
+6. reversed() returns a VIEW — not a copy
+7. `System.out.println("Reversed: " + reversed);` — [F, E, D, C, B, A, Z]
+8. `System.out.println("Original: " + list);` — [Z, A, B, C, D, E, F] — unchanged
+9. Line 2: SequencedSet — LinkedHashSet implements it
+10. `System.out.println("First: " + set.getFirst());` — "X"
+11. `System.out.println("Last: " + set.getLast());` — "Z"
+12. `set.addFirst("W");` — [W, X, Y, Z]
+13. `set.addLast("A");` — [W, X, Y, Z, A]
+14. `System.out.println("Reversed: " + reversedSet);` — [A, Z, Y, X, W]
+15. Line 3: SequencedMap — LinkedHashMap implements it
+16. `System.out.println("First entry: " + first);` — Alice=30
+17. `System.out.println("Last entry: " + last);` — Carol=35
+18. `map.putFirst("Zoe", 28);` — adds at beginning
+19. `map.putLast("Dave", 22);` — adds at end
+20. `System.out.println("Reversed: " + reversedMap);` — {Dave=22, Carol=35, Bob=25, Alice=30, Zoe=28}
+21. Line 4: reversed() is a VIEW — changes propagate
+22. `System.out.println("Reversed view: " + reversedView);` — [6, 5, 4, 3, 2, 1]
+23. Line 5: Practical — processing from both ends
+24. `System.out.println("From start: " + deque.getFirst());` — "first"
+25. `System.out.println("From end: " + deque.getLast());` — "third"
+
+The same code, clean:
+
 ```java
 import java.util.*;
 
 public class SequencedCollectionsDemo {
     public static void main(String[] args) {
-        // Line 1: SequencedCollection — List implements it
         var list = new ArrayList<>(List.of("A", "B", "C", "D", "E"));
 
-        System.out.println("First: " + list.getFirst());   // "A"
-        System.out.println("Last: " + list.getLast());     // "E"
+        System.out.println("First: " + list.getFirst());
+        System.out.println("Last: " + list.getLast());
 
-        list.addFirst("Z");  // [Z, A, B, C, D, E]
-        list.addLast("F");   // [Z, A, B, C, D, E, F]
+        list.addFirst("Z");
+        list.addLast("F");
 
-        // reversed() returns a VIEW — not a copy
         var reversed = list.reversed();
-        System.out.println("Reversed: " + reversed);       // [F, E, D, C, B, A, Z]
-        System.out.println("Original: " + list);           // [Z, A, B, C, D, E, F] — unchanged
+        System.out.println("Reversed: " + reversed);
+        System.out.println("Original: " + list);
 
-        // Line 2: SequencedSet — LinkedHashSet implements it
         var set = new LinkedHashSet<>(List.of("X", "Y", "Z"));
-        System.out.println("First: " + set.getFirst());    // "X"
-        System.out.println("Last: " + set.getLast());      // "Z"
+        System.out.println("First: " + set.getFirst());
+        System.out.println("Last: " + set.getLast());
 
-        set.addFirst("W");  // [W, X, Y, Z]
-        set.addLast("A");   // [W, X, Y, Z, A]
+        set.addFirst("W");
+        set.addLast("A");
 
         var reversedSet = set.reversed();
-        System.out.println("Reversed: " + reversedSet);    // [A, Z, Y, X, W]
+        System.out.println("Reversed: " + reversedSet);
 
-        // Line 3: SequencedMap — LinkedHashMap implements it
         var map = new LinkedHashMap<String, Integer>();
         map.put("Alice", 30);
         map.put("Bob", 25);
@@ -84,25 +107,23 @@ public class SequencedCollectionsDemo {
 
         var first = map.firstEntry();
         var last = map.lastEntry();
-        System.out.println("First entry: " + first);       // Alice=30
-        System.out.println("Last entry: " + last);         // Carol=35
+        System.out.println("First entry: " + first);
+        System.out.println("Last entry: " + last);
 
-        map.putFirst("Zoe", 28);   // adds at beginning
-        map.putLast("Dave", 22);   // adds at end
+        map.putFirst("Zoe", 28);
+        map.putLast("Dave", 22);
 
         var reversedMap = map.reversed();
-        System.out.println("Reversed: " + reversedMap);    // {Dave=22, Carol=35, Bob=25, Alice=30, Zoe=28}
+        System.out.println("Reversed: " + reversedMap);
 
-        // Line 4: reversed() is a VIEW — changes propagate
         var numbers = new ArrayList<>(List.of(1, 2, 3, 4, 5));
         var reversedView = numbers.reversed();
         numbers.add(6);
-        System.out.println("Reversed view: " + reversedView);  // [6, 5, 4, 3, 2, 1]
+        System.out.println("Reversed view: " + reversedView);
 
-        // Line 5: Practical — processing from both ends
         var deque = new ArrayDeque<>(List.of("first", "second", "third"));
-        System.out.println("From start: " + deque.getFirst());  // "first"
-        System.out.println("From end: " + deque.getLast());     // "third"
+        System.out.println("From start: " + deque.getFirst());
+        System.out.println("From end: " + deque.getLast());
     }
 }
 ```
@@ -113,7 +134,6 @@ public class SequencedCollectionsDemo {
 
 ### Scenario 1: LRU Cache implementation
 
-```java
 public class LRUCache<K, V> {
     private final LinkedHashMap<K, V> cache;
     private final int maxSize;
@@ -139,11 +159,9 @@ public class LRUCache<K, V> {
         }
     }
 }
-```
 
 ### Scenario 2: Undo/Redo stack
 
-```java
 public class UndoRedoStack<T> {
     private final ArrayList<T> history = new ArrayList<>();
     private int position = -1;
@@ -177,7 +195,6 @@ public class UndoRedoStack<T> {
         return history.isEmpty() ? null : history.get(position);
     }
 }
-```
 
 ---
 
@@ -189,3 +206,4 @@ public class UndoRedoStack<T> {
 | Calling `getFirst()` on empty list | Throws NoSuchElementException | Check `isEmpty()` first |
 | Using `Collections.reverse()` | Mutates the original | Use `.reversed()` for a non-mutating view |
 | Confusing `addFirst()` with `add(0, ...)` | Semantically different | `addFirst()` is clearer and works on all SequencedCollections |
+

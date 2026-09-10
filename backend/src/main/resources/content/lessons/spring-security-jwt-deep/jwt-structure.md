@@ -1,7 +1,7 @@
 ---
 title: JWT Structure — What's Actually in a Token
 module: spring-security-jwt-deep
-order: 1
+order: 3
 minutes: 26
 topics: ["JWT", "JWS", "header", "payload", "signature", "base64url"]
 summary: A JWT (JSON Web Token) is a compact, URLsafe string that carries claims (statements about a subject — "user 42 is an admin", "this token expires at...
@@ -72,6 +72,17 @@ The signature is computed over **header + payload** with a secret (HMAC) or priv
 
 ## The Code Walkthrough — Building a Token by Hand
 
+
+**What this code does — step by step:**
+
+1. base64url: standard base64, but URL-safe and no padding
+2. `String secret = "super-secret-key";` — NEVER hardcode in real apps
+3. 1. Header + payload as JSON, then base64url-encoded
+4. 2. Sign header.payload with HMAC-SHA256
+5. 3. Verification: recompute the signature and compare. (in practice, a library like jjwt does this)
+
+The same code, clean:
+
 ```java
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -80,23 +91,20 @@ import java.util.Base64;
 
 public class JwtStructureDemo {
 
-    // base64url: standard base64, but URL-safe and no padding
     static String b64url(byte[] data) {
         return Base64.getUrlEncoder().withoutPadding()
                 .encodeToString(data);
     }
 
     public static void main(String[] args) throws Exception {
-        String secret = "super-secret-key";   // NEVER hardcode in real apps
+        String secret = "super-secret-key";
 
-        // 1. Header + payload as JSON, then base64url-encoded
         String header  = "{\"alg\":\"HS256\",\"typ\":\"JWT\"}";
         String payload = "{\"sub\":\"42\",\"name\":\"Sateesh\",\"admin\":true}";
 
         String h = b64url(header.getBytes(StandardCharsets.UTF_8));
         String p = b64url(payload.getBytes(StandardCharsets.UTF_8));
 
-        // 2. Sign header.payload with HMAC-SHA256
         Mac mac = Mac.getInstance("HmacSHA256");
         mac.init(new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), "HmacSHA256"));
         String signingInput = h + "." + p;
@@ -105,8 +113,6 @@ public class JwtStructureDemo {
         String token = signingInput + "." + b64url(sig);
         System.out.println(token);
 
-        // 3. Verification: recompute the signature and compare
-        //    (in practice, a library like jjwt does this)
         String[] parts = token.split("\\.");
         Mac verifier = Mac.getInstance("HmacSHA256");
         verifier.init(new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), "HmacSHA256"));
@@ -161,3 +167,4 @@ For auth, JWS is correct: you *want* the server to read the claims (subject, rol
 - Verification = recompute the signature and compare; tampering breaks it.
 - HS256 = one shared secret; RS256 = private/public key pair (better for multi-service).
 - Never use `alg: none`, never trust tokens without verification, always set `exp`.
+

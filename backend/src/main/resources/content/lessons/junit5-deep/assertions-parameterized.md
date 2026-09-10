@@ -1,7 +1,7 @@
 ---
 title: Assertions in Depth and Parameterized Tests
 module: junit5-deep
-order: 2
+order: 1
 minutes: 26
 topics: ["assertions", "assertAll", "parameterized tests", "ValueSource", "CsvSource", "MethodSource", "ArgumentSources"]
 summary: Two JUnit 5 features separate "tests that pass" from "tests that prove something": assertion composition (assertAll — report every failure, not jus...
@@ -22,6 +22,14 @@ Two JUnit 5 features separate "tests that pass" from "tests that prove something
 
 ## assertAll: See Every Failure
 
+
+**What this code does — step by step:**
+
+1. WITHOUT assertAll: the first failing assertion aborts the test —. You fix it, rerun, find the next one. One failure at a time. WITH assertAll: ALL assertions run; every failure is reported. Together, each with its own message and stack.
+2. If three of these fail, the report shows ALL THREE at once.
+
+The same code, clean:
+
 ```java
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
@@ -34,17 +42,12 @@ class OrderTest {
     void orderFieldsAreValid() {
         Order order = createOrder();
 
-        // WITHOUT assertAll: the first failing assertion aborts the test —
-        // you fix it, rerun, find the next one. One failure at a time.
-        // WITH assertAll: ALL assertions run; every failure is reported
-        // together, each with its own message and stack.
         assertAll("order fields",
             () -> assertNotNull(order.id(), "id must not be null"),
             () -> assertTrue(order.total() > 0, "total must be positive"),
             () -> assertTrue(order.total() < 10_000, "total under sanity cap"),
             () -> assertEquals("PENDING", order.status(), "initial status")
         );
-        // If three of these fail, the report shows ALL THREE at once.
     }
 
     Order createOrder() { return new Order("o1", 99.0, "PENDING"); }
@@ -57,6 +60,16 @@ class OrderTest {
 
 The feature that collapses copy-pasted tests:
 
+
+**What this code does — step by step:**
+
+1. The @ValueSource provides the inputs; the test runs once per value.
+2. @CsvSource — MULTIPLE arguments per invocation, as CSV rows:
+3. `"0, 1",` — n, expected
+4. @MethodSource — the most flexible: a static method returns the inputs. (Stream of Arguments / a record / simple values):
+
+The same code, clean:
+
 ```java
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -65,7 +78,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class ParameterizedDemo {
 
-    // The @ValueSource provides the inputs; the test runs once per value.
     @ParameterizedTest
     @ValueSource(strings = { "racecar", "radar", "level", "hello" })
     void isPalindrome(String word) {
@@ -77,10 +89,9 @@ class ParameterizedDemo {
         return new StringBuilder(w).reverse().toString().equals(w);
     }
 
-    // @CsvSource — MULTIPLE arguments per invocation, as CSV rows:
     @ParameterizedTest
     @CsvSource({
-        "0, 1",     // n, expected
+        "0, 1",
         "1, 1",
         "2, 2",
         "3, 6",
@@ -96,8 +107,6 @@ class ParameterizedDemo {
         return r;
     }
 
-    // @MethodSource — the most flexible: a static method returns the inputs
-    // (Stream of Arguments / a record / simple values):
     @ParameterizedTest
     @MethodSource("amounts")
     void chargeRejectsInvalidAmounts(BigDecimal amount) {
@@ -125,14 +134,12 @@ class ParameterizedDemo {
 
 ## Customizing the Display Names
 
-```java
 @ParameterizedTest
 @CsvSource({ "2, 1", "3, 2", "10, 55" })
 @DisplayName("fib({0}) = {1}")
 void fib(int n, long expected) {
     // each invocation shows: fib(2) = 1, fib(3) = 2, fib(10) = 55
 }
-```
 
 The `{0}`, `{1}` placeholders inject the invocation arguments into the display name — the report reads like a table of cases instead of `[1]`, `[2]`, `[3]`.
 
@@ -147,3 +154,4 @@ The `{0}`, `{1}` placeholders inject the invocation arguments into the display n
 ## Recap
 
 `assertAll` aggregates every assertion failure into one report — the difference between fixing one bug per run and seeing the whole failure picture at once. Parameterized tests (`@ValueSource`, `@CsvSource`, `@MethodSource`, `@EnumSource`) run one test body against many inputs, each invocation reported as its own named case — collapsing copy-pasted tests into data-driven coverage with self-documenting names. The craft: parameterize same-logic-different-data, include boundaries, name with placeholders, and keep sources next to their tests. Combined, these two features are what make a JUnit suite a *diagnostic instrument* rather than a checkbox.
+

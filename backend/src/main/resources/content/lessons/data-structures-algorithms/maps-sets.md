@@ -24,24 +24,36 @@ A list answers "does this contain x?" by scanning every element — O(n). A **ma
 
 ## The HashMap in Action
 
+
+**What this code does — step by step:**
+
+1. `ages.put("Ada", 36);` — O(1) average
+2. `Integer ada = ages.get("Ada");` — O(1) — 36
+3. `Integer missing = ages.get("Bob");` — null — no such key
+4. `int safe = ages.getOrDefault("Bob", 0);` — 0 — avoid null
+5. `System.out.println(ages.containsKey("Grace"));` — true
+6. `System.out.println(ages.size());` — 3
+7. Iteration order is NOT insertion order for HashMap:
+
+The same code, clean:
+
 ```java
 import java.util.*;
 
 public class MapDemo {
     public static void main(String[] args) {
         Map<String, Integer> ages = new HashMap<>();
-        ages.put("Ada", 36);      // O(1) average
+        ages.put("Ada", 36);
         ages.put("Grace", 45);
         ages.put("Linus", 54);
 
-        Integer ada = ages.get("Ada");       // O(1) — 36
-        Integer missing = ages.get("Bob");   // null — no such key
-        int safe = ages.getOrDefault("Bob", 0);  // 0 — avoid null
+        Integer ada = ages.get("Ada");
+        Integer missing = ages.get("Bob");
+        int safe = ages.getOrDefault("Bob", 0);
 
-        System.out.println(ages.containsKey("Grace"));  // true
-        System.out.println(ages.size());                // 3
+        System.out.println(ages.containsKey("Grace"));
+        System.out.println(ages.size());
 
-        // Iteration order is NOT insertion order for HashMap:
         for (Map.Entry<String, Integer> e : ages.entrySet()) {
             System.out.println(e.getKey() + " -> " + e.getValue());
         }
@@ -59,38 +71,48 @@ A hash function maps an infinite key space onto a finite bucket array, so differ
 
 ## The equals/hashCode Contract
 
+
+**What this code does — step by step:**
+
+1. A key type that violates the contract — hashCode is constant.
+2. `public int hashCode() { return 1; }` — WRONG: all keys, one bucket
+3. The contract-correct version:
+4. `public int hashCode() { return Objects.hashCode(value); }` — RIGHT
+5. `System.out.println(good.get(new GoodKey("a")));` — found — WORKS
+6. `System.out.println(bad.get(new BadKey("a")));` — null — BROKEN!
+
+The same code, clean:
+
 ```java
 import java.util.*;
 
 public class ContractDemo {
-    // A key type that violates the contract — hashCode is constant.
     static class BadKey {
         String value;
         BadKey(String v) { value = v; }
         public boolean equals(Object o) {
             return o instanceof BadKey && ((BadKey) o).value.equals(value);
         }
-        public int hashCode() { return 1; }   // WRONG: all keys, one bucket
+        public int hashCode() { return 1; }
     }
 
-    // The contract-correct version:
     static class GoodKey {
         String value;
         GoodKey(String v) { value = v; }
         public boolean equals(Object o) {
             return o instanceof GoodKey && ((GoodKey) o).value.equals(value);
         }
-        public int hashCode() { return Objects.hashCode(value); }  // RIGHT
+        public int hashCode() { return Objects.hashCode(value); }
     }
 
     public static void main(String[] args) {
         Map<GoodKey, String> good = new HashMap<>();
         good.put(new GoodKey("a"), "found");
-        System.out.println(good.get(new GoodKey("a")));   // found — WORKS
+        System.out.println(good.get(new GoodKey("a")));
 
         Map<BadKey, String> bad = new HashMap<>();
         bad.put(new BadKey("a"), "found");
-        System.out.println(bad.get(new BadKey("a")));     // null — BROKEN!
+        System.out.println(bad.get(new BadKey("a")));
     }
 }
 ```
@@ -101,15 +123,31 @@ public class ContractDemo {
 
 When you need keys *in order* (ranges, "smallest key ≥ x", iteration sorted), the hash table can't help — it's deliberately unordered. `TreeMap` uses a **red-black tree**: a self-balancing binary search tree where every operation (get, put, remove) walks the tree in O(log n), and iteration yields keys in sorted order. The extras it buys:
 
-```java
-TreeMap<Integer, String> logs = new TreeMap<>();
-logs.put(10, "startup"); logs.put(50, "login"); logs.put(90, "logout");
 
-System.out.println(logs.firstKey());       // 10
-System.out.println(logs.lastKey());        // 90
-System.out.println(logs.ceilingKey(45));   // 50 — smallest key >= 45
-System.out.println(logs.floorKey(45));     // 10 — largest key <= 45
-System.out.println(logs.subMap(10, 90));   // {10=startup, 50=login}
+**What this code does — step by step:**
+
+1. `System.out.println(logs.firstKey());` — 10
+2. `System.out.println(logs.lastKey());` — 90
+3. `System.out.println(logs.ceilingKey(45));` — 50 — smallest key >= 45
+4. `System.out.println(logs.floorKey(45));` — 10 — largest key <= 45
+5. `System.out.println(logs.subMap(10, 90));` — {10=startup, 50=login}
+
+The same code, clean:
+
+```java
+public class Main {
+
+    public static void main(String[] args) {
+        TreeMap<Integer, String> logs = new TreeMap<>();
+        logs.put(10, "startup"); logs.put(50, "login"); logs.put(90, "logout");
+
+        System.out.println(logs.firstKey());
+        System.out.println(logs.lastKey());
+        System.out.println(logs.ceilingKey(45));
+        System.out.println(logs.floorKey(45));
+        System.out.println(logs.subMap(10, 90));
+    }
+}
 ```
 
 Range queries (`ceilingKey`, `subMap`) are the reason `TreeMap` exists. The trade-off: O(log n) instead of O(1) for basic ops — a small constant-factor cost for huge ordering power.
@@ -132,3 +170,4 @@ Range queries (`ceilingKey`, `subMap`) are the reason `TreeMap` exists. The trad
 ## Recap
 
 Hash tables turn lookup into computation: a good hash function spreads keys across buckets, giving O(1) average get/put, with chaining (and bucket-to-tree upgrades) handling collisions and resizing keeping load low. Sets are maps without values. The two laws to live by: honor the equals/hashCode contract and use immutable keys, or lookups silently break; and know that `HashMap` promises speed, not order — reach for `LinkedHashMap` for insertion order or `TreeMap` for sorted keys and ranges. Master these and the "constant-time lookup" claims of every framework become something you can verify and rely on.
+

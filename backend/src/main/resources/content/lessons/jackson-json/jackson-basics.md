@@ -1,7 +1,7 @@
 ---
 title: Jackson Basics — ObjectMapper, Serialization, and Deserialization
 module: jackson-json
-order: 1
+order: 3
 minutes: 24
 topics: ["Jackson", "ObjectMapper", "serialization", "deserialization", "JSON", "Spring Boot"]
 summary: Every Spring Boot REST API lives on a JSON bridge: the request body arrives as JSON text, becomes a Java object, flows through your service, and re...
@@ -22,34 +22,42 @@ Every Spring Boot REST API lives on a JSON bridge: the request body arrives as J
 
 ## The Core Two Operations
 
+
+**What this code does — step by step:**
+
+1. A plain Java object — the thing we translate.
+2. `ObjectMapper mapper = new ObjectMapper();` — the translator
+3. ---- SERIALIZATION: Java -> JSON ----
+4. {"id":1,"title":"Generics Basics","minutes":24,"published":true}
+5. ---- DESERIALIZATION: JSON -> Java ----
+6. Wildcards / 27
+7. ---- Collections work naturally: ----
+8. `System.out.println(lessons.size());` — 2
+
+The same code, clean:
+
 ```java
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class JacksonBasics {
-    // A plain Java object — the thing we translate.
     static record Lesson(Long id, String title, int minutes, boolean published) {}
 
     public static void main(String[] args) throws Exception {
-        ObjectMapper mapper = new ObjectMapper();   // the translator
+        ObjectMapper mapper = new ObjectMapper();
 
-        // ---- SERIALIZATION: Java -> JSON ----
         Lesson lesson = new Lesson(1L, "Generics Basics", 24, true);
         String json = mapper.writeValueAsString(lesson);
         System.out.println(json);
-        // {"id":1,"title":"Generics Basics","minutes":24,"published":true}
 
-        // ---- DESERIALIZATION: JSON -> Java ----
         String incoming = "{\"id\":2,\"title\":\"Wildcards\",\"minutes\":27,\"published\":false}";
         Lesson parsed = mapper.readValue(incoming, Lesson.class);
         System.out.println(parsed.title() + " / " + parsed.minutes());
-        // Wildcards / 27
 
-        // ---- Collections work naturally: ----
         String listJson = mapper.writeValueAsString(java.util.List.of(lesson, parsed));
         java.util.List<Lesson> lessons = mapper.readValue(
                 listJson,
                 new com.fasterxml.jackson.core.type.TypeReference<java.util.List<Lesson>>() {});
-        System.out.println(lessons.size());   // 2
+        System.out.println(lessons.size());
     }
 }
 ```
@@ -70,24 +78,27 @@ public class JacksonBasics {
 
 ## The Configuration Dials
 
+
+**What this code does — step by step:**
+
+1. The dials that matter for REST APIs:
+2. Default: TRUE — an unexpected JSON key fails deserialization. REST APIs usually turn it OFF so adding a field to the payload. (a forward-compatible client) doesn't break the server.
+3. Default: dates serialize as numeric timestamps; false gives ISO-8601. Strings — what REST APIs actually want.
+4. Pretty printing for debugging:
+
+The same code, clean:
+
 ```java
 ObjectMapper mapper = new ObjectMapper();
 
-// The dials that matter for REST APIs:
 mapper.configure(
         com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
         false);
-// Default: TRUE — an unexpected JSON key fails deserialization.
-// REST APIs usually turn it OFF so adding a field to the payload
-// (a forward-compatible client) doesn't break the server.
 
 mapper.configure(
         com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS,
         false);
-// Default: dates serialize as numeric timestamps; false gives ISO-8601
-// strings — what REST APIs actually want.
 
-// Pretty printing for debugging:
 mapper.enable(com.fasterxml.jackson.databind.SerializationFeature.INDENT_OUTPUT);
 ```
 
@@ -95,7 +106,6 @@ mapper.enable(com.fasterxml.jackson.databind.SerializationFeature.INDENT_OUTPUT)
 
 ## The Spring Boot Integration
 
-```java
 // Spring Boot auto-configures the ObjectMapper bean:
 @RestController
 class LessonController {
@@ -107,7 +117,6 @@ class LessonController {
     @GetMapping("/lessons/{id}")
     Lesson get(@PathVariable Long id) { ... }
 }
-```
 
 **The invisible magic:** `@RequestBody` tells Spring "deserialize the body into this type" (it uses the configured `ObjectMapper`); the return value of a `@RestController` method is serialized by the same mapper. `@JsonIgnoreProperties`, `@JsonProperty`, `@JsonFormat` annotations on your DTOs customize per-type. The ecosystem: `ResponseEntity<T>` for status codes, `Page<T>` for pagination, records for DTOs — all flowing through the same translator.
 
@@ -122,3 +131,4 @@ class LessonController {
 ## Recap
 
 Jackson is the Java↔JSON bridge: `ObjectMapper.writeValueAsString` serializes (getters/accessors → keys), `readValue` deserializes (constructor/setters ← keys), and collections need `TypeReference` for their element types. The configuration dials — `FAIL_ON_UNKNOWN_PROPERTIES`, date formats, the JavaTimeModule — are what make the bridge behave like a REST API expects. Spring Boot wires an auto-configured mapper into `@RequestBody`/`@ResponseBody`, so your DTOs and records flow across the wire with zero ceremony. Master the core two operations and the dials, and the JSON layer of your API becomes invisible — until you need `@JsonProperty`, custom serializers, or the polymorphic features of the next lessons.
+

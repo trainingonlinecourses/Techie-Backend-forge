@@ -1,7 +1,7 @@
 ---
 title: JPA Projections — Fetch Only What You Need
 summary: Interface projections, closed vs open projections, DTO projections with constructor expressions, and why they beat returning full entities for reads.
-order: 8
+order: 7
 minutes: 17
 topics: [projections, dto, interface-projection, constructor-expression, jpql, fetch-strategy]
 docs:
@@ -22,7 +22,6 @@ Closed proj.:  SELECT o.id, o.status FROM orders o → 3 columns, no entity at a
 
 ## Interface projections — the Spring Data idiom
 
-```java
 public interface OrderSummary {
     Long getId();
     String getStatus();
@@ -32,18 +31,15 @@ public interface OrderSummary {
 public interface OrderRepository extends JpaRepository<Order, Long> {
     List<OrderSummary> findSummariesByStatus(String status);   // derived — selects only needed cols
 }
-```
 
 The repository method returns the interface; Spring Data generates a **proxy implementation** backed by the selected values. **Closed projections** (every property comes from the entity, matching getter names) produce a tight `SELECT` of exactly those columns. That's the big win: the SQL itself changes, not just the Java type.
 
 **Open projections** use SpEL to compute values:
 
-```java
 public interface OrderView {
     @Value("#{target.amount.multiply(target.quantity)}")
     BigDecimal getLineTotal();     // computed, not a column — Hibernate can't push this to SQL
 }
-```
 
 Open projections force a full-entity load (the SpEL needs the target), so they're for *computed* views — use them deliberately, not as the default.
 
@@ -51,7 +47,6 @@ Open projections force a full-entity load (the SpEL needs the target), so they'r
 
 Interface proxies hide the target type; some teams prefer **plain DTOs** built by JPQL constructor expressions:
 
-```java
 public record OrderSummaryDto(Long id, String status, Instant createdAt) {}
 
 public interface OrderRepository extends JpaRepository<Order, Long> {
@@ -59,7 +54,6 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
            "from Order o where o.status = :status")
     List<OrderSummaryDto> findSummaries(@Param("status") String status);
 }
-```
 
 - **Pro:** a real record — no proxy magic, trivially serializable, unit-testable, and the query is explicit.
 - **Con:** constructor signatures must match the JPQL argument order exactly (a mismatch is a runtime error), and the DTO lives as a class.
@@ -68,7 +62,6 @@ The org split is usually: **interface projections for derived queries** (no JPQL
 
 ## Projections with joins and nested data
 
-```java
 public interface OrderWithCustomer {
     Long getId();
     String getStatus();
@@ -83,7 +76,6 @@ public interface OrderWithCustomer {
 // derived:
 List<OrderWithCustomer> findTop100By();
 // produces: SELECT o.id, o.status, c.name, c.email FROM orders o JOIN customers c ...
-```
 
 Nested projections compose into a single query with joins — the correct fix when you'd otherwise fetch the whole customer graph per order.
 
@@ -112,3 +104,4 @@ Nested projections compose into a single query with joins — the correct fix wh
 - DTO projections (records + constructor expressions) are the explicit alternative for custom JPQL.
 - Nested projections produce joined single queries for related data.
 - Return projections from list/report endpoints — keep entities for writes and complex domain logic.
+

@@ -22,33 +22,38 @@ Mockito's plain unit tests mock *directly* — no Spring involved. But Spring Bo
 
 ## The Setup: Web Slice + Mocked Service
 
+
+**What this code does — step by step:**
+
+1. A WebMvcTest — a REAL Spring MVC context with ONLY the web layer. (controller, filters, validation, error handling):
+2. The controller's collaborator — replaced by a MOCK in the context:
+3. The real MVC machinery, ready to drive HTTP-style calls:
+4. Stub the mocked bean exactly like any Mockito mock:
+5. Drive a real HTTP request through the MVC layer:
+6. Verify the interaction with the mocked bean:
+
+The same code, clean:
+
 ```java
-// A WebMvcTest — a REAL Spring MVC context with ONLY the web layer
-// (controller, filters, validation, error handling):
 @WebMvcTest(LessonController.class)
 class LessonControllerTest {
 
-    // The controller's collaborator — replaced by a MOCK in the context:
     @MockBean
     LessonService lessonService;
 
-    // The real MVC machinery, ready to drive HTTP-style calls:
     @Autowired
     MockMvc mockMvc;
 
     @Test
     void getLesson_returnsJson() throws Exception {
-        // Stub the mocked bean exactly like any Mockito mock:
         when(lessonService.findById(1L))
             .thenReturn(new LessonDto(1L, "Generics Basics", 24));
 
-        // Drive a real HTTP request through the MVC layer:
         mockMvc.perform(get("/api/lessons/1"))
                .andExpect(status().isOk())
                .andExpect(jsonPath("$.title").value("Generics Basics"))
                .andExpect(jsonPath("$.minutes").value(24));
 
-        // Verify the interaction with the mocked bean:
         verify(lessonService).findById(1L);
     }
 }
@@ -62,7 +67,6 @@ class LessonControllerTest {
 
 `@MockBean` registers a Mockito mock as a Spring bean, replacing any bean of the same type in the context. It works in `@SpringBootTest`, `@WebMvcTest`, and `@DataJpaTest`:
 
-```java
 @SpringBootTest                     // the whole app
 class FullContextTest {
     @Autowired LessonService realService;    // hmm — this is the MOCK now
@@ -75,7 +79,6 @@ class FullContextTest {
         // the REAL service logic runs, backed by the mock repository
     }
 }
-```
 
 **The costs to know (why @MockBean is not always the answer):**
 
@@ -89,7 +92,6 @@ class FullContextTest {
 
 MockMvc lets you assert on the full HTTP response:
 
-```java
 mockMvc.perform(post("/api/lessons")
         .contentType(MediaType.APPLICATION_JSON)
         .content("{\"title\":\"A\",\"minutes\":-5}"))     // invalid input
@@ -97,7 +99,6 @@ mockMvc.perform(post("/api/lessons")
     .andExpect(jsonPath("$.message").exists())             // 2. body shape
     .andExpect(header().string("Content-Type", containsString("application/json")))
     .andReturn();                                          // 3. full access
-```
 
 - **Status** — `isOk()`, `isBadRequest()`, `isNotFound()`, `isCreated()`.
 - **Body** — `jsonPath(...)` (the JSONPath expression language: `$.title`, `$[0].id`, wildcards) or `content().json(...)` (exact JSON match).
@@ -127,3 +128,4 @@ The full-context tests with heavy mocking can become *detached from reality*: th
 ## Recap
 
 Mockito meets Spring through **`@MockBean`/`@MockitoBean`**: a Mockito mock dropped into the application context in place of a real bean — the mechanism behind `@WebMvcTest` slice tests, where the web layer runs real and the service below is stubbed. MockMvc then drives real HTTP and asserts on status, `jsonPath` bodies, and headers. The discipline: use `@MockBean` for *boundaries the test targets* (controller tests, service tests against mocked repos); use real infrastructure (`@DataJpaTest` + Testcontainers) for *contracts* with the data layer; and watch the context-caching cost — group tests by mock set and prefer slices over full-context mocking. The result is tests that are fast, real where it matters, and controlled where it counts.
+

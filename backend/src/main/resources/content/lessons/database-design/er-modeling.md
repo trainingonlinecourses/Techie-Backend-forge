@@ -1,7 +1,7 @@
 ---
 title: ER Modeling — From Requirements to Tables
 module: database-design
-order: 4
+order: 3
 minutes: 25
 topics: ["ER diagrams", "entities", "attributes", "cardinality", "schema design process"]
 summary: An entityrelationship (ER) model is a diagram of your domain before it becomes SQL: the entities (things that exist: Student, Course, Lesson), thei...
@@ -161,3 +161,4 @@ Before writing any SQL, sanity-check the model:
 - Many-to-many becomes a join table carrying relationship attributes.
 - Verify the model against the requirement queries before writing SQL.
 - The blueprint phase is where design errors cost nothing — use it.
+

@@ -1,7 +1,7 @@
 ---
 title: YAML Multi-Document and Profile Configuration
 summary: How Spring profiles work with YAML multi-document sections, property precedence, profile-specific properties, and externalized configuration strategies.
-order: 3
+order: 6
 minutes: 15
 topics: [yaml, multi-document, profile-properties, property-source, configuration]
 docs:
@@ -124,3 +124,4 @@ spring:
 | Missing `---` separator | Properties don't activate per profile | Always separate documents with `---` |
 | Wrong `on-profile` syntax | Profile never activates | Use `spring.config.activate.on-profile` |
 | Property override order confusion | Wrong value wins | Remember: later profiles override defaults |
+

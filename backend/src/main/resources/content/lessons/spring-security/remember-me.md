@@ -1,7 +1,7 @@
 ---
 title: Remember-Me Authentication — Persistent Logins Done Safely
 summary: How remember-me works, token-based vs persistent implementations, cookie risks, and the org policy decisions for long-lived logins.
-order: 17
+order: 12
 minutes: 16
 topics: [remember-me, persistent-login, token, cookie, remembermeparameter, session-fixation]
 docs:
@@ -19,11 +19,9 @@ The decision every team makes first: **is remember-me appropriate at all?** For 
 
 ## Token-based remember-me (the simple, less-secure version)
 
-```java
 http.rememberMe(rm -> rm
     .key("unique-and-secret-key")     // server secret — MUST be externalized, not hard-coded
     .tokenValiditySeconds(2_592_000)); // 30 days
-```
 
 The token is `username + expiry + MD5(username:expiry:password:key)`. **The flaw:** the token's hash includes the *password*, so changing the password invalidates all tokens — but more importantly, the token itself is the credential, and there's no server-side record to revoke. A stolen cookie is a stolen login for up to 30 days with no kill-switch. Fine for prototypes; not the production answer.
 
@@ -31,7 +29,6 @@ The token is `username + expiry + MD5(username:expiry:password:key)`. **The flaw
 
 The persistent implementation stores each token **server-side** and tracks usage:
 
-```java
 http.rememberMe(rm -> rm
     .tokenRepository(jdbcTokenRepository())   // a PersistentTokenRepository (JDBC-backed)
     .tokenValiditySeconds(2_592_000));
@@ -43,7 +40,6 @@ public PersistentTokenRepository jdbcTokenRepository(DataSource ds) {
     repo.setCreateTableOnStartup(true);       // creates persistent_logins on first boot
     return repo;
 }
-```
 
 Schema: `persistent_logins (username, series, token, last_used)`.
 
@@ -57,14 +53,12 @@ This gives server-side **revocation** (delete the row = logged out everywhere) a
 
 ## Cookie security — non-negotiable
 
-```java
 http.rememberMe(rm -> rm
     .rememberMeParameter("remember-me")     // the login form checkbox name
     .rememberMeCookieName("ACADEMY_REMEMBER_ME")
     .tokenValiditySeconds(2_592_000));
 
 // The cookie MUST be: Secure + HttpOnly + SameSite
-```
 
 Spring sets `HttpOnly` and `Secure` (on HTTPS) by default; add **SameSite** so the cookie isn't sent on cross-site requests (the CSRF-adjacent protection for cookies):
 
@@ -100,3 +94,4 @@ A remember-me cookie without `Secure` is transmitted over HTTP; without `HttpOnl
 - Rotate the token each use; on series-match/token-mismatch, invalidate the series and investigate.
 - Cookie must be Secure + HttpOnly + SameSite; externalize the signing key.
 - Invalidate all tokens on password change; step-up auth for sensitive actions; for APIs, use revocable refresh tokens.
+

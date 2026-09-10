@@ -1,7 +1,7 @@
 ---
 title: Filters, Interceptors and Argument Resolvers
 module: spring-webmvc-advanced
-order: 5
+order: 7
 minutes: 22
 topics: ["OncePerRequestFilter", "HandlerInterceptor", "ArgumentResolver", "filter chain", "pre/post processing"]
 summary: Three layers sit between the HTTP request and your controller method. Knowing which to use for what — Filter (servlet level), HandlerInterceptor (M...
@@ -35,7 +35,6 @@ Servlet container
 
 ## OncePerRequestFilter
 
-```java
 @Component
 public class RequestLoggingFilter extends OncePerRequestFilter {
 
@@ -56,13 +55,11 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
         }
     }
 }
-```
 
 `OncePerRequestFilter` guarantees a single execution even with internal forwards — a plain `Filter` would run twice on a forward.
 
 ### Registering with Order
 
-```java
 @Configuration
 public class FilterConfig {
 
@@ -75,13 +72,11 @@ public class FilterConfig {
         return reg;
     }
 }
-```
 
 Filters run in `Order` — request logging (1) before auth (2) before rate limiting (3).
 
 ## HandlerInterceptor
 
-```java
 @Component
 public class AuditInterceptor implements HandlerInterceptor {
 
@@ -109,11 +104,9 @@ public class AuditInterceptor implements HandlerInterceptor {
         if (ex != null) log.error("Handler failed", ex);
     }
 }
-```
 
 ### Registration and Paths
 
-```java
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
@@ -126,11 +119,9 @@ public class WebConfig implements WebMvcConfigurer {
             .excludePathPatterns("/api/health", "/api/auth/**");
     }
 }
-```
 
 **Why interceptors over filters for auth?** Interceptors know the *handler* — you can skip auth for `@PublicEndpoint`-annotated methods:
 
-```java
 @Override
 public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
                          Object handler) {
@@ -141,13 +132,11 @@ public boolean preHandle(HttpServletRequest request, HttpServletResponse respons
     }
     return authenticate(request, response);
 }
-```
 
 ## HandlerMethodArgumentResolver
 
 Inject **anything** into controller parameters:
 
-```java
 @Component
 public class CurrentUserArgumentResolver implements HandlerMethodArgumentResolver {
 
@@ -168,23 +157,18 @@ public class CurrentUserArgumentResolver implements HandlerMethodArgumentResolve
         return userService.findById(userId).orElse(null);
     }
 }
-```
 
-```java
 @GetMapping("/me")
 public UserDto me(@CurrentUser User user) {
     return UserDto.from(user);
 }
-```
 
 Register it:
 
-```java
 @Override
 public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
     resolvers.add(currentUserResolver);
 }
-```
 
 Controllers become declarative: no boilerplate token parsing, no repeated lookups.
 
@@ -204,7 +188,6 @@ Controllers become declarative: no boilerplate token parsing, no repeated lookup
 
 The classic pattern uses a filter to generate, an interceptor to log, and everything downstream to carry:
 
-```java
 // Filter: create request id
 @Component
 public class RequestIdFilter extends OncePerRequestFilter {
@@ -228,13 +211,11 @@ public class RequestIdFilter extends OncePerRequestFilter {
         }
     }
 }
-```
 
 Every log line in the request now carries the same request id — filter, interceptor, controller, and service alike.
 
 ## Testing
 
-```java
 @SpringBootTest
 @AutoConfigureMockMvc
 class InterceptorTest {
@@ -256,7 +237,6 @@ class InterceptorTest {
             .andExpect(jsonPath("$.id").value("u1"));
     }
 }
-```
 
 ## Summary
 
@@ -267,3 +247,4 @@ class InterceptorTest {
 | ArgumentResolver | Parameter-level | `@CurrentUser`, custom params, pagination objects |
 
 Compose them deliberately: filters for the raw plumbing, interceptors for MVC concerns, resolvers for ergonomics. Each layer doing one job keeps the request pipeline readable and the controllers thin.
+

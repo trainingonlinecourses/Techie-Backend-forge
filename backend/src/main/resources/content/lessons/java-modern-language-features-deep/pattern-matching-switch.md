@@ -1,7 +1,7 @@
 ---
 title: Pattern Matching in Switch — Branching by Shape, Not Just by Value
 summary: Switch pattern matching, standardised in Java 21, lets a case label match on the type or shape of the value, and lets you add a guard with a boolean condition. This is far more expressive than the old switch on primitives and strings. This lesson explains how case labels with patterns work, how guards work, how null is handled, and how to write a switch that is exhaustive and safe.
-order: 2
+order: 1
 minutes: 20
 topics: [switch, pattern-matching, type-pattern, guarded-case, sealed-classes, exhaustive-switch, record-patterns, java21]
 docs:
@@ -17,7 +17,6 @@ Before pattern matching, the standard way to branch on type was a chain of `if (
 
 Pattern matching in `switch` solves this. A `case` label can now carry a **pattern** that matches on the type (or shape) of the selector expression, and the matching value is automatically bound to a variable you can use in the case body. You can also add a **guard** — a boolean condition that further refines the match.
 
-```java
 // Pattern matching switch: branch by type, with no explicit cast
 String describe(Object obj) {
     return switch (obj) {
@@ -28,7 +27,6 @@ String describe(Object obj) {
         default -> "something else";
     };
 }
-```
 
 In this example:
 
@@ -44,20 +42,23 @@ This is cleaner than the old `if-instanceof` chain, and it expresses the intent 
 
 A type pattern is the simplest kind of pattern: `Type name`. It matches if the value is an instance of `Type` (or a subtype), and it binds the value to `name` of type `Type`.
 
-```java
-void handle(Object obj) {
-    switch (obj) {
-        case String s ->
-            System.out.println("a string: " + s);
-        case Integer i ->
-            System.out.println("an integer: " + i);
-        case List<?> list ->
-            System.out.println("a list with " + list.size() + " elements");
-        default ->
-            System.out.println("something else: " + obj);
+public class Main {
+
+    public static void main(String[] args) {
+        void handle(Object obj) {
+            switch (obj) {
+                case String s ->
+                    System.out.println("a string: " + s);
+                case Integer i ->
+                    System.out.println("an integer: " + i);
+                case List<?> list ->
+                    System.out.println("a list with " + list.size() + " elements");
+                default ->
+                    System.out.println("something else: " + obj);
+            }
+        }
     }
 }
-```
 
 A few things to notice:
 
@@ -69,7 +70,6 @@ A few things to notice:
 
 A **guard** is an additional boolean condition on a case label, written with the `when` keyword. A guarded case matches only if both the pattern matches **and** the guard is true.
 
-```java
 // A guarded case: match a non-empty string
 String categorize(Object obj) {
     return switch (obj) {
@@ -80,7 +80,6 @@ String categorize(Object obj) {
         default -> "something else";
     };
 }
-```
 
 In this example:
 
@@ -90,22 +89,28 @@ In this example:
 
 Guards let you refine the match without introducing an extra nested `if`. Without guards, you would write:
 
+
+**What this code does — step by step:**
+
+1. Without guards — verbose and easy to get wrong
+2. empty string case
+3. non-empty string case
+4. positive integer case
+5. non-positive integer case
+6. default case
+
+The same code, clean:
+
 ```java
-// Without guards — verbose and easy to get wrong
 if (obj instanceof String s) {
     if (s.isEmpty()) {
-        // empty string case
     } else {
-        // non-empty string case
     }
 } else if (obj instanceof Integer i) {
     if (i > 0) {
-        // positive integer case
     } else {
-        // non-positive integer case
     }
 } else {
-    // default case
 }
 ```
 
@@ -117,7 +122,6 @@ A switch expression (one that returns a value, with `->` case labels) must be **
 
 This is one of the benefits of pattern matching. If you switch on a sealed hierarchy, the compiler knows all the possible subtypes, and it can check that every subtype is covered. If you add a new subtype, the compiler tells you that the switch is no longer exhaustive — you must handle the new case.
 
-```java
 sealed interface Shape permits Circle, Rectangle, Triangle { }
 
 final class Circle implements Shape {
@@ -144,7 +148,6 @@ double area(Shape s) {
         // are the only permitted subtypes, so this switch is exhaustive.
     };
 }
-```
 
 In this example:
 
@@ -157,7 +160,6 @@ This is a powerful pattern. Sealed classes and exhaustive switches give you the 
 
 If the switch is on a non-sealed type (like `Object`), you usually need a `default` case to make the switch exhaustive, because the compiler does not know all possible subtypes of `Object`.
 
-```java
 // Switching on Object — need a default
 String describe(Object obj) {
     return switch (obj) {
@@ -167,7 +169,6 @@ String describe(Object obj) {
         default -> "something else";   // needed to make the switch exhaustive
     };
 }
-```
 
 ### Null Handling in Pattern Matching Switch
 
@@ -175,7 +176,6 @@ A `null` selector does not match a type pattern. A `case String s` does **not** 
 
 This is a deliberate design choice. The old `switch` threw `NullPointerException` on a `null` selector. Pattern matching switch keeps that behaviour, but lets you handle `null` explicitly with a `case null`.
 
-```java
 // Explicit null case — safe handling of null
 String describe(Object obj) {
     return switch (obj) {
@@ -185,7 +185,6 @@ String describe(Object obj) {
         default -> "something else";
     };
 }
-```
 
 Without the `case null`, passing `null` into this switch would throw. With it, `null` is handled gracefully. This is especially useful when the selector might be `null` in normal use — for example, a method that accepts an `Object` and might be called with `null`.
 
@@ -193,7 +192,6 @@ Without the `case null`, passing `null` into this switch would throw. With it, `
 
 A switch can mix pattern cases with constant cases (for `enum`, `String`, and primitives). The compiler checks that all cases are covered and that there are no overlaps that would make a later case unreachable.
 
-```java
 enum Status { ACTIVE, INACTIVE, PENDING }
 
 String summary(Object obj) {
@@ -207,7 +205,6 @@ String summary(Object obj) {
         default -> "something else";
     };
 }
-```
 
 Here the switch handles `null`, three `Status` constants, a `String` pattern, an `Integer` pattern, and a `default`. The compiler ensures the cases are well-formed.
 
@@ -215,7 +212,6 @@ Here the switch handles `null`, three `Status` constants, a `String` pattern, an
 
 (Record patterns are a related feature, standardised in Java 21 alongside pattern matching for switch. They let a pattern match the components of a record and bind each component to a variable.)
 
-```java
 record Point(int x, int y) {}
 record Circle(Point center, double radius) {}
 record Rectangle(Point topLeft, Point bottomRight) {}
@@ -230,7 +226,6 @@ String summarize(Object obj) {
         default -> "something else";
     };
 }
-```
 
 In this example:
 
@@ -241,7 +236,6 @@ In this example:
 
 Record patterns can be nested. You can match a `Circle` and, inside that, match the `Point` and bind its components:
 
-```java
 String deep(Object obj) {
     return switch (obj) {
         case Circle(Point(int cx, int cy), double r) ->
@@ -249,7 +243,6 @@ String deep(Object obj) {
         default -> "something else";
     };
 }
-```
 
 Here the pattern `Circle(Point(int cx, int cy), double r)` matches a `Circle`, matches its `center` with a nested `Point` pattern, and binds the point's `x` and `y` to `cx` and `cy`, and the circle's `radius` to `r`. This is a deep structural match — the shape of the data is matched directly.
 
@@ -259,8 +252,18 @@ Record patterns are a natural companion to pattern matching in switch. They let 
 
 This example uses a sealed hierarchy, pattern matching switch, guarded cases, and a record pattern to calculate areas and describe shapes.
 
+
+**What this code does — step by step:**
+
+1. A sealed hierarchy — the compiler knows all the subtypes
+2. Pattern matching switch — exhaustive over the sealed hierarchy
+3. No default needed — the sealed hierarchy is exhaustive
+4. A switch with guards — classify a number
+5. Nested record pattern — extract the center of a circle
+
+The same code, clean:
+
 ```java
-// A sealed hierarchy — the compiler knows all the subtypes
 sealed interface Shape permits Circle, Rectangle, Square, Triangle {
     double area();
 }
@@ -283,7 +286,6 @@ record Triangle(double base, double height) implements Shape {
 
 public class ShapeDemo {
 
-    // Pattern matching switch — exhaustive over the sealed hierarchy
     static String describe(Shape s) {
         return switch (s) {
             case Circle(double r) ->
@@ -294,11 +296,9 @@ public class ShapeDemo {
                 "square with side " + side + ", area " + s.area();
             case Triangle(double b, double h) ->
                 "triangle base " + b + " height " + h + ", area " + s.area();
-            // No default needed — the sealed hierarchy is exhaustive
         };
     }
 
-    // A switch with guards — classify a number
     static String classifyNumber(Object obj) {
         return switch (obj) {
             case null -> "null";
@@ -314,7 +314,6 @@ public class ShapeDemo {
         };
     }
 
-    // Nested record pattern — extract the center of a circle
     static String circleCenter(Object obj) {
         return switch (obj) {
             case Circle(Point(int x, int y), double r) ->
@@ -394,3 +393,4 @@ In the lab, you will see a starter with a chain of `instanceof` checks that clas
 ## Summary
 
 Pattern matching in switch, standardised in Java 21, lets a `case` label match on the type or shape of the selector value. A type pattern (`Type name`) matches an instance of that type and binds the value to a variable of that type, with no explicit cast. A guard (`when` condition) refines the match with a boolean condition. A switch expression must be exhaustive — every value must be covered — and the compiler enforces this. For sealed hierarchies, the compiler knows all the permitted subtypes and checks exhaustiveness automatically; if you add a new subtype, the compiler tells you. `null` does not match a type pattern — you must handle it explicitly with `case null`, or the switch throws. Record patterns let you match the components of a record and bind them to variables, and they can be nested for deep structural matching. The result is cleaner, safer code for branching on type and structure, especially when combined with sealed classes and records.
+

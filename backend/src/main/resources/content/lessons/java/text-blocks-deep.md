@@ -1,7 +1,7 @@
 ---
 title: Text Blocks — Multi-Line Strings in Java
 summary: Triple-quoted strings for HTML, SQL, and JSON templates, indentation handling, escape sequences, and .formatted() for dynamic content.
-order: 30
+order: 79
 minutes: 14
 topics: [text-blocks, multi-line-strings, triple-quotes, string-formatting, template-literals]
 docs:
@@ -15,7 +15,6 @@ docs:
 
 Before Java 13, writing multi-line strings in Java was painful:
 
-```java
 // Old way — ugly escape sequences everywhere
 String html = "<html>\n" +
               "  <body>\n" +
@@ -34,11 +33,9 @@ String json = "{\n" +
               "  \"name\": \"Alice\",\n" +
               "  \"age\": 25\n" +
               "}";
-```
 
 **Text Blocks** (Java 13+, stable in Java 15+) fix this with triple quotes `"""`:
 
-```java
 // New way — clean, readable, no escape sequences!
 String html = """
               <html>
@@ -61,7 +58,6 @@ String json = """
                 "age": 25
               }
               """;
-```
 
 ---
 
@@ -69,7 +65,6 @@ String json = """
 
 ### Basic Syntax
 
-```java
 // Opening: """ followed by a newline
 // Content: the multi-line string
 // Closing: """ on its own line
@@ -78,13 +73,11 @@ String text = """
               Line 2
               Line 3
               """;
-```
 
 ### Indentation Handling
 
 Java uses the **closing `"""`** to determine the indentation:
 
-```java
 // The closing """ determines the left margin
 String message = """
                  Hello
@@ -99,11 +92,9 @@ String indented = """
                   Third line
                   """;
 // Result: "First line\n  Second line (indented by 2)\nThird line\n"
-```
 
 ### No Newline at the End
 
-```java
 // The closing """ being on its own line means NO trailing newline
 String s1 = """
             Hello
@@ -116,7 +107,6 @@ String s2 = """
 
             """;
 // s2 = "Hello\n\n"
-```
 
 ---
 
@@ -124,7 +114,6 @@ String s2 = """
 
 ### 1. HTML/XML Templates
 
-```java
 String emailTemplate = """
                        <html>
                          <body>
@@ -136,11 +125,9 @@ String emailTemplate = """
                        """;
 
 String html = String.format(emailTemplate, "Alice", "https://app.example.com");
-```
 
 ### 2. SQL Queries
 
-```java
 String query = """
                SELECT u.id, u.name, u.email, o.total
                FROM users u
@@ -161,11 +148,9 @@ String query = """
                ORDER BY o.total DESC
                """, nativeQuery = true)
 List<Object[]> findCompletedOrdersSince(@Param("startDate") LocalDateTime startDate);
-```
 
 ### 3. JSON Templates
 
-```java
 String requestJson = """
                      {
                        "name": "%s",
@@ -178,11 +163,9 @@ String requestJson = """
                      """;
 
 String payload = String.format(requestJson, "Alice", "alice@example.com");
-```
 
 ### 4. Code Generation
 
-```java
 String javaClass = """
                    package com.example;
 
@@ -201,11 +184,9 @@ String javaClass = """
 
 String className = "User";
 String code = String.format(javaClass, className, className);
-```
 
 ### 5. Markdown / Documentation
 
-```java
 String readme = """
                 # %s
 
@@ -213,11 +194,10 @@ String readme = """
                 %s
 
                 ## Installation
-                ```bash
                 git clone https://github.com/%s/%s.git
                 cd %s
                 mvn install
-                ```
+```
 
                 ## Usage
                 Run with: `java -jar %s.jar`
@@ -232,18 +212,15 @@ Text blocks support special escape sequences:
 
 ### `\s` — Preserve Trailing Spaces
 
-```java
 String spaced = """
                 Hello\s
                 World\s
                 """;
 // Both lines have a trailing space before the newline
 // "Hello \nWorld \n"
-```
 
 ### `\` — Line Continuation (End the Line)
 
-```java
 String singleLine = """
                     This is a very long \
                     line that continues \
@@ -252,31 +229,25 @@ String singleLine = """
                     """;
 // Result: "This is a very long line that continues on the next linebut appears as one line in output."
 // Note: NO spaces around "linebut" — the \ eats the newline AND surrounding whitespace
-```
 
 ### `\"` — Double Quotes Inside Text Block
 
-```java
 String withQuotes = """
                     She said, \"Hello!\" and left.
                     """;
 // Result: She said, "Hello!" and left.
-```
 
 ### `\\` — Literal Backslash
 
-```java
 String path = """
               C:\\Users\\Alice\\Documents
               """;
 // Result: C:\Users\Alice\Documents
-```
 
 ---
 
 ## Text Blocks vs String Concatenation
 
-```java
 // ❌ Old way — hard to read, easy to make mistakes
 String xml = "<root>\n" +
              "  <name>" + user.getName() + "</name>\n" +
@@ -298,7 +269,6 @@ String xml = String.format("""
                              <email>%s</email>
                            </root>
                            """, user.getName(), user.getEmail());
-```
 
 ---
 
@@ -306,7 +276,6 @@ String xml = String.format("""
 
 ### The `.formatted()` Method (Java 15+)
 
-```java
 String template = """
                   {
                     "user": {
@@ -319,11 +288,9 @@ String template = """
 
 // .formatted() is a convenience method on String
 String json = template.formatted("Alice", 25, true);
-```
 
 ### Multiple Arguments
 
-```java
 String report = """
                 Monthly Report
                 ===============
@@ -339,7 +306,6 @@ String result = report.formatted(
     45678.90,
     37.01
 );
-```
 
 ---
 
@@ -347,7 +313,6 @@ String result = report.formatted(
 
 ### Scenario 1: REST API Documentation
 
-```java
 // Generating OpenAPI/Swagger descriptions
 public class ApiDocs {
     public static String getUserDescription() {
@@ -365,10 +330,9 @@ public class ApiDocs {
                - 500: Server error
 
                ### Example Request
-               ```
                GET /api/users/123
                Authorization: Bearer <token>
-               ```
+```
 
                ### Example Response
                ```json
@@ -377,7 +341,7 @@ public class ApiDocs {
                  "name": "Alice",
                  "email": "alice@example.com"
                }
-               ```
+```
                """;
     }
 }
@@ -385,7 +349,6 @@ public class ApiDocs {
 
 ### Scenario 2: Email Templates
 
-```java
 @Service
 public class EmailService {
     public String buildWelcomeEmail(String name, String activationLink) {
@@ -407,11 +370,9 @@ public class EmailService {
                """.formatted(name, activationLink);
     }
 }
-```
 
 ### Scenario 3: Database Migration Scripts
 
-```java
 public class MigrationScripts {
     public static String createUsersTable() {
         return """
@@ -430,11 +391,9 @@ public class MigrationScripts {
                """;
     }
 }
-```
 
 ### Scenario 4: Log Message Formatting
 
-```java
 public class AuditLogger {
     public void logUserAction(String userId, String action, String details) {
         String logMessage = """
@@ -449,7 +408,6 @@ public class AuditLogger {
         logger.info(logMessage);
     }
 }
-```
 
 ---
 
@@ -463,3 +421,4 @@ public class AuditLogger {
 | Mixing `\n` with text blocks | Redundant newlines | Text blocks already handle newlines |
 | Text block with only one line | Just use a regular string | Reserve text blocks for multi-line content |
 | Forgetting `.formatted()` for dynamic content | Placeholder strings appear literally | Always call `.formatted()` or `String.format()` |
+

@@ -1,7 +1,7 @@
 ---
 title: Authorization — Roles, URL Rules & Method Security
 summary: URL-based rules vs method security, @PreAuthorize, authorities and the differences between roles and permissions.
-order: 5
+order: 3
 minutes: 16
 topics: [authorization, preauthorize, roles, method-security]
 docs:
@@ -22,25 +22,20 @@ Start with URL rules, add method security where *business logic* needs guards.
 
 ## URL rules
 
-```java
 .authorizeHttpRequests(auth -> auth
     .requestMatchers("/api/content/**").permitAll()          // public reading
     .requestMatchers("/api/admin/**").hasRole("ADMIN")
     .requestMatchers(HttpMethod.POST, "/api/accounts/**").hasAnyRole("USER", "ADMIN")
     .anyRequest().authenticated())
-```
 
 `hasRole("ADMIN")` matches authority `ROLE_ADMIN`. `hasAuthority("account:write")` matches a permission. The difference is convention: roles are coarse buckets, authorities/permissions are fine-grained claims.
 
 ## Method security
 
-```java
 @Configuration
 @EnableMethodSecurity                     // turns on @PreAuthorize etc.
 public class SecurityConfig { ... }
-```
 
-```java
 @Service
 public class PaymentService {
 
@@ -54,13 +49,11 @@ public class PaymentService {
     @PreAuthorize("#iban == authentication.principal.user().iban or hasRole('ADMIN')")
     public void manage(String iban) { ... }
 }
-```
 
 ## Authorities vs roles
 
 Authorities are the raw strings in the token/principal. Spring Security convention: role authorities are prefixed `ROLE_`. Permissions can be arbitrary strings (`account:read`).
 
-```java
 // Give users fine-grained permissions (org pattern):
 public Collection<? extends GrantedAuthority> getAuthorities() {
     List<GrantedAuthority> authorities = new ArrayList<>();
@@ -70,7 +63,6 @@ public Collection<? extends GrantedAuthority> getAuthorities() {
             .toList());
     return authorities;
 }
-```
 
 ## The hierarchy: roles → permissions
 
@@ -102,3 +94,4 @@ Both return JSON in an API app (see jwt-auth lesson). The distinction matters to
 - 401 vs 403: authenticate first, authorize second.
 
 **Official docs:** [Authorization](https://docs.spring.io/spring-security/reference/servlet/authorization/index.html) · [Method security](https://docs.spring.io/spring-security/reference/servlet/authorization/method-security.html)
+

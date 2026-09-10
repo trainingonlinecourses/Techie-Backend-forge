@@ -1,7 +1,7 @@
 ---
 title: Gateways and Transformers — The Integration Toolkit
 module: spring-messaging
-order: 3
+order: 2
 minutes: 24
 topics: ["@MessagingGateway", "transformers", "routers", "splitters", "aggregators", "EIP"]
 summary: Messaging systems have a set of recurring problems: how do I expose messaging to business code? How do I reshape a message? How do I route it based...
@@ -30,6 +30,21 @@ This lesson covers the core four: gateway, transformer, router, and the splitter
 
 ## The Code Walkthrough
 
+
+**What this code does — step by step:**
+
+1. ---- 1. GATEWAY: messaging behind a Java method ----
+2. ---- 2. TRANSFORMER: reshape the incoming message ----
+3. "imports.in" -> transformer -> "imports.parsed"
+4. Turn the file name into a structured payload
+5. ---- 3. ROUTER: content-based routing ----. "imports.parsed" -> router -> (csv | json | default)
+6. ---- 4. SPLITTER: one message becomes many ----. "imports.csv" -> splitter -> "imports.rows" (one message per row)
+7. `return doc.rows();` — each element = one message
+8. ---- 5. AGGREGATOR: many correlated messages become one ----. "imports.rows" -> aggregator -> "imports.summary"
+9. ---- 6. FILTER: drop what doesn't qualify ----
+
+The same code, clean:
+
 ```java
 import org.springframework.integration.annotation.*;
 import org.springframework.stereotype.Component;
@@ -37,7 +52,6 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Map;
 
-// ---- 1. GATEWAY: messaging behind a Java method ----
 @MessagingGateway
 public interface ImportGateway {
 
@@ -45,20 +59,15 @@ public interface ImportGateway {
     void submitImport(String fileName);
 }
 
-// ---- 2. TRANSFORMER: reshape the incoming message ----
 @Component
 public class ImportFlow {
 
-    // "imports.in" -> transformer -> "imports.parsed"
     @Transformer(inputChannel = "imports.in", outputChannel = "imports.parsed")
     public ParsedImport parse(String fileName) {
-        // Turn the file name into a structured payload
         String[] parts = fileName.split("\\.");
         return new ParsedImport(parts[0], parts[1]);
     }
 
-    // ---- 3. ROUTER: content-based routing ----
-    // "imports.parsed" -> router -> (csv | json | default)
     @Router(inputChannel = "imports.parsed")
     public String route(ParsedImport parsed) {
         return switch (parsed.extension().toLowerCase()) {
@@ -68,22 +77,17 @@ public class ImportFlow {
         };
     }
 
-    // ---- 4. SPLITTER: one message becomes many ----
-    // "imports.csv" -> splitter -> "imports.rows" (one message per row)
     @Splitter(inputChannel = "imports.csv", outputChannel = "imports.rows")
     public List<CsvRow> split(CsvDocument doc) {
-        return doc.rows();                       // each element = one message
+        return doc.rows();
     }
 
-    // ---- 5. AGGREGATOR: many correlated messages become one ----
-    // "imports.rows" -> aggregator -> "imports.summary"
     @Aggregator(inputChannel = "imports.rows", outputChannel = "imports.summary")
     public ImportSummary aggregate(List<CsvRow> allRows) {
         int total = allRows.stream().mapToInt(CsvRow::count).sum();
         return new ImportSummary(allRows.size(), total);
     }
 
-    // ---- 6. FILTER: drop what doesn't qualify ----
     @Filter(inputChannel = "imports.rows")
     public boolean validRow(CsvRow row) {
         return row.count() > 0;
@@ -150,3 +154,4 @@ If the release strategy is wrong, the aggregator waits forever (messages sit un-
 - Filter gates what flows downstream.
 - Read a pipeline top-to-bottom — that readability is the design goal.
 - Set aggregator timeouts and route to defaults; keep components single-purpose.
+

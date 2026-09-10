@@ -1,7 +1,7 @@
 ---
 title: Request-Reply and RPC Patterns
 module: spring-amqp
-order: 4
+order: 5
 minutes: 20
 topics: ["RPC", "replyTo", "correlationId", "convertSendAndReceive", "async request-reply"]
 summary: Most messaging is fireandforget, but some flows need an answer: "validate this address", "compute this quote", "translate this text". RabbitMQ's re...
@@ -29,7 +29,6 @@ Client                          Server
 
 ## The Server: @RabbitListener Returns a Value
 
-```java
 @Component
 public class AddressValidationServer {
 
@@ -39,13 +38,11 @@ public class AddressValidationServer {
         return addressService.validate(request);
     }
 }
-```
 
 Spring AMQP's listener container detects a return value and publishes it to the `replyTo` queue with the matching `correlationId`. Zero manual plumbing.
 
 ## The Client: convertSendAndReceive
 
-```java
 @Service
 public class AddressValidationClient {
 
@@ -56,13 +53,11 @@ public class AddressValidationClient {
             "validation.exchange", "validation.requests", request);
     }
 }
-```
 
 `convertSendAndReceive` blocks until the reply arrives (or times out). The reply is correlated automatically via a private reply queue + correlation id.
 
 ### Timeouts
 
-```java
 template.setReplyTimeout(10_000);   // ms — default 5s
 
 // or per call with a MessagePostProcessor carrying timeout
@@ -71,7 +66,6 @@ ValidationResult result = (ValidationResult) template
         message.getMessageProperties().setExpiration("10000");   // queue-side TTL
         return message;
     });
-```
 
 A hanging RPC is worse than a failed one — always set timeouts.
 
@@ -79,7 +73,6 @@ A hanging RPC is worse than a failed one — always set timeouts.
 
 Blocking `convertSendAndReceive` ties up a thread per in-flight request. For high throughput, go async with a `CompletableFuture`-style correlation:
 
-```java
 @Service
 public class AsyncValidationClient {
 
@@ -118,7 +111,6 @@ public class AsyncValidationClient {
         }
     }
 }
-```
 
 The client maps each reply to the waiting future by correlation id — no thread blocked.
 
@@ -137,7 +129,6 @@ RPC-over-messaging is an *internal* pattern. Exposing it publicly means every ca
 
 The server's exception must reach the client as a distinguishable reply:
 
-```java
 @RabbitListener(queues = "validation.requests")
 public Object validate(AddressRequest request) {
     try {
@@ -147,13 +138,11 @@ public Object validate(AddressRequest request) {
         return new ValidationError("ADDRESS_NOT_FOUND", e.getMessage());
     }
 }
-```
 
 Return an error envelope; reserve throws for cases where you *want* the retry ladder.
 
 ## Testing Request-Reply
 
-```java
 @SpringBootTest
 class RpcFlowTest {
 
@@ -179,7 +168,6 @@ class RpcFlowTest {
         assertNull(reply);   // timeout → null
     }
 }
-```
 
 ## Summary
 
@@ -194,3 +182,4 @@ class RpcFlowTest {
 | Errors | Error envelope in the reply, not a throw |
 
 Request-reply turns RabbitMQ from a queue into a distributed function call — with the broker's reliability guarantees and the two sides deployed independently. Keep it internal, keep it time-boxed, and correlate explicitly.
+

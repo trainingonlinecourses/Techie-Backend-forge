@@ -1,7 +1,7 @@
 ---
 title: "Pattern Matching for switch — Eliminating Type-Check Boilerplate"
 summary: "What pattern matching for switch is, how it replaces if-else chains with instanceof, guarded patterns, and how organizations use it for cleaner dispatch logic."
-order: 8
+order: 2
 minutes: 22
 topics: [pattern-matching, switch-expressions, sealed-classes, java-17-preview, java-21-preview, type-patterns, guarded-patterns]
 docs:
@@ -15,7 +15,6 @@ docs:
 
 Before pattern matching, checking types in Java required verbose `if-else` chains with casts:
 
-```java
 // OLD way — ugly and error-prone
 static String describe(Object obj) {
     if (obj instanceof String) {
@@ -31,7 +30,6 @@ static String describe(Object obj) {
         return "Unknown: " + obj.getClass();
     }
 }
-```
 
 **The problems:**
 1. You check the type, then cast — repeated boilerplate
@@ -40,7 +38,6 @@ static String describe(Object obj) {
 
 **Pattern matching for switch fixes this** (finalized in Java 21, JEP 441):
 
-```java
 // NEW way — clean and safe
 static String describe(Object obj) {
     return switch (obj) {
@@ -50,7 +47,6 @@ static String describe(Object obj) {
         default          -> "Unknown: " + obj.getClass();
     };
 }
-```
 
 **One line per case. No casts. No intermediate variables.** The pattern variable `s`, `i`, `arr` is automatically bound if the type matches.
 
@@ -58,25 +54,28 @@ static String describe(Object obj) {
 
 Switch can now be used as an **expression** (not just a statement):
 
-```java
-// As a statement (traditional)
-switch (day) {
-    case MONDAY:
-        System.out.println("Start of work week");
-        break;
-    case FRIDAY:
-        System.out.println("Almost weekend!");
-        break;
-}
+public class Main {
 
-// As an expression (modern)
-String message = switch (day) {
-    case MONDAY    -> "Start of work week";
-    case FRIDAY    -> "Almost weekend!";
-    case SATURDAY, SUNDAY -> "Weekend!";
-    default        -> "Midweek";
-};
-```
+    public static void main(String[] args) {
+        // As a statement (traditional)
+        switch (day) {
+            case MONDAY:
+                System.out.println("Start of work week");
+                break;
+            case FRIDAY:
+                System.out.println("Almost weekend!");
+                break;
+        }
+
+        // As an expression (modern)
+        String message = switch (day) {
+            case MONDAY    -> "Start of work week";
+            case FRIDAY    -> "Almost weekend!";
+            case SATURDAY, SUNDAY -> "Weekend!";
+            default        -> "Midweek";
+        };
+    }
+}
 
 **Key differences from traditional switch:**
 - Use `->` instead of `case:`
@@ -86,7 +85,6 @@ String message = switch (day) {
 
 ### Type Patterns — The Basics
 
-```java
 public class TypePatterns {
     static String format(Object obj) {
         return switch (obj) {
@@ -105,13 +103,11 @@ public class TypePatterns {
         System.out.println(format(null));      // null value
     }
 }
-```
 
 ### Guarded Patterns (When Clauses)
 
 Sometimes you need more than just a type check. Use `when` to add conditions:
 
-```java
 public class GuardedPatterns {
     static String classify(Number num) {
         return switch (num) {
@@ -132,13 +128,11 @@ public class GuardedPatterns {
         System.out.println(classify(100L));    // Long: 100
     }
 }
-```
 
 ### Pattern Matching with Sealed Classes
 
 Pattern matching becomes incredibly powerful with sealed classes:
 
-```java
 // Define a sealed class hierarchy
 public sealed interface Shape 
     permits Circle, Rectangle, Triangle {
@@ -162,7 +156,6 @@ public class ShapeCalculator {
         // No default needed — the compiler knows all cases are covered!
     }
 }
-```
 
 **Why this matters:** The compiler enforces exhaustiveness. If you add a new shape to the sealed hierarchy and forget to handle it, you get a compile error.
 
@@ -170,7 +163,6 @@ public class ShapeCalculator {
 
 Pattern matching for switch has special null handling:
 
-```java
 public class NullHandling {
     static String process(String input) {
         return switch (input) {
@@ -181,13 +173,11 @@ public class NullHandling {
         // In pattern matching, null is handled explicitly
     }
 }
-```
 
 ### Nested Pattern Matching
 
 You can destructure records within patterns:
 
-```java
 public record Point(int x, int y) {}
 public record Line(Point start, Point end) {}
 
@@ -203,12 +193,10 @@ public class NestedPatterns {
         };
     }
 }
-```
 
 ### Organization Use Cases
 
 **1. API Request Routing**
-```java
 public class RequestRouter {
     public String route(Request request) {
         return switch (request) {
@@ -220,10 +208,8 @@ public class RequestRouter {
         };
     }
 }
-```
 
 **2. State Machine**
-```java
 public class OrderStateMachine {
     public OrderState transition(OrderState current, Event event) {
         return switch (current) {
@@ -238,10 +224,8 @@ public class OrderStateMachine {
         };
     }
 }
-```
 
 **3. Visitor Pattern Simplified**
-```java
 public class AstEvaluator {
     double evaluate(AstNode node) {
         return switch (node) {
@@ -252,7 +236,6 @@ public class AstEvaluator {
         };
     }
 }
-```
 
 ### Common Mistakes
 
@@ -266,41 +249,38 @@ public class AstEvaluator {
 
 ### Line-by-Line Code Explanation
 
+
+**What this code does — step by step:**
+
+1. ↑ Public class for pattern matching demonstration
+2. ↑ Static method — takes any Object as input
+3. ↑ Switch EXPRESSION — returns a value (not just a statement). ↑ The variable 'shape' is tested against each case
+4. ↑ Type pattern: checks if shape is a Circle. ↑ Binds it to variable 'c'. ↑ Guarded pattern: additional condition radius > 10. ↑ Arrow -> means no fall-through
+5. ↑ Second Circle case — catches circles with radius <= 10. ↑ Order matters — more specific patterns first
+6. ↑ Type pattern for Rectangle. ↑ No guard needed — matches all Rectangles
+7. ↑ Special null case — handled explicitly. ↑ In traditional switch, null would throw NPE
+8. ↑ Catch-all for any other type. ↑ Not needed with sealed classes (compiler enforces exhaustiveness)
+9. ↑ The switch expression evaluates to a String. ↑ That String is returned from the method
+
+The same code, clean:
+
 ```java
 public class PatternMatchingDemo {
-    // ↑ Public class for pattern matching demonstration
-    
+
     static String describeShape(Object shape) {
-        // ↑ Static method — takes any Object as input
-        
+
         return switch (shape) {
-            // ↑ Switch EXPRESSION — returns a value (not just a statement)
-            // ↑ The variable 'shape' is tested against each case
-            
+
             case Circle c when c.radius() > 10 -> "Big circle"
-            // ↑ Type pattern: checks if shape is a Circle
-            // ↑ Binds it to variable 'c'
-            // ↑ Guarded pattern: additional condition radius > 10
-            // ↑ Arrow -> means no fall-through
-            
+
             case Circle c -> "Small circle"
-            // ↑ Second Circle case — catches circles with radius <= 10
-            // ↑ Order matters — more specific patterns first
-            
+
             case Rectangle r -> "Rectangle: " + r.width() + "x" + r.height()
-            // ↑ Type pattern for Rectangle
-            // ↑ No guard needed — matches all Rectangles
-            
+
             case null -> "No shape provided"
-            // ↑ Special null case — handled explicitly
-            // ↑ In traditional switch, null would throw NPE
-            
+
             default -> "Unknown shape"
-            // ↑ Catch-all for any other type
-            // ↑ Not needed with sealed classes (compiler enforces exhaustiveness)
         };
-        // ↑ The switch expression evaluates to a String
-        // ↑ That String is returned from the method
     }
 }
 ```
@@ -327,3 +307,4 @@ public class PatternMatchingDemo {
 ### Real-World Organization Scenario
 
 A fintech company processes different transaction types. Each transaction type has different fields and validation rules. Using pattern matching for switch with sealed classes, they eliminate 40 lines of instanceof chains, making the code compile-time safe and immediately readable. Adding a new transaction type forces them to handle it in every switch — impossible to forget.
+

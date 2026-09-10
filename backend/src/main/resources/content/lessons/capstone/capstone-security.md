@@ -15,7 +15,6 @@ Open `projects/payments-api/src/main/java/com/example/payments/security/` — th
 
 ## The security config
 
-```java
 package com.example.payments.config;
 
 import com.example.payments.security.JwtAuthFilter;
@@ -90,11 +89,9 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 }
-```
 
 ## The JWT filter (stateless per-request auth)
 
-```java
 package com.example.payments.security;
 
 import jakarta.servlet.FilterChain;
@@ -137,11 +134,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         chain.doFilter(request, response);
     }
 }
-```
 
 ## Login & register endpoints
 
-```java
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -163,9 +158,7 @@ public class AuthController {
         return UserDto.from(principal.user());
     }
 }
-```
 
-```java
 @Service
 public class AuthService {
 
@@ -195,7 +188,6 @@ public class AuthService {
         return new AuthResponse(jwtService.issue(principal.user()), UserDto.from(principal.user()));
     }
 }
-```
 
 ## Try it live
 
@@ -225,3 +217,4 @@ curl -i localhost:8081/api/accounts
 - 401/403 as JSON via entry point + denied handler.
 
 **Official docs:** [Spring Security auth](https://docs.spring.io/spring-security/reference/servlet/authentication/index.html)
+

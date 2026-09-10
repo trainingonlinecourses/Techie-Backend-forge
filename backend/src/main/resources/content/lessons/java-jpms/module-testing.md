@@ -24,29 +24,24 @@ jdeps --multi-release 17 --check mylib.jar
 
 ## Line-by-Line Walkthrough
 
+
+**What this code does — step by step:**
+
+1. 1. Test module access. Test code needs --add-reads to access internal module APIs. In your test's module-info.java:
+2. Allow test to read internal packages
+3. 2. jdeps analysis. $ jdeps --module-path target/classes --check target/classes. Shows missing requires, split packages, illegal accesses
+4. 3. Verify module descriptors. $ jdeps --module-descriptor target/classes/module-info.class
+5. 4. Run tests on module path. $ java --module-path target/test-classes:target/classes \. --add-modules org.junit.jupiter.api \. -m com.example.myapp.test/com.example.TestRunner
+
+The same code, clean:
+
 ```java
-// 1. Test module access
-// Test code needs --add-reads to access internal module APIs
-// In your test's module-info.java:
 module com.example.myapp.test {
     requires com.example.myapp;
     requires org.junit.jupiter.api;
 
-    // Allow test to read internal packages
     opens com.example.internal to org.junit.jupiter.api;
 }
-
-// 2. jdeps analysis
-// $ jdeps --module-path target/classes --check target/classes
-// Shows missing requires, split packages, illegal accesses
-
-// 3. Verify module descriptors
-// $ jdeps --module-descriptor target/classes/module-info.class
-
-// 4. Run tests on module path
-// $ java --module-path target/test-classes:target/classes \
-//        --add-modules org.junit.jupiter.api \
-//        -m com.example.myapp.test/com.example.TestRunner
 ```
 
 ---
@@ -90,3 +85,4 @@ java --module-path libs/ \
 | Not using jdeps | Undetected module boundary violations | Add jdeps check to CI |
 | Forgetting --add-reads for test modules | Test can't access production code | Add requires and --add-reads |
 | Ignoring split package warnings | Runtime failures | Fix before deploying |
+

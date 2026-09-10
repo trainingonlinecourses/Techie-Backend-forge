@@ -1,7 +1,7 @@
 ---
 title: Maven Plugins in Practice
 module: maven-gradle
-order: 3
+order: 4
 minutes: 20
 topics: ["plugin configuration", "compiler", "surefire", "failsafe", "checkstyle", "code coverage", "spotless"]
 summary: The lifecycle is the skeleton; plugins are the organs. This lesson covers the plugins every Spring project actually uses — compiler, surefire/fails...
@@ -220,3 +220,4 @@ mvn verify -Dskip.unit.tests=true   # per-run override
 | Static analysis | spotbugs / PMD |
 
 `mvn verify` with quality gates is the difference between "the build passes" and "the build is trustworthy": tests prove behavior, coverage proves the tests touched the code, checkstyle/spotless keep it readable, and spotbugs catches what tests miss. Configure them once, enforce them in CI, and let the build be the gatekeeper.
+

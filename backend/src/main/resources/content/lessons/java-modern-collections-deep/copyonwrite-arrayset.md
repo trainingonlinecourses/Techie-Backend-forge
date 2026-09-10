@@ -38,70 +38,72 @@ A `CopyOnWriteArraySet` does not delegate to a `HashMap` or `HashSet` internally
 
 The most common real-world use of `CopyOnWriteArrayList` is a list of listeners or callbacks. Think of a button that has a list of click listeners, or a service that notifies a list of observers when something happens. Listeners are registered and unregistered occasionally, but events happen often and each event must notify all current listeners quickly. A copy-on-write list is a natural fit.
 
+
+**What this code does — step by step:**
+
+1. An event source that maintains a list of listeners
+2. CopyOnWriteArrayList: many reads (notifications), few writes (register/unregister)
+3. Register a listener — a write, copies the array
+4. Unregister a listener — a write, copies the array
+5. Fire an event to all current listeners — a read, no locking
+6. Iterate over a snapshot — safe even if listeners are modified during iteration
+7. In a real system, log the error; one bad listener should not. Stop the others. With CopyOnWriteArrayList, removing during. Iteration is safe, but we still catch to be polite.
+8. A functional interface for listeners
+9. A small demo
+10. Register some listeners
+11. Register another listener during iteration — safe with CopyOnWriteArrayList
+12. Remove a listener
+13. NOTE: removing by lambda expression using the same code may not match. The original listener object. In real code, keep a reference to the. Listener you added so you can remove the exact same object.
+
+The same code, clean:
+
 ```java
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-// An event source that maintains a list of listeners
 public class EventSource {
-    // CopyOnWriteArrayList: many reads (notifications), few writes (register/unregister)
     private final List<EventListener> listeners = new CopyOnWriteArrayList<>();
 
-    // Register a listener — a write, copies the array
     public void addListener(EventListener listener) {
         listeners.add(listener);
     }
 
-    // Unregister a listener — a write, copies the array
     public void removeListener(EventListener listener) {
         listeners.remove(listener);
     }
 
-    // Fire an event to all current listeners — a read, no locking
     public void fireEvent(String message) {
-        // Iterate over a snapshot — safe even if listeners are modified during iteration
         for (EventListener listener : listeners) {
             try {
                 listener.onEvent(message);
             } catch (Exception e) {
-                // In a real system, log the error; one bad listener should not
-                // stop the others. With CopyOnWriteArrayList, removing during
-                // iteration is safe, but we still catch to be polite.
                 System.err.println("listener failed: " + e.getMessage());
             }
         }
     }
 
-    // A functional interface for listeners
     @FunctionalInterface
     public interface EventListener {
         void onEvent(String message);
     }
 }
 
-// A small demo
 class Demo {
     public static void main(String[] args) {
         EventSource source = new EventSource();
 
-        // Register some listeners
         source.addListener(msg -> System.out.println("Listener A: " + msg));
         source.addListener(msg -> System.out.println("Listener B: " + msg));
 
         System.out.println("=== firing first event ===");
         source.fireEvent("hello");
 
-        // Register another listener during iteration — safe with CopyOnWriteArrayList
         source.addListener(msg -> System.out.println("Listener C (added later): " + msg));
 
         System.out.println("=== firing second event (includes C) ===");
         source.fireEvent("world");
 
-        // Remove a listener
         source.removeListener(msg -> System.out.println("Listener A: " + msg));
-        // NOTE: removing by lambda expression using the same code may not match
-        // the original listener object. In real code, keep a reference to the
-        // listener you added so you can remove the exact same object.
 
         System.out.println("=== firing third event (A removed, B and C remain) ===");
         source.fireEvent("goodbye");
@@ -138,6 +140,19 @@ Do **not** use a copy-on-write collection when:
 
 This example compares how a `CopyOnWriteArrayList` and an `ArrayList` protected by a lock behave under different read/write ratios.
 
+
+**What this code does — step by step:**
+
+1. Scenario 1: CopyOnWriteArrayList — many reads, few writes. Scenario 2: ArrayList + ReentrantLock — same workload, locked
+2. CopyOnWriteArrayList: readers iterate freely, writers copy on each write
+3. read-heavy: iterate over the list
+4. do something trivial with each element
+5. few writes
+6. `list.remove(0);` — keep size bounded
+7. ArrayList + lock: every access is locked
+
+The same code, clean:
+
 ```java
 import java.util.ArrayList;
 import java.util.List;
@@ -153,8 +168,6 @@ public class CopyOnWritePerformance {
     static final int OPERATIONS = 100_000;
 
     public static void main(String[] args) throws Exception {
-        // Scenario 1: CopyOnWriteArrayList — many reads, few writes
-        // Scenario 2: ArrayList + ReentrantLock — same workload, locked
 
         System.out.println("=== Many reads, few writes ===");
         test("CopyOnWriteArrayList", new CopyOnWriteListHarness());
@@ -173,7 +186,6 @@ interface ListHarness {
     void run() throws Exception;
 }
 
-// CopyOnWriteArrayList: readers iterate freely, writers copy on each write
 class CopyOnWriteListHarness implements ListHarness {
     private final List<String> list = new java.util.concurrent.CopyOnWriteArrayList<>();
 
@@ -187,9 +199,7 @@ class CopyOnWriteListHarness implements ListHarness {
                 try {
                     start.await();
                     for (int j = 0; j < CopyOnWritePerformance.OPERATIONS; j++) {
-                        // read-heavy: iterate over the list
                         for (String s : list) {
-                            // do something trivial with each element
                             int ignored = s.length();
                         }
                     }
@@ -205,10 +215,9 @@ class CopyOnWriteListHarness implements ListHarness {
             try {
                 start.await();
                 for (int j = 0; j < CopyOnWritePerformance.OPERATIONS / 10; j++) {
-                    // few writes
                     list.add("item-" + j);
                     if (list.size() > 1000) {
-                        list.remove(0);   // keep size bounded
+                        list.remove(0);
                     }
                 }
             } catch (InterruptedException e) {
@@ -224,7 +233,6 @@ class CopyOnWriteListHarness implements ListHarness {
     }
 }
 
-// ArrayList + lock: every access is locked
 class LockedListHarness implements ListHarness {
     private final List<String> list = new ArrayList<>();
     private final ReentrantLock lock = new ReentrantLock();
@@ -322,3 +330,4 @@ In the lab, you will see a buggy event bus that uses a plain `ArrayList` and suf
 ## Summary
 
 `CopyOnWriteArrayList` and `CopyOnWriteArraySet` are thread-safe collections that copy their underlying data on every write, giving lock-free reads and safe iteration over a snapshot. They are ideal for read-heavy, write-rare workloads — the classic example is a list of listeners or callbacks that is registered and unregistered occasionally but notified frequently. The cost is that every write copies the entire underlying array, so they are slow for write-heavy workloads and for large collections. `CopyOnWriteArraySet` is backed by a list, so its containment checks are O(n), making it unsuitable for large sets where fast containment checks are needed. Use `ConcurrentHashMap` and `ConcurrentHashMap.newKeySet()` for write-heavy or larger concurrent collections. Match the collection to the workload: copy-on-write for many reads and few writes, other concurrent collections for the rest.
+

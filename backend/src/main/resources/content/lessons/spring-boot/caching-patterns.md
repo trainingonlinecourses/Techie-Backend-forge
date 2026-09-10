@@ -1,7 +1,7 @@
 ---
 title: Spring Boot Caching — Multi-Level Cache Patterns
 summary: @Cacheable and @CacheEvict, Redis vs Caffeine vs Ehcache, multi-level caching, cache key design, stampede prevention, and how production systems cache data without stale reads.
-order: 46
+order: 16
 minutes: 22
 topics: [caching, cacheable, cacheevict, cache-manager, redis-cache, caffeine, multi-level-cache, cache-stampede]
 docs:
@@ -16,12 +16,10 @@ docs:
 
 Spring provides a **cache abstraction** that lets you add caching to any method with annotations. The implementation (Caffeine, Redis, Ehcache) is pluggable — change the cache store without changing your code.
 
-```java
 @Cacheable("users")  // Spring intercepts calls to this method
 public User getUser(String id) {
     return userRepository.findById(id).orElseThrow();  // only runs on cache miss
 }
-```
 
 **How it works internally:**
 1. First call with `id="user-123"` → cache miss → method executes → result stored in cache
@@ -44,7 +42,6 @@ public User getUser(String id) {
 
 Cache expensive product queries with automatic eviction:
 
-```java
 @Service
 public class ProductService {
     private final ProductRepository productRepo;
@@ -74,11 +71,9 @@ public class ProductService {
         log.info("Refreshing all product caches");
     }
 }
-```
 
 ### Scenario 2: Multi-level cache (Caffeine + Redis)
 
-```java
 @Configuration
 @EnableCaching
 public class CacheConfig {
@@ -109,13 +104,11 @@ public class CacheConfig {
             .build();
     }
 }
-```
 
 ### Scenario 3: Cache stampede prevention
 
 When a popular cache entry expires, hundreds of concurrent requests all miss the cache and hit the DB simultaneously — this is the **cache stampede** (or thundering herd).
 
-```java
 @Service
 public class ResilientCacheService {
     private final LoadingCache<String, Product> productCache;
@@ -137,7 +130,6 @@ public class ResilientCacheService {
         return productCache.get(id);  // thread-safe, only one thread refreshes
     }
 }
-```
 
 **`refreshAfterWrite`** is the key: when the entry is accessed after the refresh period but before expiry, Caffeine returns the old value while asynchronously loading the new one in the background. Only one thread does the refresh.
 
@@ -145,7 +137,6 @@ public class ResilientCacheService {
 
 Cache only specific results:
 
-```java
 @Cacheable(
     value = "search-results",
     key = "#query + ':' + #page",
@@ -155,14 +146,12 @@ Cache only specific results:
 public List<SearchResult> search(String query, int page) {
     return searchEngine.search(query, page);
 }
-```
 
 **`condition`** — evaluated BEFORE the method runs (decides whether to check cache)
 **`unless`** — evaluated AFTER the method runs (decides whether to store result)
 
 ### Scenario 5: Cache metrics and monitoring
 
-```java
 @Bean
 public MeterBinder cacheMetrics(CaffeineCacheManager cacheManager) {
     return registry -> {
@@ -180,13 +169,11 @@ public MeterBinder cacheMetrics(CaffeineCacheManager cacheManager) {
         });
     };
 }
-```
 
 ## Cache key design
 
 Keys must be unique, deterministic, and compact:
 
-```java
 // Good — composite key for method arguments
 @Cacheable(value = "orders", key = "#customerId + ':' + #status + ':' + #page")
 
@@ -195,7 +182,6 @@ Keys must be unique, deterministic, and compact:
 
 // Bad — key that changes every call (cache never hits)
 @Cacheable(value = "data", key = "T(System).currentTimeMillis()")
-```
 
 ## Common mistakes
 
@@ -207,3 +193,4 @@ Keys must be unique, deterministic, and compact:
 | No monitoring of hit/miss rates | Cannot tune cache sizing |
 | Caching method with side effects | Side effects skipped on cache hit |
 | Using `@Cacheable` on void methods | Cache stores null, never re-calls |
+

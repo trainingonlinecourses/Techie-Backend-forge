@@ -1,7 +1,7 @@
 ---
 title: Pattern Matching for switch — Type-Safe, Exhaustive Switch
 summary: What pattern matching for switch is, guarded patterns, null handling, sealed class exhaustiveness, and how organizations use it for cleaner code.
-order: 3
+order: 1
 minutes: 22
 topics: [pattern-matching-switch, guarded-pattern, sealed-switch, java21]
 docs:
@@ -12,7 +12,6 @@ docs:
 
 Before Java 21, switch only worked with primitives and enums. You couldn't switch on object types. Pattern matching for switch lets you match by type AND extract variables:
 
-```java
 // OLD: if-else chain for type checking
 Object obj = getSomething();
 if (obj instanceof String s) {
@@ -31,7 +30,6 @@ switch (obj) {
     case List<?> l  -> processList(l);
     default         -> throw new IllegalArgumentException("Unknown: " + obj);
 };
-```
 
 ---
 
@@ -39,7 +37,6 @@ switch (obj) {
 
 ### Guarded patterns (when clauses)
 
-```java
 // Match a type AND a condition
 String classify(Object obj) {
     return switch (obj) {
@@ -52,22 +49,18 @@ String classify(Object obj) {
         default                   -> "other";
     };
 }
-```
 
 ### Null handling
 
-```java
 // switch can now handle null — no more NullPointerException
 switch (obj) {
     case null    -> "null";
     case String s -> "string: " + s;
     default      -> "other";
 };
-```
 
 ### Exhaustive matching with sealed classes
 
-```java
 sealed interface Shape permits Circle, Rectangle, Triangle {}
 record Circle(double r) implements Shape {}
 record Rectangle(double w, double h) implements Shape {}
@@ -81,17 +74,41 @@ double area(Shape shape) {
         case Triangle t  -> 0.5 * t.b() * t.h();
     };
 }
-```
 
 ---
 
 ## Line-by-Line Walkthrough
 
+
+**What this code does — step by step:**
+
+1. Line 1: Basic pattern matching switch
+2. Line 2: Guarded patterns with when
+3. Line 3: Pattern matching with sealed hierarchy
+4. Line 4: Nested pattern matching
+5. Line 5: Test all patterns
+6. `System.out.println(describe(null));` — "null"
+7. `System.out.println(describe(42));` — "integer: 42"
+8. `System.out.println(describe("hello"));` — "string: \"hello\""
+9. `System.out.println(describe(List.of(1, 2)));` — "list of size 2"
+10. Line 6: Guarded patterns
+11. `System.out.println(classify(-5));` — "negative"
+12. `System.out.println(classify(0));` — "zero"
+13. `System.out.println(classify(10));` — "positive (10)"
+14. Line 7: Sealed switch
+15. `System.out.println(processResult(r1));` — "OK: data loaded"
+16. `System.out.println(processResult(r2));` — "Server error: timeout"
+17. `System.out.println(processResult(r3));` — "Client error: not found"
+18. Line 8: Nested patterns
+19. `System.out.println(describeLine(line1));` — "Vertical line at x=0"
+20. `System.out.println(describeLine(line2));` — "Horizontal line at y=0"
+
+The same code, clean:
+
 ```java
 import java.util.*;
 
 public class PatternMatchingSwitchDemo {
-    // Line 1: Basic pattern matching switch
     static String describe(Object obj) {
         return switch (obj) {
             case null              -> "null";
@@ -104,7 +121,6 @@ public class PatternMatchingSwitchDemo {
         };
     }
 
-    // Line 2: Guarded patterns with when
     static String classify(int value) {
         return switch (value) {
             case int i when i < 0    -> "negative";
@@ -113,7 +129,6 @@ public class PatternMatchingSwitchDemo {
         };
     }
 
-    // Line 3: Pattern matching with sealed hierarchy
     sealed interface Result permits Success, Failure, Pending {}
     record Success(Object data) implements Result {}
     record Failure(String error, int code) implements Result {}
@@ -128,7 +143,6 @@ public class PatternMatchingSwitchDemo {
         };
     }
 
-    // Line 4: Nested pattern matching
     record Point(int x, int y) {}
     record Line(Point start, Point end) {}
 
@@ -143,30 +157,26 @@ public class PatternMatchingSwitchDemo {
     }
 
     public static void main(String[] args) {
-        // Line 5: Test all patterns
-        System.out.println(describe(null));           // "null"
-        System.out.println(describe(42));             // "integer: 42"
-        System.out.println(describe("hello"));        // "string: \"hello\""
-        System.out.println(describe(List.of(1, 2)));  // "list of size 2"
+        System.out.println(describe(null));
+        System.out.println(describe(42));
+        System.out.println(describe("hello"));
+        System.out.println(describe(List.of(1, 2)));
 
-        // Line 6: Guarded patterns
-        System.out.println(classify(-5));  // "negative"
-        System.out.println(classify(0));   // "zero"
-        System.out.println(classify(10));  // "positive (10)"
+        System.out.println(classify(-5));
+        System.out.println(classify(0));
+        System.out.println(classify(10));
 
-        // Line 7: Sealed switch
         Result r1 = new Success("data loaded");
         Result r2 = new Failure("timeout", 504);
         Result r3 = new Failure("not found", 404);
-        System.out.println(processResult(r1));  // "OK: data loaded"
-        System.out.println(processResult(r2));  // "Server error: timeout"
-        System.out.println(processResult(r3));  // "Client error: not found"
+        System.out.println(processResult(r1));
+        System.out.println(processResult(r2));
+        System.out.println(processResult(r3));
 
-        // Line 8: Nested patterns
         Line line1 = new Line(new Point(0, 0), new Point(0, 5));
         Line line2 = new Line(new Point(0, 0), new Point(5, 0));
-        System.out.println(describeLine(line1));  // "Vertical line at x=0"
-        System.out.println(describeLine(line2));  // "Horizontal line at y=0"
+        System.out.println(describeLine(line1));
+        System.out.println(describeLine(line2));
     }
 }
 ```
@@ -177,7 +187,6 @@ public class PatternMatchingSwitchDemo {
 
 ### Scenario 1: API error handling
 
-```java
 public ResponseEntity<?> handleServiceResult(ServiceResult result) {
     return switch (result) {
         case Success<?> s    -> ResponseEntity.ok(s.data());
@@ -187,11 +196,9 @@ public ResponseEntity<?> handleServiceResult(ServiceResult result) {
         case RateLimited r   -> ResponseEntity.status(429).body(Map.of("retryAfter", r.seconds()));
     };
 }
-```
 
 ### Scenario 2: AST evaluation
 
-```java
 public double evaluate(Expr expr) {
     return switch (expr) {
         case Literal l    -> l.value();
@@ -203,7 +210,6 @@ public double evaluate(Expr expr) {
         case Divide d     -> evaluate(d.left()) / evaluate(d.right());
     };
 }
-```
 
 ---
 
@@ -216,3 +222,4 @@ public double evaluate(Expr expr) {
 | Non-exhaustive switch | Compilation error | Add `default` or ensure sealed hierarchy |
 | Complex patterns in one case | Hard to read | Break into multiple cases |
 | Using `when` with side effects | May not execute | Keep guards pure |
+

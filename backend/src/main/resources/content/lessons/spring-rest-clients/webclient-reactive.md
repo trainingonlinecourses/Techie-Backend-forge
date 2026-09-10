@@ -1,7 +1,7 @@
 ---
 title: WebClient — Reactive HTTP Calls
 module: spring-rest-clients
-order: 3
+order: 5
 minutes: 25
 topics: ["WebClient", "reactive", "Mono", "Flux", "non-blocking", "WebFlux"]
 summary: A blocking HTTP call (RestClient) occupies a thread for the whole round trip: the thread sits idle waiting for the server. With thousands of concur...
@@ -16,13 +16,11 @@ docs:
 
 A blocking HTTP call (RestClient) occupies a thread for the whole round trip: the thread sits idle waiting for the server. With thousands of concurrent calls, you need thousands of threads. **Reactive** clients flip the model: instead of *blocking and waiting*, you **describe what you want** and get a *future-like* object (`Mono` = 0 or 1 result, `Flux` = 0..n results). The actual work happens on shared, non-blocking event-loop threads, and your continuation runs **when the response arrives** — no thread is ever idle-waiting.
 
-```java
 // Blocking (RestClient): thread waits
 Course course = restClient.get().uri("/api/courses/1").retrieve().body(Course.class);
 
 // Reactive (WebClient): returns immediately with a Mono
 Mono<Course> future = webClient.get().uri("/api/courses/1").retrieve().bodyToMono(Course.class);
-```
 
 The first call *hangs* the calling thread until data arrives. The second returns in microseconds — the `Mono` is a *promise* that will emit the `Course` (or an error) when the server answers. You attach `.map(...)`, `.flatMap(...)`, `.subscribe(...)` to process the result when it comes.
 
@@ -38,6 +36,21 @@ The first call *hangs* the calling thread until data arrives. The second returns
 Both are *lazy*: nothing happens until you **subscribe** (directly or via `block()`, or by returning them from a reactive controller, which subscribes for you).
 
 ## The Code Walkthrough
+
+
+**What this code does — step by step:**
+
+1. ---- 1. Mono: single result ----
+2. ---- 2. Flux: a stream of results ----
+3. ---- 3. Chaining: process the result without blocking ----
+4. `.map(Course::title)` — transform when it arrives
+5. `.timeout(Duration.ofSeconds(5))` — fail fast if the server is slow
+6. `.onErrorReturn("unknown");` — fallback on any error
+7. ---- 4. Composing two calls (parallel, then combine) ----
+8. `Mono<Author> author = getAuthor(authorId);` — runs concurrently
+9. `return Mono.zip(course, author)` — wait for both
+
+The same code, clean:
 
 ```java
 import org.springframework.stereotype.Service;
@@ -59,7 +72,6 @@ public class ReactiveCourseClient {
                 .build();
     }
 
-    // ---- 1. Mono: single result ----
     public Mono<Course> getCourse(long id) {
         return webClient.get()
                 .uri("/api/courses/{id}", id)
@@ -67,7 +79,6 @@ public class ReactiveCourseClient {
                 .bodyToMono(Course.class);
     }
 
-    // ---- 2. Flux: a stream of results ----
     public Flux<Course> listCourses() {
         return webClient.get()
                 .uri("/api/courses")
@@ -75,19 +86,17 @@ public class ReactiveCourseClient {
                 .bodyToFlux(Course.class);
     }
 
-    // ---- 3. Chaining: process the result without blocking ----
     public Mono<String> getCourseTitle(long id) {
         return getCourse(id)
-                .map(Course::title)                 // transform when it arrives
-                .timeout(Duration.ofSeconds(5))     // fail fast if the server is slow
-                .onErrorReturn("unknown");          // fallback on any error
+                .map(Course::title)
+                .timeout(Duration.ofSeconds(5))
+                .onErrorReturn("unknown");
     }
 
-    // ---- 4. Composing two calls (parallel, then combine) ----
     public Mono<CourseDetail> courseWithAuthor(long id, long authorId) {
         Mono<Course> course = getCourse(id);
-        Mono<Author> author = getAuthor(authorId);      // runs concurrently
-        return Mono.zip(course, author)                 // wait for both
+        Mono<Author> author = getAuthor(authorId);
+        return Mono.zip(course, author)
                 .map(tuple -> new CourseDetail(tuple.getT1(), tuple.getT2()));
     }
 }
@@ -119,11 +128,9 @@ public class ReactiveCourseClient {
 
 If you're on WebFlux but need a blocking result in one place (e.g., a `@Scheduled` task), `block()` exists:
 
-```java
 Course course = webClient.get().uri("/api/courses/1").retrieve()
         .bodyToMono(Course.class)
         .block(Duration.ofSeconds(5));   // wait (bounded) for the result
-```
 
 Never call `block()` inside a reactive pipeline (it blocks an event-loop thread — the exact anti-pattern). Use it only at *imperative boundaries* (scheduled jobs, `@PostConstruct`, plain tests).
 
@@ -144,3 +151,4 @@ Never call `block()` inside a reactive pipeline (it blocks an event-loop thread 
 - Compose concurrent calls with `zip`/`flatMap` without dedicating threads.
 - In WebFlux apps, WebClient is mandatory; in MVC apps, prefer RestClient.
 - Always bound timeouts; never `block()` inside a reactive pipeline.
+

@@ -1,7 +1,7 @@
 ---
 title: Testcontainers for Real Dependencies
 module: spring-testing-advanced
-order: 4
+order: 10
 minutes: 25
 topics: ["Testcontainers", "@ServiceConnection", "PostgreSQL", "Redis", "Kafka", "container lifecycle"]
 summary: Inmemory substitutes (H2 for Postgres, embedded Redis) drift from production. Testcontainers runs the real thing — actual Postgres, actual Redis, a...
@@ -27,7 +27,6 @@ The drift means "passes in CI, fails in prod". Testcontainers eliminates the ent
 
 ## The Basic Setup
 
-```java
 @DataJpaTest
 @Testcontainers
 class CourseRepositoryTest {
@@ -39,13 +38,11 @@ class CourseRepositoryTest {
 
     @Autowired CourseRepository repository;
 }
-```
 
 `@ServiceConnection` (Spring Boot 3.1+) auto-wires the container's connection into the context — no `spring.datasource.url` properties needed.
 
 ## Multiple Dependencies
 
-```java
 @SpringBootTest
 @Testcontainers
 class FullStackIntegrationTest {
@@ -66,7 +63,6 @@ class FullStackIntegrationTest {
     @Autowired StringRedisTemplate redisTemplate;
     @Autowired KafkaTemplate<String, String> kafkaTemplate;
 }
-```
 
 One context, three real dependencies, everything wired. Tests exercise the exact stack production runs.
 
@@ -84,18 +80,15 @@ The static pattern is the default: one container per test class, state reset bet
 
 For older setups, wire manually:
 
-```java
 @DynamicPropertySource
 static void datasourceProps(DynamicPropertyRegistry registry) {
     registry.add("spring.datasource.url", postgres::getJdbcUrl);
     registry.add("spring.datasource.username", postgres::getUsername);
     registry.add("spring.datasource.password", postgres::getPassword);
 }
-```
 
 ## Reusing Containers Across Classes
 
-```java
 @Testcontainers(disabledWithoutDocker = true)
 abstract class ContainerTestBase {
 
@@ -111,7 +104,6 @@ abstract class ContainerTestBase {
         // ...
     }
 }
-```
 
 Extend `ContainerTestBase` from every JPA test — one container, many test classes.
 
@@ -119,7 +111,6 @@ Extend `ContainerTestBase` from every JPA test — one container, many test clas
 
 The killer use case: verify migrations apply cleanly to a fresh DB.
 
-```java
 @DataJpaTest
 @Testcontainers
 class MigrationTest {
@@ -144,11 +135,9 @@ class MigrationTest {
             "SELECT count(*) FROM courses WHERE published = true", Integer.class);
     }
 }
-```
 
 ## Testing Kafka Flows
 
-```java
 @SpringBootTest
 @Testcontainers
 class OrderEventFlowTest {
@@ -169,7 +158,6 @@ class OrderEventFlowTest {
                 assertEquals(1, orderListener.getProcessedCount()));
     }
 }
-```
 
 `await()` (Awaitility) is essential for async flows — poll until the assertion holds, with a timeout.
 
@@ -207,3 +195,4 @@ class OrderEventFlowTest {
 | Fake S3 | LocalStack |
 
 Testcontainers turns "the tests pass but prod breaks" into "the tests run against prod's actual dependencies". The cost — a few seconds of container startup — is repaid the first time a Postgres-only SQL bug is caught in CI instead of production.
+

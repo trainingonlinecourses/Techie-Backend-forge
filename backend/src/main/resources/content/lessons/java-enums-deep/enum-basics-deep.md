@@ -16,12 +16,10 @@ docs:
 ## The Concept, From Zero
 
 Most beginners think enums are just a fancy way to write `public static final int`:
-```java
 // The C way (fragile, not type-safe)
 public static final int STATUS_ACTIVE = 0;
 public static final int STATUS_INACTIVE = 1;
 public static final int STATUS_BANNED = 2;
-```
 
 Java enums are **full classes**. Each constant is an instance of the enum class. This means enums can have:
 - **Fields** (each constant can carry data)
@@ -36,25 +34,33 @@ This makes enums far more powerful than named constants. They're the foundation 
 
 ### Step 1: Enums with Fields and Constructors
 
+
+**What this code does — step by step:**
+
+1. (1) Each constant passes its data to the constructor
+2. (2) Instance fields — each constant gets its own values
+3. `private final double mass;` — in kilograms
+4. `private final double radius;` — in meters
+5. (3) Constructor is always PRIVATE (you can't create new instances outside the enum)
+6. (4) Normal instance method — called on each constant
+
+The same code, clean:
+
 ```java
 public enum Planet {
-    // (1) Each constant passes its data to the constructor
     MERCURY(3.303e+23, 2.4397e6),
     VENUS(4.869e+24, 6.0518e6),
     EARTH(5.976e+24, 6.37814e6),
     MARS(6.421e+23, 3.3972e6);
 
-    // (2) Instance fields — each constant gets its own values
-    private final double mass;   // in kilograms
-    private final double radius; // in meters
+    private final double mass;
+    private final double radius;
 
-    // (3) Constructor is always PRIVATE (you can't create new instances outside the enum)
     Planet(double mass, double radius) {
         this.mass = mass;
         this.radius = radius;
     }
 
-    // (4) Normal instance method — called on each constant
     public double surfaceGravity() {
         final double G = 6.67300E-11;
         return G * mass / (radius * radius);
@@ -76,7 +82,6 @@ public enum Planet {
 | `surfaceGravity()` | Instance method | Each constant can call this: `Planet.EARTH.surfaceGravity()` |
 
 **Usage:**
-```java
 public class WeightCalculator {
     public static void main(String[] args) {
         double earthWeight = 75.0;
@@ -92,13 +97,11 @@ public class WeightCalculator {
         // Weight on MARS: 28.36 N
     }
 }
-```
 
 ### Step 2: Enums with Abstract Methods (Strategy Pattern)
 
 This is where enums become truly powerful. Each constant can **implement a different method**:
 
-```java
 public enum Operation {
     // (1) Each constant implements calculate() differently
     ADD("+") {
@@ -143,7 +146,6 @@ public enum Operation {
         throw new IllegalArgumentException("Unknown symbol: " + symbol);
     }
 }
-```
 
 **Line-by-line explanation:**
 
@@ -154,14 +156,11 @@ public enum Operation {
 | `Operation.fromSymbol("+")` | Static lookup method | Type-safe way to convert user input to enum constant |
 
 **Usage:**
-```java
 double result = Operation.MULTIPLY.apply(4, 5);  // 20.0
 Operation op = Operation.fromSymbol("+");          // Operation.ADD
-```
 
 **Why this is better than switch statements:**
 
-```java
 // BAD: switch-based approach (fragile, doesn't scale)
 public double calculate(String op, double a, double b) {
     switch (op) {
@@ -178,41 +177,53 @@ public double calculate(String op, double a, double b) {
 public double calculate(Operation op, double a, double b) {
     return op.apply(a, b);  // Adding a new operation = adding a new enum constant
 }
-```
 
 ### Step 3: EnumSet and EnumMap — Blazing-Fast Collections
+
+
+**What this code does — step by step:**
+
+1. Define permissions as an enum
+2. (1) EnumSet — bit-vector implementation, O(1) operations
+3. `EnumSet<Permission> ownerPerms = EnumSet.allOf(Permission.class);` — all permissions
+4. `EnumSet<Permission> guestPerms = EnumSet.of(Permission.READ);` — read only
+5. (2) Set operations — union, intersection, difference
+6. `EnumSet<Permission> common = EnumSet.intersection(ownerPerms, devPerms);` — READ, WRITE, EXECUTE
+7. `EnumSet<Permission> ownerOnly = EnumSet.difference(ownerPerms, devPerms);` — DELETE, ADMIN
+8. `System.out.println("Owner: " + ownerPerms);` — [READ, WRITE, EXECUTE, DELETE, ADMIN]
+9. `System.out.println("Guest: " + guestPerms);` — [READ]
+10. `System.out.println("Common: " + common);` — [READ, WRITE, EXECUTE]
+11. (3) EnumMap — maps enum keys to values, uses array internally (very fast)
+12. (4) Iteration in natural enum order (guaranteed)
+
+The same code, clean:
 
 ```java
 import java.util.EnumSet;
 import java.util.EnumMap;
 
 public class PermissionDemo {
-    // Define permissions as an enum
     public enum Permission {
         READ, WRITE, EXECUTE, DELETE, ADMIN
     }
 
     public static void main(String[] args) {
-        // (1) EnumSet — bit-vector implementation, O(1) operations
-        EnumSet<Permission> ownerPerms = EnumSet.allOf(Permission.class);      // all permissions
-        EnumSet<Permission> guestPerms = EnumSet.of(Permission.READ);           // read only
+        EnumSet<Permission> ownerPerms = EnumSet.allOf(Permission.class);
+        EnumSet<Permission> guestPerms = EnumSet.of(Permission.READ);
         EnumSet<Permission> devPerms = EnumSet.of(Permission.READ, Permission.WRITE, Permission.EXECUTE);
 
-        // (2) Set operations — union, intersection, difference
-        EnumSet<Permission> common = EnumSet.intersection(ownerPerms, devPerms);  // READ, WRITE, EXECUTE
-        EnumSet<Permission> ownerOnly = EnumSet.difference(ownerPerms, devPerms); // DELETE, ADMIN
+        EnumSet<Permission> common = EnumSet.intersection(ownerPerms, devPerms);
+        EnumSet<Permission> ownerOnly = EnumSet.difference(ownerPerms, devPerms);
 
-        System.out.println("Owner: " + ownerPerms);      // [READ, WRITE, EXECUTE, DELETE, ADMIN]
-        System.out.println("Guest: " + guestPerms);       // [READ]
-        System.out.println("Common: " + common);          // [READ, WRITE, EXECUTE]
+        System.out.println("Owner: " + ownerPerms);
+        System.out.println("Guest: " + guestPerms);
+        System.out.println("Common: " + common);
 
-        // (3) EnumMap — maps enum keys to values, uses array internally (very fast)
         EnumMap<Permission, String> descriptions = new EnumMap<>(Permission.class);
         descriptions.put(Permission.READ, "View files");
         descriptions.put(Permission.WRITE, "Modify files");
         descriptions.put(Permission.DELETE, "Remove files");
 
-        // (4) Iteration in natural enum order (guaranteed)
         for (Permission p : Permission.values()) {
             System.out.println(p + " = " + descriptions.getOrDefault(p, "No description"));
         }
@@ -232,15 +243,24 @@ public class PermissionDemo {
 
 ### Step 4: Enum as Singleton
 
+
+**What this code does — step by step:**
+
+1. (1) Single instance — JVM guarantees exactly one
+2. (2) Private constructor
+3. (3) Instance methods
+4. (4) Usage — simple and thread-safe
+5. Usage anywhere:
+
+The same code, clean:
+
 ```java
 public enum DatabaseConfig {
-    // (1) Single instance — JVM guarantees exactly one
     INSTANCE;
 
     private final String url;
     private final int maxConnections;
 
-    // (2) Private constructor
     DatabaseConfig() {
         this.url = System.getenv("DB_URL") ?: "jdbc:localhost:5432/mydb";
         this.maxConnections = Integer.parseInt(
@@ -248,17 +268,14 @@ public enum DatabaseConfig {
         );
     }
 
-    // (3) Instance methods
     public String getUrl() { return url; }
     public int getMaxConnections() { return maxConnections; }
 
-    // (4) Usage — simple and thread-safe
     public static DatabaseConfig get() {
         return INSTANCE;
     }
 }
 
-// Usage anywhere:
 String url = DatabaseConfig.get().getUrl();
 ```
 
@@ -271,7 +288,6 @@ String url = DatabaseConfig.get().getUrl();
 ## Real-World Scenarios
 
 ### Scenario 1: Order status state machine
-```java
 public enum OrderStatus {
     PENDING {
         @Override public OrderStatus next() { return CONFIRMED; }
@@ -293,10 +309,8 @@ public enum OrderStatus {
     public abstract OrderStatus next();
     public abstract String describe();
 }
-```
 
 ### Scenario 2: Database column mapping
-```java
 public enum ColumnType {
     VARCHAR("VARCHAR(255)", String.class),
     INTEGER("INT", Integer.class),
@@ -315,7 +329,6 @@ public enum ColumnType {
     public String getSqlType() { return sqlType; }
     public Class<?> getJavaType() { return javaType; }
 }
-```
 
 ## Common Beginner Pitfalls
 
@@ -333,3 +346,4 @@ public enum ColumnType {
 - **EnumMap** uses arrays internally — faster than HashMap for enum keys
 - **Enum singleton** is the safest singleton pattern in Java
 - **Never use `==` for non-enum comparisons**; for enums, `==` is fine and preferred
+

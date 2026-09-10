@@ -1,7 +1,7 @@
 ---
 title: "Profile-Specific Configuration — One Codebase, Many Environments"
 summary: "How Spring profiles work, activating profiles, profile-specific properties, YAML multi-document format, and how organizations manage dev/test/prod configurations."
-order: 2
+order: 5
 minutes: 18
 topics: [profiles, profile-specific-config, yaml-profiles, active-profile, conditional-beans, environment]
 docs:
@@ -57,11 +57,9 @@ export SPRING_PROFILES_ACTIVE=prod
 ```
 
 **Option 4: Programmatic**
-```java
 SpringApplication app = new SpringApplication(App.class);
 app.setAdditionalProfiles("dev");
 app.run(args);
-```
 
 ### YAML Multi-Document Format
 
@@ -95,7 +93,6 @@ logging:
 
 ### Profile-Specific Beans
 
-```java
 @Configuration
 public class DataSourceConfig {
     
@@ -119,7 +116,6 @@ public class DataSourceConfig {
         return new HikariDataSource(config);
     }
 }
-```
 
 ### Organization Use Cases
 
@@ -167,31 +163,32 @@ email.service.url=https://api.sendgrid.com/v3
 
 ### Line-by-Line Code Explanation
 
+
+**What this code does — step by step:**
+
+1. ↑ Main application class — Spring Boot entry point
+2. ↑ Standard Java main method
+3. ↑ Create SpringApplication instance. ↑ Don't call run() yet — we need to configure profiles first
+4. ↑ Get profile from environment variable. ↑ Default to "dev" if not set. ↑ In production, set SPRING_PROFILES_ACTIVE=prod
+5. ↑ Set the active profile programmatically. ↑ This overrides any spring.profiles.active in properties files
+6. ↑ Start the application with the configured profile. ↑ Spring loads application-{profile}.properties automatically
+
+The same code, clean:
+
 ```java
 @SpringBootApplication
-// ↑ Main application class — Spring Boot entry point
 
 public class AcademyApplication {
-    
+
     public static void main(String[] args) {
-        // ↑ Standard Java main method
-        
+
         SpringApplication app = new SpringApplication(AcademyApplication.class);
-        // ↑ Create SpringApplication instance
-        // ↑ Don't call run() yet — we need to configure profiles first
-        
+
         String activeProfile = System.getenv().getOrDefault("SPRING_PROFILES_ACTIVE", "dev");
-        // ↑ Get profile from environment variable
-        // ↑ Default to "dev" if not set
-        // ↑ In production, set SPRING_PROFILES_ACTIVE=prod
-        
+
         app.setAdditionalProfiles(activeProfile);
-        // ↑ Set the active profile programmatically
-        // ↑ This overrides any spring.profiles.active in properties files
-        
+
         app.run(args);
-        // ↑ Start the application with the configured profile
-        // ↑ Spring loads application-{profile}.properties automatically
     }
 }
 ```
@@ -208,3 +205,4 @@ public class AcademyApplication {
 ### Real-World Organization Scenario
 
 A SaaS company runs the same Spring Boot app in 4 environments: local dev, staging, production-us, production-eu. Each profile configures database URLs, cache TTLs, email providers, and feature flags. Developers use `dev` profile with H2 and mock services. Staging uses real services but with test data. Production profiles use real databases with proper credentials (injected via Kubernetes secrets).
+

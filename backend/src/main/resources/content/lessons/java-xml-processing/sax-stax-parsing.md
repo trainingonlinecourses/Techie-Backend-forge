@@ -1,7 +1,7 @@
 ---
 title: SAX & StAX — Streaming XML Without Running Out of Memory
 summary: Event-driven (SAX) and pull-based (StAX) parsing for processing huge XML files in constant memory — when the file is bigger than your RAM.
-order: 4
+order: 3
 minutes: 24
 topics: [sax, stax, streaming, xmlreader, xmleventreader, event-driven]
 docs:
@@ -35,36 +35,42 @@ You receive a 2 GB XML file containing 10 million sensor readings from an IoT sy
 
 SAX uses a callback pattern — you extend `DefaultHandler` and override methods for each XML event:
 
+
+**What this code does — step by step:**
+
+1. Called when the parser encounters an opening tag like <sensor>
+2. Read attributes from the opening tag
+3. Called for text content between tags (including whitespace!)
+4. This can be called multiple times for the same text node! Always append, never replace.
+5. Called when the parser encounters a closing tag like </sensor>
+6. `textBuffer = new StringBuilder();` — Reset for next element
+
+The same code, clean:
+
 ```java
 public class SensorHandler extends DefaultHandler {
     private List<SensorReading> readings = new ArrayList<>();
     private SensorReading current;
     private StringBuilder textBuffer;
     private String currentElement;
-    
-    // Called when the parser encounters an opening tag like <sensor>
+
     @Override
     public void startElement(String uri, String localName, String qName, Attributes attributes) {
         currentElement = qName;
         textBuffer = new StringBuilder();
-        
+
         if ("reading".equals(qName)) {
             current = new SensorReading();
-            // Read attributes from the opening tag
             current.setSensorId(attributes.getValue("sensorId"));
             current.setTimestamp(attributes.getValue("timestamp"));
         }
     }
-    
-    // Called for text content between tags (including whitespace!)
+
     @Override
     public void characters(char[] ch, int start, int length) {
-        // This can be called multiple times for the same text node!
-        // Always append, never replace.
         textBuffer.append(ch, start, length);
     }
-    
-    // Called when the parser encounters a closing tag like </sensor>
+
     @Override
     public void endElement(String uri, String localName, String qName) {
         if ("reading".equals(qName)) {
@@ -74,52 +80,69 @@ public class SensorHandler extends DefaultHandler {
         } else if ("humidity".equals(qName)) {
             current.setHumidity(Double.parseDouble(textBuffer.toString().trim()));
         }
-        textBuffer = new StringBuilder();  // Reset for next element
+        textBuffer = new StringBuilder();
     }
-    
+
     public List<SensorReading> getReadings() { return readings; }
 }
 ```
 
 ### Step 2: Drive the Parser
 
+
+**What this code does — step by step:**
+
+1. Create the parser
+2. Create handler
+3. Parse — this blocks until the entire file is processed. Each element triggers startElement → characters → endElement callbacks
+4. After parsing completes, results are in the handler
+
+The same code, clean:
+
 ```java
-// Create the parser
-SAXParserFactory factory = SAXParserFactory.newInstance();
-SAXParser parser = factory.newSAXParser();
+public class Main {
 
-// Create handler
-SensorHandler handler = new SensorHandler();
+    public static void main(String[] args) {
+        SAXParserFactory factory = SAXParserFactory.newInstance();
+        SAXParser parser = factory.newSAXParser();
 
-// Parse — this blocks until the entire file is processed
-// Each element triggers startElement → characters → endElement callbacks
-parser.parse(new File("sensors-2gb.xml"), handler);
+        SensorHandler handler = new SensorHandler();
 
-// After parsing completes, results are in the handler
-List<SensorReading> readings = handler.getReadings();
-System.out.println("Processed " + readings.size() + " readings");
+        parser.parse(new File("sensors-2gb.xml"), handler);
+
+        List<SensorReading> readings = handler.getReadings();
+        System.out.println("Processed " + readings.size() + " readings");
+    }
+}
 ```
 
 ### Important SAX Behaviors
 
+
+**What this code does — step by step:**
+
+1. 1. characters() can fire MULTIPLE TIMES for one text node. WRONG:
+2. `text = new String(ch, start, length);` — ❌ Overwrites partial text!
+3. RIGHT:
+4. `textBuffer.append(ch, start, length);` — ✅ Accumulates all fragments
+5. 2. No random access — you're in a streaming pipeline. If you need the first 100 records, you can't "seek" — you must read through
+6. 3. Error handling
+7. `throw e;` — Stop parsing
+
+The same code, clean:
+
 ```java
-// 1. characters() can fire MULTIPLE TIMES for one text node
-// WRONG:
 @Override
 public void characters(char[] ch, int start, int length) {
-    text = new String(ch, start, length);  // ❌ Overwrites partial text!
+    text = new String(ch, start, length);
 }
 
-// RIGHT:
 @Override
 public void characters(char[] ch, int start, int length) {
-    textBuffer.append(ch, start, length);  // ✅ Accumulates all fragments
+    textBuffer.append(ch, start, length);
 }
 
-// 2. No random access — you're in a streaming pipeline
-// If you need the first 100 records, you can't "seek" — you must read through
 
-// 3. Error handling
 @Override
 public void error(SAXParseException e) {
     System.err.println("XML Error at line " + e.getLineNumber() + ": " + e.getMessage());
@@ -128,7 +151,7 @@ public void error(SAXParseException e) {
 @Override
 public void fatalError(SAXParseException e) throws SAXException {
     System.err.println("Fatal XML Error: " + e.getMessage());
-    throw e;  // Stop parsing
+    throw e;
 }
 ```
 
@@ -138,18 +161,27 @@ public void fatalError(SAXParseException e) throws SAXException {
 
 ### Option 1: Event-Based (Iterator)
 
+
+**What this code does — step by step:**
+
+1. StAX uses a factory pattern to create the reader
+2. Loop through events — YOU control when to call next()
+3. `int event = reader.next();` — Pull the next event
+4. Text comes as characters event AFTER start element
+5. Note: getName() here gives the parent element, not text
+
+The same code, clean:
+
 ```java
-// StAX uses a factory pattern to create the reader
 XMLInputFactory factory = XMLInputFactory.newInstance();
 XMLStreamReader reader = factory.createXMLStreamReader(new FileInputStream("sensors.xml"));
 
 List<SensorReading> readings = new ArrayList<>();
 SensorReading current = null;
 
-// Loop through events — YOU control when to call next()
 while (reader.hasNext()) {
-    int event = reader.next();  // Pull the next event
-    
+    int event = reader.next();
+
     switch (event) {
         case XMLStreamConstants.START_ELEMENT:
             String element = reader.getLocalName();
@@ -157,18 +189,16 @@ while (reader.hasNext()) {
                 current = new SensorReading();
                 current.setSensorId(reader.getAttributeValue(null, "sensorId"));
             } else if ("temperature".equals(element)) {
-                // Text comes as characters event AFTER start element
             }
             break;
-            
+
         case XMLStreamConstants.CHARACTERS:
             String text = reader.getText().trim();
             if (!text.isEmpty() && current != null) {
                 String lastElement = reader.getName().getLocalPart();
-                // Note: getName() here gives the parent element, not text
             }
             break;
-            
+
         case XMLStreamConstants.END_ELEMENT:
             String endElement = reader.getLocalName();
             if ("reading".equals(endElement)) {
@@ -183,37 +213,39 @@ reader.close();
 
 ### Option 2: Cursor-Based (Higher Level)
 
-```java
-// XMLEventReader is a higher-level API on top of XMLStreamReader
-XMLInputFactory factory = XMLInputFactory.newInstance();
-XMLEventReader eventReader = factory.createXMLEventReader(new FileInputStream("sensors.xml"));
+public class Main {
 
-while (eventReader.hasNext()) {
-    XMLEvent event = eventReader.nextEvent();
+    public static void main(String[] args) {
+        // XMLEventReader is a higher-level API on top of XMLStreamReader
+        XMLInputFactory factory = XMLInputFactory.newInstance();
+        XMLEventReader eventReader = factory.createXMLEventReader(new FileInputStream("sensors.xml"));
+
+        while (eventReader.hasNext()) {
+            XMLEvent event = eventReader.nextEvent();
     
-    if (event.isStartElement()) {
-        StartElement startEl = event.asStartElement();
-        String name = startEl.getName().getLocalPart();
+            if (event.isStartElement()) {
+                StartElement startEl = event.asStartElement();
+                String name = startEl.getName().getLocalPart();
         
-        if ("reading".equals(name)) {
-            Iterator<Attribute> attrs = startEl.getAttributes();
-            while (attrs.hasNext()) {
-                Attribute attr = attrs.next();
-                System.out.println(attr.getName() + " = " + attr.getValue());
+                if ("reading".equals(name)) {
+                    Iterator<Attribute> attrs = startEl.getAttributes();
+                    while (attrs.hasNext()) {
+                        Attribute attr = attrs.next();
+                        System.out.println(attr.getName() + " = " + attr.getValue());
+                    }
+                }
+            }
+    
+            if (event.isCharacters()) {
+                String text = event.asCharacters().getData().trim();
+                // Process text content
             }
         }
     }
-    
-    if (event.isCharacters()) {
-        String text = event.asCharacters().getData().trim();
-        // Process text content
-    }
 }
-```
 
 ### Key StAX Advantage: Conditional Parsing
 
-```java
 // You can skip entire subtrees — something SAX can't do easily
 while (reader.hasNext()) {
     int event = reader.next();
@@ -232,7 +264,6 @@ while (reader.hasNext()) {
     }
     // Process other elements normally...
 }
-```
 
 ---
 
@@ -254,7 +285,6 @@ while (reader.hasNext()) {
 
 ### Processing a 50 GB B2B Data Feed
 
-```java
 public List<Order> parseGiantEdiXml(String filePath) throws Exception {
     XMLInputFactory factory = XMLInputFactory.newInstance();
     // Disable external entities (security!)
@@ -292,7 +322,6 @@ public List<Order> parseGiantEdiXml(String filePath) throws Exception {
     }
     return orders;
 }
-```
 
 ---
 
@@ -300,7 +329,6 @@ public List<Order> parseGiantEdiXml(String filePath) throws Exception {
 
 Both SAX and StAX are vulnerable to **XXE (XML External Entity) attacks** unless you explicitly disable external entities:
 
-```java
 // For SAX
 SAXParserFactory factory = SAXParserFactory.newInstance();
 factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
@@ -311,7 +339,6 @@ factory.setFeature("http://xml.org/sax/features/external-parameter-entities", fa
 XMLInputFactory factory = XMLInputFactory.newInstance();
 factory.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, "");
 factory.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
-```
 
 Without these settings, an attacker could inject `<!ENTITY xxe SYSTEM "file:///etc/passwd">` and exfiltrate server files.
 
@@ -327,3 +354,4 @@ Without these settings, an attacker could inject `<!ENTITY xxe SYSTEM "file:///e
 | Get text | Accumulate in `characters()` | `reader.getText()` |
 | Skip subtree | Manual depth counter | Just call `next()` until depth=0 |
 | Close | Not needed (parser manages) | `reader.close()` |
+

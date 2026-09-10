@@ -1,7 +1,7 @@
 ---
 title: AOP Best Practices — When to Use Aspects and When Not To
 summary: The production patterns that justify aspects (audit, metrics, retry), the anti-patterns that hide logic, and how teams keep pointcuts reviewable.
-order: 7
+order: 2
 minutes: 17
 topics: [aop-practices, audit-aspect, metrics-aspect, retry-aspect, anti-patterns, pointcut-design]
 docs:
@@ -30,7 +30,6 @@ The org rule of thumb:
 
 **Pattern 1 — an audit aspect keyed by a custom annotation.** The annotation is the *contract*; the aspect is the *policy*:
 
-```java
 @Target(ElementType.METHOD) @Retention(RetentionPolicy.RUNTIME)
 public @interface Audited { String action(); }
 
@@ -47,13 +46,11 @@ public class AuditAspect {
 // Usage — declarative, obvious, uniform:
 @Audited(action = "ORDER_CREATED")
 public Order placeOrder(OrderRequest r) { ... }
-```
 
 The annotation pattern is the sweet spot: **the *what* is declared on the method, the *how* lives in one aspect**, and adding auditing to a new method is a one-line annotation.
 
 **Pattern 2 — a retry aspect for transient failures.** Retrying only the *transient* exception types, with backoff and a cap — and importantly, sitting **outside** any transaction so each attempt gets a fresh unit of work:
 
-```java
 @Aspect @Component
 public class RetryAspect {
     @Around("@annotation(retryable)")
@@ -69,13 +66,11 @@ public class RetryAspect {
         }
     }
 }
-```
 
 (Production teams often reach for Spring Retry or Resilience4j instead of hand-rolling — but a small custom aspect is legitimate when the policy is tiny and specific.)
 
 **Pattern 3 — a timing/metrics aspect on service boundaries.** Measure every `@Service` method or every controller handler uniformly, feeding a metrics registry:
 
-```java
 @Aspect @Component
 public class MetricsAspect {
     @Around("execution(* com.acme..*Service.*(..))")   // package-scoped pointcut
@@ -86,7 +81,6 @@ public class MetricsAspect {
                           .record(System.nanoTime() - start, NANOSECONDS); }
     }
 }
-```
 
 The `execution(...)` pointcut scoped to a package is the maintainable form — a new `*Service` in that package is *automatically* covered, which is exactly the uniformity AOP promises.
 
@@ -119,3 +113,4 @@ The `execution(...)` pointcut scoped to a package is the maintainable form — a
 - Scope pointcuts tightly (package/annotation), declare `@Order`, and test that aspects actually fire.
 - Avoid aspects for single-use or business logic — implicit behavior is a maintainability cost.
 - Watch self-invocation, exception transparency, and hot-path overhead.
+

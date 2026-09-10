@@ -1,7 +1,7 @@
 ---
 title: Compile-Time Annotation Processing — Code Generation with APT
 summary: How annotation processors work at compile time, creating custom processors with AbstractProcessor, code generation with JavaPoet, and how Lombok, MapStruct, and Dagger use this technique.
-order: 5
+order: 2
 minutes: 25
 topics: [apt, annotation-processor, abstract-processor, code-generation, javapoet, compile-time, source-model]
 docs:
@@ -12,22 +12,20 @@ docs:
 
 Annotation processors run during compilation — they read your annotations and generate new `.java` source files or `.class` bytecode. This is how Lombok generates getters/setters, how MapStruct generates mapper implementations, and how Dagger generates dependency injection code.
 
+
+**What this code does — step by step:**
+
+1. You write this:
+2. The annotation processor generates this at compile time: public class UserBuilder {. Private String name; private int age; public UserBuilder name(String name) { this.name = name; return this; }. Public UserBuilder age(int age) { this.age = age; return this; }. Public User build() { return new User(name, age); }. }
+
+The same code, clean:
+
 ```java
-// You write this:
 @Builder
 public class User {
     private String name;
     private int age;
 }
-
-// The annotation processor generates this at compile time:
-// public class UserBuilder {
-//     private String name;
-//     private int age;
-//     public UserBuilder name(String name) { this.name = name; return this; }
-//     public UserBuilder age(int age) { this.age = age; return this; }
-//     public User build() { return new User(name, age); }
-// }
 ```
 
 ---
@@ -40,8 +38,18 @@ public class User {
 4. Processor generates new source files via `Filer`
 5. `javac` compiles the generated sources
 
+
+**What this code does — step by step:**
+
+1. A minimal annotation processor
+2. element is the class annotated with @Builder
+3. Generate a new source file
+4. ... write builder fields and methods
+5. `return true;` — we've handled these annotations
+
+The same code, clean:
+
 ```java
-// A minimal annotation processor
 import javax.annotation.processing.*;
 import javax.lang.model.*;
 import javax.lang.model.element.*;
@@ -55,20 +63,17 @@ public class BuilderProcessor extends AbstractProcessor {
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         for (Element element : roundEnv.getElementsAnnotatedWith(Builder.class)) {
-            // element is the class annotated with @Builder
             TypeElement typeElement = (TypeElement) element;
             String className = typeElement.getSimpleName().toString();
             String packageName = processingEnv.getElementUtils()
                 .getPackageOf(typeElement).getQualifiedName().toString();
 
-            // Generate a new source file
             try {
                 var filer = processingEnv.getFiler();
                 var sourceFile = filer.createSourceFile(packageName + "." + className + "Builder");
                 var writer = sourceFile.openWriter();
                 writer.write("package " + packageName + ";\n\n");
                 writer.write("public class " + className + "Builder {\n");
-                // ... write builder fields and methods
                 writer.write("}\n");
                 writer.close();
             } catch (Exception e) {
@@ -77,7 +82,7 @@ public class BuilderProcessor extends AbstractProcessor {
                 );
             }
         }
-        return true;  // we've handled these annotations
+        return true;
     }
 }
 ```
@@ -86,7 +91,6 @@ public class BuilderProcessor extends AbstractProcessor {
 
 ## Line-by-Line Walkthrough
 
-```java
 import javax.annotation.processing.*;
 import javax.lang.model.*;
 import javax.lang.model.element.*;
@@ -162,7 +166,6 @@ public class ToStringProcessor extends AbstractProcessor {
         processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, msg, element);
     }
 }
-```
 
 ---
 
@@ -198,12 +201,10 @@ com.example.ToStringProcessor
 ```
 
 ### Auto-service (Google)
-```java
 @AutoService(Processor.class)  // auto-generates the service file
 @SupportedAnnotationTypes("ToString")
 @SupportedSourceVersion(SourceVersion.RELEASE_21)
 public class ToStringProcessor extends AbstractProcessor { }
-```
 
 ---
 
@@ -216,3 +217,4 @@ public class ToStringProcessor extends AbstractProcessor { }
 | Not reporting errors properly | Silent failures | Use `processingEnv.getMessager()` |
 | Forgetting `@SupportedAnnotationTypes` | Processor never runs | Always declare supported annotations |
 | Using RUNTIME retention | Unnecessary, processor runs at compile time | Use SOURCE retention |
+

@@ -1,7 +1,7 @@
 ---
 title: Spring Boot Rate Limiting — API Protection Patterns
 summary: Token bucket, sliding window and fixed window algorithms, Bucket4j integration, per-user and per-endpoint limits, Redis-backed distributed rate limiting, and how production APIs prevent abuse without blocking legitimate traffic.
-order: 48
+order: 42
 minutes: 20
 topics: [rate-limiting, token-bucket, sliding-window, bucket4j, api-abuse, throttling, backpressure]
 docs:
@@ -26,7 +26,6 @@ Three common algorithms:
 
 ### Scenario 1: Per-user rate limiting with Bucket4j
 
-```java
 @Component
 public class UserRateLimiter {
     private final Bucket userBucket;
@@ -42,11 +41,9 @@ public class UserRateLimiter {
         return userBucket.tryConsume(1);
     }
 }
-```
 
 ### Scenario 2: Filter-based rate limiting
 
-```java
 @Component
 @Order(2)  // after auth filter
 public class RateLimitFilter extends OncePerRequestFilter {
@@ -79,13 +76,11 @@ public class RateLimitFilter extends OncePerRequestFilter {
         }
     }
 }
-```
 
 ### Scenario 3: Redis-backed distributed rate limiting
 
 For multiple application instances, use Redis to share rate limit state:
 
-```java
 @Component
 public class DistributedRateLimiter {
     private final StringRedisTemplate redis;
@@ -117,13 +112,11 @@ public class DistributedRateLimiter {
         return allowed != null && allowed == 1L;
     }
 }
-```
 
 ### Scenario 4: Endpoint-specific limits
 
 Different endpoints have different limits:
 
-```java
 @Configuration
 public class RateLimitConfig {
     @Bean
@@ -135,13 +128,11 @@ public class RateLimitConfig {
         return limits;
     }
 }
-```
 
 ### Scenario 5: Rate limit headers
 
 Always inform clients about their rate limit status:
 
-```java
 @Component
 public class RateLimitResponseHeaders {
     public void addHeaders(HttpServletResponse response, int limit, int remaining, long resetSeconds) {
@@ -150,7 +141,6 @@ public class RateLimitResponseHeaders {
         response.setHeader("X-RateLimit-Reset", String.valueOf(resetSeconds));
     }
 }
-```
 
 Output:
 ```
@@ -170,3 +160,4 @@ X-RateLimit-Reset: 45
 | Rate limiting health check endpoints | Monitoring breaks |
 | In-memory only in multi-instance deployment | Each instance has independent limits |
 | No rate limit on login endpoint | Brute-force attacks succeed |
+

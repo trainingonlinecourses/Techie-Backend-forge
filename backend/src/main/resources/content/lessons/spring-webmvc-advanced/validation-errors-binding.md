@@ -1,7 +1,7 @@
 ---
 title: Validation Errors & Data Binding — From Request to Validated Object
 summary: @Valid + BindingResult, the field-error model, message codes, and the error-response shapes that frontends actually parse.
-order: 13
+order: 12
 minutes: 17
 topics: [bindingresult, validation-errors, field-errors, message-codes, @Valid, error-response]
 docs:
@@ -29,7 +29,6 @@ Each violation has:
 - **`code`** — the constraint key (`NotBlank`, `Email`, `Size`)
 - **`rejectedValue`** — what was rejected (careful: may contain PII or huge values — often omitted from responses)
 
-```java
 @RestControllerAdvice
 public class ValidationHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -44,7 +43,6 @@ public class ValidationHandler {
     public record ValidationError(String code, List<FieldErrorDto> fields) {}
     public record FieldErrorDto(String field, String message) {}
 }
-```
 
 **The frontend contract:** the SPA maps `fields` to form inputs (`input name="customer.email"` gets the message). The org standard is: **always return the field path + a human message, never raw exception text.**
 
@@ -70,7 +68,6 @@ This is the same `MessageSource` as i18n (see the i18n lesson) — validation me
 
 ## @ModelAttribute binding errors — the form-flow variant
 
-```java
 @PostMapping("/register")
 public String register(@Valid @ModelAttribute("form") RegisterForm form,
                        BindingResult binding) {
@@ -80,7 +77,6 @@ public String register(@Valid @ModelAttribute("form") RegisterForm form,
     userService.register(form);
     return "redirect:/login";                    // PRG — see the redirect lesson
 }
-```
 
 With `@ModelAttribute`, the `BindingResult` must immediately follow the validated parameter — the framework validates, and *you* decide the outcome (re-render vs redirect), unlike the `@RequestBody` path where the advice handles it.
 
@@ -90,12 +86,10 @@ With `@ModelAttribute`, the `BindingResult` must immediately follow the validate
 
 **Scenario 2 — cross-field validation.** Bean Validation's field constraints can't check "end ≥ start". Options: a class-level custom constraint, `@ScriptAssert`, or a `@AssertTrue` method on the DTO:
 
-```java
 public record BookingRequest(Instant start, Instant end) {
     @AssertTrue(message = "end must be after start")
     public boolean isRangeValid() { return end.isAfter(start); }
 }
-```
 
 **Scenario 3 — group-based create vs update.** `@Validated(CreateGroup.class)` on the controller param activates only the create-group constraints (see the method-validation lesson for the service-side version).
 
@@ -116,3 +110,4 @@ public record BookingRequest(Instant start, Instant end) {
 - Message codes (`NotBlank.field`) enable custom, localized validation messages via `MessageSource`.
 - `@ModelAttribute` + `BindingResult` gives the form-flow control; `@RequestBody` delegates to the advice.
 - Handle cross-field rules with class-level constraints or `@AssertTrue` methods.
+

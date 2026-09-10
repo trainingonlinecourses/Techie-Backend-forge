@@ -1,7 +1,7 @@
 ---
 title: R2DBC — Reactive Database Access
 summary: Replace JDBC with reactive database calls, ReactiveCrudRepository, backpressure-aware queries, connection pooling with R2DBC, and why R2DBC matters for WebFlux.
-order: 8
+order: 4
 minutes: 20
 topics: [r2dbc, reactive-database, reactive-crud, connection-pooling, backpressure, webflux-database]
 docs:
@@ -19,7 +19,6 @@ Why does this matter? In a WebFlux application, every thread is precious. If one
 
 ### The Problem: JDBC Blocks
 
-```java
 // JDBC blocks the thread while waiting for the database
 @GetMapping("/users/{id}")
 public User getUser(@PathVariable Long id) {
@@ -30,11 +29,9 @@ public User getUser(@PathVariable Long id) {
         userRowMapper, id
     );
 }
-```
 
 ### The Solution: R2DBC Returns Immediately
 
-```java
 // R2DBC returns Mono<User> immediately — no thread is blocked
 @GetMapping("/users/{id}")
 public Mono<User> getUser(@PathVariable Long id) {
@@ -42,7 +39,6 @@ public Mono<User> getUser(@PathVariable Long id) {
     // Thread is free to handle other requests while waiting
     return userRepository.findById(id);
 }
-```
 
 ---
 
@@ -83,7 +79,6 @@ spring:
 
 ### Entity
 
-```java
 @Table("users")
 public class User {
     @Id
@@ -97,11 +92,9 @@ public class User {
 
     // Getters, setters, constructor
 }
-```
 
 ### Repository Interface
 
-```java
 public interface UserRepository extends ReactiveCrudRepository<User, Long> {
 
     // Spring Data R2DBC automatically implements these
@@ -119,9 +112,19 @@ public interface UserRepository extends ReactiveCrudRepository<User, Long> {
     @Query("SELECT COUNT(*) FROM users WHERE active = true")
     Mono<Long> countActiveUsers();
 }
-```
 
 ### Using the Repository
+
+
+**What this code does — step by step:**
+
+1. Find one user
+2. Find all users
+3. Create user
+4. Update user
+5. Delete user
+
+The same code, clean:
 
 ```java
 @Service
@@ -133,23 +136,19 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    // Find one user
     public Mono<User> findById(Long id) {
         return userRepository.findById(id)
             .switchIfEmpty(Mono.error(new UserNotFoundException(id)));
     }
 
-    // Find all users
     public Flux<User> findAll() {
         return userRepository.findAll();
     }
 
-    // Create user
     public Mono<User> createUser(User user) {
         return userRepository.save(user);
     }
 
-    // Update user
     public Mono<User> updateUser(Long id, UserUpdateRequest request) {
         return userRepository.findById(id)
             .flatMap(user -> {
@@ -160,7 +159,6 @@ public class UserService {
             .switchIfEmpty(Mono.error(new UserNotFoundException(id)));
     }
 
-    // Delete user
     public Mono<Void> deleteUser(Long id) {
         return userRepository.deleteById(id);
     }
@@ -171,7 +169,6 @@ public class UserService {
 
 ## Reactive Controllers
 
-```java
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
@@ -215,11 +212,21 @@ public class UserController {
         return userService.deleteUser(id);
     }
 }
-```
 
 ---
 
 ## Advanced: Combining Multiple Queries
+
+
+**What this code does — step by step:**
+
+1. Parallel queries — all run concurrently, no blocking
+2. Combine all three — they execute in parallel
+3. `tuple.getT1(),` — userCount
+4. `tuple.getT2(),` — orderCount
+5. `tuple.getT3()` — topProducts
+
+The same code, clean:
 
 ```java
 @Service
@@ -229,7 +236,6 @@ public class DashboardService {
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
 
-    // Parallel queries — all run concurrently, no blocking
     public Mono<DashboardData> getDashboard() {
         Mono<Long> userCount = userRepository.count();
         Mono<Long> orderCount = orderRepository.count();
@@ -237,12 +243,11 @@ public class DashboardService {
             .findTop10ByOrderBySalesDesc()
             .collectList();
 
-        // Combine all three — they execute in parallel
         return Mono.zip(userCount, orderCount, topProducts)
             .map(tuple -> new DashboardData(
-                tuple.getT1(),   // userCount
-                tuple.getT2(),   // orderCount
-                tuple.getT3()    // topProducts
+                tuple.getT1(),
+                tuple.getT2(),
+                tuple.getT3()
             ));
     }
 }
@@ -273,3 +278,4 @@ public class DashboardService {
 | Ignoring backpressure | Memory overflow with large result sets | Use `.limitRate()`, `.buffer()` |
 | Creating Flux in a loop | Inefficient, confusing | Use `Flux.fromIterable()` or `Flux.range()` |
 | Not using connection pooling | Connection exhaustion | Configure R2DBC pool properly |
+

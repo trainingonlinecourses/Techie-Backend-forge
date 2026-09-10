@@ -1,7 +1,7 @@
 ---
 title: Clean Architecture and the Dependency Rule
 module: ddd-architecture
-order: 4
+order: 2
 minutes: 25
 topics: ["clean architecture", "dependency rule", "use cases", "entities", "boundaries", "layers"]
 summary: Clean Architecture (Uncle Bob) generalizes hexagonal: concentric circles of responsibility, with the dependency rule — source code dependencies poi...
@@ -44,7 +44,6 @@ Clean Architecture (Uncle Bob) generalizes hexagonal: concentric circles of resp
 
 ## Entities: The Innermost
 
-```java
 // Entity — pure, no framework
 public class Course {
     private final CourseId id;
@@ -66,11 +65,9 @@ public class Course {
 
     // ... no imports beyond java.*
 }
-```
 
 ## Use Cases: Application-Specific Rules
 
-```java
 public class PublishCourseUseCase {
 
     private final CourseRepository repository;
@@ -86,13 +83,11 @@ public class PublishCourseUseCase {
         repository.save(course);
     }
 }
-```
 
 The use case orchestrates: load entity, apply rule, persist. It knows the *entity's* interface (an inbound abstraction), not JPA.
 
 ## Interface Adapters: Controllers and Repositories
 
-```java
 // Adapter depends on the use case interface — points inward
 @RestController
 @RequestMapping("/api/courses")
@@ -106,9 +101,7 @@ public class CourseController {
         return ResponseEntity.noContent().build();
     }
 }
-```
 
-```java
 // Repository adapter — implements the interface, uses JPA
 @Repository
 public class JpaCourseRepository implements CourseRepository {
@@ -118,19 +111,16 @@ public class JpaCourseRepository implements CourseRepository {
         jpa.save(CourseMapper.toEntity(course));
     }
 }
-```
 
 ## The Dependency Inversion in Practice
 
 The rule manifests as **interfaces owned by the inner layer**:
 
-```java
 // In the use-case layer — the OUTER layer implements it
 public interface CourseRepository {
     Optional<Course> findById(CourseId id);
     void save(Course course);
 }
-```
 
 JPA adapter implements it. The use case depends on the *interface*, not the framework — swap JPA for MyBatis without touching the use case.
 
@@ -138,22 +128,18 @@ JPA adapter implements it. The use case depends on the *interface*, not the fram
 
 Crossing a boundary means translating — don't leak DTOs into the use case:
 
-```java
 // Controller's DTO (outer layer)
 public record PublishRequest(Long courseId, String reason) {}
 
 // Use case input (inner layer)
 public record PublishCourseCommand(CourseId courseId, String reason) {}
-```
 
-```java
 @PostMapping("/{id}/publish")
 public ResponseEntity<Void> publish(@PathVariable Long id,
                                     @RequestBody PublishRequest request) {
     publish.publish(new PublishCourseCommand(CourseId.of(id), request.reason()));
     return ResponseEntity.noContent().build();
 }
-```
 
 The mapping happens at the boundary — the use case never sees the HTTP DTO.
 
@@ -161,24 +147,31 @@ The mapping happens at the boundary — the use case never sees the HTTP DTO.
 
 Where do Spring annotations go? On the *adapters*:
 
+
+**What this code does — step by step:**
+
+1. ❌ Entity with JPA annotations — leaks the framework inward
+2. ✅ Entity pure — mapping in the adapter
+3. `public class CourseEntity {` — adapter's persistence model
+4. ...
+5. maps CourseEntity ↔ Course
+
+The same code, clean:
+
 ```java
-// ❌ Entity with JPA annotations — leaks the framework inward
 @Entity
 public class Course {
     @Id @GeneratedValue private Long id;
 }
 
-// ✅ Entity pure — mapping in the adapter
 public class Course { ... }
 
 @Entity
-public class CourseEntity {        // adapter's persistence model
+public class CourseEntity {
     @Id @GeneratedValue private Long id;
-    // ...
 }
 
 public class JpaCourseRepository implements CourseRepository {
-    // maps CourseEntity ↔ Course
 }
 ```
 
@@ -186,7 +179,6 @@ Pragmatic note: many teams annotate entities directly for simplicity (the "pragm
 
 ## The Dependency Rule as Tests
 
-```java
 // The architecture test — enforces the rule mechanically
 class ArchitectureTest {
 
@@ -205,11 +197,9 @@ class ArchitectureTest {
         }
     }
 }
-```
 
 ArchUnit does this properly:
 
-```java
 @AnalyzeClasses(packages = "com.acme")
 class ArchitectureTest {
 
@@ -228,7 +218,6 @@ class ArchitectureTest {
         .whereLayer("Controllers").mayNotBeAccessedByAnyLayer()
         .whereLayer("Domain").mayOnlyBeAccessedByLayers("UseCases");
 }
-```
 
 ## Summary
 
@@ -240,3 +229,4 @@ class ArchitectureTest {
 | Frameworks | Plumbing | Everything |
 
 Clean architecture is the dependency rule enforced as a discipline: inner circles pure, outer circles swappable, boundaries translated. The tests that enforce it (ArchUnit) are cheap insurance — they make the architecture a checked contract instead of an aspiration.
+

@@ -1,7 +1,7 @@
 ---
 title: Startup Performance — Lazy Init, Spring AOT and Faster Boots
 summary: Why startup time matters in serverless and scale-to-zero, @Lazy beans, Spring AOT, and the profiling workflow to find slow startup beans.
-order: 20
+order: 47
 minutes: 18
 topics: [startup, lazy-init, spring-aot, aot, cold-start, serverless, startup-profiling, graalvm]
 docs:
@@ -33,7 +33,6 @@ Spring Boot also exposes `ApplicationStartup` (flight-recorder-style bean init s
 
 **2. `@Lazy` the heavy, rarely-used beans.** A `KafkaAdmin`, a second `DataSource`, a reporting `WebClient` — defer them until first use:
 
-```java
 @Configuration
 public class HeavyBeans {
     @Bean
@@ -44,19 +43,16 @@ public class HeavyBeans {
     @Lazy
     public DataSource reportingDataSource() { ... }  // analytics pool — rarely touched
 }
-```
 
 Or globally: `spring.main.lazy-initialization=true` creates **everything** on first use. Fast, but it hides wiring errors until first touch and reorders startup side effects — acceptable for dev/CI, risky as a blanket prod setting. Use it as a diagnostic ("is my app fast when lazy?") more than a permanent switch.
 
 **3. Trim auto-configuration.** Actuator can tell you what's being wired: `GET /actuator/conditions` shows `@ConditionalOn*` matches. If you never use MongoDB, exclude its auto-config rather than letting the classpath scan it:
 
-```java
 @SpringBootApplication(exclude = {
     MongoAutoConfiguration.class,
     ElasticsearchClientAutoConfiguration.class,
     // ... anything present on the classpath but unused
 })
-```
 
 Each excluded auto-config saves the class-loading and bean-registration work of that subsystem.
 
@@ -97,3 +93,4 @@ Native is the biggest win for serverless cold starts, at the cost of longer buil
 - Trim unused auto-configurations; verify with `/actuator/conditions`.
 - Spring AOT + GraalVM native = millisecond starts for serverless.
 - Async non-critical runners so the port opens before the warmup finishes.
+

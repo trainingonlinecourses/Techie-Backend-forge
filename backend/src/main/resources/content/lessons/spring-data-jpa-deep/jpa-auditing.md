@@ -1,7 +1,7 @@
 ---
 title: JPA Auditing — CreatedAt, UpdatedAt and Who Changed What
 summary: Automatic timestamp and user auditing with @CreatedDate/@LastModifiedDate, AuditorAware, and the audit-trail scenarios every backend needs.
-order: 6
+order: 2
 minutes: 17
 topics: [auditing, createddate, lastmodifieddate, auditoraware, createdby, lastmodifiedby, audit-trail]
 docs:
@@ -22,15 +22,12 @@ Almost every table needs "when was this row created, when last changed, and by w
 
 Enable it with one annotation:
 
-```java
 @Configuration
 @EnableJpaAuditing
 public class JpaConfig { }
-```
 
 ## The mapped superclass — one base for all entities
 
-```java
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)   // the hook that fills the fields
 public abstract class Auditable {
@@ -59,13 +56,11 @@ public class Order extends Auditable {
     private String status;
     // ...
 }
-```
 
 `@EntityListeners(AuditingEntityListener.class)` is the wiring — it's the `BeanPostProcessor`-style hook that observes persist/update events. Every entity extending `Auditable` gets the four columns automatically, consistently named and typed.
 
 ## AuditorAware — where "by whom" comes from
 
-```java
 @Component
 public class SecurityAuditorAware implements AuditorAware<String> {
     @Override
@@ -75,7 +70,6 @@ public class SecurityAuditorAware implements AuditorAware<String> {
         return Optional.ofNullable(auth.getName());
     }
 }
-```
 
 The auditor comes from the **current security context** — the logged-in user (or `"system"`/`"anonymous"` for background jobs and unauthenticated paths). Because it's resolved at write time, the same entity set works for user-driven changes *and* batch jobs, and the trail distinguishes them.
 
@@ -108,3 +102,4 @@ The auditor comes from the **current security context** — the logged-in user (
 - `AuditorAware` resolves the current user from the security context, defaulting for system jobs.
 - It works through the persistence layer (even bulk saves) — but not through native SQL.
 - Enable it explicitly, freeze `createdAt`/`createdBy`, use UTC `Instant`, and handle the no-user case.
+

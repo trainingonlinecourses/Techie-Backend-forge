@@ -1,7 +1,7 @@
 ---
 title: Docker Compose Networks & Volumes — Isolating Services and Persisting Data
 summary: Custom bridge networks for service isolation, named volumes for data persistence, bind mounts for development, and network policies for microservices.
-order: 4
+order: 1
 minutes: 22
 topics: [docker-networks, volumes, bind-mounts, service-isolation, data-persistence]
 docs:
@@ -129,3 +129,4 @@ networks:
 3. **Bind mounts** are for development (hot reload); volumes are for production
 4. **Multiple networks** create security boundaries between service tiers
 5. **Secrets** avoid hardcoding passwords in compose files
+

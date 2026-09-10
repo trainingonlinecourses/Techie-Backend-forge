@@ -1,7 +1,7 @@
 ---
 title: NIO Networking — Selectors and Non-Blocking I/O
 module: java-networking
-order: 4
+order: 3
 minutes: 28
 topics: ["NIO", "Selector", "non-blocking", "Channel", "reactor pattern", "scalability"]
 summary: The classic server is one thread per client. It works until you have thousands of concurrent connections: each thread costs ~1MB of stack and sched...
@@ -24,6 +24,25 @@ This is the **reactor pattern** — the architecture behind Netty, Node.js, Redi
 
 ## The Core Pieces
 
+
+**What this code does — step by step:**
+
+1. 1. The selector — ONE operator watching all channels.
+2. 2. Open a server channel and put it in NON-BLOCKING mode.
+3. `server.configureBlocking(false);` — the key line!
+4. 3. Register the server channel with the selector, saying: "tell me when a new connection is ready to accept."
+5. 4. The event loop — keep watching until told to stop.
+6. BLOCK here until at least one channel has an event.
+7. `selector.select();` — blocks! Now collect the events that are ready.
+8. `it.remove();` — MUST remove — else it reprocesses forever
+9. A new client is connecting.
+10. Register the client for READ events.
+11. A client sent data — read it without blocking.
+12. `client.close();` — client closed the connection
+13. (Echo back: write a flipped buffer to the channel)
+
+The same code, clean:
+
 ```java
 import java.nio.ByteBuffer;
 import java.nio.channels.*;
@@ -32,50 +51,39 @@ import java.util.*;
 
 public class NioServer {
     public static void main(String[] args) throws Exception {
-        // 1. The selector — ONE operator watching all channels.
         Selector selector = Selector.open();
 
-        // 2. Open a server channel and put it in NON-BLOCKING mode.
         ServerSocketChannel server = ServerSocketChannel.open();
         server.bind(new InetSocketAddress(9091));
-        server.configureBlocking(false);          // the key line!
+        server.configureBlocking(false);
 
-        // 3. Register the server channel with the selector, saying:
-        //    "tell me when a new connection is ready to accept."
         server.register(selector, SelectionKey.OP_ACCEPT);
         System.out.println("NIO server on port 9091");
 
-        // 4. The event loop — keep watching until told to stop.
         while (true) {
-            // BLOCK here until at least one channel has an event.
-            selector.select();                    // blocks!
-            // Now collect the events that are ready.
+            selector.select();
             Set<SelectionKey> ready = selector.selectedKeys();
             Iterator<SelectionKey> it = ready.iterator();
 
             while (it.hasNext()) {
                 SelectionKey key = it.next();
-                it.remove();   // MUST remove — else it reprocesses forever
+                it.remove();
 
                 if (key.isAcceptable()) {
-                    // A new client is connecting.
                     SocketChannel client = server.accept();
                     client.configureBlocking(false);
-                    // Register the client for READ events.
                     client.register(selector, SelectionKey.OP_READ);
                     System.out.println("Client connected");
                 } else if (key.isReadable()) {
-                    // A client sent data — read it without blocking.
                     SocketChannel client = (SocketChannel) key.channel();
                     ByteBuffer buffer = ByteBuffer.allocate(1024);
                     int read = client.read(buffer);
                     if (read == -1) {
-                        client.close();      // client closed the connection
+                        client.close();
                     } else {
                         buffer.flip();
                         String msg = new String(buffer.array(), 0, buffer.limit());
                         System.out.println("Received: " + msg);
-                        // (Echo back: write a flipped buffer to the channel)
                         client.write(ByteBuffer.wrap(("echo: " + msg).getBytes()));
                     }
                 }
@@ -114,17 +122,16 @@ NIO is powerful but *harder to write correctly* than blocking I/O. The event loo
 
 NIO replaces streams with **`ByteBuffer`** — a positioned view over a byte array with four key properties: `position` (where you're reading/writing), `limit` (end of valid data), `capacity` (total size), and `flip()` (prepare for reading after writing). The classic choreography:
 
-```java
 ByteBuffer buf = ByteBuffer.allocate(1024);
 channel.read(buf);      // channel writes INTO the buffer; position advances
 buf.flip();             // flip: limit = position; position = 0  -> ready to read
 byte[] data = new byte[buf.remaining()];
 buf.get(data);          // read the data out
 buf.clear();            // reset for reuse
-```
 
 Mastering `flip`/`clear` is the NIO rite of passage — get them backwards and you read stale data or nothing at all.
 
 ## Recap
 
 NIO networking replaces "a thread per client" with a single selector thread watching many non-blocking channels: register channels for interest (`OP_ACCEPT`, `OP_READ`), call `select()` to block until events arrive, and handle each ready channel without blocking. It's the reactor pattern behind Netty, Node.js, and WebFlux, and it scales to tens of thousands of connections on one thread. The cost is complexity — partial reads, state across callbacks, buffer management — which is why you should *understand* NIO but *use* the frameworks built on it. And remember the alternatives: NIO.2's async channels and Java 21's virtual threads solve the same scaling problem in different ways, each with its own sweet spot.
+

@@ -1,7 +1,7 @@
 ---
 title: Actuator — Production Insights Built In
 module: spring-boot-internals
-order: 5
+order: 1
 minutes: 24
 topics: ["actuator", "health", "metrics", "info", "endpoints", "readiness liveness"]
 summary: A deployed app is a black box: is it up? Is it healthy? How much memory? What's the request rate? Without tooling, answering means SSHing in and gu...
@@ -57,7 +57,6 @@ Boot 3 exposes both as groups automatically: `curl /actuator/health/readiness`. 
 
 ## The Code Walkthrough
 
-```java
 // ---- 1. Expose the endpoints you want (security-minded by default) ----
 # application.properties
 management.endpoints.web.exposure.include=health,info,metrics
@@ -85,9 +84,7 @@ public class CurriculumHealthIndicator implements HealthIndicator {
                 .build();
     }
 }
-```
 
-```java
 // ---- 3. Info endpoint — static and dynamic metadata ----
 // application.properties:
 info.app.name=BackendForge Academy
@@ -101,7 +98,6 @@ public class VersionInfoContributor implements InfoContributor {
         builder.withDetail("build", BuildInfo.buildNumber());   // from manifest/env
     }
 }
-```
 
 ### Walking Through Each Part
 
@@ -122,7 +118,6 @@ curl /actuator/metrics/http.server.requests
 
 Micrometer (covered in depth in the observability module) powers this: JVM memory, threads, GC, HTTP request counts/latencies, DB pool usage — all captured automatically. The same registry feeds Prometheus (`/actuator/prometheus`) and dashboards. Add your own counters easily:
 
-```java
 @Component
 public class CourseMetrics {
     private final Counter lessonsViewed;
@@ -135,7 +130,6 @@ public class CourseMetrics {
 
     public void lessonViewed() { lessonsViewed.increment(); }
 }
-```
 
 ## Security — Don't Expose Your Internals Publicly
 
@@ -145,12 +139,10 @@ Actuator endpoints expose internals (`/actuator/env` shows environment variables
 - **Protect the rest** with Spring Security or a network policy (internal-only).
 - With Spring Security present, actuator endpoints are **automatically protected** by default (403 without auth) — you must explicitly permit `/actuator/health` for your platform's health checks:
 
-```java
 http.securityMatcher("/actuator/**")
     .authorizeHttpRequests(auth -> auth
         .requestMatchers("/actuator/health/**").permitAll()   // platforms poll this
         .anyRequest().authenticated());
-```
 
 ## Common Beginner Pitfalls
 
@@ -169,3 +161,4 @@ http.securityMatcher("/actuator/**")
 - Micrometer metrics feed dashboards and alerting (Prometheus/Grafana).
 - Expose only what you need; protect the rest; never expose `/env` publicly.
 - In Spring Security setups, permit `/actuator/health/**` explicitly for platform checks.
+

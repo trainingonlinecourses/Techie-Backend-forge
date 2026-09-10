@@ -1,7 +1,7 @@
 ---
 title: Structured Logging — Machine-Readable Logs
 summary: JSON log format, log aggregation with ELK/Datadog, key-value logging, and why structured logs are essential for production observability.
-order: 4
+order: 6
 minutes: 15
 topics: [structured-logging, json, elk, datadog, log-aggregation, key-value]
 docs:
@@ -60,6 +60,17 @@ Dependency:
 
 ## Line-by-Line Walkthrough
 
+
+**What this code does — step by step:**
+
+1. 1. Basic structured fields
+2. Log with structured data
+3. 2. Adding fields via argument array
+4. 3. Exception with stack trace
+5. Stack trace is included as "stack_trace" field in JSON
+
+The same code, clean:
+
 ```java
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,23 +81,18 @@ public class StructuredLoggingDemo {
     private static final Logger log = LoggerFactory.getLogger(StructuredLoggingDemo.class);
 
     public static void main(String[] args) {
-        // 1. Basic structured fields
         MDC.put("requestId", "req-001");
         MDC.put("userId", "user-42");
 
-        // Log with structured data
         log.info("Order created");
 
-        // 2. Adding fields via argument array
         log.info("Payment processed orderId={} amount={} currency={}",
             "ORD-123", 99.99, "USD");
 
-        // 3. Exception with stack trace
         try {
             throw new RuntimeException("Payment failed");
         } catch (Exception e) {
             log.error("Payment error orderId={}", "ORD-123", e);
-            // Stack trace is included as "stack_trace" field in JSON
         }
 
         MDC.clear();
@@ -115,7 +121,6 @@ services:
 
 ### Scenario 2: Custom log fields
 
-```java
 // Add custom fields to every log line
 @Component
 public class RequestContextFilter implements Filter {
@@ -134,7 +139,6 @@ public class RequestContextFilter implements Filter {
         }
     }
 }
-```
 
 ---
 
@@ -146,3 +150,4 @@ public class RequestContextFilter implements Filter {
 | Logging sensitive data in structured fields | Security risk in log aggregation | Mask PII, use @JsonIgnore |
 | Not including request ID | Can't trace requests across services | Always add requestId to MDC |
 | Forgetting to clear MDC | Memory leak, wrong context | Always clear in finally |
+

@@ -31,49 +31,67 @@ These interfaces are implemented by the existing ordered collections. A `List` i
 
 The practical benefit is uniform access to first and last elements and a reversed view, without having to remember which interface provides which method.
 
+
+**What this code does — step by step:**
+
+1. A List is a SequencedCollection — getFirst, getLast, addFirst, addLast, reversed
+2. `System.out.println("first: " + list.getFirst());` — A
+3. `System.out.println("last:  " + list.getLast());` — C
+4. `list.addFirst("Start");` — add to the beginning
+5. `list.addLast("End");` — add to the end
+6. `System.out.println(list);` — [Start, A, B, C, End]
+7. reversed() returns a view — not a copy
+8. `System.out.println("reversed: " + reversed);` — [End, C, B, A, Start]. Mutating the reversed view mutates the original
+9. list is now [A, B, C, End] — the "Start" was removed via the view
+10. A LinkedHashSet has encounter order — it is a SequencedSet
+11. `set.add("X");` — duplicate — ignored
+12. `System.out.println("set first: " + set.getFirst());` — X
+13. `System.out.println("set last:  " + set.getLast());` — Y
+14. `System.out.println("set reversed: " + set.reversed());` — [Y, X]
+15. A LinkedHashMap has encounter order — it is a SequencedMap
+16. `System.out.println("map first key: " + map.firstKey());` — one
+17. `System.out.println("map last key:  " + map.lastKey());` — three
+18. `System.out.println("map reversed:  " + map.reversed());` — {three=3, two=2, one=1}
+
+The same code, clean:
+
 ```java
 import java.util.*;
 
 public class SequencedDemo {
     public static void main(String[] args) {
-        // A List is a SequencedCollection — getFirst, getLast, addFirst, addLast, reversed
         List<String> list = new ArrayList<>();
         list.add("A");
         list.add("B");
         list.add("C");
 
-        System.out.println("first: " + list.getFirst());   // A
-        System.out.println("last:  " + list.getLast());    // C
+        System.out.println("first: " + list.getFirst());
+        System.out.println("last:  " + list.getLast());
 
-        list.addFirst("Start");   // add to the beginning
-        list.addLast("End");      // add to the end
-        System.out.println(list);  // [Start, A, B, C, End]
+        list.addFirst("Start");
+        list.addLast("End");
+        System.out.println(list);
 
-        // reversed() returns a view — not a copy
         List<String> reversed = list.reversed();
-        System.out.println("reversed: " + reversed);   // [End, C, B, A, Start]
-        // mutating the reversed view mutates the original
+        System.out.println("reversed: " + reversed);
         reversed.removeFirst();
         System.out.println("after removing first from reversed view: " + list);
-        // list is now [A, B, C, End] — the "Start" was removed via the view
 
-        // A LinkedHashSet has encounter order — it is a SequencedSet
         Set<String> set = new LinkedHashSet<>();
         set.add("X");
         set.add("Y");
-        set.add("X");   // duplicate — ignored
-        System.out.println("set first: " + set.getFirst());   // X
-        System.out.println("set last:  " + set.getLast());    // Y
-        System.out.println("set reversed: " + set.reversed()); // [Y, X]
+        set.add("X");
+        System.out.println("set first: " + set.getFirst());
+        System.out.println("set last:  " + set.getLast());
+        System.out.println("set reversed: " + set.reversed());
 
-        // A LinkedHashMap has encounter order — it is a SequencedMap
         Map<String, Integer> map = new LinkedHashMap<>();
         map.put("one", 1);
         map.put("two", 2);
         map.put("three", 3);
-        System.out.println("map first key: " + map.firstKey());   // one
-        System.out.println("map last key:  " + map.lastKey());    // three
-        System.out.println("map reversed:  " + map.reversed());   // {three=3, two=2, one=1}
+        System.out.println("map first key: " + map.firstKey());
+        System.out.println("map last key:  " + map.lastKey());
+        System.out.println("map reversed:  " + map.reversed());
     }
 }
 ```
@@ -91,7 +109,6 @@ The key idea is uniformity. Instead of remembering that a `List` uses `get(0)`, 
 
 This is especially useful in generic code. If you write a method that should work on any ordered collection and needs the first and last elements, you can use `SequencedCollection` as the parameter type and call `getFirst()` and `getLast()` without knowing the concrete type.
 
-```java
 // Generic code that works on any sequenced collection
 static void printFirstAndLast(SequencedCollection<String> col) {
     if (col.isEmpty()) {
@@ -107,7 +124,6 @@ public static void main(String[] args) {
     printFirstAndLast(new LinkedHashSet<>(Set.of("X", "Y", "Z")));
     printFirstAndLast(List.of("p", "q", "r"));
 }
-```
 
 ### Part 2 — Scoped Values
 
@@ -135,26 +151,38 @@ The key differences from `ThreadLocal`:
 
 A simple example:
 
+
+**What this code does — step by step:**
+
+1. Define a scoped value — a holder for a value that is bound within a scope
+2. A method that uses the scoped value
+3. Bind USER to the given username for the scope of this run
+4. Any code in this call tree can read USER
+5. Read the scoped value — no need to pass it as a parameter
+
+The same code, clean:
+
 ```java
 import java.lang.ScopedValue;
 
-// Define a scoped value — a holder for a value that is bound within a scope
-static final ScopedValue<String> USER = ScopedValue.newInstance();
+public class Main {
 
-// A method that uses the scoped value
-static void handleRequest(String username) {
-    // Bind USER to the given username for the scope of this run
-    ScopedValue.where(USER, username)
-               .run(() -> {
-                   // Any code in this call tree can read USER
-                   System.out.println("user: " + USER.get());
-                   processOrder();
-               });
-}
+    public static void main(String[] args) {
 
-static void processOrder() {
-    // Read the scoped value — no need to pass it as a parameter
-    System.out.println("processing for user: " + USER.get());
+        static final ScopedValue<String> USER = ScopedValue.newInstance();
+
+        static void handleRequest(String username) {
+            ScopedValue.where(USER, username)
+                       .run(() -> {
+                           System.out.println("user: " + USER.get());
+                           processOrder();
+                       });
+        }
+
+        static void processOrder() {
+            System.out.println("processing for user: " + USER.get());
+        }
+    }
 }
 ```
 
@@ -169,7 +197,6 @@ The scoping is the point. You bind the value at the top of the request handling,
 
 In a structured concurrency setting, the binding is inherited by subtasks:
 
-```java
 // Structured concurrency with ScopedValue (incubating API)
 import java.lang.ScopedValue;
 import java.util.List;
@@ -189,7 +216,6 @@ static void handleRequestWithSubtasks(String username) {
 static String fetchUserData() {
     return "data for user: " + USER.get();
 }
-```
 
 Here, the `fork` creates a subtask that inherits the scoped value bindings of the parent. The subtask can read `USER` and see the same username as the parent. This is the "structured" part — the data is bound at the top and flows down to subtasks in a controlled, explicit way.
 
@@ -217,47 +243,52 @@ In new code on Java 21+, scoped values are the preferred choice for per-thread (
 
 This example shows a scoped value carrying a user context through a request, with a subtask that inherits it.
 
-```java
 import java.lang.ScopedValue;
+
 import java.util.concurrent.StructuredTaskScope;
 
-// A scoped value for the current user
-static final ScopedValue<String> CURRENT_USER = ScopedValue.newInstance();
-static final ScopedValue<List<String>> PERMISSIONS = ScopedValue.newInstance();
+public class Main {
 
-// Simulate a request handler
-static void handleRequest(String username) {
-    // Bind the scoped values for the scope of this request
-    ScopedValue.where(CURRENT_USER, username)
-               .where(PERMISSIONS, List.of("read", "write"))
-               .run(() -> {
-                   System.out.println("[" + CURRENT_USER.get() + "] handling request");
-                   processOrder();
-                   fetchUserDataAsync();
-               });
-}
+    public static void main(String[] args) {
 
-static void processOrder() {
-    System.out.println("  [" + CURRENT_USER.get() + "] processing order for user");
-    System.out.println("  permissions: " + PERMISSIONS.get());
-}
+        // A scoped value for the current user
+        static final ScopedValue<String> CURRENT_USER = ScopedValue.newInstance();
+        static final ScopedValue<List<String>> PERMISSIONS = ScopedValue.newInstance();
 
-static void fetchUserDataAsync() {
-    try (var scope = new StructuredTaskScope.ShutdownOnFailure()) {
-        // Fork a subtask — it inherits CURRENT_USER and PERMISSIONS
-        var future = scope.fork(() -> {
-            System.out.println("  [subtask] fetching data for " + CURRENT_USER.get());
-            System.out.println("  [subtask] permissions: " + PERMISSIONS.get());
-            return "user-data-" + CURRENT_USER.get();
-        });
+        // Simulate a request handler
+        static void handleRequest(String username) {
+            // Bind the scoped values for the scope of this request
+            ScopedValue.where(CURRENT_USER, username)
+                       .where(PERMISSIONS, List.of("read", "write"))
+                       .run(() -> {
+                           System.out.println("[" + CURRENT_USER.get() + "] handling request");
+                           processOrder();
+                           fetchUserDataAsync();
+                       });
+        }
 
-        scope.join();
-        System.out.println("  result: " + future.get());
-    } catch (Exception e) {
-        System.out.println("  error: " + e);
+        static void processOrder() {
+            System.out.println("  [" + CURRENT_USER.get() + "] processing order for user");
+            System.out.println("  permissions: " + PERMISSIONS.get());
+        }
+
+        static void fetchUserDataAsync() {
+            try (var scope = new StructuredTaskScope.ShutdownOnFailure()) {
+                // Fork a subtask — it inherits CURRENT_USER and PERMISSIONS
+                var future = scope.fork(() -> {
+                    System.out.println("  [subtask] fetching data for " + CURRENT_USER.get());
+                    System.out.println("  [subtask] permissions: " + PERMISSIONS.get());
+                    return "user-data-" + CURRENT_USER.get();
+                });
+
+                scope.join();
+                System.out.println("  result: " + future.get());
+            } catch (Exception e) {
+                System.out.println("  error: " + e);
+            }
+        }
     }
 }
-```
 
 Line by line:
 
@@ -275,7 +306,6 @@ This shows the model: bind context at the top, read it anywhere in the call tree
 
 A scoped value can only be read within a binding scope. If you call `USER.get()` outside a `where().run()` scope, it throws an exception.
 
-```java
 // WRONG: reading a scoped value outside its scope
 static void bad() {
     System.out.println(CURRENT_USER.get());   // throws ScopedValue.CalloutException
@@ -287,7 +317,6 @@ static void good(String username) {
         System.out.println(CURRENT_USER.get());   // OK — inside the scope
     });
 }
-```
 
 This is the safety mechanism of scoped values. They are not global variables. They are bound for a specific scope, and reading them outside that scope is an error.
 
@@ -322,3 +351,4 @@ In the lab, you will see a helper that prints the first and last elements of a c
 ## Summary
 
 Java 21 added sequenced collections — `SequencedCollection`, `SequencedSet`, and `SequencedMap` — that give every ordered collection a uniform set of first/last accessors and a `reversed()` view. A `List` is a `SequencedCollection`, a `LinkedHashSet` is a `SequencedSet`, and a `LinkedHashMap` is a `SequencedMap`. These interfaces make it easier to write uniform code over ordered collections and to access first and last elements without remembering which interface provides which method. Separately, scoped values (`ScopedValue`) give you a way to share immutable data within a thread and its subtasks without the problems of `ThreadLocal`. You bind a value with `ScopedValue.where(value).run(...)`, and any code in the scope reads it with `get()`. In a `StructuredTaskScope`, subtasks inherit the bindings. Scoped values avoid the leak and cleanup issues of `ThreadLocal` and are the preferred choice for per-call-tree context data in new code on Java 21+. The common mistakes are reading a scoped value outside its scope and treating `reversed()` as a copy.
+

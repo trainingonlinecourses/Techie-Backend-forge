@@ -76,7 +76,6 @@ logging:
 
 ### Scenario 1: Dynamic log level changes
 
-```java
 // Actuator endpoint to change log levels at runtime
 // POST /actuator/loggers/com.example.MyService
 // {"configuredLevel": "DEBUG"}
@@ -85,7 +84,6 @@ logging:
 LoggerContext ctx = (LoggerContext) LoggerFactory.getILoggerFactory();
 Logger logger = ctx.getLogger("com.example.MyService");
 logger.setLevel(Level.DEBUG);
-```
 
 ### Scenario 2: Log shipping to ELK
 
@@ -107,3 +105,4 @@ logger.setLevel(Level.DEBUG);
 | No log rotation | Disk fills up | Configure max-file-size + max-history |
 | Logging to /dev/stdout only | Lost on restart | Also log to file |
 | Not monitoring log volume | Unexpected costs in cloud | Set up log volume alerts |
+

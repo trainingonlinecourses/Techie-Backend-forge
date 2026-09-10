@@ -1,7 +1,7 @@
 ---
 title: Exception Handling Best Practices — Patterns That Scale
 module: java-exceptions-deep
-order: 4
+order: 3
 minutes: 26
 topics: ["exception best practices", "fail fast", "logging", "exception translation", "cleanup"]
 summary: Beginners treat exceptions as something to "wrap around" code when it crashes. Senior engineers treat exception handling as a contract with the cal...
@@ -24,7 +24,6 @@ This lesson distills the practices that scale — the rules professional Java te
 
 The worst bug is the one that doesn't crash — it silently corrupts state and keeps running. **Validate inputs at the boundary and throw immediately**:
 
-```java
 public class PaymentService {
     public void charge(String accountId, BigDecimal amount) {
         // Fail fast: reject nonsense input before doing ANY work.
@@ -37,7 +36,6 @@ public class PaymentService {
         // Only now do real work...
     }
 }
-```
 
 The alternative — proceeding with a blank account id — could charge the wrong account, write bad rows, or throw a confusing `NullPointerException` three layers deep. Failing at the boundary means the error message names the actual problem, at the actual location. Spring Boot's bean validation (`@Valid`, `@NotNull`) automates this at REST boundaries; the same principle applies inside your code.
 
@@ -45,7 +43,6 @@ The alternative — proceeding with a blank account id — could charge the wron
 
 An exception should be caught **as close as possible to where you can meaningfully respond**. The repository layer usually *throws* (translated); the service layer decides retry vs. fail; the controller layer maps to HTTP responses. Catching low and doing nothing, or catching high and losing context, are both wrong.
 
-```java
 // Controller — the right place to translate domain failure to HTTP.
 @RestController
 public class LessonController {
@@ -66,7 +63,6 @@ public class ApiExceptionHandler {
         return Map.of("error", "not_found", "message", e.getMessage());
     }
 }
-```
 
 The `@RestControllerAdvice` pattern is the production-standard way to keep controllers clean while giving every failure a consistent HTTP shape.
 
@@ -74,7 +70,6 @@ The `@RestControllerAdvice` pattern is the production-standard way to keep contr
 
 Every wrap must keep the original exception. This is non-negotiable: the cause chain (`ApplicationException ← ServiceException ← SQLException`) is how you debug.
 
-```java
 // GOOD — cause preserved:
 catch (SQLException e) {
     throw new DataAccessException("Failed to load user " + id, e);
@@ -84,7 +79,6 @@ catch (SQLException e) {
 catch (SQLException e) {
     throw new DataAccessException("Failed to load user " + id + ": " + e.getMessage());
 }
-```
 
 The second version keeps only the *message*; the stack trace, the exact line, the original type — all gone. When this error reaches the log, you'll see "Failed to load user 42: connection refused" with a stack that starts at the wrapper, and the real origin is unrecoverable.
 
@@ -92,7 +86,6 @@ The second version keeps only the *message*; the stack trace, the exact line, th
 
 Every catch block must do one of three things: **handle** the failure (respond, recover, retry), **rethrow** it (possibly wrapped), or **log** it. Empty catches and `catch (Exception e) {}` violate all three — they convert a diagnosable failure into a mystery.
 
-```java
 // What NOT to do:
 try {
     metrics.report();
@@ -106,7 +99,6 @@ try {
 } catch (Exception e) {
     log.warn("Metrics reporting failed — continuing", e);   // still logged!
 }
-```
 
 Even "expected" failures deserve a log line at debug/trace level; the cost is tiny and the visibility is priceless.
 
@@ -114,7 +106,6 @@ Even "expected" failures deserve a log line at debug/trace level; the cost is ti
 
 Catch the *most specific* type that matches your intent, not `Exception`:
 
-```java
 try {
     sendEmail(user);
 } catch (UnknownHostException e) {
@@ -124,7 +115,6 @@ try {
     // General I/O problem — report the failure.
     log.error("Failed to send email to {}", user.email(), e);
 }
-```
 
 Catching `Exception` lumps "network down" with "programming bug" — two failures needing entirely different responses — into one pile. Specific catches let each failure take its correct path. Multi-catch (`catch (A | B e)`) is the clean way to share handling when types are genuinely equivalent.
 
@@ -136,7 +126,6 @@ Resources must close even when code throws — covered in depth in the try-with-
 
 Exceptions are for *exceptional* conditions. Using them for normal logic is both slow (exception construction captures a stack trace — thousands of times slower than a branch) and unreadable:
 
-```java
 // ANTI-PATTERN — exception as control flow:
 try {
     int value = parseInt(userInput);
@@ -145,13 +134,11 @@ try {
 }
 // BETTER — normal checks first:
 int value = userInput == null ? 0 : parseIntSafely(userInput);
-```
 
 Note there's a legitimate nuance: the JDK itself uses `NumberFormatException` as a parsing signal, and `Optional`/`isPresent` exist to avoid null-check pyramids. The rule is about *your* code: reserve exceptions for genuine failures, and design normal paths with normal branching.
 
 ## Rule 8: Log the Exception Object, Not Just the Message
 
-```java
 // GOOD:
 log.error("Failed to charge account {}", accountId, e);
 // The exception object as the last argument -> full stack trace in the log.
@@ -159,13 +146,11 @@ log.error("Failed to charge account {}", accountId, e);
 // BAD:
 log.error("Failed to charge account {}: {}", accountId, e.getMessage());
 // Only the message — the stack, cause chain, and line number are gone.
-```
 
 Logging frameworks (SLF4J/Logback, which Spring Boot uses) treat a trailing `Throwable` argument specially: they render the full stack trace. Pass the exception object — that's where the debugging value lives.
 
 ## The Complete Pattern in One Example
 
-```java
 public class OrderService {
     private final OrderRepository repo;
 
@@ -182,10 +167,10 @@ public class OrderService {
         }
     }
 }
-```
 
 The controller above catches `OrderCreationFailedException` and returns 503 (service unavailable) with a clean JSON body; the log, thanks to the preserved cause, shows the exact database statement and driver line that failed. Every rule in this lesson is at work: fast validation, right-layer catching, cause preservation, specific types, and loud failure.
 
 ## Recap
 
 Professional exception handling is design: fail fast at boundaries, catch at the layer that can respond, preserve root causes through every wrap, never swallow without logging, catch specific types, keep exceptions out of normal control flow, and log the exception object itself. Applied consistently, these rules turn exception handling from boilerplate into the system's diagnostic backbone — and they're the exact patterns Spring Boot's `@RestControllerAdvice` machinery is built to support. Write your `throws` clauses like API documentation, and your catch blocks like business rules.
+

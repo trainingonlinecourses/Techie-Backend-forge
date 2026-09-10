@@ -19,7 +19,6 @@ Sessions are the most targeted part of a web application. Attackers try to steal
 
 **Cross-Site Request Forgery** is when a malicious site tricks your browser into making requests to your app using your session cookie.
 
-```java
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -43,7 +42,6 @@ public class SecurityConfig {
         return http.build();
     }
 }
-```
 
 ### How CSRF Tokens Work
 
@@ -60,12 +58,10 @@ public class SecurityConfig {
 
 **Session fixation** is when an attacker sets a known session ID before the user logs in, then hijacks the session after login.
 
-```java
 http.sessionManagement(session -> session
     // Prevents fixation by creating a new session ID after login
     .sessionFixation().migrateSessionId()  // Default
 );
-```
 
 | Strategy | Behavior | Best For |
 |----------|----------|----------|
@@ -78,13 +74,11 @@ http.sessionManagement(session -> session
 
 ## Concurrent Session Control
 
-```java
 http.sessionManagement(session -> session
     .maximumSessions(1)                    // One session per user
     .maxSessionsPreventsLogin(false)        // Kick out old session
     .expiredUrl("/login?expired=true")     // Where to redirect
 );
-```
 
 **When user A logs in from Device 1, then logs in from Device 2:**
 - `maxSessionsPreventsLogin(false)` → Device 1 is logged out, Device 2 succeeds
@@ -94,17 +88,29 @@ http.sessionManagement(session -> session
 
 ## Secure Cookie Configuration
 
+
+**What this code does — step by step:**
+
+1. `cookie.setName("__Host-session-id");` — __Host- prefix: HTTPS only
+2. `cookie.setHttpOnly(true);` — No JavaScript access
+3. `cookie.setSecure(true);` — HTTPS only
+4. `cookie.setMaxAge(1800);` — 30 minutes
+5. `cookie.setPath("/");` — Entire domain
+6. `cookie.setAttribute("SameSite", "Lax");` — Prevents CSRF from cross-site
+
+The same code, clean:
+
 ```java
 @Bean
 public ServletContextInitializer cookieConfig() {
     return servletContext -> {
         SessionCookieConfig cookie = servletContext.getSessionCookieConfig();
-        cookie.setName("__Host-session-id");    // __Host- prefix: HTTPS only
-        cookie.setHttpOnly(true);               // No JavaScript access
-        cookie.setSecure(true);                 // HTTPS only
-        cookie.setMaxAge(1800);                 // 30 minutes
-        cookie.setPath("/");                    // Entire domain
-        cookie.setAttribute("SameSite", "Lax"); // Prevents CSRF from cross-site
+        cookie.setName("__Host-session-id");
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true);
+        cookie.setMaxAge(1800);
+        cookie.setPath("/");
+        cookie.setAttribute("SameSite", "Lax");
     };
 }
 ```
@@ -121,7 +127,6 @@ public ServletContextInitializer cookieConfig() {
 
 ## Session Hijacking Prevention
 
-```java
 @Component
 public class SessionHijackPrevention {
 
@@ -158,7 +163,6 @@ public class SessionHijackPrevention {
         return true;
     }
 }
-```
 
 ---
 
@@ -171,3 +175,4 @@ public class SessionHijackPrevention {
 | No session timeout | Sessions live forever → memory leak | Set `spring.session.timeout: 30m` |
 | Missing `Secure` flag on cookies | Session ID sent over HTTP | Always set `Secure=true` |
 | Storing sensitive data in session | Session data readable in Redis | Store IDs only, fetch data in service |
+

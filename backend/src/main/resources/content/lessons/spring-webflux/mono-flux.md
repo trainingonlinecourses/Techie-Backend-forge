@@ -1,7 +1,7 @@
 ---
 title: Mono & Flux — The Reactive Types
 summary: Publisher subtypes, creation, the operator toolbox (map, flatMap, error handling), and backpressure in practice.
-order: 2
+order: 3
 minutes: 20
 topics: [reactor, mono, flux, operators, backpressure, flatMap]
 docs:
@@ -18,20 +18,30 @@ docs:
 - **`Mono<T>`** — emits **0 or 1** item (then completes). Use for a single value: one entity, one HTTP response, one DB row.
 - **`Flux<T>`** — emits **0..N** items (then completes). Use for streams: a list, a feed, a download.
 
+
+**What this code does — step by step:**
+
+1. `Mono<String> one = Mono.just("hello");` — one value
+2. `Mono<String> none = Mono.empty();` — completes without a value
+3. `Flux<Integer> many = Flux.range(1, 5);` — 1,2,3,4,5
+4. `Flux<Long> ticks = Flux.interval(Duration.ofSeconds(1));` — infinite timer stream
+5. `Flux<Customer> all = customerRepo.findAll();` — reactive DB query
+
+The same code, clean:
+
 ```java
-Mono<String> one = Mono.just("hello");            // one value
-Mono<String> none = Mono.empty();                 // completes without a value
+Mono<String> one = Mono.just("hello");
+Mono<String> none = Mono.empty();
 Mono<String> err = Mono.error(new RuntimeException("boom"));
-Flux<Integer> many = Flux.range(1, 5);            // 1,2,3,4,5
-Flux<Long> ticks = Flux.interval(Duration.ofSeconds(1)); // infinite timer stream
-Flux<Customer> all = customerRepo.findAll();      // reactive DB query
+Flux<Integer> many = Flux.range(1, 5);
+Flux<Long> ticks = Flux.interval(Duration.ofSeconds(1));
+Flux<Customer> all = customerRepo.findAll();
 ```
 
 ## Nothing happens until you subscribe
 
 A `Publisher` is a **declaration**, not a computation. Operators build a pipeline; **subscribing** starts the flow:
 
-```java
 Flux.range(1, 10)
     .map(i -> i * 2)
     .subscribe(System.out::println);   // ← now it runs (prints 2..20)
@@ -39,29 +49,34 @@ Flux.range(1, 10)
 // Blocking escape hatches (tests, main methods — NEVER in a server request):
 int v = Mono.just(42).block();                 // block until done
 List<Integer> l = Flux.range(1, 5).collectList().block();
-```
 
 ## The operator toolbox
+
+
+**What this code does — step by step:**
+
+1. map: 1:1 transform of values
+2. filter: keep matching
+3. flatMap: 1:N, async, INTERLEAVED — for calling services/DBs per item
+4. concatMap: 1:N, async, PRESERVES ORDER (slower — sequential per source item)
+5. zip: combine two publishers pairwise
+6. take: limit; timeout: cap wait; retry: re-subscribe on error
+
+The same code, clean:
 
 ```java
 Flux<Order> orders = orderRepo.findByCustomer(customerId);
 
-// map: 1:1 transform of values
 Flux<String> ids = orders.map(Order::getId);
 
-// filter: keep matching
 Flux<Order> big = orders.filter(o -> o.amount().compareTo(BigDecimal.valueOf(100)) > 0);
 
-// flatMap: 1:N, async, INTERLEAVED — for calling services/DBs per item
 Flux<Inventory> stock = orders.flatMap(o -> inventoryClient.stockFor(o.sku()));
 
-// concatMap: 1:N, async, PRESERVES ORDER (slower — sequential per source item)
 Flux<Inventory> ordered = orders.concatMap(o -> inventoryClient.stockFor(o.sku()));
 
-// zip: combine two publishers pairwise
 Mono<OrderSummary> summary = Mono.zip(orderMono, customerMono, OrderSummary::of);
 
-// take: limit; timeout: cap wait; retry: re-subscribe on error
 Flux<Quote> first3 = quoteStream.take(3);
 Mono<Resp> guarded = client.call().timeout(Duration.ofSeconds(2)).retryWhen(Retry.backoff(3, Duration.ofMillis(200)));
 ```
@@ -72,7 +87,6 @@ The **flatMap vs concatMap** distinction is the #1 interview question: `flatMap`
 
 Errors travel down the pipeline as events. Handle them with operators, not `try/catch`:
 
-```java
 Mono<Customer> customer = repo.findById(id)
         .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
         .onErrorResume(DataAccessException.class, e -> Mono.just(Customer.empty())) // fallback value
@@ -81,7 +95,6 @@ Mono<Customer> customer = repo.findById(id)
 Mono<Customer> c = repo.findById(id)
         .doOnError(e -> log.warn("lookup failed", e))
         .doFinally(sig -> metrics.count(sig));
-```
 
 - `switchIfEmpty` — provide an alternate publisher when the source completes empty (the reactive "optional or fallback").
 - `onErrorResume` — recover with another publisher (like a catch that returns a value).
@@ -91,12 +104,10 @@ Mono<Customer> c = repo.findById(id)
 
 A `Flux` from `interval` is **unbounded**: if you `subscribe` and process slowly, items pile up. Control it:
 
-```java
 Flux.interval(Duration.ofMillis(10))
     .onBackpressureBuffer(1000)      // buffer up to 1000 (then error) — bounded
     .limitRate(100)                  // request 100 at a time from upstream
     .subscribe(...);
-```
 
 In practice you rarely write this — databases and HTTP clients apply backpressure automatically. But it's why reactive systems don't blow up memory under load: **a slow consumer propagates its demand upstream**.
 
@@ -115,3 +126,4 @@ In practice you rarely write this — databases and HTTP clients apply backpress
 - [Project Reactor — Getting Started](https://projectreactor.io/docs/core/release/reference/#getting-started)
 - [Project Reactor — Which Operator Do I Need?](https://projectreactor.io/docs/core/release/reference/#which-operator)
 - [Project Reactor — Error Handling](https://projectreactor.io/docs/core/release/reference/#error.handling)
+

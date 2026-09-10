@@ -1,7 +1,7 @@
 ---
 title: Java Networking — Sockets, HTTP, and URL Handling
 summary: TCP/UDP sockets, HttpClient for REST calls, URL/URLConnection for simple fetches, and how organizations build reliable networked systems. Beginner-friendly with line-by-line code.
-order: 84
+order: 39
 minutes: 20
 topics: [networking, TCP, UDP, socket, HttpClient, URL, URLConnection, DNS, timeout, retry]
 docs:
@@ -32,6 +32,32 @@ Networking in Java means **communicating between programs over a network** — w
 
 This is what you'll use 90% of the time in modern Java applications:
 
+
+**What this code does — step by step:**
+
+1. `.connectTimeout(Duration.ofSeconds(5))` — Fail fast if server is unreachable
+2. `.version(HttpClient.Version.HTTP_2)` — Use HTTP/2 (multiplexed connections)
+3. `.followRedirects(HttpClient.Redirect.NORMAL)` — Follow 3xx redirects automatically
+4. === GET request ===
+5. `.uri(URI.create("https://api.example.com/users/" + userId))` — Target URL
+6. `.header("Accept", "application/json")` — We want JSON back
+7. `.header("Authorization", "Bearer " + token)` — Auth header
+8. `.GET()` — HTTP method
+9. `.timeout(Duration.ofSeconds(10))` — Per-request timeout
+10. `HttpResponse.BodyHandlers.ofString());` — Parse body as String
+11. `return response.body();` — The JSON string
+12. `return null;` — Not found
+13. === POST request with JSON body ===
+14. `String json = objectMapper.writeValueAsString(req);` — Serialize to JSON
+15. `.header("Content-Type", "application/json")` — Tell server we're sending JSON
+16. `.POST(HttpRequest.BodyPublishers.ofString(json))` — Send the JSON body
+17. `return objectMapper.readValue(response.body(), Order.class);` — Parse response
+18. === Async request (non-blocking) ===
+19. `return client.sendAsync(request, HttpResponse.BodyHandlers.ofString())` — Non-blocking
+20. `.thenApply(HttpResponse::body);` — Extract body from response
+
+The same code, clean:
+
 ```java
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -41,60 +67,57 @@ import java.net.http.HttpResponse;
 public class ExternalApiService {
 
     private final HttpClient client = HttpClient.newBuilder()
-        .connectTimeout(Duration.ofSeconds(5))           // Fail fast if server is unreachable
-        .version(HttpClient.Version.HTTP_2)              // Use HTTP/2 (multiplexed connections)
-        .followRedirects(HttpClient.Redirect.NORMAL)     // Follow 3xx redirects automatically
+        .connectTimeout(Duration.ofSeconds(5))
+        .version(HttpClient.Version.HTTP_2)
+        .followRedirects(HttpClient.Redirect.NORMAL)
         .build();
 
-    // === GET request ===
     public String fetchUser(String userId) throws Exception {
         HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create("https://api.example.com/users/" + userId))  // Target URL
-            .header("Accept", "application/json")         // We want JSON back
-            .header("Authorization", "Bearer " + token)   // Auth header
-            .GET()                                        // HTTP method
-            .timeout(Duration.ofSeconds(10))              // Per-request timeout
+            .uri(URI.create("https://api.example.com/users/" + userId))
+            .header("Accept", "application/json")
+            .header("Authorization", "Bearer " + token)
+            .GET()
+            .timeout(Duration.ofSeconds(10))
             .build();
 
         HttpResponse<String> response = client.send(request,
-            HttpResponse.BodyHandlers.ofString());        // Parse body as String
+            HttpResponse.BodyHandlers.ofString());
 
         if (response.statusCode() == 200) {
-            return response.body();                       // The JSON string
+            return response.body();
         } else if (response.statusCode() == 404) {
-            return null;                                  // Not found
+            return null;
         } else {
             throw new ApiException("API returned " + response.statusCode());
         }
     }
 
-    // === POST request with JSON body ===
     public Order createOrder(OrderRequest req) throws Exception {
-        String json = objectMapper.writeValueAsString(req);  // Serialize to JSON
+        String json = objectMapper.writeValueAsString(req);
 
         HttpRequest request = HttpRequest.newBuilder()
             .uri(URI.create("https://api.example.com/orders"))
-            .header("Content-Type", "application/json")    // Tell server we're sending JSON
+            .header("Content-Type", "application/json")
             .header("Accept", "application/json")
-            .POST(HttpRequest.BodyPublishers.ofString(json))  // Send the JSON body
+            .POST(HttpRequest.BodyPublishers.ofString(json))
             .timeout(Duration.ofSeconds(15))
             .build();
 
         HttpResponse<String> response = client.send(request,
             HttpResponse.BodyHandlers.ofString());
 
-        return objectMapper.readValue(response.body(), Order.class);  // Parse response
+        return objectMapper.readValue(response.body(), Order.class);
     }
 
-    // === Async request (non-blocking) ===
     public CompletableFuture<String> fetchUserAsync(String userId) {
         HttpRequest request = HttpRequest.newBuilder()
             .uri(URI.create("https://api.example.com/users/" + userId))
             .GET()
             .build();
 
-        return client.sendAsync(request, HttpResponse.BodyHandlers.ofString())  // Non-blocking
-            .thenApply(HttpResponse::body);            // Extract body from response
+        return client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+            .thenApply(HttpResponse::body);
     }
 }
 ```
@@ -108,16 +131,25 @@ public class ExternalApiService {
 
 ### 2. Low-Level TCP Socket
 
+
+**What this code does — step by step:**
+
+1. Server side: listens for connections
+2. `ServerSocket serverSocket = new ServerSocket(8080);` — Listen on port 8080
+3. `Socket clientSocket = serverSocket.accept();` — BLOCKS until a client connects. Handle each connection in a new thread:
+4. `String line = in.readLine();` — Read a line from the client
+5. `out.println("Echo: " + line);` — Send response back
+
+The same code, clean:
+
 ```java
-// Server side: listens for connections
 public class SimpleServer {
     public static void main(String[] args) throws IOException {
-        ServerSocket serverSocket = new ServerSocket(8080);  // Listen on port 8080
+        ServerSocket serverSocket = new ServerSocket(8080);
         System.out.println("Server listening on port 8080");
 
         while (true) {
-            Socket clientSocket = serverSocket.accept();    // BLOCKS until a client connects
-            // Handle each connection in a new thread:
+            Socket clientSocket = serverSocket.accept();
             new Thread(() -> handleClient(clientSocket)).start();
         }
     }
@@ -126,10 +158,10 @@ public class SimpleServer {
         try (BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
              PrintWriter out = new PrintWriter(socket.getOutputStream(), true)) {
 
-            String line = in.readLine();                    // Read a line from the client
+            String line = in.readLine();
             System.out.println("Received: " + line);
 
-            out.println("Echo: " + line);                  // Send response back
+            out.println("Echo: " + line);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -145,21 +177,30 @@ public class SimpleServer {
 
 ### 3. Simple URL Fetch
 
+
+**What this code does — step by step:**
+
+1. Quick and dirty HTTP fetch (for simple use cases):
+2. `new InputStreamReader(url.openStream()))) {` — Opens the connection
+3. `while ((line = reader.readLine()) != null) {` — Read line by line
+4. `response.append(line);` — Build the response string
+5. The try-with-resources closes the reader (and the connection) automatically
+
+The same code, clean:
+
 ```java
-// Quick and dirty HTTP fetch (for simple use cases):
 public String fetchUrl(String urlString) throws IOException {
     URL url = new URL(urlString);
     try (BufferedReader reader = new BufferedReader(
-            new InputStreamReader(url.openStream()))) {    // Opens the connection
+            new InputStreamReader(url.openStream()))) {
 
         StringBuilder response = new StringBuilder();
         String line;
-        while ((line = reader.readLine()) != null) {       // Read line by line
-            response.append(line);                         // Build the response string
+        while ((line = reader.readLine()) != null) {
+            response.append(line);
         }
         return response.toString();
     }
-    // The try-with-resources closes the reader (and the connection) automatically
 }
 ```
 
@@ -175,7 +216,6 @@ public String fetchUrl(String urlString) throws IOException {
 
 ### Scenario 1: Microservice Communication with Retry
 
-```java
 @Service
 public class OrderService {
     private final HttpClient client;
@@ -204,11 +244,9 @@ public class OrderService {
         }
     }
 }
-```
 
 ### Scenario 2: Health Check Client
 
-```java
 @Component
 public class HealthChecker {
     private final HttpClient client = HttpClient.newBuilder()
@@ -241,7 +279,6 @@ public class HealthChecker {
         }
     }
 }
-```
 
 ---
 
@@ -266,3 +303,4 @@ public class HealthChecker {
 - **Low-level sockets** are rarely needed in business applications — Spring Boot's web stack handles networking for you.
 
 Official docs: [HttpClient](https://docs.oracle.com/en/java/javase/21/docs/api/java.net.http/java/net/http/HttpClient.html) · [Socket](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/net/Socket.html)
+

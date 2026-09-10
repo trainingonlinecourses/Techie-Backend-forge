@@ -1,7 +1,7 @@
 ---
 title: Spring Boot Error Handling — @ControllerAdvice, Custom Exceptions, and Error Responses
 summary: How Spring Boot handles exceptions, @ControllerAdvice for global error handling, custom exception classes, validation error formatting, problem-detail responses (RFC 7807), error logging best practices, and how organizations build consistent error APIs with line-by-line walkthroughs.
-order: 6
+order: 26
 minutes: 28
 topics: [error-handling, controller-advice, exception-handler, custom-exceptions, validation-errors, problem-detail, error-response]
 docs:
@@ -24,7 +24,6 @@ When a controller method throws an exception, Spring Boot's default error handli
 
 ## Custom exceptions — meaningful error types
 
-```java
 // Base exception for all business errors
 public class BusinessException extends RuntimeException {
     private final String errorCode;
@@ -64,16 +63,33 @@ public class InsufficientFundsException extends BusinessException {
     public BigDecimal getAttempted() { return attempted; }
     public BigDecimal getAvailable() { return available; }
 }
-```
 
 ## @ControllerAdvice — global exception handling
 
+
+**What this code does — step by step:**
+
+1. `@RestControllerAdvice` — catches exceptions from ALL @RestController classes
+2. `@Slf4j` — Lombok: creates a Logger field
+3. Handle business exceptions
+4. Map specific exception types to HTTP status codes
+5. `case DuplicateEmailException e   -> 409;` — Conflict
+6. `case InsufficientFundsException e -> 402;` — Payment Required
+7. `default                           -> 400;` — Bad Request
+8. Handle validation errors (@Valid failures)
+9. `FieldError::getField,` — field name
+10. `(existing, replacement) -> existing` — keep first error if duplicate fields
+11. Handle missing parameters
+12. Catch-all for unexpected errors (NEVER expose internal details)
+13. `log.error("Unexpected error", ex);` — log the full stack trace for debugging
+
+The same code, clean:
+
 ```java
-@RestControllerAdvice    // catches exceptions from ALL @RestController classes
-@Slf4j                   // Lombok: creates a Logger field
+@RestControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler {
 
-    // Handle business exceptions
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<ErrorResponse> handleBusiness(BusinessException ex) {
         log.warn("Business error: {} - {}", ex.getErrorCode(), ex.getMessage());
@@ -84,26 +100,24 @@ public class GlobalExceptionHandler {
             .timestamp(Instant.now())
             .build();
 
-        // Map specific exception types to HTTP status codes
         int status = switch (ex) {
             case UserNotFoundException e     -> 404;
-            case DuplicateEmailException e   -> 409;  // Conflict
-            case InsufficientFundsException e -> 402;  // Payment Required
-            default                           -> 400;  // Bad Request
+            case DuplicateEmailException e   -> 409;
+            case InsufficientFundsException e -> 402;
+            default                           -> 400;
         };
 
         return ResponseEntity.status(status).body(error);
     }
 
-    // Handle validation errors (@Valid failures)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidation(MethodArgumentNotValidException ex) {
         List<FieldError> fieldErrors = ex.getBindingResult().getFieldErrors();
         Map<String, String> errors = fieldErrors.stream()
             .collect(Collectors.toMap(
-                FieldError::getField,             // field name
+                FieldError::getField,
                 fe -> fe.getDefaultMessage() != null ? fe.getDefaultMessage() : "Invalid value",
-                (existing, replacement) -> existing  // keep first error if duplicate fields
+                (existing, replacement) -> existing
             ));
 
         ErrorResponse error = ErrorResponse.builder()
@@ -116,7 +130,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(error);
     }
 
-    // Handle missing parameters
     @ExceptionHandler(MissingServletRequestParameterException.class)
     public ResponseEntity<ErrorResponse> handleMissingParam(MissingServletRequestParameterException ex) {
         ErrorResponse error = ErrorResponse.builder()
@@ -127,10 +140,9 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(error);
     }
 
-    // Catch-all for unexpected errors (NEVER expose internal details)
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGeneric(Exception ex) {
-        log.error("Unexpected error", ex);  // log the full stack trace for debugging
+        log.error("Unexpected error", ex);
         ErrorResponse error = ErrorResponse.builder()
             .code("INTERNAL_ERROR")
             .message("An unexpected error occurred. Please try again later.")
@@ -143,13 +155,24 @@ public class GlobalExceptionHandler {
 
 ## Standard error response format
 
+
+**What this code does — step by step:**
+
+1. Consistent error response structure used across all endpoints
+2. `String code,` — machine-readable error code
+3. `String message,` — human-readable message
+4. `Map<String, String> details,` — field-level errors (optional)
+5. `Instant timestamp` — when the error occurred
+6. Example error response (JSON): {. "code": "VALIDATION_ERROR",. "message": "Request validation failed",. "details": {. "email": "must be a valid email address",. "name": "must not be blank". },. "timestamp": "2024-01-15T14:30:00Z". }
+
+The same code, clean:
+
 ```java
-// Consistent error response structure used across all endpoints
 public record ErrorResponse(
-    String code,                    // machine-readable error code
-    String message,                 // human-readable message
-    Map<String, String> details,    // field-level errors (optional)
-    Instant timestamp               // when the error occurred
+    String code,
+    String message,
+    Map<String, String> details,
+    Instant timestamp
 ) {
     public static Builder builder() { return new Builder(); }
 
@@ -166,39 +189,27 @@ public record ErrorResponse(
         public ErrorResponse build() { return new ErrorResponse(code, message, details, timestamp); }
     }
 }
-
-// Example error response (JSON):
-// {
-//   "code": "VALIDATION_ERROR",
-//   "message": "Request validation failed",
-//   "details": {
-//     "email": "must be a valid email address",
-//     "name": "must not be blank"
-//   },
-//   "timestamp": "2024-01-15T14:30:00Z"
-// }
 ```
 
 ## How we use it in organizations
 
 ### Scenario 1: Consistent error API across microservices
 
-```java
-// Every microservice uses the same error format:
-// {
-//   "code": "ORDER_NOT_FOUND",
-//   "message": "Order with id 12345 not found",
-//   "details": {},
-//   "timestamp": "2024-01-15T14:30:00Z",
-//   "traceId": "abc-123-def-456"   // for distributed tracing
-// }
 
+**What this code does — step by step:**
+
+1. Every microservice uses the same error format: {. "code": "ORDER_NOT_FOUND",. "message": "Order with id 12345 not found",. "details": {},. "timestamp": "2024-01-15T14:30:00Z",. "traceId": "abc-123-def-456" // for distributed tracing. }
+2. `String traceId = MDC.get("traceId");` — from ThreadLocal trace context
+
+The same code, clean:
+
+```java
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGeneric(Exception ex) {
-        String traceId = MDC.get("traceId");  // from ThreadLocal trace context
+        String traceId = MDC.get("traceId");
 
         log.error("[{}] Unexpected error: {}", traceId, ex.getMessage(), ex);
 
@@ -216,7 +227,6 @@ public class GlobalExceptionHandler {
 
 ### Scenario 2: Error handling for file uploads
 
-```java
 @RestControllerAdvice
 public class FileUploadExceptionHandler {
 
@@ -242,9 +252,19 @@ public class FileUploadExceptionHandler {
         );
     }
 }
-```
 
 ### Scenario 3: Error logging with context
+
+
+**What this code does — step by step:**
+
+1. Log with request context
+2. `ex);` — full stack trace
+3. Different log levels for different severity
+4. `log.warn("Business error: {}", ex.getMessage());` — expected business rule violation
+5. `log.error("Unexpected error: {}", ex.getMessage(), ex);` — unexpected — full trace
+
+The same code, clean:
 
 ```java
 @RestControllerAdvice
@@ -255,19 +275,17 @@ public class ErrorLoggingAdvice {
     public ResponseEntity<ErrorResponse> handleError(
             HttpServletRequest request, Exception ex) {
 
-        // Log with request context
         log.error("Request failed: {} {} from {} - {}",
             request.getMethod(),
             request.getRequestURI(),
             request.getRemoteAddr(),
             ex.getMessage(),
-            ex);  // full stack trace
+            ex);
 
-        // Different log levels for different severity
         if (ex instanceof BusinessException) {
-            log.warn("Business error: {}", ex.getMessage());  // expected business rule violation
+            log.warn("Business error: {}", ex.getMessage());
         } else {
-            log.error("Unexpected error: {}", ex.getMessage(), ex);  // unexpected — full trace
+            log.error("Unexpected error: {}", ex.getMessage(), ex);
         }
 
         return ResponseEntity.status(500).body(
@@ -291,3 +309,4 @@ public class ErrorLoggingAdvice {
 | Using different error formats per endpoint | Clients can't parse errors consistently | Use统一 ErrorResponse format |
 | Throwing exceptions for control flow | Slow (exception creation is expensive) | Use if/else for expected cases |
 | Catching all exceptions with one handler | Loses specific error information | Handle specific exceptions first |
+

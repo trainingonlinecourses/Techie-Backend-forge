@@ -1,7 +1,7 @@
 ---
 title: Java IO Streams — Byte Streams, Character Streams, and NIO Channels
 summary: The InputStream/OutputStream vs Reader/Writer split, buffered I/O, try-with-resources, NIO channels and buffers, and when to pick NIO over classic IO for high-throughput file and network operations.
-order: 45
+order: 28
 minutes: 22
 topics: [inputstream, outputstream, reader, writer, buffered-io, try-with-resources, nio-channel, nio-buffer, memory-mapped]
 docs:
@@ -26,7 +26,6 @@ The key mistake teams make: using byte streams for text. When you read text with
 
 Java IO is built on the **decorator pattern**: you wrap a base stream in progressively more capable wrappers.
 
-```java
 // Base: a raw byte stream from a file
 InputStream raw = new FileInputStream("data.bin");
 
@@ -38,20 +37,16 @@ InputStream decompressed = new GZIPInputStream(buffered);
 
 // Now read — every read() goes through GZip → Buffered → File
 byte[] data = decompressed.readAllBytes();
-```
 
 Each wrapper adds a capability without the others knowing. This is elegant but verbose — Java 7's try-with-resources simplifies cleanup:
 
-```java
 try (InputStream in = new GZIPInputStream(new BufferedInputStream(new FileInputStream("data.bin")))) {
     byte[] data = in.readAllBytes();
     // process data
 }  // automatically closed in reverse order, even on exception
-```
 
 ## Character streams: Reader/Writer
 
-```java
 // Reading text — Reader handles encoding
 try (BufferedReader reader = new BufferedReader(
         new InputStreamReader(new FileInputStream("orders.csv"), StandardCharsets.UTF_8))) {
@@ -69,38 +64,44 @@ try (BufferedWriter writer = new BufferedWriter(
     writer.write("Order processed");
     writer.newLine();
 }
-```
 
 **Java 8+ simplification:** `Files.newBufferedReader()` and `Files.newBufferedWriter()` eliminate the decorator chain:
 
-```java
 try (BufferedReader reader = Files.newBufferedReader(Path.of("orders.csv"), StandardCharsets.UTF_8)) {
     reader.lines().forEach(this::processOrder);
 }
-```
 
 **Java 11+ further simplification:** `readString()` and `writeString()`:
 
-```java
 String content = Files.readString(Path.of("config.yml"));
 Files.writeString(Path.of("output.txt"), "Order processed\n");
-```
 
 ## NIO: channels and buffers
 
 NIO flips the model. Instead of reading bytes one at a time into a variable, you read into a **buffer** and then process the buffer's contents in bulk.
 
+
+**What this code does — step by step:**
+
+1. `ByteBuffer buffer = ByteBuffer.allocate(8192);` — 8KB buffer
+2. `while (channel.read(buffer) > 0) {` — read into buffer
+3. `buffer.flip();` — switch from write-mode to read-mode
+4. `processByte(buffer.get());` — read from buffer
+5. `buffer.clear();` — reset for next read
+
+The same code, clean:
+
 ```java
 try (FileChannel channel = FileChannel.open(Path.of("large-data.bin"), StandardOpenOption.READ)) {
 
-    ByteBuffer buffer = ByteBuffer.allocate(8192);  // 8KB buffer
+    ByteBuffer buffer = ByteBuffer.allocate(8192);
 
-    while (channel.read(buffer) > 0) {  // read into buffer
-        buffer.flip();                   // switch from write-mode to read-mode
+    while (channel.read(buffer) > 0) {
+        buffer.flip();
         while (buffer.hasRemaining()) {
-            processByte(buffer.get());   // read from buffer
+            processByte(buffer.get());
         }
-        buffer.clear();                  // reset for next read
+        buffer.clear();
     }
 }
 ```
@@ -112,7 +113,6 @@ try (FileChannel channel = FileChannel.open(Path.of("large-data.bin"), StandardO
 
 **Memory-mapped files** — map a file directly into the JVM's address space. The OS handles paging; no explicit `read()` needed:
 
-```java
 try (FileChannel channel = FileChannel.open(Path.of("huge-database.db"), StandardOpenOption.READ)) {
 
     MappedByteBuffer mapped = channel.map(
@@ -123,7 +123,6 @@ try (FileChannel channel = FileChannel.open(Path.of("huge-database.db"), Standar
     byte first = mapped.get(0);
     byte last = mapped.get((int) (channel.size() - 1));
 }
-```
 
 Memory-mapped files are ideal for random-access databases, large configuration files, and IPC.
 
@@ -131,7 +130,6 @@ Memory-mapped files are ideal for random-access databases, large configuration f
 
 ### Scenario 1: streaming CSV processing — avoid loading the entire file
 
-```java
 @Service
 public class CsvOrderProcessor {
 
@@ -151,13 +149,11 @@ public class CsvOrderProcessor {
         return new Order(fields[0], new BigDecimal(fields[1]), fields[2]);
     }
 }
-```
 
 A 2GB CSV file is processed line by line — memory usage stays constant at ~8KB regardless of file size.
 
 ### Scenario 2: file upload with NIO transfer
 
-```java
 @RestController
 @RequestMapping("/api/uploads")
 public class UploadController {
@@ -175,13 +171,11 @@ public class UploadController {
         return ResponseEntity.ok().build();
     }
 }
-```
 
 `InputStream.transferTo()` uses OS-level zero-copy when available (Linux `sendfile`), avoiding a user-space buffer copy.
 
 ### Scenario 3: writing audit logs with NIO
 
-```java
 @Component
 public class AuditLogWriter {
 
@@ -204,7 +198,6 @@ public class AuditLogWriter {
         }
     }
 }
-```
 
 ## When to use what
 
@@ -226,3 +219,4 @@ public class AuditLogWriter {
 | Small buffer size (1024 bytes) | Excessive system calls — slow |
 | Memory-mapping a file larger than 2GB (32-bit JVM) | `OutOfMemoryError` — use FileChannel instead |
 | Forgetting `buffer.flip()` after write | Reads garbage or nothing from buffer |
+

@@ -1,7 +1,7 @@
 ---
 title: Text Blocks — Multiline Strings Without the Escaping Nightmare
 summary: A text block is a multiline string literal delimited by three double-quote characters. It lets you write HTML, JSON, SQL, and other structured text directly in Java code without escaping every newline and quote. This lesson explains the syntax, how indentation is stripped, when escaping is still needed, and the situations where a text block is cleaner than a regular string — and when it is not.
-order: 1
+order: 4
 minutes: 16
 topics: [text-blocks, strings, multiline, escaping, formatted, json, sql, html, jls]
 docs:
@@ -13,19 +13,16 @@ docs:
 
 Before text blocks, writing a multiline string in Java was painful. You had to write one long line, or you had to concatenate several lines with `+` and `\n`, and every double-quote inside the string had to be escaped with a backslash.
 
-```java
 // The old way — painful escaping and concatenation
 String json = "{\n" +
               "  \"name\": \"Alice\",\n" +
               "  \"email\": \"alice@example.com\"\n" +
               "}";
-```
 
 This is hard to read, hard to maintain, and hard to change. If you add a field, you have to edit multiple lines and make sure the indentation and escaping are still correct. The code does not look like the data it represents.
 
 A **text block** solves this. It is a string literal delimited by three double-quote characters (`"""`), and it can span multiple lines. Inside a text block, you do not need to escape normal characters, and newlines are part of the string.
 
-```java
 // The text block way — the string looks like the data
 String json = """
     {
@@ -33,7 +30,6 @@ String json = """
         "email": "alice@example.com"
     }
     """;
-```
 
 The text block starts with `"""` and ends with `"""`. Everything between them is the string content. The newlines you type are part of the string. The double-quotes inside do not need escaping because the delimiter is three quotes, so a single `"` inside is just a quote character, not the end of the string.
 
@@ -49,7 +45,6 @@ The content of a text block includes the newlines and the spaces that are part o
 
 The rule is: the compiler finds the line with the least amount of leading whitespace among all the non-empty content lines (including the line with the closing `"""`), and it removes that amount of whitespace from the beginning of every line. What remains is the string content.
 
-```java
 // The text block is indented to match the surrounding code.
 // The compiler strips the common leading whitespace.
 String html = """
@@ -60,7 +55,6 @@ String html = """
         </body>
     </html>
     """;
-```
 
 In this example, the source lines inside the text block are indented to align with the surrounding code. The compiler finds the minimum indentation among the lines (the lines with `<html>`, `<body>`, etc. have more indentation, but the line with `"""` and the lines with the HTML tags all contribute to the common whitespace calculation) and strips it. The resulting string starts at the first non-whitespace character of each line after stripping.
 
@@ -76,13 +70,11 @@ This means a text block is not a "raw string." It still understands escape seque
 
 There is also a new escape sequence that is especially useful in text blocks: `\s`. This is a single space. It is used to prevent the stripping of trailing whitespace on a line. Normally, trailing whitespace on a line in a text block is removed. If you want a line to end with a space, you write `\s` at the end.
 
-```java
 // \s prevents stripping of trailing whitespace on a line
 String spaces = """
     line one   \s
     line two   \s
     """;
-```
 
 ### When a Text Block Is Cleaner
 
@@ -96,7 +88,6 @@ Text blocks are especially clean for:
 
 They are less useful for short, single-line strings. If the string fits comfortably on one line, a regular string literal is fine. A text block is not a replacement for every string — it is a tool for multiline, structured text.
 
-```java
 // A text block for a SQL query — readable and close to the real SQL
 String query = """
     SELECT u.id, u.name, u.email
@@ -116,7 +107,6 @@ String expected = """
         "roles": ["admin", "user"]
     }
     """;
-```
 
 ### When You Still Need Escaping
 
@@ -127,7 +117,6 @@ You still need to escape in a few cases:
 - **A double-quote inside text that might be ambiguous** — you usually do not need to escape a `"` in a text block, but if you have three quotes in a row inside the content, you need to escape at least one of them to avoid ending the block prematurely.
 - **A trailing space you want to keep** — use `\s`.
 
-```java
 // Escaping still matters in a text block
 String path = """
     C:\\Users\\Alice\\Documents
@@ -140,14 +129,22 @@ String withQuote = """
 String tricky = """
     a\"\"\"b
     """;   // three consecutive quotes — escape one to avoid ending the block
-```
 
 ### The Indentation Gotcha
 
 The most common mistake with text blocks is misunderstanding the indentation stripping. The compiler does not strip all indentation — it strips the **minimum** indentation across all lines (including the closing delimiter line). If you put the closing `"""` at the very left margin (no indentation), the minimum indentation is zero, and no whitespace is stripped — every line keeps its source-code indentation, which is usually not what you want.
 
+
+**What this code does — step by step:**
+
+1. WRONG: closing delimiter at the left margin — no stripping
+2. The minimum indentation here is the 4 spaces before <html>, so 4 spaces are stripped from every line. If you put """ on its own line with ZERO leading spaces, the minimum is 0 and NOTHING is stripped.
+3. CORRECT: closing delimiter aligned with the content you want to be leftmost
+4. Minimum indentation is 4 spaces — stripped from every line. Result: <html> starts at column 0, <body> at column 4, etc.
+
+The same code, clean:
+
 ```java
-// WRONG: closing delimiter at the left margin — no stripping
 String wrong = """
     <html>
         <body>
@@ -155,10 +152,7 @@ String wrong = """
         </body>
     </html>
     """;   // closing delimiter indented — but wait, the leftmost line is "<html>" which has 4 spaces
-// The minimum indentation here is the 4 spaces before <html>, so 4 spaces are stripped from every line.
-// If you put """ on its own line with ZERO leading spaces, the minimum is 0 and NOTHING is stripped.
 
-// CORRECT: closing delimiter aligned with the content you want to be leftmost
 String correct = """
     <html>
         <body>
@@ -166,8 +160,6 @@ String correct = """
         </body>
     </html>
     """;   // the closing """ is indented 4 spaces — same as <html>
-// Minimum indentation is 4 spaces — stripped from every line.
-// Result: <html> starts at column 0, <body> at column 4, etc.
 ```
 
 The fix is simple: always indent the closing `"""` to match the leftmost line of content you want in the final string, and preview the result if the exact whitespace matters.
@@ -176,11 +168,30 @@ The fix is simple: always indent the closing `"""` to match the leftmost line of
 
 This example shows text blocks for JSON, HTML, SQL, and a multiline message, plus the common gotchas.
 
+
+**What this code does — step by step:**
+
+1. === JSON — a text block that looks like the real JSON ===
+2. === HTML — readable markup, no escaping the tags ===
+3. === SQL — a readable query with indentation ===
+4. === A single-line text block — also works, but usually a regular string is fine ===
+5. `System.out.println(single);` — "a short string" — note: includes the trailing newline
+6. === Escaping — backslash still needs escaping ===
+7. `System.out.println(path);` — C:\Users\Alice
+8. === Three consecutive quotes — escape one to avoid ending the block ===
+9. === Trailing whitespace — use \s to keep it ===
+10. `System.out.println("[" + padded.split("\n")[0] + "]");` — shows trailing spaces are kept
+11. === The indentation gotcha — closing delimiter position matters ===. If the closing """ is at column 0, NO whitespace is stripped.
+12. The first line is "<html>" with no leading spaces (4 spaces stripped)
+13. If we put """ at column 0:
+14. The first line is " <html>" — 4 leading spaces remain
+
+The same code, clean:
+
 ```java
 public class TextBlockDemo {
     public static void main(String[] args) {
 
-        // === JSON — a text block that looks like the real JSON ===
         String json = """
             {
                 "user": "Alice",
@@ -190,7 +201,6 @@ public class TextBlockDemo {
             """;
         System.out.println(json);
 
-        // === HTML — readable markup, no escaping the tags ===
         String html = """
             <!DOCTYPE html>
             <html>
@@ -202,7 +212,6 @@ public class TextBlockDemo {
             """;
         System.out.println(html);
 
-        // === SQL — a readable query with indentation ===
         String sql = """
             SELECT id, name, email
             FROM users
@@ -211,33 +220,27 @@ public class TextBlockDemo {
             ORDER BY created_at DESC
             """;
 
-        // === A single-line text block — also works, but usually a regular string is fine ===
         String single = """
             a short string
             """;
-        System.out.println(single);   // "a short string" — note: includes the trailing newline
+        System.out.println(single);
 
-        // === Escaping — backslash still needs escaping ===
         String path = """
             C:\\Users\\Alice
             """;
-        System.out.println(path);   // C:\Users\Alice
+        System.out.println(path);
 
-        // === Three consecutive quotes — escape one to avoid ending the block ===
         String threeQuotes = """
             He said, \"\"\"hello\"\"\"
             """;
         System.out.println(threeQuotes);
 
-        // === Trailing whitespace — use \s to keep it ===
         String padded = """
             column1  \s
             column2  \s
             """;
-        System.out.println("[" + padded.split("\n")[0] + "]");   // shows trailing spaces are kept
+        System.out.println("[" + padded.split("\n")[0] + "]");
 
-        // === The indentation gotcha — closing delimiter position matters ===
-        // If the closing """ is at column 0, NO whitespace is stripped.
         String gotcha = """
             <html>
                 <body>
@@ -246,9 +249,7 @@ public class TextBlockDemo {
             </html>
             """;   // closing """ is indented 4 spaces → minimum 4 spaces stripped
         System.out.println("gotcha first line: '" + gotcha.split("\n")[0] + "'");
-        // The first line is "<html>" with no leading spaces (4 spaces stripped)
 
-        // If we put """ at column 0:
         String gotcha2 = """
             <html>
                 <body>
@@ -257,7 +258,6 @@ public class TextBlockDemo {
             </html>
 """;   // closing """ at column 0 → minimum indentation is 0 → NO stripping
         System.out.println("gotcha2 first line: '" + gotcha2.split("\n")[0] + "'");
-        // The first line is "    <html>" — 4 leading spaces remain
     }
 }
 ```
@@ -279,7 +279,6 @@ In a backend team, text blocks appear in several places.
 
 First, **SQL queries embedded in Java code.** A long SQL query is much more readable as a text block than as a concatenated string. You can format it like the SQL you would write in a database tool, with indentation that reflects the structure of the query. This is a big readability win.
 
-```java
 String query = """
     SELECT u.id, u.name, o.total, o.created_at
     FROM users u
@@ -288,11 +287,9 @@ String query = """
       AND o.created_at >= :since
     ORDER BY o.created_at DESC
     """;
-```
 
 Second, **JSON and JSON-like test data.** When you write a test that checks a JSON response, the expected JSON is much cleaner as a text block. You can format it with indentation and not worry about escaping every quote.
 
-```java
 String expected = """
     {
         "id": 1,
@@ -300,20 +297,17 @@ String expected = """
         "email": "alice@example.com"
     }
     """;
-```
 
 Third, **embedded documents and templates.** Small HTML templates, email bodies, RFC 7807 problem details, and other structured text are clearer as text blocks.
 
 One caution: text blocks are for **static** text. If you need to build dynamic text with variables, use `String.formatted()` (Java 15+) or a template engine for larger templates. A text block with too many embedded variables becomes hard to read — the point of a text block is that the static structure is visible and clean.
 
-```java
 // Build dynamic text with formatted()
 String greeting = """
     Hello, %s!
     Welcome to %s.
     Your account was created on %s.
     """.formatted("Alice", "BackendForge", "2025-01-15");
-```
 
 ## Common Mistakes
 
@@ -334,3 +328,4 @@ In the lab, you will see a helper that builds an HTML email body using string co
 ## Summary
 
 A text block is a multiline string literal delimited by `"""`. It is cleaner than concatenation and escaping for JSON, HTML, SQL, and other structured multiline text. The compiler strips incidental leading whitespace based on the minimum indentation across all lines, including the closing delimiter — so the position of the closing `"""` controls the result. Escape sequences still apply: `\\` for a backslash, `\n` for a newline, `\"` for a quote (usually optional inside a text block but needed for three consecutive quotes), and `\s` to preserve trailing whitespace. Text blocks are standard in Java 15 and later. Use them for static structured text; use `String.formatted()` or a template engine for dynamic content.
+

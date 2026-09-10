@@ -1,7 +1,7 @@
 ---
 title: Interface Defaults and Static Methods — Contracts That Implement Code
 summary: How default methods solve the diamond problem in interface hierarchies, why static methods on interfaces exist, and the patterns that replace abstract base classes.
-order: 57
+order: 27
 minutes: 18
 topics: [interfaces, default methods, static methods, diamond problem, abstract class vs interface, compatibility]
 docs:
@@ -19,7 +19,6 @@ Before Java 8, interfaces were pure contracts — methods with no body. Adding a
 
 A default method has a body (using the `default` keyword) and is inherited by all implementing classes:
 
-```java
 public interface Cache<K, V> {
     V get(K key);
     void put(K key, V value);
@@ -38,13 +37,23 @@ public interface Cache<K, V> {
 // RedisCache and CaffeineCache both inherit getOrDefault without writing a line
 public class RedisCache<K, V> implements Cache<K, V> { /* only implements get + put */ }
 public class CaffeineCache<K, V> implements Cache<K, V> { /* only implements get + put */ }
-```
 
 **The org power:** add a new method to a 50-class interface hierarchy without touching any existing code. The default body runs everywhere; classes override only when they need a specialized implementation.
 
 ## The diamond problem — when two defaults collide
 
 A class can implement two interfaces that have the same default method name. Java forces you to resolve the ambiguity:
+
+
+**What this code does — step by step:**
+
+1. COMPILE ERROR: class C inherits unrelated defaults for greet(). Class C implements A, B { }
+2. Solution 1: override and pick one (or combine)
+3. `A.super.greet();` — call A's default explicitly. Or B.super.greet(); or write your own logic
+4. Solution 2: if one interface extends the other, the subinterface's default wins
+5. A class implementing both A and C gets C's greet() — no conflict
+
+The same code, clean:
 
 ```java
 interface A {
@@ -54,32 +63,24 @@ interface B {
     default void greet() { System.out.println("Hello from B"); }
 }
 
-// COMPILE ERROR: class C inherits unrelated defaults for greet()
-// class C implements A, B { }
 
-// Solution 1: override and pick one (or combine)
 class C implements A, B {
     @Override
     public void greet() {
-        A.super.greet();  // call A's default explicitly
-        // or B.super.greet();
-        // or write your own logic
+        A.super.greet();
     }
 }
 
-// Solution 2: if one interface extends the other, the subinterface's default wins
 interface C extends A {
     @Override
     default void greet() { System.out.println("Hello from C (extends A)"); }
 }
-// A class implementing both A and C gets C's greet() — no conflict
 ```
 
 ## Static methods on interfaces — namespace without a class
 
 Interfaces can have static methods, which belong to the interface itself (not to implementing classes):
 
-```java
 public interface Money {
     long cents();
     String currency();
@@ -104,7 +105,6 @@ public interface Money {
 // Usage:
 Money price = Money.of(1999, "USD");
 Money total = Money.sum(price, Money.of(500, "USD"));
-```
 
 **The org pattern:** use static methods on interfaces for factory methods (`of()`, `from()`, `valueOf()`), comparison utilities (`Comparator.naturalOrder()`), and validation helpers. The interface becomes a self-contained domain object.
 
@@ -112,10 +112,21 @@ Money total = Money.sum(price, Money.of(500, "USD"));
 
 Interfaces enable the "program to an interface" pattern. The caller depends only on the contract, not the implementation:
 
+
+**What this code does — step by step:**
+
+1. Service layer depends on the interface
+2. `private final MessageSender sender;` — interface, not concrete class
+3. Implementations are swappable
+4. At runtime, inject the right one
+5. `new NotificationService(new EmailSender());` — production
+6. `new NotificationService(new SlackSender());` — dev notifications
+
+The same code, clean:
+
 ```java
-// Service layer depends on the interface
 public class NotificationService {
-    private final MessageSender sender;  // interface, not concrete class
+    private final MessageSender sender;
 
     public NotificationService(MessageSender sender) {
         this.sender = sender;
@@ -126,7 +137,6 @@ public class NotificationService {
     }
 }
 
-// Implementations are swappable
 public interface MessageSender {
     void send(String to, String body);
 }
@@ -134,9 +144,8 @@ public class EmailSender implements MessageSender { /* SMTP */ }
 public class SmsSender implements MessageSender { /* Twilio */ }
 public class SlackSender implements MessageSender { /* Webhook */ }
 
-// At runtime, inject the right one
-new NotificationService(new EmailSender());   // production
-new NotificationService(new SlackSender());   // dev notifications
+new NotificationService(new EmailSender());
+new NotificationService(new SlackSender());
 ```
 
 ## Abstract class vs interface — when to use which
@@ -154,7 +163,6 @@ new NotificationService(new SlackSender());   // dev notifications
 
 **Use an abstract class when:** sharing state, constructors, or non-public helpers among closely related classes in a hierarchy (e.g., `AbstractList` provides most of `List`'s methods).
 
-```java
 // Interface: a capability that any class can have
 public interface Loggable {
     default String logContext() { return getClass().getSimpleName(); }
@@ -172,7 +180,6 @@ public abstract class BaseRepository<T> {
         return jdbc.query(sql, mapper);
     }
 }
-```
 
 ## Key takeaways
 
@@ -181,3 +188,4 @@ public abstract class BaseRepository<T> {
 - Static methods on interfaces replace utility classes and provide factory methods (`of()`, `from()`).
 - Program to interfaces for polymorphism and testability; use abstract classes when you need shared state or constructors.
 - Interfaces can extend multiple other interfaces; abstract classes can only extend one.
+

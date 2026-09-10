@@ -1,7 +1,7 @@
 ---
 title: Kubernetes in Practice — Helm, Autoscaling, and Day-2 Operations
 module: kubernetes-deep
-order: 5
+order: 3
 minutes: 27
 topics: ["Helm", "HorizontalPodAutoscaler", "kubectl", "observability", "day-2 ops", "GitOps"]
 summary: Deploying a helloworld pod teaches the concepts; running a production system teaches the tooling. This lesson is the professional layer: Helm (pack...
@@ -146,3 +146,4 @@ The three signals every service dashboard must have: **RED** (Rate of requests, 
 ## Recap
 
 The professional layer around Kubernetes is tooling and discipline: **Helm** packages and versions your manifests (one chart, per-environment values, instant rollbacks); the **HPA** autoscales on CPU (with **KEDA** for queue-depth signals on event-driven services); the **kubectl** ladder (get → describe → logs → exec) is the daily diagnostic path; and **Prometheus/Grafana/Loki** provide the observability without which a cluster is a black box. The operating model that ties it together is **GitOps** — Git as the single source of truth, synced by Argo CD or Flux — turning every cluster change into a reviewable, revertible commit. Master the concepts and the tooling, and "running Kubernetes" stops being heroics and becomes a boring, repeatable process.
+

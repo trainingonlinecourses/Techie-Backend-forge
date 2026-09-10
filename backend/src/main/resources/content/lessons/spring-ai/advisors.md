@@ -1,7 +1,7 @@
 ---
 title: Advisors — Memory, Logging, RAG & Safety
 summary: Cross-cutting concerns for every prompt: chat memory, logging, retrieval augmentation and moderation.
-order: 6
+order: 1
 minutes: 15
 topics: [advisors, chat-memory, logging-advisor, safety]
 docs:
@@ -16,7 +16,6 @@ docs:
 
 ## Memory: conversations with context
 
-```java
 @Configuration
 public class AiConfig {
 
@@ -28,9 +27,7 @@ public class AiConfig {
                 .build();
     }
 }
-```
 
-```java
 // Keep the conversation handle around between turns:
 String conversationId = UUID.randomUUID().toString();
 
@@ -39,30 +36,24 @@ chatClient.prompt()
         .advisors(a -> a.param(ChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY, conversationId))
         .call()
         .content();
-```
 
 For multi-user apps, scope memory per user: `conversationId = user.getId()` — never a global memory (users would see each other's context).
 
 ## Logging: observability for prompts
 
-```java
 .builder()
     .defaultAdvisors(new SimpleLoggerAdvisor())    // logs request + response
     .build();
-```
 
 `SimpleLoggerAdvisor` prints the prompt (system + user + messages) and the response — invaluable in dev; use structured logging + redaction in prod (prompts can contain PII).
 
 ## RAG advisor (covered in the previous lesson)
 
-```java
 .defaultAdvisors(new QuestionAnswerAdvisor(vectorStore,
         SearchRequest.builder().topK(4).build()))
-```
 
 ## Safety: moderation & guardrails
 
-```java
 public class ModerationAdvisor implements Advisor {
     @Override
     public AdvisedRequest before(AdvisedRequest request) {
@@ -75,13 +66,10 @@ public class ModerationAdvisor implements Advisor {
         return response;
     }
 }
-```
 
-```java
 ChatClient safeClient = builder
         .defaultAdvisors(new ModerationAdvisor())
         .build();
-```
 
 Implementing `Advisor` gives you `before`/`after` hooks — the place for input filtering, output filtering, and injection guards.
 
@@ -91,7 +79,6 @@ Advisors run in order. RAG advisor should run before the call; memory advisor wr
 
 ## Composing a production assistant
 
-```java
 @Bean
 ChatClient assistant(ChatClient.Builder builder, VectorStore vectorStore, ChatMemory memory) {
     return builder
@@ -104,7 +91,6 @@ ChatClient assistant(ChatClient.Builder builder, VectorStore vectorStore, ChatMe
             .defaultTools(ToolCallbacks.from(new SupportTools()))
             .build();
 }
-```
 
 One builder, one coherent behavior — the org-standard way to assemble an assistant.
 
@@ -118,3 +104,4 @@ One builder, one coherent behavior — the org-standard way to assemble an assis
 - Compose memory + RAG + logging + moderation in one builder.
 
 **Official docs:** [Advisors](https://docs.spring.io/spring-ai/reference/api/advisors.html)
+

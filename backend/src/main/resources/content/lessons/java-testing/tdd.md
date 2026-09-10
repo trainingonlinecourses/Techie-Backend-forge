@@ -21,7 +21,6 @@ Test-Driven Development is a **workflow** that makes design and refactoring safe
 3. REFACTOR — clean up, with the test as your safety net; repeat
 ```
 
-```java
 // 1. RED — the test fails because create() doesn't exist / returns null:
 @Test void createComputesTotal() {
     Order o = service.create(List.of(new Line(2, TEN)));
@@ -34,7 +33,6 @@ public Order create(List<Line> lines) {
 }
 
 // 3. REFACTOR — extract, rename, dedupe… the test keeps proving behavior
-```
 
 The discipline that makes it work: **watch each test fail once** for the right reason (a test that never failed proves nothing — it could be asserting the wrong thing, or passing vacuously), then keep the cycle tight — minutes, not hours.
 
@@ -52,7 +50,6 @@ It's not a religion: for exploratory/UI/infrastructure code, write tests when th
 
 Code that has no tests can't be safely refactored — which is why it stays untouchable. The unlock is **characterization tests**: tests that capture *current behavior* so refactoring preserves it, even if the behavior is imperfect.
 
-```java
 // 1. Write tests against the EXISTING behavior (they document the status quo):
 @Test
 void currentTaxRule_appliesFivePercentAboveThousand() {
@@ -62,7 +59,6 @@ void currentTaxRule_appliesFivePercentAboveThousand() {
 // 2. Refactor freely — the characterization tests prove behavior didn't change.
 // 3. Where the behavior is wrong, fix the TEST expectations FIRST (a deliberate decision),
 //    then the code — never simultaneously.
-```
 
 The move: **test everything you're about to touch before you touch it** (Seam-based: Michael Feathers' *Working Effectively with Legacy Code*). A seam is a place where behavior can be altered without editing — extracting a method, injecting a collaborator, wrapping a call. Find the seam, put a characterization test through it, then refactor.
 
@@ -99,3 +95,4 @@ TDD: red → green → refactor, in seconds, on the domain. Legacy: characterize
 - TDD the domain logic; slice/integration tests cover the boundaries; both run in CI.
 
 Official docs: [Test-Driven Development (Fowler)](https://martinfowler.com/bliki/TestDrivenDevelopment.html) · [Obey the Testing Goat](https://www.obeythetestinggoat.com/)
+

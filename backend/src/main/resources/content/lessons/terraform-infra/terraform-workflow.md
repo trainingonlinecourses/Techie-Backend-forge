@@ -136,3 +136,4 @@ The complete secret-handling stack for Terraform:
 ## Recap
 
 The Terraform workflow treats infrastructure changes as code changes: CI runs `terraform plan` on every PR and posts the plan for review; merge runs `terraform apply` with the reviewed plan; secrets come from the pipeline's secret store; and policy-as-code (Sentinel/Conftest) enforces the guardrails mechanically. Environments are separate state scopes moving through the same pipeline, destroys are deliberate and gated (with `prevent_destroy` as the last defense), and everything stands on locked, remote, versioned state. The takeaway is cultural as much as technical: the tool already made infrastructure declarable — the workflow makes it *governable*, which is what turns "it worked on my machine" into "it was reviewed, tested, and approved for production."
+

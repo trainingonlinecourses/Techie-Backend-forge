@@ -28,6 +28,17 @@ The key insight: **a thread never goes directly from `NEW` to `RUNNABLE` in appl
 
 A common beginner mistake is to think that calling `thread.run()` starts a new thread. It does not. `thread.run()` is just a plain method call on the current thread. Only `thread.start()` asks the JVM to create a new thread of execution. Let me make that concrete.
 
+
+**What this code does — step by step:**
+
+1. `System.out.println("state before start: " + t.getState());` — NEW
+2. `t.start();` — asks JVM to create a new thread
+3. `System.out.println("state after start: " + t.getState());` — RUNNABLE (or TIMED_WAITING briefly)
+4. `t.join();` — wait for the thread to terminate
+5. `System.out.println("state after join: " + t.getState());` — TERMINATED
+
+The same code, clean:
+
 ```java
 public class ThreadStartDemo {
     public static void main(String[] args) {
@@ -35,16 +46,16 @@ public class ThreadStartDemo {
             System.out.println("running in thread: " + Thread.currentThread().getName());
         });
 
-        System.out.println("state before start: " + t.getState());   // NEW
-        t.start();                                                    // asks JVM to create a new thread
-        System.out.println("state after start: " + t.getState());    // RUNNABLE (or TIMED_WAITING briefly)
+        System.out.println("state before start: " + t.getState());
+        t.start();
+        System.out.println("state after start: " + t.getState());
 
         try {
-            t.join();                                                // wait for the thread to terminate
+            t.join();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
-        System.out.println("state after join: " + t.getState());     // TERMINATED
+        System.out.println("state after join: " + t.getState());
     }
 }
 ```
@@ -62,6 +73,17 @@ The `join()` call is how one thread waits for another. Without it, main would pr
 
 Now let me show the lifecycle transitions through `sleep` and `wait`/`notify`, because that is where most bugs live.
 
+
+**What this code does — step by step:**
+
+1. `lock.wait();` — releases the lock and waits to be notified
+2. `Thread.sleep(50);` — give the waiter time to enter wait()
+3. `System.out.println("waiter is now: " + waiter.getState());` — WAITING
+4. `lock.notify();` — wake the waiter
+5. `System.out.println("waiter finished: " + waiter.getState());` — TERMINATED
+
+The same code, clean:
+
 ```java
 public class ThreadStateTransitions {
     public static void main(String[] args) throws InterruptedException {
@@ -72,7 +94,7 @@ public class ThreadStateTransitions {
                 try {
                     System.out.println("WAITING: " + Thread.currentThread().getName()
                         + " -> " + Thread.currentThread().getState());
-                    lock.wait();   // releases the lock and waits to be notified
+                    lock.wait();
                     System.out.println("woke up: " + Thread.currentThread().getState());
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
@@ -81,16 +103,16 @@ public class ThreadStateTransitions {
         }, "waiter");
 
         waiter.start();
-        Thread.sleep(50);  // give the waiter time to enter wait()
+        Thread.sleep(50);
 
-        System.out.println("waiter is now: " + waiter.getState());   // WAITING
+        System.out.println("waiter is now: " + waiter.getState());
 
         synchronized (lock) {
-            lock.notify();   // wake the waiter
+            lock.notify();
         }
 
         waiter.join();
-        System.out.println("waiter finished: " + waiter.getState()); // TERMINATED
+        System.out.println("waiter finished: " + waiter.getState());
     }
 }
 ```
@@ -127,7 +149,6 @@ The three blocking states have specific causes. If you see a thread in `BLOCKED`
 
 A critical rule: **`sleep()` and `wait()` are not the same.** `sleep()` does not release locks; `wait()` does. This is the single most important distinction to internalize.
 
-```java
 public class SleepVsWait {
     static final Object lock = new Object();
 
@@ -153,7 +174,6 @@ public class SleepVsWait {
         }
     }
 }
-```
 
 Line by line:
 
@@ -167,7 +187,6 @@ There are three historical ways to create a thread, and one modern way. Understa
 
 **1. Subclass `Thread`** — override `run()`. Simple, but limited: you can only subclass one class, so your thread cannot extend anything else. Rarely used in production.
 
-```java
 class Worker extends Thread {
     private final String task;
     Worker(String task) { this.task = task; }
@@ -178,27 +197,32 @@ class Worker extends Thread {
 }
 // usage:
 new Worker("job-1").start();
-```
 
 **2. Implement `Runnable` and pass it to `Thread`** — the classic approach. Separates the task (what to do) from the thread (how to run it). Preferred over subclassing Thread.
 
-```java
-Runnable job = () -> System.out.println("job done by " + Thread.currentThread().getName());
-new Thread(job, "worker-1").start();
-```
+public class Main {
+
+    public static void main(String[] args) {
+        Runnable job = () -> System.out.println("job done by " + Thread.currentThread().getName());
+        new Thread(job, "worker-1").start();
+    }
+}
 
 **3. `ThreadFactory` / `ExecutorService`** — in production, you almost never create raw `Thread` objects. You use an `ExecutorService` (thread pool), which creates threads via a `ThreadFactory`. This is how Spring and every modern backend creates threads. The pool manages lifecycle, reuse, and limits.
 
-```java
-ExecutorService pool = Executors.newFixedThreadPool(4,
-    r -> {
-        Thread t = new Thread(r, "pool-worker");
-        t.setDaemon(false);
-        return t;
-    });
-pool.submit(() -> System.out.println("running in pool"));
-pool.shutdown();
-```
+public class Main {
+
+    public static void main(String[] args) {
+        ExecutorService pool = Executors.newFixedThreadPool(4,
+            r -> {
+                Thread t = new Thread(r, "pool-worker");
+                t.setDaemon(false);
+                return t;
+            });
+        pool.submit(() -> System.out.println("running in pool"));
+        pool.shutdown();
+    }
+}
 
 **4. Virtual threads (Java 21, `Thread.startVirtualThread`)** — the modern default for I/O-bound work. Millions of virtual threads can run on a few carrier threads. We will cover these in the Java 21 module. For CPU-bound work, stick with platform threads.
 
@@ -214,7 +238,6 @@ Three methods tell you whether a thread is alive and whether it has been interru
 
 The interrupt flag is how one thread asks another to stop. You do not force a thread to stop — there is no `Thread.stop()` in modern Java (it was deprecated because it could leave objects in inconsistent states). Instead, you set the interrupt flag, and the target thread checks it and exits cooperatively.
 
-```java
 public class InterruptDemo {
     public static void main(String[] args) throws InterruptedException {
         Thread worker = new Thread(() -> {
@@ -238,7 +261,6 @@ public class InterruptDemo {
         worker.join();
     }
 }
-```
 
 Line by line:
 
@@ -253,7 +275,6 @@ The golden rule: **never swallow `InterruptedException` without restoring the in
 
 When the JVM starts, the main thread is a **user thread** (non-daemon). The JVM shuts down when **all user threads have terminated**. Daemon threads are background threads that do not prevent shutdown — when only daemon threads remain, the JVM exits.
 
-```java
 public class DaemonDemo {
     public static void main(String[] args) throws InterruptedException {
         Thread daemon = new Thread(() -> {
@@ -271,7 +292,6 @@ public class DaemonDemo {
         System.out.println("main exiting — daemon will be aborted even though its loop is infinite");
     }
 }
-```
 
 Line by line:
 
@@ -289,7 +309,6 @@ A `ThreadGroup` is a named collection of threads, organized hierarchically. Ever
 
 Thread groups are **largely legacy** — they are not used much in modern code, and they have some known weaknesses (e.g., they are not thread-safe for some operations, and security managers are gone in modern Java). But they are still in the API, and you will see them in older codebases and in thread dumps.
 
-```java
 public class ThreadGroupDemo {
     public static void main(String[] args) {
         ThreadGroup workers = new ThreadGroup("workers");
@@ -313,7 +332,6 @@ public class ThreadGroupDemo {
             System.out.println("unhandled in " + t.getName() + ": " + ex));
     }
 }
-```
 
 Line by line:
 
@@ -392,3 +410,4 @@ In the lab, you will start with a program that creates several threads and print
 ## Summary
 
 A Java thread passes through six states — `NEW`, `RUNNABLE`, `BLOCKED`, `WAITING`, `TIMED_WAITING`, `TERMINATED` — and every concurrency bug is a thread in the wrong state. Only `start()` creates a new thread of execution; `run()` is just a method call on the current thread. `sleep()` does not release locks; `wait()` does — this is the most important distinction in the lifecycle. Threads block on monitor locks (`BLOCKED`), wait for notifications or joins (`WAITING`/`TIMED_WAITING`), and terminate when `run()` returns. Interrupts are cooperative: set the flag, let the thread check it and exit. Daemon threads do not keep the JVM alive; user threads do. Thread dumps are the diagnostic artifact — read the state, the lock, and the stack to find what each thread is doing and why.
+

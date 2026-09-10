@@ -1,7 +1,7 @@
 ---
 title: "Exception Handling — Clean Error Responses That Clients Actually Understand"
 summary: "@ControllerAdvice, custom exceptions, RFC 7807 Problem Details, global exception handlers, and how organizations return consistent error responses."
-order: 57
+order: 28
 minutes: 20
 topics: [exception-handling, controller-advice, custom-exceptions, error-response, rfc-7807, handler-exception]
 docs:
@@ -14,7 +14,6 @@ docs:
 ### Why Exception Handling Matters
 
 Without proper exception handling:
-```java
 // Client sends invalid data
 @PostMapping("/users")
 public User create(@RequestBody User user) {
@@ -22,19 +21,15 @@ public User create(@RequestBody User user) {
     // If email is duplicate → 500 Internal Server Error with ugly stack trace
     // Client has no idea what went wrong
 }
-```
 
 With proper exception handling:
-```java
 // Same request, but now:
 // 400 Bad Request
 // { "error": "DUPLICATE_EMAIL", "message": "Email already registered", "field": "email" }
 // Client knows exactly what to fix
-```
 
 ### @RestControllerAdvice — The Global Handler
 
-```java
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     
@@ -71,11 +66,9 @@ public class GlobalExceptionHandler {
         return new ErrorResponse(500, "INTERNAL_ERROR", "Something went wrong");
     }
 }
-```
 
 ### Custom Exception Classes
 
-```java
 // Base application exception
 public class AppException extends RuntimeException {
     private final String code;
@@ -107,13 +100,11 @@ public class InsufficientBalanceException extends AppException {
               "Required: " + required + ", Available: " + available);
     }
 }
-```
 
 ### RFC 7807 Problem Details Format
 
 The industry standard for error responses:
 
-```java
 public record ProblemDetail(
     int status,
     String type,
@@ -126,7 +117,6 @@ public record ProblemDetail(
         return new ProblemDetail(status, type, title, detail, null, null);
     }
 }
-```
 
 ```json
 {
@@ -144,7 +134,6 @@ public record ProblemDetail(
 
 ### Exception Handler Priority
 
-```java
 @RestControllerAdvice
 public class ExceptionHandlers {
     
@@ -169,7 +158,6 @@ public class ExceptionHandlers {
         return ProblemDetail.of(500, "internal", "Internal Error", "An unexpected error occurred");
     }
 }
-```
 
 ### Common Mistakes
 
@@ -183,40 +171,39 @@ public class ExceptionHandlers {
 
 ### Line-by-Line Code Explanation
 
+
+**What this code does — step by step:**
+
+1. ↑ Spring annotation that makes this class handle exceptions across ALL controllers. ↑ Runs AFTER the controller method throws — before the response is sent. ↑ "Advice" = AOP term for code that runs around other code
+2. ↑ Single class handles ALL exception types. ↑ DRY: no try-catch blocks in individual controllers
+3. ↑ Logger for server-side errors (not sent to client)
+4. ↑ This method runs when @Valid fails on a @RequestBody. ↑ Spring automatically passes the exception as a parameter
+5. ↑ Sets HTTP status code to 400 Bad Request. ↑ Client knows the error is their fault (bad input)
+6. ↑ Method signature: exception type → return type. ↑ Spring calls this when MethodArgumentNotValidException is thrown
+7. ↑ Extract field-level errors: {"email": "must be valid", "name": "required"}. ↑ getField() = field name, getDefaultMessage() = validation message
+8. ↑ Return structured error — client can parse and display inline
+
+The same code, clean:
+
 ```java
 @RestControllerAdvice
-// ↑ Spring annotation that makes this class handle exceptions across ALL controllers
-// ↑ Runs AFTER the controller method throws — before the response is sent
-// ↑ "Advice" = AOP term for code that runs around other code
 
 public class GlobalExceptionHandler {
-    // ↑ Single class handles ALL exception types
-    // ↑ DRY: no try-catch blocks in individual controllers
-    
+
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
-    // ↑ Logger for server-side errors (not sent to client)
-    
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    // ↑ This method runs when @Valid fails on a @RequestBody
-    // ↑ Spring automatically passes the exception as a parameter
-    
+
     @ResponseStatus(400)
-    // ↑ Sets HTTP status code to 400 Bad Request
-    // ↑ Client knows the error is their fault (bad input)
-    
+
     public ErrorResponse handleValidation(MethodArgumentNotValidException ex) {
-        // ↑ Method signature: exception type → return type
-        // ↑ Spring calls this when MethodArgumentNotValidException is thrown
-        
+
         Map<String, String> fieldErrors = new HashMap<>();
         ex.getBindingResult().getFieldErrors().forEach(err ->
             fieldErrors.put(err.getField(), err.getDefaultMessage())
         );
-        // ↑ Extract field-level errors: {"email": "must be valid", "name": "required"}
-        // ↑ getField() = field name, getDefaultMessage() = validation message
-        
+
         return new ErrorResponse(400, "VALIDATION_ERROR", "Invalid input", fieldErrors);
-        // ↑ Return structured error — client can parse and display inline
     }
 }
 ```
@@ -240,3 +227,4 @@ A fintech API has 50+ endpoints. Instead of scattering try-catch blocks everywhe
 - Server errors → 500 with correlation ID (for log tracing)
 
 Every error response follows RFC 7807 Problem Details format. The frontend team can parse errors uniformly and display them inline next to form fields.
+

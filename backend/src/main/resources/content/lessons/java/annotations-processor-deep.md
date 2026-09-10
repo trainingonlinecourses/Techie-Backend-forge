@@ -1,7 +1,7 @@
 ---
 title: Java Annotations Deep — Meta-annotations and Annotation Processing
 summary: Annotation retention policies, target elements, meta-annotations like @Inherited and @Repeatable, writing custom annotations with annotation processors, and how Spring uses annotations to power its entire framework.
-order: 53
+order: 4
 minutes: 22
 topics: [annotations, meta-annotations, retention-policy, annotation-processor, compile-time-processing, source-generation]
 docs:
@@ -15,12 +15,10 @@ docs:
 
 An **annotation** is a form of metadata. It does not directly affect program execution — it provides information that can be read by tools, frameworks, or the compiler at compile time or runtime. Think of annotations as labels that you attach to classes, methods, or fields, which other code can inspect to make decisions.
 
-```java
 @Override  // This is an annotation — tells the compiler "this method overrides a superclass method"
 public String toString() {
     return "User{...}";
 }
-```
 
 Java annotations come in three flavors:
 
@@ -30,7 +28,6 @@ Java annotations come in three flavors:
 
 ## The anatomy of a custom annotation
 
-```java
 @Target(ElementType.METHOD)           // Where can this annotation be placed?
 @Retention(RetentionPolicy.RUNTIME)   // When is it available?
 @Inherited                            // Do subclasses inherit this?
@@ -39,7 +36,6 @@ public @interface Auditable {
     int priority() default 0;
     boolean sensitive() default false;
 }
-```
 
 **@Target** — Controls where the annotation can be placed:
 - `TYPE` — Class, interface, enum
@@ -64,16 +60,13 @@ public @interface Auditable {
 
 Mark any service method for automatic audit logging:
 
-```java
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Auditable {
     String action();  // e.g., "USER_CREATE", "ORDER_CANCEL"
     boolean sensitive() default false;
 }
-```
 
-```java
 @Component
 public class UserService {
     @Auditable(action = "USER_CREATE")
@@ -86,9 +79,7 @@ public class UserService {
         // ... password change logic
     }
 }
-```
 
-```java
 @Aspect
 @Component
 public class AuditAspect {
@@ -114,13 +105,11 @@ public class AuditAspect {
         }
     }
 }
-```
 
 ### Scenario 2: Custom validation annotations
 
 Create domain-specific validations that Spring automatically enforces:
 
-```java
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = PhoneNumberValidator.class)
@@ -129,9 +118,7 @@ public @interface PhoneNumber {
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }
-```
 
-```java
 public class PhoneNumberValidator implements ConstraintValidator<PhoneNumber, String> {
     private static final Pattern PHONE = Pattern.compile("^\\+?[1-9]\\d{6,14}$");
 
@@ -140,9 +127,7 @@ public class PhoneNumberValidator implements ConstraintValidator<PhoneNumber, St
         return value == null || PHONE.matcher(value).matches();  // null = optional
     }
 }
-```
 
-```java
 public class ContactDto {
     @NotBlank(message = "Name is required")
     private String name;
@@ -150,21 +135,17 @@ public class ContactDto {
     @PhoneNumber
     private String phone;  // validated by our custom annotation
 }
-```
 
 ### Scenario 3: Annotation processing at compile time
 
 Generate boilerplate code during compilation using annotation processors:
 
-```java
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.SOURCE)
 public @interface Builder {
     // Marker annotation — no elements
 }
-```
 
-```java
 // An annotation processor generates a Builder class at compile time
 @SupportedAnnotationTypes("com.app.Builder")
 @SupportedSourceVersion(SourceVersion.RELEASE_21)
@@ -184,7 +165,6 @@ public class BuilderProcessor extends AbstractProcessor {
         // This is how Lombok's @Builder works internally
     }
 }
-```
 
 **Annotation processors run at compile time.** They read annotations from source files and generate new source files (or resource files). This is how Lombok, MapStruct, and Dagger work.
 
@@ -192,15 +172,12 @@ public class BuilderProcessor extends AbstractProcessor {
 
 Document thread-safety contracts that static analysis tools can verify:
 
-```java
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ThreadSafe {
     String value() default "";  // description of thread-safety strategy
 }
-```
 
-```java
 @ThreadSafe("Synchronized on 'this' for all public methods")
 public class ThreadSafeCounter {
     private int count = 0;
@@ -213,7 +190,6 @@ public class ThreadSafeCounter {
         return count;
     }
 }
-```
 
 Tools like SpotBugs can read `@ThreadSafe` and `@NotThreadSafe` annotations to flag potential race conditions.
 
@@ -221,7 +197,6 @@ Tools like SpotBugs can read `@ThreadSafe` and `@NotThreadSafe` annotations to f
 
 Create your own mini-framework annotations:
 
-```java
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ScheduledJob {
@@ -229,9 +204,7 @@ public @interface ScheduledJob {
     String description() default "";
     boolean enabled() default true;
 }
-```
 
-```java
 @ScheduledJob(cron = "0 0 2 * * ?", description = "Daily data sync")
 public class DailySyncJob implements Job {
     @Override
@@ -239,9 +212,7 @@ public class DailySyncJob implements Job {
         // sync logic
     }
 }
-```
 
-```java
 @Component
 public class JobScheduler {
     @PostConstruct
@@ -250,7 +221,6 @@ public class JobScheduler {
         // with Spring's TaskScheduler
     }
 }
-```
 
 ## The annotation hierarchy
 
@@ -274,3 +244,4 @@ java.lang.annotation.Annotation (root)
 | Over-annotating (every class, every method) | Code becomes unreadable, annotation fatigue |
 | Using annotations to replace all if/else logic | Runtime reflection makes code hard to follow |
 | Not testing annotation processors | Generated code breaks silently |
+

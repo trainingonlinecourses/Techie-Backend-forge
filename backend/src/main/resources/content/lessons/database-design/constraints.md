@@ -1,7 +1,7 @@
 ---
 title: Constraints — The Database Refuses Bad Data
 module: database-design
-order: 3
+order: 1
 minutes: 24
 topics: ["NOT NULL", "UNIQUE", "CHECK", "FOREIGN KEY", "constraint design", "data integrity"]
 summary: Application validation is the first line of defense — but it's not enough. Every app has bugs, every API has a path you forgot to validate, every f...
@@ -111,3 +111,4 @@ ALTER TABLE enrollments
 - Composite `UNIQUE` prevents duplicate pairs at the schema level.
 - Name your constraints; handle NULLs in CHECKs; pick `ON DELETE` policies.
 - Constraints surface data corruption at migration time instead of hiding it.
+

@@ -1,7 +1,7 @@
 ---
 title: Spring Boot Native — The Automated Path
 module: graalvm-native
-order: 2
+order: 5
 minutes: 26
 topics: ["Spring Boot native", "buildpacks", "native plugin", "AOT engine", "hints", "configuration"]
 summary: Raw GraalVM native image on a Spring Boot app used to be a heroic configuration exercise — handwritten metadata for every framework feature. Spring...
@@ -88,35 +88,41 @@ The heart is the **AOT processing phase** that runs during the native build:
 
 The automation covers the standard stack; your custom dynamic edges need **hints**. The two forms:
 
+
+**What this code does — step by step:**
+
+1. Form 1 — annotation-based (the common case):
+2. "Jackson must be able to reflect into these types":
+3. Form 2 — the full registrar (programmatic, conditional):
+4. Reflection for a custom serializer's target:
+5. A resource the app loads at runtime:
+6. A dynamic proxy:
+7. A serializable class:
+8. Registered in the config:
+
+The same code, clean:
+
 ```java
-// Form 1 — annotation-based (the common case):
 @SpringBootApplication
-// "Jackson must be able to reflect into these types":
 @RegisterReflectionForBinding({ LessonDto.class, OrderReceipt.class })
 public class AcademyApplication { ... }
 
-// Form 2 — the full registrar (programmatic, conditional):
 public class AcademyRuntimeHints implements RuntimeHintsRegistrar {
     @Override
     public void registerHints(RuntimeHints hints, ClassLoader classLoader) {
-        // Reflection for a custom serializer's target:
         hints.reflection().registerType(SpecialDto.class,
                 MemberCategory.PUBLIC_FIELDS,
                 MemberCategory.DECLARED_CONSTRUCTORS,
                 MemberCategory.DECLARED_METHODS);
 
-        // A resource the app loads at runtime:
         hints.resources().registerResourceBundle("messages");
 
-        // A dynamic proxy:
         hints.proxies().registerJdkProxy(RemoteApi.class);
 
-        // A serializable class:
         hints.serialization().registerType(CacheEntry.class);
     }
 }
 
-// Registered in the config:
 @Configuration
 @ImportRuntimeHints(AcademyRuntimeHints.class)
 class NativeConfig { }
@@ -153,3 +159,4 @@ This is the ConfigMap/Secrets lesson's spirit taken to its logical end: the imag
 ## Recap
 
 Spring Boot 3's native support automates the GraalVM path: the **AOT engine** analyzes your application during the build, generates bean definitions and GraalVM metadata for the whole framework stack, and hands everything to native-image — so `-Pnative native:compile` (or the buildpacks `spring-boot:build-image`) produces a milliseconds-starting executable. Your responsibility shrinks to the dynamic edges: **hints** (`@RegisterReflectionForBinding`, `RuntimeHintsRegistrar`) for custom reflection/resources/serialization, profile-config inclusion at build time, and third-party native compatibility. The mental shift is the whole game: Spring Boot native isn't a faster JVM — it's a *build-time-wired application* whose runtime configuration is the environment. Master the AOT model and the hint surface, and native deployment becomes a routine — albeit slow-building — workflow.
+

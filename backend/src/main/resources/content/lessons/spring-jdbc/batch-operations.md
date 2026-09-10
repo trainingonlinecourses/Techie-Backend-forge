@@ -1,7 +1,7 @@
 ---
 title: Batch Operations at Scale
 module: spring-jdbc
-order: 5
+order: 1
 minutes: 22
 topics: ["batchUpdate", "JdbcBatchItemWriter", "chunking", "rewriteBatchedStatements", "performance tuning"]
 summary: Inserting one row at a time over JDBC is the single biggest performance mistake in dataheavy Spring apps. This lesson covers the batch patterns, th...
@@ -29,7 +29,6 @@ Batch processing is not an optimization — it's the difference between an impor
 
 ## JdbcTemplate.batchUpdate
 
-```java
 public void insertCourses(List<Course> courses) {
     jdbcTemplate.batchUpdate(
         "INSERT INTO courses (title, level, minutes) VALUES (?, ?, ?)",
@@ -41,13 +40,11 @@ public void insertCourses(List<Course> courses) {
             ps.setInt(3, course.getMinutes());
         });
 }
-```
 
 The 3-arg `batchUpdate(sql, collection, batchSize, setter)` form is the modern API — Spring chunks the collection into `batchSize` groups automatically.
 
 ## NamedParameter Batch
 
-```java
 public void insertCourses(List<Course> courses) {
     SqlParameterSource[] batch = courses.stream()
         .map(BeanPropertySqlParameterSource::new)
@@ -57,7 +54,6 @@ public void insertCourses(List<Course> courses) {
         VALUES (:title, :level, :minutes)
         """, batch);
 }
-```
 
 ## The Postgres Secret: rewriteBatchedStatements
 
@@ -73,7 +69,6 @@ With `rewriteBatchedStatements=true`, the driver rewrites `INSERT ... VALUES (?,
 
 ## Batching Updates and Deletes
 
-```java
 public void updateLevels(Map<Long, String> idToLevel) {
     jdbcTemplate.batchUpdate(
         "UPDATE courses SET level = ?, updated_at = now() WHERE id = ?",
@@ -84,7 +79,6 @@ public void updateLevels(Map<Long, String> idToLevel) {
             ps.setLong(2, entry.getKey());
         });
 }
-```
 
 Batching isn't only for inserts — bulk updates and deletes benefit identically.
 
@@ -99,20 +93,17 @@ Batch size is a trade:
 
 Sweet spot: **100–1000 rows per chunk**, tuned by row size and DB. For millions of rows, chunk + transaction-per-chunk:
 
-```java
 @Transactional
 public void importAll(Stream<Course> courses) {
     // one transaction per 500 rows — a failure rolls back only that chunk
     ChunkedBatching.chunk(courses, 500).forEach(chunk ->
         jdbcTemplate.batchUpdate(INSERT_SQL, chunk, 500, setter));
 }
-```
 
 ## JdbcBatchItemWriter: Batch + Spring Batch
 
 In a Spring Batch job, `JdbcBatchItemWriter` is the standard write step:
 
-```java
 @Bean
 public JdbcBatchItemWriter<Course> courseWriter(DataSource dataSource) {
     return new JdbcBatchItemWriterBuilder<Course>()
@@ -122,11 +113,9 @@ public JdbcBatchItemWriter<Course> courseWriter(DataSource dataSource) {
         .assertUpdates(true)      // fail if a row wasn't written
         .build();
 }
-```
 
 Configured inside a `Step` with `commit-interval` (chunk size) controlling the transaction boundary:
 
-```java
 @Bean
 public Step importStep(JdbcBatchItemWriter<Course> writer) {
     return new StepBuilder("importStep", jobRepository)
@@ -135,13 +124,11 @@ public Step importStep(JdbcBatchItemWriter<Course> writer) {
         .writer(writer)
         .build();
 }
-```
 
 The writer + commit-interval pair is the production answer for million-row ETL: streaming reads, batched writes, transactional chunks.
 
 ## Measuring the Win
 
-```java
 // Before: one-by-one
 long start = System.nanoTime();
 courses.forEach(c -> jdbcTemplate.update(INSERT_SQL, c.getTitle(), c.getLevel(), c.getMinutes()));
@@ -151,7 +138,6 @@ log.info("One-by-one: {} ms", TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - 
 start = System.nanoTime();
 jdbcTemplate.batchUpdate(INSERT_SQL, courses, 500, setter);
 log.info("Batched: {} ms", TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start));
-```
 
 Typical: 100k rows, one-by-one ≈ 40s → batched ≈ 1.5s (with `rewriteBatchedStatements`). Always measure — the numbers justify the pattern.
 
@@ -159,7 +145,6 @@ Typical: 100k rows, one-by-one ≈ 40s → batched ≈ 1.5s (with `rewriteBatche
 
 Batch failures can be partial. Handle per-chunk with a decision:
 
-```java
 public void importWithSkip(List<Course> courses) {
     List<Course> failed = new ArrayList<>();
     for (List<Course> chunk : partition(courses, 500)) {
@@ -173,7 +158,6 @@ public void importWithSkip(List<Course> courses) {
         log.warn("Skipped {} duplicates", failed.size());
     }
 }
-```
 
 ## Summary
 
@@ -188,3 +172,4 @@ public void importWithSkip(List<Course> courses) {
 | Verification | Measure before/after |
 
 Batch operations are the difference between an import that works and one that melts the database. Chunk the data, batch the statements, flip `rewriteBatchedStatements`, and measure — 10× is the baseline, not the ceiling.
+

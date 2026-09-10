@@ -1,7 +1,7 @@
 ---
 title: Security Events & Audit — Watching Authentication and Authorization
 summary: AuthenticationEventPublisher, the security event classes, and the audit-log patterns that answer "who did what and when did login fail".
-order: 18
+order: 14
 minutes: 16
 topics: [security-events, authenticationevents, audit-log, authenticationeventpublisher, failed-login, monitoring]
 docs:
@@ -26,17 +26,14 @@ Spring Security publishes **events** for every authentication and authorization 
 
 Wiring the publisher (Spring Security 6 — in Boot 3 it's auto-wired when the context has a publisher):
 
-```java
 @Bean
 public AuthenticationEventPublisher authenticationEventPublisher(
         ApplicationEventPublisher applicationEventPublisher) {
     return new DefaultAuthenticationEventPublisher(applicationEventPublisher);
 }
-```
 
 Then a listener observes everything:
 
-```java
 @Component
 public class SecurityAuditListener {
     private final AuditLog auditLog;
@@ -56,42 +53,35 @@ public class SecurityAuditListener {
         auditLog.failure(event.getAuthentication().getName(), "account-locked");
     }
 }
-```
 
 ## How we use it in an organization: the scenarios
 
 **Scenario 1 — the failed-login ledger.** Every failed login appended to an audit store (DB table, log stream). This is the raw material for: **lockout policy** (after N failures, disable — implemented in the `UserDetails`/lockout service), **brute-force detection** (same IP, many users; same user, many IPs), and **incident investigation** ("was the attacker trying this account?").
 
-```java
 @EventListener
 public void onFailure(AuthenticationFailureBadCredentialsEvent e) {
     String name = e.getAuthentication().getName();
     loginAttemptService.recordFailure(name, requestInfo());   // increments a counter, may lock
     auditRepo.save(new LoginFailure(name, Instant.now(), requestInfo()));
 }
-```
 
 **Scenario 2 — the success trail.** "Who logged in when and from where" — the first query in any security investigation and the compliance answer for privileged systems:
 
-```java
 @EventListener
 public void onSuccess(AuthenticationSuccessEvent e) {
     auditRepo.save(new LoginSuccess(e.getAuthentication().getName(), Instant.now()));
 }
-```
 
 **Scenario 3 — account-state changes.** Locked, disabled, expired events feed both the audit and the *user-facing* message ("Your account is locked — contact support").
 
 **Scenario 4 — authorization denials.** `AuthorizationDeniedEvent` records *attempted but denied* access — the signal for over-privileged users and probing:
 
-```java
 @EventListener
 public void onDenied(AuthorizationDeniedEvent<?> event) {
     auditRepo.save(new AccessDenied(
         event.getAuthentication().getName(),
         event.getAuthorizationResult().getAuthorizationDecision().toString()));
 }
-```
 
 ## Where audit logs go — and how to structure them
 
@@ -116,3 +106,4 @@ public void onDenied(AuthorizationDeniedEvent<?> event) {
 - Failed-login events feed lockout, brute-force detection, and incident investigation.
 - Success events build the "who logged in when" trail; denial events surface access probing.
 - Audit logs are append-only, structured, and off the login hot path — and never contain credentials.
+

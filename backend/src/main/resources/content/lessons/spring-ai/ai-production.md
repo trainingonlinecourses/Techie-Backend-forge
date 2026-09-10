@@ -1,7 +1,7 @@
 ---
 title: Productionizing AI — Costs, Guardrails & MCP
 summary: Cost control, caching, fallbacks, guardrails, streaming UX and the MCP ecosystem.
-order: 8
+order: 5
 minutes: 15
 topics: [production, cost, caching, guardrails, mcp]
 docs:
@@ -22,16 +22,13 @@ LLM calls cost money per token — the org controls it with:
 | **Token budget** | Enforce a per-request max (`maxTokens`), alert on per-user spend |
 | **Rate limits** | Per-user/per-key limits at the API layer |
 
-```java
 @Cacheable(cacheNames = "ai.answers", key = "#question", unless = "#result == null")
 public String cachedAnswer(String question) { ... }
-```
 
 ## Fallbacks & resilience
 
 Models fail: rate limits, timeouts, provider outages. The API must survive:
 
-```java
 @Service
 public class ResilientAssistant {
 
@@ -44,7 +41,6 @@ public class ResilientAssistant {
         }
     }
 }
-```
 
 Add: timeouts (`ChatOptions` `requestTimeout`), retries with backoff (Spring Retry), and a circuit breaker (Resilience4j) for sustained outages.
 
@@ -62,7 +58,6 @@ Frontends expect token-by-token responses. Backend options:
 2. **WebFlux** — reactive `Flux<String>` (if you're on WebFlux).
 3. **Polling** — generate in a job, poll for the result (batch use cases).
 
-```java
 @GetMapping(value = "/api/chat/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
 public SseEmitter stream(@RequestParam String question) {
     SseEmitter emitter = new SseEmitter(30_000L);
@@ -70,7 +65,6 @@ public SseEmitter stream(@RequestParam String question) {
             .subscribe(chunk -> send(emitter, chunk), emitter::completeWithError, emitter::complete);
     return emitter;
 }
-```
 
 ## MCP: the ecosystem standard
 
@@ -106,3 +100,4 @@ One MCP server can expose your org's tools (search, ticketing, docs) to *any* MC
 - MCP standardizes tool ecosystems — Spring AI supports client and server.
 
 **Official docs:** [MCP support](https://docs.spring.io/spring-ai/reference/api/tools/mcp.html) · [Spring AI reference](https://docs.spring.io/spring-ai/reference/)
+

@@ -1,7 +1,7 @@
 ---
 title: Mockito Injection — @InjectMocks, @Spy, and @Captor
 module: mockito-deep
-order: 2
+order: 1
 minutes: 24
 topics: ["@InjectMocks", "@Spy", "@Captor", "argument captors", "dependency injection", "partial mocking"]
 summary: The basics lesson covered @Mock and stubbing. The professional workflow adds three more tools: @InjectMocks (wire mocks into the class under test a...
@@ -20,7 +20,6 @@ The basics lesson covered `@Mock` and stubbing. The professional workflow adds t
 
 ## @InjectMocks: Let Mockito Wire the Dependencies
 
-```java
 @ExtendWith(MockitoExtension.class)
 class OrderServiceTest {
 
@@ -44,7 +43,6 @@ class OrderServiceTest {
         verify(orderRepo).save(any());
     }
 }
-```
 
 **Walking through it:** `@InjectMocks` constructs a real `OrderService` and injects the `@Mock` fields by type — **constructor injection preferred**, then setter, then field. The mock fields must match the service's constructor parameters (by type) or its setters/fields. The payoff: no manual `new OrderService(orderRepo, paymentService, clock)` boilerplate, and adding a dependency to the service just means adding a `@Mock` field.
 
@@ -57,7 +55,6 @@ class OrderServiceTest {
 
 Sometimes "the code called `save`" isn't enough — you need to *see what it passed*:
 
-```java
 @ExtendWith(MockitoExtension.class)
 class AuditTest {
 
@@ -79,7 +76,6 @@ class AuditTest {
         assertNotNull(entry.timestamp());
     }
 }
-```
 
 **Why captors matter:** `argThat(...)` asserts *inline* but you can't easily inspect a complex object's multiple fields. `@Captor` grabs the actual argument object so you can run normal assertions on its fields — the standard way to test "the code built the right DTO/entity/event" without exposing those internals. It's also the tool for *collecting* multiple invocations: `entryCaptor.getAllValues()` returns everything passed across calls.
 
@@ -89,25 +85,30 @@ class AuditTest {
 
 A **spy** is a *real* object that keeps its real behavior — except for the parts you stub. The use case: you want the real logic, but one collaborator call must be replaced (partial mocking):
 
+
+**What this code does — step by step:**
+
+1. A REAL NotificationService — its real methods run.
+2. Stub ONE method on the real object:
+3. (doReturn, not when().thenReturn() — spies need the do* family. Because when() would actually CALL the real method first)
+4. The REAL retry loop ran; only sendViaEmail was stubbed.
+
+The same code, clean:
+
 ```java
 @ExtendWith(MockitoExtension.class)
 class NotificationServiceTest {
 
-    // A REAL NotificationService — its real methods run.
     @Spy
     NotificationService service;
 
     @Test
     void retriesFailedNotifications() {
-        // Stub ONE method on the real object:
         doReturn(true).when(service).sendViaEmail(anyString());
-        // (doReturn, not when().thenReturn() — spies need the do* family
-        //  because when() would actually CALL the real method first)
 
         boolean ok = service.sendWithRetry("hello", 2);
 
         assertTrue(ok);
-        // The REAL retry loop ran; only sendViaEmail was stubbed.
         verify(service, times(1)).sendViaEmail("hello");
     }
 }
@@ -130,7 +131,6 @@ class NotificationServiceTest {
 
 ## Combining the Toolkit
 
-```java
 @ExtendWith(MockitoExtension.class)
 class FullExampleTest {
 
@@ -150,10 +150,10 @@ class FullExampleTest {
         assertEquals("PENDING", orderCaptor.getValue().status());
     }
 }
-```
 
 Every tool in one test: mocks for collaborators, a captor to inspect what was saved, injection to wire it, and real logic in the service under test.
 
 ## Recap
 
 The Mockito injection toolbox completes the mocking story: **`@InjectMocks`** auto-wires `@Mock` collaborators into a real class under test (constructor-first, by type — with the caveat that type-ambiguous or constructor-changed wiring fails silently, so keep constructors visible); **`@Captor`** captures the exact arguments passed so you can assert on an object's fields (`verify(mock).method(captor.capture())`); and **`@Spy`** gives a real object with individually mockable parts — using `doReturn`/`doThrow`, never `when()` — for retry loops and legacy seams. The decision rule: mock collaborators, spy the class under test only when necessary, and never mock the behavior you're actually verifying. With these three plus the basics, the full mock-based unit-testing workflow is in your hands.
+

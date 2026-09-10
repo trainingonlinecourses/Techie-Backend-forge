@@ -33,26 +33,34 @@ Think of it like a movie stunt double — they look like the real actor, do the 
 
 ### 1. Stub (Predefined Responses)
 
+
+**What this code does — step by step:**
+
+1. The real dependency:
+2. A stub: returns whatever you tell it to
+3. Arrange: create a stub that always returns a specific user
+4. `Mockito.when(stub.findById("user-123"))` — When findById is called
+5. `.thenReturn(Optional.of(new User("user-123", "Alice")));` — Return this user
+6. Act: use the stub in your service
+7. Assert: verify the result
+
+The same code, clean:
+
 ```java
-// The real dependency:
 public interface UserRepository {
     Optional<User> findById(String id);
     User save(User user);
 }
 
-// A stub: returns whatever you tell it to
 @Test
 void shouldProcessOrder() {
-    // Arrange: create a stub that always returns a specific user
     UserRepository stub = Mockito.mock(UserRepository.class);
-    Mockito.when(stub.findById("user-123"))                         // When findById is called
-        .thenReturn(Optional.of(new User("user-123", "Alice")));   // Return this user
+    Mockito.when(stub.findById("user-123"))
+        .thenReturn(Optional.of(new User("user-123", "Alice")));
 
-    // Act: use the stub in your service
     OrderService service = new OrderService(stub);
     Order order = service.createOrder("user-123", List.of(item1));
 
-    // Assert: verify the result
     assertThat(order.getUserId()).isEqualTo("user-123");
     assertThat(order.getStatus()).isEqualTo(OrderStatus.CREATED);
 }
@@ -65,27 +73,36 @@ void shouldProcessOrder() {
 
 ### 2. Mock (Verify Interactions)
 
+
+**What this code does — step by step:**
+
+1. Arrange: create a mock
+2. Act: use the mock in the service under test
+3. Assert: verify the mock was called with the right arguments
+4. `Mockito.verify(mockEmail)` — Check this mock
+5. `.sendOrderConfirmation(` — This method was called
+6. `Mockito.eq("user-123"),` — With this argument
+7. `Mockito.argThat(order ->` — And this argument matches
+8. If sendOrderConfirmation was NOT called → test fails! If called with wrong arguments → test fails!
+
+The same code, clean:
+
 ```java
 @Test
 void shouldSendEmailWhenOrderCreated() {
-    // Arrange: create a mock
     EmailService mockEmail = Mockito.mock(EmailService.class);
 
-    // Act: use the mock in the service under test
     OrderService service = new OrderService(userRepo, mockEmail);
     service.createOrder("user-123", List.of(item1));
 
-    // Assert: verify the mock was called with the right arguments
-    Mockito.verify(mockEmail)                                      // Check this mock
-        .sendOrderConfirmation(                                    // This method was called
-            Mockito.eq("user-123"),                                // With this argument
-            Mockito.argThat(order ->                               // And this argument matches
+    Mockito.verify(mockEmail)
+        .sendOrderConfirmation(
+            Mockito.eq("user-123"),
+            Mockito.argThat(order ->
                 order.getStatus() == OrderStatus.CREATED &&
                 order.getTotal().compareTo(BigDecimal.ZERO) > 0
             )
         );
-    // If sendOrderConfirmation was NOT called → test fails!
-    // If called with wrong arguments → test fails!
 }
 ```
 
@@ -97,21 +114,29 @@ void shouldSendEmailWhenOrderCreated() {
 
 ### 3. Spy (Record Calls on Real Objects)
 
+
+**What this code does — step by step:**
+
+1. Arrange: spy on a REAL repository
+2. `UserRepository spy = Mockito.spy(realRepo);` — Wraps real object, records all calls
+3. Act: call twice
+4. Assert: findById was called only ONCE (second call used cache)
+5. `Mockito.verify(spy, Mockito.times(1))` — Only once
+
+The same code, clean:
+
 ```java
 @Test
 void shouldCacheUserAfterFirstLookup() {
-    // Arrange: spy on a REAL repository
     UserRepository realRepo = new JdbcUserRepository(dataSource);
-    UserRepository spy = Mockito.spy(realRepo);    // Wraps real object, records all calls
+    UserRepository spy = Mockito.spy(realRepo);
 
     OrderService service = new OrderService(spy, emailService);
 
-    // Act: call twice
     service.createOrder("user-123", List.of(item1));
     service.createOrder("user-123", List.of(item2));
 
-    // Assert: findById was called only ONCE (second call used cache)
-    Mockito.verify(spy, Mockito.times(1))          // Only once
+    Mockito.verify(spy, Mockito.times(1))
         .findById("user-123");
 }
 ```
@@ -123,27 +148,36 @@ void shouldCacheUserAfterFirstLookup() {
 
 ### 4. Fake (Working Implementation)
 
+
+**What this code does — step by step:**
+
+1. A fake: simplified but working implementation
+2. `return Optional.ofNullable(store.get(id));` — Simple map lookup
+3. `store.put(user.getId(), user);` — Simple map store
+4. Usage in tests:
+5. `UserRepository fake = new InMemoryUserRepository();` — No database needed!
+
+The same code, clean:
+
 ```java
-// A fake: simplified but working implementation
 public class InMemoryUserRepository implements UserRepository {
     private final Map<String, User> store = new ConcurrentHashMap<>();
 
     @Override
     public Optional<User> findById(String id) {
-        return Optional.ofNullable(store.get(id));      // Simple map lookup
+        return Optional.ofNullable(store.get(id));
     }
 
     @Override
     public User save(User user) {
-        store.put(user.getId(), user);                  // Simple map store
+        store.put(user.getId(), user);
         return user;
     }
 }
 
-// Usage in tests:
 @Test
 void shouldPersistUser() {
-    UserRepository fake = new InMemoryUserRepository();  // No database needed!
+    UserRepository fake = new InMemoryUserRepository();
     OrderService service = new OrderService(fake, emailService);
 
     service.createUser("user-123", "Alice");
@@ -165,32 +199,44 @@ void shouldPersistUser() {
 
 ### Scenario 1: Testing Payment Processing
 
+
+**What this code does — step by step:**
+
+1. `PaymentGateway gateway;` — Mock the external payment API
+2. `OrderRepository orderRepo;` — Mock the database
+3. `PaymentService paymentService;` — Real service under test
+4. Arrange: stub the gateway
+5. Act
+6. Assert: verify interactions
+7. Arrange: stub the gateway to fail
+8. Act & Assert
+9. `"PAYMENT_FAILED".equals(order.getStatus())` — Order marked as failed
+
+The same code, clean:
+
 ```java
 @SpringBootTest
 class PaymentServiceTest {
 
     @MockBean
-    PaymentGateway gateway;                    // Mock the external payment API
+    PaymentGateway gateway;
 
     @MockBean
-    OrderRepository orderRepo;                 // Mock the database
+    OrderRepository orderRepo;
 
     @Autowired
-    PaymentService paymentService;             // Real service under test
+    PaymentService paymentService;
 
     @Test
     void shouldProcessPaymentSuccessfully() {
-        // Arrange: stub the gateway
         when(gateway.charge(any(PaymentRequest.class)))
             .thenReturn(new PaymentResult("txn-123", "SUCCESS"));
 
         when(orderRepo.findById("order-1"))
             .thenReturn(Optional.of(new Order("order-1", BigDecimal.valueOf(99.99))));
 
-        // Act
         PaymentResult result = paymentService.processPayment("order-1");
 
-        // Assert: verify interactions
         assertThat(result.getTransactionId()).isEqualTo("txn-123");
         verify(gateway).charge(argThat(req ->
             req.getAmount().compareTo(BigDecimal.valueOf(99.99)) == 0
@@ -202,16 +248,14 @@ class PaymentServiceTest {
 
     @Test
     void shouldHandlePaymentFailure() {
-        // Arrange: stub the gateway to fail
         when(gateway.charge(any()))
             .thenThrow(new PaymentDeclinedException("Insufficient funds"));
 
-        // Act & Assert
         assertThatThrownBy(() -> paymentService.processPayment("order-1"))
             .isInstanceOf(PaymentDeclinedException.class);
 
         verify(orderRepo).save(argThat(order ->
-            "PAYMENT_FAILED".equals(order.getStatus())    // Order marked as failed
+            "PAYMENT_FAILED".equals(order.getStatus())
         ));
     }
 }
@@ -219,7 +263,6 @@ class PaymentServiceTest {
 
 ### Scenario 2: Argument Captor (Capture and Inspect)
 
-```java
 @Test
 void shouldSendCorrectEmailContent() {
     ArgumentCaptor<EmailMessage> captor = ArgumentCaptor.forClass(EmailMessage.class);
@@ -233,7 +276,6 @@ void shouldSendCorrectEmailContent() {
     assertThat(sent.getBody()).contains("Alice");
     assertThat(sent.getRecipients()).contains("alice@example.com");
 }
-```
 
 ---
 
@@ -258,3 +300,4 @@ void shouldSendCorrectEmailContent() {
 - **AAA pattern**: Arrange (set up doubles) → Act (call the method) → Assert (verify results + interactions).
 
 Official docs: [Mockito](https://site.mockito.org/) · [Spring Testing](https://docs.spring.io/spring-framework/reference/testing.html)
+

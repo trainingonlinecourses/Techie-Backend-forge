@@ -1,7 +1,7 @@
 ---
 title: Java Networking — Sockets, URLs, and HTTP Clients
 summary: From raw Socket and ServerSocket to the modern HttpClient API, covering TCP connections, URL parsing, and the reactive HttpClient introduced in Java 11.
-order: 4
+order: 1
 minutes: 22
 topics: [sockets, tcp, server-socket, httpclient, url-parsing, networking]
 docs:
@@ -17,7 +17,6 @@ At a higher level, HTTP lets you make web requests. Java's modern HttpClient (Ja
 ## The Code
 
 ### Raw TCP Socket Server
-```java
 import java.net.*;
 import java.io.*;
 
@@ -51,10 +50,8 @@ public class SimpleServer {
         }
     }
 }
-```
 
 ### Modern HttpClient (Java 11+)
-```java
 import java.net.http.*;
 import java.net.URI;
 import java.time.Duration;
@@ -105,7 +102,6 @@ public class HttpExamples {
             "{\"name\": \"Sateesh\"}");
     }
 }
-```
 
 ## Line-by-Line Explanation
 
@@ -122,7 +118,6 @@ public class HttpExamples {
 ## Real-World Scenarios
 
 **Scenario 1: Microservice health check**
-```java
 public static boolean isServiceAlive(String url) {
     try {
         HttpRequest request = HttpRequest.newBuilder()
@@ -137,18 +132,20 @@ public static boolean isServiceAlive(String url) {
         return false;
     }
 }
-```
 
 **Scenario 2: File download with progress**
-```java
-HttpRequest request = HttpRequest.newBuilder()
-    .uri(URI.create(downloadUrl))
-    .GET()
-    .build();
-client.sendAsync(request, HttpResponse.BodyHandlers.ofFile(
-    Path.of("download.zip")))
-    .thenAccept(resp -> System.out.println("Downloaded to " + resp.body()));
-```
+public class Main {
+
+    public static void main(String[] args) {
+        HttpRequest request = HttpRequest.newBuilder()
+            .uri(URI.create(downloadUrl))
+            .GET()
+            .build();
+        client.sendAsync(request, HttpResponse.BodyHandlers.ofFile(
+            Path.of("download.zip")))
+            .thenAccept(resp -> System.out.println("Downloaded to " + resp.body()));
+    }
+}
 
 ## Key Takeaways
 
@@ -157,3 +154,4 @@ client.sendAsync(request, HttpResponse.BodyHandlers.ofFile(
 3. **sendAsync** returns CompletableFuture — chain with thenApply/thenAccept
 4. **Timeouts are critical** — always set connectTimeout and request timeout
 5. **try-with-resources** ensures sockets and streams are properly closed
+

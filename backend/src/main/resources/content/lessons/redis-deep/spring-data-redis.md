@@ -1,7 +1,7 @@
 ---
 title: Spring Data Redis — RedisTemplate, Repositories, and Serialization
 module: redis-deep
-order: 2
+order: 5
 minutes: 27
 topics: ["Spring Data Redis", "RedisTemplate", "RedisRepository", "serialization", "StringRedisTemplate"]
 summary: Raw Jedis/Lettuce calls work, but they leave you managing connections, serialization, and error handling. Spring Data Redis wraps the client (Lettu...
@@ -34,7 +34,6 @@ The starter brings Lettuce (the modern Netty-based client), and Boot creates the
 
 ## RedisTemplate in Action
 
-```java
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -69,7 +68,6 @@ public class SessionService {
         return redis.keys("session:*").size();
     }
 }
-```
 
 **Walking through it:** `StringRedisTemplate` is the specialization where keys and values are `String`s — perfect for JSON payloads, tokens, and simple counters. `opsForValue()` returns the *value operations* view — the object-oriented face of the raw `SET`/`GET` commands. The `Duration` overload of `set` is the TTL in Spring idiom. And note the pattern: the service never touches sockets or protocol — it calls typed methods, and Spring handles the rest.
 
@@ -77,21 +75,28 @@ public class SessionService {
 
 Every Redis structure has an ops view:
 
-```java
-// Lists — queues and stacks:
-redis.opsForList().rightPush("queue:jobs", "job-1");
-String job = redis.opsForList().leftPop("queue:jobs");   // FIFO
 
-// Sets — membership and algebra:
+**What this code does — step by step:**
+
+1. Lists — queues and stacks:
+2. `String job = redis.opsForList().leftPop("queue:jobs");` — FIFO
+3. Sets — membership and algebra:
+4. Hashes — object fields:
+5. Sorted sets — leaderboards:
+
+The same code, clean:
+
+```java
+redis.opsForList().rightPush("queue:jobs", "job-1");
+String job = redis.opsForList().leftPop("queue:jobs");
+
 redis.opsForSet().add("tags:java", "spring", "jvm");
 Boolean member = redis.opsForSet().isMember("tags:java", "spring");
 Set<String> overlap = redis.opsForSet().intersect("tags:java", "tags:web");
 
-// Hashes — object fields:
 redis.opsForHash().put("product:1", "name", "Laptop");
 Object price = redis.opsForHash().get("product:1", "price");
 
-// Sorted sets — leaderboards:
 redis.opsForZSet().add("leaderboard", "Ada", 92.0);
 redis.opsForZSet().incrementScore("leaderboard", "Ada", 3.0);
 Set<String> top2 = redis.opsForZSet().reverseRange("leaderboard", 0, 1);
@@ -103,7 +108,6 @@ The ops hierarchy mirrors Redis's structures exactly: `ValueOperations`, `ListOp
 
 `RedisTemplate<String, Object>` (as opposed to `StringRedisTemplate`) needs to convert Java objects to bytes — and **the default serializer is the problem**. Historically, Boot's default was JdkSerializationRedisSerializer: it writes Java serialization format (binary, opaque, incompatible with anything not Java, and a security surface). The two production-grade options:
 
-```java
 @Configuration
 public class RedisConfig {
 
@@ -126,7 +130,6 @@ public class RedisConfig {
         return template;
     }
 }
-```
 
 **Why this matters so much:** serialization decides whether the data you store is *interoperable*. With `StringRedisTemplate` + JSON strings, any tool (redis-cli, other languages, your own debugging) can read the values. With the JDK serializer, only Java can read them, and the bytes are garbage to humans. The modern recommendation: **store JSON strings** (via `StringRedisTemplate` or a JSON serializer) — debuggable, interoperable, and versionable. Serializer mismatches (writing with one, reading with another) produce the classic "cannot deserialize" runtime surprises.
 
@@ -134,7 +137,6 @@ public class RedisConfig {
 
 Spring Data Redis can also act like a repository layer for your domain objects — `@RedisHash` + a `CrudRepository` interface, storing entities as hashes with automatic indexing:
 
-```java
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 
@@ -146,7 +148,6 @@ public record Product(
 
 // The repository — Spring generates the implementation:
 public interface ProductRepository extends CrudRepository<Product, Long> {}
-```
 
 Then `productRepository.save(p)`, `findById`, `findAll` work like JPA repositories but against Redis hashes. This is convenient for session-like or frequently-read entities — but note: Redis repositories are *not* a relational model; they suit fast lookup by id, not complex queries. For complex querying, keep Postgres; for ultra-fast id lookup, Redis.
 
@@ -154,7 +155,6 @@ Then `productRepository.save(p)`, `findById`, `findAll` work like JPA repositori
 
 The killer integration: Spring's **cache abstraction** (`@Cacheable`, `@CacheEvict`) with Redis as the provider:
 
-```java
 @Service
 public class LessonService {
 
@@ -169,10 +169,10 @@ public class LessonService {
     @CacheEvict(value = "lessons", key = "#id")
     public void updateLesson(Long id, LessonDto dto) { /* save */ }
 }
-```
 
 With `spring.cache.type=redis` and `spring.cache.redis.time-to-live=10m` in properties, `@Cacheable` reads Redis first and populates on miss — transparently. This is the standard way production Spring apps get sub-millisecond reads on hot data without writing a single Redis call. (The dedicated `spring-cache` module in this curriculum covers the abstraction in depth; this is its Redis backend.)
 
 ## Recap
 
 Spring Data Redis connects your beans to Redis through configured templates: `StringRedisTemplate` for JSON-string workflows, `RedisTemplate` with explicit serializers for typed objects, `opsFor*` views mapping one-to-one onto Redis structures, and optional `@RedisHash` repositories for entity-style access. The two habits that separate clean integrations from disasters: **choose your serializers deliberately** (JSON over JDK serialization) and **use the cache abstraction** (`@Cacheable` with Redis) for the common cache-behind-database pattern. One starter, one config block, and Redis becomes a first-class citizen of your Spring application.
+

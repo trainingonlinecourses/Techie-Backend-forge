@@ -1,7 +1,7 @@
 ---
 title: Shutdown Hooks — Graceful Cleanup When the JVM Exits
 summary: Runtime.addShutdownHook, orderly shutdown sequences, signal handling, why shutdown hooks are NOT guarantees, and how Spring Boot hooks into this lifecycle for graceful drain.
-order: 49
+order: 71
 minutes: 16
 topics: [shutdown-hook, addShutdownHook, graceful-shutdown, signal-handler, jvm-lifecycle, spring-shutdown]
 docs:
@@ -30,7 +30,6 @@ When the JVM receives a shutdown signal:
 4. If a hook throws, the JVM may skip remaining hooks.
 5. After hooks complete (or timeout), the JVM exits.
 
-```java
 public class Application {
 
     public static void main(String[] args) {
@@ -54,13 +53,11 @@ public class Application {
         startServer(pool, broker);
     }
 }
-```
 
 **Order is NOT guaranteed.** Hooks run concurrently in separate threads. If broker depends on the database being available during shutdown, you need explicit ordering within the hooks.
 
 ## Ordering shutdown hooks
 
-```java
 public class ShutdownManager {
 
     private final List<Runnable> shutdownActions = new CopyOnWriteArrayList<>();
@@ -87,20 +84,16 @@ public class ShutdownManager {
         }
     }
 }
-```
 
-```java
 ShutdownManager manager = new ShutdownManager();
 
 manager.register(() -> messageBroker.stop());      // registered 1st, shutdown 2nd
 manager.register(() -> databasePool.close());       // registered 2nd, shutdown 1st
 
 manager.init();
-```
 
 ## System.exit() and hooks
 
-```java
 public static void main(String[] args) {
     Runtime.getRuntime().addShutdownHook(new Thread(() -> {
         System.out.println("Hook running");  // THIS WILL execute
@@ -110,7 +103,6 @@ public static void main(String[] args) {
     System.exit(0);  // triggers hooks, then JVM exits
     System.out.println("After exit");  // NEVER reached
 }
-```
 
 `System.exit(0)` triggers orderly shutdown (hooks run). `System.halt(0)` forces immediate termination (hooks are skipped).
 
@@ -143,7 +135,6 @@ When Kubernetes sends SIGTERM, Spring:
 
 ### Scenario 2: deregister from service discovery
 
-```java
 @Component
 public class ServiceRegistryHook {
 
@@ -161,11 +152,9 @@ public class ServiceRegistryHook {
         System.out.println("Deregistered from service discovery");
     }
 }
-```
 
 ### Scenario 3: flushing audit logs
 
-```java
 @Component
 public class AuditFlushHook {
 
@@ -178,7 +167,6 @@ public class AuditFlushHook {
         System.out.println("Audit logs flushed");
     }
 }
-```
 
 ## Spring @PreDestroy vs shutdown hooks
 
@@ -190,7 +178,6 @@ Spring's `@PreDestroy` is NOT a shutdown hook. It runs during Spring's context c
 4. Spring destroys beans (calling `@PreDestroy` methods).
 5. Spring stops the embedded server.
 
-```java
 @Component
 public class MyService {
 
@@ -201,7 +188,6 @@ public class MyService {
         // But HTTP server is still running
     }
 }
-```
 
 ## Common mistakes
 
@@ -212,3 +198,4 @@ public class MyService {
 | Using hooks for business logic | Skipped on SIGKILL, power loss |
 | Not registering hooks for external resources | Leaked connections, corrupted files |
 | Relying on hooks for data durability | No guarantee on force-kill |
+

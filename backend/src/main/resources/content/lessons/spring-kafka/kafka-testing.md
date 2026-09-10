@@ -1,7 +1,7 @@
 ---
 title: Testing Kafka Applications
 summary: EmbeddedKafka, Testcontainers, testing producers, consumers and the outbox relay, and DLT assertions.
-order: 6
+order: 4
 minutes: 18
 topics: [kafka, testing, embeddedkafka, testcontainers, integration-test]
 docs:
@@ -25,7 +25,6 @@ docs:
 
 The `spring-kafka-test` dependency ships an in-process Kafka broker — no Docker needed, fast, perfect for logic tests:
 
-```java
 @SpringBootTest
 @EmbeddedKafka(partitions = 1, topics = { "orders", "notifications" })
 class OutboxFlowTest {
@@ -40,7 +39,6 @@ class OutboxFlowTest {
         await().atMost(5, TimeUnit.SECONDS).until(() -> processedStore.contains("order-1"));
     }
 }
-```
 
 Key rules for embedded tests:
 
@@ -50,7 +48,6 @@ Key rules for embedded tests:
 
 ## Testing the outbox relay end to end (what the demo project does)
 
-```java
 @SpringBootTest
 @EmbeddedKafka(partitions = 1, topics = "orders")
 class OutboxRelayTest {
@@ -67,13 +64,11 @@ class OutboxRelayTest {
                    e -> e.orderId().equals(order.getId())));
     }
 }
-```
 
 This is the test that matters most: **business transaction → outbox row → relay → Kafka → consumer**, all in one. If it passes, your consistency backbone works.
 
 ## Testing retries and the DLT
 
-```java
 @SpringBootTest
 @EmbeddedKafka(partitions = 1, topics = "notifications")
 class RetryDltTest {
@@ -88,7 +83,6 @@ class RetryDltTest {
             assertThat(dltStore.received()).extracting(Notification::id).contains("boom"));
     }
 }
-```
 
 Use short backoff in tests (`@RetryableTopic(backoff = @Backoff(delay = 100, multiplier = 1.0))` via a test property override) so retries don't make the test slow.
 
@@ -96,14 +90,12 @@ Use short backoff in tests (`@RetryableTopic(backoff = @Backoff(delay = 100, mul
 
 Use a real Kafka container when you need: multiple brokers (replication), schema registry integration, or production-fidelity behavior. `spring-kafka-test` also ships `KafkaContainer` via `testcontainers`:
 
-```java
 @Testcontainers
 class KafkaContainerIT {
     @Container
     static final KafkaContainer KAFKA = new KafkaContainer(DockerImageName
             .parse("confluentinc/cp-kafka:7.6.0"));
 }
-```
 
 The trade-off: Docker required, slower, but catches real-broker bugs (serde headers, partition behavior) that embedded mode glosses over. Common strategy: **embedded for fast CI unit-ish tests, containers for the critical flows.**
 
@@ -122,3 +114,4 @@ The trade-off: Docker required, slower, but catches real-broker bugs (serde head
 - [Spring Kafka — Testing Support](https://docs.spring.io/spring-kafka/reference/testing.html)
 - [Spring Boot — Testcontainers](https://docs.spring.io/spring-boot/reference/testing/testcontainers.html)
 - [Awaitility](https://github.com/awaitility/awaitility)
+

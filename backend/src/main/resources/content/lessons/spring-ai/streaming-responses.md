@@ -30,6 +30,17 @@ Streaming doesn't make the AI faster — it makes it **feel** faster because the
 
 ### 1. Streaming with ChatClient
 
+
+**What this code does — step by step:**
+
+1. Non-streaming (waits for complete response):
+2. `.content();` — Blocks until FULL response is ready
+3. Streaming (returns tokens as they arrive):
+4. `.stream()` — Returns Flux<String> instead of blocking
+5. `.content();` — Each element is one token/chunk
+
+The same code, clean:
+
 ```java
 @RestController
 @RequestMapping("/api/ai")
@@ -41,22 +52,20 @@ public class AiStreamController {
         this.chatClient = ChatClient.create(chatModel);
     }
 
-    // Non-streaming (waits for complete response):
     @PostMapping("/chat")
     public String chat(@RequestBody ChatRequest request) {
         return chatClient.prompt()
             .user(request.message())
             .call()
-            .content();                     // Blocks until FULL response is ready
+            .content();
     }
 
-    // Streaming (returns tokens as they arrive):
     @PostMapping(value = "/chat/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<String> chatStream(@RequestBody ChatRequest request) {
         return chatClient.prompt()
             .user(request.message())
-            .stream()                       // Returns Flux<String> instead of blocking
-            .content();                     // Each element is one token/chunk
+            .stream()
+            .content();
     }
 }
 ```
@@ -69,7 +78,6 @@ public class AiStreamController {
 
 ### 2. Streaming with Tool Calls
 
-```java
 @PostMapping(value = "/agent/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
 public Flux<String> agentStream(@RequestBody ChatRequest request) {
     return chatClient.prompt()
@@ -80,11 +88,9 @@ public Flux<String> agentStream(@RequestBody ChatRequest request) {
         .content();                           // Tokens arrive as AI generates them
     // Tool calls happen transparently — the client sees the final answer streaming
 }
-```
 
 ### 3. SSE Endpoint (Alternative Approach)
 
-```java
 @RestController
 @RequestMapping("/api/ai")
 public class AiSseController {
@@ -135,7 +141,6 @@ public class AiSseController {
         return emitter;
     }
 }
-```
 
 **Line-by-line explained:**
 - `SseEmitter` — Spring's way to send Server-Sent Events. The connection stays open until `complete()` is called.
@@ -183,7 +188,6 @@ async function streamChat(message) {
 
 ### Scenario 1: Chat UI with Typewriter Effect
 
-```java
 @RestController
 @RequestMapping("/api/ai")
 public class AiChatController {
@@ -207,11 +211,9 @@ public class AiChatController {
             ));
     }
 }
-```
 
 ### Scenario 2: Streaming with Progress Indicators
 
-```java
 @PostMapping(value = "/research", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
 public Flux<String> researchStream(@RequestBody ChatRequest request) {
     return Flux.concat(
@@ -230,11 +232,9 @@ public Flux<String> researchStream(@RequestBody ChatRequest request) {
         Flux.just("\n\n✅ Research complete!")
     );
 }
-```
 
 ### Scenario 3: Streaming for Long-Running Analysis
 
-```java
 @PostMapping(value = "/analyze/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
 public Flux<String> analyzeStream(@RequestBody AnalysisRequest request) {
     return Flux.concat(
@@ -255,7 +255,6 @@ public Flux<String> analyzeStream(@RequestBody AnalysisRequest request) {
         Flux.just("\n\n✅ Analysis complete!")
     );
 }
-```
 
 ---
 
@@ -280,3 +279,4 @@ public Flux<String> analyzeStream(@RequestBody AnalysisRequest request) {
 - **Streaming + tools** = the AI calls tools silently while the client sees the answer streaming.
 
 Official docs: [Streaming (Spring AI)](https://docs.spring.io/spring-ai/reference/api/chatclient-streaming.html) · [SSE (Spring)](https://docs.spring.io/spring-framework/reference/web/webflux-webfn.html)
+

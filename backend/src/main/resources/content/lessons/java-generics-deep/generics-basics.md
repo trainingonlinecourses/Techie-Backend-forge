@@ -1,7 +1,7 @@
 ---
 title: Generics Basics — Why Type Parameters Exist
 module: java-generics-deep
-order: 1
+order: 2
 minutes: 24
 topics: ["generics", "type safety", "type parameters", "type erasure", "compiler checks"]
 summary: Imagine you are a librarian who receives boxes of books. Before generics existed in Java (before Java 5, released in 2004), every box was simply la...
@@ -30,30 +30,40 @@ Generics solve both problems with a single idea: **let the type be a parameter o
 
 Let's build a simple generic class and walk through every line:
 
+
+**What this code does — step by step:**
+
+1. The <T> after the class name declares a type parameter. T is a placeholder for "whatever type the user of this class chooses."
+2. The field is of type T — the placeholder type. Whatever type fills T, this field will hold that type.
+3. A method that accepts a value of the placeholder type.
+4. A method that returns the placeholder type.
+5. A generic method with its OWN type parameter <E>. This has nothing to do with the class-level T.
+6. Here we fill in the slot: this box can ONLY hold strings.
+7. `stringBox.put("hello");` — fine — "hello" is a String. StringBox.put(42); // COMPILE ERROR — 42 is not a String
+8. `String value = stringBox.get();` — no cast needed!
+9. `System.out.println(value);` — prints: hello
+10. The same class, with a different type filling the slot:
+11. `int n = intBox.get();` — also no cast
+12. `System.out.println(n);` — prints: 100
+
+The same code, clean:
+
 ```java
 import java.util.ArrayList;
 import java.util.List;
 
-// The <T> after the class name declares a type parameter.
-// T is a placeholder for "whatever type the user of this class chooses."
 public class Box<T> {
 
-    // The field is of type T — the placeholder type.
-    // Whatever type fills T, this field will hold that type.
     private T contents;
 
-    // A method that accepts a value of the placeholder type.
     public void put(T item) {
         this.contents = item;
     }
 
-    // A method that returns the placeholder type.
     public T get() {
         return contents;
     }
 
-    // A generic method with its OWN type parameter <E>.
-    // This has nothing to do with the class-level T.
     public <E> List<E> wrapInList(E value) {
         List<E> list = new ArrayList<>();
         list.add(value);
@@ -61,19 +71,16 @@ public class Box<T> {
     }
 
     public static void main(String[] args) {
-        // Here we fill in the slot: this box can ONLY hold strings.
         Box<String> stringBox = new Box<>();
-        stringBox.put("hello");          // fine — "hello" is a String
-        // stringBox.put(42);            // COMPILE ERROR — 42 is not a String
+        stringBox.put("hello");
 
-        String value = stringBox.get();  // no cast needed!
-        System.out.println(value);       // prints: hello
+        String value = stringBox.get();
+        System.out.println(value);
 
-        // The same class, with a different type filling the slot:
         Box<Integer> intBox = new Box<>();
         intBox.put(100);
-        int n = intBox.get();            // also no cast
-        System.out.println(n);           // prints: 100
+        int n = intBox.get();
+        System.out.println(n);
     }
 }
 ```
@@ -133,3 +140,4 @@ A **raw type** is a generic class used without any type argument: `Box box = new
 ## Recap
 
 Generics are compile-time type parameters: they let one class definition serve many types while the compiler verifies every use. Type erasure means the JVM sees plain `Object`-based classes with inserted casts, which explains why you can't reflect on `T`, instantiate `T`, or use `T` in statics. The payoff is code that fails at compile time instead of production, needs no casts, and documents itself. Master this foundation and the wildcard rules, generic methods, and bounded parameters in the following lessons will feel natural rather than mysterious.
+

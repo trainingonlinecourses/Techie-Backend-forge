@@ -1,7 +1,7 @@
 ---
 title: Springdoc — OpenAPI in Spring Boot
 module: openapi-rest-docs
-order: 2
+order: 5
 minutes: 23
 topics: ["springdoc-openapi", "swagger config", "OpenAPI bean", "security schemes", "groups"]
 summary: Most apps need nothing beyond the dependency. The configuration work begins when you want to customize: the API's metadata (title, version, descrip...
@@ -20,16 +20,16 @@ Most apps need nothing beyond the dependency. The configuration work begins when
 
 ## The Code Walkthrough
 
-```java
-// ---- 1. The dependency ----
-// Maven:
-// <dependency>
-//   <groupId>org.springdoc</groupId>
-//   <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-//   <version>2.6.0</version>
-// </dependency>
 
-// ---- 2. Customize the API metadata + security scheme ----
+**What this code does — step by step:**
+
+1. ---- 1. The dependency ----. Maven: <dependency>. <groupId>org.springdoc</groupId>. <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>. <version>2.6.0</version>. </dependency>
+2. ---- 2. Customize the API metadata + security scheme ----
+3. Tell Swagger UI: this API uses Bearer tokens
+
+The same code, clean:
+
+```java
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
@@ -50,7 +50,6 @@ public class OpenApiConfig {
                         .title("BackendForge Academy API")
                         .description("Course catalog, progress, and AI tutor APIs")
                         .version("1.0.0"))
-                // Tell Swagger UI: this API uses Bearer tokens
                 .addSecurityItem(new SecurityRequirement().addList(securitySchemeName))
                 .components(new Components().addSecuritySchemes(securitySchemeName,
                         new SecurityScheme()
@@ -80,25 +79,20 @@ springdoc.show-actuator=false                 # don't document actuator endpoint
 
 ## Documenting Auth on Individual Operations
 
-```java
 @Operation(security = { @SecurityRequirement(name = "bearerAuth") })
 @GetMapping("/me")
 public UserDto me() { ... }
-```
 
 Or apply globally (the bean above) and refine per-operation. Public endpoints (login) can *clear* the requirement:
 
-```java
 @Operation(security = {})
 @PostMapping("/auth/login")
 public TokenDto login(@RequestBody LoginRequest r) { ... }
-```
 
 ## Grouping — Public vs Internal Specs
 
 For larger APIs, group endpoints into separate specs:
 
-```java
 @Bean
 public GroupedOpenApi publicApi() {
     return GroupedOpenApi.builder()
@@ -114,7 +108,6 @@ public GroupedOpenApi internalApi() {
             .pathsToMatch("/admin/**", "/internal/**")
             .build();
 }
-```
 
 Each group gets its own spec endpoint (`/v3/api-docs/public`, `/v3/api-docs/internal`) and its own UI tab. Useful when the internal API shouldn't be shown to external consumers.
 
@@ -160,3 +153,4 @@ The generated spec is also your **contract** for tests:
 - Group APIs (public vs internal) into separate specs.
 - Protect the UI in production: disable by profile or secure with Spring Security.
 - The spec doubles as a contract for tests and client generation.
+

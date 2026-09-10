@@ -1,7 +1,7 @@
 ---
 title: @Configuration Classes in Depth — proxyBeanMethods and @Bean Semantics
 summary: How @Configuration is proxied, why bean-to-bean calls return singletons, proxyBeanMethods=false, and the @Bean lifecycle wiring teams rely on.
-order: 21
+order: 8
 minutes: 18
 topics: [configuration, proxybeanmethods, bean-methods, full-lite-mode, bean-wiring, lifecycle]
 docs:
@@ -15,7 +15,6 @@ docs:
 
 A class annotated `@Configuration` is **itself a bean**, and — by default — Spring **proxies it** (CGLIB) so that calls between its `@Bean` methods honor the container's singleton semantics:
 
-```java
 @Configuration
 public class AppConfig {
     @Bean
@@ -28,16 +27,13 @@ public class AppConfig {
         // not a second HikariDataSource — a plain method call would build a new one!
     }
 }
-```
 
 The proxy intercepts `dataSource()` and returns the container-managed singleton instead of executing the method body again. That's **full mode** — the default and the behavior everyone expects: "call the @Bean method, get the shared bean".
 
 ## Lite mode — proxyBeanMethods = false
 
-```java
 @Configuration(proxyBeanMethods = false)
 public class AppConfig { ... }
-```
 
 With `proxyBeanMethods = false`, the class is **not proxied** — it's treated as a plain component that happens to have `@Bean` methods ("lite mode"). Consequences:
 
@@ -48,7 +44,6 @@ Lite mode is correct only when your `@Bean` methods **don't call each other** (e
 
 ## @Bean lifecycle wiring
 
-```java
 @Configuration
 public class MessagingConfig {
     @Bean(initMethod = "connect", destroyMethod = "close")   // non-annotatable classes
@@ -65,7 +60,6 @@ public class MessagingConfig {
     @Bean
     public PaymentGateway refundGateway() { return new AdyenGateway(); }
 }
-```
 
 - `initMethod`/`destroyMethod` wire lifecycle hooks on classes you can't annotate.
 - `@Bean` methods can declare `@Scope("prototype")`, `@Lazy`, `@Primary` — the full bean-definition vocabulary.
@@ -75,12 +69,10 @@ public class MessagingConfig {
 
 **Scenario 1 — the dependency-via-parameter pattern.** Teams write `@Bean` methods with parameters (container-resolved), not method calls:
 
-```java
 @Bean
 public OrderService orderService(OrderRepository repo, PaymentGateway gateway, Clock clock) {
     return new OrderService(repo, gateway, clock);   // deps injected — no proxying surprises
 }
-```
 
 This makes the config readable as a dependency graph and works identically in full and lite mode.
 
@@ -88,7 +80,6 @@ This makes the config readable as a dependency graph and works identically in fu
 
 **Scenario 3 — external library wiring.** A library bean that needs a custom setup:
 
-```java
 @Bean
 public ObjectMapper objectMapper() {
     return JsonMapper.builder()
@@ -96,7 +87,6 @@ public ObjectMapper objectMapper() {
         .serializerByType(BigDecimal.class, new ToStringSerializer())
         .build();
 }
-```
 
 ## @Configuration vs @Component — the same, but not really
 
@@ -121,3 +111,4 @@ The review rule: **use `@Configuration` for wiring that references other beans; 
 - Prefer `@Bean` methods with parameters over calling other `@Bean` methods — explicit and proxy-independent.
 - Wire lifecycle (`initMethod`/`destroyMethod`), scope, and `@Primary` at the `@Bean` level.
 - Use `@Configuration` for interlinked wiring; `@Component`+`@Bean` only for standalone factories.
+

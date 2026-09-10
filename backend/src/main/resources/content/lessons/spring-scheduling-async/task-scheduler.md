@@ -1,7 +1,7 @@
 ---
 title: The TaskScheduler Abstraction
 module: spring-scheduling-async
-order: 3
+order: 5
 minutes: 18
 topics: ["TaskScheduler", "ScheduledFuture", "Trigger", "programmatic scheduling", "periodic tasks"]
 summary: @Scheduled is declarative — the schedule is baked into the method at compile time. But real systems sometimes need dynamic scheduling: schedules re...
@@ -18,7 +18,6 @@ docs:
 
 The `TaskScheduler` interface (implemented by `ThreadPoolTaskScheduler`) offers four families of methods:
 
-```java
 public interface TaskScheduler {
 
     ScheduledFuture<?> schedule(Runnable task, Trigger trigger);
@@ -26,13 +25,11 @@ public interface TaskScheduler {
     ScheduledFuture<?> scheduleAtFixedRate(Runnable task, Duration period);
     ScheduledFuture<?> scheduleWithFixedDelay(Runnable task, Duration delay);
 }
-```
 
 The return value is a `ScheduledFuture` — cancel it to stop the task, or check `isDone()` to see if it terminated.
 
 ## Programmatic Fixed-Rate Scheduling
 
-```java
 @Service
 public class DynamicJobService {
 
@@ -58,11 +55,9 @@ public class DynamicJobService {
         return future != null && !future.isCancelled();
     }
 }
-```
 
 This enables a management API:
 
-```java
 @RestController
 @RequestMapping("/api/jobs")
 public class JobController {
@@ -81,7 +76,6 @@ public class JobController {
         jobs.stopJob(id);
     }
 }
-```
 
 ## Triggers: Schedules as Objects
 
@@ -89,26 +83,21 @@ A `Trigger` computes the *next* execution time from the current one. Spring ship
 
 ### CronTrigger
 
-```java
 Trigger trigger = new CronTrigger("0 0/5 * * * *");   // every 5 min
 ScheduledFuture<?> future = taskScheduler.schedule(task, trigger);
-```
 
 ### PeriodicTrigger
 
-```java
 PeriodicTrigger trigger = new PeriodicTrigger(Duration.ofSeconds(30));
 trigger.setFixedRate(true);            // default is fixed-delay
 
 // Or with an initial delay
 PeriodicTrigger trigger2 = new PeriodicTrigger(10_000, TimeUnit.MILLISECONDS);
-```
 
 ### Custom Trigger
 
 The interface is trivial — this one skips weekends:
 
-```java
 public class WeekdayTrigger implements Trigger {
 
     private final CronTrigger delegate = new CronTrigger("0 0 3 * * *");
@@ -129,13 +118,11 @@ public class WeekdayTrigger implements Trigger {
         return dow == DayOfWeek.SATURDAY || dow == DayOfWeek.SUNDAY;
     }
 }
-```
 
 ## TriggerContext: What the Scheduler Remembers
 
 The `TriggerContext` passed to `nextExecution` carries the last scheduled time, last actual start time, and last completion time — so a trigger can implement **missed-run compensation** (e.g., if the app slept through a run, run immediately on wake):
 
-```java
 public class CatchUpTrigger implements Trigger {
 
     @Override
@@ -149,13 +136,11 @@ public class CatchUpTrigger implements Trigger {
         return lastCompletion.plus(Duration.ofMinutes(5));
     }
 }
-```
 
 ## Scheduling From a Database
 
 Combining `TaskScheduler` with a repository turns schedules into data:
 
-```java
 @Service
 public class DatabaseDrivenScheduler {
 
@@ -184,19 +169,16 @@ public class DatabaseDrivenScheduler {
         schedule(job);
     }
 }
-```
 
 ## Shutdown Behavior
 
 `ThreadPoolTaskScheduler` integrates with Spring's lifecycle. Configure graceful shutdown:
 
-```java
 ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
 scheduler.setWaitForTasksToCompleteOnShutdown(true);
 scheduler.setAwaitTerminationSeconds(30);
 scheduler.setPoolSize(4);
 scheduler.setRemoveOnCancelPolicy(true);
-```
 
 `removeOnCancelPolicy(true)` is a small but real optimization: cancelled tasks are removed from the internal queue immediately, freeing memory for long-lived schedules.
 
@@ -212,3 +194,4 @@ scheduler.setRemoveOnCancelPolicy(true);
 | `ScheduledFuture` | Cancel, check status, await completion |
 
 `TaskScheduler` is the programmatic counterpart to `@Scheduled` — when schedules are data, not annotations, this abstraction is what keeps your application flexible and your scheduling logic testable.
+

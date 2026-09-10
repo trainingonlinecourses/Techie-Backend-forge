@@ -1,7 +1,7 @@
 ---
 title: Volatile and the Happens-Before Relationship
 summary: What volatile actually guarantees at the hardware level, the JMM happens-before rules, double-checked locking with volatile, and why volatile is not a substitute for synchronization.
-order: 47
+order: 84
 minutes: 20
 topics: [volatile, happens-before, memory-barrier, visibility, double-checked-locking, ordering, store-buffer]
 docs:
@@ -32,36 +32,55 @@ Key happens-before rules:
 5. **Thread join:** any action in a thread happens-before another thread successfully returns from `join()`.
 6. **Transitivity:** if A happens-before B, and B happens-before C, then A happens-before C.
 
+
+**What this code does — step by step:**
+
+1. Without volatile — thread B may never see the update
+2. `boolean ready = false;` — NOT volatile
+3. Thread A
+4. Thread B
+5. `while (!config.ready) {` — may loop forever — no happens-before guarantee
+6. With volatile — guaranteed visibility
+7. Now Thread B is guaranteed to see ready = true eventually
+
+The same code, clean:
+
 ```java
-// Without volatile — thread B may never see the update
 class Config {
-    boolean ready = false;  // NOT volatile
+    boolean ready = false;
 }
 
-// Thread A
 config.ready = true;
 
-// Thread B
-while (!config.ready) {  // may loop forever — no happens-before guarantee
+while (!config.ready) {
     Thread.sleep(100);
 }
 System.out.println("Started");
 
-// With volatile — guaranteed visibility
 class Config {
     volatile boolean ready = false;
 }
-// Now Thread B is guaranteed to see ready = true eventually
 ```
 
 ## Double-checked locking with volatile
 
 The classic pattern for lazy initialization without locks:
 
+
+**What this code does — step by step:**
+
+1. `private static volatile ConfigManager instance;` — MUST be volatile
+2. `if (instance == null) {` — first check — no lock
+3. `if (instance == null) {` — second check — inside lock
+4. `instance = new ConfigManager();` — volatile write
+5. `return instance;` — volatile read
+
+The same code, clean:
+
 ```java
 public class ConfigManager {
 
-    private static volatile ConfigManager instance;  // MUST be volatile
+    private static volatile ConfigManager instance;
 
     private Config config;
 
@@ -70,14 +89,14 @@ public class ConfigManager {
     }
 
     public static ConfigManager getInstance() {
-        if (instance == null) {                    // first check — no lock
+        if (instance == null) {
             synchronized (ConfigManager.class) {
-                if (instance == null) {            // second check — inside lock
-                    instance = new ConfigManager(); // volatile write
+                if (instance == null) {
+                    instance = new ConfigManager();
                 }
             }
         }
-        return instance;                           // volatile read
+        return instance;
     }
 }
 ```
@@ -98,7 +117,6 @@ public class ConfigManager {
 
 ### Scenario 1: volatile flag for graceful shutdown
 
-```java
 public class OrderProcessor {
 
     private volatile boolean running = true;
@@ -126,11 +144,9 @@ public class OrderProcessor {
         running = false;                       // volatile write — visible to worker thread
     }
 }
-```
 
 ### Scenario 2: volatile for double-checked config loading
 
-```java
 @Component
 public class FeatureFlags {
 
@@ -157,26 +173,32 @@ public class FeatureFlags {
         return flags.getOrDefault(flag, false);
     }
 }
-```
 
 ### Scenario 3: volatile does NOT protect compound operations
 
+
+**What this code does — step by step:**
+
+1. BROKEN: volatile does not make count++ atomic
+2. `count++;` — read → increment → write: not atomic!
+3. Thread A reads count (0), Thread B reads count (0). Thread A writes 1, Thread B writes 1 — lost update!
+4. FIX: use AtomicInteger
+5. `count.incrementAndGet();` — atomic CAS operation
+
+The same code, clean:
+
 ```java
-// BROKEN: volatile does not make count++ atomic
 private volatile int count = 0;
 
 public void increment() {
-    count++;  // read → increment → write: not atomic!
+    count++;
 }
 
-// Thread A reads count (0), Thread B reads count (0)
-// Thread A writes 1, Thread B writes 1 — lost update!
 
-// FIX: use AtomicInteger
 private final AtomicInteger count = new AtomicInteger(0);
 
 public void increment() {
-    count.incrementAndGet();  // atomic CAS operation
+    count.incrementAndGet();
 }
 ```
 
@@ -198,3 +220,4 @@ This is expensive relative to a normal read/write (roughly 5-10x slower on x86),
 | Using volatile instead of `synchronized` for compound state | Race conditions between multiple volatile fields |
 | Making every field volatile | Performance degradation — unnecessary memory barriers |
 | Assuming volatile is faster than synchronized | For single flags yes, for compound operations no |
+

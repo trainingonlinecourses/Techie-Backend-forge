@@ -17,7 +17,6 @@ When Spring Boot starts your application, it creates all the beans, wires them t
 
 **CommandLineRunner** and **ApplicationRunner** are interfaces that let you execute code **after** the Spring context is fully loaded but **before** the application starts accepting requests.
 
-```java
 // CommandLineRunner — simple, just takes String[] args
 @Component
 public class DataLoader implements CommandLineRunner {
@@ -38,7 +37,6 @@ public class DataLoader implements ApplicationRunner {
         System.out.println("Non-option args: " + nonOptionArgs);
     }
 }
-```
 
 ---
 
@@ -46,7 +44,6 @@ public class DataLoader implements ApplicationRunner {
 
 ### Basic Usage
 
-```java
 @Component
 public class StartupInitializer implements CommandLineRunner {
 
@@ -60,11 +57,9 @@ public class StartupInitializer implements CommandLineRunner {
         }
     }
 }
-```
 
 ### Multiple Runners with @Order
 
-```java
 @Component
 @Order(1)
 public class DatabaseMigration implements CommandLineRunner {
@@ -94,11 +89,9 @@ public class HealthChecker implements CommandLineRunner {
         // Verify database, Redis, etc. are reachable
     }
 }
-```
 
 ### Conditional Execution
 
-```java
 @Component
 public class DevDataLoader implements CommandLineRunner {
 
@@ -113,11 +106,9 @@ public class DevDataLoader implements CommandLineRunner {
         }
     }
 }
-```
 
 ### With Dependencies (Constructor Injection)
 
-```java
 @Component
 public class DataSeeder implements CommandLineRunner {
 
@@ -153,7 +144,6 @@ public class DataSeeder implements CommandLineRunner {
         userRepository.save(admin);
     }
 }
-```
 
 ---
 
@@ -161,7 +151,6 @@ public class DataSeeder implements CommandLineRunner {
 
 ApplicationRunner is similar but receives an `ApplicationArguments` object that provides structured access to command-line arguments:
 
-```java
 @Component
 public class SmartStarter implements ApplicationRunner {
 
@@ -185,7 +174,6 @@ public class SmartStarter implements ApplicationRunner {
         }
     }
 }
-```
 
 ```bash
 # Running with arguments
@@ -216,7 +204,6 @@ java -jar app.jar --profile=production --debug arg1 arg2
 
 ### Scenario 1: Database Schema Validation
 
-```java
 @Component
 @Order(1)
 public class SchemaValidator implements CommandLineRunner {
@@ -250,11 +237,9 @@ public class SchemaValidator implements CommandLineRunner {
         log.info("Schema validation passed — all {} tables present", required.size());
     }
 }
-```
 
 ### Scenario 2: Feature Flag Initialization
 
-```java
 @Component
 public class FeatureFlagLoader implements CommandLineRunner {
 
@@ -279,11 +264,9 @@ public class FeatureFlagLoader implements CommandLineRunner {
         log.info("Loaded {} feature flags", flags.size());
     }
 }
-```
 
 ### Scenario 3: Cache Warming
 
-```java
 @Component
 @Order(2)
 public class CacheWarmer implements CommandLineRunner {
@@ -319,11 +302,9 @@ public class CacheWarmer implements CommandLineRunner {
         log.info("Warmed users cache with {} items", activeUsers.size());
     }
 }
-```
 
 ### Scenario 4: Startup Health Checks
 
-```java
 @Component
 @Order(3)
 public class HealthChecker implements CommandLineRunner {
@@ -362,7 +343,6 @@ public class HealthChecker implements CommandLineRunner {
         log.info("All health checks passed!");
     }
 }
-```
 
 ---
 
@@ -376,3 +356,4 @@ public class HealthChecker implements CommandLineRunner {
 | Using `@PostConstruct` instead | `@PostConstruct` runs before all beans are ready | Use `CommandLineRunner` for post-startup tasks |
 | Running blocking operations | Delays startup | Keep runners fast or run them async |
 | Forgetting `@Component` | Runner never gets picked up | Always annotate with `@Component` |
+

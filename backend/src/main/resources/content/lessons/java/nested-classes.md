@@ -1,7 +1,7 @@
 ---
 title: Nested & Inner Classes — Static, Inner, Local and Anonymous
 summary: The four kinds of nested classes, when each is used in production, the implicit-outer-reference gotcha, and lambda-vs-anonymous-class trade-offs.
-order: 34
+order: 56
 minutes: 20
 topics: [nested-classes, inner-class, static-nested, anonymous-class, local-class, outer-reference, lambdas]
 docs:
@@ -20,29 +20,36 @@ Java allows classes declared inside other classes — four kinds, each with diff
 3. **Local class** — a class declared inside a method; scoped to that method, can capture effectively-final locals.
 4. **Anonymous class** — `new Interface() { ... }` — a one-off class with no name, the pre-lambda way to pass behavior.
 
+
+**What this code does — step by step:**
+
+1. static nested — a pure helper, no outer access needed
+2. inner class — needs the outer instance (accesses taxRate)
+3. `BigDecimal taxable() { return unitPrice.multiply(taxRate); }` — outer field via hidden ref
+4. local class inside a method
+5. ...
+6. anonymous class (pre-lambda style — see lambdas lesson for the modern form)
+
+The same code, clean:
+
 ```java
 public class OrderService {
     private final BigDecimal taxRate;
 
-    // static nested — a pure helper, no outer access needed
     public static class OrderResult {
         final Long id; final BigDecimal total;
         public OrderResult(Long id, BigDecimal total) { this.id = id; this.total = total; }
     }
 
-    // inner class — needs the outer instance (accesses taxRate)
     public class OrderLine {
         private final BigDecimal unitPrice;
-        BigDecimal taxable() { return unitPrice.multiply(taxRate); }  // outer field via hidden ref
+        BigDecimal taxable() { return unitPrice.multiply(taxRate); }
     }
 
-    // local class inside a method
     public OrderResult create(...) {
         class Validator { boolean ok(Order o) { return o != null; } }
-        // ...
     }
 
-    // anonymous class (pre-lambda style — see lambdas lesson for the modern form)
     Runnable cleanup = new Runnable() {
         @Override public void run() { /* release resources */ }
     };
@@ -53,18 +60,15 @@ public class OrderService {
 
 **Pattern 1 — static nested for grouped helpers.** The `Builder`, `Result`, or `Key` classes that belong to one type and need no outer state. `Map.Entry` and `Builder`-style classes are the canonical examples — static nesting is *namespacing*, not composition:
 
-```java
 public class Customer {
     public static class Address {          // belongs to Customer, needs nothing from it
         private final String street;
         public Address(String street) { this.street = street; }
     }
 }
-```
 
 **Pattern 2 — inner classes for stateful adapters.** When the nested behavior needs the outer's fields — e.g., an iterator over a collection:
 
-```java
 public class OrderList {
     private final Order[] items;
     public class Iterator {                // inner — sees items
@@ -73,11 +77,9 @@ public class OrderList {
         public Order next() { return items[pos++]; }
     }
 }
-```
 
 **Pattern 3 — anonymous classes are legacy behavior-passing.** Before lambdas, every `Comparator`, `Runnable`, `ActionListener` was an anonymous class. Modern code uses **lambdas** — shorter, and they compile to the same functional interface:
 
-```java
 // Anonymous (still legal, now mostly legacy)
 list.sort(new Comparator<Order>() {
     public int compare(Order a, Order b) { return a.createdAt().compareTo(b.createdAt()); }
@@ -85,7 +87,6 @@ list.sort(new Comparator<Order>() {
 
 // Lambda — the modern form
 list.sort(Comparator.comparing(Order::createdAt));
-```
 
 Rule of thumb: if the anonymous class implements a *functional interface* (one abstract method), write a lambda. Use an explicit named class when the behavior is reused or has more than a couple of statements.
 
@@ -115,3 +116,4 @@ Because a lambda's `this` is the enclosing object, a lambda can accidentally cap
 - Anonymous classes that implement functional interfaces should be lambdas.
 - Lambdas capture the enclosing `this`; anonymous classes have their own `this`.
 - Prefer static nesting for helpers — no hidden references, no retention surprises.
+

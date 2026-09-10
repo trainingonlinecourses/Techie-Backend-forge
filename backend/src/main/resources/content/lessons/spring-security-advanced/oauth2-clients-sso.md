@@ -1,7 +1,7 @@
 ---
 title: OAuth2 Client — Login with Google, GitHub & SSO
 summary: Adding "Sign in with …" to your app — the OAuth2 client filter chain, provider registration, user info mapping and the OIDC login flow.
-order: 4
+order: 2
 minutes: 14
 topics: [oauth2 client, oidc, sso, sign in with google, userinfo, federated login]
 docs:
@@ -55,7 +55,6 @@ The `client-secret` exchange happens **server-side** — that's why the client (
 
 Provider identity (Google `sub`, email) isn't your user model. Map on login via `OAuth2UserService`:
 
-```java
 @Service
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
@@ -67,13 +66,10 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         return new AppOAuth2User(user);          // wrap with YOUR authorities/roles
     }
 }
-```
 
-```java
 http.oauth2Login(oauth -> oauth
     .userInfoEndpoint(ui -> ui.userService(customService))
     .defaultSuccessUrl("/dashboard", true));
-```
 
 The pattern to get right: **provider identity (sub) must be unique per provider** — storing by email alone lets an attacker who controls the victim's email at another provider hijack the account. Store `provider` + `providerSub` as the link key.
 
@@ -102,12 +98,10 @@ Each registration gets its own login button and callback path. **Account linking
 
 ## Testing the client flow
 
-```java
 // Mock the provider with spring-security-oauth2-client test support:
 http.oauth2Login(oauth -> oauth
     .userInfoEndpoint(ui -> ui.userService(mockUserService)))   // no real Google in tests
 // then: GET /oauth2/authorization/google with the mocked filter → assert redirect + local session
-```
 
 `MockMvc` + a mocked `OAuth2UserService` tests the entire client chain without touching the provider — the security-testing lesson's `@WithMockOAuth2User`/`@WithUser` annotations cover the logged-in side.
 
@@ -119,3 +113,4 @@ http.oauth2Login(oauth -> oauth
 - Multiple registrations = multiple providers; plan logout semantics when going multi-app SSO.
 
 Official docs: [OAuth2 Login](https://docs.spring.io/spring-security/reference/servlet/oauth2/login/index.html) · [OAuth2 Client](https://docs.spring.io/spring-security/reference/servlet/oauth2/client/index.html)
+

@@ -1,7 +1,7 @@
 ---
 title: Redis as the Cache Store
 module: spring-cache
-order: 3
+order: 6
 minutes: 22
 topics: ["RedisCacheManager", "TTL", "serialization", "distributed cache", "Redis config"]
 summary: Singleinstance apps can use Caffeine. The moment you scale out, every replica needs the same cache — that's what Redis provides: a shared, networka...
@@ -39,7 +39,6 @@ Spring Boot auto-configures `RedisConnectionFactory` and `RedisTemplate`. Cachin
 
 Spring Boot's default `RedisCacheManager` uses JDK serialization — verbose, slow, and requires `Serializable` on every cached type. Configure JSON with a dedicated `RedisTemplate`:
 
-```java
 @Configuration
 public class RedisCacheConfig {
 
@@ -62,7 +61,6 @@ public class RedisCacheConfig {
             .build();
     }
 }
-```
 
 `disableCachingNullValues()` is important: it stops Redis from storing empty entries (which `unless = "#result == null"` would otherwise let through and which defeat cache-aside for nulls).
 
@@ -70,14 +68,12 @@ public class RedisCacheConfig {
 
 Different data, different TTLs:
 
-```java
 .withCacheConfiguration("course-catalog",
     RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofHours(24)))
 .withCacheConfiguration("course-pricing",
     RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofHours(6)))
 .withCacheConfiguration("user-sessions",
     RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofMinutes(30)))
-```
 
 Every `@Cacheable("course-catalog")` now gets 24h automatically.
 
@@ -102,10 +98,8 @@ redis-cli ttl 'courses::c1'
 
 `sync = true` works across the cluster because Redis supports it natively:
 
-```java
 @Cacheable(value = "courses", key = "#id", sync = true)
 public Course getCourse(String id) { ... }
-```
 
 With Redis, the lock is a distributed Redis lock, so a cold key is computed once even when 100 replicas request it simultaneously. This is one of the biggest wins of Redis over a local cache in a cluster.
 
@@ -113,7 +107,6 @@ With Redis, the lock is a distributed Redis lock, so a cold key is computed once
 
 Avoid cold-start misses by warming the cache at startup:
 
-```java
 @Component
 public class CacheWarmer implements ApplicationRunner {
 
@@ -126,13 +119,11 @@ public class CacheWarmer implements ApplicationRunner {
             .forEach(c -> courseService.getCourse(c.getId()));
     }
 }
-```
 
 ## Redis Failure Behavior
 
 Redis is a dependency — when it's down, every cached method throws. Decide the failure policy:
 
-```java
 @Cacheable(value = "courses", sync = true)
 public Course getCourse(String id) {
     try {
@@ -143,7 +134,6 @@ public Course getCourse(String id) {
         return courseRepository.findById(id).orElseThrow();
     }
 }
-```
 
 "Fail open" (serve from DB) is usually right for reads; "fail closed" (throw) is right when serving stale data is worse than an error.
 
@@ -151,14 +141,12 @@ public Course getCourse(String id) {
 
 For very hot data, layer Caffeine in front of Redis — L1 local, L2 shared:
 
-```java
 @Bean
 public CacheManager localCacheManager() {
     CaffeineCacheManager manager = new CaffeineCacheManager();
     manager.setCaffeine(Caffeine.newBuilder().maximumSize(1000).expireAfterWrite(Duration.ofSeconds(30)));
     return manager;
 }
-```
 
 L1 gives sub-microsecond hits; L2 gives cluster consistency with a 30s lag. The tradeoff: invalidation is eventually consistent within the L1 TTL.
 
@@ -174,3 +162,4 @@ L1 gives sub-microsecond hits; L2 gives cluster consistency with a 30s lag. The 
 | Hot data | Optional Caffeine L1 in front of Redis |
 
 Redis turns Spring's cache abstraction into a cluster-wide facility with TTLs, distributed locks, and predictable failure modes — the production-grade answer to "which cache should I use?"
+

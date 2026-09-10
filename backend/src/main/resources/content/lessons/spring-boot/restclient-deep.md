@@ -1,7 +1,7 @@
 ---
 title: RestClient — Modern HTTP Client (Spring 6.1)
 summary: Fluent API for synchronous HTTP calls, replacing RestTemplate, request interceptors, error handling, and calling external microservices.
-order: 50
+order: 43
 minutes: 16
 topics: [restclient, resttemplate, http-client, microservices, external-api, request-interceptor]
 docs:
@@ -21,7 +21,6 @@ Think of it as a **postman for your code** — you build requests step by step a
 
 ## Why RestClient Over RestTemplate?
 
-```java
 // ❌ Old way — RestTemplate (verbose, hard to read)
 RestTemplate restTemplate = new RestTemplate();
 
@@ -35,9 +34,7 @@ HttpEntity<String> entity = new HttpEntity<>("{\"name\":\"Alice\"}", headers);
 ResponseEntity<User> response = restTemplate.postForEntity(
     "https://api.example.com/users", entity, User.class
 );
-```
 
-```java
 // ✅ New way — RestClient (clean, fluent, readable)
 RestClient client = RestClient.create("https://api.example.com");
 
@@ -54,7 +51,6 @@ User user = client.post()
     .body(Map.of("name", "Alice"))
     .retrieve()
     .body(User.class);
-```
 
 ---
 
@@ -62,7 +58,6 @@ User user = client.post()
 
 ### Creating a RestClient
 
-```java
 // Option 1: Simple creation
 RestClient client = RestClient.create("https://api.example.com");
 
@@ -72,11 +67,9 @@ RestClient client = RestClient.builder()
     .defaultHeader("Authorization", "Bearer " + token)
     .defaultHeader("Accept", MediaType.APPLICATION_JSON_VALUE)
     .build();
-```
 
 ### GET Requests
 
-```java
 RestClient client = RestClient.create("https://jsonplaceholder.typicode.com");
 
 // Simple GET
@@ -100,11 +93,9 @@ List<Post> posts = client.get()
         .build())
     .retrieve()
     .body(new ParameterizedTypeReference<List<Post>>() {});
-```
 
 ### POST Requests
 
-```java
 // POST with JSON body
 Post newPost = client.post()
     .uri("/posts")
@@ -126,11 +117,9 @@ ResponseEntity<Post> response = client.post()
 
 int statusCode = response.getStatusCode().value();  // 201
 Post created = response.getBody();
-```
 
 ### PUT and DELETE
 
-```java
 // PUT — update entire resource
 client.put()
     .uri("/posts/1")
@@ -152,7 +141,6 @@ client.delete()
     .uri("/posts/1")
     .retrieve()
     .toBodilessEntity();
-```
 
 ---
 
@@ -160,42 +148,48 @@ client.delete()
 
 ### Custom Error Handling
 
-```java
-RestClient client = RestClient.create("https://api.example.com");
+public class Main {
 
-try {
-    User user = client.get()
-        .uri("/users/{id}", 999)
-        .retrieve()
-        .body(User.class);
-} catch (HttpClientErrorException.NotFound e) {
-    // 404 — user not found
-    System.out.println("User not found: " + e.getResponseBodyAsString());
-} catch (HttpClientErrorException e) {
-    // Any 4xx error
-    System.out.println("Client error: " + e.getStatusCode());
-} catch (HttpServerErrorException e) {
-    // Any 5xx error
-    System.out.println("Server error: " + e.getStatusCode());
+    public static void main(String[] args) {
+        RestClient client = RestClient.create("https://api.example.com");
+
+        try {
+            User user = client.get()
+                .uri("/users/{id}", 999)
+                .retrieve()
+                .body(User.class);
+        } catch (HttpClientErrorException.NotFound e) {
+            // 404 — user not found
+            System.out.println("User not found: " + e.getResponseBodyAsString());
+        } catch (HttpClientErrorException e) {
+            // Any 4xx error
+            System.out.println("Client error: " + e.getStatusCode());
+        } catch (HttpServerErrorException e) {
+            // Any 5xx error
+            System.out.println("Server error: " + e.getStatusCode());
+        }
+    }
 }
-```
 
 ### Handling Errors with ResponseEntity
 
-```java
-// Get the full response including error status
-ResponseEntity<User> response = client.get()
-    .uri("/users/{id}", 999)
-    .toEntity(User.class);
+public class Main {
 
-if (response.getStatusCode().is4xxClientError()) {
-    System.out.println("Client error: " + response.getStatusCode());
-} else if (response.getStatusCode().is5xxServerError()) {
-    System.out.println("Server error: " + response.getStatusCode());
-} else {
-    User user = response.getBody();
+    public static void main(String[] args) {
+        // Get the full response including error status
+        ResponseEntity<User> response = client.get()
+            .uri("/users/{id}", 999)
+            .toEntity(User.class);
+
+        if (response.getStatusCode().is4xxClientError()) {
+            System.out.println("Client error: " + response.getStatusCode());
+        } else if (response.getStatusCode().is5xxServerError()) {
+            System.out.println("Server error: " + response.getStatusCode());
+        } else {
+            User user = response.getBody();
+        }
+    }
 }
-```
 
 ---
 
@@ -203,21 +197,23 @@ if (response.getStatusCode().is4xxClientError()) {
 
 ### Request Interceptors
 
-```java
-RestClient client = RestClient.builder()
-    .baseUrl("https://api.example.com")
-    .requestInterceptor((request, body, execution) -> {
-        // Add auth token to every request
-        request.getHeaders().set("Authorization", "Bearer " + getToken());
-        System.out.println("Request: " + request.getMethod() + " " + request.getURI());
-        return execution.execute(request, body);
-    })
-    .build();
-```
+public class Main {
+
+    public static void main(String[] args) {
+        RestClient client = RestClient.builder()
+            .baseUrl("https://api.example.com")
+            .requestInterceptor((request, body, execution) -> {
+                // Add auth token to every request
+                request.getHeaders().set("Authorization", "Bearer " + getToken());
+                System.out.println("Request: " + request.getMethod() + " " + request.getURI());
+                return execution.execute(request, body);
+            })
+            .build();
+    }
+}
 
 ### Request/Response Logging
 
-```java
 RestClient client = RestClient.builder()
     .baseUrl("https://api.example.com")
     .requestInterceptor(new LoggingInterceptor())
@@ -235,18 +231,15 @@ public class LoggingInterceptor implements ClientHttpRequestInterceptor {
         return response;
     }
 }
-```
 
 ### Custom Headers Per Request
 
-```java
 User user = client.get()
     .uri("/users/1")
     .header("X-Request-Id", UUID.randomUUID().toString())
     .header("Accept-Language", "en-US")
     .retrieve()
     .body(User.class);
-```
 
 ---
 
@@ -254,7 +247,6 @@ User user = client.get()
 
 ### Scenario 1: Calling an External Payment API
 
-```java
 @Service
 public class PaymentService {
 
@@ -284,11 +276,9 @@ public class PaymentService {
             .body(PaymentIntent.class);
     }
 }
-```
 
 ### Scenario 2: Calling a Microservice
 
-```java
 @Service
 public class OrderService {
 
@@ -314,11 +304,9 @@ public class OrderService {
         return new OrderSummary(order.getId(), user.getName(), order.getTotal());
     }
 }
-```
 
 ### Scenario 3: Webhook Configuration
 
-```java
 @Service
 public class WebhookService {
 
@@ -339,7 +327,6 @@ public class WebhookService {
             .toBodilessEntity();
     }
 }
-```
 
 ---
 
@@ -368,3 +355,4 @@ public class WebhookService {
 | Hardcoding URLs | Impossible to change environments | Use `@Value` or `@ConfigurationProperties` |
 | Not setting timeouts | Requests hang forever | Configure connect/read timeouts |
 | Returning raw entities | Exposes internal data | Map to DTOs before returning |
+

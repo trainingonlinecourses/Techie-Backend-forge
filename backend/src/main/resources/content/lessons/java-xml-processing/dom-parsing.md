@@ -1,7 +1,7 @@
 ---
 title: DOM Parsing — Loading XML Into a Navigable Tree
 summary: How the Document Object Model builds a full in-memory tree from XML, node traversal, modification, and serialization back to string or file.
-order: 2
+order: 1
 minutes: 22
 topics: [dom, xml-parsing, document-builder, node-traversal, xml-modification]
 docs:
@@ -61,16 +61,20 @@ Every box is a **Node** — the base interface. Elements, attributes, and text a
 
 ### Step 1: Create a DocumentBuilder
 
+
+**What this code does — step by step:**
+
+1. DocumentBuilderFactory is a factory that creates DocumentBuilder instances. Each implementation of this factory supports different features and options.
+2. Enable namespace awareness so elements like <ns:employee> are handled properly. Without this, <ns:employee> and <employee> look the same to the parser.
+3. Create the actual parser. This is thread-safe and can be reused.
+
+The same code, clean:
+
 ```java
-// DocumentBuilderFactory is a factory that creates DocumentBuilder instances.
-// Each implementation of this factory supports different features and options.
 DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 
-// Enable namespace awareness so elements like <ns:employee> are handled properly.
-// Without this, <ns:employee> and <employee> look the same to the parser.
 factory.setNamespaceAware(true);
 
-// Create the actual parser. This is thread-safe and can be reused.
 DocumentBuilder builder = factory.newDocumentBuilder();
 ```
 
@@ -81,7 +85,6 @@ DocumentBuilder builder = factory.newDocumentBuilder();
 
 ### Step 2: Parse XML into a Document
 
-```java
 // Parse from a file
 Document doc = builder.parse(new File("employees.xml"));
 
@@ -90,7 +93,6 @@ Document doc = builder.parse(new InputSource(new StringReader(xmlString)));
 
 // Or parse from an input stream (useful for network data)
 Document doc = builder.parse(connection.getInputStream());
-```
 
 **What happens internally:**
 1. The parser reads the XML byte stream
@@ -100,34 +102,45 @@ Document doc = builder.parse(connection.getInputStream());
 
 ### Step 3: Navigate the Tree
 
+
+**What this code does — step by step:**
+
+1. Get the root element — every XML document has exactly one root
+2. `Element root = doc.getDocumentElement();` — <company>
+3. Get child elements by tag name. Note: this only searches DIRECT children, not all descendants
+4. Access a specific department (index 0 = first one)
+5. Read attributes
+6. `String deptName = dept.getAttribute("name");` — "Engineering"
+7. Get child elements of the department
+8. Get the text content of child elements. GetElementsByTagName returns ALL descendants, so use getChildNodes() for direct children
+
+The same code, clean:
+
 ```java
-// Get the root element — every XML document has exactly one root
-Element root = doc.getDocumentElement();  // <company>
+public class Main {
 
-// Get child elements by tag name
-// Note: this only searches DIRECT children, not all descendants
-NodeList departments = root.getElementsByTagName("department");
-System.out.println("Number of departments: " + departments.getLength());
+    public static void main(String[] args) {
+        Element root = doc.getDocumentElement();
 
-// Access a specific department (index 0 = first one)
-Element dept = (Element) departments.item(0);
+        NodeList departments = root.getElementsByTagName("department");
+        System.out.println("Number of departments: " + departments.getLength());
 
-// Read attributes
-String deptName = dept.getAttribute("name");  // "Engineering"
-System.out.println("Department: " + deptName);
+        Element dept = (Element) departments.item(0);
 
-// Get child elements of the department
-NodeList employees = dept.getElementsByTagName("employee");
-for (int i = 0; i < employees.getLength(); i++) {
-    Element emp = (Element) employees.item(i);
-    String id = emp.getAttribute("id");
-    
-    // Get the text content of child elements
-    // getElementsByTagName returns ALL descendants, so use getChildNodes() for direct children
-    String name = emp.getElementsByTagName("name").item(0).getTextContent();
-    String role = emp.getElementsByTagName("role").item(0).getTextContent();
-    
-    System.out.printf("Employee %s: %s (%s)%n", id, name, role);
+        String deptName = dept.getAttribute("name");
+        System.out.println("Department: " + deptName);
+
+        NodeList employees = dept.getElementsByTagName("employee");
+        for (int i = 0; i < employees.getLength(); i++) {
+            Element emp = (Element) employees.item(i);
+            String id = emp.getAttribute("id");
+
+            String name = emp.getElementsByTagName("name").item(0).getTextContent();
+            String role = emp.getElementsByTagName("role").item(0).getTextContent();
+
+            System.out.printf("Employee %s: %s (%s)%n", id, name, role);
+        }
+    }
 }
 ```
 
@@ -135,41 +148,51 @@ for (int i = 0; i < employees.getLength(); i++) {
 - `getElementsByTagName("name")` — searches ALL descendants recursively. If a grandchild element is also named "name", it gets included.
 - `getChildNodes()` — returns only direct children (including text nodes and whitespace nodes).
 
-```java
-// getChildNodes() returns ALL node types, including whitespace!
-NodeList children = dept.getChildNodes();
-for (int i = 0; i < children.getLength(); i++) {
-    Node node = children.item(i);
-    // Filter by node type — you usually want ELEMENT_NODE only
-    if (node.getNodeType() == Node.ELEMENT_NODE) {
-        System.out.println("Direct child: " + node.getNodeName());
+public class Main {
+
+    public static void main(String[] args) {
+        // getChildNodes() returns ALL node types, including whitespace!
+        NodeList children = dept.getChildNodes();
+        for (int i = 0; i < children.getLength(); i++) {
+            Node node = children.item(i);
+            // Filter by node type — you usually want ELEMENT_NODE only
+            if (node.getNodeType() == Node.ELEMENT_NODE) {
+                System.out.println("Direct child: " + node.getNodeName());
+            }
+        }
     }
 }
-```
 
 ### Step 4: Modify the Document
 
+
+**What this code does — step by step:**
+
+1. Create a new employee element
+2. Create child elements
+3. Assemble the tree
+4. Add to the department
+5. Remove an employee (first one with id="1")
+6. Modify existing content
+
+The same code, clean:
+
 ```java
-// Create a new employee element
 Element newEmp = doc.createElement("employee");
 newEmp.setAttribute("id", "3");
 
-// Create child elements
 Element newName = doc.createElement("name");
 newName.setTextContent("Charlie");
 
 Element newRole = doc.createElement("role");
 newRole.setTextContent("Intern");
 
-// Assemble the tree
 newEmp.appendChild(newName);
 newEmp.appendChild(newRole);
 
-// Add to the department
 Element dept = (Element) root.getElementsByTagName("department").item(0);
 dept.appendChild(newEmp);
 
-// Remove an employee (first one with id="1")
 NodeList employees = dept.getElementsByTagName("employee");
 for (int i = 0; i < employees.getLength(); i++) {
     Element emp = (Element) employees.item(i);
@@ -179,7 +202,6 @@ for (int i = 0; i < employees.getLength(); i++) {
     }
 }
 
-// Modify existing content
 Element firstEmp = (Element) dept.getElementsByTagName("employee").item(0);
 firstEmp.getElementsByTagName("role").item(0).setTextContent("Lead Developer");
 ```
@@ -188,7 +210,6 @@ firstEmp.getElementsByTagName("role").item(0).setTextContent("Lead Developer");
 
 ### Step 5: Serialize Back to XML
 
-```java
 // Create a Transformer that converts DOM tree back to XML text
 TransformerFactory tf = TransformerFactory.newInstance();
 Transformer transformer = tf.newTransformer();
@@ -206,7 +227,6 @@ transformer.transform(source, result);
 StringWriter writer = new StringWriter();
 transformer.transform(source, new StreamResult(writer));
 String xmlString = writer.toString();
-```
 
 ---
 
@@ -215,7 +235,6 @@ String xmlString = writer.toString();
 ### Scenario 1: Configuration File Management
 Many enterprises store application configuration in XML. DOM is perfect for reading AND modifying these files:
 
-```java
 public class ConfigManager {
     private Document configDoc;
     private File configFile;
@@ -261,12 +280,10 @@ ConfigManager config = new ConfigManager("app-config.xml");
 System.out.println(config.getValue("database", "url"));   // jdbc:postgresql://...
 config.setValue("database", "pool-size", "20");
 config.save();
-```
 
 ### Scenario 2: SOAP Response Processing
 Legacy enterprise systems often communicate via SOAP XML:
 
-```java
 public OrderStatus parseSoapResponse(String soapXml) throws Exception {
     DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
     factory.setNamespaceAware(true);
@@ -282,12 +299,10 @@ public OrderStatus parseSoapResponse(String soapXml) throws Exception {
         order.getElementsByTagNameNS("*", "trackingNumber").item(0).getTextContent()
     );
 }
-```
 
 ### Scenario 3: Build Pipeline Configuration
 Maven's `pom.xml` is itself parsed with DOM-like APIs. You might need to read or modify build configs programmatically:
 
-```java
 public void addDependency(Document pomDoc, String groupId, String artifactId, String version) {
     NodeList deps = pomDoc.getElementsByTagName("dependencies");
     Element dependencies = (Element) deps.item(0);
@@ -300,7 +315,6 @@ public void addDependency(Document pomDoc, String groupId, String artifactId, St
     dep.appendChild(g); dep.appendChild(a); dep.appendChild(v);
     dependencies.appendChild(dep);
 }
-```
 
 ---
 
@@ -328,3 +342,4 @@ public void addDependency(Document pomDoc, String groupId, String artifactId, St
 | Read-only, one-pass processing | **SAX** | Fastest, lowest memory |
 | Complex conditional processing | **StAX** | Pull-based, most control |
 | JSON-like data | **Jackson/Gson** | XML is overkill for key-value data |
+

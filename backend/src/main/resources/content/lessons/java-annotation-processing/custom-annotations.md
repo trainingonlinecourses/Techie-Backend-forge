@@ -1,7 +1,7 @@
 ---
 title: Custom Annotations — Metadata for Your Code
 summary: What annotations are, how to create custom ones, annotation retention, targets, processing with reflection, and how organizations use annotations for frameworks.
-order: 1
+order: 3
 minutes: 25
 topics: [annotations, custom-annotations, retention, target, reflection, annotation-processing]
 docs:
@@ -12,72 +12,132 @@ docs:
 
 Annotations are metadata you attach to code. They don't do anything by themselves — they need a processor (like Spring, JUnit, or your own reflection code) to act on them:
 
-```java
-// Built-in annotations you already use
-@Override      // Compiler check: this method overrides a parent
-@FXML          // JavaFX: inject a UI element
-@Test          // JUnit: mark a test method
 
-// Custom annotations YOU can create
-@RateLimited(limit = 100, window = 60)  // Custom: rate limit this endpoint
-@Cached(ttl = 300)                       // Custom: cache this method's result
-@Audited                              // Custom: log this operation for compliance
+**What this code does — step by step:**
+
+1. Built-in annotations you already use
+2. `@Override` — Compiler check: this method overrides a parent
+3. `@FXML` — JavaFX: inject a UI element
+4. `@Test` — JUnit: mark a test method
+5. Custom annotations YOU can create
+6. `@RateLimited(limit = 100, window = 60)` — Custom: rate limit this endpoint
+7. `@Cached(ttl = 300)` — Custom: cache this method's result
+8. `@Audited` — Custom: log this operation for compliance
+
+The same code, clean:
+
+```java
+@Override
+@FXML
+@Test
+
+@RateLimited(limit = 100, window = 60)
+@Cached(ttl = 300)
+@Audited
 ```
 
 ---
 
 ## Creating Custom Annotations
 
+
+**What this code does — step by step:**
+
+1. Step 1: Define the annotation
+2. `@Retention(RetentionPolicy.RUNTIME)` — Keep at runtime (accessible via reflection)
+3. `@Target(ElementType.METHOD)` — Can only be placed on methods
+4. `int limit();` — Required parameter
+5. `long window() default 60;` — Optional parameter with default
+6. `String key() default "";` — Optional parameter
+7. Step 2: Use it
+8. ...
+9. Step 3: Process it (via reflection)
+10. `int limit = annotation.limit();` — 100
+11. `long window = annotation.window();` — 60
+
+The same code, clean:
+
 ```java
-// Step 1: Define the annotation
 import java.lang.annotation.*;
 
-@Retention(RetentionPolicy.RUNTIME)   // Keep at runtime (accessible via reflection)
-@Target(ElementType.METHOD)          // Can only be placed on methods
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
 public @interface RateLimited {
-    int limit();                      // Required parameter
-    long window() default 60;         // Optional parameter with default
-    String key() default "";          // Optional parameter
+    int limit();
+    long window() default 60;
+    String key() default "";
 }
 
-// Step 2: Use it
 @RateLimited(limit = 100, window = 60)
 public ResponseEntity<?> handleRequest() {
-    // ...
 }
 
-// Step 3: Process it (via reflection)
 Method method = controller.getClass().getMethod("handleRequest");
 RateLimited annotation = method.getAnnotation(RateLimited.class);
-int limit = annotation.limit();       // 100
-long window = annotation.window();   // 60
+int limit = annotation.limit();
+long window = annotation.window();
 ```
 
 ---
 
 ## Retention Policies
 
-```java
 @Retention(RetentionPolicy.SOURCE)   // Discarded after compilation (like @Override)
 @Retention(RetentionPolicy.CLASS)    // Kept in .class file but not at runtime
 @Retention(RetentionPolicy.RUNTIME)  // Kept at runtime (accessible via reflection)
-```
 
 ## Targets
 
+
+**What this code does — step by step:**
+
+1. `@Target(ElementType.TYPE)` — Classes, interfaces, enums
+2. `@Target(ElementType.METHOD)` — Methods
+3. `@Target(ElementType.FIELD)` — Fields
+4. `@Target(ElementType.PARAMETER)` — Method parameters
+5. `@Target(ElementType.CONSTRUCTOR)` — Constructors
+6. `@Target(ElementType.LOCAL_VARIABLE)` — Local variables
+7. `@Target({ElementType.TYPE, ElementType.METHOD})` — Multiple targets
+
+The same code, clean:
+
 ```java
-@Target(ElementType.TYPE)        // Classes, interfaces, enums
-@Target(ElementType.METHOD)      // Methods
-@Target(ElementType.FIELD)       // Fields
-@Target(ElementType.PARAMETER)   // Method parameters
-@Target(ElementType.CONSTRUCTOR) // Constructors
-@Target(ElementType.LOCAL_VARIABLE) // Local variables
-@Target({ElementType.TYPE, ElementType.METHOD}) // Multiple targets
+@Target(ElementType.TYPE)
+@Target(ElementType.METHOD)
+@Target(ElementType.FIELD)
+@Target(ElementType.PARAMETER)
+@Target(ElementType.CONSTRUCTOR)
+@Target(ElementType.LOCAL_VARIABLE)
+@Target({ElementType.TYPE, ElementType.METHOD})
 ```
 
 ---
 
 ## Line-by-Line Walkthrough
+
+
+**What this code does — step by step:**
+
+1. Line 1: Define a custom annotation for validation
+2. Line 2: Define a custom annotation for caching
+3. `int ttlSeconds() default 300;` — time to live
+4. `String key() default "";` — cache key
+5. Line 3: Define a custom annotation for auditing
+6. `String action();` — what action is being performed
+7. `boolean logParams() default false;` — whether to log parameters
+8. Line 4: Use the annotations
+9. Line 5: Annotation processor using reflection
+10. Check @NotBlank
+11. Check @Range
+12. Line 6: Cache annotation processor
+13. Line 7: Audit annotation processor
+14. Line 8: Test validation
+15. `System.out.println("Valid user errors: " + validErrors);` — []
+16. `System.out.println("Invalid user errors: " + invalidErrors);` — [name: ..., age: ..., email: ...]
+17. Line 9: Test cache annotation
+18. Line 10: Test audit annotation
+
+The same code, clean:
 
 ```java
 import java.lang.annotation.*;
@@ -85,7 +145,6 @@ import java.lang.reflect.*;
 import java.util.*;
 
 public class CustomAnnotationsDemo {
-    // Line 1: Define a custom annotation for validation
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
     public @interface NotBlank {
@@ -100,23 +159,20 @@ public class CustomAnnotationsDemo {
         String message() default "Value out of range";
     }
 
-    // Line 2: Define a custom annotation for caching
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.METHOD)
     public @interface Cached {
-        int ttlSeconds() default 300;  // time to live
-        String key() default "";       // cache key
+        int ttlSeconds() default 300;
+        String key() default "";
     }
 
-    // Line 3: Define a custom annotation for auditing
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.METHOD)
     public @interface Audited {
-        String action();               // what action is being performed
-        boolean logParams() default false;  // whether to log parameters
+        String action();
+        boolean logParams() default false;
     }
 
-    // Line 4: Use the annotations
     static class User {
         @NotBlank(message = "Name is required")
         private String name;
@@ -134,7 +190,6 @@ public class CustomAnnotationsDemo {
         }
     }
 
-    // Line 5: Annotation processor using reflection
     static class Validator {
         public static List<String> validate(Object obj) throws IllegalAccessException {
             List<String> errors = new ArrayList<>();
@@ -144,7 +199,6 @@ public class CustomAnnotationsDemo {
                 field.setAccessible(true);
                 Object value = field.get(obj);
 
-                // Check @NotBlank
                 NotBlank notBlank = field.getAnnotation(NotBlank.class);
                 if (notBlank != null) {
                     if (value == null || value.toString().isBlank()) {
@@ -152,7 +206,6 @@ public class CustomAnnotationsDemo {
                     }
                 }
 
-                // Check @Range
                 Range range = field.getAnnotation(Range.class);
                 if (range != null && value instanceof Integer intValue) {
                     if (intValue < range.min() || intValue > range.max()) {
@@ -164,7 +217,6 @@ public class CustomAnnotationsDemo {
         }
     }
 
-    // Line 6: Cache annotation processor
     static Map<String, Object> cache = new HashMap<>();
 
     public static <T> T getCachedResult(String key, int ttl, java.util.function.Supplier<T> supplier) {
@@ -177,7 +229,6 @@ public class CustomAnnotationsDemo {
         return result;
     }
 
-    // Line 7: Audit annotation processor
     public static void auditMethod(Object obj, String methodName, Object... args) throws Exception {
         Method method = obj.getClass().getMethod(methodName);
         Audited audited = method.getAnnotation(Audited.class);
@@ -191,21 +242,18 @@ public class CustomAnnotationsDemo {
     }
 
     public static void main(String[] args) throws Exception {
-        // Line 8: Test validation
         User validUser = new User("Alice", 30, "alice@example.com");
         User invalidUser = new User("", 200, "");
 
         List<String> validErrors = Validator.validate(validUser);
         List<String> invalidErrors = Validator.validate(invalidUser);
 
-        System.out.println("Valid user errors: " + validErrors);    // []
-        System.out.println("Invalid user errors: " + invalidErrors); // [name: ..., age: ..., email: ...]
+        System.out.println("Valid user errors: " + validErrors);
+        System.out.println("Invalid user errors: " + invalidErrors);
 
-        // Line 9: Test cache annotation
         System.out.println("@Cached annotation found: " +
             DemoService.class.getMethod("getData").isAnnotationPresent(Cached.class));
 
-        // Line 10: Test audit annotation
         System.out.println("@Audited annotation found: " +
             DemoService.class.getMethod("processOrder").isAnnotationPresent(Audited.class));
     }
@@ -226,7 +274,6 @@ public class CustomAnnotationsDemo {
 
 ### Scenario 1: Custom validation framework
 
-```java
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
 public @interface Email {
@@ -246,11 +293,9 @@ public static boolean isValidEmail(Object obj) throws IllegalAccessException {
     }
     return true;
 }
-```
 
 ### Scenario 2: AOP-based audit logging
 
-```java
 @Aspect
 @Component
 public class AuditAspect {
@@ -267,7 +312,6 @@ public class AuditAspect {
         return result;
     }
 }
-```
 
 ---
 
@@ -280,3 +324,4 @@ public class AuditAspect {
 | Not handling null values | NullPointerException in processor | Check for null before accessing annotation |
 | Over-annotating | Code becomes noisy | Only annotate where it adds value |
 | Using annotations for logic | Annotations are metadata, not code | Process annotations in frameworks/tools |
+

@@ -1,7 +1,7 @@
 ---
 title: GraphQL Schema Design — Types, Queries, and Mutations
 module: graphql-deep
-order: 1
+order: 5
 minutes: 26
 topics: ["GraphQL schema", "SDL", "types", "queries", "mutations", "schema design"]
 summary: GraphQL's defining idea: the client asks for exactly the fields it wants — no overfetching (getting 50 fields when you need 3), no underfetching (n...
@@ -81,13 +81,18 @@ type Lesson {
 
 ## The Code Walkthrough — Schema First in Spring
 
-```java
-// ---- 1. The schema file (src/main/resources/graphql/schema.graphqls) ----
-// type Course { id: ID! title: String! minutes: Int! lessons: [Lesson!]! }
-// type Query { course(id: ID!): Course courses: [Course!]! }
-// type Mutation { createCourse(title: String!, minutes: Int!): Course! }
 
-// ---- 2. Data fetchers: Spring GraphQL wires schema -> methods ----
+**What this code does — step by step:**
+
+1. ---- 1. The schema file (src/main/resources/graphql/schema.graphqls) ----. Type Course { id: ID! title: String! minutes: Int! lessons: [Lesson!]! }. Type Query { course(id: ID!): Course courses: [Course!]! }. Type Mutation { createCourse(title: String!, minutes: Int!): Course! }
+2. ---- 2. Data fetchers: Spring GraphQL wires schema -> methods ----
+3. Implements: course(id: ID!): Course
+4. Implements: courses: [Course!]!
+5. Implements: createCourse(title: String!, minutes: Int!): Course!
+
+The same code, clean:
+
+```java
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.Argument;
@@ -100,19 +105,16 @@ public class CourseGraphqlController {
 
     public CourseGraphqlController(CourseService service) { this.service = service; }
 
-    // Implements: course(id: ID!): Course
     @QueryMapping
     public Course course(@Argument Long id) {
         return service.get(id);
     }
 
-    // Implements: courses: [Course!]!
     @QueryMapping
     public List<Course> courses() {
         return service.listAll();
     }
 
-    // Implements: createCourse(title: String!, minutes: Int!): Course!
     @MutationMapping
     public Course createCourse(@Argument String title, @Argument Integer minutes) {
         return service.create(title, minutes);
@@ -153,3 +155,4 @@ public class CourseGraphqlController {
 - Spring GraphQL: `schema.graphqls` + `@QueryMapping`/`@MutationMapping` controllers.
 - Nullability discipline: start nullable, tighten later; add fields, don't remove.
 - Use enums and input types; return changed objects from mutations.
+

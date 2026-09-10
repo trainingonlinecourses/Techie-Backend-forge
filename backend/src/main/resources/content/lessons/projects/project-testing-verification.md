@@ -122,7 +122,6 @@ echo "=== Results: $PASS passed, $FAIL failed ==="
 
 ## Integration Test Template
 
-```java
 package com.backendforge.project;
 
 import org.junit.jupiter.api.*;
@@ -180,7 +179,6 @@ class ProjectIntegrationTest {
         assertEquals(HttpStatus.NOT_FOUND, deleteCheck.getStatusCode());
     }
 }
-```
 
 ---
 
@@ -375,3 +373,4 @@ mvn test
 # Check health
 curl http://localhost:8080/actuator/health
 ```
+

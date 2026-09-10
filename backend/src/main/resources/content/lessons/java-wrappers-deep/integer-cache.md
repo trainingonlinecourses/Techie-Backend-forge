@@ -1,7 +1,7 @@
 ---
 title: The Integer Cache and Wrapper Interning
 summary: How Java caches Integer, Long, Byte, Short, and Character objects, the -128 to 127 range, Integer.valueOf(), and when to care about object identity.
-order: 3
+order: 2
 minutes: 15
 topics: [integer-cache, valueOf, interning, -128-127, object-identity, performance]
 docs:
@@ -12,15 +12,18 @@ docs:
 
 Java caches small wrapper objects to avoid creating millions of identical objects. When you write `Integer x = 42`, Java calls `Integer.valueOf(42)` which returns a cached object for values -128 to 127.
 
-```java
-Integer a = 100;
-Integer b = 100;
-System.out.println(a == b);  // true — same cached object
+public class Main {
 
-Integer c = 200;
-Integer d = 200;
-System.out.println(c == d);  // false — different objects
-```
+    public static void main(String[] args) {
+        Integer a = 100;
+        Integer b = 100;
+        System.out.println(a == b);  // true — same cached object
+
+        Integer c = 200;
+        Integer d = 200;
+        System.out.println(c == d);  // false — different objects
+    }
+}
 
 ---
 
@@ -41,16 +44,33 @@ System.out.println(c == d);  // false — different objects
 
 ## valueOf vs new
 
-```java
-// valueOf() — uses cache
-Integer a = Integer.valueOf(100);  // cached
-Integer b = Integer.valueOf(100);  // same object
-System.out.println(a == b);  // true
 
-// new — always creates new object
-Integer c = new Integer(100);  // deprecated, always new object
-Integer d = new Integer(100);  // different object
-System.out.println(c == d);  // false
+**What this code does — step by step:**
+
+1. valueOf() — uses cache
+2. `Integer a = Integer.valueOf(100);` — cached
+3. `Integer b = Integer.valueOf(100);` — same object
+4. `System.out.println(a == b);` — true
+5. new — always creates new object
+6. `Integer c = new Integer(100);` — deprecated, always new object
+7. `Integer d = new Integer(100);` — different object
+8. `System.out.println(c == d);` — false
+
+The same code, clean:
+
+```java
+public class Main {
+
+    public static void main(String[] args) {
+        Integer a = Integer.valueOf(100);
+        Integer b = Integer.valueOf(100);
+        System.out.println(a == b);
+
+        Integer c = new Integer(100);
+        Integer d = new Integer(100);
+        System.out.println(c == d);
+    }
+}
 ```
 
 ---
@@ -59,21 +79,23 @@ System.out.println(c == d);  // false
 
 ### Scenario 1: HashMap key comparison
 
-```java
-Map<Integer, String> map = new HashMap<>();
-Integer key1 = Integer.valueOf(100);
-Integer key2 = Integer.valueOf(100);
-// Works because Integer overrides equals() and hashCode()
-map.put(key1, "value");
-System.out.println(map.get(key2));  // "value" — works fine
+public class Main {
 
-// But == comparison is wrong
-System.out.println(key1 == key2);  // true (lucky — cached)
-```
+    public static void main(String[] args) {
+        Map<Integer, String> map = new HashMap<>();
+        Integer key1 = Integer.valueOf(100);
+        Integer key2 = Integer.valueOf(100);
+        // Works because Integer overrides equals() and hashCode()
+        map.put(key1, "value");
+        System.out.println(map.get(key2));  // "value" — works fine
+
+        // But == comparison is wrong
+        System.out.println(key1 == key2);  // true (lucky — cached)
+    }
+}
 
 ### Scenario 2: Thread safety of cache
 
-```java
 // The cache is thread-safe — Integer.valueOf() is synchronized internally
 // Multiple threads can safely use cached values
 ExecutorService pool = Executors.newFixedThreadPool(10);
@@ -83,7 +105,6 @@ for (int i = 0; i < 1000; i++) {
         // ...
     });
 }
-```
 
 ---
 
@@ -94,3 +115,4 @@ for (int i = 0; i < 1000; i++) {
 | Relying on == for wrappers | Works by accident with cache, fails at 128+ | Always use .equals() |
 | Creating wrapper with new | Bypasses cache, wastes memory | Use valueOf() or autoboxing |
 | Comparing Long == Long | Fails for values outside cache | Use .equals() |
+

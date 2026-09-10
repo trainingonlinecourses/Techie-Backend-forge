@@ -1,7 +1,7 @@
 ---
 title: Sending Email — SMTP, Templates, and Attachments
 summary: JavaMailSender configuration, HTML email with Thymeleaf templates, attachments, async email sending, and how organizations build reliable email pipelines with retries and bounce handling.
-order: 33
+order: 25
 minutes: 18
 topics: [email, javamailsender, smtp, thymeleaf-email, html-email, async-email, email-template, attachment]
 docs:
@@ -39,7 +39,6 @@ spring:
 
 ## Plain text email
 
-```java
 @Service
 public class EmailService {
 
@@ -59,11 +58,9 @@ public class EmailService {
         mailSender.send(message);
     }
 }
-```
 
 ## HTML email with Thymeleaf template
 
-```java
 @Service
 public class TemplatedEmailService {
 
@@ -97,11 +94,9 @@ public class TemplatedEmailService {
         }
     }
 }
-```
 
 ## Email with attachment
 
-```java
 public void sendInvoice(Invoice invoice, Path pdfPath) {
     MimeMessage message = mailSender.createMimeMessage();
     try {
@@ -121,11 +116,9 @@ public void sendInvoice(Invoice invoice, Path pdfPath) {
         throw new EmailException("Failed to send invoice", e);
     }
 }
-```
 
 ## Async email with retry
 
-```java
 @Service
 public class AsyncEmailService {
 
@@ -157,9 +150,7 @@ public class AsyncEmailService {
         deadLetterQueue.store(request);
     }
 }
-```
 
-```java
 @Bean("emailExecutor")
 public Executor emailExecutor() {
     ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
@@ -170,13 +161,11 @@ public Executor emailExecutor() {
     executor.initialize();
     return executor;
 }
-```
 
 ## How we use it in organizations
 
 ### Scenario 1: welcome email on user registration
 
-```java
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
@@ -198,11 +187,9 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(user);
     }
 }
-```
 
 ### Scenario 2: password reset with token
 
-```java
 public void sendPasswordReset(String email, String resetToken) {
     String resetUrl = "https://backendforge.com/reset?token=" + resetToken;
 
@@ -213,11 +200,9 @@ public void sendPasswordReset(String email, String resetToken) {
         buildPasswordResetHtml(resetUrl)
     ));
 }
-```
 
 ### Scenario 3: notification digest (batch emails)
 
-```java
 @Scheduled(cron = "0 0 8 * * MON")  // every Monday at 8 AM
 public void sendWeeklyDigest() {
     List<User> subscribers = userService.findAllSubscribed();
@@ -235,7 +220,6 @@ public void sendWeeklyDigest() {
         }
     }
 }
-```
 
 ## Common mistakes
 
@@ -246,3 +230,4 @@ public void sendWeeklyDigest() {
 | Embedding images as base64 | Huge emails, blocked by spam filters |
 | Using `reply-to` as `from` | Confusing sender address |
 | Not verifying email addresses | Bounced emails, spam complaints |
+

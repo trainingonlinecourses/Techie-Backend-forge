@@ -1,7 +1,7 @@
 ---
 title: Logging with SLF4J & Logback
 summary: Structured, level-aware logging with the SLF4J API and Logback — configuration, log levels, patterns, structured (JSON) logging and common anti-patterns.
-order: 11
+order: 37
 minutes: 14
 topics: [slf4j, logback, log levels, structured logging, log configuration]
 docs:
@@ -18,14 +18,25 @@ Spring Boot ships **SLF4J** (the API) over **Logback** (the implementation) — 
 - **Code against SLF4J**, never the concrete logger — implementations stay swappable.
 - Use `LoggerFactory.getLogger(MyClass.class)` or Lombok's `@Slf4j` (which generates the same field).
 
+
+**What this code does — step by step:**
+
+1. `log.trace("entry params {}", params);` — TRACE — internal diagnostics
+2. `log.debug("loading order {}", id);` — DEBUG — dev-time detail
+3. `log.info("order {} created", id);` — INFO — business milestones
+4. `log.warn("cache miss for {}", id);` — WARN — recoverable anomaly
+5. `log.error("payment failed for {}", id, ex);` — ERROR — needs attention
+
+The same code, clean:
+
 ```java
 private static final Logger log = LoggerFactory.getLogger(OrderService.class);
 
-log.trace("entry params {}", params);    // TRACE — internal diagnostics
-log.debug("loading order {}", id);       // DEBUG — dev-time detail
-log.info("order {} created", id);        // INFO — business milestones
-log.warn("cache miss for {}", id);       // WARN — recoverable anomaly
-log.error("payment failed for {}", id, ex); // ERROR — needs attention
+log.trace("entry params {}", params);
+log.debug("loading order {}", id);
+log.info("order {} created", id);
+log.warn("cache miss for {}", id);
+log.error("payment failed for {}", id, ex);
 ```
 
 **Never** string-concatenate: `log.info("order " + id)` always builds the string; `log.info("order {}", id)` skips it entirely when the level is disabled. The `{}` placeholder also takes multiple args and never throws on `null`.
@@ -83,10 +94,8 @@ Better: use the **logstash-logback-encoder** dependency and `LogstashEncoder`, w
 
 For request tracing, put a correlation ID in the **MDC** (inherited by all log lines from that thread):
 
-```java
 MDC.put("correlationId", reqId);   // set in a servlet filter
 try { ... } finally { MDC.remove("correlationId"); }
-```
 
 Every line in that request then carries the same ID — the field that makes log-diving possible across services.
 
@@ -98,3 +107,4 @@ Every line in that request then carries the same ID — the field that makes log
 - Never log secrets; log once, at the boundary, with the exception attached.
 
 Official docs: [Spring Boot Logging](https://docs.spring.io/spring-boot/reference/features/logging.html) · [Logback](https://logback.qos.ch/documentation.html)
+

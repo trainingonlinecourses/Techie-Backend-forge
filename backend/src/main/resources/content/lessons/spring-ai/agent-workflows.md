@@ -1,7 +1,7 @@
 ---
 title: AI Agent Workflows — Autonomous Tool-Using Agents
 summary: Building AI agents that call tools, make decisions, and complete multi-step tasks autonomously — function calling, tool definitions, agent loops, and multi-agent orchestration. Beginner-friendly with line-by-line code.
-order: 9
+order: 2
 minutes: 28
 topics: [AI agents, tool calling, function calling, agent loop, autonomous agents, multi-agent, ReAct pattern, tool definitions]
 docs:
@@ -41,20 +41,28 @@ The pattern is: **Reason → Act → Observe → Repeat** until the goal is achi
 
 ### 1. Define a Tool (Function)
 
+
+**What this code does — step by step:**
+
+1. Step 1: Define what the tool does — this is a Java method with annotations
+2. @Tool tells Spring AI: "This method is available for the AI to call"
+3. Call a real weather API
+4. The data classes:
+5. `double priceRange` — 1-4 dollar signs
+
+The same code, clean:
+
 ```java
-// Step 1: Define what the tool does — this is a Java method with annotations
 @Component
 public class WeatherTools {
 
     private final RestTemplate weatherApi = new RestTemplate();
 
-    // @Tool tells Spring AI: "This method is available for the AI to call"
     @Tool(description = "Get the current weather and forecast for a city. " +
                          "Returns temperature, humidity, and chance of rain.")
     public WeatherInfo getWeather(
             @ToolParam(description = "The city name, e.g. 'Paris' or 'New York'") String city
     ) {
-        // Call a real weather API
         String url = "https://api.weather.example.com/forecast?city=" + city;
         return weatherApi.getForObject(url, WeatherInfo.class);
     }
@@ -77,7 +85,6 @@ public class WeatherTools {
     }
 }
 
-// The data classes:
 public record WeatherInfo(
     String city,
     double temperatureCelsius,
@@ -91,7 +98,7 @@ public record Restaurant(
     String cuisine,
     double rating,
     String address,
-    double priceRange  // 1-4 dollar signs
+    double priceRange
 ) {}
 ```
 
@@ -102,7 +109,6 @@ public record Restaurant(
 
 ### 2. Register Tools with ChatClient
 
-```java
 @Service
 public class AiAgentService {
 
@@ -133,7 +139,6 @@ public class AiAgentService {
             .content();                                    // AI decides which tools to call
     }
 }
-```
 
 **Line-by-line explained:**
 - `.tools(weatherTools, restaurantTools)` — Makes these tool classes available to the AI. The AI can see the method names and descriptions.
@@ -142,13 +147,21 @@ public class AiAgentService {
 
 ### 3. The Agent Loop in Detail
 
+
+**What this code does — step by step:**
+
+1. The agent can call tools multiple times in a conversation:
+2. `.chatResponse();` — Get full response with tool calls
+3. The response may contain multiple tool call rounds: Round 1: AI calls searchDatabase("recent studies on X"). Round 2: AI calls calculateStatistics(results). Round 3: AI generates final answer with all gathered data
+
+The same code, clean:
+
 ```java
 @Service
 public class MultiStepAgent {
 
     private final ChatClient chatClient;
 
-    // The agent can call tools multiple times in a conversation:
     public String executeTask(String goal) {
         ChatResponse response = chatClient.prompt()
             .system("""
@@ -159,12 +172,8 @@ public class MultiStepAgent {
             .user(goal)
             .tools(researchTools, calculatorTools, databaseTools)
             .call()
-            .chatResponse();                               // Get full response with tool calls
+            .chatResponse();
 
-        // The response may contain multiple tool call rounds:
-        // Round 1: AI calls searchDatabase("recent studies on X")
-        // Round 2: AI calls calculateStatistics(results)
-        // Round 3: AI generates final answer with all gathered data
 
         return response.getResult().getOutput().getText();
     }
@@ -173,7 +182,6 @@ public class MultiStepAgent {
 
 ### 4. Tool Call Monitoring
 
-```java
 @Component
 public class AgentAuditListener {
 
@@ -194,7 +202,6 @@ public class AgentAuditListener {
         }
     }
 }
-```
 
 ---
 
@@ -202,7 +209,6 @@ public class AgentAuditListener {
 
 ### Scenario 1: Customer Support Agent
 
-```java
 @Service
 public class SupportAgent {
 
@@ -242,11 +248,9 @@ public class SupportAgent {
             .content();
     }
 }
-```
 
 ### Scenario 2: Data Analysis Agent
 
-```java
 @Service
 public class DataAnalysisAgent {
 
@@ -278,25 +282,32 @@ public class DataAnalysisAgent {
             .content();
     }
 }
-```
 
 ### Scenario 3: Multi-Agent Orchestration
+
+
+**What this code does — step by step:**
+
+1. Agent 1: Research specialist
+2. Agent 2: Writing specialist
+3. Agent 3: Review specialist
+4. Step 1: Research agent gathers information
+5. Step 2: Writing agent creates a draft
+6. Step 3: Review agent checks quality
+
+The same code, clean:
 
 ```java
 @Service
 public class MultiAgentOrchestrator {
 
-    // Agent 1: Research specialist
     private final ChatClient researchAgent;
 
-    // Agent 2: Writing specialist
     private final ChatClient writingAgent;
 
-    // Agent 3: Review specialist
     private final ChatClient reviewAgent;
 
     public String orchestrate(String task) {
-        // Step 1: Research agent gathers information
         String research = researchAgent.prompt()
             .system("You are a research specialist. Find comprehensive information.")
             .user(task)
@@ -304,14 +315,12 @@ public class MultiAgentOrchestrator {
             .call()
             .content();
 
-        // Step 2: Writing agent creates a draft
         String draft = writingAgent.prompt()
             .system("You are a professional writer. Create well-structured content.")
             .user("Based on this research: " + research + "\n\nWrite: " + task)
             .call()
             .content();
 
-        // Step 3: Review agent checks quality
         String review = reviewAgent.prompt()
             .system("You are an editor. Review for accuracy, clarity, and completeness.")
             .user("Review and improve this draft: " + draft)
@@ -347,3 +356,4 @@ public class MultiAgentOrchestrator {
 - **Multi-agent orchestration** = chain multiple specialized agents for complex workflows.
 
 Official docs: [Function Calling (Spring AI)](https://docs.spring.io/spring-ai/reference/api/chat/functions/openai-chat-functions.html) · [Agents (Spring AI)](https://docs.spring.io/spring-ai/reference/api/agents.html)
+

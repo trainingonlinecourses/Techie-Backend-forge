@@ -1,7 +1,7 @@
 ---
 title: Time Zones and ZonedDateTime — "Where" Matters
 module: java-time-api
-order: 4
+order: 5
 minutes: 28
 topics: ["ZonedDateTime", "ZoneId", "UTC offset", "DST", "time zone conversions"]
 summary: "3:30 PM" is not a moment — it's a local clock reading. To pin it to the timeline you must add where: 3:30 PM in which place? That's what a time zo...
@@ -35,42 +35,54 @@ Zone identifiers are **`Region/City`** names (`Europe/Berlin`, `Asia/Kolkata`, `
 
 ## The Code Walkthrough
 
+
+**What this code does — step by step:**
+
+1. 1. Named zones — always Region/City
+2. 2. A moment (instant), then view it in different zones
+3. `Instant moment = Instant.parse("2026-07-15T12:00:00Z");` — 12:00 UTC
+4. `System.out.println("Kolkata: " + inKolkata);` — 2026-07-15T17:30+05:30[Asia/Kolkata]
+5. `System.out.println("NY:      " + inNewYork);` — 2026-07-15T08:00-04:00[America/New_York]. Same moment, different clocks — both are correct.
+6. 3. Construct directly in a zone
+7. 4. Convert to another zone
+8. `System.out.println("Call in Berlin: " + callInBerlin);` — 20:00 — 6h ahead in July
+9. 5. Offsets are NOT fixed — DST changes them
+10. `System.out.println("January offset: " + jan.getOffset());` — -05:00
+11. `System.out.println("July offset:    " + jul.getOffset());` — -04:00
+12. 6. Getting the UTC instant back — always unambiguous
+13. `System.out.println(backToUtc);` — 2026-07-15T18:00:00Z
+
+The same code, clean:
+
 ```java
 import java.time.*;
 
 public class TimeZoneDemo {
 
     public static void main(String[] args) {
-        // 1. Named zones — always Region/City
         ZoneId kolkata   = ZoneId.of("Asia/Kolkata");
         ZoneId newYork   = ZoneId.of("America/New_York");
         ZoneId berlin    = ZoneId.of("Europe/Berlin");
 
-        // 2. A moment (instant), then view it in different zones
-        Instant moment = Instant.parse("2026-07-15T12:00:00Z");   // 12:00 UTC
+        Instant moment = Instant.parse("2026-07-15T12:00:00Z");
         ZonedDateTime inKolkata = moment.atZone(kolkata);
         ZonedDateTime inNewYork = moment.atZone(newYork);
 
-        System.out.println("Kolkata: " + inKolkata);   // 2026-07-15T17:30+05:30[Asia/Kolkata]
-        System.out.println("NY:      " + inNewYork);   // 2026-07-15T08:00-04:00[America/New_York]
-        // Same moment, different clocks — both are correct.
+        System.out.println("Kolkata: " + inKolkata);
+        System.out.println("NY:      " + inNewYork);
 
-        // 3. Construct directly in a zone
         ZonedDateTime call = ZonedDateTime.of(2026, 7, 15, 14, 0, 0, 0, newYork);
 
-        // 4. Convert to another zone
         ZonedDateTime callInBerlin = call.withZoneSameInstant(berlin);
-        System.out.println("Call in Berlin: " + callInBerlin);   // 20:00 — 6h ahead in July
+        System.out.println("Call in Berlin: " + callInBerlin);
 
-        // 5. Offsets are NOT fixed — DST changes them
         ZonedDateTime jan = ZonedDateTime.of(2026, 1, 15, 12, 0, 0, 0, newYork);
         ZonedDateTime jul = ZonedDateTime.of(2026, 7, 15, 12, 0, 0, 0, newYork);
-        System.out.println("January offset: " + jan.getOffset());   // -05:00
-        System.out.println("July offset:    " + jul.getOffset());   // -04:00
+        System.out.println("January offset: " + jan.getOffset());
+        System.out.println("July offset:    " + jul.getOffset());
 
-        // 6. Getting the UTC instant back — always unambiguous
         Instant backToUtc = callInBerlin.toInstant();
-        System.out.println(backToUtc);                 // 2026-07-15T18:00:00Z
+        System.out.println(backToUtc);
     }
 }
 ```
@@ -121,3 +133,4 @@ Fall-back: the first Sunday of November, 1:00 AM occurs **twice**. `java.time` r
 - `withZoneSameInstant` converts preserving the moment.
 - Store `Instant`/UTC; display in the user's zone.
 - DST creates gaps (nonexistent times) and overlaps (times that occur twice) — `java.time` resolves them deterministically.
+

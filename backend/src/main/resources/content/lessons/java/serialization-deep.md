@@ -1,7 +1,7 @@
 ---
 title: Java Serialization Deep — Serializable, Externalizable and Pitfalls
 summary: The Serializable contract, writeReplace/readResolve for control, Externalizable for performance, serialVersionUID, cross-version pitfalls, and why JSON often beats Java serialization in production.
-order: 51
+order: 70
 minutes: 22
 topics: [serialization, deserialization, serializable, externalizable, uid, security, json-alternative]
 docs:
@@ -24,7 +24,6 @@ Java provides two mechanisms:
 
 A class implements `Serializable` and optionally declares `serialVersionUID`:
 
-```java
 public class UserAccount implements Serializable {
     private static final long serialVersionUID = 1L;  // version guard
 
@@ -35,7 +34,6 @@ public class UserAccount implements Serializable {
 
     // Getters, setters, constructor...
 }
-```
 
 **What gets serialized:**
 - All non-transient, non-static fields
@@ -53,7 +51,6 @@ public class UserAccount implements Serializable {
 
 When a user logs in, the session object is serialized and stored in Redis. On the next request, it's deserialized back into memory:
 
-```java
 public class UserSession implements Serializable {
     private static final long serialVersionUID = 2L;
 
@@ -80,7 +77,6 @@ public class UserSession implements Serializable {
         return user;
     }
 }
-```
 
 **Why transient for User?** The `User` object might contain lazy-loaded JPA relationships, Hibernate proxies, or a database connection. Serializing all of that would be slow, fragile, and potentially leak sensitive data. Better to store just the username and re-fetch from the database on demand.
 
@@ -88,7 +84,6 @@ public class UserSession implements Serializable {
 
 If you serialize a singleton, deserialization creates a NEW instance — breaking the singleton pattern. `readResolve()` fixes this:
 
-```java
 public class DatabaseConfig implements Serializable {
     private static final long serialVersionUID = 1L;
     private static DatabaseConfig instance;
@@ -109,13 +104,11 @@ public class DatabaseConfig implements Serializable {
         return getInstance();  // always return the singleton
     }
 }
-```
 
 ### Scenario 3: Externalizable for high-performance serialization
 
 When performance matters (millions of objects per second), `Externalizable` avoids reflection overhead:
 
-```java
 public class MarketDataPoint implements Externalizable {
     private long timestamp;
     private double price;
@@ -140,7 +133,6 @@ public class MarketDataPoint implements Externalizable {
         symbol = in.readUTF();
     }
 }
-```
 
 **Why Externalizable here?** In a financial system processing millions of market data points per second, the reflection overhead of standard serialization is unacceptable. Externalizable writes fields in a fixed order with no metadata — roughly 3x faster.
 
@@ -148,29 +140,37 @@ public class MarketDataPoint implements Externalizable {
 
 Serialization vulnerabilities are real — an attacker can craft a byte stream that triggers arbitrary code during deserialization. `writeReplace()` lets you convert an object to a safe representation before serialization:
 
+
+**What this code does — step by step:**
+
+1. `private final char[] password;` — sensitive — never serialize raw
+2. Replace the actual credentials with a safe proxy before serialization
+3. `return new SafeCredentialProxy(username);` — no password in the stream
+4. Inner proxy class
+5. Prevent deserialization of the proxy back into real credentials
+
+The same code, clean:
+
 ```java
 public class Credentials implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private final String username;
-    private final char[] password;  // sensitive — never serialize raw
+    private final char[] password;
 
     public Credentials(String username, char[] password) {
         this.username = username;
         this.password = password;
     }
 
-    // Replace the actual credentials with a safe proxy before serialization
     protected Object writeReplace() {
-        return new SafeCredentialProxy(username);  // no password in the stream
+        return new SafeCredentialProxy(username);
     }
 
-    // Inner proxy class
     private static class SafeCredentialProxy implements Serializable {
         private final String username;
         SafeCredentialProxy(String username) { this.username = username; }
 
-        // Prevent deserialization of the proxy back into real credentials
         private Object readResolve() {
             throw new InvalidObjectException("Credentials cannot be deserialized directly");
         }
@@ -220,3 +220,4 @@ For everything else, use JSON, Protocol Buffers, or Avro.
 | Deep object graph serialization | Memory explosion, slow performance |
 | Deserializing untrusted data | Remote code execution vulnerability |
 | Forgetting `readResolve()` for singletons | Deserialization creates duplicate instances |
+

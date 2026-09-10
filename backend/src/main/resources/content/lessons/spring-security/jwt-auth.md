@@ -1,7 +1,7 @@
 ---
 title: Stateless JWT Authentication
 summary: The JWT structure, issuing and validating tokens with Nimbus, and a stateless filter for REST APIs.
-order: 4
+order: 8
 minutes: 20
 topics: [jwt, stateless, bearer-tokens, nimbus]
 docs:
@@ -37,7 +37,6 @@ The signature makes the token **tamper-evident**: anyone can read the payload, b
 
 ## Issuing tokens (Nimbus — spring-boot-starter-oauth2-jose)
 
-```java
 @Service
 public class JwtService {
 
@@ -75,11 +74,9 @@ public class JwtService {
         }
     }
 }
-```
 
 ## The authentication filter
 
-```java
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
 
@@ -104,13 +101,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         chain.doFilter(request, response);
     }
 }
-```
 
 Registered in the chain: `http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)`.
 
 ## Security config for a stateless API
 
-```java
 http
     .csrf(AbstractHttpConfigurer::disable)                    // no cookies → no CSRF
     .cors(Customizer.withDefaults())
@@ -122,7 +117,6 @@ http
         .requestMatchers("/api/auth/**", "/actuator/health").permitAll()
         .anyRequest().authenticated())
     .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
-```
 
 ## JWT best practices
 
@@ -146,3 +140,4 @@ http
 - Re-load the user per request so deletions/roles take effect immediately.
 
 **Official docs:** [Bearer tokens](https://docs.spring.io/spring-security/reference/servlet/authentication/index.html#servlet-authentication-bearer) · [JWT resource server](https://docs.spring.io/spring-security/reference/servlet/oauth2/resource-server/jwt.html)
+

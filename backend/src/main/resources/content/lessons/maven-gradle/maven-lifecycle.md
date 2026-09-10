@@ -1,7 +1,7 @@
 ---
 title: The Maven Lifecycle and Build Phases
 module: maven-gradle
-order: 1
+order: 3
 minutes: 22
 topics: ["Maven lifecycle", "phases", "goals", "plugins", "pom.xml", "profiles"]
 summary: Maven isn't a build script — it's a fixed lifecycle with pluggable goals. Understanding the three lifecycles, the phase ordering, and how plugins b...
@@ -130,9 +130,7 @@ mvn install              # default through install (includes tests!)
 
 ## The Repackage: Why Spring Boot Jars Run
 
-```java
 java -jar app.jar
-```
 
 The jar-plugin produces a *thin* jar; the **spring-boot-maven-plugin's `repackage` goal** (bound to `package`) rewrites it into a fat jar — your classes plus all dependencies plus the `JarLauncher`:
 
@@ -209,3 +207,4 @@ mvn -pl module-a -am package # build module + its dependencies
 | Skip tests | `-DskipTests` (run) vs `-Dmaven.test.skip` (compile) |
 
 Maven is a lifecycle engine with a plugin system: pick the prefix (`test`, `package`, `verify`), let the plugins bind, and the build is deterministic. The next lessons cover dependency management, plugins, and the Gradle alternative.
+

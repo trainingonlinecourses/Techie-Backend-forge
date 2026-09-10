@@ -1,7 +1,7 @@
 ---
 title: Retries & Dead Letter Queues
 summary: RetryableTopic, exponential backoff, DLT handlers, poison messages, and deserialization errors.
-order: 5
+order: 6
 minutes: 22
 topics: [kafka, retry, dlq, dead-letter, backoff, error-handling, poison-message]
 docs:
@@ -22,24 +22,34 @@ The answer: **retry transient failures with backoff, then park permanent failure
 
 ## @RetryableTopic — retries with a DLT, declaratively
 
+
+**What this code does — step by step:**
+
+1. `attempts = "4",` — 1 original + 3 retries
+2. `backoff = @Backoff(delay = 1000, multiplier = 2.0),` — 1s, 2s, 4s
+3. `autoCreateTopics = "true")` — demo: let Spring create retry/DLT topics
+4. `ledger.record(event);` — may throw transiently (DB down)
+5. Runs after attempts are exhausted — permanent failure.
+6. Do NOT rethrow here — the DLT record is the record of the failure.
+
+The same code, clean:
+
 ```java
 @Component
 public class PaymentEventListener {
 
     @RetryableTopic(
-        attempts = "4",                      // 1 original + 3 retries
-        backoff = @Backoff(delay = 1000, multiplier = 2.0),  // 1s, 2s, 4s
-        autoCreateTopics = "true")           // demo: let Spring create retry/DLT topics
+        attempts = "4",
+        backoff = @Backoff(delay = 1000, multiplier = 2.0),
+        autoCreateTopics = "true")
     @KafkaListener(topics = "payments", groupId = "payment-ledger")
     public void onPaymentCaptured(PaymentCaptured event) {
-        ledger.record(event);                // may throw transiently (DB down)
+        ledger.record(event);
     }
 
     @DltHandler
     public void onDlt(PaymentCaptured event) {
-        // Runs after attempts are exhausted — permanent failure.
         alerting.notify("payment event failed permanently", event);
-        // Do NOT rethrow here — the DLT record is the record of the failure.
     }
 }
 ```
@@ -65,7 +75,6 @@ With a failed-deserialization function of `sendToDlq`, malformed records go stra
 
 ## Manual retry control — when you need it
 
-```java
 @KafkaListener(topics = "payments", groupId = "payment-ledger")
 public void onPaymentCaptured(PaymentCaptured event) {
     try {
@@ -74,7 +83,6 @@ public void onPaymentCaptured(PaymentCaptured event) {
         throw new RetryableException("db unavailable", e);   // container retries
     }
 }
-```
 
 `RetryableException` tells the container "retry me". Any other exception → default behavior (or DLT, per config). Reserve this for cases where `@RetryableTopic` doesn't fit (e.g. you need custom logic to decide retryability).
 
@@ -100,3 +108,4 @@ public void onPaymentCaptured(PaymentCaptured event) {
 - [Spring Kafka — RetryTopic](https://docs.spring.io/spring-kafka/reference/retrytopic/index.html)
 - [Spring Kafka — Error Handling](https://docs.spring.io/spring-kafka/reference/kafka/error-handling.html)
 - [Apache Kafka — Dead Letter Queues](https://kafka.apache.org/documentation/#basic_ops_consumer_lag)
+

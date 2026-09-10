@@ -1,7 +1,7 @@
 ---
 title: The Transactional Outbox Pattern
 summary: The dual-write problem, an outbox table written in the same transaction as your business state, and a relay that publishes to Kafka.
-order: 4
+order: 5
 minutes: 22
 topics: [outbox, transaction, dual-write, event-relay, debezium, idempotency]
 docs:
@@ -53,7 +53,6 @@ CREATE TABLE outbox (
 
 ## Writing the outbox row (Spring, same transaction)
 
-```java
 @Service
 public class OrderService {
 
@@ -70,13 +69,11 @@ public class OrderService {
         return order;
     }
 }
-```
 
 That's the whole trick: **one `@Transactional` method, two inserts, one commit.** No Kafka call in the business path — the DB is the source of truth for "what happened".
 
 ## The relay (polling version — what the demo project runs)
 
-```java
 @Component
 public class OutboxRelay {
 
@@ -99,7 +96,6 @@ public class OutboxRelay {
         outbox.saveAll(pending);
     }
 }
-```
 
 - **Order by id** keeps events in insertion order (per aggregate, use a key in the payload for per-key Kafka ordering).
 - **Published flag after successful send** — a crash mid-loop re-sends the row next poll; consumers must be idempotent (they are, by rule).
@@ -130,3 +126,4 @@ Production hardening: delete or archive outbox rows after publish (retention), a
 - [Transactional Outbox (microservices.io)](https://microservices.io/patterns/data/transactional-outbox.html)
 - [Spring Kafka — Transactions](https://docs.spring.io/spring-kafka/reference/kafka/transactions.html)
 - [Debezium — transaction-based outbox](https://debezium.io/documentation/reference/stable/transformations/outbox-event-router.html)
+

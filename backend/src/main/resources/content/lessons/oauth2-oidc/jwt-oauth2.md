@@ -1,7 +1,7 @@
 ---
 title: JWT as Access Tokens — Structure, Signing, and Validation
 module: oauth2-oidc
-order: 3
+order: 2
 minutes: 27
 topics: ["JWT", "access tokens", "signature", "HS256", "RS256", "JWKS", "audience"]
 summary: OAuth2 access tokens come in two flavors: opaque (random strings the resource server must look up at the auth server) and JWT (selfcontained JSON t...
@@ -52,14 +52,14 @@ The registered claims (`iss`, `sub`, `aud`, `exp`, `iat`, `nbf`) are standardize
 
 ## Validation: What the Resource Server Checks
 
+
+**What this code does — step by step:**
+
+1. The resource server's validation checklist (what Spring Security does): 1. SIGNATURE — verify with the issuer's public key. 2. EXPIRY (exp) — reject if now > exp. 3. ISSUER (iss) — must match the expected authorization server. 4. AUDIENCE (aud) — must include THIS resource server. 5. NBF (not before) — reject if used too early. 6. ALGORITHM — must be a whitelisted algorithm (never "none"!).
+
+The same code, clean:
+
 ```java
-// The resource server's validation checklist (what Spring Security does):
-// 1. SIGNATURE — verify with the issuer's public key.
-// 2. EXPIRY (exp) — reject if now > exp.
-// 3. ISSUER (iss) — must match the expected authorization server.
-// 4. AUDIENCE (aud) — must include THIS resource server.
-// 5. NBF (not before) — reject if used too early.
-// 6. ALGORITHM — must be a whitelisted algorithm (never "none"!).
 ```
 
 **The attacks these checks prevent:**
@@ -94,7 +94,6 @@ spring.security.oauth2.resourceserver.jwt.issuer-uri=https://auth.academy.com
 #    and populates the SecurityContext from the token's claims.
 ```
 
-```java
 @Configuration
 public class SecurityConfig {
 
@@ -110,7 +109,6 @@ public class SecurityConfig {
         return http.build();
     }
 }
-```
 
 **The Spring translation:** `issuer-uri` → fetch JWKS → validate every incoming `Authorization: Bearer <jwt>` → build an `Authentication` carrying the claims (subject, scopes, authorities). `hasAuthority("SCOPE_read:lessons")` enforces the token's scope at the endpoint — the resource-server enforcement of OAuth's delegation limits.
 
@@ -125,3 +123,4 @@ public class SecurityConfig {
 ## Recap
 
 A JWT is a signed, self-contained token: header (algorithm), payload (claims — `iss`, `sub`, `aud`, `exp`, `scope`), and signature. The resource server validates it *locally*: signature via the issuer's public key (from JWKS, rotation-aware), `exp` (freshness), `iss` (right issuer), and `aud` (right audience) — rejecting forgery, expiry, and token confusion. Asymmetric signing (RS256) keeps the private key at the auth server while resource servers verify with public keys; short expiries plus refresh tokens compensate for the statelessness that makes JWTs hard to revoke. Spring Security wires the whole validation from `issuer-uri` — but the checklist (signature, exp, iss, aud, algorithm whitelist) is what you must understand to trust it and to debug when it fails.
+

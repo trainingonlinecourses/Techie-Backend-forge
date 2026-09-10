@@ -1,7 +1,7 @@
 ---
 title: Bulkhead — Containing a Slow Dependency
 module: resilience-circuit-breaker
-order: 2
+order: 1
 minutes: 24
 topics: ["bulkhead", "isolation", "thread pools", "semaphores", "blast radius", "Resilience4j"]
 summary: A bulkhead (in shipbuilding) is a partition inside the hull: if one compartment floods, the others stay dry and the ship floats. The software patte...
@@ -31,6 +31,18 @@ The bulkhead fixes it: the AI provider gets **at most 20 threads**. When those 2
 
 ## The Code Walkthrough
 
+
+**What this code does — step by step:**
+
+1. `private final Bulkhead aiBulkhead;` — semaphore style
+2. `private final ThreadPoolBulkhead catalogPool;` — thread-pool style
+3. ---- 1. Semaphore bulkhead: at most 5 concurrent AI calls ----
+4. `.maxWaitDuration(Duration.ofMillis(500))` — fail fast if full
+5. ---- 2. Thread-pool bulkhead: a dedicated pool for catalog calls ----
+6. The AI provider gets at most 5 concurrent calls. The 6th fails fast instead of consuming a main-pool thread for 8s.
+
+The same code, clean:
+
 ```java
 import io.github.resilience4j.bulkhead.Bulkhead;
 import io.github.resilience4j.bulkhead.BulkheadConfig;
@@ -43,17 +55,15 @@ import java.time.Duration;
 @Service
 public class AiTutorService {
 
-    private final Bulkhead aiBulkhead;                 // semaphore style
-    private final ThreadPoolBulkhead catalogPool;      // thread-pool style
+    private final Bulkhead aiBulkhead;
+    private final ThreadPoolBulkhead catalogPool;
 
     public AiTutorService() {
-        // ---- 1. Semaphore bulkhead: at most 5 concurrent AI calls ----
         this.aiBulkhead = Bulkhead.of("ai-provider", BulkheadConfig.custom()
                 .maxConcurrentCalls(5)
-                .maxWaitDuration(Duration.ofMillis(500))   // fail fast if full
+                .maxWaitDuration(Duration.ofMillis(500))
                 .build());
 
-        // ---- 2. Thread-pool bulkhead: a dedicated pool for catalog calls ----
         this.catalogPool = ThreadPoolBulkhead.of("catalog", ThreadPoolBulkheadConfig.custom()
                 .maxThreadPoolSize(10)
                 .coreThreadPoolSize(4)
@@ -62,8 +72,6 @@ public class AiTutorService {
     }
 
     public String ask(String question) {
-        // The AI provider gets at most 5 concurrent calls.
-        // The 6th fails fast instead of consuming a main-pool thread for 8s.
         return aiBulkhead.executeSupplier(() -> aiProvider.answer(question));
     }
 }
@@ -81,14 +89,12 @@ public class AiTutorService {
 
 The resilience patterns compose in layers:
 
-```java
 // Breaker outside (decide whether to call at all),
 // retry inside the breaker (transient failures get another try),
 // bulkhead beneath (limit concurrent calls):
 Supplier<Answer> call = () -> paymentBulkhead.executeSupplier(
         () -> retry.decorateSupplier(() -> gateway.charge(req)));
 Answer result = circuitBreaker.executeSupplier(call);
-```
 
 - **Bulkhead** — how many calls may be in flight (protects your threads).
 - **Circuit breaker** — whether to call at all (protects the dependency + your time).
@@ -125,3 +131,4 @@ Watch: `BulkheadFullException` rate (is the limit being hit?), call duration (is
 - Size by `concurrency = throughput × latency` with headroom.
 - Fast-fail must be *handled* — pair bulkheads with fallbacks.
 - Monitor fullness and duration per dependency.
+

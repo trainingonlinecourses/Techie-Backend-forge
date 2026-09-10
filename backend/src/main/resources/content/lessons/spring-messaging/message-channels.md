@@ -1,7 +1,7 @@
 ---
 title: Message Channels — The Wires of the Bus
 module: spring-messaging
-order: 2
+order: 3
 minutes: 23
 topics: ["channels", "point-to-point vs pub-sub channels", "pollable vs subscribable", "channel adapters"]
 summary: If messaging is a plumbing system, channels are the pipes. Producers write into a channel; consumers read from it. The channel is the coupling poin...
@@ -36,6 +36,17 @@ Choosing the channel type *is* choosing the integration behavior. This is why ch
 
 ## The Code Walkthrough
 
+
+**What this code does — step by step:**
+
+1. 1. Synchronous: the caller's thread runs the handler
+2. 2. Async: hand off to a pool, return immediately
+3. 3. Fan-out: every subscriber gets the message
+4. 4. Queued: consumers pull at their own pace (backpressure)
+5. `return new QueueChannel(100);` — bounded — producers block when full
+
+The same code, clean:
+
 ```java
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -49,28 +60,24 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 @Configuration
 public class ChannelConfig {
 
-    // 1. Synchronous: the caller's thread runs the handler
     @Bean
     public MessageChannel ordersIn() {
         return new DirectChannel();
     }
 
-    // 2. Async: hand off to a pool, return immediately
     @Bean
     public MessageChannel notificationsOut() {
         return new ExecutorChannel(notifierPool());
     }
 
-    // 3. Fan-out: every subscriber gets the message
     @Bean
     public MessageChannel userEvents() {
         return new PublishSubscribeChannel();
     }
 
-    // 4. Queued: consumers pull at their own pace (backpressure)
     @Bean
     public MessageChannel slowTasks() {
-        return new QueueChannel(100);     // bounded — producers block when full
+        return new QueueChannel(100);
     }
 
     private ThreadPoolTaskExecutor notifierPool() {
@@ -135,3 +142,4 @@ Learning the channel vocabulary once pays off twice: you already understand the 
 - Size your queues; catch subscriber exceptions; accept reordering on concurrent channels.
 - The channel vocabulary transfers to brokers (queue ≈ QueueChannel, topic ≈ pub-sub).
 - Design the channels deliberately — they *are* the architecture.
+

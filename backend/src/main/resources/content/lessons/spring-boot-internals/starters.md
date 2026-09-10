@@ -1,7 +1,7 @@
 ---
 title: Starters — Curated Dependency Bundles
 module: spring-boot-internals
-order: 2
+order: 5
 minutes: 22
 topics: ["starters", "dependencies", "spring-boot-starter", "version management", "bill of materials"]
 summary: In raw Spring (no Boot), wiring up a web app meant adding half a dozen dependencies by hand — springwebmvc, springcontext, jacksondatabind, tomcate...
@@ -161,3 +161,4 @@ For multi-module enterprise builds with a company parent POM, teams import the B
 - Drivers (Postgres, MySQL, H2) are added separately, usually `runtime` scope.
 - Starters + auto-configuration = "add a dependency, it just works".
 - Check `mvn dependency:tree` to see what your starters actually pulled in.
+

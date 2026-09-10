@@ -1,7 +1,7 @@
 ---
 title: Spring Batch — Overview & Job Model
 summary: Why batch processing exists, the Job → Step → ItemReader/Processor/Writer model, JobRepository metadata and when batch beats request/response.
-order: 1
+order: 3
 minutes: 14
 topics: [spring batch, job, step, jobrepository, batch processing]
 docs:
@@ -28,7 +28,6 @@ ItemReader ──▶ ItemProcessor ──▶ ItemWriter
 - **Step** — one stage; can be *chunk-oriented* (read/process/write) or *tasklet* (single unit of work, e.g. "clean temp dir").
 - **JobRepository** — persists job/step state to a database, which is what makes **restartability** possible.
 
-```java
 @Configuration
 public class StatementJobConfig {
 
@@ -52,7 +51,6 @@ public class StatementJobConfig {
             .build();
     }
 }
-```
 
 `chunk(1000, tx)` is the heart: **1000 items are read, processed, and written inside one database transaction**. A failure mid-chunk rolls back only that chunk, not the whole job.
 
@@ -82,10 +80,8 @@ JobInstance (logical job) → JobExecution (one run) → StepExecution (per step
 
 Jobs run on `ApplicationRunner` at startup by default (`spring.batch.job.enabled=false` to disable), or on demand — via `JobLauncher.run(job, params)`, from a controller, or scheduled:
 
-```java
 JobExecution ex = jobLauncher.run(statementJob,
     new JobParametersBuilder().addLong("runId", System.currentTimeMillis()).toJobParameters());
-```
 
 ## When NOT to use batch
 
@@ -101,3 +97,4 @@ JobExecution ex = jobLauncher.run(statementJob,
 - Use it for offline, repeatable, high-volume work; use events for incremental work.
 
 Official docs: [Spring Batch Reference](https://docs.spring.io/spring-batch/reference/) · [Spring Boot Batch](https://docs.spring.io/spring-boot/reference/features/batch.html)
+

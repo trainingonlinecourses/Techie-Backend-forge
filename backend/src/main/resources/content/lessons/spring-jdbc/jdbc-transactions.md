@@ -1,7 +1,7 @@
 ---
 title: Transactions With JdbcTemplate
 module: spring-jdbc
-order: 4
+order: 2
 minutes: 20
 topics: ["@Transactional", "TransactionTemplate", "programmatic transactions", "savepoints", "connection propagation"]
 summary: JdbcTemplate doesn't manage transactions itself — Spring's transaction infrastructure does, and the template joins whatever transaction is active. ...
@@ -30,7 +30,6 @@ Every template call inside the method uses the same transactional connection —
 
 ## Declarative: @Transactional
 
-```java
 @Service
 public class CourseService {
 
@@ -50,7 +49,6 @@ public class CourseService {
         // any exception → BOTH updates roll back
     }
 }
-```
 
 If the audit insert fails, the publish update rolls back too. Atomicity across statements.
 
@@ -58,7 +56,6 @@ If the audit insert fails, the publish update rolls back too. Atomicity across s
 
 When a method has multiple independent transaction boundaries, or the transaction should wrap only part of the work:
 
-```java
 @Service
 public class ImportService {
 
@@ -83,24 +80,20 @@ public class ImportService {
         return new ImportResult(succeeded, courses.size() - succeeded);
     }
 }
-```
 
 `TransactionTemplate.execute` returns a value; `executeWithoutResult` is for void operations. Both commit on return, roll back on exception.
 
 ## Configuring the TransactionTemplate
 
-```java
 TransactionTemplate template = new TransactionTemplate(txManager);
 template.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
 template.setIsolationLevel(TransactionDefinition.ISOLATION_READ_COMMITTED);
 template.setTimeout(30);   // seconds
-```
 
 Per-call settings — useful when the same service needs different isolation for different operations.
 
 ## REQUIRES_NEW: A Nested Transaction
 
-```java
 @Transactional
 public void processOrder(Long orderId) {
     jdbcTemplate.update("UPDATE orders SET status='PROCESSING' WHERE id=?", orderId);
@@ -114,18 +107,15 @@ public void processOrder(Long orderId) {
 public void recordAudit(Long orderId) {
     jdbcTemplate.update("INSERT INTO audit_log ...", orderId);
 }
-```
 
 `REQUIRES_NEW` suspends the outer transaction, runs the inner one on a **new connection**, commits it independently, then resumes the outer. The audit survives an outer rollback — the classic audit-trail pattern.
 
 ## Read-Only Transactions
 
-```java
 @Transactional(readOnly = true)
 public List<Course> search(String q) {
     return jdbcTemplate.query("SELECT ...", courseRowMapper, q);
 }
-```
 
 With JDBC, `readOnly` hints the driver (connection-level `setReadOnly`) — some drivers use it to skip locks or route to read replicas. It's a hint, not a hard guarantee, but it documents intent and can unlock read-replica routing.
 
@@ -138,10 +128,8 @@ With JDBC, `readOnly` hints the driver (connection-level `setReadOnly`) — some
 | REPEATABLE_READ | Non-repeatable reads | Medium |
 | SERIALIZABLE | Phantom reads | High — locking |
 
-```java
 @Transactional(isolation = Isolation.SERIALIZABLE)
 public void reconcileBalances() { ... }
-```
 
 For a deep dive on the anomalies (dirty read, non-repeatable read, phantom), see the Postgres module lesson on isolation — the concepts are identical here.
 
@@ -149,7 +137,6 @@ For a deep dive on the anomalies (dirty read, non-repeatable read, phantom), see
 
 `NESTED` propagation uses savepoints — roll back part of a transaction, keep the rest:
 
-```java
 @Transactional
 public void importWithPartialRollback(List<Course> courses) {
     int i = 0;
@@ -163,13 +150,11 @@ public void importWithPartialRollback(List<Course> courses) {
         log.warn("Stopped at row {}: {}", i, e.getMessage());
     }
 }
-```
 
 NESTED is cheaper than REQUIRES_NEW (same connection, savepoint markers) and gives partial failure — ideal for large imports where "keep what worked, skip what failed" is the requirement.
 
 ## The Self-Invocation Trap (Again)
 
-```java
 @Service
 public class CourseService {
 
@@ -181,11 +166,9 @@ public class CourseService {
     @Transactional
     public void updateCourse(Long id) { ... }
 }
-```
 
 Same proxy problem as `@Async`/`@Cacheable`. Fix with self-injection or `TransactionTemplate`:
 
-```java
 @Service
 public class CourseService {
 
@@ -203,11 +186,9 @@ public class CourseService {
         tx.executeWithoutResult(status -> jdbcTemplate.update("...", id));
     }
 }
-```
 
 ## Testing Transactions
 
-```java
 @DataJpaTest   // rolls back each test automatically
 class TransactionTest {
 
@@ -220,7 +201,6 @@ class TransactionTest {
     }
     // rolled back after the test — no cleanup needed
 }
-```
 
 With `@JdbcTest` + `@Transactional`, each test runs in a rollback-only transaction: assertions see the writes, and nothing leaks to the next test.
 
@@ -237,3 +217,4 @@ With `@JdbcTest` + `@Transactional`, each test runs in a rollback-only transacti
 | Pitfall | Self-invocation bypasses the proxy |
 
 JdbcTemplate + Spring transactions = exact SQL with production-grade atomicity. Pick declarative transactions for whole-method boundaries, `TransactionTemplate` for fine-grained control, and remember the connection-propagation rule that makes it all work: one thread, one transactional connection, one commit point.
+

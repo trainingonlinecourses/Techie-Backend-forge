@@ -1,7 +1,7 @@
 ---
 title: HandlerMethodArgumentResolver — Custom Controller Parameters
 summary: How Spring fills controller parameters, the built-in resolvers, and custom resolvers for current-user, tenant, and header-injected arguments.
-order: 11
+order: 1
 minutes: 18
 topics: [argument-resolver, handlermethodargumentresolver, controller-parameters, current-user, tenant-context]
 docs:
@@ -25,7 +25,6 @@ The extension point: **write your own resolver** to inject a custom parameter �
 
 ## A custom resolver — current user and tenant
 
-```java
 @Component
 public class CurrentUserArgumentResolver implements HandlerMethodArgumentResolver {
 
@@ -45,11 +44,9 @@ public class CurrentUserArgumentResolver implements HandlerMethodArgumentResolve
         return new CurrentUser(u.getId(), u.getEmail(), u.getRoles());
     }
 }
-```
 
 Register it:
 
-```java
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
     @Override
@@ -57,16 +54,13 @@ public class WebConfig implements WebMvcConfigurer {
         resolvers.add(currentUserResolver);     // appended AFTER the built-ins
     }
 }
-```
 
 Now every controller can declare the argument directly — no repeated extraction:
 
-```java
 @GetMapping("/api/orders/mine")
 public List<Order> myOrders(CurrentUser user) {       // resolved by the custom resolver
     return orderService.findByCustomer(user.id());
 }
-```
 
 ## The two rules of the contract
 
@@ -77,7 +71,6 @@ public List<Order> myOrders(CurrentUser user) {       // resolved by the custom 
 
 **Pattern 1 — the tenant-context argument.** Multi-tenant APIs inject the tenant for every controller:
 
-```java
 @Component
 public class TenantResolver implements HandlerMethodArgumentResolver {
     @Override public boolean supportsParameter(MethodParameter p) {
@@ -94,7 +87,6 @@ public class TenantResolver implements HandlerMethodArgumentResolver {
 public Page<Order> list(Tenant tenant, Pageable pageable) {
     return orderRepo.findByTenant(tenant.id(), pageable);   // tenant everywhere, zero boilerplate
 }
-```
 
 **Pattern 2 — the header-parsed argument.** A `Pagination` object built from `X-Page`/`X-Per-Page` headers, or a `RequestId` for correlation — resolved once in the resolver instead of three `@RequestHeader` + parsing lines per controller.
 
@@ -125,3 +117,4 @@ Teams sometimes overuse filters to "prepare" things that belong in resolvers —
 - Custom resolvers for current-user, tenant, header-parsed objects — killing repeated extraction boilerplate.
 - Resolvers turn requests into parameters; filters/interceptors handle the rest — use the right tool.
 - Unit-test the two methods directly; register via `WebMvcConfigurer.addArgumentResolvers`.
+

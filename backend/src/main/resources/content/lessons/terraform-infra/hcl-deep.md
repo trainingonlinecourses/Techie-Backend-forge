@@ -1,7 +1,7 @@
 ---
 title: HCL Deep — Expressions, Functions, and the Language
 module: terraform-infra
-order: 2
+order: 1
 minutes: 24
 topics: ["HCL", "expressions", "functions", "loops", "conditionals", "locals"]
 summary: The first lesson's config was declarative but flat. HCL (HashiCorp Configuration Language) is a full expression language: loops, conditionals, func...
@@ -162,3 +162,4 @@ HCL's power comes with a warning that every Terraform team learns: **abstraction
 ## Recap
 
 HCL is a real expression language: interpolation and operators compose values; `locals` compute once and reuse (the anti-repetition tool); `count` (positional) and `for_each` (keyed — preferred) generate many resources; functions (`join`, `file`, `lookup`, `merge`, `sha256`) form the standard library; and `for` expressions plus splat syntax (`[*]`) transform collections compactly. The craft is using the power to remove duplication while keeping plans readable — variables and locals for tunables, `for_each` for keyed repetition, and modules (next) as the boundary where complexity lives.
+

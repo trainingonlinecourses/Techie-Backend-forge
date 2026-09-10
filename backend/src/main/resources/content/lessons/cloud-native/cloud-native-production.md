@@ -1,7 +1,7 @@
 ---
 title: Cloud-Native Production — Complete Beginner's Guide
 summary: Health checks, readiness probes, graceful shutdown, externalized config, and the 12-factor checklist for deploying Spring Boot to the cloud.
-order: 4
+order: 1
 minutes: 22
 topics: [cloud-native, health checks, readiness, graceful shutdown, 12-factor, production]
 docs:
@@ -66,7 +66,6 @@ Liveness: "Is the app alive?" (If not → restart it)
 Readiness: "Is the app ready to serve traffic?" (If not → stop sending requests)
 ```
 
-```java
 // Custom health indicator
 @Component
 public class DatabaseHealthIndicator implements HealthIndicator {
@@ -86,7 +85,6 @@ public class DatabaseHealthIndicator implements HealthIndicator {
         }
     }
 }
-```
 
 ```bash
 # Check health
@@ -119,16 +117,19 @@ spring:
 4. `@PreDestroy` methods run (close DB connections, flush caches)
 5. App exits cleanly
 
+
+**What this code does — step by step:**
+
+1. Cleanup on shutdown
+2. Line 1: Close database connections. Line 2: Flush caches. Line 3: Deregister from service discovery. Line 4: Stop background threads
+
+The same code, clean:
+
 ```java
-// Cleanup on shutdown
 @Component
 public class ShutdownCleanup {
     @PreDestroy
     public void cleanup() {
-        // Line 1: Close database connections
-        // Line 2: Flush caches
-        // Line 3: Deregister from service discovery
-        // Line 4: Stop background threads
         System.out.println("Cleaning up before shutdown...");
     }
 }
@@ -265,3 +266,4 @@ spec:
 - The 12-Factor checklist is your production deployment guide
 
 **Official docs:** [Actuator Endpoints](https://docs.spring.io/spring-boot/reference/actuator/endpoints.html) · [Graceful Shutdown](https://docs.spring.io/spring-boot/reference/web/graceful-shutdown.html)
+

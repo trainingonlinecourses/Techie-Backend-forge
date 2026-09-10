@@ -1,7 +1,7 @@
 ---
 title: Reactive Security — Authentication & Authorization in WebFlux
 summary: SecurityWebFilterChain, reactive authentication, JWT validation, route-level authorization, and the patterns that secure reactive applications. Beginner-friendly with line-by-line code.
-order: 15
+order: 9
 minutes: 22
 topics: [reactive security, SecurityWebFilterChain, reactive authentication, JWT, route authorization, security filter, CORS, CSRF]
 docs:
@@ -23,6 +23,25 @@ Think of it like this: in MVC, a security filter stops the request and returns i
 
 ### 1. Reactive Security Configuration
 
+
+**What this code does — step by step:**
+
+1. === CSRF: disable for REST APIs (token-based auth) ===
+2. `.csrf(csrf -> csrf.disable())` — REST APIs don't use cookies
+3. === CORS: allow specific origins ===
+4. `corsConfig.addAllowedMethod("*");` — Allow all HTTP methods
+5. `corsConfig.addAllowedHeader("*");` — Allow all headers
+6. === Authorization rules ===
+7. Public endpoints — no auth needed
+8. `.pathMatchers("/ws/chat").permitAll()` — WebSocket (auth via query param)
+9. Admin-only endpoints
+10. Authenticated users only
+11. Everything else
+12. === HTTP Basic (for development/testing) ===
+13. === JWT (for production) ===. See JWT filter configuration below
+
+The same code, clean:
+
 ```java
 @Configuration
 @EnableWebFluxSecurity
@@ -31,42 +50,32 @@ public class ReactiveSecurityConfig {
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
         return http
-            // === CSRF: disable for REST APIs (token-based auth) ===
-            .csrf(csrf -> csrf.disable())                        // REST APIs don't use cookies
+            .csrf(csrf -> csrf.disable())
 
-            // === CORS: allow specific origins ===
             .cors(cors -> cors.configurationSource(config -> {
                 var corsConfig = new CorsConfiguration();
                 corsConfig.addAllowedOrigin("https://techie-backend-forge.vercel.app");
-                corsConfig.addAllowedMethod("*");                // Allow all HTTP methods
-                corsConfig.addAllowedHeader("*");                // Allow all headers
+                corsConfig.addAllowedMethod("*");
+                corsConfig.addAllowedHeader("*");
                 corsConfig.setAllowCredentials(true);
                 return corsConfig;
             }))
 
-            // === Authorization rules ===
             .authorizeExchange(exchanges -> exchanges
-                // Public endpoints — no auth needed
                 .pathMatchers("/api/auth/**").permitAll()
                 .pathMatchers("/api/public/**").permitAll()
-                .pathMatchers("/ws/chat").permitAll()            // WebSocket (auth via query param)
+                .pathMatchers("/ws/chat").permitAll()
                 .pathMatchers("/actuator/health").permitAll()
 
-                // Admin-only endpoints
                 .pathMatchers("/api/admin/**").hasRole("ADMIN")
 
-                // Authenticated users only
                 .pathMatchers("/api/**").authenticated()
 
-                // Everything else
                 .anyExchange().authenticated()
             )
 
-            // === HTTP Basic (for development/testing) ===
             .httpBasic(Customizer.withDefaults())
 
-            // === JWT (for production) ===
-            // See JWT filter configuration below
 
             .build();
     }
@@ -82,6 +91,24 @@ public class ReactiveSecurityConfig {
 
 ### 2. JWT Authentication Filter (Reactive)
 
+
+**What this code does — step by step:**
+
+1. Extract token from Authorization header
+2. No token — continue without authentication (let authorization rules decide)
+3. `String token = authHeader.substring(7);` — Remove "Bearer " prefix
+4. `return tokenValidator.validate(token)` — Mono<Claims>
+5. Token is valid — create authentication object
+6. Create Spring Security authentication
+7. `user,` — Principal
+8. `null,` — Credentials (already validated)
+9. Set authentication in the security context
+10. Attach to the exchange for downstream use
+11. `.then(chain.filter(exchange))` — Continue the filter chain
+12. Invalid token — return 401
+
+The same code, clean:
+
 ```java
 @Component
 public class JwtAuthenticationFilter implements WebFilter {
@@ -91,45 +118,38 @@ public class JwtAuthenticationFilter implements WebFilter {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
-        // Extract token from Authorization header
         String authHeader = exchange.getRequest()
             .getHeaders()
             .getFirst("Authorization");
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            // No token — continue without authentication (let authorization rules decide)
             return chain.filter(exchange);
         }
 
-        String token = authHeader.substring(7);                  // Remove "Bearer " prefix
+        String token = authHeader.substring(7);
 
-        return tokenValidator.validate(token)                    // Mono<Claims>
+        return tokenValidator.validate(token)
             .flatMap(claims -> {
-                // Token is valid — create authentication object
                 String username = claims.getSubject();
                 String role = claims.get("role", String.class);
 
                 return userRepository.findByUsername(username)
                     .map(user -> {
-                        // Create Spring Security authentication
                         Authentication auth = new UsernamePasswordAuthenticationToken(
-                            user,                                // Principal
-                            null,                                // Credentials (already validated)
+                            user,
+                            null,
                             List.of(new SimpleGrantedAuthority("ROLE_" + role))
                         );
 
-                        // Set authentication in the security context
                         SecurityContext context = SecurityContextHolder.createEmptyContext();
                         context.setAuthentication(auth);
 
-                        // Attach to the exchange for downstream use
                         return exchange.getAttributes()
                             .put(SecurityWebServerContextServerWebExchange.WEBFLUX_SECURITY_CONTEXT_ATTR, context);
                     });
             })
-            .then(chain.filter(exchange))                        // Continue the filter chain
+            .then(chain.filter(exchange))
             .onErrorResume(e -> {
-                // Invalid token — return 401
                 exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
                 return exchange.getResponse().setComplete();
             });
@@ -138,6 +158,19 @@ public class JwtAuthenticationFilter implements WebFilter {
 ```
 
 ### 3. Route-Level Authorization
+
+
+**What this code does — step by step:**
+
+1. Public routes (no auth):
+2. User routes (authenticated):
+3. `.filter(this::requireAuth)` — Add auth filter to this group
+4. Admin routes (authenticated + admin role):
+5. `.filter(this::requireAdmin)` — Add admin filter
+6. Filter: require authentication
+7. Filter: require ADMIN role
+
+The same code, clean:
 
 ```java
 @Configuration
@@ -149,30 +182,26 @@ public class RouteConfig {
             AdminHandler adminHandler) {
 
         return RouterFunctions.route()
-            // Public routes (no auth):
             .path("/api/auth", builder -> builder
                 .POST("/login", authHandler::login)
                 .POST("/register", authHandler::register)
             )
 
-            // User routes (authenticated):
             .path("/api/user", builder -> builder
                 .GET("/profile", authHandler::getProfile)
                 .PUT("/profile", authHandler::updateProfile)
-                .filter(this::requireAuth)                       // Add auth filter to this group
+                .filter(this::requireAuth)
             )
 
-            // Admin routes (authenticated + admin role):
             .path("/api/admin", builder -> builder
                 .GET("/users", adminHandler::listUsers)
                 .DELETE("/users/{id}", adminHandler::deleteUser)
-                .filter(this::requireAdmin)                      // Add admin filter
+                .filter(this::requireAdmin)
             )
 
             .build();
     }
 
-    // Filter: require authentication
     private HandlerFilterFunction<ServerResponse, ServerResponse> requireAuth() {
         return (request, next) -> {
             return ReactiveSecurityContextHolder.getContext()
@@ -187,7 +216,6 @@ public class RouteConfig {
         };
     }
 
-    // Filter: require ADMIN role
     private HandlerFilterFunction<ServerResponse, ServerResponse> requireAdmin() {
         return (request, next) -> {
             return ReactiveSecurityContextHolder.getContext()
@@ -207,7 +235,6 @@ public class RouteConfig {
 
 ### 4. Reactive UserDetailsService
 
-```java
 @Component
 public class ReactiveUserDetailsService implements ReactiveUserDetailsService {
 
@@ -223,7 +250,6 @@ public class ReactiveUserDetailsService implements ReactiveUserDetailsService {
             );
     }
 }
-```
 
 ---
 
@@ -231,7 +257,6 @@ public class ReactiveUserDetailsService implements ReactiveUserDetailsService {
 
 ### Scenario 1: JWT + Refresh Token Flow
 
-```java
 @RestController
 @RequestMapping("/api/auth")
 public class ReactiveAuthController {
@@ -271,11 +296,9 @@ public class ReactiveAuthController {
             .onErrorReturn(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
     }
 }
-```
 
 ### Scenario 2: Method-Level Security (Reactive)
 
-```java
 @Service
 public class OrderService {
 
@@ -292,11 +315,9 @@ public class OrderService {
         return orderRepository.save(order);
     }
 }
-```
 
 ### Scenario 3: WebSocket Authentication
 
-```java
 @Component
 public class SecureWebSocketHandler implements WebSocketHandler {
 
@@ -320,7 +341,6 @@ public class SecureWebSocketHandler implements WebSocketHandler {
             .switchIfEmpty(session.close(CloseStatus.POLICY_VIOLATION).then());
     }
 }
-```
 
 ---
 
@@ -345,3 +365,4 @@ public class SecureWebSocketHandler implements WebSocketHandler {
 - **Never block** in reactive security — always return `Mono`/`Flux`.
 
 Official docs: [Reactive Security](https://docs.spring.io/spring-security/reference/reactive/index.html) · [WebFlux Security](https://docs.spring.io/spring-security/reference/reactive/configuration/webflux-security.html)
+

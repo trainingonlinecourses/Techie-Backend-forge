@@ -1,7 +1,7 @@
 ---
 title: Stable Values — Lazy, Thread-Safe, Single-Assignment Variables
 summary: The StableValue API provides a thread-safe, lazy, single-assignment variable that's cheaper than volatile fields and safer than double-checked locking.
-order: 5
+order: 1
 minutes: 18
 topics: [stable-values, value-classes, lazy-initialization, thread-safety]
 docs:
@@ -21,7 +21,6 @@ A StableValue is like a sealed envelope. Once you put a value in, it can never b
 
 ## The Code
 
-```java
 import jdk.incubator.concurrent.StableValue;
 
 public class ConfigManager {
@@ -53,7 +52,6 @@ public class ConfigManager {
         return volatileConfig;
     }
 }
-```
 
 ## Line-by-Line Explanation
 
@@ -67,7 +65,6 @@ public class ConfigManager {
 ## Real-World Scenarios
 
 **Scenario 1: Lazy database connection pool**
-```java
 private final StableValue<ConnectionPool> pool = StableValue.of();
 
 public Connection getConnection() {
@@ -75,10 +72,8 @@ public Connection getConnection() {
         config.getUrl(), config.getUsername(), config.getPassword()
     )).getConnection();
 }
-```
 
 **Scenario 2: Feature flag checked on every request**
-```java
 private final StableValue<Boolean> featureEnabled =
     StableValue.of();
 
@@ -87,7 +82,6 @@ public boolean isFeatureEnabled() {
         featureFlagService.isEnabled("new-checkout-flow")
     );
 }
-```
 
 ## Key Takeaways
 
@@ -96,3 +90,4 @@ public boolean isFeatureEnabled() {
 3. **Thread-safe by design** — the JVM handles the synchronization internally
 4. **Use for truly immutable values** — once set, it can never change
 5. **Preview feature** — may change based on feedback
+

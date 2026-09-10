@@ -1,7 +1,7 @@
 ---
 title: JSONB: Documents in Postgres
 module: postgresql-deep
-order: 4
+order: 2
 minutes: 25
 topics: ["jsonb", "document queries", "GIN indexes", "jsonb operators", "hybrid relational-document"]
 summary: Postgres's jsonb type gives you documentdatabase capabilities inside a relational database: store arbitrary JSON, query into it, index it. The resu...
@@ -50,7 +50,6 @@ CREATE TABLE course_metadata (
 
 ## Writing JSONB
 
-```java
 @Entity
 public class CourseMetadata {
 
@@ -59,7 +58,6 @@ public class CourseMetadata {
     @JdbcTypeCode(SqlTypes.JSON)          // Hibernate 6+ maps String ↔ jsonb
     private String attributes;            // JSON text in the entity
 }
-```
 
 ```sql
 INSERT INTO course_metadata (course_id, attributes)
@@ -96,13 +94,11 @@ FROM course_metadata;
 
 In Spring Data JPA:
 
-```java
 @Query(value = """
     SELECT course_id FROM course_metadata
     WHERE attributes @> CAST(:filter AS jsonb)
     """, nativeQuery = true)
 List<Long> findByAttribute(@Param("filter") String jsonFilter);
-```
 
 ## Indexing JSONB: GIN
 
@@ -146,7 +142,6 @@ WHERE course_id = 1;
 
 The winning pattern — strict rows + JSONB extras:
 
-```java
 @Entity
 public class Course {
 
@@ -157,7 +152,6 @@ public class Course {
     @JdbcTypeCode(SqlTypes.JSON)
     private String metadata;            // jsonb: flexible extras
 }
-```
 
 ```sql
 -- Hybrid query: indexed column + jsonb filter
@@ -182,7 +176,6 @@ Use Postgres jsonb when JSON is one attribute among relational data. Use a real 
 
 ## Testing JSONB Queries
 
-```java
 @DataJpaTest
 @Testcontainers
 class JsonbTest {
@@ -204,7 +197,6 @@ class JsonbTest {
         assertEquals(List.of(1L), ids);
     }
 }
-```
 
 ## Summary
 
@@ -219,3 +211,4 @@ class JsonbTest {
 | Alternative | Document store only when JSON is everything |
 
 JSONB is how Postgres absorbed the document database: ACID, SQL, joins, and flexible JSON in one engine. Model deliberately — queried fields as columns, flexible data as jsonb, GIN-index the paths you filter — and you get the best of both worlds without a second database.
+

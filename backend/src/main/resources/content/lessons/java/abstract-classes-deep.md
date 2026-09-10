@@ -1,7 +1,7 @@
 ---
 title: Abstract Classes vs Interfaces — When to Use Which
 summary: The contract difference between abstract classes and interfaces, diamond problem rules, when an abstract class beats an interface, and the Java 8+ default-method overlap that confuses every team.
-order: 39
+order: 1
 minutes: 20
 topics: [abstract-class, interface, diamond-problem, default-methods, template-method, is-a-vs-can-do]
 docs:
@@ -40,24 +40,35 @@ When `default` methods collide from two interfaces, the compiler forces the impl
 
 A payment service has `CreditCardProcessor`, `BankTransferProcessor`, and `WalletProcessor`. They all need a common `process()` flow: validate → charge → record audit log. The shared code lives in an abstract base; each subclass overrides the charge step.
 
+
+**What this code does — step by step:**
+
+1. Constructor — interfaces cannot do this
+2. Template method: the flow is fixed, the charge step varies
+3. `validate(request);` — shared
+4. `PaymentResult result = charge(request);` — abstract — subclass decides
+5. `auditLog.record(request, result);` — shared
+6. `repository.save(result);` — shared
+7. Each subclass implements its own charging logic
+
+The same code, clean:
+
 ```java
 public abstract class PaymentProcessor {
 
     protected final AuditLog auditLog;
     protected final PaymentRepository repository;
 
-    // Constructor — interfaces cannot do this
     protected PaymentProcessor(AuditLog auditLog, PaymentRepository repository) {
         this.auditLog = auditLog;
         this.repository = repository;
     }
 
-    // Template method: the flow is fixed, the charge step varies
     public final PaymentResult process(PaymentRequest request) {
-        validate(request);                              // shared
-        PaymentResult result = charge(request);         // abstract — subclass decides
-        auditLog.record(request, result);               // shared
-        repository.save(result);                        // shared
+        validate(request);
+        PaymentResult result = charge(request);
+        auditLog.record(request, result);
+        repository.save(result);
         return result;
     }
 
@@ -67,12 +78,10 @@ public abstract class PaymentProcessor {
         }
     }
 
-    // Each subclass implements its own charging logic
     protected abstract PaymentResult charge(PaymentRequest request);
 }
 ```
 
-```java
 public class CreditCardProcessor extends PaymentProcessor {
 
     private final StripeGateway stripe;
@@ -87,7 +96,6 @@ public class CreditCardProcessor extends PaymentProcessor {
         return stripe.charge(request.cardToken(), request.amount());
     }
 }
-```
 
 **Why abstract class here, not interface?** Because `process()` is a fixed algorithm (template method) that depends on shared fields (`auditLog`, `repository`) and a constructor. An interface cannot hold those.
 
@@ -95,14 +103,11 @@ public class CreditCardProcessor extends PaymentProcessor {
 
 Now suppose *any* entity in the system — not just payments — can produce an audit trail. `Order`, `User`, `Payment`, `Shipment` are unrelated classes that share zero code. The right abstraction is an interface:
 
-```java
 public interface Auditable {
     AuditEntry toAuditEntry();
     String auditCategory();    // e.g., "PAYMENT", "ORDER", "USER"
 }
-```
 
-```java
 public class Order implements Auditable {
     private String orderId;
     private BigDecimal total;
@@ -128,9 +133,7 @@ public class Payment implements Auditable {
     @Override
     public String auditCategory() { return "PAYMENT"; }
 }
-```
 
-```java
 // Audit service works with ANY Auditable — Order, Payment, User, etc.
 public class AuditService {
     public void record(Auditable entity) {
@@ -138,7 +141,6 @@ public class AuditService {
         auditRepository.save(entry);
     }
 }
-```
 
 **Why interface here, not abstract class?** Because `Order` and `Payment` have nothing else in common. Forcing them to extend a shared base class would be an artificial hierarchy. The interface says "you *can* produce an audit entry" without forcing a shared identity.
 
@@ -146,7 +148,6 @@ public class AuditService {
 
 Two interfaces both provide a default `describe()` method. A class implementing both must resolve the conflict:
 
-```java
 public interface Loggable {
     default String describe() { return "Loggable entity"; }
 }
@@ -162,7 +163,6 @@ public class Session implements Loggable, Cacheable {
         return Loggable.super.describe();  // pick one, or write a new implementation
     }
 }
-```
 
 This is rare in practice because well-designed interfaces avoid overlapping default methods. When it happens, the compiler forces you to make a conscious decision — which is the right behavior.
 
@@ -183,3 +183,4 @@ This is rare in practice because well-designed interfaces avoid overlapping defa
 2. **Making everything an abstract class** — prevents multiple inheritance, couples subclasses to a single hierarchy.
 3. **Putting utility methods in an interface with no fields** — works, but if the method needs state, an abstract class is the right tool.
 4. **Ignoring the diamond problem** — adding `default` methods to two interfaces in different modules can break consumers at compile time.
+

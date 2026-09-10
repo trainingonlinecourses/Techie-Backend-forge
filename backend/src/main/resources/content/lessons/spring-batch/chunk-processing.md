@@ -1,7 +1,7 @@
 ---
 title: Chunk-Oriented Processing — Complete Beginner's Guide
 summary: How Spring Batch processes data in chunks, the Reader-Processor-Writer pattern, and why chunking beats one-by-one processing.
-order: 2
+order: 4
 minutes: 20
 topics: [chunk processing, reader, processor, writer, batch processing, commit interval]
 docs:
@@ -42,16 +42,38 @@ Chunk processing (fast):
 
 **Line-by-line code example:**
 
+
+**What this code does — step by step:**
+
+1. Step 1: Reader — reads chunks of data from a source
+2. `return new FlatFileItemReaderBuilder<Order>()` — Line 1: Builder pattern
+3. `.name("orderReader")` — Line 2: Name for logging
+4. `.resource(new ClassPathResource("orders.csv"))` — Line 3: Input file
+5. `.delimited()` — Line 4: CSV format
+6. `.names("id", "customer", "total", "status")` — Line 5: Column names
+7. `.fieldSetMapper(fieldSet -> new Order(` — Line 6: Map CSV to Java object
+8. Step 2: Processor — transforms each item
+9. Line 1: Validate the order
+10. `return null;` — Line 2: Return null to skip invalid items
+11. Line 3: Transform to the output format
+12. `order.getCustomer().toUpperCase(),` — Line 4: Transform data
+13. `Instant.now()` — Line 5: Add processing timestamp
+14. Step 3: Writer — writes chunks to the destination
+15. `.dataSource(dataSource)` — Line 1: Database connection
+16. `"VALUES (:id, :customer, :total, :processedAt)")` — Line 2: SQL with named params
+17. `.beanMapped()` — Line 3: Use bean properties for parameters
+
+The same code, clean:
+
 ```java
-// Step 1: Reader — reads chunks of data from a source
 @Bean
 public FlatFileItemReader<Order> reader() {
-    return new FlatFileItemReaderBuilder<Order>()     // Line 1: Builder pattern
-        .name("orderReader")                          // Line 2: Name for logging
-        .resource(new ClassPathResource("orders.csv")) // Line 3: Input file
-        .delimited()                                  // Line 4: CSV format
-        .names("id", "customer", "total", "status")  // Line 5: Column names
-        .fieldSetMapper(fieldSet -> new Order(        // Line 6: Map CSV to Java object
+    return new FlatFileItemReaderBuilder<Order>()
+        .name("orderReader")
+        .resource(new ClassPathResource("orders.csv"))
+        .delimited()
+        .names("id", "customer", "total", "status")
+        .fieldSetMapper(fieldSet -> new Order(
             fieldSet.readLong("id"),
             fieldSet.readString("customer"),
             fieldSet.readBigDecimal("total"),
@@ -60,44 +82,53 @@ public FlatFileItemReader<Order> reader() {
         .build();
 }
 
-// Step 2: Processor — transforms each item
 @Bean
 public ItemProcessor<Order, ProcessedOrder> processor() {
     return order -> {
-        // Line 1: Validate the order
         if (order.getTotal().compareTo(BigDecimal.ZERO) <= 0) {
-            return null;  // Line 2: Return null to skip invalid items
+            return null;
         }
-        // Line 3: Transform to the output format
         return new ProcessedOrder(
             order.getId(),
-            order.getCustomer().toUpperCase(),  // Line 4: Transform data
+            order.getCustomer().toUpperCase(),
             order.getTotal(),
-            Instant.now()                       // Line 5: Add processing timestamp
+            Instant.now()
         );
     };
 }
 
-// Step 3: Writer — writes chunks to the destination
 @Bean
 public JdbcBatchItemWriter<ProcessedOrder> writer(DataSource dataSource) {
     return new JdbcBatchItemWriterBuilder<ProcessedOrder>()
-        .dataSource(dataSource)                     // Line 1: Database connection
+        .dataSource(dataSource)
         .sql("INSERT INTO processed_orders (id, customer, total, processed_at) " +
-             "VALUES (:id, :customer, :total, :processedAt)")  // Line 2: SQL with named params
-        .beanMapped()                               // Line 3: Use bean properties for parameters
+             "VALUES (:id, :customer, :total, :processedAt)")
+        .beanMapped()
         .build();
 }
 ```
 
 ## The complete job — putting it together
 
+
+**What this code does — step by step:**
+
+1. `return new JobBuilder("importOrders", jobRepository)` — Line 1: Create job
+2. `.start(importStep)` — Line 2: Add the step
+3. `return new StepBuilder("importStep", jobRepository)` — Line 1: Create step
+4. `.<Order, ProcessedOrder>chunk(100, transactionManager)` — Line 2: Chunk size = 100
+5. `.reader(reader)` — Line 3: Set the reader
+6. `.processor(processor)` — Line 4: Set the processor
+7. `.writer(writer)` — Line 5: Set the writer
+
+The same code, clean:
+
 ```java
 @Bean
 public Job importOrdersJob(JobRepository jobRepository, 
                            Step importStep) {
-    return new JobBuilder("importOrders", jobRepository)  // Line 1: Create job
-        .start(importStep)                                 // Line 2: Add the step
+    return new JobBuilder("importOrders", jobRepository)
+        .start(importStep)
         .build();
 }
 
@@ -107,11 +138,11 @@ public Step importStep(JobRepository jobRepository,
                        FlatFileItemReader<Order> reader,
                        ItemProcessor<Order, ProcessedOrder> processor,
                        JdbcBatchItemWriter<ProcessedOrder> writer) {
-    return new StepBuilder("importStep", jobRepository)   // Line 1: Create step
-        .<Order, ProcessedOrder>chunk(100, transactionManager)  // Line 2: Chunk size = 100
-        .reader(reader)                                   // Line 3: Set the reader
-        .processor(processor)                             // Line 4: Set the processor
-        .writer(writer)                                   // Line 5: Set the writer
+    return new StepBuilder("importStep", jobRepository)
+        .<Order, ProcessedOrder>chunk(100, transactionManager)
+        .reader(reader)
+        .processor(processor)
+        .writer(writer)
         .build();
 }
 ```
@@ -126,18 +157,19 @@ public Step importStep(JobRepository jobRepository,
 
 ## Chunk size — tuning for performance
 
+
+**What this code does — step by step:**
+
+1. Small chunk (10) — more database round-trips, less memory
+2. Large chunk (1000) — fewer round-trips, more memory
+3. The sweet spot depends on: - Record size (small records → larger chunks). - Database performance (fast DB → larger chunks). - Memory available (limited memory → smaller chunks). - Transaction overhead (high overhead → larger chunks)
+
+The same code, clean:
+
 ```java
-// Small chunk (10) — more database round-trips, less memory
 .chunk(10, transactionManager)
 
-// Large chunk (1000) — fewer round-trips, more memory
 .chunk(1000, transactionManager)
-
-// The sweet spot depends on:
-// - Record size (small records → larger chunks)
-// - Database performance (fast DB → larger chunks)
-// - Memory available (limited memory → smaller chunks)
-// - Transaction overhead (high overhead → larger chunks)
 ```
 
 ## Common mistakes
@@ -159,3 +191,4 @@ public Step importStep(JobRepository jobRepository,
 - Spring Batch handles transactions automatically per chunk
 
 **Official docs:** [Chunk-Oriented Processing](https://docs.spring.io/spring-batch/reference/core/chunk-container.html) · [Item Readers](https://docs.spring.io/spring-batch/reference/core/itemreaders.html)
+

@@ -1,7 +1,7 @@
 ---
 title: Java NIO Networking — Non-blocking I/O with Selectors
 summary: NIO channels, buffers, selectors, non-blocking I/O, the reactor pattern, socket programming with NIO, and how high-performance servers handle thousands of connections without thousands of threads.
-order: 55
+order: 57
 minutes: 22
 topics: [nio, channel, buffer, selector, non-blocking, reactor-pattern, socket-channel, bytebuffer]
 docs:
@@ -39,6 +39,18 @@ The core idea is the **Reactor pattern**: one thread monitors multiple channels 
 
 A chat server handling thousands of connections with a single selector thread:
 
+
+**What this code does — step by step:**
+
+1. `serverChannel.configureBlocking(false);` — non-blocking!
+2. `selector.select();` — blocks until at least one channel is ready
+3. `iter.remove();` — must remove — selector doesn't do it
+4. `channel.close();` — client disconnected
+5. `broadcast(message, channel);` — send to all other clients
+6. `client.write(buffer.duplicate());` — duplicate() because write is partial
+
+The same code, clean:
+
 ```java
 public class ChatServer {
     private final Selector selector;
@@ -48,7 +60,7 @@ public class ChatServer {
         selector = Selector.open();
         serverChannel = ServerSocketChannel.open();
         serverChannel.bind(new InetSocketAddress(port));
-        serverChannel.configureBlocking(false);  // non-blocking!
+        serverChannel.configureBlocking(false);
         serverChannel.register(selector, SelectionKey.OP_ACCEPT);
     }
 
@@ -57,14 +69,14 @@ public class ChatServer {
             serverChannel.socket().getLocalPort());
 
         while (true) {
-            selector.select();  // blocks until at least one channel is ready
+            selector.select();
 
             Set<SelectionKey> keys = selector.selectedKeys();
             Iterator<SelectionKey> iter = keys.iterator();
 
             while (iter.hasNext()) {
                 SelectionKey key = iter.next();
-                iter.remove();  // must remove — selector doesn't do it
+                iter.remove();
 
                 if (key.isAcceptable()) {
                     handleAccept(key);
@@ -90,13 +102,13 @@ public class ChatServer {
 
         int bytesRead = channel.read(buffer);
         if (bytesRead == -1) {
-            channel.close();  // client disconnected
+            channel.close();
             return;
         }
 
         buffer.flip();
         String message = StandardCharsets.UTF_8.decode(buffer).toString();
-        broadcast(message, channel);  // send to all other clients
+        broadcast(message, channel);
     }
 
     private void broadcast(String message, SocketChannel sender) throws IOException {
@@ -106,7 +118,7 @@ public class ChatServer {
         for (SelectionKey key : selector.keys()) {
             if (key.channel() instanceof SocketChannel client
                     && client != sender && key.isValid()) {
-                client.write(buffer.duplicate());  // duplicate() because write is partial
+                client.write(buffer.duplicate());
                 buffer.rewind();
             }
         }
@@ -118,30 +130,41 @@ public class ChatServer {
 
 Understanding buffer states:
 
+
+**What this code does — step by step:**
+
+1. Writing to a buffer
+2. `buffer.put("Hello, NIO".getBytes());` — position=10, limit=100, capacity=100
+3. Prepare for reading
+4. `buffer.flip();` — position=0, limit=10 (data to read)
+5. Now get() reads from position 0 to limit 10
+6. After reading
+7. `buffer.hasRemaining();` — true if position < limit
+8. `buffer.get();` — reads one byte, advances position
+9. Reset for writing again
+10. `buffer.clear();` — position=0, limit=capacity (all space available)
+11. OR
+12. `buffer.compact();` — keeps unread data, moves it to beginning
+
+The same code, clean:
+
 ```java
-// Writing to a buffer
 ByteBuffer buffer = ByteBuffer.allocate(100);
-buffer.put("Hello, NIO".getBytes());  // position=10, limit=100, capacity=100
+buffer.put("Hello, NIO".getBytes());
 
-// Prepare for reading
-buffer.flip();  // position=0, limit=10 (data to read)
-// Now get() reads from position 0 to limit 10
+buffer.flip();
 
-// After reading
-buffer.hasRemaining();  // true if position < limit
-buffer.get();           // reads one byte, advances position
+buffer.hasRemaining();
+buffer.get();
 
-// Reset for writing again
-buffer.clear();         // position=0, limit=capacity (all space available)
-// OR
-buffer.compact();       // keeps unread data, moves it to beginning
+buffer.clear();
+buffer.compact();
 ```
 
 ### Scenario 3: Scatter/Gather I/O
 
 Read multiple fields in one operation using scatter (read into multiple buffers):
 
-```java
 ByteBuffer header = ByteBuffer.allocate(128);
 ByteBuffer body = ByteBuffer.allocate(1024);
 
@@ -151,25 +174,33 @@ long bytesRead = channel.read(buffers);  // scatter read — fills header first,
 
 header.flip();
 body.flip();
-```
 
 Write multiple buffers in one operation using gather:
 
-```java
 ByteBuffer header = ByteBuffer.wrap("HTTP/1.1 200 OK\r\n".getBytes());
 ByteBuffer body = ByteBuffer.wrap("Hello, world".getBytes());
 
 channel.write(new ByteBuffer[]{header, body});  // gather write
-```
 
 ## Selector key operations
 
+
+**What this code does — step by step:**
+
+1. `key.interestOps(SelectionKey.OP_READ | SelectionKey.OP_WRITE);` — watch for both
+2. `key.cancel();` — stop monitoring this channel
+3. `key.isValid();` — check if key is still valid
+4. `key.attachment();` — get the attached object (e.g., client state)
+5. `key.attach(clientState);` — attach state to key
+
+The same code, clean:
+
 ```java
-key.interestOps(SelectionKey.OP_READ | SelectionKey.OP_WRITE);  // watch for both
-key.cancel();           // stop monitoring this channel
-key.isValid();          // check if key is still valid
-key.attachment();       // get the attached object (e.g., client state)
-key.attach(clientState);// attach state to key
+key.interestOps(SelectionKey.OP_READ | SelectionKey.OP_WRITE);
+key.cancel();
+key.isValid();
+key.attachment();
+key.attach(clientState);
 ```
 
 ## Common mistakes
@@ -183,3 +214,4 @@ key.attach(clientState);// attach state to key
 | Using `buffer.clear()` when you meant `compact()` | Unread data lost |
 | Allocating buffers inside the selector loop | GC pressure, poor performance |
 | Not handling partial writes | Data corruption or connection drops |
+

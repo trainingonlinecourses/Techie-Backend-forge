@@ -1,7 +1,7 @@
 ---
 title: Immutable Classes — Thread-Safe Objects by Design
 summary: How to build truly immutable classes, why final fields matter, the copy-constructor pattern, immutable collections, and how organizations use immutability for caching, DTOs, and thread safety.
-order: 63
+order: 25
 minutes: 22
 topics: [immutable-class, final-fields, defensive-copy, immutable-collection, thread-safety, value-object]
 docs:
@@ -27,19 +27,32 @@ An **immutable object** is one whose state **cannot change** after it is created
 
 There are 5 rules. Break any one and the class is no longer truly immutable:
 
+
+**What this code does — step by step:**
+
+1. `public final class Money {` — 1. Make the class final (no subclass can override methods)
+2. `private final BigDecimal amount;` — 2. Make all fields final (assigned once in constructor, never changed)
+3. `private final Currency currency;` — and private (no setter can access them)
+4. 3. Constructor initializes ALL fields
+5. `this.amount = amount;` — no defensive copy needed for BigDecimal (it's immutable itself)
+6. 4. No setters — only getters
+7. 5. "Wither" methods return NEW objects instead of modifying this one
+8. `return new Money(this.amount.add(other.amount), this.currency);` — NEW object
+9. `return new Money(newAmount, this.currency);` — NEW object with changed amount
+
+The same code, clean:
+
 ```java
-public final class Money {            // 1. Make the class final (no subclass can override methods)
+public final class Money {
 
-    private final BigDecimal amount;   // 2. Make all fields final (assigned once in constructor, never changed)
-    private final Currency currency;   //    and private (no setter can access them)
+    private final BigDecimal amount;
+    private final Currency currency;
 
-    // 3. Constructor initializes ALL fields
     public Money(BigDecimal amount, Currency currency) {
-        this.amount = amount;          // no defensive copy needed for BigDecimal (it's immutable itself)
+        this.amount = amount;
         this.currency = currency;
     }
 
-    // 4. No setters — only getters
     public BigDecimal getAmount() {
         return amount;
     }
@@ -48,16 +61,15 @@ public final class Money {            // 1. Make the class final (no subclass ca
         return currency;
     }
 
-    // 5. "Wither" methods return NEW objects instead of modifying this one
     public Money add(Money other) {
         if (!this.currency.equals(other.currency)) {
             throw new CurrencyMismatchException();
         }
-        return new Money(this.amount.add(other.amount), this.currency);  // NEW object
+        return new Money(this.amount.add(other.amount), this.currency);
     }
 
     public Money withAmount(BigDecimal newAmount) {
-        return new Money(newAmount, this.currency);  // NEW object with changed amount
+        return new Money(newAmount, this.currency);
     }
 }
 ```
@@ -73,53 +85,66 @@ public final class Money {            // 1. Make the class final (no subclass ca
 
 If your class holds a mutable object (like `Date` or `List`), you must defend against external mutation:
 
+
+**What this code does — step by step:**
+
+1. `private final Date startTime;` — Date is MUTABLE — someone could call startTime.setTime()!
+2. `private final List<String> attendees;` — List is MUTABLE — someone could call attendees.add()!
+3. `this.startTime = new Date(startTime.getTime());` — DEFENSIVE COPY — create a new Date
+4. `this.attendees = List.copyOf(attendees);` — DEFENSIVE COPY — immutable wrapper
+5. `return new Date(startTime.getTime());` — DEFENSIVE COPY — return a new Date, not the original
+6. `return attendees;` — safe — List.copyOf returns an unmodifiable list
+
+The same code, clean:
+
 ```java
 public final class Appointment {
 
     private final String title;
-    private final Date startTime;    // Date is MUTABLE — someone could call startTime.setTime()!
-    private final List<String> attendees;  // List is MUTABLE — someone could call attendees.add()!
+    private final Date startTime;
+    private final List<String> attendees;
 
     public Appointment(String title, Date startTime, List<String> attendees) {
         this.title = title;
-        this.startTime = new Date(startTime.getTime());  // DEFENSIVE COPY — create a new Date
-        this.attendees = List.copyOf(attendees);          // DEFENSIVE COPY — immutable wrapper
+        this.startTime = new Date(startTime.getTime());
+        this.attendees = List.copyOf(attendees);
     }
 
     public Date getStartTime() {
-        return new Date(startTime.getTime());  // DEFENSIVE COPY — return a new Date, not the original
+        return new Date(startTime.getTime());
     }
 
     public List<String> getAttendees() {
-        return attendees;  // safe — List.copyOf returns an unmodifiable list
+        return attendees;
     }
 }
 ```
 
 **Why the defensive copy in the constructor?** If someone passes a `Date` object and then mutates it afterward, our Appointment would silently change. The copy breaks that link:
 
-```java
 Date sharedDate = new Date();
 Appointment apt = new Appointment("Meeting", sharedDate, List.of("Alice"));
 
 // Without defensive copy: apt.getStartTime() would reflect sharedDate's mutation!
 sharedDate.setTime(0);  // sets to epoch — without defensive copy, apt's time is now 0
 // With defensive copy: apt.getStartTime() still returns the original time
-```
 
 ## The modern alternative: records (Java 16+)
 
 Records give you immutability for free — all fields are `final`, there are no setters, and `equals()`/`hashCode()`/`toString()` are auto-generated:
 
+
+**What this code does — step by step:**
+
+1. That's it. This is a fully immutable class with: - final fields (enforced by the compiler). - No setters (records don't allow them). - Constructor validation (add a compact constructor). - equals(), hashCode(), toString() auto-generated
+2. Add validation in a compact constructor
+3. Custom behavior
+
+The same code, clean:
+
 ```java
 public record Money(BigDecimal amount, Currency currency) {
-    // That's it. This is a fully immutable class with:
-    // - final fields (enforced by the compiler)
-    // - No setters (records don't allow them)
-    // - Constructor validation (add a compact constructor)
-    // - equals(), hashCode(), toString() auto-generated
 
-    // Add validation in a compact constructor
     public Money {
         if (amount.signum() < 0) {
             throw new IllegalArgumentException("Money cannot be negative");
@@ -129,7 +154,6 @@ public record Money(BigDecimal amount, Currency currency) {
         }
     }
 
-    // Custom behavior
     public Money add(Money other) {
         if (!this.currency.equals(other.currency)) {
             throw new CurrencyMismatchException();
@@ -145,7 +169,6 @@ public record Money(BigDecimal amount, Currency currency) {
 
 HashMap keys must not change. Immutable objects are perfect keys:
 
-```java
 public class LocationCache {
     // Key: immutable GeoPoint — safe because it can never change
     private final Map<GeoPoint, WeatherData> cache = new ConcurrentHashMap<>();
@@ -163,22 +186,27 @@ public record GeoPoint(double latitude, double longitude) {
         if (longitude < -180 || longitude > 180) throw new IllegalArgumentException("Invalid longitude");
     }
 }
-```
 
 ### Scenario 2: Safe API responses — no mutation after sending
 
+
+**What this code does — step by step:**
+
+1. BAD: mutable DTO — the controller can accidentally modify the response
+2. `private String name;` — public or with setters — mutable!
+3. Spring serializes this, but any interceptor can modify it
+4. GOOD: immutable DTO — safe to cache, serialize, and share across threads
+5. No setters. No mutable fields. Thread-safe by design. Spring handles record serialization perfectly with Jackson.
+
+The same code, clean:
+
 ```java
-// BAD: mutable DTO — the controller can accidentally modify the response
 public class UserResponse {
-    private String name;     // public or with setters — mutable!
+    private String name;
     private String email;
-    // Spring serializes this, but any interceptor can modify it
 }
 
-// GOOD: immutable DTO — safe to cache, serialize, and share across threads
 public record UserResponse(String name, String email, Instant createdAt) {
-    // No setters. No mutable fields. Thread-safe by design.
-    // Spring handles record serialization perfectly with Jackson.
 }
 ```
 
@@ -186,28 +214,37 @@ public record UserResponse(String name, String email, Instant createdAt) {
 
 In event-driven architectures, events must be immutable (you can't change history):
 
+
+**What this code does — step by step:**
+
+1. Each event is immutable — once created, it's permanent
+2. `items = List.copyOf(items);` — defensive copy — items list is now unmodifiable
+3. Event store — events are append-only, never modified
+4. `events.add(event);` — append only — never modify, never remove
+5. `.toList();` — returns immutable list
+
+The same code, clean:
+
 ```java
-// Each event is immutable — once created, it's permanent
 public record OrderCreated(String orderId, String customerId, List<OrderItem> items, Instant timestamp) {
     public OrderCreated {
-        items = List.copyOf(items);  // defensive copy — items list is now unmodifiable
+        items = List.copyOf(items);
     }
 }
 
 public record OrderShipped(String orderId, String trackingNumber, Instant timestamp) {}
 
-// Event store — events are append-only, never modified
 public class EventStore {
     private final List<OrderEvent> events = new CopyOnWriteArrayList<>();
 
     public void append(OrderEvent event) {
-        events.add(event);  // append only — never modify, never remove
+        events.add(event);
     }
 
     public List<OrderEvent> getEvents(String orderId) {
         return events.stream()
             .filter(e -> e.orderId().equals(orderId))
-            .toList();  // returns immutable list
+            .toList();
     }
 }
 ```
@@ -215,6 +252,18 @@ public class EventStore {
 ### Scenario 4: Builder pattern for complex immutable objects
 
 When a class has many optional fields, a builder makes construction readable:
+
+
+**What this code does — step by step:**
+
+1. `this.headers = Map.copyOf(builder.headers);` — immutable copy
+2. `this.body = builder.body != null ? builder.body.clone() : new byte[0];` — defensive copy
+3. `private final String url;` — required
+4. `private String method = "GET";` — default
+5. Usage: fluent, readable, immutable result
+6. request is now immutable — no one can change its headers, body, or timeout
+
+The same code, clean:
 
 ```java
 public final class HttpRequest {
@@ -227,14 +276,14 @@ public final class HttpRequest {
     private HttpRequest(Builder builder) {
         this.url = builder.url;
         this.method = builder.method;
-        this.headers = Map.copyOf(builder.headers);  // immutable copy
-        this.body = builder.body != null ? builder.body.clone() : new byte[0];  // defensive copy
+        this.headers = Map.copyOf(builder.headers);
+        this.body = builder.body != null ? builder.body.clone() : new byte[0];
         this.timeout = builder.timeout;
     }
 
     public static class Builder {
-        private final String url;              // required
-        private String method = "GET";         // default
+        private final String url;
+        private String method = "GET";
         private Map<String, String> headers = new HashMap<>();
         private byte[] body = null;
         private Duration timeout = Duration.ofSeconds(30);
@@ -248,14 +297,12 @@ public final class HttpRequest {
     }
 }
 
-// Usage: fluent, readable, immutable result
 HttpRequest request = new HttpRequest.Builder("https://api.example.com/users")
     .method("POST")
     .header("Content-Type", "application/json")
     .body(jsonBytes)
     .timeout(Duration.ofSeconds(5))
     .build();
-// request is now immutable — no one can change its headers, body, or timeout
 ```
 
 ## Comparison: mutable vs immutable
@@ -278,3 +325,4 @@ HttpRequest request = new HttpRequest.Builder("https://api.example.com/users")
 | Returning a mutable Date directly | Caller can mutate the internal state |
 | Using `this.field = field` without validation | Null or invalid values locked in forever |
 | Making everything immutable when mutability is needed | Unnecessary object creation in hot loops |
+

@@ -1,7 +1,7 @@
 ---
 title: Relationships and Keys — The Anatomy of a Schema
 module: database-design
-order: 2
+order: 5
 minutes: 25
 topics: ["primary keys", "foreign keys", "one-to-many", "many-to-many", "one-to-one", "join tables"]
 summary: A database table is a list of records, but a relational database earns its name from how records refer to each other. Two kinds of keys make this w...
@@ -153,3 +153,4 @@ The database automatically indexes primary keys and unique constraints — looku
 - Use surrogate ids for FKs; enforce business uniqueness with `UNIQUE` constraints.
 - Choose `ON DELETE` policies per relationship; cascade deliberately.
 - Index FK columns you join/filter on.
+

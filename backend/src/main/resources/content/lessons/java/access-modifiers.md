@@ -1,7 +1,7 @@
 ---
 title: Access Modifiers — Controlling Who Can See What
 summary: private, default (package-private), protected, and public explained with the visibility table, why organizations lock almost everything down, and how encapsulation prevents real production incidents.
-order: 70
+order: 2
 minutes: 20
 topics: [access-modifiers, encapsulation, private, protected, public, package-private]
 docs:
@@ -25,18 +25,29 @@ Read it as a funnel: each step down opens the door wider. The "default" level is
 
 ## `private` — Only this class
 
+
+**What this code does — step by step:**
+
+1. `private BigDecimal balance = BigDecimal.ZERO;` — visible ONLY inside BankAccount
+2. `public void deposit(BigDecimal amount) {` — public door to the outside world
+3. `if (amount.signum() <= 0) {` — rule enforced at ONE place
+4. `this.balance = this.balance.add(amount);` — the ONLY code path that changes balance
+5. `public BigDecimal getBalance() {` — read access, no way to write directly
+
+The same code, clean:
+
 ```java
 public class BankAccount {
-    private BigDecimal balance = BigDecimal.ZERO;  // visible ONLY inside BankAccount
+    private BigDecimal balance = BigDecimal.ZERO;
 
-    public void deposit(BigDecimal amount) {       // public door to the outside world
-        if (amount.signum() <= 0) {                // rule enforced at ONE place
+    public void deposit(BigDecimal amount) {
+        if (amount.signum() <= 0) {
             throw new IllegalArgumentException("Deposit must be positive");
         }
-        this.balance = this.balance.add(amount);   // the ONLY code path that changes balance
+        this.balance = this.balance.add(amount);
     }
 
-    public BigDecimal getBalance() {               // read access, no way to write directly
+    public BigDecimal getBalance() {
         return balance;
     }
 }
@@ -55,26 +66,35 @@ This is **encapsulation** in action: data + the rules that protect it live toget
 
 ## *(default)* / package-private — Team-internal
 
-```java
 class OrderRepositoryHelper {   // no 'public' → only classes in this same package can use it
     void cleanupExpired() { }
 }
-```
 
 Organizations use this for "implementation details shared between neighboring classes" — e.g., helper classes used only by other classes in the same feature package. It keeps them out of the public API surface.
 
 ## `protected` — Family access
 
+
+**What this code does — step by step:**
+
+1. `protected abstract List<Row> fetchData();` — subclasses MUST provide this
+2. `public final void generate() {` — template method: fixed skeleton
+3. `List<Row> rows = fetchData();` — calls the subclass's implementation
+4. `render(rows);` — ...then renders uniformly
+5. `protected void render(List<Row> rows) {` — hook subclasses MAY customize
+
+The same code, clean:
+
 ```java
 public abstract class ReportGenerator {
-    protected abstract List<Row> fetchData();   // subclasses MUST provide this
+    protected abstract List<Row> fetchData();
 
-    public final void generate() {              // template method: fixed skeleton
-        List<Row> rows = fetchData();           // calls the subclass's implementation
-        render(rows);                           // ...then renders uniformly
+    public final void generate() {
+        List<Row> rows = fetchData();
+        render(rows);
     }
 
-    protected void render(List<Row> rows) {     // hook subclasses MAY customize
+    protected void render(List<Row> rows) {
         System.out.println("Rendering " + rows.size() + " rows");
     }
 }
@@ -104,3 +124,4 @@ public abstract class ReportGenerator {
 | `getter/setter` reflexively for everything | Fake encapsulation — still fully mutable | Expose setters only where mutation is a real domain operation |
 | Marking helpers `public` "just in case" | Bloated, unchangeable API | Default to most restrictive access |
 | Confusing default access with `protected` in subclasses across packages | Subclass can't see the member | Remember: default ≠ inherited by subclasses in other packages |
+

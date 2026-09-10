@@ -1,7 +1,7 @@
 ---
 title: Running & Scheduling Batch Jobs
 summary: JobLauncher, JobParameters, restart and rerun semantics, running jobs from controllers, and scheduling with cron or a coordinator.
-order: 4
+order: 2
 minutes: 13
 topics: [joblauncher, jobparameters, scheduling, cron, job restart]
 docs:
@@ -13,7 +13,6 @@ docs:
 
 ## Launch paths
 
-```java
 // 1. At startup (default when a Job bean exists)
 // 2. On demand, programmatically:
 JobExecution ex = jobLauncher.run(job, new JobParametersBuilder()
@@ -24,7 +23,6 @@ JobExecution ex = jobLauncher.run(job, new JobParametersBuilder()
 // 3. From a REST endpoint (an "admin trigger"):
 @PostMapping("/admin/jobs/statements")
 public String runStatements() { ... jobLauncher.run(...); }
-```
 
 `spring.batch.job.enabled=false` turns off startup auto-run when jobs must be triggered explicitly (the common production setup). The **`JobLauncher` is async-safe** — wrap in an executor (`TaskExecutor`) so a web request isn't blocked, and guard with a running-instance check so two manual clicks don't launch the same job twice.
 
@@ -32,7 +30,6 @@ public String runStatements() { ... jobLauncher.run(...); }
 
 `JobInstance` = `Job` + `JobParameters`. This drives the rerun rules:
 
-```java
 // Same params on an already-COMPLETED job → JobInstanceAlreadyCompleteException
 // (protects against double-processing the same input!)
 jobLauncher.run(job, new JobParametersBuilder().addString("inputFile", path).toJobParameters());
@@ -42,7 +39,6 @@ jobLauncher.run(job, new JobParametersBuilder()
     .addString("inputFile", path)
     .addLong("runId", System.currentTimeMillis())   // unique → new JobInstance
     .toJobParameters());
-```
 
 Parameters are **typed and logged** by the JobRepository — keep secrets out of them (no passwords in parameters; they're persisted in `BATCH_JOB_EXECUTION_PARAMS`).
 
@@ -71,7 +67,6 @@ For **distributed locking** (only one replica may run the job), Spring Integrati
 - `StepExecutionListener` per step — read/write/skip counts.
 - Actuator (`spring-boot-starter-actuator`) exposes job metrics; the JobRepository tables let ops query `BATCH_STEP_EXECUTION` directly: "how long did step 2 take last night?"
 
-```java
 @Bean
 JobExecutionListener metrics() {
     return new JobExecutionListener() {
@@ -83,7 +78,6 @@ JobExecutionListener metrics() {
         }
     };
 }
-```
 
 ## Key takeaways
 
@@ -94,3 +88,4 @@ JobExecutionListener metrics() {
 - Attach listeners and use Actuator + JobRepository tables for ops visibility.
 
 Official docs: [Running Batch Jobs](https://docs.spring.io/spring-batch/reference/batch-running.html) · [Spring Scheduling](https://docs.spring.io/spring-boot/reference/io/scheduling.html)
+

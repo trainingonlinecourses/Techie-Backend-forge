@@ -1,7 +1,7 @@
 ---
 title: String Performance — Pitfalls and Patterns
 module: java-strings-deep
-order: 5
+order: 3
 minutes: 24
 topics: ["performance", "substring", "split", "regex", "deduplication", "compact strings"]
 summary: Strings look like a simple value type, but under the hood every one is a heap object with an array of characters. A program that builds and copies ...
@@ -29,6 +29,25 @@ Since Java 9 (JEP 254), a `String` stores characters as **bytes** in either Lati
 
 ## The Code Walkthrough
 
+
+**What this code does — step by step:**
+
+1. --- Pattern 1: precompile regex ---. SLOW: compiles the regex on every call
+2. `"a,b,c".split(",");` — "," is fine, but complex regexes are NOT
+3. FAST: compile once, reuse
+4. --- Pattern 2: split is regex — use indexOf for simple splits ---
+5. Fast manual split on a simple delimiter
+6. `System.out.println(user);` — user
+7. --- Pattern 3: building output once, not piecemeal ---. SLOW: one String per iteration (do not do this). String out = ""; for (...) { out += row; } // quadratic!
+8. FAST: build in a list, join once
+9. `String out = String.join("\n", rows);` — single pass join
+10. --- Pattern 4: deduplicate repeated identical strings ---. Simulates reading 100k identical status labels. Without dedup: 100k objects. With intern(): 1 object.
+11. `String label = new String("ACTIVE");` — simulate data from a file
+12. `String pooled = label.intern();` — collapse to one canonical object
+13. `System.out.println(pooled == "ACTIVE");` — true — same object now
+
+The same code, clean:
+
 ```java
 import java.util.Arrays;
 import java.util.regex.Pattern;
@@ -36,15 +55,12 @@ import java.util.regex.Pattern;
 public class StringPerfDemo {
 
     public static void main(String[] args) {
-        // --- Pattern 1: precompile regex ---
-        // SLOW: compiles the regex on every call
         long t0 = System.nanoTime();
         for (int i = 0; i < 10_000; i++) {
-            "a,b,c".split(",");          // "," is fine, but complex regexes are NOT
+            "a,b,c".split(",");
         }
         long t1 = System.nanoTime();
 
-        // FAST: compile once, reuse
         Pattern COMMA = Pattern.compile(",");
         for (int i = 0; i < 10_000; i++) {
             COMMA.split("a,b,c");
@@ -53,30 +69,20 @@ public class StringPerfDemo {
         System.out.println("regex-per-call: " + (t1 - t0) / 1_000_000 + "ms");
         System.out.println("precompiled:    " + (t2 - t1) / 1_000_000 + "ms");
 
-        // --- Pattern 2: split is regex — use indexOf for simple splits ---
         String line = "user:pass:host:port";
-        // Fast manual split on a simple delimiter
         int first = line.indexOf(':');
         String user = line.substring(0, first);
         String rest = line.substring(first + 1);
-        System.out.println(user);   // user
+        System.out.println(user);
 
-        // --- Pattern 3: building output once, not piecemeal ---
-        // SLOW: one String per iteration (do not do this)
-        // String out = "";
-        // for (...) { out += row; }        // quadratic!
 
-        // FAST: build in a list, join once
         java.util.List<String> rows = java.util.List.of("r1", "r2", "r3");
-        String out = String.join("\n", rows);   // single pass join
+        String out = String.join("\n", rows);
         System.out.println(out);
 
-        // --- Pattern 4: deduplicate repeated identical strings ---
-        // Simulates reading 100k identical status labels
-        // Without dedup: 100k objects. With intern(): 1 object.
-        String label = new String("ACTIVE");   // simulate data from a file
-        String pooled = label.intern();        // collapse to one canonical object
-        System.out.println(pooled == "ACTIVE"); // true — same object now
+        String label = new String("ACTIVE");
+        String pooled = label.intern();
+        System.out.println(pooled == "ACTIVE");
     }
 }
 ```
@@ -130,3 +136,4 @@ java -XX:+UseStringDeduplication -jar app.jar
 - `String.join` builds lists of parts in one pass.
 - Modern `substring` copies — slice sparingly.
 - Compact strings (Java 9+) halve memory for Latin-1 text automatically; `-XX:+UseStringDeduplication` is a free win.
+

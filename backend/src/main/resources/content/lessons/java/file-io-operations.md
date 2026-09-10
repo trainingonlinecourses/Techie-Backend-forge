@@ -1,7 +1,7 @@
 ---
 title: Java File I/O — Reading, Writing, Copying, and Compressing Files
 summary: NIO.2 Path/Files API vs legacy File, reading/writing text and binary, directory traversal, file copy/move, try-with-resources for streams, and when to use each approach in production.
-order: 64
+order: 21
 minutes: 24
 topics: [file-io, nio2, path, files-api, readwrite, directory-walk, try-with-resources, file-copy, zip-compress]
 docs:
@@ -25,38 +25,63 @@ Java has two file APIs:
 ## Core concepts: Path and Files
 
 **Path** represents a file or directory location:
+
+**What this code does — step by step:**
+
+1. `Path path = Path.of("/home/user/documents/report.pdf");` — create a path
+2. `Path current = Path.of(".");` — current directory
+3. `Path resolved = current.resolve("data/file.txt");` — join paths: ./data/file.txt
+4. `Path parent = path.getParent();` — /home/user/documents
+5. `String filename = path.getFileName().toString();` — report.pdf
+
+The same code, clean:
+
 ```java
-Path path = Path.of("/home/user/documents/report.pdf");  // create a path
-Path current = Path.of(".");                               // current directory
-Path resolved = current.resolve("data/file.txt");          // join paths: ./data/file.txt
-Path parent = path.getParent();                            // /home/user/documents
-String filename = path.getFileName().toString();           // report.pdf
+Path path = Path.of("/home/user/documents/report.pdf");
+Path current = Path.of(".");
+Path resolved = current.resolve("data/file.txt");
+Path parent = path.getParent();
+String filename = path.getFileName().toString();
 ```
 
 **Files** is a utility class with static methods for all file operations. No need to create instances — just call `Files.method(path)`.
 
 ## Reading files — text and binary
 
+
+**What this code does — step by step:**
+
+1. Way 1: read entire file as a String (small files only — loads into memory)
+2. Way 2: read all lines into a List (for line-by-line processing)
+3. `System.out.println(line);` — process each line
+4. Way 3: streaming (for large files — doesn't load everything into memory)
+5. `stream.filter(line -> line.contains("ERROR"))` — keep only error lines
+6. `.forEach(System.out::println);` — print each error
+7. try-with-resources auto-closes the stream when done
+8. Way 4: read binary data (images, PDFs, etc.)
+
+The same code, clean:
+
 ```java
-// Way 1: read entire file as a String (small files only — loads into memory)
-String content = Files.readString(Path.of("config.yml"));
-System.out.println(content);
+public class Main {
 
-// Way 2: read all lines into a List (for line-by-line processing)
-List<String> lines = Files.readAllLines(Path.of("data.csv"));
-for (String line : lines) {
-    System.out.println(line);    // process each line
+    public static void main(String[] args) {
+        String content = Files.readString(Path.of("config.yml"));
+        System.out.println(content);
+
+        List<String> lines = Files.readAllLines(Path.of("data.csv"));
+        for (String line : lines) {
+            System.out.println(line);
+        }
+
+        try (Stream<String> stream = Files.lines(Path.of("huge-log.txt"))) {
+            stream.filter(line -> line.contains("ERROR"))
+                  .forEach(System.out::println);
+        }
+
+        byte[] imageBytes = Files.readAllBytes(Path.of("logo.png"));
+    }
 }
-
-// Way 3: streaming (for large files — doesn't load everything into memory)
-try (Stream<String> stream = Files.lines(Path.of("huge-log.txt"))) {
-    stream.filter(line -> line.contains("ERROR"))    // keep only error lines
-          .forEach(System.out::println);              // print each error
-}
-// try-with-resources auto-closes the stream when done
-
-// Way 4: read binary data (images, PDFs, etc.)
-byte[] imageBytes = Files.readAllBytes(Path.of("logo.png"));
 ```
 
 **Line by line for Way 3:**
@@ -67,96 +92,141 @@ byte[] imageBytes = Files.readAllBytes(Path.of("logo.png"));
 
 ## Writing files — text and binary
 
+
+**What this code does — step by step:**
+
+1. Write a string to a file (overwrites existing content)
+2. Write multiple lines
+3. `List.of("Name,Age,City",` — line 1
+4. `"Alice,30,NYC",` — line 2
+5. `"Bob,25,SF"));` — line 3
+6. Append to a file (CREATE + APPEND)
+7. `StandardOpenOption.CREATE,` — create file if it doesn't exist
+8. `StandardOpenOption.APPEND);` — add to end, don't overwrite
+9. Write binary data
+
+The same code, clean:
+
 ```java
-// Write a string to a file (overwrites existing content)
 Files.writeString(Path.of("output.txt"), "Hello, World!\n");
 
-// Write multiple lines
 Files.write(Path.of("data.csv"),
-    List.of("Name,Age,City",        // line 1
-            "Alice,30,NYC",          // line 2
-            "Bob,25,SF"));           // line 3
+    List.of("Name,Age,City",
+            "Alice,30,NYC",
+            "Bob,25,SF"));
 
-// Append to a file (CREATE + APPEND)
 Files.writeString(Path.of("audit.log"), "User login: alice\n",
-    StandardOpenOption.CREATE,       // create file if it doesn't exist
-    StandardOpenOption.APPEND);      // add to end, don't overwrite
+    StandardOpenOption.CREATE,
+    StandardOpenOption.APPEND);
 
-// Write binary data
 byte[] imageBytes = fetchImageFromAPI();
 Files.write(Path.of("downloaded.png"), imageBytes);
 ```
 
 ## Copying, moving, and deleting files
 
+
+**What this code does — step by step:**
+
+1. Copy a file
+2. `Path.of("source/report.pdf"),` — source path
+3. `Path.of("backup/2024/report.pdf"),` — destination path
+4. `StandardCopyOption.REPLACE_EXISTING` — overwrite if destination exists
+5. Move/rename a file
+6. `Path.of("temp/upload.tmp"),` — source
+7. `Path.of("uploads/final.pdf"),` — destination
+8. `StandardCopyOption.REPLACE_EXISTING` — overwrite if exists
+9. Delete a file
+10. `Files.delete(Path.of("temp/upload.tmp"));` — throws exception if not found
+11. `Files.deleteIfExists(Path.of("maybe-exists.txt"));` — returns false if not found, no exception
+12. Create directories (mkdir -p equivalent)
+13. `Files.createDirectories(Path.of("data/2024/january"));` — creates all parent dirs too
+
+The same code, clean:
+
 ```java
-// Copy a file
 Files.copy(
-    Path.of("source/report.pdf"),                     // source path
-    Path.of("backup/2024/report.pdf"),                // destination path
-    StandardCopyOption.REPLACE_EXISTING               // overwrite if destination exists
+    Path.of("source/report.pdf"),
+    Path.of("backup/2024/report.pdf"),
+    StandardCopyOption.REPLACE_EXISTING
 );
 
-// Move/rename a file
 Files.move(
-    Path.of("temp/upload.tmp"),                       // source
-    Path.of("uploads/final.pdf"),                     // destination
-    StandardCopyOption.REPLACE_EXISTING               // overwrite if exists
+    Path.of("temp/upload.tmp"),
+    Path.of("uploads/final.pdf"),
+    StandardCopyOption.REPLACE_EXISTING
 );
 
-// Delete a file
-Files.delete(Path.of("temp/upload.tmp"));             // throws exception if not found
-Files.deleteIfExists(Path.of("maybe-exists.txt"));    // returns false if not found, no exception
+Files.delete(Path.of("temp/upload.tmp"));
+Files.deleteIfExists(Path.of("maybe-exists.txt"));
 
-// Create directories (mkdir -p equivalent)
-Files.createDirectories(Path.of("data/2024/january"));  // creates all parent dirs too
+Files.createDirectories(Path.of("data/2024/january"));
 ```
 
 ## Directory traversal — walking the file tree
 
+
+**What this code does — step by step:**
+
+1. List all files in a directory
+2. `paths.filter(Files::isRegularFile)` — skip directories
+3. `.forEach(System.out::println);` — print each file path
+4. Walk a directory tree (recursive — all subdirectories)
+5. `.filter(p -> p.toString().endsWith(".java"))` — only .java files
+6. Walk with depth limit (don't recurse deeper than 3 levels)
+7. `paths.forEach(System.out::println);` — max 3 levels deep
+8. Find files by glob pattern
+9. `Path.of("src"), "**/*.java")) {` — glob pattern
+
+The same code, clean:
+
 ```java
-// List all files in a directory
-try (Stream<Path> paths = Files.list(Path.of("src/main/java"))) {
-    paths.filter(Files::isRegularFile)               // skip directories
-         .forEach(System.out::println);               // print each file path
-}
+public class Main {
 
-// Walk a directory tree (recursive — all subdirectories)
-try (Stream<Path> paths = Files.walk(Path.of("src"))) {
-    List<Path> javaFiles = paths
-        .filter(p -> p.toString().endsWith(".java"))  // only .java files
-        .toList();
-    System.out.println("Found " + javaFiles.size() + " Java files");
-}
+    public static void main(String[] args) {
+        try (Stream<Path> paths = Files.list(Path.of("src/main/java"))) {
+            paths.filter(Files::isRegularFile)
+                 .forEach(System.out::println);
+        }
 
-// Walk with depth limit (don't recurse deeper than 3 levels)
-try (Stream<Path> paths = Files.walk(Path.of("src"), 3)) {
-    paths.forEach(System.out::println);  // max 3 levels deep
-}
+        try (Stream<Path> paths = Files.walk(Path.of("src"))) {
+            List<Path> javaFiles = paths
+                .filter(p -> p.toString().endsWith(".java"))
+                .toList();
+            System.out.println("Found " + javaFiles.size() + " Java files");
+        }
 
-// Find files by glob pattern
-try (Stream<Path> paths = Files.newDirectoryStream(
-        Path.of("src"), "**/*.java")) {               // glob pattern
-    paths.forEach(System.out::println);
+        try (Stream<Path> paths = Files.walk(Path.of("src"), 3)) {
+            paths.forEach(System.out::println);
+        }
+
+        try (Stream<Path> paths = Files.newDirectoryStream(
+                Path.of("src"), "**/*.java")) {
+            paths.forEach(System.out::println);
+        }
+    }
 }
 ```
 
 ## try-with-resources — why it matters
 
-```java
-// BAD: manual close — if readLine() throws, the reader is never closed (resource leak!)
-BufferedReader reader = new BufferedReader(new FileReader("data.txt"));
-String line = reader.readLine();  // if this throws... reader is leaked!
-reader.close();
+public class Main {
 
-// GOOD: try-with-resources — auto-closes even on exception
-try (BufferedReader reader = new BufferedReader(new FileReader("data.txt"))) {
-    String line;
-    while ((line = reader.readLine()) != null) {
-        System.out.println(line);
+    public static void main(String[] args) {
+        // BAD: manual close — if readLine() throws, the reader is never closed (resource leak!)
+        BufferedReader reader = new BufferedReader(new FileReader("data.txt"));
+        String line = reader.readLine();  // if this throws... reader is leaked!
+        reader.close();
+
+        // GOOD: try-with-resources — auto-closes even on exception
+        try (BufferedReader reader = new BufferedReader(new FileReader("data.txt"))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                System.out.println(line);
+            }
+        }  // reader.close() is called automatically, even if an exception occurred
     }
-}  // reader.close() is called automatically, even if an exception occurred
-```
+}
 
 **How it works:** The variable in `try(...)` must implement `AutoCloseable`. When the try block exits (normally or exceptionally), Java calls `close()` on each resource in reverse order.
 
@@ -166,30 +236,43 @@ try (BufferedReader reader = new BufferedReader(new FileReader("data.txt"))) {
 
 A company needs to import 100K rows from a CSV file into their database:
 
+
+**What this code does — step by step:**
+
+1. `try (Stream<String> lines = Files.lines(csvFile)) {` — stream — memory efficient
+2. `List<String> header = null;` — first line = column names
+3. `header = List.of(line.split(","));` — parse header row
+4. `continue;` — skip to next line
+5. `String[] fields = line.split(",");` — split CSV row
+6. `continue;` — skip bad data
+7. `userRepository.save(user);` — save to database
+
+The same code, clean:
+
 ```java
 public class CsvImporter {
     public int importUsers(Path csvFile) throws IOException {
         int imported = 0;
 
-        try (Stream<String> lines = Files.lines(csvFile)) {   // stream — memory efficient
-            List<String> header = null;                        // first line = column names
+        try (Stream<String> lines = Files.lines(csvFile)) {
+            List<String> header = null;
 
             for (Iterator<String> it = lines.iterator(); it.hasNext(); ) {
                 String line = it.next();
 
                 if (header == null) {
-                    header = List.of(line.split(","));         // parse header row
-                    continue;                                  // skip to next line
+                    header = List.of(line.split(","));
+                    continue;
                 }
 
-                String[] fields = line.split(",");             // split CSV row
+                String[] fields = line.split(",");
                 if (fields.length < 3) {
                     log.warn("Skipping malformed line: {}", line);
-                    continue;                                  // skip bad data
+                    continue;
                 }
 
                 User user = new User(fields[0], fields[1], fields[2]);
-                userRepository.save(user);                     // save to database
+                userRepository.save(user);
                 imported++;
             }
         }
@@ -203,17 +286,28 @@ public class CsvImporter {
 
 A service writes logs that need to be archived weekly:
 
+
+**What this code does — step by step:**
+
+1. `Files.createDirectories(archiveDir);` — ensure archive dir exists
+2. `.filter(p -> isOlderThan(p, Duration.ofDays(7)))` — only old logs
+3. GZIPOutputStream wraps FileOutputStream — compresses as it writes
+4. `Files.copy(logFile, gzout);` — compress and write in one step
+5. `Files.delete(logFile);` — remove original after successful compression
+
+The same code, clean:
+
 ```java
 public class LogArchiver {
     private final Path logDir = Path.of("logs");
     private final Path archiveDir = Path.of("logs/archive");
 
     public void archiveOldLogs() throws IOException {
-        Files.createDirectories(archiveDir);  // ensure archive dir exists
+        Files.createDirectories(archiveDir);
 
         try (Stream<Path> logFiles = Files.list(logDir)) {
             logFiles.filter(p -> p.toString().endsWith(".log"))
-                    .filter(p -> isOlderThan(p, Duration.ofDays(7)))  // only old logs
+                    .filter(p -> isOlderThan(p, Duration.ofDays(7)))
                     .forEach(this::compressAndDelete);
         }
     }
@@ -222,13 +316,12 @@ public class LogArchiver {
         try {
             Path zipPath = archiveDir.resolve(logFile.getFileName() + ".gz");
 
-            // GZIPOutputStream wraps FileOutputStream — compresses as it writes
             try (GZIPOutputStream gzout = new GZIPOutputStream(
                     Files.newOutputStream(zipFile))) {
-                Files.copy(logFile, gzout);   // compress and write in one step
+                Files.copy(logFile, gzout);
             }
 
-            Files.delete(logFile);  // remove original after successful compression
+            Files.delete(logFile);
             log.info("Archived {} → {}", logFile, zipPath);
         } catch (IOException e) {
             log.error("Failed to archive {}", logFile, e);
@@ -241,13 +334,23 @@ public class LogArchiver {
 
 When users upload files, validate type, size, and content:
 
+
+**What this code does — step by step:**
+
+1. `private static final long MAX_SIZE = 10 * 1024 * 1024;` — 10MB
+2. Check file size
+3. Check file extension
+4. Check magic bytes (verify actual content matches extension)
+5. `is.read(header, 0, 8);` — read first 8 bytes
+
+The same code, clean:
+
 ```java
 public class FileUploadValidator {
-    private static final long MAX_SIZE = 10 * 1024 * 1024;  // 10MB
+    private static final long MAX_SIZE = 10 * 1024 * 1024;
     private static final Set<String> ALLOWED_TYPES = Set.of("image/png", "image/jpeg", "application/pdf");
 
     public ValidationResult validate(Path uploadedFile) throws IOException {
-        // Check file size
         long size = Files.size(uploadedFile);
         if (size > MAX_SIZE) {
             return ValidationResult.rejected("File too large: " + size + " bytes (max " + MAX_SIZE + ")");
@@ -256,17 +359,15 @@ public class FileUploadValidator {
             return ValidationResult.rejected("File is empty");
         }
 
-        // Check file extension
         String filename = uploadedFile.getFileName().toString();
         String ext = filename.substring(filename.lastIndexOf('.') + 1).toLowerCase();
         if (!Set.of("png", "jpg", "jpeg", "pdf").contains(ext)) {
             return ValidationResult.rejected("Unsupported file type: ." + ext);
         }
 
-        // Check magic bytes (verify actual content matches extension)
         byte[] header = new byte[8];
         try (var is = Files.newInputStream(uploadedFile)) {
-            is.read(header, 0, 8);  // read first 8 bytes
+            is.read(header, 0, 8);
         }
 
         if (ext.equals("png") && !startsWith(header, (byte)0x89, (byte)0x50)) {
@@ -298,3 +399,4 @@ public class FileUploadValidator {
 | Using `File.listFiles()` without null check | NPE when directory doesn't exist or permission denied |
 | Hardcoding paths with `/` or `\\` | Breaks on other OS — use `Path.of("a", "b")` instead |
 | Not checking `Files.exists()` before operations | Unnecessary exceptions — check first or use `deleteIfExists()` |
+

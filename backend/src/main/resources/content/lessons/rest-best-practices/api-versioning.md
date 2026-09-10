@@ -1,7 +1,7 @@
 ---
 title: API Versioning Strategies
 module: rest-best-practices
-order: 4
+order: 2
 minutes: 20
 topics: ["URI versioning", "header versioning", "media type versioning", "deprecation", "migration"]
 summary: APIs evolve, but consumers don't update at your pace. Versioning is how you change behavior without breaking the clients you already have. Four str...
@@ -23,7 +23,6 @@ APIs evolve, but consumers don't update at your pace. Versioning is how you chan
 
 The most common and most explicit choice.
 
-```java
 @RestController
 @RequestMapping("/api/v1/courses")
 public class CourseV1Controller { ... }
@@ -31,7 +30,6 @@ public class CourseV1Controller { ... }
 @RestController
 @RequestMapping("/api/v2/courses")
 public class CourseV2Controller { ... }
-```
 
 **Pros**: obvious, cacheable (different URLs = different cache keys), works in any client (curl, browsers, SDKs), easy to A/B test.
 **Cons**: URLs leak versioning; every endpoint must be duplicated or aliased during migration.
@@ -44,7 +42,6 @@ public class CourseV2Controller { ... }
 /api/courses?version=2
 ```
 
-```java
 @GetMapping("/api/courses")
 public CourseDto list(@RequestParam(defaultValue = "1") int version) {
     return switch (version) {
@@ -53,7 +50,6 @@ public CourseDto list(@RequestParam(defaultValue = "1") int version) {
         default -> throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
     };
 }
-```
 
 **Pros**: trivial to implement, single URL.
 **Cons**: pollutes every request; caches treat all versions as one URL (version must join the cache key); easy to forget `version` in a URL and silently get v1.
@@ -67,13 +63,11 @@ GET /api/courses
 X-API-Version: 2
 ```
 
-```java
 @GetMapping(value = "/api/courses", headers = "X-API-Version=1")
 public CourseDto listV1() { ... }
 
 @GetMapping(value = "/api/courses", headers = "X-API-Version=2")
 public CourseDto listV2() { ... }
-```
 
 **Pros**: clean URLs.
 **Cons**: invisible in the address bar; harder to debug; caching must vary on the header.
@@ -86,11 +80,9 @@ public CourseDto listV2() { ... }
 Accept: application/vnd.acme.courses.v2+json
 ```
 
-```java
 @GetMapping(value = "/api/courses",
     produces = "application/vnd.acme.courses.v2+json")
 public CourseDto listV2() { ... }
-```
 
 **Pros**: the most "RESTful" — versioning rides content negotiation; single URL.
 **Cons**: hidden from browsers; client libraries must set the Accept header; cache keys must include the media type.
@@ -118,7 +110,6 @@ Version only when the change is **breaking**: removing a field, changing a type,
 
 ## The Migration Pattern
 
-```java
 @RestController
 public class CourseMigrationController {
 
@@ -134,7 +125,6 @@ public class CourseMigrationController {
         return CourseV2Dto.from(courseService.findById(id));
     }
 }
-```
 
 Migration lifecycle:
 
@@ -143,7 +133,6 @@ Migration lifecycle:
 3. Return a `Deprecation` header on v1 responses.
 4. Remove v1 after the grace period; log every v1 call to measure adoption.
 
-```java
 @GetMapping("/api/v1/courses/{id}")
 public ResponseEntity<CourseV1Dto> getV1(@PathVariable Long id) {
     return ResponseEntity.ok()
@@ -151,25 +140,21 @@ public ResponseEntity<CourseV1Dto> getV1(@PathVariable Long id) {
         .header("Sunset", "2027-01-01T00:00:00Z")
         .body(CourseV1Dto.from(courseService.findById(id)));
 }
-```
 
 ## Spring's Mapping-Level Versioning
 
 For versioning a single handler without full duplication, `RequestMapping` matching can branch on the version token:
 
-```java
 @GetMapping({"/api/v1/courses/{id}", "/api/v2/courses/{id}"})
 public CourseDto get(@PathVariable Long id, HttpServletRequest request) {
     boolean v2 = request.getRequestURI().contains("/v2/");
     return v2 ? v2Service.get(id) : v1Service.get(id);
 }
-```
 
 Cleaner: keep separate controllers per version (shown above) — the version lives in the mapping, not in if/else.
 
 ## Testing Versioned Endpoints
 
-```java
 @Test
 void v1ReturnsLegacyShape() throws Exception {
     mockMvc.perform(get("/api/v1/courses/1"))
@@ -190,7 +175,6 @@ void v1DeclaresDeprecation() throws Exception {
     mockMvc.perform(get("/api/v1/courses/1"))
         .andExpect(header().string("Deprecation", "true"));
 }
-```
 
 ## Summary
 
@@ -204,3 +188,4 @@ void v1DeclaresDeprecation() throws Exception {
 | Public, negotiated APIs | Media-type versioning if you already negotiate |
 
 Versioning is a promise to your consumers: *your code keeps working while we improve ours*. The cheapest correct system is URI versioning plus a real deprecation schedule.
+

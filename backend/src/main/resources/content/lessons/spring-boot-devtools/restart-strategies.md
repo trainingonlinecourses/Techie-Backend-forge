@@ -41,6 +41,18 @@ spring:
 
 ## Line-by-Line Walkthrough
 
+
+**What this code does — step by step:**
+
+1. 1. Trigger restart programmatically
+2. 2. Exclude specific beans from restart. These beans survive restart (state is preserved)
+3. `@RestartScope` — bean state survives restart
+4. `return new ExpensiveService();` — created once, survives restart
+5. 3. Custom trigger condition. Only restart when specific files change. (configured in application.yml)
+6. 4. Trigger patterns. Default triggers: class files, property files, YAML files. Custom triggers: add paths in additional-paths. Excludes: static resources, templates, HTML
+
+The same code, clean:
+
 ```java
 import org.springframework.context.annotation.Configuration;
 import org.springframework.devtools.restart.RestartScope;
@@ -49,30 +61,19 @@ import org.springframework.devtools.restart.Restarter;
 @Configuration
 public class DevToolsConfig {
 
-    // 1. Trigger restart programmatically
     public void triggerRestart() {
         if (Restarter.isEnabled()) {
             Restarter.getInstance().restart();
         }
     }
 
-    // 2. Exclude specific beans from restart
-    // These beans survive restart (state is preserved)
-    @RestartScope  // bean state survives restart
+    @RestartScope
     @Bean
     public ExpensiveService expensiveService() {
-        return new ExpensiveService();  // created once, survives restart
+        return new ExpensiveService();
     }
 
-    // 3. Custom trigger condition
-    // Only restart when specific files change
-    // (configured in application.yml)
 }
-
-// 4. Trigger patterns
-// Default triggers: class files, property files, YAML files
-// Custom triggers: add paths in additional-paths
-// Excludes: static resources, templates, HTML
 ```
 
 ---
@@ -93,12 +94,10 @@ spring:
       secret: ${DEVTOOLS_SECRET:changeme}
 ```
 
-```java
 // In your code — check if restart is active
 if (ClassUtils.isPresent("org.springframework.devtools.Restarter", null)) {
     // DevTools is active — optimize for development
 }
-```
 
 ---
 
@@ -116,7 +115,6 @@ spring:
 
 ### Scenario 2: Preserve expensive initialization
 
-```java
 @Component
 @RestartScope  // survives restart
 public class DatabaseMigration {
@@ -126,7 +124,6 @@ public class DatabaseMigration {
         flyway.migrate();
     }
 }
-```
 
 ---
 
@@ -138,3 +135,4 @@ public class DatabaseMigration {
 | Restart in production | Performance + security | DevTools auto-disables (JAR packaging) |
 | Forgetting @RestartScope | State lost on restart | Annotate expensive beans |
 | Not excluding static resources | Browser refresh instead of restart | Add static/** to excludes |
+

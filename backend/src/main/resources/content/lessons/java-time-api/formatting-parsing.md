@@ -1,7 +1,7 @@
 ---
 title: Formatting and Parsing Dates
 module: java-time-api
-order: 5
+order: 1
 minutes: 24
 topics: ["DateTimeFormatter", "ISO-8601", "parsing", "patterns", "locales"]
 summary: Data crosses system boundaries as text: a JSON field, a CSV column, a log line, a query parameter. Converting a LocalDate to text is formatting; co...
@@ -47,6 +47,27 @@ The three classic text-date problems:
 
 ## The Code Walkthrough
 
+
+**What this code does — step by step:**
+
+1. ---- 1. Formatting: date -> text ----
+2. `System.out.println(iso.format(release));` — 2026-08-18
+3. `System.out.println(pretty.format(release));` — 18 Aug 2026
+4. `System.out.println(verbose.format(release));` — Tuesday, August 18, 2026
+5. ---- 2. Parsing: text -> date (the dangerous direction) ----
+6. `LocalDate fromIso = LocalDate.parse("2026-08-18");` — ISO by default
+7. `System.out.println(fromIso.equals(release));` — true
+8. `System.out.println(fromCustom.equals(release));` — true
+9. ---- 3. Invalid input is rejected, not silently "adjusted" ----
+10. `LocalDate.parse("2026-02-30");` — February 30th doesn't exist
+11. ---- 4. The classic silent bug: pattern mismatch ----. Written day-first, read month-first:
+12. `String text = written.format(LocalDate.of(2026, 8, 18));` — "18/08/2026"
+13. 2026-18-08 doesn't exist... actually this THROWS, which is the lucky case. With "01/02/2026" both patterns succeed and swap day/month silently.
+14. ---- 5. Locale-aware month names ----
+15. `System.out.println(espanol.format(release));` — 18 agosto 2026
+
+The same code, clean:
+
 ```java
 import java.time.*;
 import java.time.format.DateTimeFormatter;
@@ -56,46 +77,38 @@ import java.util.Locale;
 public class FormattingDemo {
 
     public static void main(String[] args) {
-        // ---- 1. Formatting: date -> text ----
         LocalDate release = LocalDate.of(2026, 8, 18);
 
         DateTimeFormatter iso = DateTimeFormatter.ISO_LOCAL_DATE;
         DateTimeFormatter pretty = DateTimeFormatter.ofPattern("dd MMM yyyy");
         DateTimeFormatter verbose = DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy", Locale.US);
 
-        System.out.println(iso.format(release));         // 2026-08-18
-        System.out.println(pretty.format(release));      // 18 Aug 2026
-        System.out.println(verbose.format(release));     // Tuesday, August 18, 2026
+        System.out.println(iso.format(release));
+        System.out.println(pretty.format(release));
+        System.out.println(verbose.format(release));
 
-        // ---- 2. Parsing: text -> date (the dangerous direction) ----
-        LocalDate fromIso = LocalDate.parse("2026-08-18");               // ISO by default
+        LocalDate fromIso = LocalDate.parse("2026-08-18");
         LocalDate fromCustom = LocalDate.parse("18/08/2026",
                 DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 
-        System.out.println(fromIso.equals(release));     // true
-        System.out.println(fromCustom.equals(release));  // true
+        System.out.println(fromIso.equals(release));
+        System.out.println(fromCustom.equals(release));
 
-        // ---- 3. Invalid input is rejected, not silently "adjusted" ----
         try {
-            LocalDate.parse("2026-02-30");               // February 30th doesn't exist
+            LocalDate.parse("2026-02-30");
         } catch (DateTimeParseException e) {
             System.out.println("Rejected: " + e.getMessage());
         }
 
-        // ---- 4. The classic silent bug: pattern mismatch ----
-        // Written day-first, read month-first:
         DateTimeFormatter written = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         DateTimeFormatter misread = DateTimeFormatter.ofPattern("MM/dd/yyyy");
 
-        String text = written.format(LocalDate.of(2026, 8, 18));   // "18/08/2026"
+        String text = written.format(LocalDate.of(2026, 8, 18));
         LocalDate wrong = LocalDate.parse(text, misread);
         System.out.println("Written as " + text + " but read as " + wrong);
-        // 2026-18-08 doesn't exist... actually this THROWS, which is the lucky case.
-        // With "01/02/2026" both patterns succeed and swap day/month silently.
 
-        // ---- 5. Locale-aware month names ----
         DateTimeFormatter espanol = DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.of("es"));
-        System.out.println(espanol.format(release));     // 18 agosto 2026
+        System.out.println(espanol.format(release));
     }
 }
 ```
@@ -119,19 +132,27 @@ There is no way to detect this by looking at the text — which is why the rule 
 
 ## Formatting and Parsing Zoned / Instant Values
 
-```java
-// Instant <-> text with 'Z' suffix (ISO-8601 UTC)
-Instant moment = Instant.parse("2026-08-18T13:30:05Z");           // parsing
-String text = DateTimeFormatter.ISO_INSTANT.format(moment);       // "2026-08-18T13:30:05Z"
 
-// ZonedDateTime with offset — the wire format for "a moment in a zone"
+**What this code does — step by step:**
+
+1. Instant <-> text with 'Z' suffix (ISO-8601 UTC)
+2. `Instant moment = Instant.parse("2026-08-18T13:30:05Z");` — parsing
+3. `String text = DateTimeFormatter.ISO_INSTANT.format(moment);` — "2026-08-18T13:30:05Z"
+4. ZonedDateTime with offset — the wire format for "a moment in a zone"
+5. 2026-08-18T19:00:05+05:30[Asia/Kolkata]
+6. OffsetDateTime — for APIs where zone rules don't travel
+7. 2026-08-18T19:00:05+05:30
+
+The same code, clean:
+
+```java
+Instant moment = Instant.parse("2026-08-18T13:30:05Z");
+String text = DateTimeFormatter.ISO_INSTANT.format(moment);
+
 ZonedDateTime zdt = moment.atZone(ZoneId.of("Asia/Kolkata"));
 String zText = DateTimeFormatter.ISO_ZONED_DATE_TIME.format(zdt);
-// 2026-08-18T19:00:05+05:30[Asia/Kolkata]
 
-// OffsetDateTime — for APIs where zone rules don't travel
 OffsetDateTime odt = zdt.toOffsetDateTime();
-// 2026-08-18T19:00:05+05:30
 ```
 
 The API-level practice: send **`OffsetDateTime`** (ISO-8601 with offset) in JSON so the receiver knows the exact moment even without the IANA database; use `ZonedDateTime` only when the region rules themselves matter.
@@ -140,9 +161,7 @@ The API-level practice: send **`OffsetDateTime`** (ISO-8601 with offset) in JSON
 
 `DateTimeFormatter` is **immutable and thread-safe** — one instance can be shared as a `static final` field across all threads, unlike the old `SimpleDateFormat` (which was famously unsafe to share and caused corrupted output in multi-threaded code). Make your formatters `static final` constants:
 
-```java
 public static final DateTimeFormatter API_DATE = DateTimeFormatter.ISO_LOCAL_DATE;
-```
 
 ## Common Beginner Pitfalls
 
@@ -161,3 +180,4 @@ public static final DateTimeFormatter API_DATE = DateTimeFormatter.ISO_LOCAL_DAT
 - Pattern mismatch causes silent day/month swaps — standardize, don't improvise.
 - `DateTimeFormatter` is immutable and thread-safe; make it `static final`.
 - Pass a `Locale` for any human-facing month/day names.
+

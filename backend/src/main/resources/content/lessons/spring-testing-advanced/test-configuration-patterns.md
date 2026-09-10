@@ -1,7 +1,7 @@
 ---
 title: Test Configuration & Isolation Patterns
 module: spring-testing-advanced
-order: 5
+order: 7
 minutes: 22
 topics: ["@TestConfiguration", "@MockBean", "profile isolation", "context caching", "random ports", "flaky test prevention"]
 summary: The hardest part of testing Spring isn't writing assertions — it's configuring the context so tests are fast, isolated, and deterministic. This les...
@@ -18,7 +18,6 @@ The hardest part of testing Spring isn't writing assertions — it's **configuri
 
 Add beans only tests need, without polluting production config:
 
-```java
 @WebMvcTest(CourseController.class)
 class CourseControllerTest {
 
@@ -34,11 +33,9 @@ class CourseControllerTest {
     @Autowired MockMvc mockMvc;
     @MockBean CourseService courseService;
 }
-```
 
 **Inner `@TestConfiguration` classes are applied automatically** to the enclosing test. Standalone classes must be imported:
 
-```java
 @TestConfiguration
 public class TestClockConfig {
     @Bean
@@ -49,17 +46,14 @@ public class TestClockConfig {
 // usage:
 @Import(TestClockConfig.class)
 class ExpiringTokenTest { ... }
-```
 
 The fixed `Clock` bean is a classic: tests for expiry, TTL, and time-based logic become deterministic.
 
 ## @MockBean vs. @MockitoBean
 
-```java
 @MockBean CourseService courseService;      // Spring Boot 3.4+ replaces MockBean
 // or, modern:
 @MockitoBean CourseService courseService;
-```
 
 Both replace the real bean in the context with a Mockito mock. Consequences:
 
@@ -69,18 +63,15 @@ Both replace the real bean in the context with a Mockito mock. Consequences:
 
 **The context-caching trap**: each *different* combination of `@MockBean`s creates a new application context (expensive). Keep mock sets consistent across test classes:
 
-```java
 // Base class declares all mocks once → every subclass reuses the context
 @WebMvcTest
 abstract class WebMvcTestBase {
     @MockBean CourseService courseService;
     @MockBean LessonService lessonService;
 }
-```
 
 ## @SpyBean: Real Bean, Selective Stubbing
 
-```java
 @SpyBean PaymentGateway gateway;    // real implementation, spy on top
 
 @Test
@@ -92,17 +83,14 @@ void fallsBackWhenGatewayFails() {
 
     assertNotNull(order.getFallbackStatus());
 }
-```
 
 Unstubbed methods run for real; stubbed ones are intercepted.
 
 ## Profiles: Isolate Environments
 
-```java
 @SpringBootTest
 @ActiveProfiles("test")
 class IntegrationTest { ... }
-```
 
 ```yaml
 # application-test.yml
@@ -120,18 +108,15 @@ spring:
 
 Scheduled tasks and message listeners make tests flaky. Turn them off:
 
-```java
 @SpringBootTest(
     properties = {
         "spring.task.scheduling.enabled=false",
         "app.jobs.cache-refresh-enabled=false"
     })
 class ServiceTest { ... }
-```
 
 ## Random Ports for Real HTTP
 
-```java
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 class HttpEndpointTest {
 
@@ -147,7 +132,6 @@ class HttpEndpointTest {
         assertTrue(resp.getBody().contains("\"status\":\"UP\""));
     }
 }
-```
 
 `RANDOM_PORT` avoids port collisions across parallel test runs.
 
@@ -155,7 +139,6 @@ class HttpEndpointTest {
 
 Factories beat scattered `new` calls:
 
-```java
 public final class TestData {
 
     public static Course course(String title) {
@@ -169,16 +152,13 @@ public final class TestData {
 
     public static Course course() { return course("Default Course"); }
 }
-```
 
-```java
 @Test
 void filtersByLevel() {
     repository.save(TestData.course("Java"));
     repository.save(TestData.course("Spring").withLevel("ADVANCED"));
     ...
 }
-```
 
 ## Reset and Isolation
 
@@ -186,7 +166,6 @@ void filtersByLevel() {
 - **`@DirtiesContext`** — nukes the context after the test. Slow; use sparingly (static state, singleton caches).
 - **`@Sql`** — seed/cleanup SQL per test:
 
-```java
 @Test
 @Sql("/sql/seed-courses.sql")
 void listsSeededCourses() { ... }
@@ -194,7 +173,6 @@ void listsSeededCourses() { ... }
 @Test
 @Sql(statements = "DELETE FROM lessons", executionPhase = AFTER_TEST_METHOD)
 void cleansUp() { ... }
-```
 
 ## Preventing Flaky Tests
 
@@ -236,3 +214,4 @@ Slow lane (pre-release):
 | Base-class mocks | Context reuse, fast suites |
 
 Test configuration is where suites are won or lost: shared contexts keep them fast, fixed clocks keep them deterministic, and disabled background work keeps them stable. Get these patterns right and your tests become something you *trust*.
+

@@ -1,7 +1,7 @@
 ---
 title: Reactive Programming & When It Beats Servlet — Complete Guide
 summary: The reactive model explained from scratch, backpressure, the thread myth, Mono/Flux, and a decision framework for reactive vs servlet stacks.
-order: 1
+order: 7
 minutes: 22
 topics: [reactive, webflux, backpressure, reactive-streams, architecture, servlet, mono, flux]
 docs:
@@ -18,17 +18,27 @@ docs:
 
 **Reactive programming** is like a sushi conveyor belt: chefs prepare dishes and put them on the belt. Customers pick what they want as it arrives. If a customer is slow, the belt keeps moving — the chef doesn't wait.
 
+
+**What this code does — step by step:**
+
+1. TRADITIONAL (blocking) — the thread waits for the database
+2. `Order order = database.query(id);` — Thread BLOCKS here — doing nothing while waiting
+3. `return order;` — Only then does it return
+4. REACTIVE (non-blocking) — the thread moves on immediately
+5. `return database.findById(id)` — Returns IMMEDIATELY — a "promise" of future data
+6. `.map(order -> enrich(order));` — Enrichment happens when data arrives, not now
+
+The same code, clean:
+
 ```java
-// TRADITIONAL (blocking) — the thread waits for the database
 public Order getOrder(String id) {
-    Order order = database.query(id);     // Thread BLOCKS here — doing nothing while waiting
-    return order;                         // Only then does it return
+    Order order = database.query(id);
+    return order;
 }
 
-// REACTIVE (non-blocking) — the thread moves on immediately
 public Mono<Order> getOrder(String id) {
-    return database.findById(id)          // Returns IMMEDIATELY — a "promise" of future data
-        .map(order -> enrich(order));     // Enrichment happens when data arrives, not now
+    return database.findById(id)
+        .map(order -> enrich(order));
 }
 ```
 
@@ -38,27 +48,40 @@ public Mono<Order> getOrder(String id) {
 
 The Reactive Streams specification (Java 9+ standard) defines exactly four interfaces:
 
+
+**What this code does — step by step:**
+
+1. Publisher — produces data (the database, the API call, the file)
+2. `void subscribe(Subscriber<? super T> s);` — A subscriber signs up to receive data
+3. Subscriber — receives and processes data
+4. `void onSubscribe(Subscription s);` — Called first — gives the subscriber a handle
+5. `void onNext(T item);` — Called for each piece of data
+6. `void onError(Throwable t);` — Called if something goes wrong
+7. `void onComplete();` — Called when all data is sent
+8. Subscription — the handle between publisher and subscriber
+9. `void request(long n);` — Subscriber asks for N items (BACKPRESSURE!)
+10. `void cancel();` — Subscriber says "I'm done"
+11. Processor — combines Publisher and Subscriber (a transformation step)
+
+The same code, clean:
+
 ```java
-// Publisher — produces data (the database, the API call, the file)
 public interface Publisher<T> {
-    void subscribe(Subscriber<? super T> s);  // A subscriber signs up to receive data
+    void subscribe(Subscriber<? super T> s);
 }
 
-// Subscriber — receives and processes data
 public interface Subscriber<T> {
-    void onSubscribe(Subscription s);    // Called first — gives the subscriber a handle
-    void onNext(T item);                 // Called for each piece of data
-    void onError(Throwable t);           // Called if something goes wrong
-    void onComplete();                   // Called when all data is sent
+    void onSubscribe(Subscription s);
+    void onNext(T item);
+    void onError(Throwable t);
+    void onComplete();
 }
 
-// Subscription — the handle between publisher and subscriber
 public interface Subscription {
-    void request(long n);   // Subscriber asks for N items (BACKPRESSURE!)
-    void cancel();          // Subscriber says "I'm done"
+    void request(long n);
+    void cancel();
 }
 
-// Processor — combines Publisher and Subscriber (a transformation step)
 public interface Processor<T, R> extends Publisher<R>, Subscriber<T> {}
 ```
 
@@ -68,38 +91,53 @@ public interface Processor<T, R> extends Publisher<R>, Subscriber<T> {}
 
 Spring WebFlux uses **Project Reactor**, which provides two types:
 
-```java
 // Mono<T> — 0 or 1 element (like Optional<T> but reactive)
 Mono<User> user = userRepository.findById(id);  // One user, or empty
 
 // Flux<T> — 0 to N elements (like Stream<T> but reactive)
 Flux<Order> orders = orderRepository.findByCustomerId(id);  // Many orders
-```
 
 **Line-by-line code example:**
+
+
+**What this code does — step by step:**
+
+1. `private final OrderRepository orderRepo;` — Line 1: Reactive repository (R2DBC)
+2. `private final InventoryClient inventoryClient;` — Line 2: Reactive HTTP client (WebClient)
+3. Line 3: Constructor injection — Spring provides the dependencies
+4. `this.orderRepo = orderRepo;` — Line 4: Store the repository
+5. `this.inventoryClient = inventoryClient;` — Line 5: Store the HTTP client
+6. Line 6: Returns Mono — a "promise" of one Order
+7. `return orderRepo.findById(orderId)` — Line 7: Query DB (non-blocking)
+8. `.flatMap(order ->` — Line 8: When order arrives, enrich it
+9. `inventoryClient` — Line 9: Call inventory service (non-blocking)
+10. `.checkStock(order.getSku())` — Line 10: Check if item is in stock
+11. `.map(stock ->` — Line 11: When stock info arrives
+12. `order.withStock(stock)` — Line 12: Combine order + stock info
+13. `);` — Line 13: Returns Mono<Order> immediately
+
+The same code, clean:
 
 ```java
 @Service
 public class OrderService {
-    private final OrderRepository orderRepo;       // Line 1: Reactive repository (R2DBC)
-    private final InventoryClient inventoryClient; // Line 2: Reactive HTTP client (WebClient)
-    
-    // Line 3: Constructor injection — Spring provides the dependencies
+    private final OrderRepository orderRepo;
+    private final InventoryClient inventoryClient;
+
     public OrderService(OrderRepository orderRepo, InventoryClient inventoryClient) {
-        this.orderRepo = orderRepo;                // Line 4: Store the repository
-        this.inventoryClient = inventoryClient;    // Line 5: Store the HTTP client
+        this.orderRepo = orderRepo;
+        this.inventoryClient = inventoryClient;
     }
-    
-    // Line 6: Returns Mono — a "promise" of one Order
+
     public Mono<Order> enrichOrder(String orderId) {
-        return orderRepo.findById(orderId)         // Line 7: Query DB (non-blocking)
-            .flatMap(order ->                      // Line 8: When order arrives, enrich it
-                inventoryClient                     // Line 9: Call inventory service (non-blocking)
-                    .checkStock(order.getSku())    // Line 10: Check if item is in stock
-                    .map(stock ->                  // Line 11: When stock info arrives
-                        order.withStock(stock)     // Line 12: Combine order + stock info
+        return orderRepo.findById(orderId)
+            .flatMap(order ->
+                inventoryClient
+                    .checkStock(order.getSku())
+                    .map(stock ->
+                        order.withStock(stock)
                     )
-            );                                     // Line 13: Returns Mono<Order> immediately
+            );
     }
 }
 ```
@@ -160,7 +198,6 @@ An API gateway receives 50,000 concurrent connections from mobile apps. Each req
 
 **With WebFlux:** 16 event-loop threads handle all 50,000 connections. When a downstream service is slow, the thread moves to the next request. Memory usage: ~200MB.
 
-```java
 // WebFlux gateway — handles 50K concurrent connections with 16 threads
 @RestController
 public class GatewayController {
@@ -177,7 +214,6 @@ public class GatewayController {
         ));
     }
 }
-```
 
 ## Key takeaways
 
@@ -188,3 +224,4 @@ public class GatewayController {
 - Decision rule: per-service stack choice, enforced in review
 
 **Official docs:** [Spring WebFlux Reference](https://docs.spring.io/spring-framework/reference/web/webflux.html) · [Project Reactor](https://projectreactor.io/docs/core/release/reference/) · [Reactive Streams](https://www.reactive-streams.org)
+

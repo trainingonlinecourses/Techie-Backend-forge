@@ -1,7 +1,7 @@
 ---
 title: The Authorization Code Flow — With PKCE
 module: oauth2-oidc
-order: 2
+order: 1
 minutes: 27
 topics: ["authorization code", "PKCE", "redirect URIs", "code exchange", "state", "SPA"]
 summary: The authorization code flow is the workhorse of OAuth2 — the flow behind every "Sign in with Google / GitHub / Apple" button. Its genius is a twost...
@@ -52,21 +52,23 @@ The **authorization code flow** is the workhorse of OAuth2 — the flow behind e
 
 The flow above assumes a **confidential client** — one with a backend that can hold a secret. **SPAs and mobile apps have no backend** — the "secret" would live in the browser, visible to anyone. **PKCE (Proof Key for Code Exchange)** solves this: instead of a secret, the client generates a *random verifier*, sends only a *hash* of it (the challenge), and later proves knowledge of the verifier when exchanging the code.
 
-```java
-// The client-side PKCE preparation:
-// 1. Generate a random verifier (43-128 chars):
-String verifier = Base64.getUrlEncoder().withoutPadding()
-        .encodeToString(randomBytes(32));      // e.g. "fdbGH93h..."
 
-// 2. Send only the SHA-256 CHALLENGE in the authorize request:
+**What this code does — step by step:**
+
+1. The client-side PKCE preparation: 1. Generate a random verifier (43-128 chars):
+2. `.encodeToString(randomBytes(32));` — e.g. "fdbGH93h..."
+3. 2. Send only the SHA-256 CHALLENGE in the authorize request:
+4. GET /authorize?code_challenge=<challenge>&code_challenge_method=S256&...
+5. 3. At the code exchange, prove knowledge of the verifier: POST /token body: { code, client_id, code_verifier: verifier }. The auth server hashes the verifier and compares to the challenge. Only the client that generated the verifier can complete the swap.
+
+The same code, clean:
+
+```java
+String verifier = Base64.getUrlEncoder().withoutPadding()
+        .encodeToString(randomBytes(32));
+
 String challenge = Base64.getUrlEncoder().withoutPadding()
         .encodeToString(sha256(verifier));
-//    GET /authorize?code_challenge=<challenge>&code_challenge_method=S256&...
-
-// 3. At the code exchange, prove knowledge of the verifier:
-//    POST /token  body: { code, client_id, code_verifier: verifier }
-//    The auth server hashes the verifier and compares to the challenge.
-//    Only the client that generated the verifier can complete the swap.
 ```
 
 **Why PKCE defeats code interception:** if an attacker steals the code, they still can't exchange it — they don't know the original verifier, and the auth server's hash comparison fails. PKCE is now *recommended for every* authorization-code flow (even confidential clients) — defense in depth for the same one-time-code exchange. Spring Security's OAuth2 client supports it out of the box; if you use the framework, this entire ceremony is `spring.security.oauth2.client.registration.*` configuration.
@@ -98,3 +100,4 @@ Spring Security's OAuth2 client implements the entire authorization-code flow (s
 ## Recap
 
 The authorization code flow is the standard behind every social login: the user authenticates at the auth server (password never touches your app), receives a single-use **code** via redirect (guarded by `state` against CSRF), and only the client's backend — holding the **client secret** — exchanges it for tokens. **PKCE** extends the flow to public clients (SPAs/mobile) by replacing the secret with a verifier/challenge hash pair, defeating code interception. The three disciplines: verify `state` always, keep redirect URIs an exact-match allowlist, and let the secret live only server-to-server. Spring Security configures the entire ceremony from properties — but understanding the steps is what lets you debug it when it doesn't work.
+

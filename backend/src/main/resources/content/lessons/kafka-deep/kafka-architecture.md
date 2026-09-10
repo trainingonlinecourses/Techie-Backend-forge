@@ -1,7 +1,7 @@
 ---
 title: Kafka Architecture — Brokers, Topics, Partitions, and Offsets
 module: kafka-deep
-order: 1
+order: 3
 minutes: 27
 topics: ["Kafka", "brokers", "topics", "partitions", "offsets", "event streaming"]
 summary: Kafka is a distributed eventstreaming platform — but the cleanest way to understand it is as a distributed commit log: an appendonly, ordered, repl...
@@ -51,15 +51,12 @@ The partition is the most important concept to internalize. Why partition at all
 
 **The consequence to respect:** events for *different* keys can land in *different* partitions and have no global order. Systems that need global order (a single sequence number across everything) fight Kafka's model — the standard answer is to partition by the entity and keep ordering per entity, which is what almost all real systems actually need.
 
-```java
 // Producer: the KEY controls the partition. All "cust-42" events
 // go to the same partition -> guaranteed order per customer.
 producer.send(new ProducerRecord<>("orders", "cust-42", orderJson));
-```
 
 ## Producers, Consumers, and the Offset
 
-```java
 // PRODUCER — fire-and-forget or with acknowledgment.
 Properties props = new Properties();
 props.put("bootstrap.servers", "localhost:9092");
@@ -72,24 +69,37 @@ try (KafkaProducer<String, String> producer = new KafkaProducer<>(props)) {
     producer.send(new ProducerRecord<>("orders", "cust-42",
             "{\"orderId\": 9001, \"total\": 49.99}"));
 }
-```
+
+
+**What this code does — step by step:**
+
+1. CONSUMER — a consumer GROUP divides the topic's partitions among members.
+2. `cprops.put("group.id", "order-processor");` — the consumer group
+3. `cprops.put("enable.auto.commit", "true");` — auto-commit offsets
+4. `consumer.subscribe(List.of("orders"));` — join the group, get partitions
+5. poll returns any new events for THIS consumer's partitions.
+
+The same code, clean:
 
 ```java
-// CONSUMER — a consumer GROUP divides the topic's partitions among members.
-Properties cprops = new Properties();
-cprops.put("bootstrap.servers", "localhost:9092");
-cprops.put("group.id", "order-processor");      // the consumer group
-cprops.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
-cprops.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
-cprops.put("enable.auto.commit", "true");       // auto-commit offsets
+public class Main {
 
-try (KafkaConsumer<String, String> consumer = new KafkaConsumer<>(cprops)) {
-    consumer.subscribe(List.of("orders"));       // join the group, get partitions
-    while (true) {
-        // poll returns any new events for THIS consumer's partitions.
-        for (ConsumerRecord<String, String> record : consumer.poll(100)) {
-            System.out.println("offset=" + record.offset() +
-                    " key=" + record.key() + " value=" + record.value());
+    public static void main(String[] args) {
+        Properties cprops = new Properties();
+        cprops.put("bootstrap.servers", "localhost:9092");
+        cprops.put("group.id", "order-processor");
+        cprops.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+        cprops.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+        cprops.put("enable.auto.commit", "true");
+
+        try (KafkaConsumer<String, String> consumer = new KafkaConsumer<>(cprops)) {
+            consumer.subscribe(List.of("orders"));
+            while (true) {
+                for (ConsumerRecord<String, String> record : consumer.poll(100)) {
+                    System.out.println("offset=" + record.offset() +
+                            " key=" + record.key() + " value=" + record.value());
+                }
+            }
         }
     }
 }
@@ -113,3 +123,4 @@ Topics have **retention**, not deletion-on-read: by size or time (`log.retention
 ## Recap
 
 Kafka is a distributed commit log: append-only, ordered-per-partition, replicated, and replayable. Topics hold events; partitions provide parallelism and per-key ordering; offsets track each consumer group's position; brokers replicate partitions for fault tolerance. Producers write with configurable durability (`acks=all`), and consumers in groups divide partitions among themselves, polling for events and committing offsets. The three shifts in thinking Kafka demands: events are stored facts, not one-shot messages; ordering is per-partition (so key by entity); and consumers replay history rather than draining queues. Internalize those and the whole ecosystem — consumer groups, stream processing, Spring Kafka — becomes predictable.
+

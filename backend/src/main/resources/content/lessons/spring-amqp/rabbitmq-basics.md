@@ -1,7 +1,7 @@
 ---
 title: RabbitMQ & AMQP Fundamentals
 module: spring-amqp
-order: 1
+order: 2
 minutes: 25
 topics: ["RabbitMQ", "AMQP", "exchanges", "queues", "bindings", "Spring AMQP setup"]
 summary: RabbitMQ is the most widely deployed opensource message broker. Its AMQP 091 model — exchanges, queues, bindings — is the mental model behind Sprin...
@@ -71,7 +71,6 @@ Exchange ──▶ Queue A
 
 ## Defining Topology in Spring
 
-```java
 @Configuration
 public class RabbitConfig {
 
@@ -102,13 +101,11 @@ public class RabbitConfig {
             .to(ordersExchange()).with("orders.cancelled");
     }
 }
-```
 
 `durable` queues survive broker restarts; `autoDelete(false)` keeps them until explicitly removed.
 
 ## Sending With RabbitTemplate
 
-```java
 @Service
 public class OrderPublisher {
 
@@ -127,13 +124,11 @@ public class OrderPublisher {
             });
     }
 }
-```
 
 `convertAndSend` serializes POJOs with the configured `MessageConverter` (Jackson JSON by default in Boot).
 
 ## Consuming With @RabbitListener
 
-```java
 @Component
 public class OrderConsumer {
 
@@ -143,7 +138,6 @@ public class OrderConsumer {
         inventoryService.reserve(event.orderId());
     }
 }
-```
 
 The listener runs on the listener container's threads, automatically: deserializes the message, invokes the method, **acks on success** and **nacks on exception** (default: requeue).
 
@@ -167,7 +161,6 @@ AUTO is right for most cases; MANUAL when you need fine-grained control (e.g., a
 
 ## Configuring the Listener Container
 
-```java
 @Bean
 public RabbitListenerContainerFactory<SimpleMessageListenerContainer>
         rabbitListenerContainerFactory(ConnectionFactory connectionFactory) {
@@ -180,20 +173,17 @@ public RabbitListenerContainerFactory<SimpleMessageListenerContainer>
     factory.setAcknowledgeMode(AcknowledgeMode.AUTO);
     return factory;
 }
-```
 
 **Concurrency**: `concurrentConsumers` × `prefetchCount` is your throughput dial. **`defaultRequeueRejected(false)`**: poison messages (that always throw) go to the DLQ instead of looping forever.
 
 ## Message Converters
 
-```java
 @Bean
 public Jackson2JsonMessageConverter jsonMessageConverter(ObjectMapper objectMapper) {
     Jackson2JsonMessageConverter converter = new Jackson2JsonMessageConverter(objectMapper);
     converter.setCreateMessageIds(true);
     return converter;
 }
-```
 
 Set it on both sides (producer + consumer factory) and POJOs round-trip as JSON with `__TypeId__` headers for polymorphic safety.
 
@@ -219,3 +209,4 @@ Set it on both sides (producer + consumer factory) and POJOs round-trip as JSON 
 | Acks | `AUTO` default; requeue on failure; DLQ for poison |
 
 RabbitMQ's model is small and precise: exchanges route, queues buffer, listeners consume. Spring AMQP wraps it so the entire topology is beans and annotations — the next lessons cover reliability, retries/DLQs, and request/reply patterns.
+

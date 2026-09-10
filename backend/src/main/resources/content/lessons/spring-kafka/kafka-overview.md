@@ -1,7 +1,7 @@
 ---
 title: Kafka & Event-Driven Architecture — Complete Beginner's Guide
 summary: Topics, partitions, offsets, delivery semantics, and when event-driven design is the right call — explained from zero with code examples.
-order: 1
+order: 2
 minutes: 22
 topics: [kafka, event-driven, topics, partitions, offsets, architecture, producer, consumer]
 docs:
@@ -17,19 +17,21 @@ Imagine a **newspaper office**. Reporters (producers) write articles and put the
 
 **Apache Kafka** is that bulletin board, but for data events:
 
-```java
-// A producer puts an event on the board (topic)
-kafkaTemplate.send("orders", new OrderCreated(orderId, customerId, total));
-// Line 1: "orders" is the topic name (like a bulletin board)
-// Line 2: The event is an OrderCreated record
-// Line 3: Kafka stores it — it's not deleted when consumed
 
-// A consumer reads from the board
+**What this code does — step by step:**
+
+1. A producer puts an event on the board (topic)
+2. Line 1: "orders" is the topic name (like a bulletin board). Line 2: The event is an OrderCreated record. Line 3: Kafka stores it — it's not deleted when consumed
+3. A consumer reads from the board
+4. Line 1: This method is called for every OrderCreated event. Line 2: The consumer reads at its own pace. Line 3: Multiple consumers can read the same event
+
+The same code, clean:
+
+```java
+kafkaTemplate.send("orders", new OrderCreated(orderId, customerId, total));
+
 @KafkaListener(topics = "orders")
 public void handleOrder(OrderCreated event) {
-    // Line 1: This method is called for every OrderCreated event
-    // Line 2: The consumer reads at its own pace
-    // Line 3: Multiple consumers can read the same event
     inventoryService.reserve(event.orderId());
 }
 ```
@@ -121,7 +123,6 @@ Result: The event was processed TWICE (at-least-once)
 
 **Because at-least-once is the practical default, every consumer must be idempotent:**
 
-```java
 @KafkaListener(topics = "orders")
 public void handleOrder(OrderCreated event) {
     // Line 1: Check if we already processed this event
@@ -133,31 +134,41 @@ public void handleOrder(OrderCreated event) {
     // Line 4: Mark as processed
     processedEvents.add(event.eventId());
 }
-```
 
 ## Spring Boot integration — line by line
 
+
+**What this code does — step by step:**
+
+1. Producer — sends events to Kafka
+2. `private final KafkaTemplate<String, OrderCreated> kafkaTemplate;` — Line 1: Spring's Kafka client
+3. `@Transactional` — Line 2: Publish atomically with the DB write
+4. `OrderCreated event = new OrderCreated(order.getId(), order.getCustomer());` — Line 3: Create event
+5. `kafkaTemplate.send("orders", order.getId().toString(), event);` — Line 4: Send to Kafka. Line 5: Topic="orders", key=orderId (ensures same order goes to same partition)
+6. Consumer — receives events from Kafka
+7. `@KafkaListener(topics = "orders", groupId = "inventory-service")` — Line 6: Listen to "orders" topic
+8. `public void onOrderCreated(OrderCreated event) {` — Line 7: Method called for each event
+9. `inventoryService.reserve(event.orderId());` — Line 8: Process the event. Line 9: Spring auto-commits the offset after this method returns
+
+The same code, clean:
+
 ```java
-// Producer — sends events to Kafka
 @Service
 public class OrderEventPublisher {
-    private final KafkaTemplate<String, OrderCreated> kafkaTemplate;  // Line 1: Spring's Kafka client
-    
-    @Transactional  // Line 2: Publish atomically with the DB write
+    private final KafkaTemplate<String, OrderCreated> kafkaTemplate;
+
+    @Transactional
     public void publishOrderCreated(Order order) {
-        OrderCreated event = new OrderCreated(order.getId(), order.getCustomer());  // Line 3: Create event
-        kafkaTemplate.send("orders", order.getId().toString(), event);  // Line 4: Send to Kafka
-        // Line 5: Topic="orders", key=orderId (ensures same order goes to same partition)
+        OrderCreated event = new OrderCreated(order.getId(), order.getCustomer());
+        kafkaTemplate.send("orders", order.getId().toString(), event);
     }
 }
 
-// Consumer — receives events from Kafka
 @Component
 public class InventoryEventHandler {
-    @KafkaListener(topics = "orders", groupId = "inventory-service")  // Line 6: Listen to "orders" topic
-    public void onOrderCreated(OrderCreated event) {                   // Line 7: Method called for each event
-        inventoryService.reserve(event.orderId());                     // Line 8: Process the event
-        // Line 9: Spring auto-commits the offset after this method returns
+    @KafkaListener(topics = "orders", groupId = "inventory-service")
+    public void onOrderCreated(OrderCreated event) {
+        inventoryService.reserve(event.orderId());
     }
 }
 ```
@@ -180,7 +191,6 @@ spring:
 
 Events are the API between teams. Name them as **past facts** (things that happened), not commands (things to do):
 
-```java
 // GOOD — past facts (things that happened)
 record OrderCreated(UUID orderId, UUID customerId) {}
 record PaymentCaptured(UUID orderId, Money amount) {}
@@ -189,7 +199,6 @@ record ShipmentDispatched(UUID orderId, TrackingNumber tracking) {}
 // BAD — commands (things to do)
 record CreateOrder(UUID orderId) {}      // This is a command, not a fact
 record ProcessPayment(UUID orderId) {}   // This tells someone what to do
-```
 
 **Why:** An event represents something that ALREADY happened. "OrderCreated" means the order WAS created. You can't un-create it. A command like "CreateOrder" implies it might not happen — that's a different pattern.
 
@@ -220,3 +229,4 @@ Each service is independent. If the Payment Service is down, orders queue up and
 - Name events as past facts with stable IDs and versions
 
 **Official docs:** [Spring Kafka Reference](https://docs.spring.io/spring-kafka/reference/) · [Apache Kafka Introduction](https://kafka.apache.org/intro)
+

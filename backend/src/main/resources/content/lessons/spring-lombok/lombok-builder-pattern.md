@@ -1,7 +1,7 @@
 ---
 title: Builder Pattern — @Builder Deep Dive
 summary: How @Builder works, custom builder names, builder inheritance, @SuperBuilder, and when to use builders vs constructors vs records.
-order: 3
+order: 2
 minutes: 15
 topics: [@Builder, @SuperBuilder, builder-inheritance, factory-method, records]
 docs:
@@ -12,7 +12,6 @@ docs:
 
 The Builder pattern lets you construct complex objects step by step. Lombok's `@Builder` generates the builder class and all the chaining methods automatically.
 
-```java
 @Builder
 public class Server {
     private String host;
@@ -28,7 +27,6 @@ Server server = Server.builder()
     .ssl(true)
     .timeout(Duration.ofSeconds(30))
     .build();
-```
 
 ---
 
@@ -36,17 +34,14 @@ Server server = Server.builder()
 
 ### On class (all fields)
 
-```java
 @Builder
 public class User {
     private String name;
     private int age;
 }
-```
 
 ### On factory method
 
-```java
 public class User {
     private String name;
     private int age;
@@ -56,31 +51,25 @@ public class User {
         return new User(name, age);
     }
 }
-```
 
 ### Custom builder name
 
-```java
 @Builder(builderClassName = "ConfigBuilder")
 public class Config { }
 // Generates: Config.ConfigBuilder, not Config.UserBuilder
-```
 
 ### With default values
 
-```java
 @Builder.Default
 private int maxRetries = 3;
 
 @Builder.Default
 private Duration timeout = Duration.ofSeconds(30);
-```
 
 ---
 
 ## Line-by-Line Walkthrough
 
-```java
 import lombok.*;
 import java.time.Duration;
 import java.util.*;
@@ -125,13 +114,11 @@ public class BuilderDemo {
             .build();
     }
 }
-```
 
 ---
 
 ## @SuperBuilder (Inheritance)
 
-```java
 @Data
 @SuperBuilder
 public class Animal {
@@ -151,7 +138,6 @@ Dog dog = Dog.builder()
     .age(3)
     .breed("Labrador")
     .build();
-```
 
 ---
 
@@ -163,3 +149,4 @@ Dog dog = Dog.builder()
 | Forgetting @Builder.Default | Default values ignored | Always use @Builder.Default |
 | Using builder for simple DTOs | Over-engineering | Use records or @Data for simple POJOs |
 | Not using toBuilder() | Can't modify existing objects | Add toBuilder = true |
+

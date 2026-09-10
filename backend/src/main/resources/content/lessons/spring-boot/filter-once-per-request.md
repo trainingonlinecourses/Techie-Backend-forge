@@ -1,7 +1,7 @@
 ---
 title: Spring Boot Filters — OncePerRequestFilter and Filter Chains
 summary: Servlet filters vs Spring interceptors, OncePerRequestFilter for guaranteed single execution, filter registration and ordering, CORS filters, and the filter patterns that production APIs rely on.
-order: 43
+order: 29
 minutes: 20
 topics: [servlet-filter, once-per-request, filter-chain, cors-filter, security-filter, request-wrapper, logging-filter]
 docs:
@@ -34,7 +34,6 @@ Without this guarantee, your filter might run multiple times per request, causin
 
 Log every incoming request with timing, path, and user:
 
-```java
 @Component
 @Order(1)
 public class RequestLoggingFilter extends OncePerRequestFilter {
@@ -74,13 +73,11 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
         return request.getRequestURI().startsWith("/actuator");
     }
 }
-```
 
 ### Scenario 2: Request ID propagation
 
 For distributed tracing, propagate the request ID from upstream services:
 
-```java
 @Component
 public class TracingFilter extends OncePerRequestFilter {
 
@@ -108,13 +105,11 @@ public class TracingFilter extends OncePerRequestFilter {
         }
     }
 }
-```
 
 ### Scenario 3: Request body logging (with wrapping)
 
 Read the request body for logging without consuming it:
 
-```java
 @Component
 public class BodyLoggingFilter extends OncePerRequestFilter {
 
@@ -149,7 +144,6 @@ public class BodyLoggingFilter extends OncePerRequestFilter {
         return "POST".equals(method) || "PUT".equals(method) || "PATCH".equals(method);
     }
 }
-```
 
 **Critical:** When using `ContentCachingRequestWrapper`, you must call `copyBodyToResponse()` on the response wrapper. Without this, the response body will be empty.
 
@@ -157,7 +151,6 @@ public class BodyLoggingFilter extends OncePerRequestFilter {
 
 Block requests that exceed a per-IP rate limit:
 
-```java
 @Component
 public class RateLimitFilter extends OncePerRequestFilter {
 
@@ -178,13 +171,11 @@ public class RateLimitFilter extends OncePerRequestFilter {
         chain.doFilter(request, response);
     }
 }
-```
 
 ## Filter registration ordering
 
 Spring Boot auto-registers `Filter` beans with a default order. For explicit control:
 
-```java
 @Bean
 public FilterRegistrationBean<RequestLoggingFilter> loggingFilter() {
     FilterRegistrationBean<RequestLoggingFilter> registration = new FilterRegistrationBean<>();
@@ -202,7 +193,6 @@ public FilterRegistrationBean<BodyLoggingFilter> bodyFilter() {
     registration.setOrder(2);
     return registration;
 }
-```
 
 ## Common mistakes
 
@@ -214,3 +204,4 @@ public FilterRegistrationBean<BodyLoggingFilter> bodyFilter() {
 | Heavy I/O in filter (database calls) | Slow for every single request |
 | Modifying the request body without wrapping | Body consumed, controller sees empty body |
 | Filter registered too broadly (/*) | Filter runs for static resources, health checks |
+

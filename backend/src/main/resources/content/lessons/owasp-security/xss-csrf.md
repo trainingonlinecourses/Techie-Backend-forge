@@ -1,7 +1,7 @@
 ---
 title: XSS and CSRF — The Browser Attacks
 module: owasp-security
-order: 3
+order: 5
 minutes: 27
 topics: ["XSS", "CSRF", "content security policy", "same-origin policy", "CORS", "browser security"]
 summary: Two of the most misunderstood web attacks share a theme: they abuse the browser's trust. XSS (CrossSite Scripting) makes your application execute t...
@@ -112,7 +112,6 @@ server.servlet.session.cookie.same-site=lax
 
 **CORS (Cross-Origin Resource Sharing)** is *not* a CSRF defense — it's the browser's rule for when a *page* on origin A may *read responses* from origin B. Same-origin policy blocks reads by default; CORS headers relax that for legitimate cross-origin APIs:
 
-```java
 // Spring: allow the React SPA at localhost:5173 to call the API:
 @Configuration
 public class CorsConfig {
@@ -127,7 +126,6 @@ public class CorsConfig {
         return src;
     }
 }
-```
 
 **The critical distinction:** CORS controls *reading responses from other origins* — it does NOT stop the browser from *sending* requests (the CSRF vector). A `fetch` from evil.com to bank.com is *sent* regardless of CORS; CORS only decides whether evil.com can *read the response*. And a misconfigured CORS (`Access-Control-Allow-Origin: *` with credentials) turns same-origin protection off entirely. **Configure CORS as an exact allowlist** — never a wildcard with credentials — and keep CSRF protection for cookie-based sessions.
 
@@ -142,3 +140,4 @@ public class CorsConfig {
 ## Recap
 
 XSS and CSRF are browser-trust attacks: XSS makes your page *execute attacker JavaScript* (reflected, stored, or DOM) — prevented by output escaping at the framework level, with CSP and HttpOnly cookies as the safety net. CSRF makes the victim's browser *send authenticated requests* the victim never intended — prevented by Spring Security's CSRF tokens (default), SameSite cookies, and Origin checks; token-based APIs are inherently resistant. CORS is the separate rule about cross-origin *reads*, configured as an exact allowlist and never as a credentials-bearing wildcard. The mental model to keep: **the browser trusts your origin and auto-sends your cookies — your defenses must ensure that trust can only be used by your page, for your user's intent.**
+

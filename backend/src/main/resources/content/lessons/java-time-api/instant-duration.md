@@ -1,7 +1,7 @@
 ---
 title: Instant and Duration — Moments and Elapsed Time
 module: java-time-api
-order: 3
+order: 2
 minutes: 24
 topics: ["Instant", "Duration", "epoch", "UTC", "timestamps", "timeouts"]
 summary: Two of the most important time concepts have nothing to do with calendars, months, or time zones:
@@ -33,40 +33,57 @@ The industry-standard practice: **store instants as UTC** (`Instant` in memory, 
 
 ## The Code Walkthrough
 
+
+**What this code does — step by step:**
+
+1. ---- 1. Measuring elapsed time with Instant ----
+2. `Thread.sleep(250);` — simulate work
+3. `System.out.println("elapsed ms: " + elapsed.toMillis());` — ~250
+4. ---- 2. Epoch conversion (what's actually stored) ----
+5. `System.out.println("epoch millis:  " + now.toEpochMilli());` — what System.currentTimeMillis() gives
+6. ---- 3. Arithmetic on instants ----
+7. `Instant expiresAt = now.plusSeconds(3600);` — +1 hour
+8. `Instant deadline = now.plus(Duration.ofDays(30));` — +30 days of elapsed time
+9. `System.out.println(now.isBefore(expiresAt));` — true
+10. ---- 4. Duration construction and math ----
+11. `Duration retryWindow = timeout.multipliedBy(3);` — 90 seconds
+12. `Duration remaining = retryWindow.minus(Duration.ofMinutes(1));` — 30s
+13. `System.out.println(remaining.getSeconds());` — 30
+14. ---- 5. Parsing ISO durations ----
+15. `Duration fromText = Duration.parse("PT90S");` — ISO-8601: P[T]...
+16. `System.out.println(fromText.toMinutes());` — 1
+
+The same code, clean:
+
 ```java
 import java.time.*;
 
 public class InstantDurationDemo {
 
     public static void main(String[] args) throws InterruptedException {
-        // ---- 1. Measuring elapsed time with Instant ----
         Instant start = Instant.now();
-        Thread.sleep(250);                       // simulate work
+        Thread.sleep(250);
         Instant end = Instant.now();
 
         Duration elapsed = Duration.between(start, end);
-        System.out.println("elapsed ms: " + elapsed.toMillis());   // ~250
+        System.out.println("elapsed ms: " + elapsed.toMillis());
 
-        // ---- 2. Epoch conversion (what's actually stored) ----
         Instant now = Instant.now();
         System.out.println("epoch seconds: " + now.getEpochSecond());
-        System.out.println("epoch millis:  " + now.toEpochMilli());   // what System.currentTimeMillis() gives
+        System.out.println("epoch millis:  " + now.toEpochMilli());
 
-        // ---- 3. Arithmetic on instants ----
-        Instant expiresAt = now.plusSeconds(3600);          // +1 hour
-        Instant deadline = now.plus(Duration.ofDays(30));   // +30 days of elapsed time
+        Instant expiresAt = now.plusSeconds(3600);
+        Instant deadline = now.plus(Duration.ofDays(30));
 
-        System.out.println(now.isBefore(expiresAt));        // true
+        System.out.println(now.isBefore(expiresAt));
 
-        // ---- 4. Duration construction and math ----
         Duration timeout = Duration.ofSeconds(30);
-        Duration retryWindow = timeout.multipliedBy(3);     // 90 seconds
-        Duration remaining = retryWindow.minus(Duration.ofMinutes(1));  // 30s
-        System.out.println(remaining.getSeconds());         // 30
+        Duration retryWindow = timeout.multipliedBy(3);
+        Duration remaining = retryWindow.minus(Duration.ofMinutes(1));
+        System.out.println(remaining.getSeconds());
 
-        // ---- 5. Parsing ISO durations ----
-        Duration fromText = Duration.parse("PT90S");        // ISO-8601: P[T]...
-        System.out.println(fromText.toMinutes());           // 1
+        Duration fromText = Duration.parse("PT90S");
+        System.out.println(fromText.toMinutes());
     }
 }
 ```
@@ -121,3 +138,4 @@ That `Z` suffix means UTC and makes every log line comparable across servers in 
 - Instant arithmetic is pure timeline math — no calendars, no DST.
 - `Duration` for seconds/timeouts; `Period` for calendar months/years.
 - Convert instants to human zones only at the display boundary.
+

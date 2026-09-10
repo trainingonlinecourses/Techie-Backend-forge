@@ -206,3 +206,4 @@ Gradle's incremental builds shine here — unchanged modules are UP-TO-DATE inst
 | Gradle | `include(...)` + `project(":x")` |
 
 Multi-module builds make architecture mechanical: the compiler enforces what the diagram claims. Split by ownership and direction of dependency, keep the graph acyclic, and the build itself becomes the architecture review.
+

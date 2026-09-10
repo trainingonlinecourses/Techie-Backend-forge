@@ -1,7 +1,7 @@
 ---
 title: ScopedValues — Context Variables for Virtual Threads
 summary: ThreadLocal replacement for structured contexts, automatic cleanup, request tracing, multi-tenant routing, and virtual thread safety.
-order: 32
+order: 69
 minutes: 18
 topics: [scoped-values, threadlocal, virtual-threads, context-propagation, structured-concurrency]
 docs:
@@ -21,8 +21,21 @@ Think of them like **invisible parameters** — data that flows from the top of 
 
 ## The Problem: ThreadLocal Is Dangerous
 
+
+**What this code does — step by step:**
+
+1. Old way — using ThreadLocal to store current user
+2. `currentUser.remove();` — Must remember to clean up!
+3. Usage in a controller
+4. `UserContext.setCurrentUser("alice");` — Set the context
+5. `return orderService.createOrder(request);` — Uses the context
+6. `UserContext.clear();` — MUST clean up or you get memory leaks!
+7. Deep in the service layer
+8. `String user = UserContext.getCurrentUser();` — Implicit access. ... create order
+
+The same code, clean:
+
 ```java
-// Old way — using ThreadLocal to store current user
 public class UserContext {
     private static final ThreadLocal<String> currentUser = new ThreadLocal<>();
 
@@ -35,27 +48,24 @@ public class UserContext {
     }
 
     public static void clear() {
-        currentUser.remove();  // Must remember to clean up!
+        currentUser.remove();
     }
 }
 
-// Usage in a controller
 @PostMapping("/api/orders")
 public Order createOrder(@RequestBody OrderRequest request) {
-    UserContext.setCurrentUser("alice");  // Set the context
+    UserContext.setCurrentUser("alice");
     try {
-        return orderService.createOrder(request);  // Uses the context
+        return orderService.createOrder(request);
     } finally {
-        UserContext.clear();  // MUST clean up or you get memory leaks!
+        UserContext.clear();
     }
 }
 
-// Deep in the service layer
 @Service
 public class OrderService {
     public Order createOrder(OrderRequest request) {
-        String user = UserContext.getCurrentUser();  // Implicit access
-        // ... create order
+        String user = UserContext.getCurrentUser();
     }
 }
 ```
@@ -70,41 +80,54 @@ public class OrderService {
 
 ## The Solution: ScopedValues
 
+
+**What this code does — step by step:**
+
+1. New way — using ScopedValue (clean, safe, automatic cleanup)
+2. Define a ScopedValue — final, immutable once set
+3. Run code with a context value — automatic cleanup!
+4. Read the current value
+5. `return CURRENT_USER.get();` — Returns the value for the current scope
+
+The same code, clean:
+
 ```java
-// New way — using ScopedValue (clean, safe, automatic cleanup)
 public class UserContext {
-    // Define a ScopedValue — final, immutable once set
     private static final ScopedValue<String> CURRENT_USER = ScopedValue.newInstance();
 
-    // Run code with a context value — automatic cleanup!
     public static <T> T withUser(String user, Supplier<T> action) {
         return ScopedValue.where(CURRENT_USER, user).run(action);
     }
 
-    // Read the current value
     public static String currentUser() {
-        return CURRENT_USER.get();  // Returns the value for the current scope
+        return CURRENT_USER.get();
     }
 }
 ```
 
+
+**What this code does — step by step:**
+
+1. Usage — no cleanup needed!
+2. `return orderService.createOrder(request);` — User context is available
+3. When the lambda ends, the ScopedValue is automatically cleared. No try-finally needed!
+4. Deep in the service layer
+5. `String user = UserContext.currentUser();` — Clean access. ... create order
+
+The same code, clean:
+
 ```java
-// Usage — no cleanup needed!
 @PostMapping("/api/orders")
 public Order createOrder(@RequestBody OrderRequest request) {
     return UserContext.withUser("alice", () -> {
-        return orderService.createOrder(request);  // User context is available
+        return orderService.createOrder(request);
     });
-    // When the lambda ends, the ScopedValue is automatically cleared
-    // No try-finally needed!
 }
 
-// Deep in the service layer
 @Service
 public class OrderService {
     public Order createOrder(OrderRequest request) {
-        String user = UserContext.currentUser();  // Clean access
-        // ... create order
+        String user = UserContext.currentUser();
     }
 }
 ```
@@ -115,53 +138,75 @@ public class OrderService {
 
 ### Basic Usage
 
+
+**What this code does — step by step:**
+
+1. Define a ScopedValue
+2. Set a value and run code in that scope
+3. `System.out.println(GREETING.get());` — "Hello"
+4. Nested scopes — inner overrides outer
+5. `System.out.println(GREETING.get());` — "Hi"
+6. `System.out.println(GREETING.get());` — "Hello" — outer scope restored
+7. Outside the scope — value is not accessible. GREETING.get(); // 💥 ScopedValue.NotSetException!
+
+The same code, clean:
+
 ```java
 public class App {
-    // Define a ScopedValue
     private static final ScopedValue<String> GREETING = ScopedValue.newInstance();
 
     public static void main(String[] args) {
-        // Set a value and run code in that scope
         ScopedValue.where(GREETING, "Hello").run(() -> {
-            System.out.println(GREETING.get());  // "Hello"
+            System.out.println(GREETING.get());
 
-            // Nested scopes — inner overrides outer
             ScopedValue.where(GREETING, "Hi").run(() -> {
-                System.out.println(GREETING.get());  // "Hi"
+                System.out.println(GREETING.get());
             });
 
-            System.out.println(GREETING.get());  // "Hello" — outer scope restored
+            System.out.println(GREETING.get());
         });
 
-        // Outside the scope — value is not accessible
-        // GREETING.get();  // 💥 ScopedValue.NotSetException!
     }
 }
 ```
 
 ### Key Rules
 
+
+**What this code does — step by step:**
+
+1. Rule 1: ScopedValue is immutable — once set in a scope, it cannot change
+2. `System.out.println(name.get());` — "Alice". Name.set("Bob"); // ❌ No set() method — ScopedValues are immutable
+3. Rule 2: Must be accessed within the scope where it was set
+4. `System.out.println(name.get());` — "Alice" ✅
+5. name.get(); // 💥 NotSetException — outside scope
+6. Rule 3: Inner scopes can shadow outer scopes
+7. `System.out.println(name.get());` — "Bob" — inner scope
+8. `System.out.println(name.get());` — "Alice" — outer scope restored
+
+The same code, clean:
+
 ```java
-// Rule 1: ScopedValue is immutable — once set in a scope, it cannot change
-ScopedValue<String> name = ScopedValue.newInstance();
-ScopedValue.where(name, "Alice").run(() -> {
-    System.out.println(name.get());  // "Alice"
-    // name.set("Bob");  // ❌ No set() method — ScopedValues are immutable
-});
+public class Main {
 
-// Rule 2: Must be accessed within the scope where it was set
-ScopedValue.where(name, "Alice").run(() -> {
-    System.out.println(name.get());  // "Alice" ✅
-});
-// name.get();  // 💥 NotSetException — outside scope
+    public static void main(String[] args) {
+        ScopedValue<String> name = ScopedValue.newInstance();
+        ScopedValue.where(name, "Alice").run(() -> {
+            System.out.println(name.get());
+        });
 
-// Rule 3: Inner scopes can shadow outer scopes
-ScopedValue.where(name, "Alice").run(() -> {
-    ScopedValue.where(name, "Bob").run(() -> {
-        System.out.println(name.get());  // "Bob" — inner scope
-    });
-    System.out.println(name.get());  // "Alice" — outer scope restored
-});
+        ScopedValue.where(name, "Alice").run(() -> {
+            System.out.println(name.get());
+        });
+
+        ScopedValue.where(name, "Alice").run(() -> {
+            ScopedValue.where(name, "Bob").run(() -> {
+                System.out.println(name.get());
+            });
+            System.out.println(name.get());
+        });
+    }
+}
 ```
 
 ---
@@ -183,7 +228,6 @@ ScopedValue.where(name, "Alice").run(() -> {
 
 ### Scenario 1: Request Context in Web Applications
 
-```java
 public class RequestContext {
     // Define scoped values for request data
     private static final ScopedValue<String> REQUEST_ID = ScopedValue.newInstance();
@@ -203,9 +247,7 @@ public class RequestContext {
     public static String userId() { return USER_ID.get(); }
     public static String clientIp() { return CLIENT_IP.get(); }
 }
-```
 
-```java
 // Filter that sets the context for every request
 @Component
 public class RequestContextFilter implements Filter {
@@ -227,9 +269,7 @@ public class RequestContextFilter implements Filter {
         });
     }
 }
-```
 
-```java
 // Deep in any service — access request context without passing it
 @Service
 public class OrderService {
@@ -246,11 +286,9 @@ public class OrderService {
         return order;
     }
 }
-```
 
 ### Scenario 2: Multi-Tenant Database Routing
 
-```java
 public class TenantContext {
     private static final ScopedValue<String> TENANT_ID = ScopedValue.newInstance();
     private static final ScopedValue<DataSource> DATA_SOURCE = ScopedValue.newInstance();
@@ -264,9 +302,7 @@ public class TenantContext {
     public static String tenantId() { return TENANT_ID.get(); }
     public static DataSource dataSource() { return DATA_SOURCE.get(); }
 }
-```
 
-```java
 // Repository that routes to the correct tenant database
 @Repository
 public class TenantAwareRepository {
@@ -282,9 +318,7 @@ public class TenantAwareRepository {
         );
     }
 }
-```
 
-```java
 // Middleware that resolves tenant
 @Component
 public class TenantResolver {
@@ -297,11 +331,9 @@ public class TenantResolver {
         });
     }
 }
-```
 
 ### Scenario 3: Transaction Context
 
-```java
 public class TransactionContext {
     private static final ScopedValue<String> TRANSACTION_ID = ScopedValue.newInstance();
     private static final ScopedValue<Boolean> READ_ONLY = ScopedValue.newInstance();
@@ -315,11 +347,9 @@ public class TransactionContext {
     public static String transactionId() { return TRANSACTION_ID.get(); }
     public static boolean isReadOnly() { return READ_ONLY.get(); }
 }
-```
 
 ### Scenario 4: Security Context
 
-```java
 public class SecurityContext {
     private static final ScopedValue<Set<String>> ROLES = ScopedValue.newInstance();
     private static final ScopedValue<String> USERNAME = ScopedValue.newInstance();
@@ -334,9 +364,7 @@ public class SecurityContext {
     public static boolean hasRole(String role) { return ROLES.get().contains(role); }
     public static boolean isAdmin() { return hasRole("ADMIN"); }
 }
-```
 
-```java
 // Usage in a service
 @Service
 public class UserService {
@@ -351,7 +379,6 @@ public class UserService {
         return repository.save(user);
     }
 }
-```
 
 ---
 
@@ -364,3 +391,4 @@ public class UserService {
 | Confusing ScopedValue with ThreadLocal | ScopedValue is not a direct replacement | ScopedValue is for structured contexts, not arbitrary thread-local storage |
 | Using ScopedValue for simple caching | ScopedValue doesn't persist across requests | Use a regular cache or Spring's `@Cacheable` |
 | Forgetting to set the ScopedValue | `NotSetException` at runtime | Ensure the filter/interceptor sets it before downstream code |
+

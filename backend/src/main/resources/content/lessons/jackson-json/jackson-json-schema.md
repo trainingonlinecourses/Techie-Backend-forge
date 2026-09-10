@@ -1,7 +1,7 @@
 ---
 title: JSON Schema, Validation, and Integration Patterns
 module: jackson-json
-order: 5
+order: 4
 minutes: 24
 topics: ["JSON Schema", "validation", "Bean Validation", "JsonNode validation", "integration", "error handling"]
 summary: Serialization handles shape; validation handles correctness. The JSON your API accepts isn't just wellformed — it must satisfy business rules: a to...
@@ -22,7 +22,6 @@ Serialization handles *shape*; **validation** handles *correctness*. The JSON yo
 
 ## Bean Validation: The Spring-Native Layer
 
-```java
 import jakarta.validation.constraints.*;
 
 public class CreateLessonRequest {
@@ -45,9 +44,7 @@ public class CreateLessonRequest {
 
     // getters/setters...
 }
-```
 
-```java
 @RestController
 public class LessonController {
 
@@ -59,13 +56,11 @@ public class LessonController {
         return lessonService.create(req);
     }
 }
-```
 
 **Walking through it:** the annotations *declare* the rules (`@NotBlank`, `@Size`, `@Min`/`@Max`, `@Email`, `@Pattern` — the core of the Bean Validation 3.0/Jakarta set). `@Valid` on the parameter triggers validation automatically when the request is deserialized. A violation → `MethodArgumentNotValidException` → Spring's default handler returns **400 with the validation messages** — the request never reaches your service. The result: the boundary rejects bad input *before business logic runs*, which is exactly where validation belongs (the "validate at the boundary" rule from secure coding).
 
 **Handling the errors cleanly:**
 
-```java
 @RestControllerAdvice
 public class ValidationExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -79,7 +74,6 @@ public class ValidationExceptionHandler {
         // {"title":"title is required","minutes":"minutes must be at least 1"}
     }
 }
-```
 
 **The nested-validation tools:** `@Valid` on a *nested object field* cascades validation into it; `@Validated` on the class enables validation on method parameters beyond `@RequestBody` (query params, path variables: `@RequestParam @Min(1) int page`); `@Validated` at the class level also enables `@PreAuthorize`-style constraints. Groups (`@Validated(Create.class)`) express different rules per context ("create vs update").
 
@@ -116,20 +110,23 @@ public class ValidationExceptionHandler {
 
 **Enforcing it in Java:**
 
-```java
-// networknt's validator (the standard choice):
-com.networknt.schema.JsonSchema schema = JsonSchemaFactory
-        .getInstance(SpecVersion.VersionFlag.V202012)
-        .getSchema(schemaDocument);              // the schema above
+public class Main {
 
-Set<com.networknt.schema.ValidationMessage> errors =
-        schema.validate(rawJsonNode);            // validate the incoming JSON tree
+    public static void main(String[] args) {
+        // networknt's validator (the standard choice):
+        com.networknt.schema.JsonSchema schema = JsonSchemaFactory
+                .getInstance(SpecVersion.VersionFlag.V202012)
+                .getSchema(schemaDocument);              // the schema above
 
-if (!errors.isEmpty()) {
-    errors.forEach(e -> System.out.println(e.getMessage()));
-    throw new ValidationException("invalid payload");
+        Set<com.networknt.schema.ValidationMessage> errors =
+                schema.validate(rawJsonNode);            // validate the incoming JSON tree
+
+        if (!errors.isEmpty()) {
+            errors.forEach(e -> System.out.println(e.getMessage()));
+            throw new ValidationException("invalid payload");
+        }
+    }
 }
-```
 
 Validation happens *before* deserialization (on the raw JSON tree), so the schema guards the boundary independently of the Java types — the pattern for contract-first APIs, webhooks, and cross-language consumers.
 
@@ -137,13 +134,11 @@ Validation happens *before* deserialization (on the raw JSON tree), so the schem
 
 Jackson can *generate* a schema from your Java types (the reverse direction):
 
-```java
 // Generate a draft-07 schema from a POJO:
 com.fasterxml.jackson.module.jsonSchema.JsonSchema schema =
         mapper.generateJsonSchema(Lesson.class);
 String schemaJson = mapper.writerWithDefaultPrettyPrinter()
                           .writeValueAsString(schema);
-```
 
 (With the `jackson-module-jsonSchema` module.) The generated schema reflects your DTO's shape — the starting point for a published contract. The production pattern: **define the contract once** (usually the DTOs), derive what you can (schemas, OpenAPI), and validate both sides — Bean Validation for the request handling, schema validation for the contract-first boundary.
 
@@ -169,3 +164,4 @@ The full JSON contract stack in a Spring Boot API:
 ## Recap
 
 The contract layer sits between deserialization and business logic: **Bean Validation** (`@NotBlank`, `@Min`, `@Email`, `@Pattern` + `@Valid` at the boundary) rejects invalid requests with clean 400s before services run, and **JSON Schema** expresses the same rules as a machine-readable, publishable contract — enforced pre-deserialization via networknt's validator and generatable from DTOs. The integration stack — DTOs for shape, annotations for rules, `@RestControllerAdvice` for consistent errors, OpenAPI for docs, JSON Schema for cross-language contracts — is how a production API makes its JSON contract explicit at every layer. The discipline: validate at the boundary, keep shape-rules in DTOs and business-rules in services, and make the error response as deliberate as the success one.
+

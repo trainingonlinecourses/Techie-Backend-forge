@@ -24,20 +24,26 @@ docs:
 
 ## Why Not ReentrantReadWriteLock?
 
+
+**What this code does — step by step:**
+
+1. ReentrantReadWriteLock is good but has a problem: Writers can starve — readers keep getting access, writers wait forever
+2. Many readers can hold the lock simultaneously
+3. `rwLock.readLock().lock();` — Reader 1 ✓. Reader 2 ✓. Reader 3 ✓
+4. Writer waits until ALL readers release
+5. `rwLock.writeLock().lock();` — Writer waits... and waits... ⏳
+6. StampedLock fixes this with optimistic reads
+
+The same code, clean:
+
 ```java
-// ReentrantReadWriteLock is good but has a problem:
-// Writers can starve — readers keep getting access, writers wait forever
 ReentrantReadWriteLock rwLock = new ReentrantReadWriteLock();
 
-// Many readers can hold the lock simultaneously
-rwLock.readLock().lock();    // Reader 1 ✓
-rwLock.readLock().lock();    // Reader 2 ✓
-rwLock.readLock().lock();    // Reader 3 ✓
+rwLock.readLock().lock();
+rwLock.readLock().lock();
+rwLock.readLock().lock();
 
-// Writer waits until ALL readers release
-rwLock.writeLock().lock();   // Writer waits... and waits... ⏳
-
-// StampedLock fixes this with optimistic reads
+rwLock.writeLock().lock();
 ```
 
 ---
@@ -46,7 +52,6 @@ rwLock.writeLock().lock();   // Writer waits... and waits... ⏳
 
 ### 1. Exclusive Write Lock
 
-```java
 StampedLock lock = new StampedLock();
 
 // Write lock — exclusive access
@@ -57,11 +62,9 @@ try {
 } finally {
     lock.unlockWrite(stamp);  // ALWAYS unlock in finally
 }
-```
 
 ### 2. Pessimistic Read Lock
 
-```java
 // Read lock — shared access (multiple readers allowed)
 long stamp = lock.readLock();
 try {
@@ -70,32 +73,42 @@ try {
 } finally {
     lock.unlockRead(stamp);
 }
-```
 
 ### 3. Optimistic Read (The Superpower!)
 
+
+**What this code does — step by step:**
+
+1. Optimistic read — NO LOCK AT ALL!
+2. Read without locking
+3. Validate — did a write happen while we were reading?
+4. A write occurred — fall back to pessimistic read
+5. Use the values we read
+
+The same code, clean:
+
 ```java
-// Optimistic read — NO LOCK AT ALL!
-long stamp = lock.tryOptimisticRead();
+public class Main {
 
-// Read without locking
-int currentBalance = balance;
-long lastUpdate = timestamp;
+    public static void main(String[] args) {
+        long stamp = lock.tryOptimisticRead();
 
-// Validate — did a write happen while we were reading?
-if (!lock.validate(stamp)) {
-    // A write occurred — fall back to pessimistic read
-    stamp = lock.readLock();
-    try {
-        currentBalance = balance;
-        lastUpdate = timestamp;
-    } finally {
-        lock.unlockRead(stamp);
+        int currentBalance = balance;
+        long lastUpdate = timestamp;
+
+        if (!lock.validate(stamp)) {
+            stamp = lock.readLock();
+            try {
+                currentBalance = balance;
+                lastUpdate = timestamp;
+            } finally {
+                lock.unlockRead(stamp);
+            }
+        }
+
+        System.out.println("Balance: " + currentBalance);
     }
 }
-
-// Use the values we read
-System.out.println("Balance: " + currentBalance);
 ```
 
 **Why is this amazing?** The optimistic read path has **zero locking overhead** — it's as fast as an unprotected read. Only when a write conflict is detected does it fall back to a real lock.
@@ -104,13 +117,23 @@ System.out.println("Balance: " + currentBalance);
 
 ## Complete Example
 
+
+**What this code does — step by step:**
+
+1. Exclusive write
+2. Pessimistic read (when you need to do complex processing)
+3. Complex calculation — hold read lock for a while
+4. Optimistic read (for simple, fast reads)
+5. Fall back to pessimistic read
+
+The same code, clean:
+
 ```java
 public class Point {
     private final StampedLock lock = new StampedLock();
     private double x;
     private double y;
 
-    // Exclusive write
     public void move(double deltaX, double deltaY) {
         long stamp = lock.writeLock();
         try {
@@ -121,25 +144,21 @@ public class Point {
         }
     }
 
-    // Pessimistic read (when you need to do complex processing)
     public double distanceFromOrigin() {
         long stamp = lock.readLock();
         try {
-            // Complex calculation — hold read lock for a while
             return Math.sqrt(x * x + y * y);
         } finally {
             lock.unlockRead(stamp);
         }
     }
 
-    // Optimistic read (for simple, fast reads)
     public double distanceFromOriginOptimistic() {
         long stamp = lock.tryOptimisticRead();
         double currentX = x;
         double currentY = y;
 
         if (!lock.validate(stamp)) {
-            // Fall back to pessimistic read
             stamp = lock.readLock();
             try {
                 currentX = x;
@@ -158,23 +177,29 @@ public class Point {
 
 ## Convert Between Lock Modes
 
+
+**What this code does — step by step:**
+
+1. Upgrade from read to write
+2. ... reading ...
+3. Need to write — upgrade the lock
+4. Successfully upgraded to write lock
+5. ... writing ...
+6. Couldn't upgrade — unlock read and get write lock
+7. ... writing ...
+
+The same code, clean:
+
 ```java
-// Upgrade from read to write
 long stamp = lock.readLock();
 try {
-    // ... reading ...
 
-    // Need to write — upgrade the lock
     long writeStamp = lock.tryConvertToWriteLock(stamp);
     if (writeStamp != 0L) {
-        // Successfully upgraded to write lock
         stamp = writeStamp;
-        // ... writing ...
     } else {
-        // Couldn't upgrade — unlock read and get write lock
         lock.unlockRead(stamp);
         stamp = lock.writeLock();
-        // ... writing ...
     }
 } finally {
     lock.unlock(stamp);
@@ -187,6 +212,17 @@ try {
 
 ### Scenario 1: High-Performance Configuration Cache
 
+
+**What this code does — step by step:**
+
+1. Optimistic read — zero overhead, millions per second
+2. Rare case: config was updated while we read
+3. Write — exclusive access
+4. `config = newConfig;` — Volatile write — visible to all threads
+5. Bulk update
+
+The same code, clean:
+
 ```java
 @Service
 public class ConfigurationCache {
@@ -194,13 +230,11 @@ public class ConfigurationCache {
     private final StampedLock lock = new StampedLock();
     private volatile Map<String, String> config = new HashMap<>();
 
-    // Optimistic read — zero overhead, millions per second
     public String get(String key) {
         long stamp = lock.tryOptimisticRead();
         String value = config.get(key);
 
         if (!lock.validate(stamp)) {
-            // Rare case: config was updated while we read
             stamp = lock.readLock();
             try {
                 value = config.get(key);
@@ -212,19 +246,17 @@ public class ConfigurationCache {
         return value;
     }
 
-    // Write — exclusive access
     public void update(String key, String value) {
         long stamp = lock.writeLock();
         try {
             Map<String, String> newConfig = new HashMap<>(config);
             newConfig.put(key, value);
-            config = newConfig;  // Volatile write — visible to all threads
+            config = newConfig;
         } finally {
             lock.unlockWrite(stamp);
         }
     }
 
-    // Bulk update
     public void updateAll(Map<String, String> updates) {
         long stamp = lock.writeLock();
         try {
@@ -240,7 +272,6 @@ public class ConfigurationCache {
 
 ### Scenario 2: Financial Account Balance
 
-```java
 public class BankAccount {
 
     private final StampedLock lock = new StampedLock();
@@ -278,7 +309,6 @@ public class BankAccount {
         }
     }
 }
-```
 
 ---
 
@@ -305,3 +335,4 @@ public class BankAccount {
 | Using for complex lock logic | Hard to maintain | Use `ReentrantReadWriteLock` for complex scenarios |
 | Not checking `tryConvertToWriteLock` return | 0L means upgrade failed | Always check the return value |
 | Over-optimizing with optimistic reads | Validation cost may exceed read lock cost | Profile before choosing |
+

@@ -1,7 +1,7 @@
 ---
 title: Spring Session — Distributed Session Management
 summary: How Spring Session externalizes HTTP sessions to Redis/JDBC, enabling session sharing across instances, sticky-session-free scaling, and session listeners for real-time features.
-order: 1
+order: 4
 minutes: 25
 topics: ["spring-session", "redis sessions", "jdbc sessions", "session repository", "session events"]
 docs:
@@ -71,7 +71,6 @@ spring:
 
 ### Step 3: Annotate Your Application
 
-```java
 package com.example;
 
 import org.springframework.boot.SpringApplication;
@@ -85,7 +84,6 @@ public class Application {
         SpringApplication.run(Application.class, args);
     }
 }
-```
 
 **That's it.** Your sessions are now stored in Redis. Every instance of your app reads/writes to the same Redis, so sessions are shared.
 
@@ -152,7 +150,6 @@ CREATE TABLE SPRING_SESSION (
 
 ## Session Attributes in Practice
 
-```java
 @RestController
 @RequestMapping("/api/cart")
 public class ShoppingCartController {
@@ -204,13 +201,11 @@ public class ShoppingCartController {
         return ResponseEntity.noContent().build();
     }
 }
-```
 
 ---
 
 ## Session Events — Reacting to Session Lifecycle
 
-```java
 @Component
 public class SessionEventListener {
 
@@ -249,13 +244,11 @@ public class SessionEventListener {
             new UserLogoutEvent(sessionId));
     }
 }
-```
 
 ---
 
 ## Session Repository — Direct Access
 
-```java
 @Service
 public class SessionAdminService {
 
@@ -290,7 +283,6 @@ public class SessionAdminService {
             .toList();
     }
 }
-```
 
 ---
 
@@ -314,3 +306,4 @@ public class SessionAdminService {
 | Microservices | OAuth2 + JWT (each service validates independently) |
 | Single-page apps | Access tokens with refresh rotation |
 | Serverless | No session state — use a database directly |
+

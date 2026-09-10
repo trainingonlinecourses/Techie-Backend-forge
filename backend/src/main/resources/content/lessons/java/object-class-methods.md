@@ -1,7 +1,7 @@
 ---
 title: The Object Class — Every Class's Hidden Parent
 summary: toString, equals, hashCode, getClass, clone and finalize — what each method does, how every Java object inherits them, and why organizations override three of them in almost every entity.
-order: 68
+order: 58
 minutes: 25
 topics: [object-class, tostring, equals, hashcode, getclass, clone]
 docs:
@@ -12,15 +12,11 @@ docs:
 
 Here is a fact that surprises most beginners: **every single class you ever write in Java automatically extends `java.lang.Object`** — even when you don't write `extends` at all.
 
-```java
 public class Customer { }
-```
 
 Behind the scenes the compiler treats this as:
 
-```java
 public class Customer extends Object { }
-```
 
 Why does this matter? Because it means **every object in your application already has 11 methods** the moment it is created: `toString()`, `equals()`, `hashCode()`, `getClass()`, `clone()`, `finalize()`, `wait()` (3 overloads), and `notify()`/`notifyAll()`. You never wrote them — they came free from `Object`.
 
@@ -32,11 +28,14 @@ The catch: the inherited default implementations are usually **not what you want
 
 ### What the default does
 
-```java
-Customer c = new Customer();
-System.out.println(c);
-// Prints something like: Customer@1b6d3586
-```
+public class Main {
+
+    public static void main(String[] args) {
+        Customer c = new Customer();
+        System.out.println(c);
+        // Prints something like: Customer@1b6d3586
+    }
+}
 
 Line by line:
 
@@ -49,20 +48,30 @@ That output is useless for debugging. Which customer is it? What's their email? 
 
 ### Why organizations always override it
 
+
+**What this code does — step by step:**
+
+1. `this.id = id;` — store the id on THIS instance's field
+2. `this.email = email;` — store the email on THIS instance's field
+3. `@Override` — ask compiler to verify Object really has this method
+4. `public String toString() {` — same signature as Object.toString()
+5. build a human-readable description using our fields
+
+The same code, clean:
+
 ```java
 public class Customer {
     private final Long id;
     private final String email;
 
     public Customer(Long id, String email) {
-        this.id = id;          // store the id on THIS instance's field
-        this.email = email;    // store the email on THIS instance's field
+        this.id = id;
+        this.email = email;
     }
 
-    @Override                                       // ask compiler to verify Object really has this method
-    public String toString() {                      // same signature as Object.toString()
+    @Override
+    public String toString() {
         return "Customer{id=" + id + ", email='" + email + "'}";
-        // build a human-readable description using our fields
     }
 }
 ```
@@ -75,23 +84,37 @@ Now logging `c` prints `Customer{id=42, email='amy@corp.com'}` — immediately u
 
 ### What the default does
 
-```java
-Customer a = new Customer(1L, "amy@corp.com");
-Customer b = new Customer(1L, "amy@corp.com");
-System.out.println(a.equals(b)); // false !!
-```
+public class Main {
+
+    public static void main(String[] args) {
+        Customer a = new Customer(1L, "amy@corp.com");
+        Customer b = new Customer(1L, "amy@corp.com");
+        System.out.println(a.equals(b)); // false !!
+    }
+}
 
 The default `equals()` is just `==` — it compares **memory addresses**, asking "is this literally the same object?" Two separate objects holding identical data are *not* the same object, so it returns false.
 
 But in business terms these ARE the same customer. That's why we override:
 
+
+**What this code does — step by step:**
+
+1. `public boolean equals(Object o) {` — must take Object, not Customer — see pitfall below
+2. `if (this == o) return true;` — fast path: same reference means trivially equal
+3. `if (!(o instanceof Customer)) return false;` — different type can never be equal
+4. `Customer other = (Customer) o;` — now safe to cast, we know the type
+5. `return id.equals(other.id);` — compare by BUSINESS identity (the id field)
+
+The same code, clean:
+
 ```java
 @Override
-public boolean equals(Object o) {          // must take Object, not Customer — see pitfall below
-    if (this == o) return true;            // fast path: same reference means trivially equal
-    if (!(o instanceof Customer)) return false; // different type can never be equal
-    Customer other = (Customer) o;         // now safe to cast, we know the type
-    return id.equals(other.id);            // compare by BUSINESS identity (the id field)
+public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof Customer)) return false;
+    Customer other = (Customer) o;
+    return id.equals(other.id);
 }
 ```
 
@@ -110,21 +133,22 @@ Hash-based collections (`HashMap`, `HashSet`) work in two steps: find the right 
 
 If you override `equals()` but not `hashCode()`, lookups break silently:
 
-```java
-Set<Customer> customers = new HashSet<>();
-customers.add(new Customer(1L, "amy@corp.com"));
-customers.add(new Customer(1L, "amy@corp.com"));
-System.out.println(customers.size()); // 2 — duplicate! hashCode defaults differ
-```
+public class Main {
+
+    public static void main(String[] args) {
+        Set<Customer> customers = new HashSet<>();
+        customers.add(new Customer(1L, "amy@corp.com"));
+        customers.add(new Customer(1L, "amy@corp.com"));
+        System.out.println(customers.size()); // 2 — duplicate! hashCode defaults differ
+    }
+}
 
 The fix:
 
-```java
 @Override
 public int hashCode() {
     return Objects.hash(id);   // utility builds hash from the SAME fields used in equals()
 }
-```
 
 - `Objects.hash(...)` takes your equality fields and combines them safely.
 - Use exactly the same field list as `equals()`. Fewer or more fields breaks the contract.
@@ -134,11 +158,9 @@ public int hashCode() {
 
 ## Method 4: `getClass()` — "What am I, really?"
 
-```java
 Object obj = new ArrayList<String>();
 System.out.println(obj.getClass());              // class java.util.ArrayList
 System.out.println(obj.getClass().getSimpleName()); // ArrayList
-```
 
 - Returns the **runtime class**, ignoring the declared variable type.
 - It's `final` — you cannot override it. Every object honestly reports its actual type.
@@ -148,12 +170,10 @@ Frameworks live on this method: Spring inspects `getClass()` plus annotations to
 
 ## Method 5: `clone()` — copying objects (and why orgs avoid it)
 
-```java
 @Override
 public Customer clone() throws CloneNotSupportedException {
     return (Customer) super.clone();   // shallow-copies all fields bitwise
 }
-```
 
 - Requires implementing the marker interface `Cloneable`, otherwise `super.clone()` throws.
 - Produces a **shallow copy**: nested objects are shared between original and clone — mutating the clone's address mutates the original's too.
@@ -184,3 +204,4 @@ Because shallow-copy surprises cause real bugs, modern teams prefer:
 | `equals` uses 5 fields, `hashCode` uses 2 | Duplicate entries in HashSets | Identical field sets in both |
 | Mutating hash-relevant fields after adding to a Set | `contains()` returns false forever | Hash only immutable fields |
 | Relying on default `toString()` in logs | Unreadable logs during incidents | Override or use records/Lombok `@ToString` |
+

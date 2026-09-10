@@ -24,7 +24,6 @@ Here is the single most important fact about Java generics, and almost every "we
 
 Let's trace what the compiler does with a generic class. Take our `Box<T>` from the first lesson:
 
-```java
 // What YOU write:
 public class Box<T> {
     private T contents;
@@ -38,11 +37,9 @@ public class Box {
     public void put(Object item) { this.contents = item; }
     public Object get() { return contents; }
 }
-```
 
 And at the call site:
 
-```java
 // What YOU write:
 Box<String> box = new Box<>();
 String s = box.get();
@@ -50,7 +47,6 @@ String s = box.get();
 // What the compiler emits:
 Box box = new Box();          // no type arguments survive
 String s = (String) box.get(); // a cast is inserted for you
-```
 
 Notice the key mechanics: `T` was replaced with `Object` (its erasure), and the compiler inserted a cast at the point where you read a value back. The type checking happened at compile time; the runtime only needs the cast to keep the old bytecode contract. This is why your `get()` call can never throw a surprise `ClassCastException` — the compiler already verified that only `String`s went in.
 
@@ -58,11 +54,9 @@ Notice the key mechanics: `T` was replaced with `Object` (its erasure), and the 
 
 If a type parameter has a bound, it erases to the bound instead of `Object`:
 
-```java
 public static <T extends Comparable<T>> T max(List<T> list) { ... }
 // erases to:
 public static Comparable max(List list) { ... }
-```
 
 That's why the `compareTo` call worked in the previous lesson: after erasure, `T` is `Comparable`, and `Comparable` has `compareTo`. The bound serves double duty — it lets *you* call methods on `T` at compile time, and it determines the erasure.
 
@@ -86,9 +80,7 @@ Because the JVM can't see type arguments, the compiler must forbid things that w
 
 When you write:
 
-```java
 List<String> strings = new ArrayList();   // raw ArrayList!
-```
 
 the compiler can't verify safety, so it emits an **unchecked warning**. The danger: after erasure, that raw `ArrayList` is identical to a `List<Integer>` you might create elsewhere. If you pass the raw list somewhere expecting `List<Integer>`, and it happens to contain a `String`, you get a `ClassCastException` *at runtime* — the one thing generics were supposed to prevent.
 
@@ -98,7 +90,6 @@ This situation — a variable of a parameterized type pointing to an object of a
 
 Here's a subtle consequence. Suppose you have:
 
-```java
 class Parent implements Comparable<Parent> {
     public int compareTo(Parent other) { ... }
 }
@@ -108,7 +99,6 @@ class Child extends Parent {
     // than Parent's compareTo(Parent)! Overriding would silently break.
     public int compareTo(Child other) { ... }
 }
-```
 
 After erasure, `Child.compareTo(Child)` does *not* override `Parent.compareTo(Parent)` — the signatures differ. To preserve polymorphic behavior, the compiler generates a hidden **bridge method**: `compareTo(Parent other) { return compareTo((Child) other); }`. It bridges the erased signature to your real method. You never see bridge methods in source; you'll only notice them in decompiled bytecode or when reflection reports two seemingly duplicate methods. This is erasure working *for* you, keeping virtual dispatch correct.
 
@@ -116,7 +106,6 @@ After erasure, `Child.compareTo(Child)` does *not* override `Parent.compareTo(Pa
 
 The JVM doesn't know about type arguments in *most* places — but there's one famous exception: **generic superclass and field information is kept in the class file** for reflection. The compiler records the *actual* type arguments used in a class declaration (but not in local variables or casts).
 
-```java
 import java.lang.reflect.*;
 import java.util.List;
 
@@ -129,10 +118,10 @@ public class TypeInfo {
         System.out.println(pt.getActualTypeArguments()[0]); // class java.lang.String
     }
 }
-```
 
 This is how libraries like Jackson, Gson, and Spring's `ParameterizedTypeReference` figure out what type to deserialize into, even though the caller never passes a `Class`. It's the "back door" around erasure that powers huge amounts of framework magic.
 
 ## Recap
 
 Type erasure means generics exist only at compile time: `T` becomes `Object` (or its bound), and casts are inserted at read sites. This explains every generics restriction — no `instanceof T`, no `new T[]`, no static `T`, no generic exceptions. It also explains unchecked warnings, which are the compiler telling you it could not verify safety and heap pollution is possible. Bridge methods keep polymorphism intact across erasure, and the generic-supertype metadata gives reflection a narrow back door that frameworks exploit. Internalize erasure and the rest of generics — including the error messages — becomes predictable.
+

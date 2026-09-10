@@ -45,22 +45,16 @@ Click the extension icon → it connects to `localhost:35729` → green indicato
 
 ## How It Works
 
+
+**What this code does — step by step:**
+
+1. Spring Boot DevTools automatically: 1. Starts a LiveReload server on port 35729. 2. Watches classpath for changes. 3. On change: triggers browser refresh via WebSocket
+2. What triggers a refresh: - Static resource changes (HTML, CSS, JS). - Template changes (Thymeleaf, FreeMarker). - Property file changes. - Template engine configuration changes
+3. What does NOT trigger a refresh: - Java class changes (these trigger a restart, not just refresh). - Entity changes. - Configuration class changes
+
+The same code, clean:
+
 ```java
-// Spring Boot DevTools automatically:
-// 1. Starts a LiveReload server on port 35729
-// 2. Watches classpath for changes
-// 3. On change: triggers browser refresh via WebSocket
-
-// What triggers a refresh:
-// - Static resource changes (HTML, CSS, JS)
-// - Template changes (Thymeleaf, FreeMarker)
-// - Property file changes
-// - Template engine configuration changes
-
-// What does NOT trigger a refresh:
-// - Java class changes (these trigger a restart, not just refresh)
-// - Entity changes
-// - Configuration class changes
 ```
 
 ---
@@ -91,3 +85,4 @@ Click the extension icon → it connects to `localhost:35729` → green indicato
 | Not installing browser extension | No auto-refresh | Install LiveReload extension |
 | Using in production | Security risk + performance | DevTools only activates in dev |
 | Conflicting with other tools | Port 35729 occupied | Change port in config |
+

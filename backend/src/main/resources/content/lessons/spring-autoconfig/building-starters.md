@@ -1,7 +1,7 @@
 ---
 title: Custom Auto-Configuration — Building Your Own Starters
 summary: How to create custom auto-configuration classes, register them with Spring Boot, build reusable starters, and how organizations package shared behavior.
-order: 3
+order: 2
 minutes: 25
 topics: [custom-autoconfiguration, starter, META-INF, spring.factories, conditional]
 docs:
@@ -15,13 +15,20 @@ When you add `spring-boot-starter-data-jpa` to your project, Spring Boot automat
 
 Now imagine you want to create your own reusable library. You want other developers to just add your dependency and have it work automatically. That's **custom auto-configuration**.
 
+
+**What this code does — step by step:**
+
+1. Your library provides this:
+2. Users just add your starter and it works: <dependency>. <groupId>com.yourcompany</groupId>. <artifactId>your-redis-spring-boot-starter</artifactId>. <version>1.0.0</version>. </dependency>
+
+The same code, clean:
+
 ```java
-// Your library provides this:
 @AutoConfiguration
 @ConditionalOnClass(RedisOperations.class)
 @EnableConfigurationProperties(MyRedisProperties.class)
 public class MyRedisAutoConfiguration {
-    
+
     @Bean
     @ConditionalOnMissingBean
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory) {
@@ -30,13 +37,6 @@ public class MyRedisAutoConfiguration {
         return template;
     }
 }
-
-// Users just add your starter and it works:
-// <dependency>
-//     <groupId>com.yourcompany</groupId>
-//     <artifactId>your-redis-spring-boot-starter</artifactId>
-//     <version>1.0.0</version>
-// </dependency>
 ```
 
 ---
@@ -44,6 +44,17 @@ public class MyRedisAutoConfiguration {
 ## How to Create a Custom Auto-Configuration
 
 ### Step 1: Create the Configuration Class
+
+
+**What this code does — step by step:**
+
+1. `@AutoConfiguration` — Marks this as auto-configuration
+2. `@ConditionalOnClass(EmailService.class)` — Only if EmailService exists
+3. `@EnableConfigurationProperties(EmailProperties.class)` — Enable properties binding
+4. Only create if no EmailService bean exists
+5. Only if SMTP is on classpath
+
+The same code, clean:
 
 ```java
 package com.yourcompany.email.autoconfigure;
@@ -53,12 +64,11 @@ import org.springframework.boot.autoconfigure.condition.*;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.*;
 
-@AutoConfiguration  // Marks this as auto-configuration
-@ConditionalOnClass(EmailService.class)  // Only if EmailService exists
-@EnableConfigurationProperties(EmailProperties.class)  // Enable properties binding
+@AutoConfiguration
+@ConditionalOnClass(EmailService.class)
+@EnableConfigurationProperties(EmailProperties.class)
 public class EmailAutoConfiguration {
-    
-    // Only create if no EmailService bean exists
+
     @Bean
     @ConditionalOnMissingBean
     public EmailService emailService(EmailProperties properties) {
@@ -68,8 +78,7 @@ public class EmailAutoConfiguration {
             properties.getUsername()
         );
     }
-    
-    // Only if SMTP is on classpath
+
     @Bean
     @ConditionalOnClass(name = "javax.mail.Transport")
     @ConditionalOnMissingBean
@@ -81,7 +90,6 @@ public class EmailAutoConfiguration {
 
 ### Step 2: Create Properties Class
 
-```java
 package com.yourcompany.email.autoconfigure;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -101,7 +109,6 @@ public record EmailProperties(
         enabled = true;
     }
 }
-```
 
 ### Step 3: Register with Spring Boot
 
@@ -121,6 +128,20 @@ com.yourcompany.email.autoconfigure.EmailAutoConfiguration
 
 ## Line-by-Line Walkthrough
 
+
+**What this code does — step by step:**
+
+1. Line 1: The auto-configuration class
+2. `@AutoConfiguration(after = DataSourceAutoConfiguration.class)` — Run after datasource is configured
+3. `@ConditionalOnClass(SmtpClient.class)` — Only if email client exists
+4. Line 2: Properties bean
+5. Line 3: Main service bean
+6. Line 4: Optional SMTP sender
+7. Line 5: Health indicator
+8. Line 6: Properties with validation
+
+The same code, clean:
+
 ```java
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.*;
@@ -128,37 +149,32 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.*;
 import org.springframework.boot.bind.relaxedBinding;
 
-// Line 1: The auto-configuration class
-@AutoConfiguration(after = DataSourceAutoConfiguration.class)  // Run after datasource is configured
-@ConditionalOnClass(SmtpClient.class)  // Only if email client exists
+@AutoConfiguration(after = DataSourceAutoConfiguration.class)
+@ConditionalOnClass(SmtpClient.class)
 @ConditionalOnProperty(prefix = "app.email", name = "enabled", havingValue = "true", matchIfMissing = true)
 @EnableConfigurationProperties(EmailProperties.class)
 public class EmailAutoConfiguration {
-    
-    // Line 2: Properties bean
+
     @Bean
     @ConfigurationProperties(prefix = "app.email")
     public EmailProperties emailProperties() {
         return new EmailProperties();
     }
-    
-    // Line 3: Main service bean
+
     @Bean
     @ConditionalOnMissingBean(EmailService.class)
     public EmailService emailService(EmailProperties properties, 
                                       ApplicationContext context) {
         return new DefaultEmailService(properties, context);
     }
-    
-    // Line 4: Optional SMTP sender
+
     @Bean
     @ConditionalOnClass(name = "javax.mail.Transport")
     @ConditionalOnMissingBean(EmailSender.class)
     public EmailSender smtpSender(EmailProperties properties) {
         return new SmtpEmailSender(properties);
     }
-    
-    // Line 5: Health indicator
+
     @Bean
     @ConditionalOnBean(EmailService.class)
     public EmailHealthIndicator emailHealthIndicator(EmailService service) {
@@ -166,7 +182,6 @@ public class EmailAutoConfiguration {
     }
 }
 
-// Line 6: Properties with validation
 @ConfigurationProperties(prefix = "app.email")
 public record EmailProperties(
     @NotBlank String host,
@@ -184,7 +199,6 @@ public record EmailProperties(
 
 ### Scenario 1: Custom caching starter
 
-```java
 @AutoConfiguration
 @ConditionalOnClass(CacheManager.class)
 @EnableConfigurationProperties(CacheProperties.class)
@@ -213,16 +227,22 @@ public class SmartCacheAutoConfiguration {
 // app:
 //   cache:
 //     type: redis  # or caffeine
-```
 
 ### Scenario 2: Custom security starter
+
+
+**What this code does — step by step:**
+
+1. application.yml: app: security: public-endpoints: - /api/public/**. - /actuator/health
+
+The same code, clean:
 
 ```java
 @AutoConfiguration
 @ConditionalOnClass(SecurityFilterChain.class)
 @EnableConfigurationProperties(SecurityProperties.class)
 public class CustomSecurityAutoConfiguration {
-    
+
     @Bean
     @ConditionalOnMissingBean
     public SecurityFilterChain filterChain(HttpSecurity http, SecurityProperties props) throws Exception {
@@ -235,13 +255,6 @@ public class CustomSecurityAutoConfiguration {
             .build();
     }
 }
-
-// application.yml:
-// app:
-//   security:
-//     public-endpoints:
-//       - /api/public/**
-//       - /actuator/health
 ```
 
 ---
@@ -260,7 +273,6 @@ public class CustomSecurityAutoConfiguration {
 
 ## Testing Your Auto-Configuration
 
-```java
 @SpringBootTest
 class EmailAutoConfigurationTest {
     
@@ -285,4 +297,4 @@ class EmailAutoConfigurationTest {
             });
     }
 }
-```
+

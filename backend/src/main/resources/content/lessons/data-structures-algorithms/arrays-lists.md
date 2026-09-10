@@ -1,7 +1,7 @@
 ---
 title: Arrays and Lists — Contiguous Memory vs Linked Nodes
 module: data-structures-algorithms
-order: 2
+order: 1
 minutes: 24
 topics: ["arrays", "ArrayList", "LinkedList", "memory layout", "amortized analysis"]
 summary: An array and a linked list both store a sequence of elements — but they organize memory in fundamentally different ways, and that difference decide...
@@ -26,25 +26,36 @@ An **array** and a **linked list** both store a sequence of elements — but the
 
 ## Java's Implementations: ArrayList vs LinkedList
 
+
+**What this code does — step by step:**
+
+1. ArrayList: array-backed. The DEFAULT choice in Java.
+2. `arrayList.add("a");` — O(1) amortized append
+3. `arrayList.add(1, "X");` — O(n): shifts b right to make room
+4. `System.out.println(arrayList.get(2));` — "b" — O(1) random access
+5. LinkedList: node-based. Almost always the WRONG choice in Java.
+6. `linkedList.add("a");` — O(1)
+7. `linkedList.add(1, "X");` — O(1) IF you have the node; O(n) here,. Because we must WALK to index 1 first.
+8. `System.out.println(linkedList.get(2));` — O(n) — walk from the head
+
+The same code, clean:
+
 ```java
 import java.util.*;
 
 public class ListsDemo {
     public static void main(String[] args) {
-        // ArrayList: array-backed. The DEFAULT choice in Java.
         List<String> arrayList = new ArrayList<>();
-        arrayList.add("a");       // O(1) amortized append
+        arrayList.add("a");
         arrayList.add("b");
-        arrayList.add(1, "X");    // O(n): shifts b right to make room
-        System.out.println(arrayList.get(2));  // "b" — O(1) random access
+        arrayList.add(1, "X");
+        System.out.println(arrayList.get(2));
 
-        // LinkedList: node-based. Almost always the WRONG choice in Java.
         List<String> linkedList = new LinkedList<>();
-        linkedList.add("a");      // O(1)
+        linkedList.add("a");
         linkedList.add("b");
-        linkedList.add(1, "X");   // O(1) IF you have the node; O(n) here,
-                                  // because we must WALK to index 1 first.
-        System.out.println(linkedList.get(2)); // O(n) — walk from the head
+        linkedList.add(1, "X");
+        System.out.println(linkedList.get(2));
     }
 }
 ```
@@ -84,7 +95,6 @@ Here's what pure Big-O misses: **cache locality**. Modern CPUs read memory in bl
 
 ## The Iterator Gotcha: Concurrent Modification
 
-```java
 List<String> words = new ArrayList<>(List.of("a", "b", "c"));
 
 // CORRECT: remove through the iterator — safe and O(n) total.
@@ -96,10 +106,10 @@ while (it.hasNext()) {
 // WRONG: modifying the list while iterating throws
 // ConcurrentModificationException:
 // for (String w : words) { if (w.equals("b")) words.remove(w); }
-```
 
 The enhanced for-loop hides the iterator; calling `list.remove` while iterating changes the structure the iterator relies on, and Java's *fail-fast* design throws `ConcurrentModificationException` rather than silently corrupt the iteration. Removing through the iterator itself is the sanctioned path.
 
 ## Recap
 
 Arrays store elements contiguously, giving O(1) random access and cache-friendly traversal at the cost of shifting on middle inserts; linked lists scatter nodes connected by pointers, giving O(1) pointer rewiring but O(n) access and poor cache behavior. In Java, `ArrayList` is the default because its O(1) amortized appends and O(1) indexed access match how most code actually uses lists — `LinkedList`'s theoretical advantages rarely materialize outside iterator-based middle operations. Understand the two memory models, the amortized-growth trick, and the cache-locality constant factor, and the "which list?" question answers itself.
+

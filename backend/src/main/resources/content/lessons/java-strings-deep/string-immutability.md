@@ -1,7 +1,7 @@
 ---
 title: Why Strings Are Immutable
 module: java-strings-deep
-order: 1
+order: 2
 minutes: 22
 topics: ["immutability", "String internals", "security", "caching", "value objects"]
 summary: Imagine you write your name on a piece of paper. Now imagine that any program running on your computer could quietly erase part of your name and wr...
@@ -20,10 +20,8 @@ An **immutable object** is the opposite: once it is created, its contents can **
 
 `String` in Java is immutable. When you write:
 
-```java
 String name = "Sateesh";
 name = name.toUpperCase();   // this does NOT change the original
-```
 
 you might think `name` changed from `"Sateesh"` to `"SATEESH"`. But what actually happens is:
 
@@ -53,28 +51,41 @@ Because a `String` can't change, the JVM is free to **reuse** the same object fo
 
 Let's look at real code and trace exactly what happens:
 
+
+**What this code does — step by step:**
+
+1. Step 1: a String object is created
+2. `String b = a;` — b points to the SAME object as a
+3. Step 2: "modify" a through a method call
+4. `System.out.println("a = " + a);` — prints: hello
+5. `System.out.println("b = " + b);` — prints: hello (b still sees the original)
+6. `System.out.println("c = " + c);` — prints: hello world
+7. Step 3: prove a and b reference the same (unchanged) object
+8. `System.out.println(a == b);` — prints: true (same object)
+9. Step 4: a String method NEVER mutates its receiver
+10. `System.out.println(a);` — still: hello
+11. `System.out.println(d);` — HELLO — a brand-new object
+
+The same code, clean:
+
 ```java
 public class ImmutabilityDemo {
 
     public static void main(String[] args) {
-        // Step 1: a String object is created
         String a = "hello";
-        String b = a;              // b points to the SAME object as a
+        String b = a;
 
-        // Step 2: "modify" a through a method call
         String c = a.concat(" world");
 
-        System.out.println("a = " + a);   // prints: hello
-        System.out.println("b = " + b);   // prints: hello  (b still sees the original)
-        System.out.println("c = " + c);   // prints: hello world
+        System.out.println("a = " + a);
+        System.out.println("b = " + b);
+        System.out.println("c = " + c);
 
-        // Step 3: prove a and b reference the same (unchanged) object
-        System.out.println(a == b);       // prints: true  (same object)
+        System.out.println(a == b);
 
-        // Step 4: a String method NEVER mutates its receiver
         String d = a.toUpperCase();
-        System.out.println(a);            // still: hello
-        System.out.println(d);            // HELLO — a brand-new object
+        System.out.println(a);
+        System.out.println(d);
     }
 }
 ```
@@ -97,12 +108,10 @@ public class ImmutabilityDemo {
 
 Sometimes you genuinely need to build or modify text incrementally — in a loop, for example. That's what `StringBuilder` is for (next lesson). The point of this lesson is: **the `String` class itself never mutates**. The APIs that look like mutation (`concat`, `replace`, `substring`, `toUpperCase`, `trim`, ...) all return new objects.
 
-```java
 // Looks like mutation, is actually 3 objects
 String s = "a";
 s = s + "b";   // new object "ab"
 s = s + "c";   // new object "abc"
-```
 
 Each `+` creates a new `String`. For one-off concatenations that's fine; inside a loop of thousands of iterations it wastes memory — which is exactly the problem `StringBuilder` solves.
 
@@ -119,3 +128,4 @@ Each `+` creates a new `String`. For one-off concatenations that's fine; inside 
 - Every `String` method that "changes" text actually returns a **new** object.
 - The original object is never modified — variables are just re-pointed.
 - Use `.equals()` for content comparison, never `==`.
+

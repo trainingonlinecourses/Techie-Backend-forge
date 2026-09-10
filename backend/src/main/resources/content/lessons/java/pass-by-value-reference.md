@@ -1,7 +1,7 @@
 ---
 title: Pass-by-Value vs Pass-by-Reference — The Definitive Guide
 summary: Why Java is always pass-by-value, the difference between copying primitives vs object references, and the common trap of trying to reassign parameters.
-order: 28
+order: 63
 minutes: 16
 topics: [pass-by-value, pass-by-reference, object-references, method-parameters, memory-model]
 docs:
@@ -35,7 +35,6 @@ Java uses pass-by-value. But here's the key insight: **for objects, the value be
 
 ### Type 1: Primitives — Copy of the Actual Value
 
-```java
 public static void main(String[] args) {
     int num = 10;
 
@@ -50,7 +49,6 @@ static void changeNumber(int n) {
     n = 99;  // This changes the COPY, not the original
     System.out.println("Inside method: " + n);     // 99
 }
-```
 
 **What happens step by step:**
 
@@ -72,7 +70,6 @@ Step 4: changeNumber() ends, n is destroyed
 
 ### Type 2: Objects — Copy of the Reference
 
-```java
 public static void main(String[] args) {
     int[] arr = {1, 2, 3};
 
@@ -86,7 +83,6 @@ public static void main(String[] args) {
 static void changeArray(int[] a) {
     a[0] = 99;  // This modifies the ORIGINAL array!
 }
-```
 
 **Why does this work? Because `a` is a COPY of the reference, pointing to the SAME object:**
 
@@ -110,7 +106,6 @@ Step 4: a is destroyed, but arr still points to the modified object
 
 ## The Proof: Reassigning a Reference
 
-```java
 public static void main(String[] args) {
     StringBuilder sb = new StringBuilder("Hello");
 
@@ -125,7 +120,6 @@ static void reassignReference(StringBuilder s) {
     s = new StringBuilder("World");  // Creates a NEW object, reassigns the local reference
     System.out.println("Inside: " + s);  // World
 }
-```
 
 **What happened:**
 
@@ -153,7 +147,6 @@ Step 4: s goes out of scope
 
 ### Scenario 1: Changing an Object's Fields (Works!)
 
-```java
 class User {
     String name;
     int age;
@@ -178,11 +171,9 @@ static void modifyUser(User u) {
     u.name = "Bob";     // ✅ Works! We're modifying the shared object
     u.age = 30;         // ✅ Works! Same object
 }
-```
 
 ### Scenario 2: Reassigning the Reference (Doesn't Affect Original)
 
-```java
 public static void main(String[] args) {
     User user = new User("Alice", 25);
 
@@ -197,11 +188,9 @@ static void replaceUser(User u) {
     u = new User("Bob", 30);  // Creates NEW object, doesn't affect original
     System.out.println("Inside: " + u.name);      // Bob
 }
-```
 
 ### Scenario 3: Collections
 
-```java
 public static void main(String[] args) {
     List<String> names = new ArrayList<>();
     names.add("Alice");
@@ -217,7 +206,6 @@ static void addName(List<String> list) {
     list.add("Bob");     // ✅ Modifies the shared list
     // list = new ArrayList<>();  // ❌ Would NOT affect original
 }
-```
 
 ---
 
@@ -253,66 +241,88 @@ static void addName(List<String> list) {
 
 ### Scenario 1: Method That "Fails" to Replace an Object
 
+
+**What this code does — step by step:**
+
+1. ❌ Common mistake: trying to replace an object in a method
+2. This doesn't work as expected!
+3. `this.currentUser = newUser;` — Only changes local field. If called from outside: service.switchUser(new User("Bob")). The caller's variable is NOT changed
+4. ✅ Better: return the new object
+5. `return newUser;` — Caller can capture the return value
+
+The same code, clean:
+
 ```java
-// ❌ Common mistake: trying to replace an object in a method
 public class UserService {
     private User currentUser;
 
-    // This doesn't work as expected!
     public void switchUser(User newUser) {
-        this.currentUser = newUser;  // Only changes local field
-        // If called from outside: service.switchUser(new User("Bob"))
-        // the caller's variable is NOT changed
+        this.currentUser = newUser;
     }
 }
 
-// ✅ Better: return the new object
 public class UserService {
     private User currentUser;
 
     public User switchUser(User newUser) {
         this.currentUser = newUser;
-        return newUser;  // Caller can capture the return value
+        return newUser;
     }
 }
 ```
 
 ### Scenario 2: Batch Updates (Works Because of Reference Copy)
 
+
+**What this code does — step by step:**
+
+1. This works because we modify the OBJECT, not the reference
+2. `item.setPrice(item.getPrice() * (1 - percent));` — Modifies shared object
+3. items list is modified — same list the caller has
+4. Usage
+5. `service.applyDiscount(myItems, 0.10);` — 10% discount
+6. myItems is now updated — each item's price is reduced by 10%
+
+The same code, clean:
+
 ```java
-// This works because we modify the OBJECT, not the reference
 public class OrderService {
     public void applyDiscount(List<OrderItem> items, double percent) {
         for (OrderItem item : items) {
-            item.setPrice(item.getPrice() * (1 - percent));  // Modifies shared object
+            item.setPrice(item.getPrice() * (1 - percent));
         }
-        // items list is modified — same list the caller has
     }
 }
 
-// Usage
 List<OrderItem> myItems = getItems();
-service.applyDiscount(myItems, 0.10);  // 10% discount
-// myItems is now updated — each item's price is reduced by 10%
+service.applyDiscount(myItems, 0.10);
 ```
 
 ### Scenario 3: Null Checks After Method Calls
 
+
+**What this code does — step by step:**
+
+1. ❌ This won't work
+2. `list = null;` — Only nulls the local copy
+3. ✅ This works
+4. `list.clear();` — Modifies the actual list object
+5. Usage
+6. names is still not null, but it's empty []
+
+The same code, clean:
+
 ```java
-// ❌ This won't work
 public static void clearList(List<String> list) {
-    list = null;  // Only nulls the local copy
+    list = null;
 }
 
-// ✅ This works
 public static void clearList(List<String> list) {
-    list.clear();  // Modifies the actual list object
+    list.clear();
 }
 
-// Usage
 List<String> names = new ArrayList<>(List.of("Alice", "Bob"));
 clearList(names);
-// names is still not null, but it's empty []
 ```
 
 ---
@@ -338,3 +348,4 @@ clearList(names);
 | Confused why reassignment doesn't work | `param = new Foo()` creates a new object, doesn't affect the original | If you need to replace, return the new object |
 | Thinking `final` prevents modification | `final` prevents reassignment, not field modification | `final` means you can't do `u = new User(...)`, but you CAN do `u.name = "Bob"` |
 | Modifying a String parameter | Strings are immutable — `s = s + "x"` creates a new String | Use StringBuilder instead |
+

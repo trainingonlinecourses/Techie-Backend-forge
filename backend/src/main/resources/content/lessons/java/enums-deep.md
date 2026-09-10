@@ -13,11 +13,9 @@ docs:
 
 Before Java 5 added enums, teams stored fixed values as raw ints or Strings:
 
-```java
 public static final int STATUS_PENDING  = 0;
 public static final int STATUS_ACTIVE   = 1;
 public static final int STATUS_FAILED   = 2;
-```
 
 Three things went wrong repeatedly:
 
@@ -29,12 +27,10 @@ An **enum** fixes all three. It is a full class whose instances are a fixed, com
 
 ## The Anatomy of an Enum
 
-```java
 public enum OrderState {
     CREATED, PAID, SHIPPED, DELIVERED, CANCELLED;
     //          ↑ each name is a static final instance of OrderState
 }
-```
 
 Behind the scenes the compiler generates:
 
@@ -49,36 +45,53 @@ Behind the scenes the compiler generates:
 
 Raw names aren't enough in production. A payments team attaches display metadata to each constant:
 
+
+**What this code does — step by step:**
+
+1. `PENDING("Pending", "amber", 0),` — each constant passes values to the constructor
+2. `private final String label;` — once set in the constructor, never changes → safe
+3. Each constant passes its data to this shared constructor
+4. `this.label = label;` — store on the instance
+5. `public String label() { return label; }` — frontend reads this
+6. `public String badgeColor() { return badgeColor; }` — CSS class selector
+7. `public boolean isTerminal() {` — business rule: can't move forward
+8. `return this == REFUNDED || this == FAILED;` — terminal states
+9. `public static PaymentStatus fromExternal(String code) {` — gateway sends "CAPTURED"
+10. `for (PaymentStatus s : values()) {` — check every constant
+11. `if (s.name().equalsIgnoreCase(code)) return s;` — case-insensitive match
+12. `throw new IllegalArgumentException("Unknown status: " + code);` — fail fast on garbage input
+
+The same code, clean:
+
 ```java
 public enum PaymentStatus {
-    PENDING("Pending", "amber", 0),        // each constant passes values to the constructor
+    PENDING("Pending", "amber", 0),
     AUTHORIZED("Authorized", "blue", 1),
     CAPTURED("Captured", "green", 2),
     REFUNDED("Refunded", "grey", 3),
     FAILED("Failed", "red", 4);
 
-    private final String label;             // once set in the constructor, never changes → safe
+    private final String label;
     private final String badgeColor;
     private final int displayOrder;
 
-    // Each constant passes its data to this shared constructor
     PaymentStatus(String label, String badgeColor, int displayOrder) {
-        this.label = label;                 // store on the instance
+        this.label = label;
         this.badgeColor = badgeColor;
         this.displayOrder = displayOrder;
     }
 
-    public String label() { return label; }                           // frontend reads this
-    public String badgeColor() { return badgeColor; }                 // CSS class selector
-    public boolean isTerminal() {                                     // business rule: can't move forward
-        return this == REFUNDED || this == FAILED;                    // terminal states
+    public String label() { return label; }
+    public String badgeColor() { return badgeColor; }
+    public boolean isTerminal() {
+        return this == REFUNDED || this == FAILED;
     }
 
-    public static PaymentStatus fromExternal(String code) {           // gateway sends "CAPTURED"
-        for (PaymentStatus s : values()) {                            // check every constant
-            if (s.name().equalsIgnoreCase(code)) return s;            // case-insensitive match
+    public static PaymentStatus fromExternal(String code) {
+        for (PaymentStatus s : values()) {
+            if (s.name().equalsIgnoreCase(code)) return s;
         }
-        throw new IllegalArgumentException("Unknown status: " + code);// fail fast on garbage input
+        throw new IllegalArgumentException("Unknown status: " + code);
     }
 }
 ```
@@ -99,7 +112,6 @@ Line-by-line:
 
 The most powerful idiom: give each constant its own implementation of an abstract method. This replaces every `switch` with polymorphic dispatch.
 
-```java
 public enum NotificationChannel {
     EMAIL {
         @Override public void send(Notification n) {
@@ -119,11 +131,9 @@ public enum NotificationChannel {
 
     public abstract void send(Notification n);   // each constant MUST implement this
 }
-```
 
 Now callers never branch:
 
-```java
 // BEFORE (fragile — new channel means updating every switch in the codebase):
 switch (channel) {
     case EMAIL: emailGateway.send(...); break;
@@ -134,7 +144,6 @@ switch (channel) {
 
 // AFTER (adding a channel means adding ONE constant; the compiler forces you to implement send):
 channel.send(notification);
-```
 
 > 💡 This is the same principle as Spring's Strategy pattern. Effective Java item 34 makes "prefer enums over int constants" a hard standard in most code review checklists.
 
@@ -142,7 +151,6 @@ channel.send(notification);
 
 Because enum constants are known at compile time and have integer ordinals, the JVM can back maps and sets with **arrays indexed by ordinal** instead of hash tables.
 
-```java
 // Count orders by state — no hashing, no bucket collisions
 EnumMap<OrderState, Long> counts = orderRepo.countByState();
 // Iteration happens in declaration order (CREATED → CANCELLED) — useful for reports
@@ -152,7 +160,6 @@ EnumSet<UserRole> roles = EnumSet.of(UserRole.ADMIN, UserRole.SUPPORT);
 if (roles.contains(UserRole.ADMIN)) {
     return adminController.handle(request);
 }
-```
 
 Line-by-line:
 
@@ -179,3 +186,4 @@ Line-by-line:
 | Mutable fields on enums | Thread-safety bugs | All fields must be `final` |
 | Calling `values()` in a hot loop | Unnecessary garbage allocation each time | Cache in a static final array |
 | Using int constants instead of enums | `sendEmail(3)` compiles with no safety | Enums = compile-time type safety |
+

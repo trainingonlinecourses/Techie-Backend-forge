@@ -1,7 +1,7 @@
 ---
 title: Application Events & Decoupling
 summary: Publish-subscribe inside the JVM, @EventListener, transactional events and when to reach for a broker.
-order: 8
+order: 21
 minutes: 15
 topics: [events, eventlistener, transactional-event, decoupling]
 docs:
@@ -15,12 +15,9 @@ docs:
 
 Spring's `ApplicationEventPublisher` gives you **in-process pub/sub**: one bean publishes, others listen, and neither knows the other exists. That's decoupling: `OrderService` doesn't import `AuditService`, `EmailService`, or `InventoryService`.
 
-```java
 // The event — an immutable record
 public record AccountCreatedEvent(UUID accountId) {}
-```
 
-```java
 // The publisher
 @Service
 public class AccountService {
@@ -35,9 +32,7 @@ public class AccountService {
         return AccountView.from(account);
     }
 }
-```
 
-```java
 // The listener
 @Component
 public class AuditListener {
@@ -46,13 +41,11 @@ public class AuditListener {
         audit.record("ACCOUNT_CREATED", e.accountId());
     }
 }
-```
 
 ## Synchronous by default
 
 `@EventListener` runs **synchronously in the publishing thread**. Exceptions in a listener propagate to the publisher (unless the listener handles them). That's fine for fast in-process work; for slow side effects, either keep them out of the request path or make them async:
 
-```java
 @Component
 public class NotificationListener {
     @Async                       // + @EnableAsync on a config class
@@ -61,13 +54,11 @@ public class NotificationListener {
         emailService.sendWelcome(e.accountId());   // runs on the async executor
     }
 }
-```
 
 ## @TransactionalEventListener — the important one
 
 Listeners that touch the database must wait until the transaction **commits**. `@TransactionalEventListener` does exactly that:
 
-```java
 @Component
 public class EmailListener {
 
@@ -78,7 +69,6 @@ public class EmailListener {
         emailService.sendWelcome(e.accountId());
     }
 }
-```
 
 Phases: `BEFORE_COMMIT`, `AFTER_COMMIT` (default for tx listeners), `AFTER_ROLLBACK`, `AFTER_COMPLETION`.
 
@@ -103,3 +93,4 @@ So: events decouple *code*, not *systems*. If a side effect must survive a crash
 - In-process events ≠ messaging; no durability, no retries, same JVM.
 
 **Official docs:** [Events](https://docs.spring.io/spring-framework/reference/core/beans/context-introduction.html#context-functionality-events) · [Transactional events](https://docs.spring.io/spring-framework/reference/data-access/transaction/event.html)
+

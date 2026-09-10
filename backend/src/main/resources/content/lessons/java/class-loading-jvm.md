@@ -1,7 +1,7 @@
 ---
 title: Class Loading & the JVM — Complete Beginner's Guide
 summary: How the JVM loads classes, the three class loaders, delegation model, and why classloader leaks crash redeployments.
-order: 18
+order: 11
 minutes: 18
 topics: [classloading, classloader, delegation, parent-first, classpath, metaspace]
 docs:
@@ -15,11 +15,9 @@ docs:
 
 When you run a Java program, the JVM doesn't load all your code at once. It loads classes **on demand** — when they're first referenced. Class loading is the process of finding the `.class` file, reading its bytecode, and putting it into memory.
 
-```java
 // This triggers class loading:
 Order order = new Order();  // Line 1: JVM loads Order.class when this line executes
                             // Line 2: Before this, Order.class wasn't loaded
-```
 
 **The three steps of class loading:**
 1. **Loading** — Find the `.class` file and read the bytecode
@@ -38,24 +36,30 @@ Platform ClassLoader (loads Java module classes)
 Application ClassLoader (loads YOUR classes from classpath)
 ```
 
+
+**What this code does — step by step:**
+
+1. You can see the class loader hierarchy:
+2. Line 1: Application ClassLoader — loads your classes
+3. Output: sun.misc.Launcher$AppClassLoader@...
+4. Line 2: Platform ClassLoader — loads java.sql, java.xml, etc.
+5. Output: sun.misc.Launcher$ExtClassLoader@... (or PlatformClassLoader)
+6. Line 3: Bootstrap ClassLoader — loads java.lang, java.util (C code, returns null)
+7. Output: null (it's implemented in C, not Java)
+
+The same code, clean:
+
 ```java
-// You can see the class loader hierarchy:
 public class ClassLoaderDemo {
     public static void main(String[] args) {
-        // Line 1: Application ClassLoader — loads your classes
         ClassLoader appLoader = ClassLoaderDemo.class.getClassLoader();
         System.out.println("App loader: " + appLoader);
-        // Output: sun.misc.Launcher$AppClassLoader@...
-        
-        // Line 2: Platform ClassLoader — loads java.sql, java.xml, etc.
+
         ClassLoader platformLoader = appLoader.getParent();
         System.out.println("Platform loader: " + platformLoader);
-        // Output: sun.misc.Launcher$ExtClassLoader@... (or PlatformClassLoader)
-        
-        // Line 3: Bootstrap ClassLoader — loads java.lang, java.util (C code, returns null)
+
         ClassLoader bootstrapLoader = platformLoader.getParent();
         System.out.println("Bootstrap loader: " + bootstrapLoader);
-        // Output: null (it's implemented in C, not Java)
     }
 }
 ```
@@ -75,13 +79,15 @@ When a class loader needs to load a class, it **delegates to its parent first**:
 
 **Why parent-first?** Prevents loading the same class twice with different implementations. If you wrote your own `java.lang.String`, the parent-first model ensures the bootstrap loader's `String` is used instead — critical for security and consistency.
 
-```java
-// The delegation model prevents this:
-// Your classloader loads: java.lang.String (malicious)
-// Bootstrap classloader loads: java.lang.String (real)
-// Without delegation: two String classes exist → chaos
 
-// With delegation: parent loaders always win → consistent behavior
+**What this code does — step by step:**
+
+1. The delegation model prevents this: Your classloader loads: java.lang.String (malicious). Bootstrap classloader loads: java.lang.String (real). Without delegation: two String classes exist → chaos
+2. With delegation: parent loaders always win → consistent behavior
+
+The same code, clean:
+
+```java
 ```
 
 ## How Spring Boot uses class loading
@@ -106,33 +112,28 @@ my-app.jar
 
 When you undeploy a web app (e.g., hot-reload in Tomcat), the old class loader should be garbage collected. But if any reference to old classes survives, the class loader and ALL its classes stay in memory — that's a **classloader leak**.
 
+
+**What this code does — step by step:**
+
+1. A classloader leak in action: 1. Deploy app → ClassLoader A loads 500 classes. 2. Redeploy app → ClassLoader B loads 500 new classes. 3. ClassLoader A should be GC'd → but it's not! 4. Result: 1000 classes in Metaspace → OutOfMemoryError
+2. Common causes: - Static fields holding references to old classes. - ThreadLocal variables never removed. - JDBC drivers never deregistered. - Listeners/observers never unregistered
+3. Prevention:
+4. Line 1: Deregister JDBC drivers
+5. `DriverManager.deregisterDriver(driver);` — Line 2: Release the reference
+6. Line 3: Stop thread pools. Line 4: Close connections. Line 5: Clear ThreadLocals
+
+The same code, clean:
+
 ```java
-// A classloader leak in action:
-// 1. Deploy app → ClassLoader A loads 500 classes
-// 2. Redeploy app → ClassLoader B loads 500 new classes
-// 3. ClassLoader A should be GC'd → but it's not!
-// 4. Result: 1000 classes in Metaspace → OutOfMemoryError
-
-// Common causes:
-// - Static fields holding references to old classes
-// - ThreadLocal variables never removed
-// - JDBC drivers never deregistered
-// - Listeners/observers never unregistered
-
-// Prevention:
 public class CleanupListener implements ServletContextListener {
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
-        // Line 1: Deregister JDBC drivers
         Enumeration<Driver> drivers = DriverManager.getDrivers();
         while (drivers.hasMoreElements()) {
             Driver driver = drivers.nextElement();
-            DriverManager.deregisterDriver(driver);  // Line 2: Release the reference
+            DriverManager.deregisterDriver(driver);
         }
-        
-        // Line 3: Stop thread pools
-        // Line 4: Close connections
-        // Line 5: Clear ThreadLocals
+
     }
 }
 ```
@@ -167,3 +168,4 @@ public class ApplicationStartup {
 - Classloader leaks happen when references survive redeployment — deregister drivers, clear ThreadLocals
 
 **Official docs:** [java tool](https://docs.oracle.com/en/java/javase/21/docs/specs/man/java.html) · [JVM Spec — class loading](https://docs.oracle.com/javase/specs/jvms/se21/html/jvms-5.html)
+

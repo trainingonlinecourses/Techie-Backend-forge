@@ -1,7 +1,7 @@
 ---
 title: Optional — Eliminating NullPointerExceptions — Complete Beginner's Guide
 summary: What Optional is, when to use it, when NOT to use it, and the common patterns that prevent NPEs in production.
-order: 12
+order: 42
 minutes: 18
 topics: [optional, null-safety, npe, functional-style, optional-patterns]
 docs:
@@ -14,23 +14,31 @@ docs:
 
 The `NullPointerException` (NPE) is Java's most common runtime error. It happens when you call a method on a `null` reference:
 
-```java
 // This can throw NPE if customer is null
 String name = customer.getName().toUpperCase();  // Line 1: If customer is null → NPE
                                                 // Line 2: If getName() returns null → NPE
-```
 
 **Before Optional:** You had to check for null everywhere:
 
+
+**What this code does — step by step:**
+
+1. The old way — messy, easy to forget, hard to read
+2. `if (customer != null) {` — Line 1: Null check
+3. `if (addr != null) {` — Line 2: Another null check
+4. `if (city != null) {` — Line 3: AND another one!
+5. `name = city.toUpperCase();` — Line 4: Finally safe
+
+The same code, clean:
+
 ```java
-// The old way — messy, easy to forget, hard to read
 String name = "Unknown";
-if (customer != null) {                    // Line 1: Null check
+if (customer != null) {
     Address addr = customer.getAddress();
-    if (addr != null) {                    // Line 2: Another null check
+    if (addr != null) {
         String city = addr.getCity();
-        if (city != null) {                // Line 3: AND another one!
-            name = city.toUpperCase();     // Line 4: Finally safe
+        if (city != null) {
+            name = city.toUpperCase();
         }
     }
 }
@@ -38,67 +46,100 @@ if (customer != null) {                    // Line 1: Null check
 
 **With Optional:** The code becomes clean and readable:
 
+
+**What this code does — step by step:**
+
+1. The Optional way — clean, readable, hard to get wrong
+2. `.map(Customer::getAddress)` — Line 1: Returns Optional<Address>
+3. `.map(Address::getCity)` — Line 2: Returns Optional<String>
+4. `.map(String::toUpperCase)` — Line 3: Returns Optional<String>
+5. `.orElse("Unknown");` — Line 4: Default if any step was null
+
+The same code, clean:
+
 ```java
-// The Optional way — clean, readable, hard to get wrong
 String name = Optional.ofNullable(customer)
-    .map(Customer::getAddress)              // Line 1: Returns Optional<Address>
-    .map(Address::getCity)                  // Line 2: Returns Optional<String>
-    .map(String::toUpperCase)               // Line 3: Returns Optional<String>
-    .orElse("Unknown");                     // Line 4: Default if any step was null
+    .map(Customer::getAddress)
+    .map(Address::getCity)
+    .map(String::toUpperCase)
+    .orElse("Unknown");
 ```
 
 ## What is Optional?
 
 `Optional<T>` is a **wrapper** that either contains a value (`Optional.of(value)`) or is empty (`Optional.empty()`). It forces you to handle the "no value" case explicitly.
 
+
+**What this code does — step by step:**
+
+1. Creating Optionals
+2. `Optional<String> present = Optional.of("hello");` — Line 1: Wraps a non-null value
+3. `Optional<String> empty = Optional.empty();` — Line 2: No value
+4. `Optional<String> maybe = Optional.ofNullable(null);` — Line 3: null → empty, non-null → present
+5. Checking if a value exists
+6. `if (present.isPresent()) {` — Line 1: Check if present
+7. `System.out.println(present.get());` — Line 2: Get the value (safe)
+8. Better — use ifPresent with a lambda
+9. `present.ifPresent(value -> System.out.println(value));` — Line 1: Only runs if present
+
+The same code, clean:
+
 ```java
-// Creating Optionals
-Optional<String> present = Optional.of("hello");    // Line 1: Wraps a non-null value
-Optional<String> empty = Optional.empty();           // Line 2: No value
-Optional<String> maybe = Optional.ofNullable(null);  // Line 3: null → empty, non-null → present
+public class Main {
 
-// Checking if a value exists
-if (present.isPresent()) {                           // Line 1: Check if present
-    System.out.println(present.get());               // Line 2: Get the value (safe)
+    public static void main(String[] args) {
+        Optional<String> present = Optional.of("hello");
+        Optional<String> empty = Optional.empty();
+        Optional<String> maybe = Optional.ofNullable(null);
+
+        if (present.isPresent()) {
+            System.out.println(present.get());
+        }
+
+        present.ifPresent(value -> System.out.println(value));
+    }
 }
-
-// Better — use ifPresent with a lambda
-present.ifPresent(value -> System.out.println(value));  // Line 1: Only runs if present
 ```
 
 ## Common patterns
 
 ### Pattern 1: map — transform the value
 
+
+**What this code does — step by step:**
+
+1. Without Optional — NPE risk
+2. `return customer.getAddress().getCity();` — NPE if address is null
+3. With Optional — safe transformation
+4. `return Optional.ofNullable(customer)` — Line 1: Wrap customer (might be null)
+5. `.map(Customer::getAddress)` — Line 2: Transform: Customer → Address
+6. `.map(Address::getCity);` — Line 3: Transform: Address → String. Line 4: Returns Optional.empty() if any step was null
+
+The same code, clean:
+
 ```java
-// Without Optional — NPE risk
 public String getCustomerCity(Customer customer) {
-    return customer.getAddress().getCity();  // NPE if address is null
+    return customer.getAddress().getCity();
 }
 
-// With Optional — safe transformation
 public Optional<String> getCustomerCity(Customer customer) {
-    return Optional.ofNullable(customer)      // Line 1: Wrap customer (might be null)
-        .map(Customer::getAddress)            // Line 2: Transform: Customer → Address
-        .map(Address::getCity);               // Line 3: Transform: Address → String
-    // Line 4: Returns Optional.empty() if any step was null
+    return Optional.ofNullable(customer)
+        .map(Customer::getAddress)
+        .map(Address::getCity);
 }
 ```
 
 ### Pattern 2: flatMap — when the transformation returns Optional
 
-```java
 // If the transformation itself returns Optional, use flatMap
 public Optional<Order> findOrder(String orderId) {
     return Optional.ofNullable(orderId)       // Line 1: Wrap the ID
         .flatMap(id -> orderRepo.findById(id));  // Line 2: flatMap because findById returns Optional
     // Line 3: Without flatMap, you'd get Optional<Optional<Order>> (wrong!)
 }
-```
 
 ### Pattern 3: orElse / orElseGet / orElseThrow — providing defaults
 
-```java
 // orElse — simple default value
 String name = getCustomerName().orElse("Anonymous");
 
@@ -108,17 +149,14 @@ String name = getCustomerName().orElseGet(() -> generateDefaultName());
 // orElseThrow — throw exception if empty
 Customer customer = findCustomer(id)
     .orElseThrow(() -> new NotFoundException("Customer not found: " + id));
-```
 
 ### Pattern 4: filter — conditional check
 
-```java
 // Only keep the value if it matches a condition
 Optional<String> email = Optional.of("alice@example.com")
     .filter(e -> e.contains("@"))       // Line 1: Keep if contains @
     .filter(e -> e.length() > 5);       // Line 2: Keep if longer than 5 chars
 // Line 3: Returns Optional.empty() if filter fails
-```
 
 ## When NOT to use Optional
 
@@ -133,24 +171,51 @@ Optional<String> email = Optional.of("alice@example.com")
 - **Method returns where null is possible** — Makes the API explicit
 - **Chaining operations** — When you'd otherwise have nested null checks
 
+
+**What this code does — step by step:**
+
+1. GOOD — Optional for repository lookup
+2. `return orderRepo.findById(id);` — Line 1: Might find, might not
+3. BAD — Optional for a field
+4. `private Optional<String> name;` — Don't do this — use null or a default
+5. BAD — Optional as parameter
+6. `public void process(Optional<String> input) {` — Don't do this — accept null or use overloading. ...
+
+The same code, clean:
+
 ```java
-// GOOD — Optional for repository lookup
 public Optional<Order> findOrder(String id) {
-    return orderRepo.findById(id);  // Line 1: Might find, might not
+    return orderRepo.findById(id);
 }
 
-// BAD — Optional for a field
 public class Customer {
-    private Optional<String> name;  // Don't do this — use null or a default
+    private Optional<String> name;
 }
 
-// BAD — Optional as parameter
-public void process(Optional<String> input) {  // Don't do this — accept null or use overloading
-    // ...
+public void process(Optional<String> input) {
 }
 ```
 
 ## Real-world scenario — e-commerce order lookup
+
+
+**What this code does — step by step:**
+
+1. Safe order lookup with Optional chain
+2. `return orderRepo.findById(orderId)` — Line 1: Optional<Order>
+3. `.map(order -> new OrderSummary(` — Line 2: Transform to DTO
+4. `customerRepo.findById(order.getCustomerId())` — Line 3: Nested Optional
+5. `.map(Customer::getName)` — Line 4: Extract name
+6. `.orElse("Unknown Customer"),` — Line 5: Default
+7. `order.getItems().size()` — Line 6: Item count
+8. `.orElseThrow(() -> new NotFoundException("Order not found: " + orderId));` — Line 7: Fail
+9. Safe notification with Optional
+10. `orderRepo.findById(orderId)` — Line 1: Find order
+11. `.filter(order -> order.getStatus() == OrderStatus.CONFIRMED)` — Line 2: Only confirmed
+12. `.ifPresent(order -> notificationService.send(` — Line 3: Send if present
+13. Line 4: If order not found or not confirmed → do nothing (safe!)
+
+The same code, clean:
 
 ```java
 @Service
@@ -158,30 +223,27 @@ public class OrderService {
     private final OrderRepository orderRepo;
     private final CustomerRepository customerRepo;
     private final NotificationService notificationService;
-    
-    // Safe order lookup with Optional chain
+
     public OrderSummary getOrderSummary(String orderId) {
-        return orderRepo.findById(orderId)                          // Line 1: Optional<Order>
-            .map(order -> new OrderSummary(                         // Line 2: Transform to DTO
+        return orderRepo.findById(orderId)
+            .map(order -> new OrderSummary(
                 order.getId(),
                 order.getTotal(),
-                customerRepo.findById(order.getCustomerId())        // Line 3: Nested Optional
-                    .map(Customer::getName)                          // Line 4: Extract name
-                    .orElse("Unknown Customer"),                     // Line 5: Default
-                order.getItems().size()                              // Line 6: Item count
+                customerRepo.findById(order.getCustomerId())
+                    .map(Customer::getName)
+                    .orElse("Unknown Customer"),
+                order.getItems().size()
             ))
-            .orElseThrow(() -> new NotFoundException("Order not found: " + orderId));  // Line 7: Fail
+            .orElseThrow(() -> new NotFoundException("Order not found: " + orderId));
     }
-    
-    // Safe notification with Optional
+
     public void sendOrderConfirmation(String orderId) {
-        orderRepo.findById(orderId)                                 // Line 1: Find order
-            .filter(order -> order.getStatus() == OrderStatus.CONFIRMED)  // Line 2: Only confirmed
-            .ifPresent(order -> notificationService.send(           // Line 3: Send if present
+        orderRepo.findById(orderId)
+            .filter(order -> order.getStatus() == OrderStatus.CONFIRMED)
+            .ifPresent(order -> notificationService.send(
                 order.getCustomerEmail(),
                 "Your order " + order.getId() + " is confirmed!"
             ));
-        // Line 4: If order not found or not confirmed → do nothing (safe!)
     }
 }
 ```
@@ -205,3 +267,4 @@ public class OrderService {
 - The goal: eliminate NPEs at the source, not catch them everywhere
 
 **Official docs:** [Optional (Oracle)](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Optional.html)
+

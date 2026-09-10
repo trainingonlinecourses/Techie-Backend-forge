@@ -1,7 +1,7 @@
 ---
 title: Content Negotiation & Message Conversion
 module: spring-webmvc-advanced
-order: 2
+order: 3
 minutes: 20
 topics: ["Accept header", "produces/consumes", "HttpMessageConverter", "Jackson config", "custom converters"]
 summary: The same endpoint serves many representations. Content negotiation decides which representation a client gets, and HttpMessageConverters turn objec...
@@ -24,7 +24,6 @@ Spring resolves the response format through three strategies, in order:
 
 ## produces: Declaring What You Serve
 
-```java
 @RestController
 @RequestMapping("/api/courses")
 public class CourseController {
@@ -38,17 +37,14 @@ public class CourseController {
         return courseService.findById(id);
     }
 }
-```
 
 Spring matches the `Accept` header against `produces` and picks the best match. A client sending `Accept: application/json` gets JSON; `Accept: application/xml` gets XML.
 
 ## consumes: Declaring What You Read
 
-```java
 @PostMapping(value = "/{id}",
     consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
 public CourseDto update(@PathVariable Long id, @RequestBody CourseDto dto) { ... }
-```
 
 `consumes` filters on the `Content-Type` of the request — 415 Unsupported Media Type if it doesn't match.
 
@@ -56,14 +52,12 @@ public CourseDto update(@PathVariable Long id, @RequestBody CourseDto dto) { ...
 
 `@RequestBody` and `@ResponseBody` are handled by `HttpMessageConverter`s:
 
-```java
 public interface HttpMessageConverter<T> {
     boolean canRead(Class<?> clazz, MediaType mediaType);
     boolean canWrite(Class<?> clazz, MediaType mediaType);
     T read(Class<? extends T> clazz, HttpInputMessage inputMessage);
     void write(T t, MediaType contentType, HttpOutputMessage outputMessage);
 }
-```
 
 Spring Boot auto-registers the common ones:
 
@@ -87,7 +81,6 @@ spring:
       fail-on-unknown-properties: false      # lenient on new fields
 ```
 
-```java
 @Configuration
 public class JacksonConfig {
 
@@ -100,13 +93,11 @@ public class JacksonConfig {
                 DateTimeFormatter.ISO_LOCAL_DATE_TIME));
     }
 }
-```
 
 ## Custom MessageConverter: CSV
 
 Serving CSV for spreadsheet clients:
 
-```java
 @Component
 public class CsvHttpMessageConverter extends AbstractHttpMessageConverter<List<?>> {
 
@@ -142,7 +133,6 @@ public class CsvHttpMessageConverter extends AbstractHttpMessageConverter<List<?
         return s.contains(",") ? "\"" + s.replace("\"", "\"\"") + "\"" : s;
     }
 }
-```
 
 Now `Accept: text/csv` on the list endpoint returns CSV. Zero changes to the controller.
 
@@ -150,7 +140,6 @@ Now `Accept: text/csv` on the list endpoint returns CSV. Zero changes to the con
 
 Configure the resolution order and the format parameter:
 
-```java
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
@@ -163,7 +152,6 @@ public class WebConfig implements WebMvcConfigurer {
         // keep Accept header as the primary strategy
     }
 }
-```
 
 **Important default**: JSON is the default when nothing is specified. Prefer that over path extensions (`/courses.json`) — extensions create cache-key ambiguity.
 
@@ -175,7 +163,6 @@ public class WebConfig implements WebMvcConfigurer {
 
 ## Testing Negotiation
 
-```java
 @Test
 void returnsJsonByDefault() throws Exception {
     mockMvc.perform(get("/api/courses/1").accept(MediaType.APPLICATION_JSON))
@@ -199,7 +186,6 @@ void returnsCsvWhenRequested() throws Exception {
         .andExpect(content().string(containsString(",title")))
         .andExpect(content().string(containsString("1,")));
 }
-```
 
 ## Summary
 
@@ -214,3 +200,4 @@ void returnsCsvWhenRequested() throws Exception {
 | Errors | 406 (can't serve), 415 (can't read) |
 
 Content negotiation is the part of REST that makes one endpoint serve many clients. Jackson for JSON, JAXB for XML, a 30-line converter for CSV — and your API is suddenly consumable by dashboards, spreadsheets, and browsers alike.
+

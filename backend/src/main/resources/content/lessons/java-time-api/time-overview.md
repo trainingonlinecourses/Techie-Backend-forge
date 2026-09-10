@@ -1,7 +1,7 @@
 ---
 title: java.time — The Modern Date & Time API
 module: java-time-api
-order: 1
+order: 4
 minutes: 25
 topics: ["java.time", "LocalDate", "LocalTime", "Instant", "design principles"]
 summary: Dates look simple — "August 18, 2026, 3:30 PM." But that innocent sentence hides three separate questions:
@@ -39,6 +39,31 @@ The core principle: **never mix types that answer different questions.** A `Loca
 
 ## The Code Walkthrough
 
+
+**What this code does — step by step:**
+
+1. 1. The three "now" concepts — deliberately different
+2. `LocalDate today     = LocalDate.now();` — your machine's date
+3. `LocalTime nowTime   = LocalTime.now();` — your machine's time
+4. `Instant nowInstant  = Instant.now();` — the true moment, UTC
+5. `System.out.println(today);` — 2026-08-18
+6. `System.out.println(nowTime);` — 13:30:00.123456
+7. `System.out.println(nowInstant);` — 2026-08-18T13:30:00.123456Z (Z = UTC)
+8. 2. Construct values explicitly (the "of" factories)
+9. 3. Immutable arithmetic — every method returns a NEW object
+10. `System.out.println(courseEnds);` — 2026-12-15 (unchanged!)
+11. `System.out.println(nextWeek);` — 2026-12-22
+12. 4. Compare and query
+13. `System.out.println(courseEnds.isAfter(today));` — true
+14. `System.out.println(courseEnds.getDayOfWeek());` — TUESDAY
+15. `System.out.println(courseEnds.lengthOfMonth());` — 31
+16. 5. Convert between concepts (where it's meaningful)
+17. `System.out.println(date);` — the calendar date in Kolkata right now
+18. 6. Format
+19. 15 Dec 2026
+
+The same code, clean:
+
 ```java
 import java.time.*;
 import java.time.format.DateTimeFormatter;
@@ -46,38 +71,31 @@ import java.time.format.DateTimeFormatter;
 public class TimeApiOverview {
 
     public static void main(String[] args) {
-        // 1. The three "now" concepts — deliberately different
-        LocalDate today     = LocalDate.now();            // your machine's date
-        LocalTime nowTime   = LocalTime.now();            // your machine's time
-        Instant nowInstant  = Instant.now();              // the true moment, UTC
+        LocalDate today     = LocalDate.now();
+        LocalTime nowTime   = LocalTime.now();
+        Instant nowInstant  = Instant.now();
 
-        System.out.println(today);       // 2026-08-18
-        System.out.println(nowTime);     // 13:30:00.123456
-        System.out.println(nowInstant);  // 2026-08-18T13:30:00.123456Z   (Z = UTC)
+        System.out.println(today);
+        System.out.println(nowTime);
+        System.out.println(nowInstant);
 
-        // 2. Construct values explicitly (the "of" factories)
         LocalDate courseEnds = LocalDate.of(2026, 12, 15);
         LocalTime lectureAt  = LocalTime.of(14, 30);
         LocalDateTime start  = LocalDateTime.of(2026, 8, 18, 14, 30);
 
-        // 3. Immutable arithmetic — every method returns a NEW object
         LocalDate nextWeek = courseEnds.plusWeeks(1);
         LocalDate twoMonthsAgo = courseEnds.minusMonths(2);
-        System.out.println(courseEnds);   // 2026-12-15  (unchanged!)
-        System.out.println(nextWeek);     // 2026-12-22
+        System.out.println(courseEnds);
+        System.out.println(nextWeek);
 
-        // 4. Compare and query
-        System.out.println(courseEnds.isAfter(today));   // true
-        System.out.println(courseEnds.getDayOfWeek());   // TUESDAY
-        System.out.println(courseEnds.lengthOfMonth());  // 31
+        System.out.println(courseEnds.isAfter(today));
+        System.out.println(courseEnds.getDayOfWeek());
+        System.out.println(courseEnds.lengthOfMonth());
 
-        // 5. Convert between concepts (where it's meaningful)
         LocalDate date = nowInstant.atZone(ZoneId.of("Asia/Kolkata")).toLocalDate();
-        System.out.println(date);         // the calendar date in Kolkata right now
+        System.out.println(date);
 
-        // 6. Format
         System.out.println(DateTimeFormatter.ofPattern("dd MMM yyyy").format(courseEnds));
-        // 15 Dec 2026
     }
 }
 ```
@@ -119,3 +137,4 @@ The two dangerous ones: `LocalDateTime` and `ZonedDateTime` misuse. `LocalDateTi
 - `LocalDate`/`LocalTime`/`LocalDateTime` have no zone; `ZonedDateTime`/`OffsetDateTime` do.
 - `Duration` = elapsed seconds; `Period` = calendar years/months/days.
 - Never store "3:30 PM" without knowing *where* — that's where the bugs live.
+

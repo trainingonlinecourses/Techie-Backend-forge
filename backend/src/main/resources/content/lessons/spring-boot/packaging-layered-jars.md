@@ -1,7 +1,7 @@
 ---
 title: Packaging — Fat Jars, Layered Jars and Buildpacks
 summary: How the Spring Boot repackaged jar works, layered jars for efficient Docker images, and Cloud Native Buildpacks for image builds without Dockerfiles.
-order: 21
+order: 39
 minutes: 18
 topics: [packaging, fat-jar, layered-jars, buildpacks, docker-image, spring-boot-maven-plugin, deploy]
 docs:
@@ -111,3 +111,4 @@ Buildpacks detect the app (Java), pick a runtime (Temurin JRE), apply layers (de
 - Use `java -Djarmode=layertools -jar app.jar extract` + per-layer COPYs for efficient images.
 - Buildpacks (`spring-boot:build-image`) build images without a Dockerfile — hardened, layered defaults.
 - Pin base-image tags, prefer JAR packaging, and keep layers enabled for CI speed.
+

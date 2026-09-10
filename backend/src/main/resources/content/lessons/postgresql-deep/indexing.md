@@ -1,7 +1,7 @@
 ---
 title: Indexing for Performance
 module: postgresql-deep
-order: 2
+order: 1
 minutes: 28
 topics: ["B-tree indexes", "composite indexes", "covering indexes", "EXPLAIN ANALYZE", "index-only scans", "partial indexes"]
 summary: An index is a sorted copy of a column (or columns) that lets the database find rows without scanning the whole table. This lesson covers what index...
@@ -39,14 +39,12 @@ CREATE INDEX idx_courses_level_minutes ON courses (level, minutes);
 
 In JPA, via `@Index`:
 
-```java
 @Entity
 @Table(indexes = {
     @Index(name = "idx_courses_level", columnList = "level"),
     @Index(name = "idx_courses_level_minutes", columnList = "level, minutes")
 })
 public class Course { ... }
-```
 
 ## Composite Indexes: Column Order Is Everything
 
@@ -130,7 +128,6 @@ Bitmap Heap Scan on courses  (cost=... rows=9000)
 
 ## The Common Index Set for a Spring Entity
 
-```java
 @Entity
 @Table(name = "courses", indexes = {
     @Index(name = "idx_courses_code", columnList = "code", unique = true),
@@ -138,7 +135,6 @@ Bitmap Heap Scan on courses  (cost=... rows=9000)
     @Index(name = "idx_courses_status_created", columnList = "status, created_at DESC")
 })
 public class Course { ... }
-```
 
 ## Summary
 
@@ -151,3 +147,4 @@ public class Course { ... }
 | Unique | Uniqueness constraint + lookup |
 
 Indexes are the difference between a database that responds and one that times out — but they cost writes and space. `EXPLAIN ANALYZE` before and after, follow the leftmost-prefix rule, cover your hottest queries, and prune redundant indexes.
+

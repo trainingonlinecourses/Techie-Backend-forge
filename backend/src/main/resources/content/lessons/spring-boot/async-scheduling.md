@@ -1,7 +1,7 @@
 ---
 title: @Async, @Scheduled & Background Work
 summary: Running work off the request thread, scheduled jobs, and the pitfalls (proxy, executor tuning, missed runs).
-order: 10
+order: 5
 minutes: 14
 topics: [async, scheduled, task-executor, background-jobs]
 docs:
@@ -12,7 +12,6 @@ docs:
 
 ## @Async: offload work from the request thread
 
-```java
 @Configuration
 @EnableAsync
 public class AsyncConfig {
@@ -28,9 +27,7 @@ public class AsyncConfig {
         return exec;
     }
 }
-```
 
-```java
 @Service
 public class NotificationService {
     @Async("taskExecutor")
@@ -38,13 +35,11 @@ public class NotificationService {
         // runs on the async executor — caller returns immediately
     }
 }
-```
 
 **The trap**: `@Async` works through the proxy — calling `this.sendWelcome(...)` from inside the same bean silently runs synchronously. Inject the bean (or use `ApplicationContext.getBean`) to go through the proxy (same story as `@Transactional`).
 
 ## @Scheduled: cron and fixed-rate jobs
 
-```java
 @Configuration
 @EnableScheduling
 public class SchedulingConfig {}
@@ -60,7 +55,6 @@ public class OutboxRelay {
     @Scheduled(cron = "0 15 3 * * *")          // daily at 03:15 server time
     public void dailyReconciliation() { ... }
 }
-```
 
 | Mode | Meaning |
 |---|---|
@@ -78,14 +72,12 @@ public class OutboxRelay {
 
 ## Outbox pattern (the production answer)
 
-```java
 @Transactional
 public void createOrder(Order order) {
     orders.save(order);
     outbox.save(new OutboxEvent("order.created", order.getId()));  // same transaction
 }
 // OutboxRelay publishes committed events to the broker and marks them sent.
-```
 
 This is how you get "exactly-once-ish" side effects: write the side effect as data in the same transaction, then a job/broker consumer delivers it.
 
@@ -99,3 +91,4 @@ This is how you get "exactly-once-ish" side effects: write the side effect as da
 - Outbox pattern: side effects as data in the same transaction.
 
 **Official docs:** [Scheduling & async](https://docs.spring.io/spring-framework/reference/integration/scheduling.html)
+

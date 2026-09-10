@@ -1,7 +1,7 @@
 ---
 title: The Java Memory Model — Visibility, Happens-Before and Volatile
 summary: Why shared fields go stale across threads, the happens-before rules that make visibility deterministic, and the volatile/atomic patterns orgs rely on.
-order: 31
+order: 53
 minutes: 22
 topics: [memory-model, happens-before, volatile, visibility, atomicity, data-race, memory-barrier]
 docs:
@@ -15,7 +15,6 @@ docs:
 
 Every thread has its own **working memory** (CPU caches / registers). When thread A writes a plain field, that write may sit in A's cache — thread B can read the *stale* value indefinitely:
 
-```java
 class StopFlag {
     boolean running = true;                 // plain field
     void stop() { running = false; }        // thread A
@@ -23,7 +22,6 @@ class StopFlag {
         while (running) { /* busy loop */ } // thread B — may NEVER see the change!
     }
 }
-```
 
 Without synchronization, the JVM is *allowed* to keep the loop running forever — no guarantee, no error, just a hang. This is a **data race** (unsynchronized read/write of the same field), and the Java Memory Model (JMM) defines exactly when visibility *is* guaranteed.
 
@@ -45,17 +43,14 @@ The JMM guarantees: **if action X happens-before action Y, then X's writes are v
 
 **Pattern 1 — the volatile flag.** The shutdown pattern from the graceful-shutdown lesson — `volatile` is exactly right here because the flag is written by one thread and read by many, with no compound operation:
 
-```java
 class Worker {
     private volatile boolean running = true;   // visibility guaranteed
     public void shutdown() { running = false; }
     public void run() { while (running) { ... } }
 }
-```
 
 **Pattern 2 — immutable publishes.** If a field is `final`, the JMM guarantees the fully-constructed object is visible to any thread that obtains the reference (safe publication):
 
-```java
 class Config {
     final int poolSize;            // final → safe publication through the reference
     final String dbUrl;
@@ -63,17 +58,14 @@ class Config {
 }
 // Publish:  shared.config = new Config(...)  → any thread reading shared.config
 // sees the fully-built Config (as long as `this` didn't escape the constructor)
-```
 
 Records and immutable value objects rely on this — publishing an immutable object needs **no** locking.
 
 **Pattern 3 — volatile is not atomic.** The classic bug: incrementing a volatile counter is *three* operations (read, add, write) and can lose updates:
 
-```java
 volatile int count = 0;
 // count++ is NOT atomic — two threads can both read 5, both write 6 → lost update
 // Fix: AtomicInteger, or synchronized, or LongAdder under heavy contention
-```
 
 Volatile guarantees **visibility**, not **atomicity**. For read-modify-write you need `AtomicInteger`/`AtomicLong` (which use CAS and also establish happens-before) or a lock.
 
@@ -108,3 +100,4 @@ Volatile guarantees **visibility**, not **atomicity**. For read-modify-write you
 - `volatile` = visibility for single-writer/many-reader flags; `Atomic*` = atomic read-modify-write.
 - `final` fields give safe publication of immutable objects with zero locking.
 - A data race may work locally and fail in prod — always establish the edge explicitly.
+

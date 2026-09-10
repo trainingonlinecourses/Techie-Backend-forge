@@ -1,7 +1,7 @@
 ---
 title: The Files API — Modern File Handling
 module: java-io-nio
-order: 4
+order: 1
 minutes: 25
 topics: ["java.nio.file", "Path", "Files", "walk", "globs", "watch service"]
 summary: Before Java 7, file code was java.io.File — a class that bundled a name with operations, and couldn't express many realworld paths (symbolic links,...
@@ -26,6 +26,24 @@ The result: file handling that used to take 20 lines of boilerplate is now one o
 
 ## The Code Walkthrough
 
+
+**What this code does — step by step:**
+
+1. 1. Build a path, inspect it
+2. `Path dir = Path.of("data", "logs");` — data/logs (or data\logs on Windows)
+3. `Path file = dir.resolve("app.log");` — data/logs/app.log
+4. `System.out.println(file.getFileName());` — app.log
+5. `System.out.println(file.getParent());` — data/logs
+6. 2. Create directories if needed
+7. `Files.createDirectories(dir);` — no-op if they exist
+8. 3. Write and read text
+9. `System.out.println(all.contains("line2"));` — true
+10. 4. Copy and move
+11. 5. List and walk
+12. 6. Delete
+
+The same code, clean:
+
 ```java
 import java.io.IOException;
 import java.nio.file.*;
@@ -36,33 +54,27 @@ import java.util.stream.Stream;
 public class FilesApiDemo {
 
     public static void main(String[] args) throws IOException {
-        // 1. Build a path, inspect it
-        Path dir = Path.of("data", "logs");                 // data/logs (or data\logs on Windows)
-        Path file = dir.resolve("app.log");                 // data/logs/app.log
-        System.out.println(file.getFileName());             // app.log
-        System.out.println(file.getParent());               // data/logs
+        Path dir = Path.of("data", "logs");
+        Path file = dir.resolve("app.log");
+        System.out.println(file.getFileName());
+        System.out.println(file.getParent());
 
-        // 2. Create directories if needed
-        Files.createDirectories(dir);                       // no-op if they exist
+        Files.createDirectories(dir);
 
-        // 3. Write and read text
         Files.writeString(file, "line1\nline2\nline3\n", StandardCharsets.UTF_8);
         String all = Files.readString(file, StandardCharsets.UTF_8);
-        System.out.println(all.contains("line2"));          // true
+        System.out.println(all.contains("line2"));
 
-        // 4. Copy and move
         Path copy = dir.resolve("app.copy.log");
         Files.copy(file, copy, StandardCopyOption.REPLACE_EXISTING);
         Path moved = dir.resolve("app.moved.log");
         Files.move(copy, moved, StandardCopyOption.REPLACE_EXISTING);
 
-        // 5. List and walk
         System.out.println("files in " + dir + ":");
         try (Stream<Path> entries = Files.list(dir)) {
             entries.forEach(System.out::println);
         }
 
-        // 6. Delete
         Files.deleteIfExists(moved);
         Files.deleteIfExists(file);
     }
@@ -81,11 +93,9 @@ public class FilesApiDemo {
 
 **Part 5 — listing with streams.** `Files.list(dir)` returns a `Stream<Path>` that must be **closed** (it holds a directory handle) — hence try-with-resources. The stream is lazy: entries are read as you consume them. `Files.walk(dir)` does the same recursively, which makes "find all `.log` files under a tree" a one-liner:
 
-```java
 try (Stream<Path> s = Files.walk(dir)) {
     s.filter(p -> p.toString().endsWith(".log")).forEach(System.out::println);
 }
-```
 
 **Part 6 — deletion.** `deleteIfExists` deletes or silently does nothing. Always prefer the `IfExists` variants to avoid `NoSuchFileException` races.
 
@@ -93,11 +103,9 @@ try (Stream<Path> s = Files.walk(dir)) {
 
 `Files.newDirectoryStream(dir, "*.log")` takes a **glob** — the shell-style pattern language (`*`, `?`, `{a,b}`, `**`):
 
-```java
 try (DirectoryStream<Path> logs = Files.newDirectoryStream(dir, "*.log")) {
     for (Path p : logs) System.out.println(p);
 }
-```
 
 This is much simpler than regex for the common "all files with this extension" case, and unlike `Files.list` it filters *inside* the directory read (more efficient, no `Stream` filter pass).
 
@@ -105,21 +113,24 @@ This is much simpler than regex for the common "all files with this extension" c
 
 The **WatchService** lets you react to file events (created, modified, deleted) — the mechanism behind file-sync tools, hot-reload dev servers, and log tailers:
 
-```java
-WatchService watcher = FileSystems.getDefault().newWatchService();
-Path dirToWatch = Path.of("data");
-dirToWatch.register(watcher,
-        StandardWatchEventKinds.ENTRY_CREATE,
-        StandardWatchEventKinds.ENTRY_MODIFY,
-        StandardWatchEventKinds.ENTRY_DELETE);
+public class Main {
 
-// In a background thread:
-WatchKey key = watcher.take();                 // blocks until an event
-for (WatchEvent<?> event : key.pollEvents()) {
-    System.out.println(event.kind() + ": " + event.context());
+    public static void main(String[] args) {
+        WatchService watcher = FileSystems.getDefault().newWatchService();
+        Path dirToWatch = Path.of("data");
+        dirToWatch.register(watcher,
+                StandardWatchEventKinds.ENTRY_CREATE,
+                StandardWatchEventKinds.ENTRY_MODIFY,
+                StandardWatchEventKinds.ENTRY_DELETE);
+
+        // In a background thread:
+        WatchKey key = watcher.take();                 // blocks until an event
+        for (WatchEvent<?> event : key.pollEvents()) {
+            System.out.println(event.kind() + ": " + event.context());
+        }
+        key.reset();                                    // must reset to keep watching
+    }
 }
-key.reset();                                    // must reset to keep watching
-```
 
 This uses the OS's native file-watch facility (inotify on Linux, ReadDirectoryChangesW on Windows) rather than polling — efficient and near-real-time.
 
@@ -155,3 +166,4 @@ This uses the OS's native file-watch facility (inotify on Linux, ReadDirectoryCh
 - Streams from `Files.list`/`walk`/`lines` must be closed.
 - Globs (`*.log`) beat regex for filename filtering.
 - WatchService gives native, event-driven directory watching.
+

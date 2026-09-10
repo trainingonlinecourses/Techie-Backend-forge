@@ -1,7 +1,7 @@
 ---
 title: Testing Native Images — JVM Tests, Native Tests, and the Gap
 module: graalvm-native
-order: 3
+order: 4
 minutes: 24
 topics: ["native testing", "test AOT", "GraalVM test support", "JVM vs native", "integration testing"]
 summary: Here's the trap: your test suite runs on the JVM — but production runs a native binary. The two execution models differ precisely at the seams nati...
@@ -50,23 +50,21 @@ Here's the trap: your test suite runs on the **JVM** — but production runs a *
 
 The failure classes only the native tier reveals:
 
+
+**What this code does — step by step:**
+
+1. 1. Missing reflection hints — the classic: On the JVM: works (reflection is free). In native: ClassNotFoundException / NoSuchMethodError at runtime.
+2. `@RegisterReflectionForBinding(CustomDto.class)` — <- needed for native
+3. 2. Missing resource hints — a template, a SQL file, a properties file: In native: "Could not find resource classpath:templates/email.html". Fix: hints.resources().registerPattern("templates/*.html");
+4. 3. Dynamic class loading — Class.forName by config value (JDBC drivers,. Service loaders): works JVM, absent native. Fix: reflect-config hint (or the driver's native support).
+5. 4. Serialization of custom types — works JVM, fails native.
+
+The same code, clean:
+
 ```java
-// 1. Missing reflection hints — the classic:
-//    On the JVM: works (reflection is free).
-//    In native: ClassNotFoundException / NoSuchMethodError at runtime.
-@RegisterReflectionForBinding(CustomDto.class)   // <- needed for native
+@RegisterReflectionForBinding(CustomDto.class)
 @SpringBootTest
 class SerializationTest { ... }
-
-// 2. Missing resource hints — a template, a SQL file, a properties file:
-//    In native: "Could not find resource classpath:templates/email.html"
-//    Fix: hints.resources().registerPattern("templates/*.html");
-
-// 3. Dynamic class loading — Class.forName by config value (JDBC drivers,
-//    service loaders): works JVM, absent native.
-//    Fix: reflect-config hint (or the driver's native support).
-
-// 4. Serialization of custom types — works JVM, fails native.
 ```
 
 **The discipline:** run the full test suite (unit + integration + the Spring slices) in native mode. A passing native test suite is the *evidence* that the closed-world analysis saw everything — the integration tests, especially, exercise the reflective edges (JSON binding, Spring Data, Actuator) that the analyzer must have hinted correctly.
@@ -113,3 +111,4 @@ Native testing has its own integration-test realities:
 ## Recap
 
 Native testing is two-tier discipline: the **JVM tier** (`mvn test` — fast iteration, optionally with `-Dspring.aot=true` for AOT verification) catches logic and many reachability issues in seconds; the **native tier** (`mvn -Pnative test` — the same suite compiled AOT and run against the native binary) verifies the *production runtime*: missing reflection hints, absent resources, dynamic-loading gaps — everything the closed-world analysis must have captured. The gap between the tiers *is* the native-image risk surface, and the native test run is the only honest measurement of it. Develop fast on the JVM, gate deliberately on native, and never ship a native binary that hasn't run its own test suite.
+

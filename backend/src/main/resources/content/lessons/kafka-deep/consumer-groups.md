@@ -1,7 +1,7 @@
 ---
 title: Consumer Groups — Partition Assignment and Rebalancing
 module: kafka-deep
-order: 3
+order: 1
 minutes: 25
 topics: ["consumer groups", "rebalancing", "partition assignment", "group coordinator", "lag"]
 summary: A single consumer reading a topic processes events one at a time. A consumer group is Kafka's mechanism for parallelizing that work: the group's me...
@@ -32,11 +32,9 @@ The mechanics: every consumer group has a **group coordinator** (one of the brok
 - **RoundRobinAssignor**: partitions are dealt out round-robin like cards — best balance across many topics.
 - **StickyAssignor** (the modern default): balances *and* keeps as many previous assignments as possible during rebalances — minimizing partition moves and their cost.
 
-```java
 // Explicitly choosing the strategy:
 props.put("partition.assignment.strategy",
           "org.apache.kafka.clients.consumer.RoundRobinAssignor");
-```
 
 For most applications the default (sticky) is right; the strategy matters when you have many topics or observe uneven load.
 
@@ -44,19 +42,30 @@ For most applications the default (sticky) is right; the strategy matters when y
 
 The consumer's entire existence is the **poll loop**, and every `poll` is also a **heartbeat** to the coordinator:
 
+
+**What this code does — step by step:**
+
+1. `props.put("heartbeat.interval.ms", 3000);` — how often to ping
+2. `props.put("session.timeout.ms", 45000);` — "dead" if silent this long
+3. `props.put("max.poll.interval.ms", 300000);` — max time between polls
+4. `consumer.subscribe(List.of("orders"));` — express interest in the topic
+5. `process(r);` — the actual work happens between polls
+
+The same code, clean:
+
 ```java
 props.put("group.id", "order-processor");
-props.put("heartbeat.interval.ms", 3000);       // how often to ping
-props.put("session.timeout.ms", 45000);         // "dead" if silent this long
-props.put("max.poll.interval.ms", 300000);      // max time between polls
+props.put("heartbeat.interval.ms", 3000);
+props.put("session.timeout.ms", 45000);
+props.put("max.poll.interval.ms", 300000);
 
 KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props);
-consumer.subscribe(List.of("orders"));          // express interest in the topic
+consumer.subscribe(List.of("orders"));
 
 while (true) {
     ConsumerRecords<String, String> records = consumer.poll(100);
     for (ConsumerRecord<String, String> r : records) {
-        process(r);      // the actual work happens between polls
+        process(r);
     }
 }
 ```
@@ -108,3 +117,4 @@ kafka-consumer-groups.sh --bootstrap-server localhost:9092 \
 ## Recap
 
 Consumer groups are Kafka's parallel-processing and fault-tolerance mechanism: members split the topic's partitions (exactly one consumer per partition at a time), the coordinator manages membership and assignments, and the poll loop doubles as the heartbeat. Rebalancing — triggered by joins, leaves, crashes, or slow processing — pauses the group and reassigns partitions, so you must commit on revoke and tolerate reprocessing. The three timers (heartbeat, session timeout, max.poll.interval) define "alive" and "keeping up," and **lag** is the metric that reveals the truth about your pipeline's health. Design groups per logical consumer, size for partition count, and treat rebalances as normal events — because in a healthy Kafka deployment, they are.
+

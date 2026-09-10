@@ -1,7 +1,7 @@
 ---
 title: ApplicationRunner & CommandLineRunner — Startup Work After Context Load
 summary: Running code after the context starts, the difference between the two runner interfaces, ordering, and the startup-job scenarios teams use them for.
-order: 14
+order: 3
 minutes: 16
 topics: [applicationrunner, commandlinerunner, startup-tasks, data-seeding, warmup, exit-codes]
 docs:
@@ -29,7 +29,6 @@ Prefer `ApplicationRunner` — parsing raw args is error-prone, and `Application
 
 **Scenario 1 — seed reference data on first boot.** A runner that populates lookup tables only when they're empty (idempotent, so redeploys don't duplicate):
 
-```java
 @Component
 public class ReferenceDataSeeder implements ApplicationRunner {
     private final CountryRepository countries;
@@ -51,13 +50,11 @@ public class ReferenceDataSeeder implements ApplicationRunner {
         }
     }
 }
-```
 
 The `count() == 0` guard makes it safe across restarts and across the ephemeral-vs-persistent database moves teams do.
 
 **Scenario 2 — warm caches and connections at startup.** Eagerly load the hot reference data so the first user request doesn't pay a cold-cache penalty:
 
-```java
 @Component
 public class CacheWarmer implements ApplicationRunner {
     private final ProductCache cache;
@@ -69,11 +66,9 @@ public class CacheWarmer implements ApplicationRunner {
         log.info("Warmed product cache with {} entries", cache.size());
     }
 }
-```
 
 **Scenario 3 — fail-fast health check on boot.** A runner that verifies a critical external dependency and fails the app (via `System.exit(1)`) if it's unreachable — so a misconfigured deployment never serves traffic in a broken state:
 
-```java
 @Component
 public class ExternalDependencyCheck implements ApplicationRunner {
     @Override
@@ -85,11 +80,9 @@ public class ExternalDependencyCheck implements ApplicationRunner {
         }
     }
 }
-```
 
 **Scenario 4 — data migration step.** A one-time rename/backfill runner, guarded by a flag so it runs exactly once per environment:
 
-```java
 @Component
 public class BackfillRunner implements ApplicationRunner {
     @Override
@@ -100,17 +93,14 @@ public class BackfillRunner implements ApplicationRunner {
         }
     }
 }
-```
 
 ## Ordering multiple runners
 
 Multiple runners run in unspecified order unless you order them — implement `Ordered` or annotate `@Order`:
 
-```java
 @Component @Order(1) public class DependencyCheck implements ApplicationRunner { ... }
 @Component @Order(2) public class CacheWarmer implements ApplicationRunner { ... }
 @Component @Order(3) public class ReferenceDataSeeder implements ApplicationRunner { ... }
-```
 
 Lower order value runs first. Use `@Order` when the sequence matters (check dependencies before warming caches).
 
@@ -134,3 +124,4 @@ Lower order value runs first. Use `@Order` when the sequence matters (check depe
 - `ApplicationRunner` with `ApplicationArguments` beats `CommandLineRunner`'s raw `String[]`.
 - Use `@Order` when sequence matters; fail fast for critical checks, swallow non-critical warmups.
 - Runners delay the port opening — keep them quick and profile-guarded.
+

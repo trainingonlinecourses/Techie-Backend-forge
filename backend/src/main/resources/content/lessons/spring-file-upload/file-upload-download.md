@@ -1,7 +1,7 @@
 ---
 title: Spring Boot File Upload & Download
 summary: MultipartFile handling, file storage strategies, download endpoints, validation, and how organizations handle file processing at scale.
-order: 1
+order: 4
 minutes: 22
 topics: [file-upload, multipart, file-download, storage, spring-boot]
 docs:
@@ -12,7 +12,6 @@ docs:
 
 Spring Boot makes file upload simple with `MultipartFile`:
 
-```java
 @PostMapping("/upload")
 public ResponseEntity<?> upload(@RequestParam("file") MultipartFile file) {
     String filename = file.getOriginalFilename();
@@ -21,17 +20,34 @@ public ResponseEntity<?> upload(@RequestParam("file") MultipartFile file) {
     String contentType = file.getContentType();
     // Save to disk, database, or cloud storage
 }
-```
 
 ---
 
 ## Line-by-Line Walkthrough
 
+
+**What this code does — step by step:**
+
+1. Line 1: Basic file upload endpoint
+2. Validate file
+3. Generate unique filename
+4. Create directory if needed
+5. Save file
+6. Line 2: File upload with validation
+7. `private static final long MAX_SIZE = 10 * 1024 * 1024;` — 10MB
+8. Size validation
+9. Type validation
+10. Process file
+11. Line 3: File download endpoint
+12. Line 4: Multiple file upload
+13. Line 5: application.yml configuration. Spring: servlet: multipart: max-file-size: 10MB. Max-request-size: 50MB. Enabled: true
+
+The same code, clean:
+
 ```java
 import org.springframework.web.multipart.MultipartFile;
 import java.nio.file.*;
 
-// Line 1: Basic file upload endpoint
 @RestController
 @RequestMapping("/api/files")
 public class FileUploadController {
@@ -42,19 +58,15 @@ public class FileUploadController {
     public ResponseEntity<Map<String, String>> upload(
             @RequestParam("file") MultipartFile file) throws IOException {
 
-        // Validate file
         if (file.isEmpty()) {
             return ResponseEntity.badRequest().body(Map.of("error", "File is empty"));
         }
 
-        // Generate unique filename
         String filename = UUID.randomUUID() + "_" + file.getOriginalFilename();
         Path filePath = uploadDir.resolve(filename);
 
-        // Create directory if needed
         Files.createDirectories(uploadDir);
 
-        // Save file
         file.transferTo(filePath.toFile());
 
         return ResponseEntity.ok(Map.of(
@@ -66,12 +78,11 @@ public class FileUploadController {
     }
 }
 
-// Line 2: File upload with validation
 @RestController
 @RequestMapping("/api/documents")
 public class DocumentController {
 
-    private static final long MAX_SIZE = 10 * 1024 * 1024;  // 10MB
+    private static final long MAX_SIZE = 10 * 1024 * 1024;
     private static final Set<String> ALLOWED_TYPES = Set.of(
         "application/pdf",
         "image/jpeg",
@@ -83,19 +94,16 @@ public class DocumentController {
     public ResponseEntity<?> uploadDocument(
             @RequestParam("file") MultipartFile file) {
 
-        // Size validation
         if (file.getSize() > MAX_SIZE) {
             return ResponseEntity.badRequest()
                 .body(Map.of("error", "File too large. Max: 10MB"));
         }
 
-        // Type validation
         if (!ALLOWED_TYPES.contains(file.getContentType())) {
             return ResponseEntity.badRequest()
                 .body(Map.of("error", "File type not allowed"));
         }
 
-        // Process file
         try {
             String savedPath = saveFile(file);
             return ResponseEntity.ok(Map.of("path", savedPath));
@@ -106,7 +114,6 @@ public class DocumentController {
     }
 }
 
-// Line 3: File download endpoint
 @RestController
 @RequestMapping("/api/files")
 public class FileDownloadController {
@@ -128,7 +135,6 @@ public class FileDownloadController {
     }
 }
 
-// Line 4: Multiple file upload
 @PostMapping("/upload-multiple")
 public ResponseEntity<List<Map<String, String>>> uploadMultiple(
         @RequestParam("files") List<MultipartFile> files) {
@@ -147,14 +153,6 @@ public ResponseEntity<List<Map<String, String>>> uploadMultiple(
 
     return ResponseEntity.ok(results);
 }
-
-// Line 5: application.yml configuration
-// spring:
-//   servlet:
-//     multipart:
-//       max-file-size: 10MB
-//       max-request-size: 50MB
-//       enabled: true
 ```
 
 ---
@@ -163,7 +161,6 @@ public ResponseEntity<List<Map<String, String>>> uploadMultiple(
 
 ### Scenario 1: Profile picture upload with resize
 
-```java
 @Service
 public class ProfilePictureService {
 
@@ -187,11 +184,9 @@ public class ProfilePictureService {
         return filename;
     }
 }
-```
 
 ### Scenario 2: CSV import processing
 
-```java
 @PostMapping("/import-csv")
 public ResponseEntity<?> importCsv(@RequestParam("file") MultipartFile file) {
     if (!file.getOriginalFilename().endsWith(".csv")) {
@@ -218,7 +213,6 @@ public ResponseEntity<?> importCsv(@RequestParam("file") MultipartFile file) {
         return ResponseEntity.ok(results);
     }
 }
-```
 
 ---
 
@@ -231,3 +225,4 @@ public ResponseEntity<?> importCsv(@RequestParam("file") MultipartFile file) {
 | No file size limit | Disk fills up | Configure `spring.servlet.multipart.max-file-size` |
 | Not validating content type | Security risk | Validate against allowed types |
 | Storing files in classpath | Lost on redeploy | Use external storage |
+

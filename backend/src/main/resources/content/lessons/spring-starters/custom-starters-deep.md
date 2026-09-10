@@ -41,14 +41,22 @@ A **starter** is a dependency descriptor that pulls in a set of related librarie
 
 ## Line-by-Line Walkthrough
 
+
+**What this code does — step by step:**
+
+1. === Creating a Custom Starter ===
+2. Step 1: Create two modules. Mycompany-redis-spring-boot-starter (auto-configuration). Mycompany-redis-spring-boot-autoconfigure (auto-configuration code)
+3. Step 2: Auto-configuration module
+4. Apply custom properties
+5. Step 3: Properties class
+6. `private int cacheTtl = 30;` — minutes
+7. getters and setters
+8. Step 4: Register auto-configuration. META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports
+9. Step 5: Use in application.yml. Mycompany: redis: expose-headers: true. Cache-ttl: 60. Key-prefix: "myservice:"
+
+The same code, clean:
+
 ```java
-// === Creating a Custom Starter ===
-
-// Step 1: Create two modules
-// mycompany-redis-spring-boot-starter       (auto-configuration)
-// mycompany-redis-spring-boot-autoconfigure (auto-configuration code)
-
-// Step 2: Auto-configuration module
 @AutoConfiguration
 @ConditionalOnClass(RedisOperations.class)
 @EnableConfigurationProperties(MyCompanyRedisProperties.class)
@@ -65,7 +73,6 @@ public class MyCompanyRedisAutoConfiguration {
         template.setKeySerializer(new StringRedisSerializer());
         template.setValueSerializer(new GenericJackson2JsonRedisSerializer());
 
-        // Apply custom properties
         template.setExposeConnectionKeysInHeaders(properties.isExposeHeaders());
 
         return template;
@@ -81,26 +88,15 @@ public class MyCompanyRedisAutoConfiguration {
     }
 }
 
-// Step 3: Properties class
 @ConfigurationProperties(prefix = "mycompany.redis")
 public class MyCompanyRedisProperties {
     private boolean exposeHeaders = false;
-    private int cacheTtl = 30;  // minutes
+    private int cacheTtl = 30;
     private String keyPrefix = "app:";
 
-    // getters and setters
 }
 
-// Step 4: Register auto-configuration
-// META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports
 com.mycompany.redis.autoconfigure.MyCompanyRedisAutoConfiguration
-
-// Step 5: Use in application.yml
-// mycompany:
-//   redis:
-//     expose-headers: true
-//     cache-ttl: 60
-//     key-prefix: "myservice:"
 ```
 
 ---
@@ -109,8 +105,15 @@ com.mycompany.redis.autoconfigure.MyCompanyRedisAutoConfiguration
 
 ### Scenario 1: Organization-wide security starter
 
+
+**What this code does — step by step:**
+
+1. mycompany-security-spring-boot-starter
+2. Usage: teams just add the starter dependency. <dependency>. <groupId>com.mycompany</groupId>. <artifactId>mycompany-security-starter</artifactId>. </dependency>
+
+The same code, clean:
+
 ```java
-// mycompany-security-spring-boot-starter
 @AutoConfiguration
 @ConditionalOnClass(SecurityFilterChain.class)
 @EnableConfigurationProperties(MyCompanySecurityProperties.class)
@@ -135,17 +138,10 @@ public class MyCompanySecurityAutoConfiguration {
             .build();
     }
 }
-
-// Usage: teams just add the starter dependency
-// <dependency>
-//   <groupId>com.mycompany</groupId>
-//   <artifactId>mycompany-security-starter</artifactId>
-// </dependency>
 ```
 
 ### Scenario 2: Database migration starter
 
-```java
 @AutoConfiguration
 @ConditionalOnClass(Flyway.class)
 @EnableConfigurationProperties(MyCompanyFlywayProperties.class)
@@ -169,7 +165,6 @@ public class FlywayAutoConfiguration {
 }
 
 // Teams just add: mycompany.flyway.locations=classpath:db/migration
-```
 
 ---
 
@@ -182,3 +177,4 @@ public class FlywayAutoConfiguration {
 | Not providing defaults | Config required for every use | Provide sensible defaults |
 | Bundling too many dependencies | Classpath bloat | Keep starters focused |
 | Not testing starter in isolation | Works in your app, breaks elsewhere | Test with minimal dependencies |
+

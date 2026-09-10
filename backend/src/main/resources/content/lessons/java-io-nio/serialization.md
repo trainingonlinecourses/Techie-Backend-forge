@@ -31,16 +31,28 @@ Serialization walks the **entire object graph**: if your `User` references `Addr
 
 ## The Code Walkthrough
 
+
+**What this code does — step by step:**
+
+1. `private static final long serialVersionUID = 1L;` — version stamp (explained below)
+2. `private transient String sessionToken;` — NOT serialized — sensitive or non-serializable
+3. 1. Serialize a whole object graph to a file
+4. 2. Deserialize back
+5. `System.out.println(a);` — User{name='Alice', age=30, token='null'} <- token lost!
+6. `System.out.println(b);` — User{name='Bob', age=25, token='null'}
+
+The same code, clean:
+
 ```java
 import java.io.*;
 import java.util.List;
 
 class User implements Serializable {
-    private static final long serialVersionUID = 1L;   // version stamp (explained below)
+    private static final long serialVersionUID = 1L;
 
     private String name;
     private int age;
-    private transient String sessionToken;   // NOT serialized — sensitive or non-serializable
+    private transient String sessionToken;
 
     public User(String name, int age, String sessionToken) {
         this.name = name; this.age = age; this.sessionToken = sessionToken;
@@ -57,18 +69,16 @@ public class SerializationDemo {
         User alice = new User("Alice", 30, "secret-token-xyz");
         User bob   = new User("Bob", 25, "another-secret");
 
-        // 1. Serialize a whole object graph to a file
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("users.dat"))) {
             oos.writeObject(alice);
             oos.writeObject(bob);
         }
 
-        // 2. Deserialize back
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("users.dat"))) {
             User a = (User) ois.readObject();
             User b = (User) ois.readObject();
-            System.out.println(a);   // User{name='Alice', age=30, token='null'}  <- token lost!
-            System.out.println(b);   // User{name='Bob', age=25, token='null'}
+            System.out.println(a);
+            System.out.println(b);
         }
     }
 }
@@ -127,3 +137,4 @@ Java deserialization has a notorious history: `readObject` will happily instanti
 - `ObjectOutputStream.writeObject` / `ObjectInputStream.readObject` are the tools.
 - Compatible field additions keep the UID; incompatible changes require a bump + migration.
 - Never deserialize untrusted data without a filter — prefer JSON for cross-boundary data.
+

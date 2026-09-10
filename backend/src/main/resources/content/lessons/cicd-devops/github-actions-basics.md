@@ -1,7 +1,7 @@
 ---
 title: GitHub Actions Fundamentals
 module: cicd-devops
-order: 1
+order: 2
 minutes: 25
 topics: ["workflows", "jobs", "steps", "actions", "secrets", "triggers", "runners"]
 summary: CI/CD is the pipeline that turns a push into a deployed artifact with tests run, secrets handled, and failures reported. GitHub Actions is the most...
@@ -285,3 +285,4 @@ jobs:
 | Concurrency | Cancel stale runs on new pushes |
 
 CI is the contract between the repo and production: *every push is verified the same way*. The next lessons cover the Docker pipeline, Kubernetes deployment, and zero-downtime release strategies.
+

@@ -1,7 +1,7 @@
 ---
 title: Issuing JWTs — From Login to Token
 module: spring-security-jwt-deep
-order: 2
+order: 1
 minutes: 25
 topics: ["token issuance", "jjwt", "claims", "expiry", "login flow"]
 summary: The issuance side of JWT auth is the login flow: the user presents credentials, the server verifies them, and — if valid — mints a token the user c...
@@ -52,6 +52,21 @@ Rules:
 
 ## The Code Walkthrough
 
+
+**What this code does — step by step:**
+
+1. Derive an HMAC key from the configured secret (HS256 needs >= 256-bit key)
+2. `.subject(String.valueOf(user.getId()))` — sub
+3. `.claim("roles", user.getRoles())` — e.g. ["USER","ADMIN"]
+4. `.issuedAt(Date.from(now))` — iat
+5. `.expiration(Date.from(now.plus(expiryHours, ChronoUnit.HOURS)))` — exp
+6. `.signWith(key)` — HS256 with our key
+7. `.compact();` — produce the string
+8. The login endpoint uses this service:
+9. `User user = userStore.findByUsername(username);` — fetch user
+
+The same code, clean:
+
 ```java
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -72,25 +87,23 @@ public class TokenService {
     private final long expiryHours = 24;
 
     public TokenService(@Value("${app.jwt.secret}") String secret) {
-        // Derive an HMAC key from the configured secret (HS256 needs >= 256-bit key)
         this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
 
     public String issueToken(User user) {
         Instant now = Instant.now();
         return Jwts.builder()
-                .subject(String.valueOf(user.getId()))          // sub
+                .subject(String.valueOf(user.getId()))
                 .claim("username", user.getUsername())
-                .claim("roles", user.getRoles())                 // e.g. ["USER","ADMIN"]
-                .issuedAt(Date.from(now))                        // iat
-                .expiration(Date.from(now.plus(expiryHours, ChronoUnit.HOURS)))  // exp
-                .signWith(key)                                   // HS256 with our key
-                .compact();                                      // produce the string
+                .claim("roles", user.getRoles())
+                .issuedAt(Date.from(now))
+                .expiration(Date.from(now.plus(expiryHours, ChronoUnit.HOURS)))
+                .signWith(key)
+                .compact();
     }
 
-    // The login endpoint uses this service:
     public String login(String username, String rawPassword) {
-        User user = userStore.findByUsername(username);          // fetch user
+        User user = userStore.findByUsername(username);
         if (user == null || !passwordEncoder.matches(rawPassword, user.getPasswordHash())) {
             throw new BadCredentialsException("invalid credentials");
         }
@@ -109,14 +122,12 @@ public class TokenService {
 
 ## Password Verification — Why PasswordEncoder Matters
 
-```java
 // Spring Security's PasswordEncoder — bcrypt by default in modern Boot
 PasswordEncoder encoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
 
 String hash = encoder.encode("correct horse battery staple");   // $2a$10$...
 boolean ok = encoder.matches("correct horse battery staple", hash);   // true
 boolean no = encoder.matches("guess", hash);                           // false
-```
 
 - **Never store raw passwords** — store the bcrypt hash (a salted, deliberately slow hash).
 - **`matches` is constant-time-ish** — it compares hashes, not strings, so timing attacks can't recover the password.
@@ -149,3 +160,4 @@ The industry pattern is **short access tokens + refresh tokens** (next lesson): 
 - Verify passwords with `PasswordEncoder` (bcrypt/Argon2) — never raw comparison.
 - Always set `exp`; prefer short access tokens + refresh tokens.
 - Same generic error for unknown user vs wrong password (anti-enumeration).
+

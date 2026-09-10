@@ -1,7 +1,7 @@
 ---
 title: Spring Boot + Docker Compose — Full Production Stack
 summary: Real-world Docker Compose configurations for Spring Boot applications with PostgreSQL, Redis, monitoring, reverse proxy, and CI/CD integration.
-order: 2
+order: 4
 minutes: 25
 topics: [spring-boot-docker, production-stack, nginx-reverse-proxy, monitoring, ci-cd]
 docs:
@@ -339,3 +339,4 @@ docker compose top
 | No log rotation | Disk fills up | Configure `logging` driver with max-size/max-file |
 | No SSL termination | Data in transit is plaintext | Use Nginx with SSL certificates |
 | Default bridge network | No service discovery | Create explicit named networks |
+

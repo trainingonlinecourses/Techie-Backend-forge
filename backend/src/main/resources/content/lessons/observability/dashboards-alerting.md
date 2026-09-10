@@ -1,7 +1,7 @@
 ---
 title: Dashboards and Alerting
 module: observability
-order: 5
+order: 2
 minutes: 22
 topics: ["Prometheus", "Grafana", "alert rules", "SLOs", "on-call", "golden signals"]
 summary: Metrics without dashboards are numbers; dashboards without alerts are archaeology. This lesson covers the standard stack — Prometheus scrapes, Graf...
@@ -216,3 +216,4 @@ tests:
 | Contract | SLOs + burn rate | Know when you're failing the promise |
 
 Observability is a loop: dashboards tell you what's happening, alerts tell you when to act, and postmortems turn incidents into improvements. Instrument early, alert on burn rate, and let the platform metrics do the heavy lifting.
+

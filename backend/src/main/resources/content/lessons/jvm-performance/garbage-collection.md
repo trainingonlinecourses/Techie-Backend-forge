@@ -1,7 +1,7 @@
 ---
 title: Garbage Collection — How the JVM Cleans Up
 summary: Generational hypothesis, minor vs major GC, how each algorithm works, and the real-world impact of GC pauses. Beginner-friendly with line-by-line explanations.
-order: 4
+order: 1
 minutes: 25
 topics: [garbage collection, generational GC, minor GC, major GC, G1GC, ZGC, concurrent marking, STW, GC roots]
 docs:
@@ -39,14 +39,23 @@ Young Generation              Old Generation
 
 ### Minor GC (Young Generation)
 
+
+**What this code does — step by step:**
+
+1. These objects live in Young Gen:
+2. `Order order = new Order();` — Allocated in Eden
+3. `String desc = req.getDescription();` — Temporary, dies after return
+4. `order.setTotal(calculateTotal(req));` — calcTotal creates temp objects
+5. `return order;` — order may survive → promoted to Old Gen. Desc, temp objects → eligible for Minor GC
+
+The same code, clean:
+
 ```java
-// These objects live in Young Gen:
 public Order createOrder(OrderRequest req) {
-    Order order = new Order();              // Allocated in Eden
-    String desc = req.getDescription();     // Temporary, dies after return
-    order.setTotal(calculateTotal(req));    // calcTotal creates temp objects
-    return order;                           // order may survive → promoted to Old Gen
-    // desc, temp objects → eligible for Minor GC
+    Order order = new Order();
+    String desc = req.getDescription();
+    order.setTotal(calculateTotal(req));
+    return order;
 }
 ```
 
@@ -59,14 +68,19 @@ public Order createOrder(OrderRequest req) {
 
 ### Major/Full GC (Old Generation)
 
-```java
-// These objects live in Old Gen:
-private static final Map<String, Config> configCache = new HashMap<>();  // Static → Old Gen
-private final EntityManager em;  // Long-lived → Old Gen
 
-// A Major GC scans the ENTIRE Old Generation
-// This takes longer because there's more to scan
-// Pause: 50-500ms depending on algorithm and heap size
+**What this code does — step by step:**
+
+1. These objects live in Old Gen:
+2. `private static final Map<String, Config> configCache = new HashMap<>();` — Static → Old Gen
+3. `private final EntityManager em;` — Long-lived → Old Gen
+4. A Major GC scans the ENTIRE Old Generation. This takes longer because there's more to scan. Pause: 50-500ms depending on algorithm and heap size
+
+The same code, clean:
+
+```java
+private static final Map<String, Config> configCache = new HashMap<>();
+private final EntityManager em;
 ```
 
 ### Concurrent GC (G1, ZGC, Shenandoah)
@@ -122,7 +136,6 @@ java -Xlog:gc*=info:file=/var/log/app/gc.log:time,uptime,tags -jar app.jar
 
 ### Scenario 1: GC Pause Causing Timeout
 
-```java
 @RestController
 public class OrderController {
     @GetMapping("/orders/{id}")
@@ -133,7 +146,6 @@ public class OrderController {
         return orderService.findById(id);
     }
 }
-```
 
 **Fix options:**
 1. **Reduce heap size** — smaller heap = faster Full GC (less to scan)
@@ -154,16 +166,22 @@ This is a **memory leak**, not a GC tuning issue. No GC algorithm can fix an app
 
 ### Scenario 3: Humongous Allocation in G1
 
+
+**What this code does — step by step:**
+
+1. BAD: Creates a 10MB byte array
+2. `byte[] buffer = new byte[10 * 1024 * 1024];` — 10MB!
+3. In G1, objects bigger than half the region size (default 4MB). Are allocated as "humongous" — they trigger special GC behavior. And can cause Full GC pauses
+4. FIX: Use off-heap buffers or stream the data
+5. `ByteBuffer buffer = ByteBuffer.allocateDirect(10 * 1024 * 1024);` — Off-heap
+
+The same code, clean:
+
 ```java
-// BAD: Creates a 10MB byte array
-byte[] buffer = new byte[10 * 1024 * 1024];  // 10MB!
+byte[] buffer = new byte[10 * 1024 * 1024];
 
-// In G1, objects bigger than half the region size (default 4MB)
-// are allocated as "humongous" — they trigger special GC behavior
-// and can cause Full GC pauses
 
-// FIX: Use off-heap buffers or stream the data
-ByteBuffer buffer = ByteBuffer.allocateDirect(10 * 1024 * 1024);  // Off-heap
+ByteBuffer buffer = ByteBuffer.allocateDirect(10 * 1024 * 1024);
 ```
 
 ---
@@ -219,3 +237,4 @@ ZGC: ░░░░░░░░░░░░░░░░░░░░░░░░░
 - **Most GC issues are code issues** — fix memory allocation patterns before tuning GC flags.
 
 Official docs: [GC Tuning Guide](https://www.oracle.com/java/technologies/gctuning.html) · [java tool](https://docs.oracle.com/en/java/javase/21/docs/specs/man/java.html)
+

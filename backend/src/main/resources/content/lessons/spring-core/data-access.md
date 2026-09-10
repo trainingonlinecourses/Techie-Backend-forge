@@ -1,7 +1,7 @@
 ---
 title: Data Access & Transactions
 summary: The transaction abstraction, @Transactional semantics, propagation and isolation — and the pitfalls that break them.
-order: 9
+order: 10
 minutes: 20
 topics: [transactions, jdbc, jdbctemplate, isolation, propagation]
 docs:
@@ -15,7 +15,6 @@ docs:
 
 Spring's `PlatformTransactionManager` decouples your code from the underlying transaction system (JDBC, JPA/Hibernate, JTA). You annotate; the manager begins, commits or rolls back.
 
-```java
 @Transactional
 public void transfer(String fromIban, String toIban, Money amount) {
     Account from = accounts.findByIban(fromIban);
@@ -24,7 +23,6 @@ public void transfer(String fromIban, String toIban, Money amount) {
     to.credit(amount);
     // one commit at method exit — or full rollback if anything throws
 }
-```
 
 ## How @Transactional really behaves
 
@@ -33,18 +31,14 @@ public void transfer(String fromIban, String toIban, Money amount) {
 3. On success: commit. On any `RuntimeException`: roll back.
 4. **Checked exceptions do NOT roll back** by default — configure `rollbackFor`:
 
-```java
 @Transactional(rollbackFor = {TransferException.class})   // roll back on checked too
 public void transfer(...) throws TransferException { ... }
-```
 
 ## Propagation & isolation
 
-```java
 @Transactional(propagation = Propagation.REQUIRES_NEW)   // suspend outer tx, start new one
 @Transactional(isolation = Isolation.REPEATABLE_READ)    // per-transaction read behavior
 @Transactional(readOnly = true)                          // hint: no writes, fewer locks
-```
 
 | Propagation | Meaning |
 |---|---|
@@ -63,7 +57,6 @@ public void transfer(...) throws TransferException { ... }
 
 When you don't need an ORM, `JdbcTemplate` is explicit and fast:
 
-```java
 @Repository
 public class JdbcAccountRepository {
     private final JdbcTemplate jdbc;
@@ -79,24 +72,31 @@ public class JdbcAccountRepository {
         jdbc.update("UPDATE accounts SET balance_cents = ? WHERE iban = ?", cents, iban);
     }
 }
-```
 
 ## The pitfalls that break transactions
 
+
+**What this code does — step by step:**
+
+1. 1. Self-invocation — proxy bypassed, NO transaction
+2. `@Transactional public void a() { this.b(); }` — b() not transactional!
+3. 2. Private method — not proxied
+4. 3. Thread hop — connection is bound to the calling thread
+5. `executor.submit(() -> otherRepo.update(...));` — different thread, no tx!
+
+The same code, clean:
+
 ```java
-// 1. Self-invocation — proxy bypassed, NO transaction
 @Service
 class Service {
-    @Transactional public void a() { this.b(); }        // b() not transactional!
+    @Transactional public void a() { this.b(); }
     @Transactional public void b() { ... }
 }
 
-// 2. Private method — not proxied
 @Transactional private void hidden() { ... }
 
-// 3. Thread hop — connection is bound to the calling thread
 @Transactional public void a() {
-    executor.submit(() -> otherRepo.update(...));       // different thread, no tx!
+    executor.submit(() -> otherRepo.update(...));
 }
 ```
 
@@ -112,3 +112,4 @@ Exception translation: `@Repository` beans get persistence exceptions translated
 - JdbcTemplate for SQL-first; repositories translate exceptions.
 
 **Official docs:** [Data access](https://docs.spring.io/spring-framework/reference/data-access.html) · [Transaction management](https://docs.spring.io/spring-framework/reference/data-access/transaction.html)
+

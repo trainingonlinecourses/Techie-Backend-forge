@@ -1,7 +1,7 @@
 ---
 title: ThreadLocal — Thread-Isolated Storage for Request-Scoped Data
 summary: How ThreadLocal provides per-thread copies of data, why it's essential for request tracing and user context, memory leak traps with thread pools, and the InheritableThreadLocal alternative.
-order: 65
+order: 80
 minutes: 20
 topics: [threadlocal, inheritable-threadlocal, request-context, thread-isolation, memory-leak, thread-pool]
 docs:
@@ -21,17 +21,24 @@ docs:
 
 ## How it works
 
+
+**What this code does — step by step:**
+
+1. Create a ThreadLocal variable
+2. Set the value (only visible to the CURRENT thread)
+3. Get the value (only returns what THIS thread set)
+4. `String name = currentUser.get();` — "Alice"
+5. Clear when done (important for thread pools!)
+
+The same code, clean:
+
 ```java
-// Create a ThreadLocal variable
 private static final ThreadLocal<String> currentUser = new ThreadLocal<>();
 
-// Set the value (only visible to the CURRENT thread)
 currentUser.set("Alice");
 
-// Get the value (only returns what THIS thread set)
-String name = currentUser.get();  // "Alice"
+String name = currentUser.get();
 
-// Clear when done (important for thread pools!)
 currentUser.remove();
 ```
 
@@ -41,33 +48,45 @@ currentUser.remove();
 
 In a web application, every HTTP request runs on a different thread. You need to know "who is the current user?" but you don't want to pass `UserContext` through every method call:
 
+
+**What this code does — step by step:**
+
+1. WITHOUT ThreadLocal — you must pass user through every layer
+2. `public Order createOrder(CreateOrderRequest req, UserContext user) {` — pass user
+3. `return orderService.create(req, user);` — pass user again
+4. `public Order create(CreateOrderRequest req, UserContext user) {` — pass user again
+5. `return orderRepo.save(new Order(req, user));` — and again
+6. WITH ThreadLocal — user is available everywhere without passing
+7. `public static void clear() { current.remove(); }` — ALWAYS clean up!
+8. Now any class can access the current user without parameters
+9. `User user = UserContext.get();` — get current user — no parameter needed
+
+The same code, clean:
+
 ```java
-// WITHOUT ThreadLocal — you must pass user through every layer
 public class OrderController {
-    public Order createOrder(CreateOrderRequest req, UserContext user) {  // pass user
-        return orderService.create(req, user);  // pass user again
+    public Order createOrder(CreateOrderRequest req, UserContext user) {
+        return orderService.create(req, user);
     }
 }
 
 public class OrderService {
-    public Order create(CreateOrderRequest req, UserContext user) {  // pass user again
-        return orderRepo.save(new Order(req, user));  // and again
+    public Order create(CreateOrderRequest req, UserContext user) {
+        return orderRepo.save(new Order(req, user));
     }
 }
 
-// WITH ThreadLocal — user is available everywhere without passing
 public class UserContext {
     private static final ThreadLocal<User> current = new ThreadLocal<>();
 
     public static void set(User user) { current.set(user); }
     public static User get() { return current.get(); }
-    public static void clear() { current.remove(); }  // ALWAYS clean up!
+    public static void clear() { current.remove(); }
 }
 
-// Now any class can access the current user without parameters
 public class OrderService {
     public Order create(CreateOrderRequest req) {
-        User user = UserContext.get();  // get current user — no parameter needed
+        User user = UserContext.get();
         auditLog.log("Order by " + user.getName());
         return orderRepo.save(new Order(req, user));
     }
@@ -80,18 +99,31 @@ public class OrderService {
 
 Every request gets a unique trace ID. You want it available in every log statement without passing it everywhere:
 
+
+**What this code does — step by step:**
+
+1. Called at the start of every request
+2. Called at the END of every request — CRITICAL to prevent leaks
+3. A filter that sets up context for every request
+4. `TraceContext.start(trace, user);` — set for this request's thread
+5. `chain.doFilter(request, response);` — all downstream code can access it
+6. `TraceContext.end();` — CLEAN UP — prevent leak to next request
+7. Any service can now log with trace context
+8. `log.info("[{}] Creating order for user {}",` — trace ID appears in logs
+9. ... no need to pass traceId through every method
+
+The same code, clean:
+
 ```java
 public class TraceContext {
     private static final ThreadLocal<String> traceId = new ThreadLocal<>();
     private static final ThreadLocal<String> userId = new ThreadLocal<>();
 
-    // Called at the start of every request
     public static void start(String trace, String user) {
         traceId.set(trace);
         userId.set(user);
     }
 
-    // Called at the END of every request — CRITICAL to prevent leaks
     public static void end() {
         traceId.remove();
         userId.remove();
@@ -101,7 +133,6 @@ public class TraceContext {
     public static String getUserId() { return userId.get(); }
 }
 
-// A filter that sets up context for every request
 @Component
 public class TraceFilter extends OncePerRequestFilter {
     @Override
@@ -111,25 +142,23 @@ public class TraceFilter extends OncePerRequestFilter {
         String trace = UUID.randomUUID().toString();
         String user = extractUser(request);
 
-        TraceContext.start(trace, user);  // set for this request's thread
+        TraceContext.start(trace, user);
         try {
-            chain.doFilter(request, response);  // all downstream code can access it
+            chain.doFilter(request, response);
         } finally {
-            TraceContext.end();  // CLEAN UP — prevent leak to next request
+            TraceContext.end();
         }
     }
 }
 
-// Any service can now log with trace context
 @Service
 public class OrderService {
     private static final Logger log = LoggerFactory.getLogger(OrderService.class);
 
     public Order createOrder(CreateOrderRequest req) {
-        log.info("[{}] Creating order for user {}",       // trace ID appears in logs
+        log.info("[{}] Creating order for user {}",
                  TraceContext.getTraceId(),
                  TraceContext.getUserId());
-        // ... no need to pass traceId through every method
     }
 }
 ```
@@ -137,6 +166,17 @@ public class OrderService {
 ### Scenario 2: Multi-tenant database routing
 
 Different customers use different databases. ThreadLocal determines which database to use:
+
+
+**What this code does — step by step:**
+
+1. Dynamic DataSource routing based on ThreadLocal
+2. `return TenantContext.getTenant();` — returns "acme" or "globex" etc.
+3. A filter sets the tenant from the request header
+4. `TenantContext.setTenant(tenant);` — set tenant for this request's thread
+5. `TenantContext.clear();` — prevent tenant leak to next request on same thread
+
+The same code, clean:
 
 ```java
 public class TenantContext {
@@ -147,15 +187,13 @@ public class TenantContext {
     public static void clear() { tenantId.remove(); }
 }
 
-// Dynamic DataSource routing based on ThreadLocal
 public class TenantRoutingDataSource extends AbstractRoutingDataSource {
     @Override
     protected Object determineCurrentLookupKey() {
-        return TenantContext.getTenant();  // returns "acme" or "globex" etc.
+        return TenantContext.getTenant();
     }
 }
 
-// A filter sets the tenant from the request header
 @Component
 public class TenantFilter extends OncePerRequestFilter {
     @Override
@@ -163,11 +201,11 @@ public class TenantFilter extends OncePerRequestFilter {
                                      HttpServletResponse response,
                                      FilterChain chain) throws IOException, ServletException {
         String tenant = request.getHeader("X-Tenant-ID");
-        TenantContext.setTenant(tenant);  // set tenant for this request's thread
+        TenantContext.setTenant(tenant);
         try {
             chain.doFilter(request, response);
         } finally {
-            TenantContext.clear();  // prevent tenant leak to next request on same thread
+            TenantContext.clear();
         }
     }
 }
@@ -175,7 +213,6 @@ public class TenantFilter extends OncePerRequestFilter {
 
 ### Scenario 3: The memory leak trap with thread pools
 
-```java
 // DANGEROUS: ThreadLocal in an ExecutorService with fixed thread pool
 ExecutorService executor = Executors.newFixedThreadPool(10);
 
@@ -188,13 +225,11 @@ for (int i = 0; i < 1_000_000; i++) {
         // The next 999,990 tasks will see the WRONG user
     });
 }
-```
 
 **Why this happens:** In a thread pool, threads are reused. When a task completes without calling `remove()`, the ThreadLocal value persists for the next task that reuses that thread. With 10 threads and 1M tasks, the first 10 tasks leave stale data that affects all subsequent tasks.
 
 **The fix — always remove in a finally block:**
 
-```java
 executor.submit(() -> {
     try {
         currentUser.set("Alice");
@@ -203,27 +238,29 @@ executor.submit(() -> {
         currentUser.remove();  // ALWAYS clean up — no exceptions
     }
 });
-```
 
 ## InheritableThreadLocal — passing context to child threads
 
 Regular `ThreadLocal` doesn't propagate to child threads. `InheritableThreadLocal` does:
 
-```java
-// Regular ThreadLocal — child thread gets NULL
-private static final ThreadLocal<String> parent = new ThreadLocal<>();
-parent.set("from-parent");
-new Thread(() -> {
-    System.out.println(parent.get());  // null! child can't see parent's value
-}).start();
+public class Main {
 
-// InheritableThreadLocal — child thread inherits parent's value
-private static final InheritableThreadLocal<String> inheritable = new InheritableThreadLocal<>();
-inheritable.set("from-parent");
-new Thread(() -> {
-    System.out.println(inheritable.get());  // "from-parent" — inherited!
-}).start();
-```
+    public static void main(String[] args) {
+        // Regular ThreadLocal — child thread gets NULL
+        private static final ThreadLocal<String> parent = new ThreadLocal<>();
+        parent.set("from-parent");
+        new Thread(() -> {
+            System.out.println(parent.get());  // null! child can't see parent's value
+        }).start();
+
+        // InheritableThreadLocal — child thread inherits parent's value
+        private static final InheritableThreadLocal<String> inheritable = new InheritableThreadLocal<>();
+        inheritable.set("from-parent");
+        new Thread(() -> {
+            System.out.println(inheritable.get());  // "from-parent" — inherited!
+        }).start();
+    }
+}
 
 **Caveat:** InheritableThreadLocal copies the value when the child thread is created, not when it runs. If the parent changes the value later, the child still sees the old value. For true async context propagation, use `TaskDecorator` or the `context- Propagation` library.
 
@@ -236,3 +273,4 @@ new Thread(() -> {
 | Setting ThreadLocal in a thread pool task without cleanup | Next task on same thread sees stale data |
 | Using InheritableThreadLocal with complex objects | Child sees reference to parent's mutable object — potential race |
 | ThreadLocal in static fields without remove | Values persist across requests in pooled threads |
+

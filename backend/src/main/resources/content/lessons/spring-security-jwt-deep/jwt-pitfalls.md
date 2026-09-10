@@ -1,7 +1,7 @@
 ---
 title: JWT Security — The Attacks and the Fixes
 module: spring-security-jwt-deep
-order: 5
+order: 2
 minutes: 27
 topics: ["alg confusion", "secret management", "token theft", "XSS", "CSRF", "hardening"]
 summary: A JWT's trust model rests on one assumption: only the server can produce a valid signature. Every JWT vulnerability is ultimately a way to violate ...
@@ -28,13 +28,11 @@ A JWT's trust model rests on one assumption: **only the server can produce a val
 
 **The fix:**
 
-```java
 // Pin the algorithm/key — never trust the header's alg:
 Jwts.parser()
         .verifyWith(hmacKey)          // jjwt: key-pinned => alg fixed, 'none' rejected
         .build()
         .parseSignedClaims(token);
-```
 
 Modern libraries reject `none` by default *when you verify with a key*. The rule: **verification behavior must never be decided by attacker-controlled data** (the header). The key pins everything.
 
@@ -49,20 +47,16 @@ The server expects **RS256** (asymmetric: private key signs, public key verifies
 
 **The fix:** a library that ties the algorithm to the key type and *refuses to switch*:
 
-```java
 // jjwt: the key type determines the algorithm family; you cannot
 // "reuse" an RSA public key as an HMAC secret for verification.
 .verifyWith(publicKey)     // only RS256/ES256-style signatures accepted
-```
 
 Also: never accept `alg` values you didn't configure; and if you support multiple algorithms, keep them explicitly separated.
 
 ## Attack 3 — Weak Secrets
 
-```java
 // Vulnerable: a guessable HMAC secret
 @Value("${app.jwt.secret}") String secret;   // e.g., "password" or "secret123"
-```
 
 With a weak secret, the attacker brute-forces it offline (HMAC is fast — millions of guesses/sec) and then forges any token.
 
@@ -109,7 +103,6 @@ If the access token also rides a cookie (automatic with requests), a malicious s
 
 A stolen refresh token (from a log, a proxy, a leak) lets the attacker mint access tokens. Rotation (previous lesson) is the core defense; **reuse detection** turns theft into an alarm:
 
-```java
 // If the same refresh token is presented TWICE, rotation means the second
 // use is already invalid — that's the theft signal:
 if (repository.findByToken(value).isEmpty()
@@ -117,7 +110,6 @@ if (repository.findByToken(value).isEmpty()
     revokeAllForUser(attackerGuess);     // kill the whole session family
     alertSecurity("refresh token reuse detected");
 }
-```
 
 ## The Hardening Checklist
 
@@ -152,3 +144,4 @@ if (repository.findByToken(value).isEmpty()
 - Rotation + reuse detection make refresh-token theft a loud, detectable event.
 - Use a maintained JWT library; hand-rolling is where the bugs live.
 - The complete hardening checklist above is the production baseline.
+

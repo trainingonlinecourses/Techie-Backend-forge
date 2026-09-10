@@ -22,23 +22,26 @@ docs:
 
 ## The Vulnerability, Made Concrete
 
+
+**What this code does — step by step:**
+
+1. The attacker-controlled input arrives from a request:
+2. VULNERABLE — the input is GLUED into the query:
+3. name = "admin' --" -> WHERE name = 'admin' --' (comment hides the rest). Name = "' OR '1'='1" -> WHERE name = '' OR '1'='1' (returns EVERY row). Name = "'; DROP TABLE users; --" -> the classic destruction
+
+The same code, clean:
+
 ```java
-// The attacker-controlled input arrives from a request:
 String name = request.getParameter("name");
 
-// VULNERABLE — the input is GLUED into the query:
 String sql = "SELECT * FROM users WHERE name = '" + name + "'";
 jdbcTemplate.query(sql, ...);
-//   name = "admin' --"        -> WHERE name = 'admin' --'   (comment hides the rest)
-//   name = "' OR '1'='1"      -> WHERE name = '' OR '1'='1' (returns EVERY row)
-//   name = "'; DROP TABLE users; --"  -> the classic destruction
 ```
 
 Each payload works because the input is *interpreted as SQL grammar*. The quotes in the input close the string literal the developer opened; the attacker's keywords then write new clauses. The damage scales from data theft (return every row) to data destruction.
 
 ## The Fix: Parameterization, Always
 
-```java
 // SAFE — parameterized query. The ? is a slot for a VALUE, not grammar.
 jdbcTemplate.query(
     "SELECT * FROM users WHERE name = ?",
@@ -50,7 +53,6 @@ namedJdbc.query(
     "SELECT * FROM users WHERE name = :name",
     Map.of("name", name),
     (rs, i) -> new User(rs.getString("id"), rs.getString("name")));
-```
 
 **What happens under the hood:** the SQL string with `?` is *compiled* (parsed) once, and the parameters are sent separately. The database knows the structure is `WHERE name = <value>`; the input can only fill the value slot. `admin' --` becomes the literal *string* `admin' --` — it's stored/compared as data, never parsed as grammar. **This is the single most important rule in web security: never build SQL by string concatenation; always bind parameters.**
 
@@ -64,7 +66,6 @@ The same rule extends through the stack:
 
 Parameterization binds *values* — it cannot bind *identifiers* (table/column names), because identifiers are grammar by nature. Dynamic ordering and dynamic columns are where injection sneaks back in:
 
-```java
 // VULNERABLE — the sort column is grammar, not a value:
 String sql = "SELECT * FROM products ORDER BY " + sortColumn;
 //   sortColumn = "price; DROP TABLE products; --"  -> injection!
@@ -72,7 +73,6 @@ String sql = "SELECT * FROM products ORDER BY " + sortColumn;
 // SAFE — NEVER bind identifiers; whitelist them instead:
 List<String> ALLOWED = List.of("price", "name", "created_at");
 if (!ALLOWED.contains(sortColumn)) sortColumn = "price";   // deny by default
-```
 
 **The rule:** identifiers come from a *whitelist you control*, never from user input directly. The same applies to dynamic table names, dynamic `GROUP BY` columns, and dynamic SQL fragments — each is a grammar slot that parameterization can't protect.
 
@@ -94,17 +94,18 @@ The mechanism is identical: user input that becomes *query operators* (`$ne`, `$
 
 ## Command Injection: The OS as Interpreter
 
+
+**What this code does — step by step:**
+
+1. VULNERABLE — user input becomes an OS command:
+2. file = "/etc/passwd; rm -rf /home" -> the semicolon chains commands!
+3. SAFE — never build OS commands from input: - Use the Java API instead of the shell (Files.readString, etc.). - If a process is truly needed, pass arguments as a LIST (no shell): new ProcessBuilder("cat", file) // args are passed, never parsed by a shell. - Validate/whitelist the input (a path inside a known directory)
+
+The same code, clean:
+
 ```java
-// VULNERABLE — user input becomes an OS command:
 String file = request.getParameter("file");
 Process p = Runtime.getRuntime().exec("cat " + file);
-//   file = "/etc/passwd; rm -rf /home"  -> the semicolon chains commands!
-
-// SAFE — never build OS commands from input:
-//   - Use the Java API instead of the shell (Files.readString, etc.)
-//   - If a process is truly needed, pass arguments as a LIST (no shell):
-//     new ProcessBuilder("cat", file)  // args are passed, never parsed by a shell
-//   - Validate/whitelist the input (a path inside a known directory)
 ```
 
 The principle generalizes: **any interpreter that receives untrusted input — SQL, query documents, OS shells, LDAP filters, even HTML — must receive it as *data* (bound, escaped, or validated), never as *code*.** The OWASP cheat sheets document the per-interpreter safe construction for each.
@@ -131,3 +132,4 @@ Parameterization is the primary defense; real systems layer more:
 ## Recap
 
 Injection is untrusted input that becomes interpreter grammar — SQL, NoSQL, or OS — and it's caused by string-building instructions instead of binding values. The fix is **parameterization**: prepared statements and named parameters put input in the value slot where it can never alter the sentence, `?`-style, in every layer (JdbcTemplate, JPA, Criteria). Identifiers (table/column names) can't be parameterized — whitelist them. NoSQL and command injection are the same idea in different syntaxes, with the same cure: build with operators/APIs, never strings/shells. Defense in depth — validation, least privilege, encoding, scanning — layers on top, but parameterization is the load-bearing wall: get it right once, and an entire category of catastrophe is closed.
+

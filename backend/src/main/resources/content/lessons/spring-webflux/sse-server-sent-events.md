@@ -1,7 +1,7 @@
 ---
 title: Server-Sent Events (SSE) — Real-Time Push
 summary: Push live updates from server to client using SSE, SseEmitter, Flux-based SSE endpoints, and real-time dashboards.
-order: 9
+order: 12
 minutes: 16
 topics: [sse, server-sent-events, real-time, event-stream, push-notifications, live-data]
 docs:
@@ -41,7 +41,6 @@ docs:
 
 ### Basic SSE Endpoint
 
-```java
 @RestController
 @RequestMapping("/api/events")
 public class EventController {
@@ -68,11 +67,9 @@ public class EventController {
         return emitter;
     }
 }
-```
 
 ### SseEmitter Manager
 
-```java
 @Component
 public class SseEmitterManager {
 
@@ -110,11 +107,9 @@ public class SseEmitterManager {
         emitters.removeAll(deadEmitters);
     }
 }
-```
 
 ### Sending Events from a Service
 
-```java
 @Service
 public class OrderNotificationService {
 
@@ -145,7 +140,6 @@ public class OrderNotificationService {
         ));
     }
 }
-```
 
 ---
 
@@ -153,7 +147,6 @@ public class OrderNotificationService {
 
 ### Using Flux直接 as SSE
 
-```java
 @RestController
 @RequestMapping("/api/events")
 public class ReactiveEventController {
@@ -175,11 +168,9 @@ public class ReactiveEventController {
                 .build());
     }
 }
-```
 
 ### Event Publisher
 
-```java
 @Service
 public class EventPublisher {
 
@@ -197,7 +188,6 @@ public class EventPublisher {
         return sink.asFlux();
     }
 }
-```
 
 ---
 
@@ -240,7 +230,6 @@ eventSource.close();
 
 ### Scenario 1: Live Order Dashboard
 
-```java
 @Service
 public class DashboardService {
 
@@ -261,11 +250,9 @@ public class DashboardService {
             .subscribe(data -> eventPublisher.publish("metrics", data));
     }
 }
-```
 
 ### Scenario 2: Live Chat Notifications
 
-```java
 @Service
 public class ChatService {
 
@@ -283,7 +270,6 @@ public class ChatService {
             ));
     }
 }
-```
 
 ---
 
@@ -310,3 +296,4 @@ public class ChatService {
 | Not auto-reconnecting client | Client loses connection permanently | Use `EventSource` which auto-reconnects |
 | Broadcasting to dead connections | IOException spam | Clean up dead emitters in broadcast loop |
 | Using SSE for bidirectional | SSE is one-way only | Use WebSocket for bidirectional communication |
+

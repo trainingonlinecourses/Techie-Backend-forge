@@ -1,7 +1,7 @@
 ---
 title: Integration Testing with Testcontainers
 summary: Real Postgres, Kafka, Redis and more in tests — spinning up disposable containers, wiring them to Spring contexts, and the JUnit 5 lifecycle.
-order: 13
+order: 50
 minutes: 16
 topics: [testcontainers, integration testing, docker, test lifecycle, @ServiceConnection]
 docs:
@@ -17,7 +17,6 @@ An in-memory database (H2) is *almost* production — until a Postgres-only feat
 
 ## The minimal setup
 
-```java
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class OrderRepositoryIT {
@@ -31,18 +30,15 @@ class OrderRepositoryIT {
         // repository.save(...); repository.findById(...) — against real Postgres
     }
 }
-```
 
 `@ServiceConnection` (Boot 3.1+) reads the container's connection info and configures the matching `DataSource`/connection factory automatically — no hard-coded JDBC URL. Without it, you'd extract `getJdbcUrl()` manually into a `DynamicPropertySource`:
 
-```java
 @DynamicPropertySource
 static void props(DynamicPropertyRegistry r) {
     r.add("spring.datasource.url", postgres::getJdbcUrl);
     r.add("spring.datasource.username", postgres::getUsername);
     r.add("spring.datasource.password", postgres::getPassword);
 }
-```
 
 ## Sharing containers across tests
 
@@ -54,7 +50,6 @@ Starting a container per test class is slow. The standard patterns:
 
 ## Testing more than the database
 
-```java
 @Container
 @ServiceConnection
 static KafkaContainer kafka = new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:7.6.0"));
@@ -62,7 +57,6 @@ static KafkaContainer kafka = new KafkaContainer(DockerImageName.parse("confluen
 @Container
 @ServiceConnection
 static RedisContainer redis = new RedisContainer(DockerImageName.parse("redis:7-alpine"));
-```
 
 The same pattern covers MongoDB, Elasticsearch, RabbitMQ, MySQL, even **`LocalStackContainer`** for AWS services. `@ServiceConnection` supports all of them — one annotation per container, zero manual config. That's how you integration-test the outbox pattern, the cache, and the event pipeline with their real peers.
 
@@ -98,3 +92,4 @@ The same pattern covers MongoDB, Elasticsearch, RabbitMQ, MySQL, even **`LocalSt
 - Use it at the integration level — keep the fast unit/slice layers on top of it.
 
 Official docs: [Spring Boot + Testcontainers](https://docs.spring.io/spring-boot/reference/testing/testcontainers.html) · [Testcontainers for Java](https://java.testcontainers.org/)
+

@@ -43,7 +43,6 @@ That error message is the module system speaking plainly: "java.base does not *o
 
 Here's a module declaration showing the vocabulary:
 
-```java
 // backend/src/main/java/module-info.java (conceptual)
 module academy.payments {
     // Public API — other modules can USE these packages.
@@ -59,7 +58,6 @@ module academy.payments {
     requires com.fasterxml.jackson.databind;
     requires org.hibernate.orm.core;
 }
-```
 
 **Walking through it:** the `api` and `dto` packages are *exported* — controllers and clients compile against them. The `domain` and `config` packages are *opened* — Hibernate can set private fields on entities, Jackson can serialize them, and Spring can reflect into config classes. Notice the asymmetry: `exports` is about *compile-time visibility* (can other modules reference these types?), while `opens` is about *runtime reflection* (can frameworks reach the private parts?). A package can be both (`exports` AND `opens`) — export for API consumers, open for frameworks.
 
@@ -106,3 +104,4 @@ Learning reflection on modern Java means learning these too: the language keeps 
 ## Recap
 
 Java 9's module system upgraded encapsulation from convention to enforcement: modules declare `exports` (compile-time visibility) and `opens` (deep-reflection permission), and reflection into anything else throws `InaccessibleObjectException`. Most applications live in the unnamed module on the classpath and only meet the wall when frameworks reflect into JDK internals — solved with `--add-opens` flags, one package at a time. Modern frameworks minimize the need via `privateLookupIn`, and records/sealed classes integrate cleanly with reflection. The practical takeaways: if you write a module, `opens` only what frameworks need; if you run on the classpath, keep the documented `--add-opens` set handy; and remember that `setAccessible(true)` is now a permission question, not a technique.
+

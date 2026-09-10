@@ -1,7 +1,7 @@
 ---
 title: Scaling WebSockets — Beyond One Instance
 module: websockets-deep
-order: 5
+order: 4
 minutes: 25
 topics: ["horizontal scaling", "session affinity", "Redis pub-sub", "sticky sessions", "broker relay"]
 summary: The chat handler from the first lesson keeps sessions in a ConcurrentHashMap — in one JVM's memory. That's fine for a single instance. But the mome...
@@ -54,8 +54,21 @@ Every instance subscribes to the broker; every broadcast goes *through* the brok
 
 ## The Code Walkthrough — Redis Pub/Sub Relay
 
+
+**What this code does — step by step:**
+
+1. ---- 1. Redis pub/sub: the lightweight shared channel ----
+2. `private final SimpMessagingTemplate template;` — delivers to LOCAL sessions
+3. Listen for messages published by OTHER instances:
+4. Called when ANOTHER instance published to the channel
+5. Deliver to THIS instance's local subscribers:
+6. Called by THIS instance's handlers when a message arrives locally
+7. `template.convertAndSend("/topic/chat", payload);` — deliver locally
+8. `redisTemplate.convertAndSend("chat-relay", payload);` — tell other instances
+
+The same code, clean:
+
 ```java
-// ---- 1. Redis pub/sub: the lightweight shared channel ----
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
@@ -65,13 +78,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class RedisChatRelay {
 
-    private final SimpMessagingTemplate template;    // delivers to LOCAL sessions
+    private final SimpMessagingTemplate template;
 
     public RedisChatRelay(SimpMessagingTemplate template,
                           RedisConnectionFactory redisFactory) {
         this.template = template;
 
-        // Listen for messages published by OTHER instances:
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
         container.setConnectionFactory(redisFactory);
         container.addMessageListener(new MessageListenerAdapter(this, "onRelay"),
@@ -79,16 +91,13 @@ public class RedisChatRelay {
         container.start();
     }
 
-    // Called when ANOTHER instance published to the channel
     public void onRelay(String payload) {
-        // Deliver to THIS instance's local subscribers:
         template.convertAndSend("/topic/chat", payload);
     }
 
-    // Called by THIS instance's handlers when a message arrives locally
     public void publish(String payload) {
-        template.convertAndSend("/topic/chat", payload);   // deliver locally
-        redisTemplate.convertAndSend("chat-relay", payload); // tell other instances
+        template.convertAndSend("/topic/chat", payload);
+        redisTemplate.convertAndSend("chat-relay", payload);
     }
 }
 ```
@@ -106,7 +115,6 @@ The result: one logical topic spread across N instances, each instance handling 
 
 Spring's `enableStompBrokerRelay` pushes the *brokering itself* to RabbitMQ:
 
-```java
 @Override
 public void configureMessageBroker(MessageBrokerRegistry config) {
     config.enableStompBrokerRelay("/topic", "/queue")
@@ -116,7 +124,6 @@ public void configureMessageBroker(MessageBrokerRegistry config) {
             .setClientPasscode("guest");
     config.setApplicationDestinationPrefixes("/app");
 }
-```
 
 Now RabbitMQ IS the broker: subscriptions register with RabbitMQ, messages route through it, and every instance is just a *relay point* to the same logical broker. Subscriptions are global by construction — no manual relay code at all. The cost: an extra moving part (RabbitMQ) to operate.
 
@@ -166,3 +173,4 @@ Each client holds an open socket on *one* instance. As instances scale, the dist
 - The broker relay (RabbitMQ) makes subscriptions global by construction, at the cost of running RabbitMQ.
 - Clients must reconnect with backoff; instances are ephemeral.
 - Sockets are memory-heavy — size instances by sockets, and test at scale.
+

@@ -1,7 +1,7 @@
 ---
 title: Spring Cloud Stream
 summary: Event-driven microservices with a bindable messaging abstraction — functional binders, Kafka/Rabbit backends, consumer groups, partitioning and error handling.
-order: 8
+order: 12
 minutes: 15
 topics: [spring cloud stream, binders, event-driven, consumer groups, kafka, rabbitmq]
 docs:
@@ -19,7 +19,6 @@ Spring Cloud Stream is the **messaging abstraction** for event-driven microservi
 
 Since Spring Cloud Stream 3.x, bindings are plain `java.util.function` beans — no more legacy `@EnableBinding`/`@StreamListener`:
 
-```java
 @Configuration
 public class OrderBindings {
 
@@ -35,7 +34,6 @@ public class OrderBindings {
         return () -> orderService.nextToShip();
     }
 }
-```
 
 The bean name *is* the binding name: `onOrderCreated` → consumer binding, `shipOrders` → producer binding. Config wires names to destinations:
 
@@ -91,7 +89,6 @@ A separate `Consumer<Message<?>>` on the DLQ binding can log, alert, or park the
 - **Binding naming conventions** (`-in-0`/`-out-0`) are consistent and testable.
 - **Test binder** — `spring-cloud-stream-test-binder` replaces the broker in tests with an in-memory implementation, so integration tests don't need Kafka running:
 
-```java
 @SpringBootTest
 @AutoConfigureOutputBindings
 class OrderBindingsTest {
@@ -100,7 +97,6 @@ class OrderBindingsTest {
         // assert that shipOrders() emitted onto the output binding
     }
 }
-```
 
 ## Key takeaways
 
@@ -110,3 +106,4 @@ class OrderBindingsTest {
 - The binder abstraction and the test binder keep broker choice (and broker-in-test) out of your business logic.
 
 Official docs: [Spring Cloud Stream](https://docs.spring.io/spring-cloud-stream/reference/) · [Kafka binder reference](https://docs.spring.io/spring-cloud-stream/reference/kafka/)
+

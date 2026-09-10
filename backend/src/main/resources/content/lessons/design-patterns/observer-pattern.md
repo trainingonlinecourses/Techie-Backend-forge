@@ -1,7 +1,7 @@
 ---
 title: Observer Pattern — Notifying When Things Change
 module: design-patterns
-order: 5
+order: 3
 minutes: 24
 topics: ["observer", "publish-subscribe", "event listeners", "decoupling", "Spring events"]
 summary: Think of a news subscription. You don't call the newspaper every morning asking "is there news yet?" — you subscribe, and the paper pushes new edit...
@@ -18,7 +18,6 @@ Think of a news subscription. You don't call the newspaper every morning asking 
 
 In code, this solves a fundamental coupling problem. Consider a `UserService` that creates a user. Without observers:
 
-```java
 void createUser(User u) {
     repo.save(u);
     emailService.sendWelcome(u);        // UserService KNOWS about email
@@ -26,35 +25,43 @@ void createUser(User u) {
     auditLog.record(u);                 // ...and audit
     // adding a 5th consequence = editing UserService again
 }
-```
 
 `UserService` is coupled to every downstream concern, and every new concern edits it. With observers, `UserService` just publishes an event ("a user was created") and knows nothing about who listens:
 
-```java
 // UserService: publishes; has NO knowledge of listeners
 eventPublisher.publish(new UserCreatedEvent(u));
-```
 
 Email, analytics, and audit each become *observers* that subscribe to `UserCreatedEvent` — added and removed without touching `UserService`. This is **decoupling**: the producer and consumers depend only on the *event type*, never on each other.
 
 ## The Code Walkthrough
 
+
+**What this code does — step by step:**
+
+1. ---- 1. The event: what happened ----
+2. ---- 2. The subject (publisher): manages observers and notifies ----
+3. Subscribe: register an observer for an event type
+4. Publish: notify every observer of this event type
+5. ---- 3. The subject that triggers events ----
+6. `bus.publish(new UserCreatedEvent(username, email));` — announce — knows nothing else
+7. ---- 4. Observers subscribe (each is independent) ----
+8. ---- 5. Trigger — all observers fire automatically ----
+9. [UserService] saving user sateesh. [Email] welcome to sateesh. [Audit] sateesh created at ...
+
+The same code, clean:
+
 ```java
 import java.util.*;
 
-// ---- 1. The event: what happened ----
 record UserCreatedEvent(String username, String email) {}
 
-// ---- 2. The subject (publisher): manages observers and notifies ----
 class EventBus {
     private final Map<Class<?>, List<Object>> listeners = new HashMap<>();
 
-    // Subscribe: register an observer for an event type
     public <T> void subscribe(Class<T> eventType, java.util.function.Consumer<T> handler) {
         listeners.computeIfAbsent(eventType, k -> new ArrayList<>()).add(handler);
     }
 
-    // Publish: notify every observer of this event type
     public <T> void publish(T event) {
         @SuppressWarnings("unchecked")
         List<java.util.function.Consumer<T>> handlers =
@@ -65,7 +72,6 @@ class EventBus {
     }
 }
 
-// ---- 3. The subject that triggers events ----
 class UserService {
     private final EventBus bus;
 
@@ -73,7 +79,7 @@ class UserService {
 
     void createUser(String username, String email) {
         System.out.println("[UserService] saving user " + username);
-        bus.publish(new UserCreatedEvent(username, email));   // announce — knows nothing else
+        bus.publish(new UserCreatedEvent(username, email));
     }
 }
 
@@ -82,19 +88,14 @@ public class ObserverDemo {
     public static void main(String[] args) {
         EventBus bus = new EventBus();
 
-        // ---- 4. Observers subscribe (each is independent) ----
         bus.subscribe(UserCreatedEvent.class, e ->
                 System.out.println("[Email]   welcome to " + e.username()));
         bus.subscribe(UserCreatedEvent.class, e ->
                 System.out.println("[Audit]   " + e.username() + " created at " + System.currentTimeMillis()));
 
-        // ---- 5. Trigger — all observers fire automatically ----
         UserService service = new UserService(bus);
         service.createUser("sateesh", "s@example.com");
 
-        // [UserService] saving user sateesh
-        // [Email]   welcome to sateesh
-        // [Audit]   sateesh created at ...
     }
 }
 ```
@@ -124,28 +125,35 @@ Spring uses both: `ApplicationEventPublisher` is observer-style (in-process); Ka
 
 Spring's event system *is* the Observer pattern with all the plumbing done:
 
+
+**What this code does — step by step:**
+
+1. 1. An event — plain record
+2. 2. Publish — inject the publisher anywhere
+3. constructor injection...
+4. ... save ...
+5. `publisher.publishEvent(new UserCreatedEvent(name));` — fire and forget
+6. 3. Listen — annotate a method; Spring registers it as an observer
+7. send welcome email — UserService knows nothing about this class
+
+The same code, clean:
+
 ```java
-// 1. An event — plain record
 record UserCreatedEvent(String username) {}
 
-// 2. Publish — inject the publisher anywhere
 @Service
 class UserService {
     private final ApplicationEventPublisher publisher;
-    // constructor injection...
 
     void createUser(String name) {
-        // ... save ...
-        publisher.publishEvent(new UserCreatedEvent(name));   // fire and forget
+        publisher.publishEvent(new UserCreatedEvent(name));
     }
 }
 
-// 3. Listen — annotate a method; Spring registers it as an observer
 @Component
 class WelcomeEmailListener {
     @EventListener
     void onUserCreated(UserCreatedEvent event) {
-        // send welcome email — UserService knows nothing about this class
     }
 }
 ```
@@ -176,3 +184,4 @@ Add `@Async` to the listener method (plus `@EnableAsync`) to handle it on anothe
 - Adding a consequence = one new subscriber; producers never change (open/closed).
 - Spring gives you the pattern free: `ApplicationEventPublisher.publishEvent` + `@EventListener`.
 - Pub-sub (Kafka/RabbitMQ) is the cross-process sibling; events stay immutable; watch sync cost and exceptions.
+

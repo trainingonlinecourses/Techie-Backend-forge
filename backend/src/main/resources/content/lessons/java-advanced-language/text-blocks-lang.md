@@ -1,7 +1,7 @@
 ---
 title: Text Blocks and String Processing
 module: java-advanced-language
-order: 3
+order: 5
 minutes: 15
 topics: ["text blocks", "multiline strings", "formatted", "indentation", "SQL templates"]
 summary: Multiline strings in Java used to mean \n escapes and string concatenation soup. Text blocks (Java 15+) make JSON, SQL, HTML, and templates readabl...
@@ -16,16 +16,13 @@ Multiline strings in Java used to mean `\n` escapes and string concatenation sou
 
 ## The Problem
 
-```java
 // OLD: escape soup
 String json = "{\n" +
     "  \"id\": 1,\n" +
     "  \"title\": \"Spring\",\n" +
     "  \"level\": \"BEGINNER\"\n" +
     "}";
-```
 
-```java
 // NEW: text block
 String json = """
     {
@@ -34,38 +31,31 @@ String json = """
       "level": "BEGINNER"
     }
     """;
-```
 
 ## How Text Blocks Work
 
-```java
 String block = """
     Line one
     Line two
     """;
-```
 
 - Opening `"""` must be followed by a newline.
 - **Incidental indentation** — the least-indented line determines the base; it's stripped.
 - Closing `"""` position controls the base: content is indented relative to the closing delimiter's column.
 
-```java
 String sql = """
         SELECT id, title
         FROM courses
         WHERE level = ?
         """;
 // The closing """ at column 0 → all 8 spaces of content indentation are incidental and stripped
-```
 
 ## formatted: Interpolation
 
-```java
 String message = """
     Hello %s,
     Your order %d is %s.
     """.formatted("Ada", 12345, "shipped");
-```
 
 `formatted` is `String.format` on the block. No concatenation, no `String.format` wrapper.
 
@@ -73,7 +63,6 @@ String message = """
 
 The killer use case — readable, maintainable queries:
 
-```java
 @Repository
 public class CourseRepository {
 
@@ -93,13 +82,11 @@ public class CourseRepository {
             ROW_MAPPER);
     }
 }
-```
 
 Multi-line SQL with alignment, comments, and parameters — exactly as the DBA wrote it.
 
 ## JSON Payloads
 
-```java
 String payload = """
     {
       "amount": %d,
@@ -110,13 +97,11 @@ String payload = """
       }
     }
     """.formatted(amount, currency, description);
-```
 
 Or with Jackson for full control — but for small payloads the text block is readable and self-contained.
 
 ## HTML and Email Templates
 
-```java
 String email = """
     <html>
       <body>
@@ -125,18 +110,15 @@ String email = """
       </body>
     </html>
     """.formatted(userName);
-```
 
 ## Escapes Inside Text Blocks
 
-```java
 String block = """
     Line with \"quotes\" and \\ backslash
     Unicode: \u0041
     Line continuation: \
         continues on the same line
     """;
-```
 
 - `\"` — escaped quote (three quotes in a row are allowed raw: `"""` inside content works only via escape)
 - `\\` — backslash
@@ -146,13 +128,11 @@ String block = """
 
 Java 21 previews the `STR` processor:
 
-```java
 // Preview in Java 21, finalized path in later versions
 String message = STR."""
     Hello \{name},
     Your order \{order.id()} is \{status}.
     """;
-```
 
 `\{expr}` interpolates expressions directly — no `formatted`, no format specifiers. When it stabilizes, it will supersede most `formatted` usage.
 
@@ -160,13 +140,11 @@ String message = STR."""
 
 Text blocks compile to regular `String` constants — no runtime parsing, no hidden cost:
 
-```java
 // Both compile to the same constant pool entry
 String a = "SELECT * FROM courses WHERE level = 'BEGINNER'";
 String b = """
     SELECT * FROM courses WHERE level = 'BEGINNER'
     """;
-```
 
 `b` is a compile-time constant — usable in `switch` cases and annotations.
 
@@ -190,3 +168,4 @@ String b = """
 | Interpolation | `formatted` or (preview) `STR` |
 
 Text blocks are the boring productivity win: the same strings you already write, but readable. Combine with the records/sealed/pattern-matching trio and Java stops being a language you fight and starts being one you compose in.
+

@@ -84,3 +84,4 @@ ALTER COLUMN x SET NOT NULL;            -- then tighten, once verified
 - One change per migration, peer-reviewed, tested against prod-shaped data.
 
 Official docs: [Parallel Change (Fowler)](https://martinfowler.com/bliki/ParallelChange.html) · [Expand-Contract (microservices.io)](https://microservices.io/patterns/data/expand-contract.html)
+

@@ -1,7 +1,7 @@
 ---
 title: OCP — Open/Closed Principle
 module: solid-clean-code
-order: 2
+order: 4
 minutes: 23
 topics: ["OCP", "open for extension", "closed for modification", "polymorphism", "strategy"]
 summary: The Open/Closed Principle (the O in SOLID) is a oneliner with huge consequences:
@@ -24,7 +24,6 @@ Why does this matter? Every edit to working code risks breaking it. The code tha
 
 ## The Violation — The Ever-Growing Switch
 
-```java
 // Every new report type edits this method — OCP violated:
 class ReportGenerator {
 
@@ -38,20 +37,30 @@ class ReportGenerator {
         throw new IllegalArgumentException("unknown type: " + type);
     }
 }
-```
 
 Adding Excel support means **editing** `ReportGenerator.generate` — touching the working method, risking the three existing formats, and making the class grow forever. Every addition is a modification.
 
 ## The Fix — Polymorphism Does the Switch
 
+
+**What this code does — step by step:**
+
+1. 1. The abstraction: "what every report format can do"
+2. `String name();` — "pdf"
+3. 2. Existing formats become small classes — untouched from now on
+4. 3. The generator: dispatches to whichever format it was given
+5. `System.out.println(generator.generate("pdf", "hello"));` — PDF:hello
+6. `System.out.println(generator.generate("csv", "hello"));` — a,b,c. Hello
+7. Adding "excel" tomorrow = ONE new class, registered here. The generator, PdfReport, CsvReport, JsonReport never change.
+
+The same code, clean:
+
 ```java
-// 1. The abstraction: "what every report format can do"
 interface ReportFormat {
-    String name();                       // "pdf"
+    String name();
     String render(Data data);
 }
 
-// 2. Existing formats become small classes — untouched from now on
 class PdfReport implements ReportFormat {
     public String name() { return "pdf"; }
     public String render(Data data) { return "PDF:" + data; }
@@ -67,7 +76,6 @@ class JsonReport implements ReportFormat {
     public String render(Data data) { return "{\"data\":\"" + data + "\"}"; }
 }
 
-// 3. The generator: dispatches to whichever format it was given
 class ReportGenerator {
     private final Map<String, ReportFormat> formats;
 
@@ -89,12 +97,9 @@ public class OpenClosedDemo {
         ReportGenerator generator = new ReportGenerator(
                 java.util.List.of(new PdfReport(), new CsvReport(), new JsonReport()));
 
-        System.out.println(generator.generate("pdf", "hello"));   // PDF:hello
-        System.out.println(generator.generate("csv", "hello"));   // a,b,c
-                                                                  // hello
+        System.out.println(generator.generate("pdf", "hello"));
+        System.out.println(generator.generate("csv", "hello"));
 
-        // Adding "excel" tomorrow = ONE new class, registered here.
-        // The generator, PdfReport, CsvReport, JsonReport never change.
     }
 }
 ```
@@ -158,3 +163,4 @@ Also: OCP shouldn't be applied to *every* future possibility — you can't abstr
 - Spring makes it operational: adding a `@Bean`/`@Service` adds behavior without editing consumers.
 - The Strategy pattern is the canonical OCP implementation.
 - Don't abstract prematurely — introduce the interface at the second/third variant, not the first.
+

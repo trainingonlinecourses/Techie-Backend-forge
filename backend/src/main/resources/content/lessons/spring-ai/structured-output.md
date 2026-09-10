@@ -1,7 +1,7 @@
 ---
 title: Structured Output & Function Calling
 summary: Getting typed results from models with BeanOutputConverter, and letting the model call your Java methods as tools.
-order: 3
+order: 11
 minutes: 18
 topics: [structured-output, function-calling, tools, beanoutputconverter]
 docs:
@@ -17,7 +17,6 @@ LLMs return text. Production code needs `record`s. Spring AI's converters turn m
 
 ## BeanOutputConverter: JSON → typed object
 
-```java
 public record FraudDecision(boolean approved, String riskLevel, List<String> reasons) {}
 
 BeanOutputConverter<FraudDecision> converter = new BeanOutputConverter<>(FraudDecision.class);
@@ -35,22 +34,18 @@ String response = chatClient.prompt()
         .content();
 
 FraudDecision decision = converter.convert(response);         // parse + validate
-```
 
 The converter injects the JSON schema into the prompt and parses the model's answer into the record. Guard with validation (`@Valid`) — models can return fields that don't exist.
 
 ## MapOutputConverter: when you just need key/values
 
-```java
 MapOutputConverter converter = new MapOutputConverter();
 Map<String, Object> summary = converter.convert(response);
-```
 
 ## Function calling: the model calls YOUR code
 
 The model can invoke registered Java methods as **tools**. This is how assistants take real actions: look up an order, compute a price, write to a log.
 
-```java
 @Component
 public class OrderTools {
 
@@ -63,9 +58,7 @@ public class OrderTools {
                 .orElse("Order not found: " + orderId);
     }
 }
-```
 
-```java
 @Configuration
 public class AiConfig {
     @Bean
@@ -76,7 +69,6 @@ public class AiConfig {
                 .build();
     }
 }
-```
 
 Now: *"What's the status of order 1042?"* → the model calls `orderStatus("1042")`, gets the result, and answers from it.
 
@@ -112,3 +104,4 @@ Spring AI handles steps 2–4 for you via `ToolCallbacks`.
 - Tools are public surface — idempotent, validated, logged.
 
 **Official docs:** [Structured output](https://docs.spring.io/spring-ai/reference/api/structured-output-converter.html) · [Function calling](https://docs.spring.io/spring-ai/reference/api/functions.html)
+

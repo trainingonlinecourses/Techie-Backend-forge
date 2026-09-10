@@ -1,7 +1,7 @@
 ---
 title: Spring Expression Language (SpEL) — Dynamic Values at Runtime
 summary: SpEL basics — property placeholders, bean references, conditional expressions, collection filtering, and how organizations use SpEL for dynamic configuration and security rules. Beginner-friendly with line-by-line code.
-order: 6
+order: 19
 minutes: 20
 topics: [SpEL, Spring Expression Language, property placeholders, bean references, conditional, collection filtering, dynamic config]
 docs:
@@ -56,32 +56,46 @@ app:
 
 ### 2. @Value with SpEL Expressions
 
+
+**What this code does — step by step:**
+
+1. `@Value("${app.jwt.secret}")` — Simple property lookup
+2. `@Value("#{T(java.lang.Math).PI}")` — Reference a Java class
+3. `@Value("#{${app.limits}}")` — Nested placeholder (map from properties)
+4. `@Value("#{2 * 60 * 1000}")` — Inline computation
+5. `@Value("#{systemProperties['user.home']}")` — System property
+6. `@Value("#{environment['PATH']}")` — Environment variable
+7. `@Value("#{@myBean.calculateTimeout()}")` — Call a Spring bean's method
+8. `@Value("#{configService.getMaxRetries()}")` — Call another bean's method
+
+The same code, clean:
+
 ```java
 @Component
 public class AppConfig {
 
-    @Value("${app.jwt.secret}")                              // Simple property lookup
+    @Value("${app.jwt.secret}")
     private String jwtSecret;
 
-    @Value("#{T(java.lang.Math).PI}")                        // Reference a Java class
+    @Value("#{T(java.lang.Math).PI}")
     private double pi;
 
-    @Value("#{${app.limits}}")                               // Nested placeholder (map from properties)
+    @Value("#{${app.limits}}")
     private Map<String, Integer> limits;
 
-    @Value("#{2 * 60 * 1000}")                               // Inline computation
+    @Value("#{2 * 60 * 1000}")
     private long cacheTtlMs;
 
-    @Value("#{systemProperties['user.home']}")               // System property
+    @Value("#{systemProperties['user.home']}")
     private String userHome;
 
-    @Value("#{environment['PATH']}")                         // Environment variable
+    @Value("#{environment['PATH']}")
     private String path;
 
-    @Value("#{@myBean.calculateTimeout()}")                  // Call a Spring bean's method
+    @Value("#{@myBean.calculateTimeout()}")
     private long timeout;
 
-    @Value("#{configService.getMaxRetries()}")               // Call another bean's method
+    @Value("#{configService.getMaxRetries()}")
     private int maxRetries;
 }
 ```
@@ -95,7 +109,6 @@ public class AppConfig {
 
 ### 3. Conditional Expressions
 
-```java
 @Component
 public class FeatureFlags {
 
@@ -108,11 +121,9 @@ public class FeatureFlags {
     @Value("#{${app.replicas:1} > 1 ? true : false}")
     private boolean multiInstance;                           // True if multiple replicas
 }
-```
 
 ### 4. SpEL in Annotations
 
-```java
 // @Scheduled with SpEL:
 @Scheduled("#{@cronConfig.orderCleanup}")                    // References a bean's method that returns cron expression
 public void cleanupOldOrders() { ... }
@@ -127,7 +138,6 @@ public User getUser(String userId) { ... }
 
 @PostFilter("filterObject.region == authentication.details.region")
 public List<Order> getAllOrders() { ... }
-```
 
 ---
 
@@ -135,7 +145,6 @@ public List<Order> getAllOrders() { ... }
 
 ### Scenario 1: Dynamic Feature Flags
 
-```java
 @Service
 public class OrderService {
 
@@ -150,7 +159,6 @@ public class OrderService {
         }
     }
 }
-```
 
 ```yaml
 # Toggle via environment variable without code change:
@@ -160,7 +168,6 @@ public class OrderService {
 
 ### Scenario 2: Security Rules with SpEL
 
-```java
 @Configuration
 @EnableMethodSecurity
 public class SecurityConfig {
@@ -184,11 +191,9 @@ public class OrderService {
         // Filter out deleted orders from the result
     }
 }
-```
 
 ### Scenario 3: Environment-Specific Configuration
 
-```java
 @Configuration
 public class CacheConfig {
 
@@ -205,7 +210,6 @@ public class CacheConfig {
         return new ConcurrentMapCacheManager("users", "orders", "products");
     }
 }
-```
 
 ```yaml
 # Dev: uses ConcurrentMapCacheManager (in-memory, no Redis needed)
@@ -238,3 +242,4 @@ app.cache.type: redis
 - **Never put user input in SpEL** — it can execute arbitrary code (security vulnerability).
 
 Official docs: [SpEL Reference](https://docs.spring.io/spring-framework/reference/core/expressions.html) · [Spring Expression Language](https://docs.spring.io/spring-framework/reference/core/expressions.html)
+

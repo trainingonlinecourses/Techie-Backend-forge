@@ -1,7 +1,7 @@
 ---
 title: GraphQL Federation — One Graph, Many Services
 module: graphql-deep
-order: 5
+order: 3
 minutes: 27
 topics: ["federation", "subgraphs", "supergraph", "Apollo", "@key", "distributed GraphQL"]
 summary: A monolith GraphQL API works until it doesn't: one schema, one team, one deployment — every team's fields ride in the same schema, and adding a fie...
@@ -49,16 +49,16 @@ Think of it as an interface the services share: "any object with an `id` can be 
 
 ## The Code Walkthrough — A Subgraph in Spring
 
-```java
-// ---- 1. The schema (src/main/resources/graphql/schema.graphqls) ----
-// type Course @key(fields: "id") {
-//   id: ID!
-//   title: String!
-//   minutes: Int!
-// }
-// type Query { courses: [Course!]! }
 
-// ---- 2. Entity reference resolution: the service can rebuild a Course from just its id ----
+**What this code does — step by step:**
+
+1. ---- 1. The schema (src/main/resources/graphql/schema.graphqls) ----. Type Course @key(fields: "id") {. Id: ID! title: String! minutes: Int! }. Type Query { courses: [Course!]! }
+2. ---- 2. Entity reference resolution: the service can rebuild a Course from just its id ----
+3. When the router asks this service to resolve a Course by id. (because another subgraph referenced it), fetch it:
+
+The same code, clean:
+
+```java
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
 import org.springframework.stereotype.Controller;
 
@@ -69,8 +69,6 @@ public class CourseReferenceResolver {
 
     public CourseReferenceResolver(CourseService service) { this.service = service; }
 
-    // When the router asks this service to resolve a Course by id
-    // (because another subgraph referenced it), fetch it:
     @SchemaMapping(typeName = "Course")
     public Course course(Long id) {
         return service.get(id).orElse(null);
@@ -138,3 +136,4 @@ The router: asks `courses` service for the courses → gets ids → asks `progre
 - Clients see one graph; teams keep autonomy over their subgraphs.
 - Federation pays off with real team/service boundaries — not for single-service apps.
 - Pin tooling versions, test the supergraph contract, and design `@key`s as stable identity.
+

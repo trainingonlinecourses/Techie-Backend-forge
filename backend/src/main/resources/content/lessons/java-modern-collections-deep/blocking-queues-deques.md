@@ -1,7 +1,7 @@
 ---
 title: BlockingQueue, Deque, and the Concurrent Queue Implementations
 summary: Queues are the backbone of work distribution, task execution, and inter-thread communication in Java. This lesson covers the queue families — BlockingQueue for producer-consumer patterns, Deque and its ArrayDeque and LinkedList implementations for double-ended queues, and the concurrent queues ConcurrentLinkedQueue and ConcurrentLinkedDeque — with the examples and mistakes that come up in real systems.
-order: 3
+order: 1
 minutes: 24
 topics: [BlockingQueue, Deque, ArrayDeque, LinkedBlockingQueue, ConcurrentLinkedQueue, ConcurrentLinkedDeque, producer-consumer, thread-safety, queues]
 docs:
@@ -35,24 +35,35 @@ The main operations come in two flavours:
 
 For unbounded queues, `offer` always returns `true` because there is always room. For bounded queues, `offer` returns `false` when the queue is at capacity.
 
+
+**What this code does — step by step:**
+
+1. LinkedList implements Queue (and Deque)
+2. `queue.offer("first");` — true
+3. `System.out.println(queue.peek());` — first — look at head without removing
+4. `System.out.println(queue.poll());` — first — remove and return head. Second
+5. `System.out.println(queue.peek());` — third
+6. `System.out.println(queue.size());` — 1
+
+The same code, clean:
+
 ```java
 import java.util.Queue;
 import java.util.LinkedList;
 
 public class QueueDemo {
     public static void main(String[] args) {
-        // LinkedList implements Queue (and Deque)
         Queue<String> queue = new LinkedList<>();
 
-        queue.offer("first");   // true
+        queue.offer("first");
         queue.offer("second");
         queue.offer("third");
 
-        System.out.println(queue.peek());  // first — look at head without removing
-        System.out.println(queue.poll());  // first — remove and return head
-        System.out.println(queue.poll());  // second
-        System.out.println(queue.peek());  // third
-        System.out.println(queue.size());  // 1
+        System.out.println(queue.peek());
+        System.out.println(queue.poll());
+        System.out.println(queue.poll());
+        System.out.println(queue.peek());
+        System.out.println(queue.size());
     }
 }
 ```
@@ -67,7 +78,6 @@ Line by line:
 
 The distinction between the exception-throwing and the special-value methods matters. If you use `remove()` on an empty queue, you get a `NoSuchElementException`. If you use `poll()`, you get `null`. In a loop that drains a queue, `poll()` is usually what you want, because you can check for `null` to know when you are done.
 
-```java
 // Draining a queue safely with poll()
 while (true) {
     String item = queue.poll();
@@ -76,7 +86,6 @@ while (true) {
     }
     process(item);
 }
-```
 
 ### Deque — A Double-Ended Queue
 
@@ -84,27 +93,38 @@ A `Deque` is a queue that allows insertion and removal at both ends. You can use
 
 The most common implementation is `ArrayDeque`. It is faster than `LinkedList` for most use cases because it is backed by a resizable array and has better cache locality. It is the recommended choice for a stack or a FIFO queue when you do not need concurrent access.
 
+
+**What this code does — step by step:**
+
+1. Deque as a FIFO queue
+2. `System.out.println("FIFO poll: " + fifo.pollFirst());` — A
+3. `System.out.println("FIFO peek: " + fifo.peekFirst());` — B
+4. Deque as a stack (LIFO)
+5. `stack.push("X");` — push onto the head = addFirst
+6. `System.out.println("Stack pop: " + stack.pop());` — Z (last pushed)
+7. `System.out.println("Stack peek: " + stack.peek());` — Y
+
+The same code, clean:
+
 ```java
 import java.util.ArrayDeque;
 import java.util.Deque;
 
 public class DequeDemo {
     public static void main(String[] args) {
-        // Deque as a FIFO queue
         Deque<String> fifo = new ArrayDeque<>();
         fifo.addLast("A");
         fifo.addLast("B");
         fifo.addLast("C");
-        System.out.println("FIFO poll: " + fifo.pollFirst());  // A
-        System.out.println("FIFO peek: " + fifo.peekFirst());  // B
+        System.out.println("FIFO poll: " + fifo.pollFirst());
+        System.out.println("FIFO peek: " + fifo.peekFirst());
 
-        // Deque as a stack (LIFO)
         Deque<String> stack = new ArrayDeque<>();
-        stack.push("X");     // push onto the head = addFirst
+        stack.push("X");
         stack.push("Y");
         stack.push("Z");
-        System.out.println("Stack pop: " + stack.pop());   // Z (last pushed)
-        System.out.println("Stack peek: " + stack.peek()); // Y
+        System.out.println("Stack pop: " + stack.pop());
+        System.out.println("Stack peek: " + stack.peek());
     }
 }
 ```
@@ -140,6 +160,17 @@ The most common `BlockingQueue` implementations are:
 - **`PriorityBlockingQueue`** — an unbounded blocking queue that orders elements by priority (using their natural ordering or a comparator). It is not FIFO — it is priority-ordered. Useful for task scheduling where some tasks are more urgent than others.
 - **`SynchronousQueue`** — a queue where each insert operation must wait for a corresponding remove operation by another thread, and vice versa. It does not have any internal capacity. It is like a handoff — a producer hands an item directly to a consumer. Useful for handoff patterns and for keeping the number of in-flight items at zero.
 
+
+**What this code does — step by step:**
+
+1. A producer-consumer example with ArrayBlockingQueue
+2. A bounded queue: at most 10 items in flight
+3. `queue.put(item);` — blocks if queue is full
+4. `String item = queue.take();` — blocks if queue is empty
+5. Let the demo run for a bit, then shut down
+
+The same code, clean:
+
 ```java
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -149,9 +180,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-// A producer-consumer example with ArrayBlockingQueue
 public class ProducerConsumerExample {
-    // A bounded queue: at most 10 items in flight
     static final BlockingQueue<String> queue = new ArrayBlockingQueue<>(10);
 
     static class Producer implements Runnable {
@@ -159,7 +188,7 @@ public class ProducerConsumerExample {
             try {
                 for (int i = 0; i < 20; i++) {
                     String item = "item-" + i;
-                    queue.put(item);   // blocks if queue is full
+                    queue.put(item);
                     System.out.println("produced: " + item);
                 }
             } catch (InterruptedException e) {
@@ -172,7 +201,7 @@ public class ProducerConsumerExample {
         public void run() {
             try {
                 while (!Thread.currentThread().isInterrupted()) {
-                    String item = queue.take();   // blocks if queue is empty
+                    String item = queue.take();
                     System.out.println("  consumed: " + item);
                 }
             } catch (InterruptedException e) {
@@ -187,7 +216,6 @@ public class ProducerConsumerExample {
         exec.submit(new Consumer());
         exec.submit(new Consumer());
 
-        // Let the demo run for a bit, then shut down
         Thread.sleep(2000);
         exec.shutdownNow();
     }
@@ -204,14 +232,21 @@ Line by line:
 
 A `LinkedBlockingQueue` is used the same way, but it can be unbounded if you do not specify a capacity. An unbounded queue never blocks producers on `put`, which sounds convenient but can be dangerous — if consumers cannot keep up, the queue grows without bound and the application runs out of memory. A bounded queue blocks producers when full, which applies backpressure and prevents unbounded growth.
 
-```java
-// Unbounded LinkedBlockingQueue — dangerous if consumers are slow
-BlockingQueue<String> unbounded = new LinkedBlockingQueue<>();   // no capacity limit
-// unbounded.put(item);   // never blocks — could grow without bound
 
-// Bounded LinkedBlockingQueue — backpressure when full
+**What this code does — step by step:**
+
+1. Unbounded LinkedBlockingQueue — dangerous if consumers are slow
+2. `BlockingQueue<String> unbounded = new LinkedBlockingQueue<>();` — no capacity limit
+3. unbounded.put(item); // never blocks — could grow without bound
+4. Bounded LinkedBlockingQueue — backpressure when full
+5. bounded.put(item); // blocks when 1000 items are in the queue
+
+The same code, clean:
+
+```java
+BlockingQueue<String> unbounded = new LinkedBlockingQueue<>();
+
 BlockingQueue<String> bounded = new LinkedBlockingQueue<>(1000);
-// bounded.put(item);   // blocks when 1000 items are in the queue
 ```
 
 The choice between `ArrayBlockingQueue` and `LinkedBlockingQueue` is usually about capacity and performance. `ArrayBlockingQueue` is always bounded and uses a single lock. `LinkedBlockingQueue` is optionally bounded and uses two locks, which can give higher throughput when there are many producers and consumers, but it is not dramatically faster in all cases and uses more memory per element (because of the linked nodes).
@@ -224,7 +259,6 @@ The choice between `ArrayBlockingQueue` and `LinkedBlockingQueue` is usually abo
 
 These queues are useful when you need a thread-safe queue for high-throughput concurrent access and you do not need blocking semantics. They are often used for work queues where producers and consumers run at similar rates and neither wants to block.
 
-```java
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -241,7 +275,6 @@ public class ConcurrentQueueDemo {
         System.out.println(queue.poll());   // null — queue is empty, no blocking
     }
 }
-```
 
 Key points:
 
@@ -267,27 +300,22 @@ Key points:
 
 A frequent production bug is to use an unbounded `LinkedBlockingQueue` (or plain `LinkedList`) between a fast producer and a slow consumer, without any backpressure. The producer keeps putting items, the queue grows without bound, and eventually the application runs out of memory.
 
-```java
 // DANGEROUS: unbounded queue with no backpressure
 BlockingQueue<String> queue = new LinkedBlockingQueue<>();   // unbounded
 
 // Producer runs fast, consumer runs slow — queue fills up and keeps growing
 // Eventually: OutOfMemoryError
-```
 
 The fix is to use a bounded queue and let the producer block when the queue is full, or to use a backpressure mechanism. A bounded `ArrayBlockingQueue` or a `LinkedBlockingQueue` with a capacity limit applies backpressure naturally: when the queue is full, the producer's `put` blocks, slowing the producer down to the consumer's pace.
 
-```java
 // SAFE: bounded queue with backpressure
 BlockingQueue<String> queue = new ArrayBlockingQueue<>(1000);
 
 // Producer blocks when queue is full — consumer controls the pace
 // queue.put(item);   // blocks if 1000 items are already queued
-```
 
 Another common mistake is to use `size()` on a concurrent queue as part of a control decision. The size of a concurrent queue is a snapshot that can be stale the instant you read it. If you use `size()` to decide whether the queue is "too full," you might make the decision based on a size that is already wrong. If you need flow control, use a bounded queue that blocks on `put` — that is the correct backpressure mechanism, not a manual `size()` check.
 
-```java
 // BAD: using size() for flow control — race condition
 if (queue.size() < 1000) {
     queue.put(item);   // another thread might have added items between size() and put()
@@ -295,23 +323,32 @@ if (queue.size() < 1000) {
 
 // GOOD: use a bounded blocking queue — the queue handles backpressure internally
 boundedQueue.put(item);   // blocks when full, no manual size check needed
-```
 
 ## A Code Example — A Small Thread Pool Using a BlockingQueue
 
 This example shows a minimal work-queue thread pool built with a `BlockingQueue`. It is a simplified illustration of how thread pools are built — tasks are queued, and worker threads take tasks from the queue and run them.
+
+
+**What this code does — step by step:**
+
+1. A Runnable task — in a real pool, this would be a function or command
+2. A minimal thread pool with a bounded blocking queue
+3. `queue.put(task);` — blocks if queue is full — backpressure
+4. In a real pool, you would also drain or interrupt workers
+5. `Task task = queue.take();` — blocks until a task is available
+6. A small demo
+
+The same code, clean:
 
 ```java
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-// A Runnable task — in a real pool, this would be a function or command
 interface Task {
     void run();
 }
 
-// A minimal thread pool with a bounded blocking queue
 public class SimpleThreadPool {
     private final BlockingQueue<Task> queue;
     private final Worker[] workers;
@@ -332,12 +369,11 @@ public class SimpleThreadPool {
     }
 
     public void submit(Task task) throws InterruptedException {
-        queue.put(task);   // blocks if queue is full — backpressure
+        queue.put(task);
     }
 
     public void shutdown() {
         running.set(false);
-        // In a real pool, you would also drain or interrupt workers
     }
 
     private class Worker implements Runnable {
@@ -348,7 +384,7 @@ public class SimpleThreadPool {
         public void run() {
             while (running.get()) {
                 try {
-                    Task task = queue.take();   // blocks until a task is available
+                    Task task = queue.take();
                     task.run();
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
@@ -358,7 +394,6 @@ public class SimpleThreadPool {
         }
     }
 
-    // A small demo
     public static void main(String[] args) throws InterruptedException {
         SimpleThreadPool pool = new SimpleThreadPool(3, 10);
         pool.start();
@@ -421,3 +456,4 @@ In the lab, you will see a producer-consumer demo with an unbounded queue and a 
 ## Summary
 
 Java's queue families solve different problems. `Queue` (FIFO) is the basic ordered collection — `ArrayDeque` is the recommended simple implementation, not `LinkedList`. `Deque` is a double-ended queue you can use as a FIFO queue or a LIFO stack — `ArrayDeque` is the usual choice. `BlockingQueue` is the backbone of the producer-consumer pattern — `ArrayBlockingQueue` for a bounded queue with a single lock, `LinkedBlockingQueue` for an optionally bounded queue with two locks, `PriorityBlockingQueue` for priority-ordered tasks, and `SynchronousQueue` for direct handoff. `ConcurrentLinkedQueue` and `ConcurrentLinkedDeque` are non-blocking, high-throughput concurrent queues for cases where you do not need blocking semantics. The most common production mistake is using an unbounded queue without backpressure, which lets a fast producer overwhelm a slow consumer and eventually run out of memory. The fix is a bounded blocking queue — the queue itself applies backpressure by blocking the producer when full.
+

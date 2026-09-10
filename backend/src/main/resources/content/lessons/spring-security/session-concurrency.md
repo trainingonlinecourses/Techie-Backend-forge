@@ -1,7 +1,7 @@
 ---
 title: Session Management & Concurrency Control
 summary: Concurrent session control, session fixation protection, session timeout, and how to handle "one session per user" vs "multiple sessions" policies. Beginner-friendly with line-by-line code.
-order: 14
+order: 18
 minutes: 18
 topics: [session management, concurrent sessions, session fixation, session timeout, session repository, session registry]
 docs:
@@ -30,6 +30,19 @@ By default, Spring Security allows **unlimited concurrent sessions** per user. I
 
 ### Limiting Concurrent Sessions
 
+
+**What this code does — step by step:**
+
+1. Maximum 2 concurrent sessions per user
+2. What happens when the 3rd login attempt comes in?
+3. `.maxSessionsPreventsLogin(false)` — false = old session is invalidated. True = new login is rejected (user sees "already logged in")
+4. Session fixation protection
+5. `.migrateSession()` — New session ID after login (default). .newSession() // Create entirely new session. .none() // No protection (don't do this!)
+6. Session timeout (also configurable in application.properties)
+7. Where to redirect when session expires
+
+The same code, clean:
+
 ```java
 @Configuration
 @EnableWebSecurity
@@ -39,24 +52,16 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .sessionManagement(session -> session
-                // Maximum 2 concurrent sessions per user
                 .maximumSessions(2)
 
-                // What happens when the 3rd login attempt comes in?
-                .maxSessionsPreventsLogin(false)    // false = old session is invalidated
-                // true = new login is rejected (user sees "already logged in")
+                .maxSessionsPreventsLogin(false)
 
-                // Session fixation protection
                 .sessionFixation(fix -> fix
-                    .migrateSession()              // New session ID after login (default)
-                    // .newSession()                // Create entirely new session
-                    // .none()                      // No protection (don't do this!)
+                    .migrateSession()
                 )
 
-                // Session timeout (also configurable in application.properties)
                 .sessionTimeout(Duration.ofMinutes(30))
 
-                // Where to redirect when session expires
                 .expiredUrl("/login?expired=true")
             );
 
@@ -73,7 +78,6 @@ public class SecurityConfig {
 
 ### Session Repository (Persistent Sessions)
 
-```java
 @Configuration
 @EnableSpringHttpSession   // Enables Spring's session management
 public class SessionConfig {
@@ -84,7 +88,6 @@ public class SessionConfig {
         return new JdbcIndexedSessionRepository(new JdbcTransactionManager(dataSource));
     }
 }
-```
 
 ```properties
 # application.properties
@@ -101,7 +104,6 @@ spring.session.jdbc.table-name=SPRING_SESSION      # Custom table name
 
 ### Custom Session Event Listener
 
-```java
 @Component
 public class SessionEventListener {
 
@@ -127,7 +129,6 @@ public class SessionEventListener {
         // Send notification, clean up resources, etc.
     }
 }
-```
 
 ---
 
@@ -135,13 +136,11 @@ public class SessionEventListener {
 
 ### Scenario 1: Banking — One Session Per User
 
-```java
 .sessionManagement(session -> session
     .maximumSessions(1)                              // Only 1 session per user
     .maxSessionsPreventsLogin(true)                   // Reject new login
     .expiredUrl("/login?reason=another-device")       // Tell user why
 )
-```
 
 When a bank customer logs in on a new device, the old session is NOT invalidated (that could be a security risk if the attacker has the old session). Instead, the new login is rejected with a clear message.
 
@@ -159,13 +158,11 @@ When a bank customer logs in on a new device, the old session is NOT invalidated
 
 ### Scenario 3: Multiple Device Support
 
-```java
 .sessionManagement(session -> session
     .maximumSessions(3)                              // Allow 3 devices
     .maxSessionsPreventsLogin(false)                  // Invalidate oldest session
     .expiredUrl("/login?session-expired")             // Redirect on expiry
 )
-```
 
 User logs in on phone → laptop → tablet → oldest phone session is invalidated → phone shows "Session expired, please log in again."
 
@@ -192,3 +189,4 @@ User logs in on phone → laptop → tablet → oldest phone session is invalida
 - **Monitor session events** — detect suspicious patterns like many simultaneous sessions.
 
 Official docs: [Session Management (Spring)](https://docs.spring.io/spring-security/reference/servlet/authentication/session-management.html)
+

@@ -1,7 +1,7 @@
 ---
 title: WeakHashMap and IdentityHashMap — The Unusual Map Implementations
 summary: Most of the time you use HashMap, but Java gives you two other map implementations that solve very specific problems: WeakHashMap, where the keys are held with weak references and the garbage collector can remove entries, and IdentityHashMap, which compares keys with == instead of equals. This lesson explains when each one is the right tool and why the defaults bite you.
-order: 1
+order: 3
 minutes: 22
 topics: [WeakHashMap, IdentityHashMap, HashMap, weak-references, identity-equality, garbage-collection, maps]
 docs:
@@ -40,22 +40,30 @@ A concrete example: imagine a web framework that keeps a `Map<ServletRequest, Re
 
 But there is a trap: `WeakHashMap` only weakly references the **keys**, not the values. If the value holds a strong reference back to the key — which is common, accidentally or not — then the key is still reachable and will not be collected, and the entry stays. The map cannot help you if the value keeps the key alive.
 
-```java
-// A WeakHashMap example: a simple cache where the key is something the
-// application owns and the map should not keep it alive
 
+**What this code does — step by step:**
+
+1. A WeakHashMap example: a simple cache where the key is something the. Application owns and the map should not keep it alive
+2. The keys are objects the rest of the app owns. The map should not prevent them from being GC'd.
+3. imagine a large object the application creates and uses
+4. `private final byte[] data = new byte[1024 * 1024];` — 1 MB
+5. `System.out.println("cached: " + cache.size());` — 1
+6. The application is now done with obj — drop the reference
+7. At this point, only the WeakHashMap (weakly) and the Metadata. Hold references to the BigDataObject. If Metadata does NOT. Reference the key back, the key is GC-eligible. . The entry does NOT disappear immediately — it disappears the. Next time the map is accessed and the GC has reclaimed the key. This is why WeakHashMap is not a real-time cache and why you. Should never rely on it for correctness.
+8. `System.gc();` — hint to the JVM — not guaranteed, not a solution
+
+The same code, clean:
+
+```java
 import java.util.WeakHashMap;
 import java.util.Map;
 
 public class WeakCacheExample {
-    // The keys are objects the rest of the app owns.
-    // The map should not prevent them from being GC'd.
     static final Map<BigDataObject, Metadata> cache =
         new WeakHashMap<>();
 
     static class BigDataObject {
-        // imagine a large object the application creates and uses
-        private final byte[] data = new byte[1024 * 1024]; // 1 MB
+        private final byte[] data = new byte[1024 * 1024];
     }
 
     static class Metadata {
@@ -65,21 +73,12 @@ public class WeakCacheExample {
     public static void main(String[] args) {
         BigDataObject obj = new BigDataObject();
         cache.put(obj, new Metadata());
-        System.out.println("cached: " + cache.size());   // 1
+        System.out.println("cached: " + cache.size());
 
-        // The application is now done with obj — drop the reference
         obj = null;
 
-        // At this point, only the WeakHashMap (weakly) and the Metadata
-        // hold references to the BigDataObject. If Metadata does NOT
-        // reference the key back, the key is GC-eligible.
-        //
-        // The entry does NOT disappear immediately — it disappears the
-        // next time the map is accessed and the GC has reclaimed the key.
-        // This is why WeakHashMap is not a real-time cache and why you
-        // should never rely on it for correctness.
 
-        System.gc();   // hint to the JVM — not guaranteed, not a solution
+        System.gc();
         System.out.println("after gc (best-effort): " + cache.size());
     }
 }
@@ -113,9 +112,27 @@ The use cases are narrow but real:
 - **Debugging and analysis tools** — when you are building a tool that inspects objects, you want to know whether two references point to the same object, not whether they are equal.
 - **When `equals()` is expensive and you know the objects are unique** — but this is rare and usually a premature optimisation. The default `HashMap` is almost always the right choice for application data.
 
-```java
-// IdentityHashMap: two equal-but-distinct objects are different keys
 
+**What this code does — step by step:**
+
+1. IdentityHashMap: two equal-but-distinct objects are different keys
+2. Two Person objects with the same id — they are EQUAL by our equals(),. But they are DIFFERENT objects in memory.
+3. `System.out.println("p1.equals(p2): " + p1.equals(p2));` — true
+4. `System.out.println("p1 == p2: " + (p1 == p2));` — false
+5. HashMap: uses equals — p1 and p2 are the same key
+6. `hashMap.put(p2, "second");` — overwrites the entry under p1
+7. `System.out.println("HashMap size: " + hashMap.size());` — 1
+8. `System.out.println("HashMap.get(p1): " + hashMap.get(p1));` — "second"
+9. `System.out.println("HashMap.get(p2): " + hashMap.get(p2));` — "second"
+10. IdentityHashMap: uses == — p1 and p2 are different keys
+11. `idMap.put(p2, "second");` — different key — does NOT overwrite
+12. `System.out.println("IdentityHashMap size: " + idMap.size());` — 2
+13. `System.out.println("idMap.get(p1): " + idMap.get(p1));` — "first"
+14. `System.out.println("idMap.get(p2): " + idMap.get(p2));` — "second"
+
+The same code, clean:
+
+```java
 import java.util.IdentityHashMap;
 import java.util.Map;
 
@@ -149,29 +166,25 @@ public class IdentityMapExample {
     }
 
     public static void main(String[] args) {
-        // Two Person objects with the same id — they are EQUAL by our equals(),
-        // but they are DIFFERENT objects in memory.
         Person p1 = new Person("Alice", 1);
         Person p2 = new Person("Alice", 1);
 
-        System.out.println("p1.equals(p2): " + p1.equals(p2));   // true
-        System.out.println("p1 == p2: " + (p1 == p2));           // false
+        System.out.println("p1.equals(p2): " + p1.equals(p2));
+        System.out.println("p1 == p2: " + (p1 == p2));
 
-        // HashMap: uses equals — p1 and p2 are the same key
         Map<Person, String> hashMap = new java.util.HashMap<>();
         hashMap.put(p1, "first");
-        hashMap.put(p2, "second");     // overwrites the entry under p1
-        System.out.println("HashMap size: " + hashMap.size());   // 1
-        System.out.println("HashMap.get(p1): " + hashMap.get(p1)); // "second"
-        System.out.println("HashMap.get(p2): " + hashMap.get(p2)); // "second"
+        hashMap.put(p2, "second");
+        System.out.println("HashMap size: " + hashMap.size());
+        System.out.println("HashMap.get(p1): " + hashMap.get(p1));
+        System.out.println("HashMap.get(p2): " + hashMap.get(p2));
 
-        // IdentityHashMap: uses == — p1 and p2 are different keys
         Map<Person, String> idMap = new IdentityHashMap<>();
         idMap.put(p1, "first");
-        idMap.put(p2, "second");       // different key — does NOT overwrite
-        System.out.println("IdentityHashMap size: " + idMap.size()); // 2
-        System.out.println("idMap.get(p1): " + idMap.get(p1)); // "first"
-        System.out.println("idMap.get(p2): " + idMap.get(p2)); // "second"
+        idMap.put(p2, "second");
+        System.out.println("IdentityHashMap size: " + idMap.size());
+        System.out.println("idMap.get(p1): " + idMap.get(p1));
+        System.out.println("idMap.get(p2): " + idMap.get(p2));
     }
 }
 ```
@@ -207,29 +220,38 @@ A common bug pattern is to use `WeakHashMap` when you actually needed entries to
 
 The question to ask is: "Do I care about **logical equality** (two objects with the same data are the same) or **identity** (only this exact object is the same)?" If the answer is logical equality, use `HashMap` (or `ConcurrentHashMap` if you need thread safety). If the answer is identity, and you are writing a framework or tool that tracks object instances, consider `IdentityHashMap`. If the answer is "I want to attach metadata to an object without keeping it alive," consider `WeakHashMap`, but be careful about values referencing keys.
 
-```java
-// A mistake: using IdentityHashMap for application data when you meant HashMap
 
+**What this code does — step by step:**
+
+1. A mistake: using IdentityHashMap for application data when you meant HashMap
+2. Two different String objects with the same text
+3. IdentityHashMap — different objects, different keys
+4. `String role = roles.get(s2);` — s2 is not the same object as s1
+5. `System.out.println("role for s2: " + role);` — null — not found!
+6. HashMap — same text, same key
+7. `String role2 = roles2.get(s2);` — s2.equals(s1) is true
+8. `System.out.println("role for s2 in HashMap: " + role2);` — "admin-role"
+
+The same code, clean:
+
+```java
 import java.util.IdentityHashMap;
 import java.util.Map;
 
 public class WrongMapExample {
     public static void main(String[] args) {
-        // Two different String objects with the same text
         String s1 = new String("admin");
         String s2 = new String("admin");
 
-        // IdentityHashMap — different objects, different keys
         Map<String, String> roles = new IdentityHashMap<>();
         roles.put(s1, "admin-role");
-        String role = roles.get(s2);   // s2 is not the same object as s1
-        System.out.println("role for s2: " + role);   // null — not found!
+        String role = roles.get(s2);
+        System.out.println("role for s2: " + role);
 
-        // HashMap — same text, same key
         Map<String, String> roles2 = new java.util.HashMap<>();
         roles2.put(s1, "admin-role");
-        String role2 = roles2.get(s2);   // s2.equals(s1) is true
-        System.out.println("role for s2 in HashMap: " + role2); // "admin-role"
+        String role2 = roles2.get(s2);
+        System.out.println("role for s2 in HashMap: " + role2);
     }
 }
 ```
@@ -240,6 +262,22 @@ In this example, `s1` and `s2` are two different `String` objects, but their tex
 
 This example shows a scenario where `WeakHashMap` and `IdentityHashMap` are both the right tool, but for different reasons: a simple object-graph tracer that tracks visited objects by identity, and a per-object metadata cache that should not keep objects alive.
 
+
+**What this code does — step by step:**
+
+1. === IdentityHashMap: track visited objects by identity ===. When traversing an object graph (like a deep-clone or a cycle detector),. We want to know if we have already visited a specific object instance. Two equal objects are NOT the same visit — we care about identity.
+2. === WeakHashMap: attach metadata to objects without keeping them alive ===. Objects the application works with should be GC-able when the app is. Done with them. The metadata cache should not prevent that.
+3. A sample object graph with a cycle: Node A -> Node B -> Node A
+4. Traverse a graph, stopping at already-visited objects (by identity)
+5. IdentityHashMap: use ==, not equals
+6. Create a cycle: A -> B -> A
+7. === WeakHashMap metadata cache ===
+8. Drop our reference to the payload — now only the WeakHashMap. (weakly) might reference it. The entry becomes eligible for. Removal on the next map access after GC.
+9. Access the map to trigger cleanup
+10. `metadata.get(new Object());` — triggers a cleanup pass internally
+
+The same code, clean:
+
 ```java
 import java.util.IdentityHashMap;
 import java.util.Map;
@@ -248,18 +286,10 @@ import java.util.Set;
 
 public class UnusualMapsExample {
 
-    // === IdentityHashMap: track visited objects by identity ===
-    // When traversing an object graph (like a deep-clone or a cycle detector),
-    // we want to know if we have already visited a specific object instance.
-    // Two equal objects are NOT the same visit — we care about identity.
     static final Map<Object, Boolean> visited = new IdentityHashMap<>();
 
-    // === WeakHashMap: attach metadata to objects without keeping them alive ===
-    // Objects the application works with should be GC-able when the app is
-    // done with them. The metadata cache should not prevent that.
     static final Map<Object, Object> metadata = new WeakHashMap<>();
 
-    // A sample object graph with a cycle: Node A -> Node B -> Node A
     static class Node {
         final String label;
         Node next;
@@ -272,11 +302,9 @@ public class UnusualMapsExample {
         }
     }
 
-    // Traverse a graph, stopping at already-visited objects (by identity)
     static void traverse(Object obj) {
         if (obj == null) return;
 
-        // IdentityHashMap: use ==, not equals
         if (visited.containsKey(obj)) {
             System.out.println("  already visited: " + obj);
             return;
@@ -290,7 +318,6 @@ public class UnusualMapsExample {
     }
 
     public static void main(String[] args) {
-        // Create a cycle: A -> B -> A
         Node a = new Node("A");
         Node b = new Node("B");
         a.next = b;
@@ -299,19 +326,14 @@ public class UnusualMapsExample {
         System.out.println("=== Traversing a cyclic graph with IdentityHashMap ===");
         traverse(a);
 
-        // === WeakHashMap metadata cache ===
         System.out.println("\n=== WeakHashMap metadata cache ===");
         Object payload = new Object();
         metadata.put(payload, "attached-metadata");
         System.out.println("metadata size before drop: " + metadata.size());
 
-        // Drop our reference to the payload — now only the WeakHashMap
-        // (weakly) might reference it. The entry becomes eligible for
-        // removal on the next map access after GC.
         payload = null;
 
-        // Access the map to trigger cleanup
-        metadata.get(new Object());   // triggers a cleanup pass internally
+        metadata.get(new Object());
         System.out.println("metadata size after drop + access: " + metadata.size());
     }
 }
@@ -356,3 +378,4 @@ In the lab, you will see a starter with a faulty cache that uses `WeakHashMap` i
 ## Summary
 
 `WeakHashMap` and `IdentityHashMap` are specialised `Map` implementations for specific problems. `WeakHashMap` holds keys with weak references so entries can be garbage-collected when no one else uses the key — useful for metadata caches tied to object lifetime, but not a real-time cache and not one you can rely on for correctness. `IdentityHashMap` uses reference identity (`==`) instead of `equals()` for key comparison — useful for object-graph algorithms and tools that track actual instances, but almost never the right choice for application data. For general-purpose maps, use `HashMap` (single-threaded) or `ConcurrentHashMap` (thread-safe). The three maps differ in how they compare keys and how they hold references to them — and choosing the wrong one is a common source of subtle bugs.
+

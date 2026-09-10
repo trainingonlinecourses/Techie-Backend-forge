@@ -1,7 +1,7 @@
 ---
 title: Bean Post-Processors — The Hooks That Make Spring Spring
 summary: BeanPostProcessor vs BeanFactoryPostProcessor, the lifecycle hooks, and the production use-cases — property redaction, proxying, and customization.
-order: 14
+order: 2
 minutes: 22
 topics: [beanpostprocessor, beanfactorypostprocessor, postprocess, lifecycle-hooks, proxies, customization]
 docs:
@@ -39,7 +39,6 @@ for each bean:
 
 **Scenario 1 — redact secrets in Actuator config dumps.** Configuration properties end up exposed via `ConfigDataEnvironmentPostProcessor`/`/actuator/env` unless masked. A `BeanFactoryPostProcessor` rewrites definitions so password-ish properties are redacted from any actuator exposure:
 
-```java
 @Component
 public class SecretRedactionPostProcessor implements BeanFactoryPostProcessor {
     @Override
@@ -55,11 +54,9 @@ public class SecretRedactionPostProcessor implements BeanFactoryPostProcessor {
         }
     }
 }
-```
 
 **Scenario 2 — a company-wide "traceable" marker on every service bean.** After init, record the bean so an ops tool can inspect everything the container knows:
 
-```java
 @Component
 public class ServiceRegistryPostProcessor implements BeanPostProcessor {
     private final List<Class<?>> services = new CopyOnWriteArrayList<>();
@@ -72,13 +69,11 @@ public class ServiceRegistryPostProcessor implements BeanPostProcessor {
         return bean;   // IMPORTANT: return the (possibly wrapped) bean!
     }
 }
-```
 
 The cardinal rule of `BeanPostProcessor`: **return the bean** — possibly a wrapped/proxied version, but never null and never a replacement that breaks contracts, or the container silently loses the bean.
 
 **Scenario 3 — the proxy you already use.** `@Transactional` is not magic — Spring's `InfrastructureAdvisorAutoProxyCreator` (a `BeanPostProcessor`) sees the `@Transactional` annotation on your service, builds an `Advisor`, and returns a **CGLIB/JDK proxy** from `postProcessAfterInitialization`:
 
-```java
 @Service
 public class PaymentService {
     @Transactional
@@ -86,7 +81,6 @@ public class PaymentService {
 }
 // At runtime the injected PaymentService is a PROXY whose method calls
 // first hit the transaction interceptor, then your real method.
-```
 
 That's why self-invocation (`this.someTransactionalMethod()`) bypasses transactions — the proxy isn't in the path; the real object is.
 
@@ -107,3 +101,4 @@ Most teams write post-processors only for cross-cutting, container-wide concerns
 - `BeanPostProcessor` decorates *instances* after injection — the mechanism behind proxies.
 - Always return the bean; use `@Order` to control sequence.
 - AOP, transactions, `@Async`, method security — all are post-processor-created proxies.
+

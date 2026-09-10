@@ -1,7 +1,7 @@
 ---
 title: The Java Platform — JVM, JRE, JDK, Bytecode, and Garbage Collection
 summary: What the JVM actually does, how source code becomes bytecode, how the JIT compiler makes Java fast, how garbage collection works, class loading, and why understanding the platform matters for production debugging with line-by-line walkthroughs.
-order: 1
+order: 43
 minutes: 25
 topics: [jvm, jre, jdk, bytecode, jit, garbage-collection, class-loading, java-platform]
 docs:
@@ -21,7 +21,6 @@ When you write `System.out.println("Hello")` and run it, three things happen:
 
 **Beginner mental model:** Think of Java like a universal translator. You write in English (Java source code), it translates to a neutral language (bytecode), and then any computer with a JVM can execute it. That's why Java is "write once, run anywhere."
 
-```java
 // You write this (HelloWorld.java):
 public class HelloWorld {
     public static void main(String[] args) {
@@ -31,7 +30,6 @@ public class HelloWorld {
 
 // javac compiles it to HelloWorld.class (bytecode — not human-readable)
 // The JVM reads HelloWorld.class and executes it
-```
 
 ## JDK vs JRE vs JVM
 
@@ -54,25 +52,19 @@ JDK
 
 ## Bytecode — what the JVM actually runs
 
+
+**What this code does — step by step:**
+
+1. Your source code:
+2. javac compiles it to bytecode (simplified): iconst_1 // push constant 1 onto the stack. Iload_0 // push local variable 0 (parameter a) onto the stack. Iload_1 // push local variable 1 (parameter b) onto the stack. Iadd // pop two values, add them, push result. Ireturn // return the integer result
+3. The bytecode runs on a STACK MACHINE: 1. iconst_1: stack = [1]. 2. iload_0: stack = [1, a]. 3. iload_1: stack = [1, a, b]. 4. iadd: stack = [1, a+b] (pops b and a, pushes a+b). 5. ireturn: returns a+b
+
+The same code, clean:
+
 ```java
-// Your source code:
 int add(int a, int b) {
     return a + b;
 }
-
-// javac compiles it to bytecode (simplified):
-// iconst_1      // push constant 1 onto the stack
-// iload_0       // push local variable 0 (parameter a) onto the stack
-// iload_1       // push local variable 1 (parameter b) onto the stack
-// iadd          // pop two values, add them, push result
-// ireturn       // return the integer result
-
-// The bytecode runs on a STACK MACHINE:
-// 1. iconst_1: stack = [1]
-// 2. iload_0:  stack = [1, a]
-// 3. iload_1:  stack = [1, a, b]
-// 4. iadd:     stack = [1, a+b]  (pops b and a, pushes a+b)
-// 5. ireturn:  returns a+b
 ```
 
 You can inspect bytecode with `javap`:
@@ -88,18 +80,15 @@ The JVM has two execution modes:
 1. **Interpreter**: Reads bytecode line by line (slow, but starts immediately).
 2. **JIT (Just-In-Time) Compiler**: Compiles frequently-executed bytecode ("hot spots") to native machine code (fast, but takes time to compile).
 
-```java
-// Java starts by INTERPRETING bytecode — quick startup
-// After running a method 10,000+ times, the JIT compiler kicks in:
-// It compiles that method to native machine code — 10-100x faster
-// The compiled code is cached — next call runs the fast native version
 
-// This is why Java can be slow on the first request but fast after warmup:
-// Request 1: interpreted (50ms)
-// Request 2: interpreted (50ms)
-// ...
-// Request 10,000: JIT compiles the method (takes extra time this once)
-// Request 10,001: native code (5ms!)
+**What this code does — step by step:**
+
+1. Java starts by INTERPRETING bytecode — quick startup. After running a method 10,000+ times, the JIT compiler kicks in: It compiles that method to native machine code — 10-100x faster. The compiled code is cached — next call runs the fast native version
+2. This is why Java can be slow on the first request but fast after warmup: Request 1: interpreted (50ms). Request 2: interpreted (50ms). ... Request 10,000: JIT compiles the method (takes extra time this once). Request 10,001: native code (5ms!)
+
+The same code, clean:
+
+```java
 ```
 
 You can control JIT with flags:
@@ -112,18 +101,25 @@ java -XX:-TieredCompilation MyApp   # disable tiered compilation (for benchmarki
 
 In C/C++, you manually allocate and free memory. Forget to free → memory leak. Free too early → crash. Java's Garbage Collector (GC) handles this automatically.
 
+
+**What this code does — step by step:**
+
+1. Java automatically manages memory:
+2. `Order order = new Order();` — GC allocates memory for the Order object
+3. `List<Item> items = loadItems();` — GC allocates memory for the list and items. ... process order ...
+4. When processOrders() returns, 'order' and 'items' go out of scope. The GC eventually reclaims this memory — you don't need to call free() or delete()
+5. Forcing GC (don't do this in production — it's just for learning):
+6. `System.gc();` — suggests to the JVM to run GC (JVM may ignore this)
+
+The same code, clean:
+
 ```java
-// Java automatically manages memory:
 public void processOrders() {
-    Order order = new Order();        // GC allocates memory for the Order object
-    List<Item> items = loadItems();   // GC allocates memory for the list and items
-    // ... process order ...
+    Order order = new Order();
+    List<Item> items = loadItems();
 
-    // When processOrders() returns, 'order' and 'items' go out of scope
-    // The GC eventually reclaims this memory — you don't need to call free() or delete()
 
-    // Forcing GC (don't do this in production — it's just for learning):
-    System.gc();   // suggests to the JVM to run GC (JVM may ignore this)
+    System.gc();
 }
 ```
 
@@ -138,13 +134,11 @@ Heap Memory
 └── Old Generation (long-lived objects — promoted from Young)
 ```
 
-```java
 // When you create an object, it goes to Eden Space
 User user = new User("Alice");  // allocated in Eden
 
 // After many GC cycles, if 'user' is still referenced, it's promoted to Old Gen
 // This is called "generational collection" — most objects die young
-```
 
 ### GC algorithms
 
@@ -165,46 +159,43 @@ java -XX:+UseZGC MyApp
 
 ## Class Loading — how classes enter the JVM
 
-```java
-// When you use a class for the first time, the JVM:
-// 1. Finds the .class file (classpath scanning)
-// 2. Reads the bytecode
-// 3. Verifies it's valid (security check)
-// 4. Allocates memory for static fields
-// 5. Executes static initializer blocks
 
+**What this code does — step by step:**
+
+1. When you use a class for the first time, the JVM: 1. Finds the .class file (classpath scanning). 2. Reads the bytecode. 3. Verifies it's valid (security check). 4. Allocates memory for static fields. 5. Executes static initializer blocks
+2. `System.out.println("Config class loaded!");` — runs once, when Config is first used
+3. `public static final String APP_NAME = "MyApp";` — initialized during class loading
+4. The class loader hierarchy: Bootstrap ClassLoader (loads java.lang, java.util — core JDK classes). └── Application ClassLoader (loads your classes from classpath). └── Custom ClassLoaders (load classes from DB, network, hot-reload)
+
+The same code, clean:
+
+```java
 public class Config {
     static {
-        System.out.println("Config class loaded!");  // runs once, when Config is first used
+        System.out.println("Config class loaded!");
     }
 
-    public static final String APP_NAME = "MyApp";  // initialized during class loading
+    public static final String APP_NAME = "MyApp";
 }
-
-// The class loader hierarchy:
-// Bootstrap ClassLoader (loads java.lang, java.util — core JDK classes)
-//   └── Application ClassLoader (loads your classes from classpath)
-//       └── Custom ClassLoaders (load classes from DB, network, hot-reload)
 ```
 
 ## How we use this knowledge in organizations
 
 ### Scenario 1: Diagnosing production memory issues
 
+
+**What this code does — step by step:**
+
+1. When an OutOfMemoryError occurs, use JVM flags to diagnose: java -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp/heapdump.hprof MyApp
+2. Then analyze with VisualVM or Eclipse MAT: 1. Open the heap dump. 2. Look for the largest objects. 3. Find what's holding references to them. 4. Fix the leak (usually a static Map that grows forever)
+3. Common leak: static cache without eviction
+4. `private static final Map<String, byte[]> cache = new HashMap<>();` — never freed! Fix: use WeakHashMap, Caffeine, or add TTL eviction
+
+The same code, clean:
+
 ```java
-// When an OutOfMemoryError occurs, use JVM flags to diagnose:
-// java -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/tmp/heapdump.hprof MyApp
-
-// Then analyze with VisualVM or Eclipse MAT:
-// 1. Open the heap dump
-// 2. Look for the largest objects
-// 3. Find what's holding references to them
-// 4. Fix the leak (usually a static Map that grows forever)
-
-// Common leak: static cache without eviction
 public class LeakyCache {
-    private static final Map<String, byte[]> cache = new HashMap<>();  // never freed!
-    // Fix: use WeakHashMap, Caffeine, or add TTL eviction
+    private static final Map<String, byte[]> cache = new HashMap<>();
 }
 ```
 
@@ -223,21 +214,21 @@ java \
 
 ### Scenario 3: Understanding class loading for hot-reload
 
-```java
-// Spring Boot DevTools uses a separate classloader for hot-reload:
-// 1. Base classloader loads your dependencies (don't change)
-// 2. Restart classloader loads your application code (changes on reload)
-// 3. When you edit a file, only the restart classloader is recreated
-// This is why Spring Boot restarts so fast — it doesn't reload 200+ dependencies
 
-// Custom classloader for plugin systems:
+**What this code does — step by step:**
+
+1. Spring Boot DevTools uses a separate classloader for hot-reload: 1. Base classloader loads your dependencies (don't change). 2. Restart classloader loads your application code (changes on reload). 3. When you edit a file, only the restart classloader is recreated. This is why Spring Boot restarts so fast — it doesn't reload 200+ dependencies
+2. Custom classloader for plugin systems:
+3. Override to implement custom class loading logic. (e.g., loading classes from a database or encrypted files)
+
+The same code, clean:
+
+```java
 public class PluginClassLoader extends URLClassLoader {
     public PluginClassLoader(URL[] urls, ClassLoader parent) {
         super(urls, parent);
     }
 
-    // Override to implement custom class loading logic
-    // (e.g., loading classes from a database or encrypted files)
 }
 ```
 
@@ -261,3 +252,4 @@ public class PluginClassLoader extends URLClassLoader {
 | Forgetting -XX:+HeapDumpOnOutOfMemoryError | No diagnostic data on OOM | Always add this flag in production |
 | Ignoring GC logs | Can't diagnose latency spikes | Enable GC logging and monitor |
 | Using default Serial GC in production | Long GC pauses on large heaps | Use G1 or ZGC |
+

@@ -1,7 +1,7 @@
 ---
 title: Spring Integration — Enterprise Integration Patterns, In Spring
 module: spring-integration
-order: 1
+order: 4
 minutes: 27
 topics: ["Spring Integration", "Enterprise Integration Patterns", "messages", "channels", "EIP", "integration flows"]
 summary: Systems don't live alone: a Spring Boot service must read files, call REST APIs, listen to queues, watch directories, poll databases, and transform...
@@ -32,19 +32,29 @@ Systems don't live alone: a Spring Boot service must read files, call REST APIs,
 
 ## Your First Integration Flow
 
+
+**What this code does — step by step:**
+
+1. The DSL: from the file system -> transform -> route by content.
+2. `.patternFilter("*.csv")` — only CSV files
+3. `.preventDuplicates(true),` — don't re-read files
+4. `e -> e.poller(Pollers.fixedDelay(5000)))` — poll every 5s
+5. `.transform(Transformers.fileToString())` — File -> String
+
+The same code, clean:
+
 ```java
 @Configuration
 public class FileToQueueFlow {
 
-    // The DSL: from the file system -> transform -> route by content.
     @Bean
     public IntegrationFlow fileIngest() {
         return IntegrationFlow
                 .from(Files.inboundAdapter(new File("/inbox"))
-                        .patternFilter("*.csv")        // only CSV files
-                        .preventDuplicates(true),      // don't re-read files
-                    e -> e.poller(Pollers.fixedDelay(5000)))  // poll every 5s
-                .transform(Transformers.fileToString())       // File -> String
+                        .patternFilter("*.csv")
+                        .preventDuplicates(true),
+                    e -> e.poller(Pollers.fixedDelay(5000)))
+                .transform(Transformers.fileToString())
                 .transform(/* CSV -> a List of rows (a custom transformer) */)
                 .<List<String>>route(r -> classify(r),
                     mapping -> mapping
@@ -66,24 +76,27 @@ Every station is a declarative, testable component. The flow *is* the integratio
 
 ## Channels and the Sync/Async Decision
 
+
+**What this code does — step by step:**
+
+1. DIRECT channel — synchronous: the sender blocks until the receiver. Finishes. Transaction boundaries and error handling stay in the. Caller's thread. The DEFAULT — simplest, transactional.
+2. QUEUE channel — asynchronous: the sender enqueues and returns. A separate consumer thread (or poller) drains the queue. Decouples. Producer speed from consumer speed — at the cost of buffering.
+3. `return MessageChannels.queue(100).get();` — bounded queue
+4. PUBLISH-SUBSCRIBE — broadcast: every subscriber receives the message.
+
+The same code, clean:
+
 ```java
-// DIRECT channel — synchronous: the sender blocks until the receiver
-// finishes. Transaction boundaries and error handling stay in the
-// caller's thread. The DEFAULT — simplest, transactional.
 @Bean
 MessageChannel ordersChannel() {
     return MessageChannels.direct().get();
 }
 
-// QUEUE channel — asynchronous: the sender enqueues and returns.
-// A separate consumer thread (or poller) drains the queue. Decouples
-// producer speed from consumer speed — at the cost of buffering.
 @Bean
 MessageChannel emailOutbox() {
-    return MessageChannels.queue(100).get();   // bounded queue
+    return MessageChannels.queue(100).get();
 }
 
-// PUBLISH-SUBSCRIBE — broadcast: every subscriber receives the message.
 @Bean
 MessageChannel auditEvents() {
     return MessageChannels.publishSubscribe().get();
@@ -108,26 +121,32 @@ MessageChannel auditEvents() {
 
 **The two composition stars:**
 
+
+**What this code does — step by step:**
+
+1. Splitter + Aggregator — the scatter-gather:
+2. `.split()` — one batch -> many item messages
+3. `.handle("workerService", "processItem")` — parallel-ish processing
+4. Every item processed independently; the aggregator waits for all. Items of the batch (by correlation id), then releases the combined result.
+
+The same code, clean:
+
 ```java
-// Splitter + Aggregator — the scatter-gather:
 IntegrationFlow scatterGather() {
     return IntegrationFlow
             .from("inbound")
-            .split()                        // one batch -> many item messages
-            .handle("workerService", "processItem")   // parallel-ish processing
+            .split()
+            .handle("workerService", "processItem")
             .aggregate(a -> a.correlationStrategy(m -> m.getHeaders().get("batchId"))
                               .releaseStrategy(g -> g.size() >= expected))
             .get();
 }
-// Every item processed independently; the aggregator waits for all
-// items of the batch (by correlation id), then releases the combined result.
 ```
 
 The **splitter-aggregator** pair is the workhorse of parallel processing within an integration — split a batch, process items, recombine by correlation. The aggregator's release strategy decides "how many / how long until we emit the combined message" — the heartbeat/count-based patterns are the standard.
 
 ## Testing: The Integration That's Actually Testable
 
-```java
 // Spring Integration's test support — drive messages through the flow:
 @SpringJUnitConfig(FileToQueueFlow.class)
 class FlowTest {
@@ -148,10 +167,10 @@ class FlowTest {
         //  the channel's output and assert on it)
     }
 }
-```
 
 The flows are Spring beans — the *entire* pipeline is testable in isolation: feed messages, capture the output channels, assert payloads and routing decisions. This is the framework's quiet superpower: integrations become unit-testable code instead of "send a real file and pray."
 
 ## Recap
 
 Spring Integration implements the Enterprise Integration Patterns as a message-based Spring framework: **messages** flow through **channels** (direct = sync, queue = async, publish-subscribe = broadcast) and **endpoints** (filter, transformer, router, splitter, aggregator, service activator) — composed declaratively with the **IntegrationFlow DSL**. It's the structured vocabulary for connecting your Spring Boot services to files, queues, APIs, and databases — with transactions, retries, error channels, and idempotency built into the components. The mental model: every integration is a pipeline of named stations, and the framework's grammar (`from...transform...route...handle`) makes integrations readable, testable, and composed from battle-tested patterns rather than hand-rolled loops.
+

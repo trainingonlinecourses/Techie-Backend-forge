@@ -77,34 +77,51 @@ The default **standard analyzer** lowercases and splits on word boundaries. More
 
 ## The Java Client
 
+
+**What this code does — step by step:**
+
+1. The modern client (elasticsearch-java):
+2. 1. Build the client (wraps the low-level REST client):
+3. 2. Index a document:
+4. `System.out.println("Indexed: " + index.result());` — Created
+5. 3. Search:
+
+The same code, clean:
+
 ```java
-// The modern client (elasticsearch-java):
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+
 import co.elastic.clients.elasticsearch.core.*;
+
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
+
 import co.elastic.clients.transport.rest_client.RestClientTransport;
+
 import org.elasticsearch.client.RestClient;
 
-// 1. Build the client (wraps the low-level REST client):
-RestClient restClient = RestClient.builder(
-        new HttpHost("localhost", 9200, "http")).build();
-RestClientTransport transport = new RestClientTransport(restClient, new JacksonJsonpMapper());
-ElasticsearchClient es = new ElasticsearchClient(transport);
+public class Main {
 
-// 2. Index a document:
-Product product = new Product("1", "Wireless Mechanical Keyboard", 89.99);
-IndexResponse index = es.index(i -> i.index("products").id(product.id())
-        .document(product));
-System.out.println("Indexed: " + index.result());   // Created
+    public static void main(String[] args) {
 
-// 3. Search:
-SearchResponse<Product> response = es.search(s -> s
-                .index("products")
-                .query(q -> q.match(m -> m.field("name").query("mechanical keyboard"))),
-        Product.class);
-response.hits().hits().forEach(hit ->
-        System.out.println("Hit: " + hit.source().name() +
-                           " (score " + hit.score() + ")"));
+        RestClient restClient = RestClient.builder(
+                new HttpHost("localhost", 9200, "http")).build();
+        RestClientTransport transport = new RestClientTransport(restClient, new JacksonJsonpMapper());
+        ElasticsearchClient es = new ElasticsearchClient(transport);
+
+        Product product = new Product("1", "Wireless Mechanical Keyboard", 89.99);
+        IndexResponse index = es.index(i -> i.index("products").id(product.id())
+                .document(product));
+        System.out.println("Indexed: " + index.result());
+
+        SearchResponse<Product> response = es.search(s -> s
+                        .index("products")
+                        .query(q -> q.match(m -> m.field("name").query("mechanical keyboard"))),
+                Product.class);
+        response.hits().hits().forEach(hit ->
+                System.out.println("Hit: " + hit.source().name() +
+                                   " (score " + hit.score() + ")"));
+    }
+}
 ```
 
 **Walking through it:** the client is built on the REST transport with a JSON mapper (Jackson). Indexing is `index(...)` with the document; searching is `search(...)` with a query built from the fluent builder (`match` → the `match` query). The typed client maps results back into your POJO/record. Note the syntax shape: every Elasticsearch feature — queries, aggregations, mappings — follows the same fluent-builder pattern, so once you can read one you can read them all.
@@ -116,3 +133,4 @@ Elasticsearch is a Java service (a cluster of nodes), typically run via Docker, 
 ## Recap
 
 Elasticsearch is Lucene's inverted index wrapped in a distributed, JSON-API search engine: documents go into sharded indices; text is *analyzed* (tokenized, stemmed) into searchable terms; queries are dictionary lookups that return *ranked* results. It's fundamentally different from database lookup — fuzzy, language-aware, relevance-scored — which is why it powers search, log analysis (the ELK stack), and autocomplete everywhere. The three concepts to master first: the **inverted index** (why it's fast), **analysis** (why matching works the way it does — and why index/search analyzers must agree), and **shards + replicas** (why it scales and survives). From there, every query DSL feature is a variation on the same mechanism.
+

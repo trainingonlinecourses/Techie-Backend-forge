@@ -1,7 +1,7 @@
 ---
 title: Building Custom Spring Boot Starters — Packaging Reusable Auto-Configuration
 summary: How to create a reusable starter with auto-configuration, conditional beans, configuration properties, and the naming conventions that make your starter discoverable.
-order: 25
+order: 21
 minutes: 22
 topics: [starters, auto-configuration, conditional beans, META-INF, spring.factories, configuration properties]
 docs:
@@ -38,7 +38,6 @@ my-feature/
 
 ## Writing the auto-configuration
 
-```java
 @AutoConfiguration
 @ConditionalOnClass(RateLimiter.class)
 @EnableConfigurationProperties(RateLimitProperties.class)
@@ -59,11 +58,9 @@ public class RateLimitAutoConfiguration {
         return new RateLimitInterceptor(limiter);
     }
 }
-```
 
 ## Configuration properties
 
-```java
 @ConfigurationProperties(prefix = "rate-limit")
 public class RateLimitProperties {
     private int maxRequests = 100;          // default: 100
@@ -72,7 +69,6 @@ public class RateLimitProperties {
 
     // getters and setters...
 }
-```
 
 ```yaml
 # application.yml — user just adds this
@@ -84,13 +80,24 @@ rate-limit:
 
 ## Conditional beans — the auto-configuration arsenal
 
+
+**What this code does — step by step:**
+
+1. `@ConditionalOnClass(RedisTemplate.class)` — only if Redis is on classpath
+2. `@ConditionalOnMissingBean(RedisTemplate.class)` — only if user hasn't defined one
+3. `@ConditionalOnBean(CacheManager.class)` — only if CacheManager exists
+4. `@ConditionalOnWebApplication` — only in web apps
+5. `@ConditionalOnExpression("${feature.enabled:false}")` — SpEL expression
+
+The same code, clean:
+
 ```java
-@ConditionalOnClass(RedisTemplate.class)           // only if Redis is on classpath
-@ConditionalOnMissingBean(RedisTemplate.class)     // only if user hasn't defined one
+@ConditionalOnClass(RedisTemplate.class)
+@ConditionalOnMissingBean(RedisTemplate.class)
 @ConditionalOnProperty(prefix = "cache", name = "type", havingValue = "redis")
-@ConditionalOnBean(CacheManager.class)            // only if CacheManager exists
-@ConditionalOnWebApplication                      // only in web apps
-@ConditionalOnExpression("${feature.enabled:false}")  // SpEL expression
+@ConditionalOnBean(CacheManager.class)
+@ConditionalOnWebApplication
+@ConditionalOnExpression("${feature.enabled:false}")
 ```
 
 **The org pattern:** `@ConditionalOnMissingBean` lets users override any bean your starter provides. Always annotate your beans with it — it's the escape hatch.
@@ -128,7 +135,6 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
 
 ## org scenario — audit logging starter
 
-```java
 @AutoConfiguration
 @ConditionalOnClass(AuditEvent.class)
 @EnableConfigurationProperties(AuditProperties.class)
@@ -146,7 +152,6 @@ public class AuditAutoConfiguration {
         return new AuditInterceptor(svc, props.getExcludePaths());
     }
 }
-```
 
 ```yaml
 # Teams enable with one property
@@ -165,3 +170,4 @@ audit:
 - Use `@EnableConfigurationProperties` to bind YAML/properties to a POJO with defaults.
 - Register auto-configurations in `META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports` (Boot 3+) or `spring.factories` (Boot 2).
 - Always use `@ConditionalOnMissingBean` so users can override any bean your starter provides.
+

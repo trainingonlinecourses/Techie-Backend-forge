@@ -1,7 +1,7 @@
 ---
 title: Checked vs Unchecked — When the Compiler Forces Your Hand
 module: java-exceptions-deep
-order: 5
+order: 1
 minutes: 25
 topics: ["checked exceptions", "unchecked exceptions", "throws clause", "exception design", "Spring conventions"]
 summary: Every method in Java has an implicit contract: "what can go wrong here, and who deals with it?" Checked and unchecked exceptions are the two ways J...
@@ -26,21 +26,28 @@ The naming is precise: **checked** = the compiler checks that you handled it; **
 
 ## The Two Sides in Action
 
+
+**What this code does — step by step:**
+
+1. THROWS A CHECKED EXCEPTION — the signature must say so.
+2. FileReader / readLine throw IOException — a checked exception.
+3. Without try-with-resources + catch, this method would NOT compile. Unless it declares "throws IOException" — which it does.
+4. THROWS AN UNCHECKED EXCEPTION — no declaration needed.
+5. CALLING readConfig() FORCES handling — try/catch or throws.
+6. Calling divide() needs NO handling — IllegalArgumentException. Is unchecked. The compiler won't complain if you ignore it.
+
+The same code, clean:
+
 ```java
 import java.io.*;
 
 public class CheckedDemo {
-    // THROWS A CHECKED EXCEPTION — the signature must say so.
     public static String readConfig() throws IOException {
-        // FileReader / readLine throw IOException — a checked exception.
         try (BufferedReader reader = new BufferedReader(new FileReader("app.properties"))) {
             return reader.readLine();
         }
-        // Without try-with-resources + catch, this method would NOT compile
-        // unless it declares "throws IOException" — which it does.
     }
 
-    // THROWS AN UNCHECKED EXCEPTION — no declaration needed.
     public static int divide(int a, int b) {
         if (b == 0) {
             throw new IllegalArgumentException("division by zero");
@@ -49,7 +56,6 @@ public class CheckedDemo {
     }
 
     public static void main(String[] args) {
-        // CALLING readConfig() FORCES handling — try/catch or throws.
         try {
             String line = readConfig();
             System.out.println("Config: " + line);
@@ -57,8 +63,6 @@ public class CheckedDemo {
             System.out.println("Could not read config: " + e.getMessage());
         }
 
-        // Calling divide() needs NO handling — IllegalArgumentException
-        // is unchecked. The compiler won't complain if you ignore it.
         int result = divide(10, 2);
         System.out.println("Result: " + result);
     }
@@ -94,7 +98,6 @@ Why is that OK? Because a database hiccup deep in a repository is usually *not* 
 
 Your own code gets to choose — and the tie-breaker is *who handles it*:
 
-```java
 // CHECKED — the immediate caller is expected to handle this specifically:
 public class PaymentService {
     public void refund(String txnId) throws InsufficientBalanceException { ... }
@@ -110,7 +113,6 @@ public class Config {
     }
     // No caller needs to catch this; the app's startup failure handler owns it.
 }
-```
 
 ## The Sharp Edges
 
@@ -133,3 +135,4 @@ public class Config {
 ## Recap
 
 Checked exceptions are the compiler enforcing "plan for this failure": they must be caught or declared, and they suit failures the immediate caller can act on. Unchecked exceptions are bugs or far-up-the-stack failures that no local handler should own. Modern frameworks — Spring first among them — have drifted toward unchecked for infrastructure failures, translating at boundaries, which is why `JdbcTemplate` throws `DataAccessException` with no `throws` clause. Decide by asking *who handles this and can they meaningfully respond*; set `rollbackFor` explicitly around `@Transactional`; and never let the compiler's enforcement become an excuse to swallow. The checked/unchecked split isn't bureaucracy — it's the language giving you a tool to encode failure responsibility, and the skill is choosing the right tool per failure.
+

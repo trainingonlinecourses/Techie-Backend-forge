@@ -1,7 +1,7 @@
 ---
 title: Spring Configuration — @Configuration, @Bean, and Properties
 summary: How Spring's configuration system works — @Configuration classes, @Bean methods, @Value injection, profile-specific config, and the patterns that keep enterprise applications maintainable. Beginner-friendly with line-by-line code.
-order: 5
+order: 9
 minutes: 20
 topics: [@Configuration, @Bean, @Value, @PropertySource, profiles, configuration properties, typed config, relaxed binding]
 docs:
@@ -33,40 +33,54 @@ Most real applications use **both**: component scanning for simple beans, explic
 
 ### 1. @Configuration Class
 
+
+**What this code does — step by step:**
+
+1. `@Configuration` — Marks this class as a configuration source
+2. `@EnableConfigurationProperties` — Enables typed config classes
+3. === Simple @Bean method ===
+4. `@Bean` — Tells Spring: this method creates a Spring-managed bean
+5. `.setConnectTimeout(Duration.ofSeconds(5))` — Configure the bean
+6. === @Bean with dependencies ===
+7. Spring automatically injects the required beans
+8. `return new OrderService(repo, gateway);` — Explicit constructor injection
+9. === @Bean with @ConditionalOnProperty ===
+10. `return RedisCacheManager.builder(factory).build();` — Only created if cache.type=redis
+11. `matchIfMissing = true)` — Default when property not set
+12. `return new ConcurrentMapCacheManager();` — Only created if cache.type=memory
+
+The same code, clean:
+
 ```java
-@Configuration                           // Marks this class as a configuration source
-@EnableConfigurationProperties           // Enables typed config classes
+@Configuration
+@EnableConfigurationProperties
 public class AppConfig {
 
-    // === Simple @Bean method ===
-    @Bean                               // Tells Spring: this method creates a Spring-managed bean
+    @Bean
     public RestTemplate restTemplate() {
         return RestTemplate.builder()
-            .setConnectTimeout(Duration.ofSeconds(5))      // Configure the bean
+            .setConnectTimeout(Duration.ofSeconds(5))
             .setReadTimeout(Duration.ofSeconds(10))
             .build();
     }
 
-    // === @Bean with dependencies ===
     @Bean
     public OrderService orderService(OrderRepository repo,
                                       PaymentGateway gateway) {
-        // Spring automatically injects the required beans
-        return new OrderService(repo, gateway);            // Explicit constructor injection
+        return new OrderService(repo, gateway);
     }
 
-    // === @Bean with @ConditionalOnProperty ===
     @Bean
     @ConditionalOnProperty(name = "app.cache.type", havingValue = "redis")
     public CacheManager redisCacheManager(RedisConnectionFactory factory) {
-        return RedisCacheManager.builder(factory).build(); // Only created if cache.type=redis
+        return RedisCacheManager.builder(factory).build();
     }
 
     @Bean
     @ConditionalOnProperty(name = "app.cache.type", havingValue = "memory",
-                           matchIfMissing = true)          // Default when property not set
+                           matchIfMissing = true)
     public CacheManager memoryCacheManager() {
-        return new ConcurrentMapCacheManager();            // Only created if cache.type=memory
+        return new ConcurrentMapCacheManager();
     }
 }
 ```
@@ -79,45 +93,49 @@ public class AppConfig {
 
 ### 2. @ConfigurationProperties (Typed Configuration)
 
+
+**What this code does — step by step:**
+
+1. application.yml: app: jwt: secret: my-secret-key. Expiration: 3600000. Refresh-expiration: 86400000. Payment: gateway: url: https://api.stripe.com. Timeout: 30. Retry-count: 3
+2. `@ConfigurationProperties(prefix = "app.jwt")` — Maps to "app.jwt.*" properties
+3. `String secret,` — app.jwt.secret
+4. `long expiration,` — app.jwt.expiration
+5. `long refreshExpiration` — app.jwt.refresh-expiration
+6. `@ConfigurationProperties(prefix = "app.payment.gateway")` — Maps to "app.payment.gateway.*"
+7. `String url,` — app.payment.gateway.url
+8. `int timeout,` — app.payment.gateway.timeout
+9. `int retryCount` — app.payment.gateway.retry-count
+10. Enable in your main class:
+11. Use in your beans:
+12. `this.jwtProps = jwtProps;` — Typed, IDE-completable, validated
+
+The same code, clean:
+
 ```java
-// application.yml:
-// app:
-//   jwt:
-//     secret: my-secret-key
-//     expiration: 3600000
-//     refresh-expiration: 86400000
-//   payment:
-//     gateway:
-//       url: https://api.stripe.com
-//       timeout: 30
-//       retry-count: 3
-
-@ConfigurationProperties(prefix = "app.jwt")              // Maps to "app.jwt.*" properties
+@ConfigurationProperties(prefix = "app.jwt")
 public record JwtProperties(
-    String secret,                                        // app.jwt.secret
-    long expiration,                                      // app.jwt.expiration
-    long refreshExpiration                                // app.jwt.refresh-expiration
+    String secret,
+    long expiration,
+    long refreshExpiration
 ) {}
 
-@ConfigurationProperties(prefix = "app.payment.gateway")  // Maps to "app.payment.gateway.*"
+@ConfigurationProperties(prefix = "app.payment.gateway")
 public record PaymentProperties(
-    String url,                                           // app.payment.gateway.url
-    int timeout,                                          // app.payment.gateway.timeout
-    int retryCount                                        // app.payment.gateway.retry-count
+    String url,
+    int timeout,
+    int retryCount
 ) {}
 
-// Enable in your main class:
 @SpringBootApplication
 @EnableConfigurationProperties({JwtProperties.class, PaymentProperties.class})
 public class AcademyApplication { ... }
 
-// Use in your beans:
 @Service
 public class AuthService {
     private final JwtProperties jwtProps;
 
     public AuthService(JwtProperties jwtProps) {
-        this.jwtProps = jwtProps;                         // Typed, IDE-completable, validated
+        this.jwtProps = jwtProps;
     }
 
     public String generateToken(User user) {
@@ -138,7 +156,6 @@ public class AuthService {
 
 ### 3. @PropertySource and @Value
 
-```java
 @Configuration
 @PropertySource("classpath:custom.properties")            // Load additional properties file
 public class CustomConfig {
@@ -160,7 +177,6 @@ public class CustomConfig {
             .build();
     }
 }
-```
 
 ---
 
@@ -202,23 +218,29 @@ spring:
 
 ### Scenario 2: Configuration Validation
 
+
+**What this code does — step by step:**
+
+1. `@Validated` — Enable Bean Validation
+2. `@NotBlank String host,` — Must not be blank
+3. `@Min(1) @Max(65535) int port,` — Must be 1-65535
+4. `@DurationUnit(ChronoUnit.SECONDS) Duration timeout` — Auto-parsed duration
+5. If validation fails at startup: "Invalid configuration: app.redis.host must not be blank". App fails FAST instead of failing at runtime when the connection is attempted
+
+The same code, clean:
+
 ```java
 @ConfigurationProperties(prefix = "app.redis")
-@Validated                                    // Enable Bean Validation
+@Validated
 public record RedisProperties(
-    @NotBlank String host,                    // Must not be blank
-    @Min(1) @Max(65535) int port,             // Must be 1-65535
-    @DurationUnit(ChronoUnit.SECONDS) Duration timeout  // Auto-parsed duration
+    @NotBlank String host,
+    @Min(1) @Max(65535) int port,
+    @DurationUnit(ChronoUnit.SECONDS) Duration timeout
 ) {}
-
-// If validation fails at startup:
-// "Invalid configuration: app.redis.host must not be blank"
-// App fails FAST instead of failing at runtime when the connection is attempted
 ```
 
 ### Scenario 3: @Profile for Environment-Specific Beans
 
-```java
 @Configuration
 @Profile("dev")                               // Only active in dev profile
 public class DevConfig {
@@ -243,7 +265,6 @@ public class ProdConfig {
         };
     }
 }
-```
 
 ---
 
@@ -268,3 +289,4 @@ public class ProdConfig {
 - **Always validate config at startup** — fail fast with clear error messages.
 
 Official docs: [@Configuration (Spring)](https://docs.spring.io/spring-framework/reference/core/beans/java/configuration-annotation.html) · [External Config (Boot)](https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#features.external-config)
+

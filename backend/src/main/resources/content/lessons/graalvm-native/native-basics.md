@@ -89,8 +89,18 @@ A standalone executable: your code + a minimal runtime
 
 ## The Spring Boot Native Workflow
 
+
+**What this code does — step by step:**
+
+1. Spring Boot 3 + GraalVM — the modern path is largely declarative:
+2. Spring Boot detects native mode at build time (via the plugin) and: 1. Runs the app ONCE during the build (to discover reachability). 2. Applies its GraalVM hints (Jackson, Spring Data, Actuator, ...). 3. Generates the metadata and compiles the native image
+3. What YOU add for custom dynamic behavior:
+4. "reflect into this DTO for JSON binding":
+5. "this resource must be in the image":
+
+The same code, clean:
+
 ```java
-// Spring Boot 3 + GraalVM — the modern path is largely declarative:
 @SpringBootApplication
 public class AcademyApplication {
     public static void main(String[] args) {
@@ -98,20 +108,13 @@ public class AcademyApplication {
     }
 }
 
-// Spring Boot detects native mode at build time (via the plugin) and:
-// 1. Runs the app ONCE during the build (to discover reachability)
-// 2. Applies its GraalVM hints (Jackson, Spring Data, Actuator, ...)
-// 3. Generates the metadata and compiles the native image
 
-// What YOU add for custom dynamic behavior:
 @Configuration
 public class NativeHints implements RuntimeHintsRegistrar {
     @Override
     public void registerHints(RuntimeHints hints, ClassLoader cl) {
-        // "reflect into this DTO for JSON binding":
         hints.reflection().registerType(Payment.class,
                 MemberCategory.PUBLIC_FIELDS, MemberCategory.DECLARED_METHODS);
-        // "this resource must be in the image":
         hints.resources().registerPattern("templates/*.html");
     }
 }
@@ -144,3 +147,4 @@ public class NativeHints implements RuntimeHintsRegistrar {
 ## Recap
 
 GraalVM Native Image compiles the whole application ahead of time into a standalone executable: instant startup (milliseconds), low memory, no JVM — bought with the **closed-world trade**: everything dynamic (reflection, resources, proxies, serialization) must be declared at build time via metadata, which Spring Boot and the ecosystem increasingly generate automatically through hints. The modern Spring Boot path is largely declarative (`-Pnative native:compile`, `RuntimeHintsRegistrar` for your custom edges), with the real costs being build time (minutes) and the loss of runtime dynamism. Choose native for serverless and cold-start-sensitive workloads; keep the JVM where peak throughput and dynamic freedom rule. Understand the closed-world model, and native image stops being magic — it becomes a compile-time contract you participate in.
+

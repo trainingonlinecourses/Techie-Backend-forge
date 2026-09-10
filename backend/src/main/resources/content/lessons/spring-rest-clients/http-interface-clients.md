@@ -1,7 +1,7 @@
 ---
 title: HTTP Interface Clients — REST Calls as Java Interfaces
 module: spring-rest-clients
-order: 4
+order: 2
 minutes: 23
 topics: ["@HttpExchange", "HTTP interface", "declarative client", "typed API", "proxy"]
 summary: All the clients so far (RestClient, WebClient) make you write the request mechanics at every call site: URI, method, retrieve, convert. HTTP interf...
@@ -16,7 +16,6 @@ docs:
 
 All the clients so far (RestClient, WebClient) make you write the request mechanics at every call site: URI, method, retrieve, convert. **HTTP interfaces** (Spring 6.1) take the next step: you declare the remote API as a **plain Java interface**, annotate its methods, and Spring *generates the implementation* for you.
 
-```java
 // The whole remote API, declared:
 public interface CourseApi {
 
@@ -29,7 +28,6 @@ public interface CourseApi {
     @GetExchange("/api/courses")
     List<Course> listCourses();
 }
-```
 
 This is the **declarative client** pattern (think Feign, but built into Spring): the interface *is* the API contract — readable, typed, testable. Spring's `HttpServiceProxyFactory` turns the interface into a working client backed by `RestClient` (or `WebClient`).
 
@@ -48,8 +46,18 @@ Parameter annotations mirror server-side MVC: `@PathVariable`, `@RequestBody`, `
 
 ## The Code Walkthrough
 
+
+**What this code does — step by step:**
+
+1. ---- 1. Declare the remote API ----
+2. ---- 2. Generate the implementation once (Spring Boot 3.4+ auto-detects) ----
+3. ---- 3. Use it — no request mechanics anywhere ----
+4. `private final CourseApi api;` — injected, looks like a local service
+5. `return api.getCourse(id);` — one call, fully typed
+
+The same code, clean:
+
 ```java
-// ---- 1. Declare the remote API ----
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -68,7 +76,6 @@ public interface CourseApi {
     Course createCourse(@RequestBody CourseRequest request);
 }
 
-// ---- 2. Generate the implementation once (Spring Boot 3.4+ auto-detects) ----
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestClient;
@@ -90,16 +97,15 @@ public class ApiClientConfig {
     }
 }
 
-// ---- 3. Use it — no request mechanics anywhere ----
 @Service
 public class CatalogService {
 
-    private final CourseApi api;              // injected, looks like a local service
+    private final CourseApi api;
 
     public CatalogService(CourseApi api) { this.api = api; }
 
     public Course showCourse(long id) {
-        return api.getCourse(id);             // one call, fully typed
+        return api.getCourse(id);
     }
 }
 ```
@@ -122,7 +128,6 @@ public class CatalogService {
 
 ## Real-World Shape — Many Methods, One Client
 
-```java
 public interface PaymentGatewayApi {
 
     @GetExchange("/v1/payments/{id}")
@@ -137,7 +142,6 @@ public interface PaymentGatewayApi {
     @GetExchange("/v1/payments")
     List<Payment> list(@RequestParam int page, @RequestParam int size);
 }
-```
 
 One interface = one third-party integration's whole surface, discoverable and typed.
 
@@ -162,3 +166,4 @@ One interface = one third-party integration's whole surface, discoverable and ty
 - Callers see plain typed methods — no HTTP mechanics at the call site.
 - Test with a mock; configure timeouts/retries once on the backing client.
 - Use for stable, JSON-based integrations; use RestClient for ad-hoc or dynamic calls.
+

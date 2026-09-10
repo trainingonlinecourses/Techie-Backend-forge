@@ -1,7 +1,7 @@
 ---
 title: Nested Classes — Inner, Static, Local, and Anonymous
 summary: What nested classes are, when to use each type, memory implications, and how organizations use them for encapsulation and callbacks.
-order: 1
+order: 2
 minutes: 22
 topics: [nested-classes, inner-class, static-inner, local-class, anonymous-class]
 docs:
@@ -23,25 +23,41 @@ Java lets you define a class inside another class. There are 4 types:
 
 ## Line-by-Line Walkthrough
 
+
+**What this code does — step by step:**
+
+1. Line 1: Member inner class — has access to outer instance
+2. Can access outer class's instance field
+3. Line 2: Static nested class — no access to outer instance
+4. Line 3: Local class — defined inside a method
+5. Line 4: Anonymous class — one-time implementation
+6. Anonymous class implementing Comparator
+7. Equivalent to lambda: names.sort((a, b) -> Integer.compare(a.length(), b.length()));
+8. Line 5: Practical — Builder pattern with nested class
+9. Line 6: Practical — Event listener with anonymous class
+10. Process events
+11. Line 7: Creating instances
+12. Line 8: Builder pattern
+13. Line 9: Anonymous class usage
+
+The same code, clean:
+
 ```java
 import java.util.*;
 import java.util.function.*;
 
 public class NestedClassesDemo {
 
-    // Line 1: Member inner class — has access to outer instance
     class Connection {
         private String url;
 
         Connection(String url) { this.url = url; }
 
-        // Can access outer class's instance field
         void printConfig() {
             System.out.println("URL: " + url + ", Timeout: " + timeout);
         }
     }
 
-    // Line 2: Static nested class — no access to outer instance
     static class ConnectionConfig {
         private final String host;
         private final int port;
@@ -54,7 +70,6 @@ public class NestedClassesDemo {
         String toUrl() { return "http://" + host + ":" + port; }
     }
 
-    // Line 3: Local class — defined inside a method
     void processOrders(List<Order> orders) {
         class OrderProcessor {
             private int processed = 0;
@@ -76,9 +91,7 @@ public class NestedClassesDemo {
         System.out.println("Total processed: " + processor.getProcessedCount());
     }
 
-    // Line 4: Anonymous class — one-time implementation
     void sortWithComparator(List<String> names) {
-        // Anonymous class implementing Comparator
         Comparator<String> byLength = new Comparator<String>() {
             @Override
             public int compare(String a, String b) {
@@ -87,10 +100,8 @@ public class NestedClassesDemo {
         };
 
         names.sort(byLength);
-        // Equivalent to lambda: names.sort((a, b) -> Integer.compare(a.length(), b.length()));
     }
 
-    // Line 5: Practical — Builder pattern with nested class
     static class HttpClient {
         private final String baseUrl;
         private final int timeout;
@@ -123,14 +134,12 @@ public class NestedClassesDemo {
         }
     }
 
-    // Line 6: Practical — Event listener with anonymous class
     interface OrderEventListener {
         void onOrderCreated(Order order);
         void onOrderCancelled(Order order);
     }
 
     void registerListener(OrderEventListener listener) {
-        // Process events
     }
 
     record Order(String id, boolean valid) {
@@ -138,20 +147,17 @@ public class NestedClassesDemo {
     }
 
     public static void main(String[] args) {
-        // Line 7: Creating instances
         NestedClassesDemo demo = new NestedClassesDemo();
         Connection conn = demo.new Connection("http://localhost:8080");
 
         ConnectionConfig config = new ConnectionConfig("localhost", 8080);
         System.out.println("Config: " + config.toUrl());
 
-        // Line 8: Builder pattern
         HttpClient client = new HttpClient.Builder("http://api.example.com")
             .timeout(60)
             .header("Authorization", "Bearer token")
             .build();
 
-        // Line 9: Anonymous class usage
         demo.sortWithComparator(new ArrayList<>(List.of("Charlie", "Alice", "Bob")));
     }
 }
@@ -163,7 +169,6 @@ public class NestedClassesDemo {
 
 ### Scenario 1: Iterator implementation
 
-```java
 public class Library {
     private List<Book> books = new ArrayList<>();
 
@@ -184,21 +189,23 @@ public class Library {
         };
     }
 }
-```
 
 ### Scenario 2: Thread with anonymous class
 
-```java
-new Thread(new Runnable() {
-    @Override
-    public void run() {
-        System.out.println("Running in: " + Thread.currentThread().getName());
-    }
-}).start();
+public class Main {
 
-// Modern equivalent: lambda
-new Thread(() -> System.out.println("Running")).start();
-```
+    public static void main(String[] args) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                System.out.println("Running in: " + Thread.currentThread().getName());
+            }
+        }).start();
+
+        // Modern equivalent: lambda
+        new Thread(() -> System.out.println("Running")).start();
+    }
+}
 
 ---
 
@@ -210,3 +217,4 @@ new Thread(() -> System.out.println("Running")).start();
 | Forgetting `static` on nested class | Wastes memory with outer reference | Use static nested for helpers |
 | Using anonymous class for complex logic | Hard to read and test | Extract to a named class or lambda |
 | Accessing non-effectively-final variables | Compilation error in local/anonymous | Don't reassign captured variables |
+

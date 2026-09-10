@@ -1,7 +1,7 @@
 ---
 title: Scheduled Tasks with @Scheduled
 module: spring-scheduling-async
-order: 1
+order: 4
 minutes: 20
 topics: ["@Scheduled", "fixedDelay", "cron", "TaskScheduler", "thread pools"]
 summary: Scheduling is how Spring applications run logic at fixed intervals, after fixed delays, or at cronaligned times. The @Scheduled annotation turns an...
@@ -18,12 +18,10 @@ Scheduling is how Spring applications run logic at fixed intervals, after fixed 
 
 Scheduling is opt-in. Annotate any configuration class with `@EnableScheduling`:
 
-```java
 @Configuration
 @EnableScheduling
 public class SchedulerConfig {
 }
-```
 
 Once enabled, every `@Scheduled` method in the context becomes a task. Spring Boot applications can also set `spring.task.scheduling.enabled=true` (the default) — disabling it is useful in tests to prevent background work from running during test suites.
 
@@ -33,7 +31,6 @@ Once enabled, every `@Scheduled` method in the context becomes a task. Spring Bo
 
 Runs at a fixed interval measured from the **start** of the previous invocation. If the task takes longer than the rate, executions queue up (single-threaded by default) or overlap (with a pool).
 
-```java
 @Service
 public class HeartbeatTask {
 
@@ -42,25 +39,21 @@ public class HeartbeatTask {
         monitoringClient.ping();
     }
 }
-```
 
 ### fixedDelay
 
 Runs after a fixed delay measured from the **completion** of the previous invocation. This guarantees no overlap: the next run starts `fixedDelay` ms after the previous one finishes.
 
-```java
 @Scheduled(fixedDelay = 10_000)
 public void reconcileLedger() {
     // long-running job — next run waits until this completes + 10s
     billingService.reconcile();
 }
-```
 
 ### cron
 
 Runs at calendar-aligned times using a six-field cron expression: `second minute hour day-of-month month day-of-week`. Spring adds the leading seconds field (Unix cron has five).
 
-```java
 @Scheduled(cron = "0 0 3 * * MON-FRI")   // 3:00 AM, weekdays
 public void nightlyReport() { ... }
 
@@ -69,7 +62,6 @@ public void refreshCache() { ... }
 
 @Scheduled(cron = "0 0 9 ? * MON")       // every Monday 9 AM
 public void weeklyDigest() { ... }
-```
 
 The `?` means "no specific value" — required when both day-of-month and day-of-week would conflict. `L` (last), `W` (nearest weekday), and `#` (nth weekday) are also supported.
 
@@ -77,10 +69,8 @@ The `?` means "no specific value" — required when both day-of-month and day-of
 
 All three modes accept `initialDelay` (and `initialDelayString` for property-driven config):
 
-```java
 @Scheduled(fixedDelay = 60_000, initialDelay = 15_000)
 public void warmUpThenRun() { ... }
-```
 
 This is vital when the scheduled method depends on resources (caches, connections) that take time to initialize at startup.
 
@@ -88,13 +78,11 @@ This is vital when the scheduled method depends on resources (caches, connection
 
 Hard-coding intervals is inflexible. Pull values from `application.yml` with SpEL:
 
-```java
 @Scheduled(fixedDelayString = "${app.jobs.reconcile-delay-ms}")
 public void reconcile() { ... }
 
 @Scheduled(cron = "${app.jobs.nightly-cron}")
 public void nightly() { ... }
-```
 
 ```yaml
 app:
@@ -111,7 +99,6 @@ app:
 
 ### Configuring a Proper Pool
 
-```java
 @Configuration
 @EnableScheduling
 public class SchedulerConfig {
@@ -126,7 +113,6 @@ public class SchedulerConfig {
         return scheduler;
     }
 }
-```
 
 Or purely with properties:
 
@@ -148,11 +134,9 @@ spring:
 
 Don't run a job in every environment:
 
-```java
 @Scheduled(fixedDelayString = "${app.jobs.cache-refresh-ms}")
 @ConditionalOnProperty(name = "app.jobs.cache-refresh-enabled", havingValue = "true")
 public void refreshCache() { ... }
-```
 
 In tests, either flip the property off or disable scheduling entirely with `@SpringBootTest(properties = "spring.task.scheduling.enabled=false")`.
 
@@ -169,7 +153,6 @@ In tests, either flip the property off or disable scheduling entirely with `@Spr
 
 ## Practical Example: Health-Check Scheduler
 
-```java
 @Service
 public class DependencyHealthTask {
 
@@ -193,8 +176,8 @@ public class DependencyHealthTask {
         }
     }
 }
-```
 
 ## Summary
 
 `@Scheduled` gives you three timing models — `fixedRate` (start-to-start), `fixedDelay` (finish-to-start, no overlap), and `cron` (calendar-aligned). The defaults are deliberately minimal; production systems must configure a thread pool, use property-driven intervals, handle graceful shutdown, and coordinate across cluster nodes. That last concern — distributed scheduling — is covered in depth in the final lesson of this module.
+

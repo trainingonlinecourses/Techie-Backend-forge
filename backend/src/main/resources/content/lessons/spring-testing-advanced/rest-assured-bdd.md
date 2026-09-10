@@ -1,7 +1,7 @@
 ---
 title: Testing REST APIs — TestRestTemplate and End-to-End Assertions
 summary: TestRestTemplate vs MockMvc vs RestAssured, starting the full server with RANDOM_PORT, and asserting status, headers and bodies on a real HTTP stack.
-order: 6
+order: 5
 minutes: 17
 topics: [testresttemplate, restassured, random-port, integration-test, http-testing, bdd]
 docs:
@@ -17,7 +17,6 @@ docs:
 
 Spring Boot's tool for this is **`TestRestTemplate`** (a `RestTemplate` preset for tests: relative URLs resolved against the test server, no client-side interceptors):
 
-```java
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class OrderApiE2eTest {
     @Autowired TestRestTemplate rest;
@@ -37,7 +36,6 @@ class OrderApiE2eTest {
         assertThat(fetched.getBody().status()).isEqualTo("CREATED");
     }
 }
-```
 
 `RANDOM_PORT` boots the real embedded server on an ephemeral port — so tests run in parallel without port collisions and the full web stack (filters, serializers, exception advice, security) is exercised.
 
@@ -56,7 +54,6 @@ Teams run all three: unit tests are fast and numerous; a **thin but critical** E
 
 RestAssured gives a fluent, Given/When/Then syntax many teams prefer for API tests:
 
-```java
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 class OrderApiTest {
     @LocalServerPort int port;   // inject the random port
@@ -75,7 +72,6 @@ class OrderApiTest {
             .body("status", equalTo("CREATED"));
     }
 }
-```
 
 Choose one style per codebase: `TestRestTemplate` (no extra dependency, explicit) or RestAssured (fluent BDD, more readable assertions on JSON bodies).
 
@@ -112,3 +108,4 @@ Choose one style per codebase: `TestRestTemplate` (no extra dependency, explicit
 - E2E catches serialization, filter/security ordering, and error-handling bugs MockMvc misses.
 - Keep the E2E layer thin and critical; unit + slice tests carry the bulk of coverage.
 - Stub external systems (WireMock), reset shared state, and never hardcode ports.
+
