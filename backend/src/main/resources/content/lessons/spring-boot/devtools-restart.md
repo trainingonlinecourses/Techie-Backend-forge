@@ -99,10 +99,6 @@ DevTools automatically detects production and disables itself:
 1. DevTools checks for this: 1. Is spring-boot-devtools on the classpath? 2. Is it in the root classloader? (production JAR bundles it in BOOT-INF/lib). 3. Is spring.profiles.active set? (production always sets this)
 2. Result: DevTools is ONLY active in development. In production: no restart overhead, no LiveReload
 
-The same code, clean:
-
-```java
-```
 
 ## When to NOT use DevTools
 

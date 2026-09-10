@@ -67,9 +67,13 @@ CONFLICT (content): Merge conflict in Course.java
 Git pauses the merge and marks the conflict **in the file**:
 
 <<<<<<< HEAD
+```java
 private int minutes = 30;          // what main has
+```
 =======
+```java
 private int minutes = 45;          // what the branch has
+```
 >>>>>>> feature/add-lessons
 
 **The resolution process:**

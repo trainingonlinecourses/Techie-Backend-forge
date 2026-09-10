@@ -18,7 +18,9 @@ docs:
 
 The previous lessons covered *getting* tokens. Production is about *managing* them: what happens when the access token expires (refresh tokens), how to keep long-lived sessions safe (rotation), and how the machine-to-machine flow (client credentials) fits. Every piece of this lesson is a *security decision* — the OAuth2 ecosystem's consensus on how to balance convenience against the realities of stolen tokens, leaked secrets, and long-lived sessions.
 
+```java
 **The mental model:** the access token is a short-lived key card that expires every 15 minutes; the **refresh token** is the *membership card* that gets you a new key card without re-authenticating. The membership card is far more powerful (it's valid for days and can mint new access tokens), so it must be guarded more strictly — and the modern standard, **refresh token rotation**, makes it *single-use*: every refresh *replaces* the membership card, so a stolen one becomes worthless the moment it's used.
+```
 
 ## The Token Lifecycle
 
@@ -74,9 +76,11 @@ grant_type=client_credentials
 &client_secret=<the service's secret>
 &scope=read:orders
 
+```java
 // Response: { "access_token": "...", "token_type": "Bearer", "expires_in": 3600 }
 
 **The security discipline:**
+```
 - **One client identity per service** — `client_id` identifies *which* service is calling; the auth server's `scope` limits what it may do.
 - **Secrets in the secret store** — the client secret lives in a vault/secrets manager, injected at deploy (the ConfigMap/Secret lesson's territory), never in the repo or image.
 - **Short expiries + cached tokens** — clients cache the token until near-expiry and refresh then, avoiding a token request per call.

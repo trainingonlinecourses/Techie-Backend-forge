@@ -45,6 +45,7 @@ When you call an overloaded method, the compiler picks the **most specific** app
 2. Among widening options, the narrowest wins (`int` param beats `long` for an `int` arg).
 3. Varargs is the last resort — only when nothing else applies.
 
+```java
 void f(int x) {}
 void f(long x) {}
 void f(Integer x) {}
@@ -53,6 +54,7 @@ void f(Object... xs) {}
 f(5);        // int — exact match
 f(5L);       // long — exact
 f(null);     // Integer — boxing (more specific than Object...); beware null-ambiguity!
+```
 
 **The null-ambiguity trap:** calling `f(null)` with both `f(String)` and `f(Integer)` overloads is a **compile error** ("ambiguous") because both are equally specific. It's a design smell — avoid null-passing overloads that collide.
 
@@ -73,6 +75,7 @@ public List<Order> search(String query) { return search(query, 20, Sort.DEFAULT)
 public List<Order> search(String query, int limit) { return search(query, limit, Sort.DEFAULT); }
 public List<Order> search(String query, int limit, Sort sort) { /* real implementation */ }
 
+```java
 Keep the *full* signature as the single implementation; shorter overloads delegate. Review rule: **don't duplicate logic across overloads — chain to the richest one.**
 
 **Scenario 3 — builder-style fluent APIs.** Varargs shines for "any number of" semantics in builders and configuration:
@@ -82,6 +85,7 @@ new SearchSpec().sortBy("createdAt", "status")     // sortBy(String... fields)
 **Scenario 4 — overriding with @Override always.** The annotation is mandatory in review: it turns a typo'd override (silently a new method) into a compile error, and it documents intent:
 
 @Override
+```
 public boolean equals(Object o) { ... }   // typo in signature → compile error, not a silent bug
 
 ## Overloading vs overriding — the confusion that causes bugs
@@ -89,10 +93,12 @@ public boolean equals(Object o) { ... }   // typo in signature → compile error
 - **Overloading is compile-time** — the compiler picks the method by the *declared* type of the argument.
 - **Overriding is runtime** — the JVM dispatches by the *actual* type of the receiver.
 
+```java
 class A { void f(A a) {} void f(B b) {} }        // overloads
 class B extends A { @Override void f(A a) {} }   // overrides the f(A) overload
 
 A x = new B();
+```
 x.f(new B());   // resolves f(B) at compile time (x is declared A) → A.f(B), NOT overridden
 
 This is the classic source of "I overrode it but the wrong method ran" bugs: overload resolution uses the *static* type. If dispatch-by-actual-type matters, the methods must have the *same* signature (true overriding).

@@ -12,6 +12,7 @@ docs:
 
 ## @Async: offload work from the request thread
 
+```java
 @Configuration
 @EnableAsync
 public class AsyncConfig {
@@ -35,6 +36,7 @@ public class NotificationService {
         // runs on the async executor — caller returns immediately
     }
 }
+```
 
 **The trap**: `@Async` works through the proxy — calling `this.sendWelcome(...)` from inside the same bean silently runs synchronously. Inject the bean (or use `ApplicationContext.getBean`) to go through the proxy (same story as `@Transactional`).
 
@@ -72,12 +74,14 @@ public class OutboxRelay {
 
 ## Outbox pattern (the production answer)
 
+```java
 @Transactional
 public void createOrder(Order order) {
     orders.save(order);
     outbox.save(new OutboxEvent("order.created", order.getId()));  // same transaction
 }
 // OutboxRelay publishes committed events to the broker and marks them sent.
+```
 
 This is how you get "exactly-once-ish" side effects: write the side effect as data in the same transaction, then a job/broker consumer delivers it.
 

@@ -15,6 +15,7 @@ docs:
 
 An **assertion** is a statement that declares something you believe to be true at that point in the code. If it is false, the program is in an inconsistent state — a bug.
 
+```java
 public Order processOrder(OrderRequest request) {
     Order order = createOrder(request);
     assert order != null : "createOrder returned null";
@@ -25,10 +26,13 @@ public Order processOrder(OrderRequest request) {
 
     return order;
 }
+```
 
 If the assertion fails, an `AssertionError` is thrown — a **programming error**, not a recoverable exception.
 
+```java
 **Critical distinction:** assertions are for *programming errors* (bugs in your code), not for *user input validation* (bad data from the outside world). Validation catches bad input; assertions catch internal inconsistencies.
+```
 
 ## Assertions are disabled by default
 
@@ -47,6 +51,7 @@ java -ea:com.backendforge.academy -jar app.jar
 
 This means assertions have **zero cost in production** — the JVM skips them entirely. They are a development and testing tool, not a runtime guard.
 
+```java
 **The implication:** never put logic with side effects inside an assertion:
 
 // WRONG: the counter increment is skipped when assertions are off
@@ -55,6 +60,7 @@ assert processCounter.increment() == 1 : "Should be first";
 // RIGHT: the counter works regardless
 processCounter.increment();
 assert processCounter.getCount() == 1 : "Should be first";
+```
 
 ## Assertions vs exceptions vs validation
 
@@ -80,12 +86,14 @@ public class Money {
         assert amount != null : "amount must not be null";
         assert currency != null : "currency must not be null";
         assert amount.scale() <= currency.getDefaultFractionDigits()
+```java
             : "Scale exceeds currency precision";
 
         this.amount = amount;
         this.currency = currency;
 
         // Postcondition: object is in valid state
+```
         assert this.amount.scale() <= this.currency.getDefaultFractionDigits()
             : "Internal scale error";
     }
@@ -98,6 +106,7 @@ public class Money {
 
 ### Scenario 2: assertions for algorithm correctness
 
+```java
 public class BinarySearch {
 
     public static int search(int[] sorted, int target) {
@@ -123,11 +132,13 @@ public class BinarySearch {
         return true;
     }
 }
+```
 
 ### Scenario 3: debugging with logging and diagnostics
 
 When assertions are off in production, structured logging replaces them:
 
+```java
 @Component
 public class OrderService {
 
@@ -152,6 +163,7 @@ public class OrderService {
         return order;
     }
 }
+```
 
 ## JVM debugging tools
 

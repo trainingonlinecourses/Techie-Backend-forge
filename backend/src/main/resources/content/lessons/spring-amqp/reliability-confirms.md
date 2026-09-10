@@ -12,7 +12,9 @@ docs:
 
 # Publisher Confirms & Reliability
 
+```java
 "Sent" is not "delivered". Without confirms, a publish that hits a downed broker, a full queue, or a missing exchange **silently disappears**. Publisher confirms give producers certainty; idempotent consumers make retries safe. This lesson is the reliability layer of RabbitMQ.
+```
 
 ## The Reliability Chain
 
@@ -112,6 +114,7 @@ Spring AMQP: `rabbitTemplate.setChannelTransacted(true)` enables transactions; b
 
 Redelivery happens (requeue, consumer crash after ack-less processing, DLQ reprocessing). **Consumers must be idempotent** — the third pillar:
 
+```java
 @RabbitListener(queues = "orders.new")
 public void onOrderCreated(OrderEvent event) {
     // Claim pattern: insert-if-absent in the DB
@@ -123,6 +126,7 @@ public void onOrderCreated(OrderEvent event) {
     }
     inventoryService.reserve(event.orderId());
 }
+```
 
 A unique constraint on the processed-id table turns redelivery into a no-op.
 

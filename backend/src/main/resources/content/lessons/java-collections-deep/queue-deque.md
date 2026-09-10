@@ -47,10 +47,12 @@ String head = queue.peek();
 ## ArrayDeque: The Default
 
 Deque<String> deque = new ArrayDeque<>();
+```java
 deque.addFirst("a");
 deque.addLast("b");
 deque.removeFirst();
 deque.removeLast();
+```
 
 - Resizable circular array — no node objects
 - **Faster than LinkedList for queue/stack operations** (contiguous memory, cache-friendly)
@@ -132,9 +134,11 @@ public class TaskProcessor {
 ## Deque as a Stack
 
 Deque<String> stack = new ArrayDeque<>();
+```java
 stack.push("a");       // == addFirst
 stack.push("b");
 String top = stack.pop();   // "b" — LIFO
+```
 
 `Deque` is the modern replacement for the legacy `Stack` class (which is synchronized — needlessly slow).
 
@@ -155,6 +159,7 @@ String top = stack.pop();   // "b" — LIFO
 @Test
 void priorityQueuePollsInPriorityOrder() {
     PriorityQueue<Task> q = new PriorityQueue<>(Comparator.comparingInt(Task::priority));
+```java
     q.add(new Task("low", 3));
     q.add(new Task("high", 1));
     q.add(new Task("mid", 2));
@@ -166,6 +171,7 @@ void priorityQueuePollsInPriorityOrder() {
 
 @Test
 void arrayDequeWorksAsStack() {
+```
     Deque<String> stack = new ArrayDeque<>();
     stack.push("a");
     stack.push("b");

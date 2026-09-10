@@ -225,6 +225,7 @@ public Map<String, String> parseConfig(Path configFile) throws IOException {
 
 ### Scenario 2: Generating formatted output
 
+```java
 public String formatTable(List<String[]> rows, int[] columnWidths) {
     StringBuilder sb = new StringBuilder();
     for (int i = 0; i < columnWidths.length; i++) {
@@ -235,6 +236,7 @@ public String formatTable(List<String[]> rows, int[] columnWidths) {
     // ... format rows
     return sb.toString();
 }
+```
 
 ---
 

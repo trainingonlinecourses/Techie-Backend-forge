@@ -16,12 +16,14 @@ docs:
 
 Spring provides a **cache abstraction** that lets you add caching to any method with annotations. The implementation (Caffeine, Redis, Ehcache) is pluggable — change the cache store without changing your code.
 
+```java
 @Cacheable("users")  // Spring intercepts calls to this method
 public User getUser(String id) {
     return userRepository.findById(id).orElseThrow();  // only runs on cache miss
 }
 
 **How it works internally:**
+```
 1. First call with `id="user-123"` → cache miss → method executes → result stored in cache
 2. Second call with `id="user-123"` → cache hit → method NOT executed → cached result returned
 3. `@CacheEvict("users", key = "#id")` → removes entry from cache → next call is a miss again
@@ -84,19 +86,23 @@ public class CacheConfig {
         manager.setCaffeine(Caffeine.newBuilder()
             .maximumSize(10_000)
             .expireAfterWrite(Duration.ofMinutes(5))
+```java
             .recordStats());
         return manager;
     }
 
     @Bean
     public RedisCacheManager redisCacheManager(RedisConnectionFactory factory) {
+```
         RedisCacheConfiguration config = RedisCacheConfiguration.defaultCacheConfig()
             .entryTtl(Duration.ofMinutes(30))
             .serializeValuesWith(
                 RedisSerializationContext.SerializationPair
+```java
                     .fromSerializer(new GenericJackson2JsonRedisSerializer()));
 
         return RedisCacheManager.builder(factory)
+```
             .cacheDefaults(config)
             .withCacheConfiguration("users",
                 RedisCacheConfiguration.defaultCacheConfig()
@@ -161,9 +167,13 @@ public MeterBinder cacheMetrics(CaffeineCacheManager cacheManager) {
             CacheStats stats = nativeCache.stats();
 
             Gauge.builder("cache.hit.count", stats, CacheStats::hitCount)
+```java
                 .tag("cache", name).register(registry);
+```
             Gauge.builder("cache.miss.count", stats, CacheStats::missCount)
+```java
                 .tag("cache", name).register(registry);
+```
             Gauge.builder("cache.eviction.count", stats, CacheStats::evictionCount)
                 .tag("cache", name).register(registry);
         });

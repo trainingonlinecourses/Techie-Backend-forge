@@ -12,6 +12,7 @@ docs:
 
 Spring Shell provides `CommandRunner` to test commands in integration tests. You simulate user input and verify the output.
 
+```java
 @SpringBootTest
 class GreetingCommandsTest {
 
@@ -24,6 +25,7 @@ class GreetingCommandsTest {
         assertThat(output).contains("Hello, Alice!");
     }
 }
+```
 
 ---
 
@@ -55,6 +57,7 @@ class FileCommandsTest {
     void testCopy() {
         String output = runner.call("cp",
             "--source", "a.txt",
+```java
             "--destination", "b.txt");
         assertThat(output).contains("Copied a.txt to b.txt");
     }
@@ -62,6 +65,7 @@ class FileCommandsTest {
     @Test
     void testCreateUserValidation() {
         // Should fail validation
+```
         String output = runner.call("create-user",
             "--username", "",
             "--email", "test@example.com");
@@ -75,6 +79,7 @@ class FileCommandsTest {
 
 ### Scenario 1: Test with mocked dependencies
 
+```java
 @SpringBootTest
 class DeployCommandsTest {
 
@@ -91,15 +96,18 @@ class DeployCommandsTest {
         verifyNoInteractions(deployService);  // dry run shouldn't call service
     }
 }
+```
 
 ### Scenario 2: Test availability
 
+```java
 @Test
 void testAdminCommandUnavailable() {
     // When user is not admin
     String output = runner.call("admin-reset");
     assertThat(output).contains("admin role required");
 }
+```
 
 ---
 

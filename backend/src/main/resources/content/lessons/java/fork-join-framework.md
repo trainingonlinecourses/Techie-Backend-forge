@@ -69,6 +69,7 @@ long sum = pool.invoke(new SumTask(hugeArray, 0, hugeArray.length));
 
 In a regular `ExecutorService`, threads pull from a shared queue. If one task is slow, other threads sit idle. ForkJoinPool gives each thread its own **deque** — when a thread finishes its work, it **steals** from the busiest thread's deque. This eliminates contention and keeps all cores busy.
 
+```java
 // CommonPool: the default ForkJoinPool (Runtime.getRuntime().availableProcessors() threads)
 ForkJoinPool.commonPool().submit(() -> {
     // Uses the shared pool — don't block or do I/O here
@@ -78,6 +79,7 @@ ForkJoinPool.commonPool().submit(() -> {
 ForkJoinPool customPool = new ForkJoinPool(8);  // 8 worker threads
 
 **When to use ForkJoinPool:** CPU-bound recursive tasks (sorting, image processing, tree traversal, matrix multiplication). **When NOT to use it:** I/O-bound tasks (HTTP calls, database queries), blocking operations, or tasks that don't split naturally.
+```
 
 ## Common pitfalls — the parallel stream trap
 
@@ -86,15 +88,19 @@ Parallel streams use `ForkJoinPool.commonPool()` by default. Sharing the pool ac
 // BAD: parallel stream uses commonPool — blocks all parallel streams in the app
 list.parallelStream()
     .map(id -> httpClient.get("/users/" + id))  // I/O — blocks a pool thread
+```java
     .toList();
 
 // BETTER: use a dedicated pool for I/O-bound parallel work
 ForkJoinPool ioPool = new ForkJoinPool(20);
+```
 ioPool.submit(() ->
     list.parallelStream()
         .map(id -> httpClient.get("/users/" + id))
         .toList()
+```java
 ).get();
+```
 
 **The fork/join performance rule:** never block inside `compute()` — it starves the thread of work to steal. If you need I/O, use `CompletableFuture` or a regular `ExecutorService` instead.
 
@@ -132,6 +138,7 @@ public class MatrixZeroTask extends RecursiveAction {
 **Bulk data processing:** split a large CSV/JSON file into chunks, parse each chunk in parallel, merge results.
 
 public class ChunkedParser extends RecursiveTask<List<Order>> {
+```java
     // Split file into 10MB chunks, parse each in parallel
     // Each chunk is independent — perfect for fork/join
 }
@@ -140,6 +147,7 @@ public class ChunkedParser extends RecursiveTask<List<Order>> {
 
 protected NodeCount compute() {
     if (node.children().isEmpty()) return new NodeCount(1, 0);
+```
     List<NodeCount> childCounts = node.children().stream()
         .map(child -> new NodeCount(child).fork())
         .map(forked -> forked.join())

@@ -256,6 +256,7 @@ public class DataAnalysisAgent {
 
     @Tool(description = "Execute a SQL SELECT query against the analytics database. " +
                          "Only SELECT queries allowed — no INSERT, UPDATE, or DELETE.")
+```java
     public List<Map<String, Object>> queryDatabase(String sql) {
         if (!sql.trim().toUpperCase().startsWith("SELECT")) {
             throw new IllegalArgumentException("Only SELECT queries allowed");
@@ -264,13 +265,16 @@ public class DataAnalysisAgent {
     }
 
     @Tool(description = "Create a chart from data. Accepts a title, chart type " +
+```
                          "(bar, line, pie), and data points.")
     public String createChart(String title, String chartType, List<DataPoint> data) {
+```java
         return chartService.generate(title, chartType, data);
     }
 
     public String analyzeData(String question) {
         return chatClient.prompt()
+```
             .system("""
                 You are a data analyst. Use the database to query data,
                 then create visualizations to answer the user's questions.

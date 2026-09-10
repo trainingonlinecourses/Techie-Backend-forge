@@ -12,6 +12,7 @@ docs:
 
 Spring Boot uses **SLF4J** (facade) + **Logback** (implementation) by default:
 
+```java
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,6 +31,7 @@ public class OrderService {
         }
     }
 }
+```
 
 ---
 
@@ -138,6 +140,7 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
 
 ### Scenario 2: Audit logging
 
+```java
 @Aspect
 @Component
 public class AuditLoggingAspect {
@@ -157,6 +160,7 @@ public class AuditLoggingAspect {
         return result;
     }
 }
+```
 
 ---
 

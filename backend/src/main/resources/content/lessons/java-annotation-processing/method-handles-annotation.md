@@ -12,14 +12,18 @@ docs:
 
 Method handles are Java's modern alternative to `java.lang.reflect`. They provide direct access to methods, constructors, and fields — but with better performance because they can be optimized by the JVM (inlined, compiled, etc.).
 
+```java
 // Old way: reflection
 Method m = String.class.getMethod("length");
 int len = (int) m.invoke("hello");  // 5
 
 // New way: method handle
+```
 MethodHandle mh = MethodHandles.lookup()
+```java
     .findVirtual(String.class, "length", MethodType.methodType(int.class));
 int len = (int) mh.invokeExact("hello");  // 5
+```
 
 Method handles look similar to reflection but are fundamentally different: they're designed to be JIT-optimized, while reflection always goes through slow lookup.
 
@@ -60,6 +64,7 @@ String result = (String) mh.invokeExact("hello");
 
 Describes the method signature (parameter types + return type):
 
+```java
 // No parameters, returns String
 MethodType noArgs = MethodType.methodType(String.class);
 
@@ -68,6 +73,7 @@ MethodType oneArg = MethodType.methodType(boolean.class, String.class);
 
 // Two parameters
 MethodType twoArgs = MethodType.methodType(void.class, String.class, int.class);
+```
 
 ---
 
@@ -173,6 +179,7 @@ public class MethodHandleDemo {
 
 ### Scenario 1: Fast serialization
 
+```java
 // Method handles for fast field access in serialization
 MethodHandles.Lookup lookup = MethodHandles.lookup();
 MethodHandle getName = lookup.findGetter(User.class, "name", String.class);
@@ -184,6 +191,7 @@ for (User user : users) {
     int age = (int) getAge.invoke(user);
     // serialize...
 }
+```
 
 ### Scenario 2: LambdaMetafactory (method handle + lambda)
 
@@ -229,7 +237,9 @@ public Object invokeService(Object service, String methodName, Object... args) t
     MethodType type = MethodType.methodType(
         Object.class,
         Arrays.stream(args).map(Object::getClass).toArray(Class[]::new)
+```java
     );
+```
     MethodHandle mh = MethodHandles.lookup().findVirtual(
         service.getClass(), methodName, type
     );

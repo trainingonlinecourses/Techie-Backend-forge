@@ -202,15 +202,19 @@ public class AiTutorRAG {
     public String answerWithCurriculum(String question) {
         // 1. Find relevant curriculum content
         List<Document> relevantDocs = vectorStore.similaritySearch(
+```java
             SearchRequest.query(question).withTopK(5));
 
         // 2. Build context from found documents
+```
         String context = relevantDocs.stream()
             .map(Document::getContent)
+```java
             .collect(Collectors.joining("\n\n"));
 
         // 3. Ask AI with the context
         return chatClient.prompt()
+```
             .system("""
                 You are a Java tutor. Answer based ONLY on the provided curriculum context.
                 If the context doesn't contain enough information, say so.

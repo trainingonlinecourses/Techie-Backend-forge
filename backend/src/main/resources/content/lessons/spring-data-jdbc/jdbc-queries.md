@@ -117,12 +117,14 @@ public interface CourseRepository extends CrudRepository<Course, Long> {
 
     // Return a Page (total count + content + page metadata)
     Page<Course> findByPublishedTrue(Pageable pageable);
+```java
 }
 
 @Service
 public class CatalogService {
 
     private final CourseRepository courses;
+```
 
     public Page<Course> page(int page, int size) {
         // Page 0, 10 per page, newest first

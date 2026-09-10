@@ -26,11 +26,13 @@ List<Course> findByLevelAndMinutesGreaterThan(String level, int min);
 
 public interface CourseRepository extends JpaRepository<Course, Long>,
         JpaSpecificationExecutor<Course> {
+```java
     // Specifications work through JpaSpecificationExecutor
 }
 
 // One specification per filter — composable
 public class CourseSpecifications {
+```
 
     public static Specification<Course> hasLevel(String level) {
         return (root, query, cb) ->
@@ -47,7 +49,9 @@ public class CourseSpecifications {
     }
 
     public static Specification<Course> titleContains(String text) {
+```java
         return (root, query, cb) ->
+```
             text == null ? null
                 : cb.like(cb.lower(root.get("title")), "%" + text.toLowerCase() + "%");
     }
@@ -83,15 +87,19 @@ public Page<Course> search(CourseFilter filter, Pageable pageable) {
 
 Specification<Course> spec = Specification.where(null);   // start empty
 
+```java
 if (level != null)        spec = spec.and(hasLevel(level));
 if (minMinutes != null)   spec = spec.and(minutesAtLeast(minMinutes));
 if (publishedOnly)        spec = spec.and(isPublished());
 
 // OR composition
+```
 Specification<Course> beginnerOrAdvanced =
+```java
     hasLevel("BEGINNER").or(hasLevel("ADVANCED"));
 
 // Negation
+```
 Specification<Course> notArchived = Specification.not(isArchived());
 
 `where()` is the null-safe start — composing with a null spec is a no-op.
@@ -135,7 +143,9 @@ public static Specification<Course> distinct() {
 
 Page<Course> page = repository.findAll(
     spec,
+```java
     PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "minutes")));
+```
 
 Specifications compose with `Pageable` and `Sort` natively — filters and pagination are orthogonal.
 
@@ -171,16 +181,20 @@ class SpecificationTest {
         Specification<Course> spec = Specification
             .where(CourseSpecifications.hasLevel("BEGINNER"))
             .and(CourseSpecifications.isPublished())
+```java
             .and(CourseSpecifications.minutesAtLeast(20));
+```
 
         List<Course> results = repository.findAll(spec);
 
+```java
         assertEquals(1, results.size());
         assertEquals("Java", results.get(0).getTitle());
     }
 
     @Test
     void nullFiltersAreIgnored() {
+```
         Specification<Course> spec = Specification
             .where(CourseSpecifications.hasLevel(null))     // skipped
             .and(CourseSpecifications.isPublished());

@@ -86,10 +86,13 @@ counts.merge(endpoint, 1, Integer::sum);
 
 `CopyOnWriteArrayList` makes a **fresh copy of the underlying array** on every `add`/`set`/`remove`. Reads see a consistent snapshot without locking; writes are expensive but rare.
 
+```java
 import java.util.concurrent.CopyOnWriteArrayList;
+```
 
 CopyOnWriteArrayList<Listener> listeners = new CopyOnWriteArrayList<>();
 
+```java
 // Write — copies the array (expensive, but rare)
 listeners.add(new Listener("audit"));
 listeners.remove(deadListener);
@@ -100,6 +103,7 @@ for (Listener l : listeners) {       // iterates over the snapshot taken at loop
 }
 
 **When to use it:**
+```
 | Scenario | Why CopyOnWriteArrayList fits |
 |---|---|
 | Event listener registries | Listeners change rarely; iteration is frequent |

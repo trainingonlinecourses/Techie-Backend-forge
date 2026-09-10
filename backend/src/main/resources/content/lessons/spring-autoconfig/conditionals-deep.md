@@ -15,6 +15,7 @@ Imagine you're building an app that can use either Redis OR Caffeine for caching
 
 That's what `@Conditional` annotations do. They tell Spring: **"Only create this bean IF a certain condition is true."**
 
+```java
 // Only create this bean if Redis is on the classpath
 @Bean
 @ConditionalOnClass(name = "redis.clients.jedis.Jedis")
@@ -28,6 +29,7 @@ public CacheManager redisCacheManager() {
 public CacheManager defaultCacheManager() {
     return new ConcurrentMapCacheManager();
 }
+```
 
 ---
 
@@ -186,6 +188,7 @@ public class FeatureFlags {
 
 ### Scenario 3: Profile-specific beans
 
+```java
 @Configuration
 public class EnvironmentConfiguration {
     
@@ -203,6 +206,7 @@ public class EnvironmentConfiguration {
         return new RealDataLoader();  // Uses real data
     }
 }
+```
 
 ---
 

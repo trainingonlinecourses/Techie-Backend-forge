@@ -165,7 +165,9 @@ Elasticsearch is a *search index*, not the source of truth — and the eternal q
 3. **Scheduled reindex:** batch rebuilds for non-critical data — simple, eventually consistent.
 4. **Spring Data sync on save:** index in the repository's save path — fine for small datasets.
 
+```java
 The engineering rule: **the database is authoritative; the index is a derived, eventually-consistent projection.** Accept the lag, design for it, and rebuild the index from the DB when it drifts — that's the mental model that keeps search from corrupting your source of truth.
+```
 
 ## Recap
 

@@ -83,12 +83,14 @@ public Page<CourseDto> list(
 
     Specification<Course> spec = Specification.where(null);
 
+```java
     if (title != null) spec = spec.and((root, q, cb) ->
         cb.like(cb.lower(root.get("title")), "%" + title.toLowerCase() + "%"));
     if (level != null) spec = spec.and((root, q, cb) ->
         cb.equal(root.get("level"), level));
     if (minMinutes != null) spec = spec.and((root, q, cb) ->
         cb.greaterThanOrEqualTo(root.get("minutes"), minMinutes));
+```
 
     return repository.findAll(spec, pageable).map(CourseDto::from);
 }
@@ -135,7 +137,9 @@ public List<Event> pageAfter(Long lastId, int limit) {
 - ❌ No random access to "page 5" — only next/prev
 - ❌ Sorting must be on an indexed, unique column
 
+```java
 **Choose cursor for feeds/timelines/audit logs; offset for admin tables and small datasets.**
+```
 
 ## Defaults and Guards
 
@@ -156,16 +160,22 @@ A `max-page-size` guard is essential — otherwise `?size=1000000` lets a client
 Never let raw client input reach `ORDER BY` unsanitized. Whitelist sortable fields:
 
 public Page<CourseDto> list(Pageable pageable) {
+```java
     Pageable safe = PageableUtil.sanitize(pageable, Set.of("title", "minutes", "createdAt"));
+```
     return repository.findAll(safe).map(CourseDto::from);
+```java
 }
 
 public final class PageableUtil {
+```
     private static final Set<String> BLOCKED = Set.of(
         ";", "--", "drop", "select", "union", "\\", "'", "\"", "`");
 
     public static Pageable sanitize(Pageable pageable, Set<String> allowed) {
+```java
         if (!pageable.getSort().isSorted()) return pageable;
+```
         Sort safe = pageable.getSort().stream()
             .filter(order -> allowed.contains(order.getProperty()))
             .map(order -> new Sort.Order(order.getDirection(), order.getProperty()))
@@ -202,11 +212,13 @@ class CourseControllerPaginationTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.page").value(1))
             .andExpect(jsonPath("$.size").value(5))
+```java
             .andExpect(jsonPath("$.items.length()").value(5));
     }
 
     @Test
     void rejectsOversizedPages() throws Exception {
+```
         mockMvc.perform(get("/api/courses").param("size", "100000"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.size").value(100));   // clamped by max-page-size

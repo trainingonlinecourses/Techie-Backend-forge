@@ -18,7 +18,9 @@ docs:
 
 Reliable tests share one property: **isolation** — each test runs as if it were the only test. The three enemies are *shared mutable state* (a field that leaks between tests), *hidden ordering dependencies* (test B only passes because test A ran first), and *environment coupling* (tests that depend on wall-clock time, random values, or real services). This lesson is the JUnit 5 toolkit for defeating all three — instance lifecycles, ordering, and parallel execution.
 
+```java
 **The mental model:** each test is a scientist's experiment. The experiment must be reproducible: clean apparatus (fresh instance), controlled conditions (no leftovers from the previous experiment), and independence (running experiments in any order or in parallel must not change results). JUnit 5 gives you the switches; *your discipline* decides whether tests are truly isolated.
+```
 
 ## The Default: PER_METHOD Isolation
 
@@ -56,6 +58,7 @@ class IsolationDemo {
 
 Sometimes sharing an instance is the *point* — expensive setup that shouldn't rebuild per test:
 
+```java
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class PerClassDemo {
 
@@ -80,6 +83,7 @@ class PerClassDemo {
     @Test
     void usesClientAgain() { assertTrue(client.isConnected()); }
 }
+```
 
 **The trade-off, stated plainly:** PER_CLASS shares instance state across the class's tests — faster (one setup), but it *reintroduces* the coupling the default removes. The professional rule: use PER_CLASS only for **immutable** shared resources (an expensive client that holds no test-specific state) — never for mutable fields tests write to. If two tests both mutate a shared field, you've recreated the ordering bug in slow motion. (And PER_CLASS enables `@MethodSource` factories that aren't static — a common reason to reach for it.)
 
@@ -123,9 +127,11 @@ junit.jupiter.execution.parallel.mode.default = concurrent
 junit.jupiter.execution.parallel.mode.classes.default = concurrent
 ```
 
+```java
 // Opt a class OUT if it must run serially:
 @Execution(ExecutionMode.SAME_THREAD)
 class SerialOnlyTest { }
+```
 
 **The contract parallel testing demands:** tests must be *truly independent* — no shared mutable state, no fixed ports, no ordering assumptions. The moment a test touches a shared resource (a static cache, a fixed port, a shared temp file), parallel execution exposes it as flaky failures. Which is the point: **parallel execution is a stress test of your isolation.** Spring Boot tests (which cache a shared context) run parallel safely because the context is read-only after startup; tests that *write* to the context or to shared services need `SAME_THREAD`.
 

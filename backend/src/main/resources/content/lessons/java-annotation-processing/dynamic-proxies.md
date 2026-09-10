@@ -65,6 +65,7 @@ UserService proxy = (UserService) Proxy.newProxyInstance(
 
 ### InvocationHandler
 
+```java
 class LoggingHandler implements InvocationHandler {
     private final Object target;
 
@@ -80,6 +81,7 @@ class LoggingHandler implements InvocationHandler {
         return result;
     }
 }
+```
 
 ---
 
@@ -195,12 +197,16 @@ public class DynamicProxyDemo {
 // JDK proxy (target implements interface)
 UserService proxy = (UserService) Proxy.newProxyInstance(
     UserService.class.getClassLoader(),
+```java
     new Class[]{UserService.class},
+```
     handler
+```java
 );
 
 // CGLIB proxy (target is any class) — Spring does this automatically
 // @Configuration classes use CGLIB to intercept @Bean methods
+```
 
 ---
 
@@ -208,6 +214,7 @@ UserService proxy = (UserService) Proxy.newProxyInstance(
 
 ### Scenario 1: Transaction proxy (simplified Spring)
 
+```java
 class TransactionHandler implements InvocationHandler {
     private final Object target;
 
@@ -228,12 +235,15 @@ class TransactionHandler implements InvocationHandler {
 }
 
 // Usage
+```
 UserService txService = (UserService) Proxy.newProxyInstance(
     UserService.class.getClassLoader(),
+```java
     new Class[]{UserService.class},
     new TransactionHandler(new UserServiceImpl())
 );
 txService.save(user);  // wrapped in BEGIN/COMMIT or ROLLBACK
+```
 
 ### Scenario 2: Access control proxy
 

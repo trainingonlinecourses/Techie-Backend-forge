@@ -39,7 +39,9 @@ public class SimpleServer {
     static void handleClient(Socket client) {
         try (
             BufferedReader in = new BufferedReader(
+```java
                 new InputStreamReader(client.getInputStream()));
+```
             PrintWriter out = new PrintWriter(
                 client.getOutputStream(), true)
         ) {
@@ -67,9 +69,12 @@ public class HttpExamples {
             .uri(URI.create(url))
             .header("Accept", "application/json")
             .GET()
+```java
             .build();
+```
 
         HttpResponse<String> response = client.send(
+```java
             request, HttpResponse.BodyHandlers.ofString());
 
         return response.body();
@@ -77,15 +82,19 @@ public class HttpExamples {
 
     // Asynchronous POST
     public static void postAsync(String url, String json) {
+```
         HttpRequest request = HttpRequest.newBuilder()
             .uri(URI.create(url))
             .header("Content-Type", "application/json")
             .POST(HttpRequest.BodyPublishers.ofString(json))
+```java
             .build();
+```
 
         client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
             .thenApply(HttpResponse::body)
             .thenAccept(body -> System.out.println("Response: " + body))
+```java
             .exceptionally(ex -> {
                 System.err.println("Error: " + ex.getMessage());
                 return null;
@@ -94,10 +103,13 @@ public class HttpExamples {
 
     public static void main(String[] args) throws Exception {
         // GET
+```
         String json = get("https://api.example.com/users");
+```java
         System.out.println(json);
 
         // POST
+```
         postAsync("https://api.example.com/users",
             "{\"name\": \"Sateesh\"}");
     }
@@ -124,8 +136,11 @@ public static boolean isServiceAlive(String url) {
             .uri(URI.create(url + "/actuator/health"))
             .timeout(Duration.ofSeconds(3))
             .GET()
+```java
             .build();
+```
         HttpResponse<String> resp = client.send(request,
+```java
             HttpResponse.BodyHandlers.ofString());
         return resp.statusCode() == 200;
     } catch (Exception e) {
@@ -137,10 +152,13 @@ public static boolean isServiceAlive(String url) {
 public class Main {
 
     public static void main(String[] args) {
+```
         HttpRequest request = HttpRequest.newBuilder()
             .uri(URI.create(downloadUrl))
             .GET()
+```java
             .build();
+```
         client.sendAsync(request, HttpResponse.BodyHandlers.ofFile(
             Path.of("download.zip")))
             .thenAccept(resp -> System.out.println("Downloaded to " + resp.body()));

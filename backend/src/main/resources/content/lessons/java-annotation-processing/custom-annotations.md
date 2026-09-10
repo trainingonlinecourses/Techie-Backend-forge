@@ -274,6 +274,7 @@ public class CustomAnnotationsDemo {
 
 ### Scenario 1: Custom validation framework
 
+```java
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
 public @interface Email {
@@ -293,9 +294,11 @@ public static boolean isValidEmail(Object obj) throws IllegalAccessException {
     }
     return true;
 }
+```
 
 ### Scenario 2: AOP-based audit logging
 
+```java
 @Aspect
 @Component
 public class AuditAspect {
@@ -312,6 +315,7 @@ public class AuditAspect {
         return result;
     }
 }
+```
 
 ---
 

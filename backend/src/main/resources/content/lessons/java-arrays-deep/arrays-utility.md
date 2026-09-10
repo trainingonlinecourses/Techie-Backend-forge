@@ -185,6 +185,7 @@ public class Main {
 | Memory | In-place | Requires extra array |
 | Stability | Not stable | Stable |
 
+```java
 // Decision rule:
 int[] data = getData();
 
@@ -193,6 +194,7 @@ if (data.length < 8192) {
 } else {
     Arrays.parallelSort(data); // Faster for large arrays (uses all CPU cores)
 }
+```
 
 ---
 

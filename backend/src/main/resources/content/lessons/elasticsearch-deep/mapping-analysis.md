@@ -119,7 +119,9 @@ PUT /logs/_doc/1
 3. **Numbers and booleans get guessed wrong** (a phone number field becomes `long`; a zip code becomes numeric and loses leading zeros).
 4. **Date strings can be mis-detected** as text.
 
+```java
 The production discipline: **declare mappings explicitly for indices whose shape you know** (products, users, orders); use dynamic mapping only for logs and other genuinely shape-shifting data. "It worked on the first document" is not a schema.
+```
 
 ## Reindexing: When the Mapping Must Change
 

@@ -4,8 +4,10 @@ module: resilience-circuit-breaker
 order: 5
 minutes: 25
 topics: ["retry", "backoff", "jitter", "idempotency", "exponential backoff", "Resilience4j Retry"]
+```java
 summary: Not all failures are outages. A database briefly restarts; a network packet drops; a service is momentarily overloaded (503). These transient failu...
 docs:
+```
   - title: "Resilience4j Retry"
     url: "https://resilience4j.readme.io/docs/retry"
 ---
@@ -14,7 +16,9 @@ docs:
 
 ## The Concept: Some Failures Are Just a Blip
 
+```java
 Not all failures are outages. A database briefly restarts; a network packet drops; a service is *momentarily* overloaded (503). These **transient failures** often succeed on a second attempt. **Retry** is the pattern that tries again — with discipline.
+```
 
 The discipline matters because naive retries cause damage:
 
@@ -100,18 +104,22 @@ public class NotificationService {
 | 3 | 1s | 4s | ~3.6–4.4s |
 | 4 | 1s | 8s | ~7.5–8.5s |
 
+```java
 Exponential gives the server room to recover; jitter prevents synchronized waves. For long-running distributed systems, jittered exponential backoff is *the* standard (it's what AWS SDKs, Kubernetes, and most clients use).
+```
 
 ## Idempotency — The Retry Safety Net
 
 The danger case: a POST that creates a resource. Request succeeds server-side but the response is lost (timeout). Retrying creates a **duplicate**.
 
+```java
 // The fix: an idempotency key the server dedupes by
 public void charge(ChargeRequest request) {
     request.setIdempotencyKey(UUID.randomUUID().toString());   // one key per logical operation
     retry.executeRunnable(() -> gateway.charge(request));
     // Server: "have I seen this key? -> return the original result, don't charge again"
 }
+```
 
 With idempotency keys (or naturally idempotent operations like `UPDATE SET balance = balance - x` with a unique operation id), retries become safe: the second attempt returns the *same* result instead of creating a second effect.
 
@@ -122,12 +130,16 @@ The composition question: retry first or breaker first? The standard layering:
 // Breaker OUTSIDE: decides whether to attempt at all (after failures accumulate)
 // Retry INSIDE: tries multiple times within one breaker-permitted call
 Supplier<Response> call = () -> retry.decorateSupplier(() -> client.get());
+```java
 Response r = circuitBreaker.executeSupplier(call);
+```
 
 - The **breaker** stops the retry storm: when the dependency is down, the breaker opens and *no* retries happen (fast-fail).
 - The **retry** handles blips *within* a breaker-closed period.
 
+```java
 Order matters: breaker-outside means an open breaker prevents even the first attempt; retry-outside would burn retries on a dead dependency before the breaker sees the failure.
+```
 
 ## Common Beginner Pitfalls
 

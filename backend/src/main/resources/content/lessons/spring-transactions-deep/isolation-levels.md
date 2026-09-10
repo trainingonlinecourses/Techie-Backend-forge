@@ -41,21 +41,26 @@ public Balance getBalance(Long accountId) {
 
 ## The Default Is Almost Always Right
 
+```java
 // Spring default: the DB's default (READ_COMMITTED on Postgres)
 @Transactional
 public void updateOrder(Long id, OrderDto dto) { ... }
+```
 
 READ_COMMITTED is correct for ~95% of workloads: each statement sees a consistent snapshot, writes are protected by row locks, and concurrency stays high. **Raise isolation only when you have a demonstrated anomaly**, never preemptively.
 
 ## The SERIALIZABLE Trade
 
+```java
 @Transactional(isolation = Isolation.SERIALIZABLE)
 public void reconcileBalances() { ... }
+```
 
 - Guarantees the strongest consistency (the result equals some serial order of the transactions)
 - **Cost**: Postgres aborts conflicting transactions with `40001 serialization_failure` — your code must **retry**
 - Use for financial reconciliation, unique-constraint races, complex invariants
 
+```java
 // SERIALIZABLE requires retry handling
 public void reconcileWithRetry() {
     for (int attempt = 0; attempt < 3; attempt++) {
@@ -68,6 +73,7 @@ public void reconcileWithRetry() {
     }
     throw new ReconcileFailedException();
 }
+```
 
 ## Pessimistic Locking: Lock Now, Read Later
 
@@ -100,6 +106,7 @@ public void transfer(Long fromId, Long toId, BigDecimal amount) {
 
 No locks — just a version check at write time:
 
+```java
 @Entity
 public class Course {
 
@@ -111,13 +118,10 @@ public class Course {
 
 
 **What this code does — step by step:**
+```
 
 1. Two concurrent updates: Tx A reads version=1. Tx B reads version=1. Tx A updates → version=2, commits. Tx B updates WHERE version=1 → 0 rows → OptimisticLockException
 
-The same code, clean:
-
-```java
-```
 
 @Transactional
 public void updateTitle(Long id, String title) {

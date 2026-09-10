@@ -77,6 +77,7 @@ mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
 For *huge* outputs (a million-row export), building the whole `String` in memory is wasteful. **Streaming** writes tokens directly to an output:
 
+```java
 // Streaming write — one record at a time, no giant String in memory:
 try (OutputStream os = response.getOutputStream();
      JsonGenerator gen = mapper.getFactory().createGenerator(os)) {
@@ -89,6 +90,7 @@ try (OutputStream os = response.getOutputStream();
     }
     gen.writeEndArray();
 }
+```
 
 `JsonGenerator` emits tokens (`writeStartObject`, `writeStringField`, ...) straight to the stream — the memory cost is O(1) per record instead of O(total output). This is how Jackson itself works under the hood; using the generator directly is the escape hatch for the bulk cases where `writeValueAsString` builds too much.
 
@@ -98,12 +100,14 @@ The read side mirrors it: `mapper.getFactory().createParser(input)` + `JsonParse
 
 For repeated deserialization of *the same type* (the common case in a pipeline), cache the **`ObjectReader`** — it pre-computes per-type machinery:
 
+```java
 // One reader per type, reused:
 private final ObjectReader lessonReader =
         mapper.readerFor(Lesson.class);
 
 // Per message: reader.readValue(json) — skips re-deriving the type setup.
 Lesson l = lessonReader.readValue(messageJson);
+```
 
 `ObjectReader`/`ObjectWriter` are the thread-safe, type-specialized, *cached* views of the mapper — the documented pattern for hot loops deserializing one type repeatedly.
 

@@ -17,6 +17,7 @@ The old `switch` statement had problems:
 
 Java 14 introduced **switch expressions** — a modern, safer alternative:
 
+```java
 // OLD: switch statement (fall-through bugs, no return value)
 String dayType;
 switch (day) {
@@ -40,11 +41,13 @@ String dayType = switch (day) {
     case "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY" -> "Weekday";
     case "SATURDAY", "SUNDAY" -> "Weekend";
 };
+```
 
 ---
 
 ## Arrow Syntax vs Colon Syntax
 
+```java
 public class Main {
 
     public static void main(String[] args) {
@@ -83,6 +86,7 @@ public class Main {
         }
     }
 }
+```
 
 ---
 
@@ -194,6 +198,7 @@ public class SwitchExpressionsDemo {
 
 ### Scenario 1: Status code mapping
 
+```java
 public String statusMessage(int code) {
     return switch (code) {
         case 200 -> "OK";
@@ -206,9 +211,11 @@ public String statusMessage(int code) {
         default -> "Unknown status: " + code;
     };
 }
+```
 
 ### Scenario 2: State machine transitions
 
+```java
 record Transition(String from, String to, String event) {}
 
 public String nextState(String current, String event) {
@@ -220,6 +227,7 @@ public String nextState(String current, String event) {
         default -> current;
     };
 }
+```
 
 ---
 

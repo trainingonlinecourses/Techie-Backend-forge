@@ -97,7 +97,9 @@ class ReliableSocket {
 
 Why the heartbeat matters: load balancers and proxies close connections that are idle for their timeout (often 60s). A chat that's quiet for a minute gets its socket silently killed — the UI still shows "connected" while nothing works.
 
+```java
 The fix: the client (or server) sends a **ping every ~30s** and expects a pong. WebSocket has protocol-level ping/pong frames (handled transparently by the browser), or STOMP has its own heartbeat negotiation. The code above sends an application-level ping; the server (or proxy) responds, proving both directions are alive. **If a heartbeat goes unanswered, close and reconnect** — dead sockets must not linger.
+```
 
 Spring's server side: `setHeartbeatValue` in the STOMP config, or a `TextWebSocketHandler` responding to pings. The principle is the same on both ends: *periodic liveness proof, and reconnect when it fails*.
 

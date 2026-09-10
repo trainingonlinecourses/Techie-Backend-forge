@@ -122,12 +122,14 @@ NIO is powerful but *harder to write correctly* than blocking I/O. The event loo
 
 NIO replaces streams with **`ByteBuffer`** — a positioned view over a byte array with four key properties: `position` (where you're reading/writing), `limit` (end of valid data), `capacity` (total size), and `flip()` (prepare for reading after writing). The classic choreography:
 
+```java
 ByteBuffer buf = ByteBuffer.allocate(1024);
 channel.read(buf);      // channel writes INTO the buffer; position advances
 buf.flip();             // flip: limit = position; position = 0  -> ready to read
 byte[] data = new byte[buf.remaining()];
 buf.get(data);          // read the data out
 buf.clear();            // reset for reuse
+```
 
 Mastering `flip`/`clear` is the NIO rite of passage — get them backwards and you read stale data or nothing at all.
 

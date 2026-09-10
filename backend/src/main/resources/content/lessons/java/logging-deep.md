@@ -53,6 +53,7 @@ public class OrderService {
 
 ### Scenario 1: MDC for request tracing
 
+```java
 **MDC** (Mapped Diagnostic Context) lets you attach key-value pairs to the current thread's log output. Every log line within that request automatically includes the request ID:
 
 @Component
@@ -73,6 +74,7 @@ public class RequestContextFilter implements Filter {
         }
     }
 }
+```
 
 ```xml
 <!-- logback-spring.xml: include MDC fields in every log line -->
@@ -124,9 +126,11 @@ Output (one JSON object per line):
 
 Never log passwords, credit card numbers, or API keys. Use a logback converter to mask sensitive fields:
 
+```java
 public class MaskingConverter extends ClassicConverter {
     private static final Pattern SENSITIVE = Pattern.compile(
         "(password|token|secret|ssn|creditCard)[\"\\s:=]+([^,\\s\"}]+)",
+```
         Pattern.CASE_INSENSITIVE
     );
 
@@ -169,6 +173,7 @@ Logging synchronously blocks the request thread. In high-throughput systems, use
 
 Avoid expensive string concatenation when the log level is disabled:
 
+```java
 // BAD — always concatenates the string, even when DEBUG is disabled
 log.debug("User details: " + user.toString());
 
@@ -177,6 +182,7 @@ log.debug("User details: {}", user.toString());
 
 // BEST — the lambda is not evaluated at all if DEBUG is disabled
 log.atDebug().log(() -> "User details: " + expensiveToJson(user));
+```
 
 ## Logback configuration hierarchy
 

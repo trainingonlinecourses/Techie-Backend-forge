@@ -84,6 +84,7 @@ public class AuthorizationService {
 
 Wrap the client with resilience patterns:
 
+```java
 @CircuitBreaker(name = "payment-service", fallbackMethod = "paymentFallback")
 @Retry(name = "payment-service")
 @TimeLimiter(name = "payment-service")
@@ -108,6 +109,7 @@ public class PaymentFacade {
         return PaymentResult.pending("Payment queued — will process when service recovers");
     }
 }
+```
 
 ### Scenario 3: WebClient for streaming responses
 
@@ -118,18 +120,22 @@ public class DataStreamClient {
     private final WebClient webClient;
 
     public Flux<DataChunk> streamData(String datasetId) {
+```java
         return webClient.get()
             .uri("/api/datasets/{id}/stream", datasetId)
+```
             .accept(MediaType.TEXT_EVENT_STREAM)
             .retrieve()
             .bodyToFlux(DataChunk.class)
             .timeout(Duration.ofSeconds(30))
+```java
             .retry(3);
     }
 
     public Mono<byte[]> downloadFile(String fileId) {
         return webClient.get()
             .uri("/api/files/{id}", fileId)
+```
             .accept(MediaType.APPLICATION_OCTET_STREAM)
             .retrieve()
             .bodyToMono(byte[].class);
@@ -140,6 +146,7 @@ public class DataStreamClient {
 
 Attach JWT tokens to every request:
 
+```java
 @Component
 public class ServiceAuthInterceptor implements ClientHttpRequestInterceptor {
 
@@ -154,11 +161,13 @@ public class ServiceAuthInterceptor implements ClientHttpRequestInterceptor {
         return execution.execute(request, body);
     }
 }
+```
 
 ### Scenario 5: Error handling with custom exceptions
 
 Transform HTTP errors into domain exceptions:
 
+```java
 @Component
 public class ClientErrorHandler implements ClientHttpResponseErrorHandler {
 
@@ -182,6 +191,7 @@ public class ClientErrorHandler implements ClientHttpResponseErrorHandler {
         throw new ExternalServiceException("Client error: " + status);
     }
 }
+```
 
 ## Common mistakes
 

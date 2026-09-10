@@ -21,6 +21,7 @@ Before Spring, Java enterprise development used **J2EE** (now Jakarta EE). Build
 
 Imagine you're building a car. In the traditional approach, the car builds its own engine:
 
+```java
 // WITHOUT dependency injection — the car creates its own dependencies
 public class Car {
     // Problem: Car is responsible for creating AND using the engine
@@ -30,6 +31,7 @@ public class Car {
         // What if we want a different engine? We must modify Car's code!
     }
 }
+```
 
 With dependency injection, someone **gives** the car an engine:
 
@@ -63,7 +65,9 @@ public class Car {
 2. **Flexibility** — You can swap `V8Engine` for `ElectricEngine` without changing `Car`
 3. **Separation of concerns** — `Car` doesn't need to know HOW to create an engine
 
+```java
 Spring's **IoC container** is the "someone" that creates objects and wires their dependencies together. You declare what you need; Spring provides it.
+```
 
 ## The Spring Platform — every project explained
 

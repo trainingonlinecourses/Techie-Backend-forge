@@ -23,6 +23,7 @@ JPA defines a **lifecycle**: new → managed → detached → removed. At each t
 - `@PostRemove` — after the delete.
 - `@PostLoad` — after the entity is loaded from the database (and after every refresh/merge).
 
+```java
 @Entity
 public class Customer {
     @Id @GeneratedValue private Long id;
@@ -44,6 +45,7 @@ public class Customer {
         // Derived, denormalized view — computed for every read, not stored
     }
 }
+```
 
 Because callbacks fire inside the persistence provider, they run for **every** save path — service method, bulk save, test fixture — which is exactly why teams use them for invariants that must never be missed.
 
@@ -51,6 +53,7 @@ Because callbacks fire inside the persistence provider, they run for **every** s
 
 Rather than annotating every entity, a **listener class** can be shared via `@EntityListeners`:
 
+```java
 public class AuditListener {
     @PrePersist
     void beforePersist(Object entity) {
@@ -69,6 +72,7 @@ public class AuditListener {
 @MappedSuperclass
 @EntityListeners(AuditListener.class)
 public abstract class Auditable { /* createdAt, updatedAt, setters */ }
+```
 
 `@EntityListeners` on a `@MappedSuperclass` is inherited by every subclass — this is how Spring Data's auditing (`@CreatedDate`) works under the hood (its `AuditingEntityListener` is exactly this pattern). Listeners take the entity as a parameter; callbacks inside the entity take none.
 
@@ -76,6 +80,7 @@ public abstract class Auditable { /* createdAt, updatedAt, setters */ }
 
 **Scenario 1 — normalize at the boundary.** Emails, phone numbers, and slugs normalized in `@PrePersist`/`@PreUpdate` — every insert path gets clean data, and code review stops checking "did the service normalize before save?".
 
+```java
 **Scenario 2 — hash sensitive fields before writing.** A token or secret that must never be stored raw:
 
 @PrePersist @PreUpdate
@@ -85,6 +90,7 @@ void hashSecret() {
         rawSecret = null;
     }
 }
+```
 
 **Scenario 3 — default/derived values at load.** `@PostLoad` computes transient fields (age from birth date, a display label) so reads always see current values without recomputing in every endpoint.
 

@@ -12,7 +12,9 @@ docs:
 
 # API Versioning Strategies
 
+```java
 APIs evolve, but consumers don't update at your pace. Versioning is how you change behavior without breaking the clients you already have. Four strategies exist; each trades discoverability against cleanliness.
+```
 
 ## Strategy 1: URI Path Versioning
 
@@ -23,6 +25,7 @@ APIs evolve, but consumers don't update at your pace. Versioning is how you chan
 
 The most common and most explicit choice.
 
+```java
 @RestController
 @RequestMapping("/api/v1/courses")
 public class CourseV1Controller { ... }
@@ -35,6 +38,7 @@ public class CourseV2Controller { ... }
 **Cons**: URLs leak versioning; every endpoint must be duplicated or aliased during migration.
 
 **Verdict**: the pragmatic default for most teams.
+```
 
 ## Strategy 2: Query Parameter Versioning
 
@@ -42,6 +46,7 @@ public class CourseV2Controller { ... }
 /api/courses?version=2
 ```
 
+```java
 @GetMapping("/api/courses")
 public CourseDto list(@RequestParam(defaultValue = "1") int version) {
     return switch (version) {
@@ -52,9 +57,12 @@ public CourseDto list(@RequestParam(defaultValue = "1") int version) {
 }
 
 **Pros**: trivial to implement, single URL.
+```
 **Cons**: pollutes every request; caches treat all versions as one URL (version must join the cache key); easy to forget `version` in a URL and silently get v1.
 
+```java
 **Verdict**: fine for internal tools; weak for public APIs.
+```
 
 ## Strategy 3: Header Versioning
 
@@ -63,6 +71,7 @@ GET /api/courses
 X-API-Version: 2
 ```
 
+```java
 @GetMapping(value = "/api/courses", headers = "X-API-Version=1")
 public CourseDto listV1() { ... }
 
@@ -73,6 +82,7 @@ public CourseDto listV2() { ... }
 **Cons**: invisible in the address bar; harder to debug; caching must vary on the header.
 
 **Verdict**: used by some big APIs (e.g., some Google APIs); rarely worth the hidden complexity.
+```
 
 ## Strategy 4: Media Type Versioning
 
@@ -82,12 +92,14 @@ Accept: application/vnd.acme.courses.v2+json
 
 @GetMapping(value = "/api/courses",
     produces = "application/vnd.acme.courses.v2+json")
+```java
 public CourseDto listV2() { ... }
 
 **Pros**: the most "RESTful" — versioning rides content negotiation; single URL.
 **Cons**: hidden from browsers; client libraries must set the Accept header; cache keys must include the media type.
 
 **Verdict**: elegant but operationally heavy; choose only if you already do content negotiation everywhere.
+```
 
 ## Comparison
 
@@ -110,6 +122,7 @@ Version only when the change is **breaking**: removing a field, changing a type,
 
 ## The Migration Pattern
 
+```java
 @RestController
 public class CourseMigrationController {
 
@@ -125,6 +138,7 @@ public class CourseMigrationController {
         return CourseV2Dto.from(courseService.findById(id));
     }
 }
+```
 
 Migration lifecycle:
 
@@ -145,11 +159,13 @@ public ResponseEntity<CourseV1Dto> getV1(@PathVariable Long id) {
 
 For versioning a single handler without full duplication, `RequestMapping` matching can branch on the version token:
 
+```java
 @GetMapping({"/api/v1/courses/{id}", "/api/v2/courses/{id}"})
 public CourseDto get(@PathVariable Long id, HttpServletRequest request) {
     boolean v2 = request.getRequestURI().contains("/v2/");
     return v2 ? v2Service.get(id) : v1Service.get(id);
 }
+```
 
 Cleaner: keep separate controllers per version (shown above) — the version lives in the mapping, not in if/else.
 
@@ -160,18 +176,22 @@ void v1ReturnsLegacyShape() throws Exception {
     mockMvc.perform(get("/api/v1/courses/1"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.title").exists())
+```java
         .andExpect(jsonPath("$.minutes").doesNotExist());
 }
 
 @Test
 void v2AddsNewFields() throws Exception {
+```
     mockMvc.perform(get("/api/v2/courses/1"))
         .andExpect(status().isOk())
+```java
         .andExpect(jsonPath("$.minutes").value(25));
 }
 
 @Test
 void v1DeclaresDeprecation() throws Exception {
+```
     mockMvc.perform(get("/api/v1/courses/1"))
         .andExpect(header().string("Deprecation", "true"));
 }

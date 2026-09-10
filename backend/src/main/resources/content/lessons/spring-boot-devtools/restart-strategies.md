@@ -94,10 +94,12 @@ spring:
       secret: ${DEVTOOLS_SECRET:changeme}
 ```
 
+```java
 // In your code — check if restart is active
 if (ClassUtils.isPresent("org.springframework.devtools.Restarter", null)) {
     // DevTools is active — optimize for development
 }
+```
 
 ---
 
@@ -115,6 +117,7 @@ spring:
 
 ### Scenario 2: Preserve expensive initialization
 
+```java
 @Component
 @RestartScope  // survives restart
 public class DatabaseMigration {
@@ -124,6 +127,7 @@ public class DatabaseMigration {
         flyway.migrate();
     }
 }
+```
 
 ---
 

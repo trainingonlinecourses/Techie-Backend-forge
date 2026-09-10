@@ -23,6 +23,7 @@ An **embedding** is a list of numbers (a vector, e.g. 1536 dimensions) that capt
 
 ## EmbeddingModel: text → vector
 
+```java
 @Configuration
 public class AiConfig {
     @Bean
@@ -39,18 +40,23 @@ public class EmbeddingService {
         return response.getResult().getOutput();    // float[] of N dimensions
     }
 }
+```
 
 Spring AI provides `embeddingModel.embed(String)` returning `float[]` — and batches:
 
+```java
 List<float[]> vectors = embeddingModel.embed(List.of(doc1, doc2, doc3));
+```
 
 ## VectorStore: store + retrieve
 
+```java
 @Bean
 VectorStore vectorStore(EmbeddingModel embeddingModel) {
     return SimpleVectorStore.builder(embeddingModel).build();   // in-memory, dev/CI
     // production: new PgVectorStore(...), RedisVectorStore, Milvus, Chroma, Weaviate, ...
 }
+```
 
 Store documents with metadata:
 
@@ -59,7 +65,9 @@ vectorStore.add(List.of(
                 Map.of("lesson", "boot-philosophy", "module", "spring-boot")),
         new Document("Auto-configuration registers beans conditionally",
                 Map.of("lesson", "boot-philosophy", "module", "spring-boot"))
+```java
 ));
+```
 
 Retrieve by similarity — the heart of RAG:
 
@@ -68,7 +76,9 @@ List<Document> matches = vectorStore.similaritySearch(
                 .query("what does the web starter include?")
                 .topK(3)                       // top 3 most similar
                 .similarityThreshold(0.5)      // ignore weak matches
+```java
                 .build());
+```
 
 ## Vector databases for production
 

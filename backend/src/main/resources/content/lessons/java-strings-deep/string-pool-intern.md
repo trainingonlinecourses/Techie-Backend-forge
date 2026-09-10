@@ -20,8 +20,10 @@ The Java **string pool** (also called the *intern pool*) does exactly this. It i
 
 When your code contains the literal `"hello"` twice:
 
+```java
 String a = "hello";
 String b = "hello";
+```
 
 the JVM does **not** create two objects. It checks the pool, finds the existing `"hello"`, and makes both `a` and `b` point at that **same object**.
 
@@ -41,8 +43,10 @@ Because of this, `a == b` in the example above is `true` — they literally refe
 
 Strings created at **runtime** — with `new`, or built by concatenation of variables, or returned from methods — are **not** automatically pooled:
 
+```java
 String a = "hello";              // pooled
 String b = new String("hello");  // NOT pooled — a fresh object on the heap
+```
 String c = a + "!";              // runtime concatenation → new object
 
 `b` is a brand-new object even though its content equals the pooled `"hello"`. So:

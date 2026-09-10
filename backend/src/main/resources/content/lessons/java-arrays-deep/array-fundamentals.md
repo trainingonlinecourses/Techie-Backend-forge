@@ -12,12 +12,14 @@ docs:
 
 An **array** is a fixed-size container holding elements of the same type:
 
+```java
 // Declare and create
 int[] numbers = new int[5];          // 5 elements, all 0
 String[] names = {"Alice", "Bob"};    // 2 elements
 double[] scores = new double[]{95.5, 87.3, 92.1};  // 3 elements
 
 **Arrays vs Collections:**
+```
 - Arrays: fixed size, faster, primitive-friendly
 - Collections: dynamic size, richer API, generics
 
@@ -142,6 +144,7 @@ public class ArrayDeepDive {
 
 ### Scenario 1: Fixed-size lookup table
 
+```java
 // Fast O(1) lookup — better than HashMap for small, fixed data
 private static final char[] HEX_CHARS = "0123456789ABCDEF".toCharArray();
 
@@ -153,9 +156,11 @@ public static String bytesToHex(byte[] bytes) {
     }
     return new String(hex);
 }
+```
 
 ### Scenario 2: Matrix operations
 
+```java
 public static int[][] multiply(int[][] a, int[][] b) {
     int rows = a.length, cols = b[0].length, inner = b.length;
     int[][] result = new int[rows][cols];
@@ -168,9 +173,11 @@ public static int[][] multiply(int[][] a, int[][] b) {
     }
     return result;
 }
+```
 
 ### Scenario 3: Binary search on sorted array
 
+```java
 public static int binarySearch(int[] arr, int target) {
     int left = 0, right = arr.length - 1;
     while (left <= right) {
@@ -181,6 +188,7 @@ public static int binarySearch(int[] arr, int target) {
     }
     return -1;
 }
+```
 
 ---
 

@@ -4,8 +4,10 @@ module: spring-configuration
 order: 3
 minutes: 24
 topics: ["@Profile", "profiles", "environment-specific config", "active profiles", "conditional beans"]
+```java
 summary: Dev, test, staging, production — each environment wants slightly different behavior: dev uses an inmemory H2 database and fake email; production us...
 docs:
+```
   - title: "Profiles (Spring Boot docs)"
     url: "https://docs.spring.io/spring-boot/reference/features/profiles.html"
 ---
@@ -14,7 +16,9 @@ docs:
 
 ## The Concept: One App, Several Personas
 
+```java
 Dev, test, staging, production — each environment wants slightly *different behavior*: dev uses an in-memory H2 database and fake email; production uses Postgres and real email. You don't want four codebases — you want **one app that knows which environment it's in** and activates the matching behavior.
+```
 
 **Profiles** are named sets of configuration and beans. The app activates one or more profiles (e.g., `prod`), and:
 
@@ -111,9 +115,11 @@ public class DataSourceConfig {
 - **A profile is active or not** — there's no "else" syntax. The pattern for "dev OR test but not prod" is `@Profile({"dev", "test"})`.
 - **Negative matching** — `@Profile("!prod")` registers the bean in *every* environment except prod. Useful for a fallback:
 
+```java
 @Service
 @Profile("!prod")
 public class ConsoleNotifier implements Notifier { ... }   // anything not prod
+```
 
 ## Grouping and Inheritance
 
@@ -130,6 +136,7 @@ Activating `prod` activates the whole group — a tidy way to compose environmen
 
 ## Testing with Profiles
 
+```java
 @SpringBootTest
 @ActiveProfiles("test")          // activates the test profile for the whole test
 class UserServiceTest { ... }
@@ -138,6 +145,7 @@ class UserServiceTest { ... }
 @Test
 @ActiveProfiles("dev")
 void devBehavior() { ... }
+```
 
 `@ActiveProfiles` is how tests pick their environment — test DB, test mocks, faster config — without touching the real profiles.
 

@@ -12,6 +12,7 @@ docs:
 
 Spring Shell lets you build interactive command-line tools. You define commands with `@ShellMethod`, and Spring Shell handles parsing, help generation, and tab completion.
 
+```java
 @Component
 public class GreetingCommands {
 
@@ -20,6 +21,7 @@ public class GreetingCommands {
         return "Hello, " + name + "!";
     }
 }
+```
 
 User types: `hello --name Alice` → Output: `Hello, Alice!`
 
@@ -89,6 +91,7 @@ public class FileCommands {
 
 ### Scenario 1: Database management CLI
 
+```java
 @Component
 public class DbCommands {
 
@@ -106,9 +109,11 @@ public class DbCommands {
         return "Migrated to version: " + version;
     }
 }
+```
 
 ### Scenario 2: Deployment CLI
 
+```java
 @Component
 public class DeployCommands {
 
@@ -121,6 +126,7 @@ public class DeployCommands {
         return "Deployed to " + env;
     }
 }
+```
 
 ---
 

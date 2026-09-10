@@ -12,7 +12,9 @@ docs:
 
 Streaming downloads send file data directly from source to client without loading the entire file into memory. This is essential for large files.
 
+```java
 @GetMapping("/download/{id}")
+```
 public ResponseEntity<Resource> download(@PathVariable Long id) {
     Resource resource = new FileSystemResource(file);
     return ResponseEntity.ok()
@@ -40,6 +42,7 @@ public class DownloadController {
     // 1. Simple download with ResponseEntity
     @GetMapping("/download/{filename}")
     public ResponseEntity<Resource> download(@PathVariable String filename) {
+```java
         Path file = storageDir.resolve(filename);
         if (!Files.exists(file)) {
             return ResponseEntity.notFound().build();
@@ -48,10 +51,14 @@ public class DownloadController {
         Resource resource = new FileSystemResource(file);
 
         return ResponseEntity.ok()
+```
             .header(HttpHeaders.CONTENT_DISPOSITION,
+```java
                     "attachment; filename=\"" + filename + "\"")
+```
             .contentType(MediaType.APPLICATION_OCTET_STREAM)
             .contentLength(Files.size(file))
+```java
             .body(resource);
     }
 
@@ -61,6 +68,7 @@ public class DownloadController {
                                HttpServletResponse response) throws IOException {
         Path file = storageDir.resolve(filename);
         response.setContentType("application/octet-stream");
+```
         response.setHeader("Content-Disposition",
                            "attachment; filename=\"" + filename + "\"");
         response.setContentLengthLong(Files.size(file));

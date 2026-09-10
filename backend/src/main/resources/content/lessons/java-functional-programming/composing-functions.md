@@ -25,11 +25,13 @@ The deeper idea: **a program is a data-flow graph.** By building small, pure fun
 
 ## andThen vs compose — Which Order?
 
+```java
 Function<Integer,Integer> doubleIt = x -> x * 2;
 Function<Integer,Integer> addOne   = x -> x + 1;
 
 doubleIt.andThen(addOne).apply(5);   // doubleIt FIRST, then addOne  -> 11
 doubleIt.compose(addOne).apply(5);   // addOne FIRST, then doubleIt  -> 12
+```
 
 - `f.andThen(g)`: do `f`, feed the result to `g`. Reads left-to-right — like writing steps in order.
 - `f.compose(g)`: do `g`, feed the result to `f`. Reads *right-to-left* — like nested math `f(g(x))`.
@@ -100,15 +102,19 @@ Composition only behaves predictably if the pieces are **pure**: same input → 
 // PURE — safe to compose, test, reuse
 Function<Order, Double> subtotal = o -> o.items().stream().mapToDouble(Item::price).sum();
 
+```java
 // IMPURE — cannot be safely composed or tested
 Function<Order, Double> withTax = o -> subtotal.apply(o) * (1 + taxRateService.fetchNow()); // DB call inside!
+```
 
 ## Practical Patterns
 
 **Chained validation:**
 
 Function<String, String> validate =
+```java
         s -> s.isBlank() ? "empty" : s;
+```
 Function<String, String> normalize =
         s -> validate.apply(s).toLowerCase();
 

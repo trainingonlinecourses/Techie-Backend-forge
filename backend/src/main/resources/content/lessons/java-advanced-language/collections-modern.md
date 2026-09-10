@@ -23,7 +23,9 @@ List<String> mutable = new ArrayList<>(); mutable.add("x");
 // The modern way
 List<String> tags = List.of("java", "spring");
 Set<String> levels = Set.of("BEGINNER", "ADVANCED");
+```java
 Map<String, Integer> limits = Map.of("cpu", 2, "memory", 1024);
+```
 
 - **Immutable**: any mutation throws `UnsupportedOperationException`
 - **No nulls allowed**: `List.of(null)` throws NPE at creation
@@ -34,11 +36,15 @@ Map<String, Integer> limits = Map.of("cpu", 2, "memory", 1024);
 Map<String, Integer> config = Map.of(
     "core-pool", 4,
     "max-pool", 16,
+```java
     "queue-capacity", 200);
 
 // More than 10 entries:
+```
 Map<String, Integer> big = Map.ofEntries(
+```java
     Map.entry("a", 1), Map.entry("b", 2), /* ... */);
+```
 
 ## copyOf: Defensive Copies
 
@@ -62,9 +68,11 @@ List<String> immutable = List.copyOf(mutableList);
 // Java 16+: Stream.toList() — immutable, no collectors needed
 List<String> titles = courses.stream()
     .map(Course::title)
+```java
     .toList();                       // instead of .collect(Collectors.toList())
 
 // Java 11+: toArray(IntFunction)
+```
 String[] arr = titles.stream().toArray(String[]::new);
 
 `Stream.toList()` returns an immutable list — a subtle behavioral change from `Collectors.toList()` (mutable). Prefer it unless you need mutability.
@@ -86,23 +94,31 @@ String[] arr = titles.stream().toArray(String[]::new);
 The fluent mutation style (Java 8+):
 
 List<String> tags = new ArrayList<>();
+```java
 tags.add("java");
 tags.add("spring");
 // vs
+```
 List<String> tags = new ArrayList<>();
+```java
 Collections.addAll(tags, "java", "spring");
+```
 
 ## The takeWhile/dropWhile Stream Additions (Java 9)
 
 // Take courses until the first one over 40 minutes
 List<Course> shortOnes = courses.stream()
     .takeWhile(c -> c.minutes() <= 40)
+```java
     .toList();
 
 // Drop everything up to and including the first long course
+```
 List<Course> after = courses.stream()
     .dropWhile(c -> c.minutes() <= 40)
+```java
     .toList();
+```
 
 `takeWhile`/`dropWhile` are the ordered-prefix operators — ideal for sorted data.
 
@@ -110,14 +126,19 @@ List<Course> after = courses.stream()
 
 // Finite iteration with a predicate (Java 9+)
 List<Integer> powers = Stream.iterate(1, n -> n < 1000, n -> n * 2)
+```java
     .toList();   // [1, 2, 4, 8, ..., 512]
 
 // Old: infinite + limit
+```
 List<Integer> powers = Stream.iterate(1, n -> n * 2)
+```java
     .limit(10).toList();
+```
 
 ## Records and Collections: The DTO Pattern
 
+```java
 public record CourseSummary(Long id, String title, int minutes) {
     public static CourseSummary from(Course c) {
         return new CourseSummary(c.id(), c.title(), c.minutes());
@@ -125,9 +146,12 @@ public record CourseSummary(Long id, String title, int minutes) {
 }
 
 // Mapping collections is now trivial:
+```
 List<CourseSummary> summaries = courses.stream()
     .map(CourseSummary::from)
+```java
     .toList();
+```
 
 ## Unmodifiable View vs. Immutable
 
@@ -137,21 +161,25 @@ List<String> view = Collections.unmodifiableList(backing);
 // Immutable COPY: snapshotted, isolated
 List<String> copy = List.copyOf(backing);
 
+```java
 backing.add("new");     // view now shows it; copy doesn't
 
 Know the difference: views are cheap but leak mutations; copies are safe but cost a traversal. For records and API boundaries, prefer copies.
+```
 
 ## Testing
 
 @Test
 void immutableCollectionsRejectMutation() {
     List<String> tags = List.of("java", "spring");
+```java
     assertThrows(UnsupportedOperationException.class, () -> tags.add("x"));
     assertThrows(NullPointerException.class, () -> List.of(null));
 }
 
 @Test
 void copyOfIsolatesFromSource() {
+```
     List<String> source = new ArrayList<>(List.of("a"));
     List<String> copy = List.copyOf(source);
     source.add("b");

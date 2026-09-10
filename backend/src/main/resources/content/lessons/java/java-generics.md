@@ -393,6 +393,7 @@ public class UserRepository implements GenericRepository<User, Long> {
 // A cache that works with any key type and value type
 public class Cache<K, V> {
     private final Map<K, CacheEntry<V>> store = new ConcurrentHashMap<>();
+```java
     private final Duration ttl;
 
     public Cache(Duration ttl) {
@@ -402,6 +403,7 @@ public class Cache<K, V> {
     public void put(K key, V value) {
         store.put(key, new CacheEntry<>(value, Instant.now().plus(ttl)));
     }
+```
 
     public Optional<V> get(K key) {
         CacheEntry<V> entry = store.get(key);
@@ -422,8 +424,10 @@ Cache<String, User> userCache = new Cache<>(Duration.ofMinutes(30));
 userCache.put("alice", new User("Alice", "alice@example.com"));
 Optional<User> alice = userCache.get("alice");  // Optional<User>
 
+```java
 Cache<Long, Order> orderCache = new Cache<>(Duration.ofHours(1));
 orderCache.put(12345L, new Order(12345L, Money.of(99.99)));
+```
 
 ### Scenario 3: PECS in utility methods
 

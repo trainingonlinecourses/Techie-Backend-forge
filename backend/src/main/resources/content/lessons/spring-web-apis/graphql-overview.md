@@ -75,6 +75,7 @@ public class OrderGraphController {
 
 Nested fields get their own resolvers — the graph is lazily walked:
 
+```java
 @Controller
 public class OrderLineResolvers {
     @SchemaMapping
@@ -82,6 +83,7 @@ public class OrderLineResolvers {
         return productService.find(line.productId());  // called only if the client asked for product
     }
 }
+```
 
 This lazy per-field resolution is the source of both GraphQL's power (cheap nesting) and its risk (**n+1 per field**) — the DataLoader pattern (batch per field) is the standard fix.
 

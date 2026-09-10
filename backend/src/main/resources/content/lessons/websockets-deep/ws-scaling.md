@@ -50,7 +50,9 @@ Instance 2 ─┘
 A publishes on Instance 1 → broker → Instance 1 (local sessions) + Instance 2 (remote sessions)
 ```
 
+```java
 Every instance subscribes to the broker; every broadcast goes *through* the broker, so all instances deliver it. Subscriptions become **global** instead of per-instance.
+```
 
 ## The Code Walkthrough — Redis Pub/Sub Relay
 
@@ -109,7 +111,9 @@ public class RedisChatRelay {
 - **Local delivery**: `template.convertAndSend("/topic/chat", ...)` reaches this instance's STOMP subscribers.
 - **Relay**: publishing to the Redis channel tells every *other* instance "a message happened" — each of them delivers it to *its* local subscribers.
 
+```java
 The result: one logical topic spread across N instances, each instance handling only its own sockets, all instances seeing all messages. **Redis pub/sub is the lightweight glue** (no message durability needed — a missed real-time chat message is acceptable); RabbitMQ is the heavyweight option with the same role.
+```
 
 ## The Broker Relay Option (Spring + RabbitMQ)
 

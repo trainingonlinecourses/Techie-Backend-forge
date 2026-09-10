@@ -32,12 +32,14 @@ The compiler compiles and runs in one step. This makes Java feel more like a scr
 
 ## How It Works
 
+```java
 // Hello.java — no package declaration needed
 public class Hello {
     public static void main(String[] args) {
         System.out.println("Hello, World!");
     }
 }
+```
 
 ```bash
 # Run it directly
@@ -59,6 +61,7 @@ java Hello.java
 You can make Java files executable like shell scripts:
 
 #!/usr/bin/java --source 11
+```java
 // This line above is the shebang — tells the OS to use Java 11 to run this file
 
 import java.util.*;
@@ -71,6 +74,7 @@ public class WeatherCheck {
         System.out.println("Temperature: " + (15 + new Random().nextInt(20)) + "°C");
     }
 }
+```
 
 ```bash
 # Make executable
@@ -159,7 +163,9 @@ public class LogAnalyzer {
             .collect(Collectors.groupingBy(
                 ts -> ts.substring(0, 13),     // group by hour
                 Collectors.counting()
+```java
             ));
+```
 
         stats.entrySet().stream()
             .sorted(Map.Entry.comparingByKey())
@@ -170,6 +176,7 @@ public class LogAnalyzer {
 ### Scenario 2: Testing an algorithm quickly
 
 #!/usr/bin/java --source 11
+```java
 import java.util.*;
 
 public class Fibonacci {
@@ -181,6 +188,7 @@ public class Fibonacci {
         System.out.println("Fibonacci(" + n + "): " + fib[n-1]);
     }
 }
+```
 
 ```bash
 java Fibonacci.java 30

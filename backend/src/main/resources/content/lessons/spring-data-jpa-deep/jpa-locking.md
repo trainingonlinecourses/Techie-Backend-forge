@@ -29,6 +29,7 @@ JPA offers two strategies:
 
 ## Optimistic locking with @Version
 
+```java
 @Entity
 public class Account {
     @Id @GeneratedValue private Long id;
@@ -37,6 +38,7 @@ public class Account {
     @Version
     private long version;        // Hibernate maintains this
 }
+```
 
 **How it works:** every row carries a version number. On `UPDATE`, Hibernate includes `WHERE version = ?`; if the version changed since the entity was read, **zero rows match**, and Hibernate throws `OptimisticLockException` (often surfaced as `ObjectOptimisticLockingFailureException`). The update *fails* — the losing transaction must re-read and retry.
 
@@ -47,6 +49,7 @@ User B: UPDATE account SET balance=130, version=2 WHERE id=7 AND version=1  → 
 
 `@Version` gives you: automatic per-update increment, conflict detection with zero database locks, and no read overhead. The cost: a failed write at the end of a long transaction means **retrying the whole business operation**.
 
+```java
 **Org pattern — the retry:**
 
 @Transactional
@@ -63,6 +66,7 @@ for (int attempt = 0; attempt < 3; attempt++) {
     }
 }
 throw new ConflictException("Too many concurrent edits — please retry");
+```
 
 ## Pessimistic locking — LockModeType
 
@@ -72,12 +76,14 @@ When optimistic retry is unacceptable (long-running workflows, high-contention r
 @Query("select a from Account a where a.id = :id")
 Optional<Account> findByIdForUpdate(@Param("id") Long id);
 
+```java
 @Transactional
 public void adjustBalance(Long id, BigDecimal delta) {
     Account a = accountRepo.findByIdForUpdate(id).orElseThrow();  // row LOCKED now
     a.setBalance(a.getBalance().add(delta));                       // no one else can touch it
     // lock released at COMMIT — keep the transaction short!
 }
+```
 
 `PESSIMISTIC_WRITE` issues `SELECT ... FOR UPDATE`, holding the lock until commit/rollback. `PESSIMISTIC_READ` issues `FOR SHARE`. Two variants to know:
 
@@ -94,7 +100,9 @@ public void adjustBalance(Long id, BigDecimal delta) {
 | Money-critical, must-not-fail-late | Pessimistic `FOR UPDATE` in a *short* transaction |
 | Read-heavy screens | Neither — reads don't need locks (repeatable read handles snapshot) |
 
+```java
 The general rule teams teach: **optimistic by default; pessimistic only where the failure cost of an optimistic retry outweighs the lock cost** — and always keep pessimistic transactions short, because locks serialize traffic.
+```
 
 ## Pessimistic locks in practice — the scenarios
 

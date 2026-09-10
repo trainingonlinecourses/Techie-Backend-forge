@@ -122,12 +122,14 @@ public final class Appointment {
 
 **Why the defensive copy in the constructor?** If someone passes a `Date` object and then mutates it afterward, our Appointment would silently change. The copy breaks that link:
 
+```java
 Date sharedDate = new Date();
 Appointment apt = new Appointment("Meeting", sharedDate, List.of("Alice"));
 
 // Without defensive copy: apt.getStartTime() would reflect sharedDate's mutation!
 sharedDate.setTime(0);  // sets to epoch — without defensive copy, apt's time is now 0
 // With defensive copy: apt.getStartTime() still returns the original time
+```
 
 ## The modern alternative: records (Java 16+)
 

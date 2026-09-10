@@ -13,9 +13,11 @@ docs:
 
 ## The concept
 
+```java
 Docker packages your Spring Boot app with its runtime into a **container image**. The image is a read-only template; each running instance is a container. Docker ensures your app runs identically in dev, staging, and production.
 
 **Why Docker matters for Spring Boot:**
+```
 - Eliminates "works on my machine" — the container includes the JRE.
 - Enables Kubernetes deployment — pods run containers.
 - Simplifies scaling — spin up 10 identical containers.
@@ -39,11 +41,15 @@ EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]
 ```
 
+```java
 **Multi-stage build:** the first stage uses the full JDK to compile; the second stage uses only the JRE. This reduces the final image from ~600MB to ~250MB.
+```
 
 ## Optimized Dockerfile with layer caching
 
+```java
 Spring Boot's layered JARs enable Docker layer caching. Libraries change rarely; your code changes often. By caching the library layer, only the thin code layer rebuilds on each push:
+```
 
 ```dockerfile
 FROM eclipse-temurin:21-jre AS runner

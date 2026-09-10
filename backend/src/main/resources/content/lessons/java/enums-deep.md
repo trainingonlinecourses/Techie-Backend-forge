@@ -13,9 +13,11 @@ docs:
 
 Before Java 5 added enums, teams stored fixed values as raw ints or Strings:
 
+```java
 public static final int STATUS_PENDING  = 0;
 public static final int STATUS_ACTIVE   = 1;
 public static final int STATUS_FAILED   = 2;
+```
 
 Three things went wrong repeatedly:
 
@@ -27,10 +29,12 @@ An **enum** fixes all three. It is a full class whose instances are a fixed, com
 
 ## The Anatomy of an Enum
 
+```java
 public enum OrderState {
     CREATED, PAID, SHIPPED, DELIVERED, CANCELLED;
     //          ↑ each name is a static final instance of OrderState
 }
+```
 
 Behind the scenes the compiler generates:
 
@@ -112,6 +116,7 @@ Line-by-line:
 
 The most powerful idiom: give each constant its own implementation of an abstract method. This replaces every `switch` with polymorphic dispatch.
 
+```java
 public enum NotificationChannel {
     EMAIL {
         @Override public void send(Notification n) {
@@ -131,9 +136,11 @@ public enum NotificationChannel {
 
     public abstract void send(Notification n);   // each constant MUST implement this
 }
+```
 
 Now callers never branch:
 
+```java
 // BEFORE (fragile — new channel means updating every switch in the codebase):
 switch (channel) {
     case EMAIL: emailGateway.send(...); break;
@@ -144,6 +151,7 @@ switch (channel) {
 
 // AFTER (adding a channel means adding ONE constant; the compiler forces you to implement send):
 channel.send(notification);
+```
 
 > 💡 This is the same principle as Spring's Strategy pattern. Effective Java item 34 makes "prefer enums over int constants" a hard standard in most code review checklists.
 
@@ -151,15 +159,19 @@ channel.send(notification);
 
 Because enum constants are known at compile time and have integer ordinals, the JVM can back maps and sets with **arrays indexed by ordinal** instead of hash tables.
 
+```java
 // Count orders by state — no hashing, no bucket collisions
 EnumMap<OrderState, Long> counts = orderRepo.countByState();
+```
 // Iteration happens in declaration order (CREATED → CANCELLED) — useful for reports
 
 // User permissions — a compact set of roles
 EnumSet<UserRole> roles = EnumSet.of(UserRole.ADMIN, UserRole.SUPPORT);
+```java
 if (roles.contains(UserRole.ADMIN)) {
     return adminController.handle(request);
 }
+```
 
 Line-by-line:
 

@@ -24,6 +24,7 @@ Java provides two mechanisms:
 
 A class implements `Serializable` and optionally declares `serialVersionUID`:
 
+```java
 public class UserAccount implements Serializable {
     private static final long serialVersionUID = 1L;  // version guard
 
@@ -36,6 +37,7 @@ public class UserAccount implements Serializable {
 }
 
 **What gets serialized:**
+```
 - All non-transient, non-static fields
 - The entire object graph (every object this object references, recursively)
 - Static fields are NOT serialized (they belong to the class, not the instance)
@@ -57,8 +59,10 @@ public class UserSession implements Serializable {
     private final String sessionId;
     private final String username;
     private final List<String> roles;
+```java
     private final Instant loginTime;
     private transient User user;  // re-fetched from DB on deserialization
+```
 
     public UserSession(String sessionId, String username, List<String> roles) {
         this.sessionId = sessionId;
@@ -84,6 +88,7 @@ public class UserSession implements Serializable {
 
 If you serialize a singleton, deserialization creates a NEW instance — breaking the singleton pattern. `readResolve()` fixes this:
 
+```java
 public class DatabaseConfig implements Serializable {
     private static final long serialVersionUID = 1L;
     private static DatabaseConfig instance;
@@ -104,11 +109,13 @@ public class DatabaseConfig implements Serializable {
         return getInstance();  // always return the singleton
     }
 }
+```
 
 ### Scenario 3: Externalizable for high-performance serialization
 
 When performance matters (millions of objects per second), `Externalizable` avoids reflection overhead:
 
+```java
 public class MarketDataPoint implements Externalizable {
     private long timestamp;
     private double price;
@@ -135,6 +142,7 @@ public class MarketDataPoint implements Externalizable {
 }
 
 **Why Externalizable here?** In a financial system processing millions of market data points per second, the reflection overhead of standard serialization is unacceptable. Externalizable writes fields in a fixed order with no metadata — roughly 3x faster.
+```
 
 ### Scenario 4: writeReplace for security
 

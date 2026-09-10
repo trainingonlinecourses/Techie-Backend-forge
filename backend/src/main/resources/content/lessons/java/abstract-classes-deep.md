@@ -82,6 +82,7 @@ public abstract class PaymentProcessor {
 }
 ```
 
+```java
 public class CreditCardProcessor extends PaymentProcessor {
 
     private final StripeGateway stripe;
@@ -96,6 +97,7 @@ public class CreditCardProcessor extends PaymentProcessor {
         return stripe.charge(request.cardToken(), request.amount());
     }
 }
+```
 
 **Why abstract class here, not interface?** Because `process()` is a fixed algorithm (template method) that depends on shared fields (`auditLog`, `repository`) and a constructor. An interface cannot hold those.
 
@@ -103,6 +105,7 @@ public class CreditCardProcessor extends PaymentProcessor {
 
 Now suppose *any* entity in the system — not just payments — can produce an audit trail. `Order`, `User`, `Payment`, `Shipment` are unrelated classes that share zero code. The right abstraction is an interface:
 
+```java
 public interface Auditable {
     AuditEntry toAuditEntry();
     String auditCategory();    // e.g., "PAYMENT", "ORDER", "USER"
@@ -141,6 +144,7 @@ public class AuditService {
         auditRepository.save(entry);
     }
 }
+```
 
 **Why interface here, not abstract class?** Because `Order` and `Payment` have nothing else in common. Forcing them to extend a shared base class would be an artificial hierarchy. The interface says "you *can* produce an audit entry" without forcing a shared identity.
 
@@ -148,6 +152,7 @@ public class AuditService {
 
 Two interfaces both provide a default `describe()` method. A class implementing both must resolve the conflict:
 
+```java
 public interface Loggable {
     default String describe() { return "Loggable entity"; }
 }
@@ -163,6 +168,7 @@ public class Session implements Loggable, Cacheable {
         return Loggable.super.describe();  // pick one, or write a new implementation
     }
 }
+```
 
 This is rare in practice because well-designed interfaces avoid overlapping default methods. When it happens, the compiler forces you to make a conscious decision — which is the right behavior.
 

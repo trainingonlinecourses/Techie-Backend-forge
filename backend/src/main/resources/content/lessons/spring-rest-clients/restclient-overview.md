@@ -25,9 +25,13 @@ Spring's history here:
 `RestClient` lets you write: "GET this URL, turn the JSON into this type" in a fluent chain:
 
 String result = restClient.get()
+```java
         .uri("/api/courses/{id}", 42)
+```
         .retrieve()
+```java
         .body(String.class);
+```
 
 ## The Core Operations
 

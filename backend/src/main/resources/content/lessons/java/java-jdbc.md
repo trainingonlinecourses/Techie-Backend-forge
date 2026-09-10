@@ -145,6 +145,7 @@ public class Main {
 
 ## try-with-resources — automatic cleanup
 
+```java
 public class Main {
 
     public static void main(String[] args) {
@@ -165,6 +166,7 @@ public class Main {
         }  // rs closes first, then pstmt, then conn — AUTOMATICALLY, even on exception
     }
 }
+```
 
 ## INSERT, UPDATE, DELETE — executeUpdate
 
@@ -402,7 +404,9 @@ public class TransferService {
     @Transactional  // Spring handles begin/commit/rollback automatically!
     public void transfer(Long fromId, Long toId, BigDecimal amount) {
         Account from = accountRepository.findById(fromId)
+```java
             .orElseThrow(() -> new AccountNotFoundException(fromId));
+```
         Account to = accountRepository.findById(toId)
             .orElseThrow(() -> new AccountNotFoundException(toId));
 

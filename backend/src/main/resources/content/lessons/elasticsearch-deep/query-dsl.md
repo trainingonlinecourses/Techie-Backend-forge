@@ -71,9 +71,11 @@ SearchResponse<Product> response = es.search(s -> s
                                     .gte(JsonData.of(50))
                                     .lt(JsonData.of(150))))
         .filter(f -> f.term(t -> t.field("inStock").value(true)))
+```java
     ), Product.class);
 
 **The bool clause roles:**
+```
 
 - **`must`** — required *and* scored (the search terms). Docs must match; they also contribute to ranking.
 - **`filter`** — required but *not* scored (the constraints). Docs must match; ranking ignores them. **Cacheable** — the reason to put pure constraints here instead of `must`.
@@ -112,16 +114,20 @@ SearchResponse<Product> response = es.search(s -> s
     .from(20).size(10)                      // page 3 of 10
     .sort(so -> so.field(f -> f.field("price")
                               .order(SortOrder.Asc))),
+```java
     Product.class);
 
 // Aggregations — the "GROUP BY" of search:
+```
 SearchResponse<Product> aggResponse = es.search(s -> s
     .index("products")
     .size(0)                                // no hits needed, just the agg
     .aggregations("byBrand", a -> a.terms(t -> t.field("brand.keyword")
                                                .size(10)))
     .aggregations("avgPrice", a -> a.avg(av -> av.field("price"))),
+```java
     Product.class);
+```
 
 **The two big reminders:** deep pagination via `from`/`size` is expensive beyond a few thousand (use **search_after** or PIT for deep pages); and **aggregations need `keyword` fields** — aggregating on analyzed `text` errors. Aggregations are the analytics half of Elasticsearch: counts by category, averages, date histograms ("requests per hour") — the ELK log-dashboard engine.
 

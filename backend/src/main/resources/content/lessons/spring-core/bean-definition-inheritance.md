@@ -41,23 +41,28 @@ Injecting `DocumentBuilder` anywhere gives you the factory-built instance. Injec
 
 ## How we use it in an organization: the scenarios
 
+```java
 **Scenario 1 — lazy-init for heavyweight beans.** A bean that allocates pools or connects to external systems on construction should not run during every test bootstrap:
 
 @Bean
 @Lazy
 public KafkaAdmin kafkaAdmin() { return new KafkaAdmin(props); }  // only built when first used
+```
 
 `@Lazy` on a *dependency* defers its creation until first injection; on a `@Bean` it defers until first lookup. JPA `@OneToMany` lazy loading is unrelated — this is bean-level laziness.
 
+```java
 **Scenario 2 — aliases for environment-specific names.** The same underlying bean under two names so legacy callers keep working:
 
 @Bean("orderStore")
 @Primary
 public OrderRepository orderRepository() { ... }
 // getBean("orderStore") and getBean("orderRepository") resolve the same bean
+```
 
 **Scenario 3 — `@Primary` and `@Qualifier` for ambiguous wiring.** When two beans of the same type exist, `@Primary` picks the default; `@Qualifier` overrides per injection point:
 
+```java
 @Bean @Primary public PaymentGateway defaultGateway() { return new StripeGateway(); }
 @Bean @Qualifier("refund") public PaymentGateway refundGateway() { return new AdyenGateway(); }
 
@@ -65,11 +70,14 @@ public OrderRepository orderRepository() { ... }
 public class CheckoutService {
     public CheckoutService(@Qualifier("refund") PaymentGateway refundOnly) { ... }
 }
+```
 
 **Scenario 4 — controlling init/destroy.** `@PostConstruct`/`@PreDestroy`, or the definition-level `initMethod`/`destroyMethod` for beans you can't annotate:
 
+```java
 @Bean(initMethod = "connect", destroyMethod = "close")
 public LegacyConnector legacyConnector() { return new LegacyConnector(); }
+```
 
 ## What bean order does (and doesn't) guarantee
 

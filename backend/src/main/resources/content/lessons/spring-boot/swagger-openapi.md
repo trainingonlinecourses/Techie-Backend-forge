@@ -55,6 +55,7 @@ public class OrderController {
     })
     @GetMapping
     public Page<Order> getOrders(
+```java
             @Parameter(description = "Page number (0-based)") @RequestParam(defaultValue = "0") int page,
             @Parameter(description = "Page size") @RequestParam(defaultValue = "20") int size) {
         return orderService.getOrders(page, size);
@@ -62,6 +63,7 @@ public class OrderController {
 
     @Operation(summary = "Create a new order")
     @PostMapping
+```
     public ResponseEntity<Order> createOrder(
             @RequestBody @Schema(description = "Order creation request") OrderRequest request) {
         Order order = orderService.create(request);
@@ -76,7 +78,9 @@ public record OrderResponse(
     @Schema(description = "Unique order identifier", example = "ord-123")
     String id,
 
+```java
     @Schema(description = "Current order status", allowableValues = {"CREATED", "PAID", "SHIPPED", "DELIVERED"})
+```
     String status,
 
     @Schema(description = "Total amount in USD", example = "99.99")
@@ -87,7 +91,9 @@ public record OrderResponse(
 
     @Schema(description = "When the order was created")
     Instant createdAt
+```java
 ) {}
+```
 
 ## API grouping
 
@@ -107,6 +113,7 @@ public class OpenApiConfig {
                     new SecurityScheme()
                         .type(SecurityScheme.Type.HTTP)
                         .scheme("bearer")
+```java
                         .bearerFormat("JWT")));
     }
 }
@@ -117,14 +124,17 @@ public class OpenApiGroupConfig {
     @Bean
     public GroupedOpenApi orderApis() {
         return GroupedOpenApi.builder()
+```
             .group("Orders")
             .pathsToMatch("/api/orders/**")
+```java
             .build();
     }
 
     @Bean
     public GroupedOpenApi userApis() {
         return GroupedOpenApi.builder()
+```
             .group("Users")
             .pathsToMatch("/api/users/**")
             .build();
@@ -145,6 +155,7 @@ Frontend developers use Swagger UI to:
 
 Generate the OpenAPI spec and use it for contract tests:
 
+```java
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class OrderApiContractTest {
 
@@ -155,6 +166,7 @@ class OrderApiContractTest {
         new OpenAPIParser().readContents(spec);
     }
 }
+```
 
 ### Scenario 3: API versioning documentation
 

@@ -18,11 +18,13 @@ docs:
 JobExecution ex = jobLauncher.run(job, new JobParametersBuilder()
     .addString("inputFile", "/data/orders-20260817.csv")
     .addLong("runId", System.currentTimeMillis())
+```java
     .toJobParameters());
 
 // 3. From a REST endpoint (an "admin trigger"):
 @PostMapping("/admin/jobs/statements")
 public String runStatements() { ... jobLauncher.run(...); }
+```
 
 `spring.batch.job.enabled=false` turns off startup auto-run when jobs must be triggered explicitly (the common production setup). The **`JobLauncher` is async-safe** — wrap in an executor (`TaskExecutor`) so a web request isn't blocked, and guard with a running-instance check so two manual clicks don't launch the same job twice.
 
@@ -31,14 +33,18 @@ public String runStatements() { ... jobLauncher.run(...); }
 `JobInstance` = `Job` + `JobParameters`. This drives the rerun rules:
 
 // Same params on an already-COMPLETED job → JobInstanceAlreadyCompleteException
+```java
 // (protects against double-processing the same input!)
 jobLauncher.run(job, new JobParametersBuilder().addString("inputFile", path).toJobParameters());
 
 // Legit re-runs change identity: runId / timestamp / file hash
+```
 jobLauncher.run(job, new JobParametersBuilder()
     .addString("inputFile", path)
     .addLong("runId", System.currentTimeMillis())   // unique → new JobInstance
+```java
     .toJobParameters());
+```
 
 Parameters are **typed and logged** by the JobRepository — keep secrets out of them (no passwords in parameters; they're persisted in `BATCH_JOB_EXECUTION_PARAMS`).
 

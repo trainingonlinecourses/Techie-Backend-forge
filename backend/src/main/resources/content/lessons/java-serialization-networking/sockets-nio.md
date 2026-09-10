@@ -15,12 +15,14 @@ docs:
 
 A **socket** is one endpoint of a two-way communication link between two programs. Think of it like a phone call: one program "dials" (client), the other "answers" (server), and then they can talk.
 
+```java
 // Server side — listens for connections
 ServerSocket server = new ServerSocket(8080);
 Socket client = server.accept();  // Waits for a client
 
 // Client side — connects to server
 Socket socket = new Socket("localhost", 8080);
+```
 
 ### What is NIO?
 
@@ -351,6 +353,7 @@ public class ChatServer {
 
 ### Scenario 2: File transfer with NIO
 
+```java
 public class FileTransfer {
     public static void sendFile(SocketChannel channel, Path file) throws IOException {
         ByteBuffer buffer = ByteBuffer.allocate(8192);
@@ -379,6 +382,7 @@ public class FileTransfer {
         }
     }
 }
+```
 
 ---
 

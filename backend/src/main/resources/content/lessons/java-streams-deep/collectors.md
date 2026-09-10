@@ -18,7 +18,9 @@ docs:
 
 public interface Collector<T, A, R> {
     Supplier<A> supplier();              // start: new accumulator
+```java
     BiConsumer<A, T> accumulator();      // add one element
+```
     BinaryOperator<A> combiner();        // merge two accumulators (parallel)
     Function<A, R> finisher();           // finish: accumulator → result
     Set<Characteristics> characteristics();
@@ -33,7 +35,9 @@ Set<String> levels = courses.stream().map(Course::level).collect(Collectors.toSe
 Map<Long, Course> byId = courses.stream().collect(Collectors.toMap(
     Course::id, Function.identity()));
 String joined = courses.stream().map(Course::title)
+```java
     .collect(Collectors.joining(", ", "[", "]"));   // prefix, delimiter, suffix
+```
 
 ### toMap With Duplicate Keys
 
@@ -58,10 +62,12 @@ Map<String, Course> ordered = courses.stream().collect(Collectors.toMap(
 Map<String, List<Course>> byLevel = courses.stream()
     .collect(Collectors.groupingBy(Course::level));
 
+```java
 // {
 //   "BEGINNER": [course1, course2],
 //   "ADVANCED": [course3]
 // }
+```
 
 ### Downstream Collectors: Don't Just List
 
@@ -119,18 +125,22 @@ List<Course> drafts = partition.get(false);
 // One pass, five numbers
 IntSummaryStatistics stats = courses.stream()
     .collect(Collectors.summarizingInt(Course::minutes));
+```java
 stats.getCount(); stats.getSum(); stats.getMin();
 stats.getMax(); stats.getAverage();
 
 // Summarizing by group
+```
 Map<String, IntSummaryStatistics> byLevel = courses.stream()
     .collect(Collectors.groupingBy(Course::level,
         Collectors.summarizingInt(Course::minutes)));
 
 ## teeing: Two Collectors, One Pass
 
+```java
 // Java 12+: compute two things in a single traversal
 record Range(int min, int max) {}
+```
 
 Range range = courses.stream().collect(Collectors.teeing(
     Collectors.minBy(Comparator.comparingInt(Course::minutes)),
@@ -206,12 +216,14 @@ void groupsByLevelWithCounts() {
     Map<String, Long> counts = courses.stream()
         .collect(Collectors.groupingBy(Course::level, Collectors.counting()));
 
+```java
     assertEquals(2L, counts.get("BEGINNER"));
     assertEquals(1L, counts.get("ADVANCED"));
 }
 
 @Test
 void partitionsByPublished() {
+```
     Map<Boolean, List<Course>> p = courses.stream()
         .collect(Collectors.partitioningBy(Course::published));
     assertEquals(1, p.get(true).size());

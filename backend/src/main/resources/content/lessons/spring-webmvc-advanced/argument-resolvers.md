@@ -25,6 +25,7 @@ The extension point: **write your own resolver** to inject a custom parameter �
 
 ## A custom resolver — current user and tenant
 
+```java
 @Component
 public class CurrentUserArgumentResolver implements HandlerMethodArgumentResolver {
 
@@ -44,6 +45,7 @@ public class CurrentUserArgumentResolver implements HandlerMethodArgumentResolve
         return new CurrentUser(u.getId(), u.getEmail(), u.getRoles());
     }
 }
+```
 
 Register it:
 
@@ -69,6 +71,7 @@ public List<Order> myOrders(CurrentUser user) {       // resolved by the custom 
 
 ## The patterns organizations actually use
 
+```java
 **Pattern 1 — the tenant-context argument.** Multi-tenant APIs inject the tenant for every controller:
 
 @Component
@@ -84,6 +87,7 @@ public class TenantResolver implements HandlerMethodArgumentResolver {
 }
 
 @GetMapping("/api/orders")
+```
 public Page<Order> list(Tenant tenant, Pageable pageable) {
     return orderRepo.findByTenant(tenant.id(), pageable);   // tenant everywhere, zero boilerplate
 }

@@ -37,7 +37,9 @@ String json = """
 String block = """
     Line one
     Line two
+```java
     """;
+```
 
 - Opening `"""` must be followed by a newline.
 - **Incidental indentation** — the least-indented line determines the base; it's stripped.
@@ -47,7 +49,9 @@ String sql = """
         SELECT id, title
         FROM courses
         WHERE level = ?
+```java
         """;
+```
 // The closing """ at column 0 → all 8 spaces of content indentation are incidental and stripped
 
 ## formatted: Interpolation
@@ -55,7 +59,9 @@ String sql = """
 String message = """
     Hello %s,
     Your order %d is %s.
+```java
     """.formatted("Ada", 12345, "shipped");
+```
 
 `formatted` is `String.format` on the block. No concatenation, no `String.format` wrapper.
 
@@ -72,7 +78,9 @@ public class CourseRepository {
         WHERE (:title IS NULL OR title ILIKE '%' || :title || '%')
           AND (:level IS NULL OR level = :level)
         ORDER BY title
+```java
         """;
+```
 
     public List<Course> search(String title, String level) {
         return namedJdbc.query(SEARCH_SQL,
@@ -109,7 +117,9 @@ String email = """
         <p>Your account is ready.</p>
       </body>
     </html>
+```java
     """.formatted(userName);
+```
 
 ## Escapes Inside Text Blocks
 
@@ -118,7 +128,9 @@ String block = """
     Unicode: \u0041
     Line continuation: \
         continues on the same line
+```java
     """;
+```
 
 - `\"` — escaped quote (three quotes in a row are allowed raw: `"""` inside content works only via escape)
 - `\\` — backslash
@@ -130,9 +142,11 @@ Java 21 previews the `STR` processor:
 
 // Preview in Java 21, finalized path in later versions
 String message = STR."""
+```java
     Hello \{name},
     Your order \{order.id()} is \{status}.
     """;
+```
 
 `\{expr}` interpolates expressions directly — no `formatted`, no format specifiers. When it stabilizes, it will supersede most `formatted` usage.
 
@@ -140,11 +154,15 @@ String message = STR."""
 
 Text blocks compile to regular `String` constants — no runtime parsing, no hidden cost:
 
+```java
 // Both compile to the same constant pool entry
 String a = "SELECT * FROM courses WHERE level = 'BEGINNER'";
+```
 String b = """
     SELECT * FROM courses WHERE level = 'BEGINNER'
+```java
     """;
+```
 
 `b` is a compile-time constant — usable in `switch` cases and annotations.
 

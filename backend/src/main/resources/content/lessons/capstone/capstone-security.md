@@ -60,6 +60,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers("/api/auth/**", "/actuator/health").permitAll()
                 .anyRequest().authenticated())                        // everything else needs a token
+```java
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
@@ -67,6 +68,7 @@ public class SecurityConfig {
     @Bean
     UserDetailsService userDetailsService(UserRepository users) {
         return username -> users.findByUsername(username)
+```
                 .map(UserPrincipal::new)
                 .orElseThrow(() -> new UsernameNotFoundException("Unknown user"));
     }
@@ -92,6 +94,7 @@ public class SecurityConfig {
 
 ## The JWT filter (stateless per-request auth)
 
+```java
 package com.example.payments.security;
 
 import jakarta.servlet.FilterChain;
@@ -134,9 +137,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         chain.doFilter(request, response);
     }
 }
+```
 
 ## Login & register endpoints
 
+```java
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -188,6 +193,7 @@ public class AuthService {
         return new AuthResponse(jwtService.issue(principal.user()), UserDto.from(principal.user()));
     }
 }
+```
 
 ## Try it live
 

@@ -96,6 +96,7 @@ Without origin restrictions, **any** website can open a socket to `/ws` (browser
 
 The dangerous scenario: a logged-in user subscribes to `/topic/admin/alerts` or SENDS to `/app/admin.action`. Spring Security can intercept SUBSCRIBE and SEND frames:
 
+```java
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.Message;
@@ -125,6 +126,7 @@ public class WebSocketSecurityConfig {
         return messages.build();
     }
 }
+```
 
 **Deny-by-default is the key**: any destination not explicitly allowed is rejected. A user with a valid token but no admin role gets a `403`-style rejection when subscribing to `/topic/admin/**` — at the frame level, before any data flows.
 

@@ -42,8 +42,10 @@ CompletableFuture<String> userF = CompletableFuture.supplyAsync(() -> getUser(id
 CompletableFuture<List<Order>> ordersF = CompletableFuture.supplyAsync(() -> getOrders(id));
 CompletableFuture<String> recsF = CompletableFuture.supplyAsync(() -> getRecs(id));
 
+```java
 // Wait for all — total time: 300ms (the slowest one)
 CompletableFuture.allOf(userF, ordersF, recsF).join();
+```
 
 ### Creating CompletableFutures
 
@@ -142,14 +144,17 @@ CompletableFuture<Object> first = CompletableFuture.anyOf(
 // exceptionally — handle errors, return fallback
 CompletableFuture<String> safe = CompletableFuture
     .supplyAsync(() -> riskyOperation())
+```java
     .exceptionally(ex -> {
         log.error("Failed: {}", ex.getMessage());
         return "fallback value";
     });
 
 // handle — handle both success and failure
+```
 CompletableFuture<String> handled = CompletableFuture
     .supplyAsync(() -> riskyOperation())
+```java
     .handle((result, ex) -> {
         if (ex != null) {
             log.error("Error: {}", ex.getMessage());
@@ -159,11 +164,14 @@ CompletableFuture<String> handled = CompletableFuture
     });
 
 // exceptionallyCompose — try alternative on failure
+```
 CompletableFuture<String> retry = CompletableFuture
     .supplyAsync(() -> primaryService.call())
     .exceptionallyCompose(ex -> 
         CompletableFuture.supplyAsync(() -> fallbackService.call())
+```java
     );
+```
 
 ### Timeout Support (Java 9+)
 
@@ -171,6 +179,7 @@ CompletableFuture<String> retry = CompletableFuture
 CompletableFuture<String> withTimeout = CompletableFuture
     .supplyAsync(() -> slowOperation())
     .orTimeout(5, TimeUnit.SECONDS)
+```java
     .exceptionally(ex -> {
         if (ex instanceof TimeoutException) {
             return "Request timed out";
@@ -179,9 +188,12 @@ CompletableFuture<String> withTimeout = CompletableFuture
     });
 
 // Complete with default after timeout
+```
 CompletableFuture<String> withDefault = CompletableFuture
     .supplyAsync(() -> slowOperation())
+```java
     .completeOnTimeout("default value", 5, TimeUnit.SECONDS);
+```
 
 ### Organization Use Cases
 
@@ -191,8 +203,10 @@ public CompletableFuture<DashboardData> getDashboard(Long userId) {
     CompletableFuture<List<Order>> orders = orderService.getRecent(userId);
     CompletableFuture<List<Notification>> notifs = notifService.getUnread(userId);
     
+```java
     return profile.thenCombine(orders, (p, o) -> 
         new DashboardData(p, o, null)
+```
     ).thenCombine(notifs, (data, n) -> 
         new DashboardData(data.profile(), data.orders(), n)
     );
@@ -202,9 +216,11 @@ public CompletableFuture<DashboardData> getDashboard(Long userId) {
 public CompletableFuture<Report> generateReport(Long id) {
     CompletableFuture<Revenue> revenue = revenueService.calculate(id);
     CompletableFuture<List<Transaction>> txns = txnService.list(id);
+```java
     CompletableFuture<Map<String, Integer>> stats = statsService.aggregate(id);
     
     return CompletableFuture.allOf(revenue, txns, stats)
+```
         .thenApply(v -> new Report(
             revenue.join(), txns.join(), stats.join()
         ));

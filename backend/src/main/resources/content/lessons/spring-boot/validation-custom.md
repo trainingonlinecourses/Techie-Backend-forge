@@ -32,6 +32,7 @@ Use `@Valid` for simple cases. Use `@Validated` when you need **validation group
 
 Define a custom constraint with `@Constraint`:
 
+```java
 @Target({ElementType.FIELD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = ValidOrderStateValidator.class)
@@ -40,6 +41,7 @@ public @interface ValidOrderState {
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }
+```
 
 The validator checks the business rule:
 
@@ -66,35 +68,44 @@ public record OrderRequest(
 
 Different operations have different rules:
 
+```java
 public interface CreateGroup {}
 public interface UpdateGroup {}
 
 public record UserRequest(
     @NotBlank(groups = CreateGroup.class)   // required only on create
+```
     String id,
 
+```java
     @NotBlank(groups = {CreateGroup.class, UpdateGroup.class})
+```
     String email,
 
     @Size(min = 8, groups = CreateGroup.class)  // password required on create
     String password
+```java
 ) {}
 
 @PostMapping
+```
 public ResponseEntity<Void> create(@Validated(CreateGroup.class) @RequestBody UserRequest req) {
     // id, email, password all validated
 }
 
 @PutMapping("/{id}")
 public ResponseEntity<Void> update(@PathVariable String id,
+```java
                                    @Validated(UpdateGroup.class) @RequestBody UserRequest req) {
     // only email validated — id comes from path, password not required
 }
+```
 
 ## Nested validation
 
 `@Valid` cascades validation into nested objects:
 
+```java
 public record OrderRequest(
     @NotNull String customerId,
     @Valid @NotNull List<@Valid OrderLineItem> items,  // each item is validated
@@ -113,6 +124,7 @@ public record Address(
     @Pattern(regexp = "^[A-Z]{2}$") String state,  // two-letter state code
     @NotBlank String zipCode
 ) {}
+```
 
 When `OrderRequest` is validated, Spring validates `shippingAddress` and every item in `items` — recursively.
 
@@ -144,6 +156,7 @@ public class ValidCurrencyValidator implements ConstraintValidator<ValidCurrency
 
 ### Scenario 2: cross-field validation with a class-level constraint
 
+```java
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = ValidPaymentRequestValidator.class)
@@ -172,6 +185,7 @@ public class ValidPaymentRequestValidator implements ConstraintValidator<ValidPa
         return true;
     }
 }
+```
 
 ### Scenario 3: validation error response contract
 

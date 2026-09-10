@@ -74,15 +74,18 @@ ON orders (customer_id, created_at DESC);
 // ❌ JPA fetches every column, including @Lob bodies
 List<Course> courses = repository.findAll();
 
+```java
 // ✅ Fetch only what the page needs (projection)
 public interface CourseSummary {
     Long getId();
     String getTitle();
 }
+```
 List<CourseSummary> findTop100ByOrderByCreatedAtDesc();
 
 ### 3. N+1 Queries (the JPA trap)
 
+```java
 // ❌ 1 course + N lessons = N+1 queries
 for (Course c : courses) {
     c.getLessons().size();      // triggers a query per course
@@ -90,6 +93,7 @@ for (Course c : courses) {
 
 // ✅ Fetch join or @EntityGraph — 1 query
 @EntityGraph(attributePaths = "lessons")
+```
 List<Course> findAllWithLessons();
 
 ### 4. Connection Pool Exhaustion
@@ -108,7 +112,9 @@ Symptoms: `Connection is not available, request timed out`, latency spikes, 500s
 
 ### 5. Table Bloat and Stale Stats
 
+```java
 Postgres keeps dead row versions (MVCC). **VACUUM** reclaims space; **ANALYZE** refreshes planner statistics:
+```
 
 ```sql
 VACUUM (ANALYZE) courses;          -- manual

@@ -15,10 +15,12 @@ docs:
 
 An **annotation** is a form of metadata. It does not directly affect program execution — it provides information that can be read by tools, frameworks, or the compiler at compile time or runtime. Think of annotations as labels that you attach to classes, methods, or fields, which other code can inspect to make decisions.
 
+```java
 @Override  // This is an annotation — tells the compiler "this method overrides a superclass method"
 public String toString() {
     return "User{...}";
 }
+```
 
 Java annotations come in three flavors:
 
@@ -28,6 +30,7 @@ Java annotations come in three flavors:
 
 ## The anatomy of a custom annotation
 
+```java
 @Target(ElementType.METHOD)           // Where can this annotation be placed?
 @Retention(RetentionPolicy.RUNTIME)   // When is it available?
 @Inherited                            // Do subclasses inherit this?
@@ -38,6 +41,7 @@ public @interface Auditable {
 }
 
 **@Target** — Controls where the annotation can be placed:
+```
 - `TYPE` — Class, interface, enum
 - `METHOD` — Methods only
 - `FIELD` — Fields only
@@ -94,9 +98,11 @@ public class AuditAspect {
             auditRepo.save(new AuditEntry(
                 auditable.action(), method, "SUCCESS",
                 start, Instant.now(), auditable.sensitive() ? "[REDACTED]" : toJson(joinPoint.getArgs())
+```java
             ));
             return result;
         } catch (Exception ex) {
+```
             auditRepo.save(new AuditEntry(
                 auditable.action(), method, "FAILED",
                 start, Instant.now(), ex.getMessage()
@@ -110,6 +116,7 @@ public class AuditAspect {
 
 Create domain-specific validations that Spring automatically enforces:
 
+```java
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = PhoneNumberValidator.class)
@@ -135,11 +142,13 @@ public class ContactDto {
     @PhoneNumber
     private String phone;  // validated by our custom annotation
 }
+```
 
 ### Scenario 3: Annotation processing at compile time
 
 Generate boilerplate code during compilation using annotation processors:
 
+```java
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.SOURCE)
 public @interface Builder {
@@ -167,11 +176,13 @@ public class BuilderProcessor extends AbstractProcessor {
 }
 
 **Annotation processors run at compile time.** They read annotations from source files and generate new source files (or resource files). This is how Lombok, MapStruct, and Dagger work.
+```
 
 ### Scenario 4: Thread-safety annotations
 
 Document thread-safety contracts that static analysis tools can verify:
 
+```java
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ThreadSafe {
@@ -190,6 +201,7 @@ public class ThreadSafeCounter {
         return count;
     }
 }
+```
 
 Tools like SpotBugs can read `@ThreadSafe` and `@NotThreadSafe` annotations to flag potential race conditions.
 
@@ -197,6 +209,7 @@ Tools like SpotBugs can read `@ThreadSafe` and `@NotThreadSafe` annotations to f
 
 Create your own mini-framework annotations:
 
+```java
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ScheduledJob {
@@ -221,6 +234,7 @@ public class JobScheduler {
         // with Spring's TaskScheduler
     }
 }
+```
 
 ## The annotation hierarchy
 

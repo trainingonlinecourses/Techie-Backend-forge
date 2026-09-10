@@ -41,7 +41,9 @@ class OrderDocumentation {
         this.mvc.perform(post("/orders")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
+```java
                     {"customer":"ada@example.com","amount":49.90}
+```
                     """))
             .andExpect(status().isCreated())
             .andDo(document("orders/create",

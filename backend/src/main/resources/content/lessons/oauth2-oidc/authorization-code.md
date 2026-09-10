@@ -46,7 +46,9 @@ The **authorization code flow** is the workhorse of OAuth2 — the flow behind e
 5. **The code exchange** — the client's *backend* calls `POST /token` with: the code, the client id, the **client secret** (never in the browser!), and the redirect_uri. The auth server verifies the code is valid, unexpired, and was issued *for this redirect_uri*.
 6. **Tokens arrive** — `{ access_token, token_type: "Bearer", expires_in, refresh_token, scope }`. Only the backend ever saw them.
 
+```java
 **The two security pillars:** the code is single-use and bound to the redirect_uri and client; the secret travels only in the server-to-server exchange. Even if an attacker intercepts the redirect (step 4), they hold a code they can't redeem without the secret — and the code is already spent.
+```
 
 ## PKCE: Protecting the Public Client
 

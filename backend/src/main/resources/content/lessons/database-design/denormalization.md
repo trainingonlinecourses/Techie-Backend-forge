@@ -72,7 +72,9 @@ GROUP BY c.id, c.title;
 REFRESH MATERIALIZED VIEW course_stats;
 ```
 
+```java
 The DB itself stores the pre-computed result. Reads hit the materialized view; the view is refreshed on your schedule. No application code maintains consistency — the database does.
+```
 
 ## The Code Walkthrough — The Synchronization Contract
 
@@ -115,11 +117,13 @@ public void onOrderChanged(OrderLineChanged event) {
 
 ### Walking Through Each Part
 
+```java
 **Same-transaction updates** — the strongest form: the line change and the total recompute commit together. Readers never see an inconsistent total. The cost: the write path does more work (recompute + save), and it couples the write to the maintenance.
 
 **Event-driven projections** — the write path stays fast (fire the event, return); a listener updates the read model asynchronously. The trade-off: a brief window where the read model lags the source — **eventual consistency**. Dashboards and feeds tolerate milliseconds of lag; ledgers don't.
 
 **Materialized views** — the database owns the sync entirely. No app code can forget to maintain it. The costs: refresh is all-or-nothing (a huge view refreshes slowly), and the view is stale between refreshes (acceptable for reporting).
+```
 
 ## The Decision Framework
 

@@ -88,6 +88,7 @@ public class RateLimitFilter implements GlobalFilter, Ordered {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+```java
         String clientId = extractClientId(exchange);
         String path = exchange.getRequest().getPath().value();
 
@@ -96,6 +97,7 @@ public class RateLimitFilter implements GlobalFilter, Ordered {
         long windowStart = now - config.getWindowMs();
 
         // Sliding window rate limiting with Redis
+```
         return redisTemplate.executePipelined((RedisCallback<Object>) connection -> {
             connection.zRemRange(key, 0, windowStart);  // Remove old entries
             connection.zAdd(key, now, String.valueOf(now));  // Add current request
@@ -134,8 +136,10 @@ public class LoggingFilter implements GlobalFilter, Ordered {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+```java
         long startTime = System.currentTimeMillis();
         String requestId = UUID.randomUUID().toString();
+```
 
         log.info("[{}] → {} {} from {}",
             requestId,

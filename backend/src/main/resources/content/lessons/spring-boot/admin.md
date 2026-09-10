@@ -27,6 +27,7 @@ Spring Boot Admin (SBA) is a web UI for monitoring and managing Spring Boot appl
 </dependency>
 ```
 
+```java
 @SpringBootApplication
 @EnableAdminServer
 public class AdminServerApplication {
@@ -34,6 +35,7 @@ public class AdminServerApplication {
         SpringApplication.run(AdminServerApplication.class, args);
     }
 }
+```
 
 ## Setup: Client Application
 

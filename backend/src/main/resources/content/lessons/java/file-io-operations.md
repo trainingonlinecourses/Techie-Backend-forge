@@ -210,6 +210,7 @@ public class Main {
 
 ## try-with-resources — why it matters
 
+```java
 public class Main {
 
     public static void main(String[] args) {
@@ -227,6 +228,7 @@ public class Main {
         }  // reader.close() is called automatically, even if an exception occurred
     }
 }
+```
 
 **How it works:** The variable in `try(...)` must implement `AutoCloseable`. When the try block exits (normally or exceptionally), Java calls `close()` on each resource in reverse order.
 

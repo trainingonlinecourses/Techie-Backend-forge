@@ -16,7 +16,9 @@ docs:
 Spring Modulith makes the **modular monolith** (previous lesson) enforceable in code. It formalizes the module map: each package is an application module, and the framework verifies at test time that modules only talk to each other through their **API surface** — not by reaching into internals. Modularity becomes a compile-time-adjacent fact instead of a code-review hope.
 
 @ApplicationModule(id = "billing")
+```java
 package com.acme.app.billing;
+```
 
 // package-info.java marks the package as a module
 
@@ -45,7 +47,9 @@ Modules may depend on other modules' **public API** — but the dependency graph
 
 // The module declares what it may use:
 @ApplicationModule(allowedDependencies = "fulfillment")
+```java
 package com.acme.app.billing;
+```
 
 - `allowedDependencies` makes the module map explicit and self-documenting.
 - **Cycles are rejected** — `billing → fulfillment → billing` is a design smell (two modules that can't be understood separately) and Modulith flags it.
@@ -77,6 +81,7 @@ Running in CI means **an illegal dependency fails the build** — the module map
 When a module must expose a service without exposing its implementation (or when you want the extraction seam), use a **named interface**:
 
 // billing module root:
+```java
 public interface PaymentProcessing {
     PaymentResult process(Payment payment);
 }
@@ -84,6 +89,7 @@ public interface PaymentProcessing {
 // internal implementation:
 @NamedInterface("payments")          // org.springframework.modulith
 class PaymentProcessingImpl implements PaymentProcessing { ... }
+```
 
 Other modules depend on `PaymentProcessing` (the interface); the implementation can change, or the whole module can be extracted to a service with the interface as its contract — the named interface *is* the future microservice's API.
 
@@ -91,12 +97,14 @@ Other modules depend on `PaymentProcessing` (the interface); the implementation 
 
 The anti-pattern this solves: `billing` calling `fulfillment.ship(order)` directly (module A reaching into module B's internals for a side effect). The Modulith answer is **application events** — publish a domain event, other modules listen:
 
+```java
 // billing:
 applicationEvents.publish(new OrderPaid(orderId));     // typed, guaranteed delivery
 
 // fulfillment:
 @TransactionalEventListener(phase = AFTER_COMMIT)
 void on(OrderPaid event) { ... }                        // only after the billing tx commits
+```
 
 Spring Modulith wraps Spring's event infrastructure with **publication tracking**: events are persisted and can be replayed if a listener fails (the next lesson). This is the in-process version of the outbox pattern — same discipline, no network.
 

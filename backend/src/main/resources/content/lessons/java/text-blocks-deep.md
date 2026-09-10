@@ -43,14 +43,18 @@ String html = """
                   <p>Hello, World!</p>
                 </body>
               </html>
+```java
               """;
+```
 
 String sql = """
              SELECT id, name, email
              FROM users
              WHERE age > 18
              ORDER BY name
+```java
              """;
+```
 
 String json = """
               {
@@ -72,7 +76,9 @@ String text = """
               Line 1
               Line 2
               Line 3
+```java
               """;
+```
 
 ### Indentation Handling
 
@@ -82,31 +88,39 @@ Java uses the **closing `"""`** to determine the indentation:
 String message = """
                  Hello
                  World
+```java
                  """;
 // Result: "Hello\nWorld\n" (NOT "                 Hello\n                 World\n")
 
 // The closing """ is at column 14, so 14 spaces are stripped from each line
+```
 String indented = """
                   First line
                     Second line (indented by 2)
                   Third line
+```java
                   """;
 // Result: "First line\n  Second line (indented by 2)\nThird line\n"
+```
 
 ### No Newline at the End
 
 // The closing """ being on its own line means NO trailing newline
 String s1 = """
             Hello
+```java
             """;
 // s1 = "Hello\n"
 
 // If you WANT a trailing newline, add a blank line before """
+```
 String s2 = """
             Hello
 
+```java
             """;
 // s2 = "Hello\n\n"
+```
 
 ---
 
@@ -122,7 +136,9 @@ String emailTemplate = """
                            <p>Login at: <a href="%s">Click here</a></p>
                          </body>
                        </html>
+```java
                        """;
+```
 
 String html = String.format(emailTemplate, "Alice", "https://app.example.com");
 
@@ -136,10 +152,12 @@ String query = """
                  AND o.status = 'COMPLETED'
                ORDER BY o.total DESC
                LIMIT :limit
+```java
                """;
 
 // Use with Spring Data JPA
 @Query(value = """
+```
                SELECT u.id, u.name, u.email, o.total
                FROM users u
                JOIN orders o ON u.id = o.user_id
@@ -147,7 +165,9 @@ String query = """
                  AND o.status = 'COMPLETED'
                ORDER BY o.total DESC
                """, nativeQuery = true)
+```java
 List<Object[]> findCompletedOrdersSince(@Param("startDate") LocalDateTime startDate);
+```
 
 ### 3. JSON Templates
 
@@ -167,6 +187,7 @@ String payload = String.format(requestJson, "Alice", "alice@example.com");
 ### 4. Code Generation
 
 String javaClass = """
+```java
                    package com.example;
 
                    public class %s {
@@ -184,6 +205,7 @@ String javaClass = """
 
 String className = "User";
 String code = String.format(javaClass, className, className);
+```
 
 ### 5. Markdown / Documentation
 
@@ -215,9 +237,11 @@ Text blocks support special escape sequences:
 String spaced = """
                 Hello\s
                 World\s
+```java
                 """;
 // Both lines have a trailing space before the newline
 // "Hello \nWorld \n"
+```
 
 ### `\` — Line Continuation (End the Line)
 
@@ -226,23 +250,29 @@ String singleLine = """
                     line that continues \
                     on the next line\
                     but appears as one line in output.
+```java
                     """;
 // Result: "This is a very long line that continues on the next linebut appears as one line in output."
 // Note: NO spaces around "linebut" — the \ eats the newline AND surrounding whitespace
+```
 
 ### `\"` — Double Quotes Inside Text Block
 
 String withQuotes = """
                     She said, \"Hello!\" and left.
+```java
                     """;
 // Result: She said, "Hello!" and left.
+```
 
 ### `\\` — Literal Backslash
 
 String path = """
               C:\\Users\\Alice\\Documents
+```java
               """;
 // Result: C:\Users\Alice\Documents
+```
 
 ---
 
@@ -260,15 +290,19 @@ String xml = """
                <name>%s</name>
                <email>%s</email>
              </root>
+```java
              """.formatted(user.getName(), user.getEmail());
 
 // ✅ Or with String.format
+```
 String xml = String.format("""
                            <root>
                              <name>%s</name>
                              <email>%s</email>
                            </root>
+```java
                            """, user.getName(), user.getEmail());
+```
 
 ---
 
@@ -298,14 +332,18 @@ String report = """
                 Total Orders: %d
                 Revenue: $%,.2f
                 Average Order: $%,.2f
+```java
                 """;
+```
 
 String result = report.formatted(
     "2024-01-01", "2024-01-31",
     1234,
     45678.90,
     37.01
+```java
 );
+```
 
 ---
 
@@ -356,8 +394,10 @@ public class EmailService {
                <html>
                <head>
                  <style>
+```java
                    body { font-family: Arial, sans-serif; }
                    .button { background: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; }
+```
                  </style>
                </head>
                <body>

@@ -25,6 +25,7 @@ gateway ── GET http://ORDER-SERVICE/api/... ──▶ resolved via registry 
 
 ## 1. The Eureka server (one dependency, two annotations)
 
+```java
 @SpringBootApplication
 @EnableEurekaServer
 public class EurekaServerApplication {
@@ -32,6 +33,7 @@ public class EurekaServerApplication {
         SpringApplication.run(EurekaServerApplication.class, args);
     }
 }
+```
 
 ```xml
 <dependency>
@@ -82,11 +84,13 @@ That's it — the client registers on startup and sends heartbeats (~30s by defa
 
 With the registry in place, clients don't use IPs — they use the **logical name**:
 
+```java
 @FeignClient(name = "inventory-service")          // declarative HTTP client
 public interface InventoryClient {
     @GetMapping("/api/inventory/{sku}")
     InventoryStock getStock(@PathVariable("sku") String sku);
 }
+```
 
 ```yaml
 # Feign + LoadBalancer resolve "inventory-service" through Eureka
@@ -95,10 +99,12 @@ public interface InventoryClient {
 
 For plain HTTP clients:
 
+```java
 @Bean
 RestClient restClient(RestClient.Builder builder, LoadBalancerClient lb) {
     return builder.build();
 }
+```
 // http://inventory-service/api/inventory/{sku} — resolved via the registry
 
 Or with a WebClient: `webClientBuilder.baseUrl("http://inventory-service")`. The `lb://` scheme is the same idea in Gateway routes (`uri: lb://ORDER-SERVICE`).

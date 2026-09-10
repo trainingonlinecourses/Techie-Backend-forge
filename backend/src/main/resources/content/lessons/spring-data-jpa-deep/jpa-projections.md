@@ -34,12 +34,14 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
 The repository method returns the interface; Spring Data generates a **proxy implementation** backed by the selected values. **Closed projections** (every property comes from the entity, matching getter names) produce a tight `SELECT` of exactly those columns. That's the big win: the SQL itself changes, not just the Java type.
 
+```java
 **Open projections** use SpEL to compute values:
 
 public interface OrderView {
     @Value("#{target.amount.multiply(target.quantity)}")
     BigDecimal getLineTotal();     // computed, not a column — Hibernate can't push this to SQL
 }
+```
 
 Open projections force a full-entity load (the SpEL needs the target), so they're for *computed* views — use them deliberately, not as the default.
 
@@ -62,6 +64,7 @@ The org split is usually: **interface projections for derived queries** (no JPQL
 
 ## Projections with joins and nested data
 
+```java
 public interface OrderWithCustomer {
     Long getId();
     String getStatus();
@@ -74,6 +77,7 @@ public interface OrderWithCustomer {
 }
 
 // derived:
+```
 List<OrderWithCustomer> findTop100By();
 // produces: SELECT o.id, o.status, c.name, c.email FROM orders o JOIN customers c ...
 
@@ -83,9 +87,11 @@ Nested projections compose into a single query with joins — the correct fix wh
 
 **Scenario 1 — list endpoints (the 90% case).** Every "list orders", "search products", "my tickets" endpoint returns a projection, not entities. The payload is smaller, the SQL is narrower, and lazy-loading surprises disappear (no entity → no proxy → no N+1 from serialization).
 
+```java
 **Scenario 2 — export/report queries.** A report selecting 12 of 40 columns over millions of rows — projection keeps the result-set narrow and the query plan simple.
 
 **Scenario 3 — API versioning of shapes.** The entity changes internally; the projection interface stays the contract — the API shape is decoupled from the persistence shape, so renaming a column doesn't break the endpoint.
+```
 
 **Scenario 4 — counting/aggregates that still need shape.** Derived aggregate projections (`countByStatus`) or JPQL `select new ...(o.status, count(o))` group results into typed views instead of `Object[]`.
 

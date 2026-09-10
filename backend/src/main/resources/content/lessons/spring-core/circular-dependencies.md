@@ -37,6 +37,7 @@ The org discipline: **treat a cycle as a code-review failure** — refactor, don
 **Fix 1 — extract the shared dependency (the right answer).** If `OrderService` and `NotificationService` both need each other's data, extract the shared logic:
 
 // Before: OrderService → NotificationService → OrderService  (cycle)
+```java
 // After:
 @Service public class OrderService {
     private final OrderRepository repo;
@@ -46,6 +47,7 @@ The org discipline: **treat a cycle as a code-review failure** — refactor, don
     private final OrderRepository repo;      // both depend on the repository, not on each other
     private final NotificationGateway gateway;
 }
+```
 
 Both now point *down* at shared collaborators — the cycle is gone because the graph is a DAG.
 
@@ -64,6 +66,7 @@ public class AuditService {
 
 `ObjectProvider` defers the lookup to call time, so the constructor cycle disappears while keeping constructor injection on both sides.
 
+```java
 **Fix 3 — @Lazy on one side (the pragmatic escape hatch).** Inject a lazy proxy so construction order can proceed:
 
 @Service
@@ -71,6 +74,7 @@ public class A {
     private final B b;
     public A(@Lazy B b) { this.b = b; }   // a proxy stands in until B is actually used
 }
+```
 
 `@Lazy` on the parameter injects a proxy that resolves the real bean on first use. It works, but it's the **last resort** — it hides the design smell and adds a proxy layer.
 

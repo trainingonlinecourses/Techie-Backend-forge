@@ -22,11 +22,13 @@ Some things in a program should exist exactly once: a database connection pool, 
 2. **A static field** holding the single instance.
 3. **A static accessor** (`getInstance()`) that creates it lazily on first call and returns it forever after.
 
+```java
 public class Config {
     private static final Config INSTANCE = new Config();   // created once at class load
     private Config() {}                                    // no external construction
     public static Config getInstance() { return INSTANCE; }
 }
+```
 
 The `static final` field means the JVM creates it **exactly once** (when the class is first used) — thread-safe by construction, no locks needed.
 
@@ -34,11 +36,13 @@ The `static final` field means the JVM creates it **exactly once** (when the cla
 
 The naive *lazy* version is where beginners get burned:
 
+```java
 // NOT thread-safe — two threads can both see INSTANCE == null and create two objects
 public static Config getInstance() {
     if (INSTANCE == null) INSTANCE = new Config();   // race!
     return INSTANCE;
 }
+```
 
 Two threads calling this simultaneously can both pass the `null` check before either assigns, producing **two instances** — the pattern broken. The safe forms:
 
@@ -49,6 +53,7 @@ Two threads calling this simultaneously can both pass the `null` check before ei
 
 ## The Enum Singleton (Best Practice)
 
+```java
 public enum Config {
     INSTANCE;                       // one value, one instance, guaranteed by the JVM
 
@@ -56,6 +61,7 @@ public enum Config {
 
     public String dbUrl() { return dbUrl; }
 }
+```
 
 An `enum` with a single constant is a **bulletproof singleton**: the JVM guarantees exactly one instance, it's thread-safe, and it survives serialization correctly (enums serialize by name). Access: `Config.INSTANCE.dbUrl()`. This is the recommended modern approach — though even this is unnecessary if you have dependency injection (see below).
 

@@ -81,6 +81,7 @@ For `new Child()` where both classes have fields, blocks, and constructors:
 
 Proof program:
 
+```java
 class Base {
     { log("2. base instance block"); }                 // appears before base constructor output
     Base() { log("3. base constructor"); }
@@ -93,9 +94,11 @@ class Derived extends Base {
     Derived() { log("6. derived constructor"); }
 }
 // Output order: (statics first if any), then 2,3,4,5,6
+```
 
 ## What Static Blocks Are Actually Used For
 
+```java
 public class DatabaseDriver {
     static {
         try {
@@ -106,6 +109,7 @@ public class DatabaseDriver {
         }
     }
 }
+```
 
 Classic uses:
 - Registering JDBC drivers (older JDBC versions).

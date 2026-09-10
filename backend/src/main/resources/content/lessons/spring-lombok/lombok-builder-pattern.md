@@ -12,6 +12,7 @@ docs:
 
 The Builder pattern lets you construct complex objects step by step. Lombok's `@Builder` generates the builder class and all the chaining methods automatically.
 
+```java
 @Builder
 public class Server {
     private String host;
@@ -21,12 +22,15 @@ public class Server {
 }
 
 // Usage
+```
 Server server = Server.builder()
     .host("localhost")
     .port(8080)
     .ssl(true)
     .timeout(Duration.ofSeconds(30))
+```java
     .build();
+```
 
 ---
 
@@ -34,14 +38,17 @@ Server server = Server.builder()
 
 ### On class (all fields)
 
+```java
 @Builder
 public class User {
     private String name;
     private int age;
 }
+```
 
 ### On factory method
 
+```java
 public class User {
     private String name;
     private int age;
@@ -51,20 +58,25 @@ public class User {
         return new User(name, age);
     }
 }
+```
 
 ### Custom builder name
 
+```java
 @Builder(builderClassName = "ConfigBuilder")
 public class Config { }
 // Generates: Config.ConfigBuilder, not Config.UserBuilder
+```
 
 ### With default values
 
+```java
 @Builder.Default
 private int maxRetries = 3;
 
 @Builder.Default
 private Duration timeout = Duration.ofSeconds(30);
+```
 
 ---
 
@@ -96,19 +108,23 @@ public class BuilderDemo {
             .baseUrl("https://api.example.com")
             .connectTimeout(5000)
             .readTimeout(30000)
+```java
             .build();
         System.out.println(client);  // followRedirects=true, defaultHeaders={}
 
         // 2. Override defaults
+```
         HttpClient custom = HttpClient.builder()
             .baseUrl("https://other.com")
             .connectTimeout(1000)
             .readTimeout(5000)
             .followRedirects(false)
             .defaultHeaders(Map.of("Authorization", "Bearer token"))
+```java
             .build();
 
         // 3. Copy and modify
+```
         HttpClient modified = client.toBuilder()
             .baseUrl("https://new-api.com")
             .build();
@@ -119,6 +135,7 @@ public class BuilderDemo {
 
 ## @SuperBuilder (Inheritance)
 
+```java
 @Data
 @SuperBuilder
 public class Animal {
@@ -133,11 +150,14 @@ public class Dog extends Animal {
 }
 
 // Usage
+```
 Dog dog = Dog.builder()
     .name("Rex")
     .age(3)
     .breed("Labrador")
+```java
     .build();
+```
 
 ---
 

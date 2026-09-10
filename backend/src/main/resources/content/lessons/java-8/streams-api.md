@@ -15,6 +15,7 @@ Before Java 8, processing a collection meant writing loops:
 
 // OLD: filter employees, transform, collect — 8 lines of imperative code
 List<String> highEarnerNames = new ArrayList<>();
+```java
 for (Employee e : employees) {
     if (e.getSalary() > 80000) {
         String name = e.getName().toUpperCase();
@@ -25,14 +26,17 @@ for (Employee e : employees) {
 **Streams** let you describe *what* you want, not *how* to do it:
 
 // NEW: Same logic in a fluent, declarative pipeline
+```
 List<String> highEarnerNames = employees.stream()
     .filter(e -> e.getSalary() > 80000)
     .map(e -> e.getName().toUpperCase())
+```java
     .toList();
 
 **Key insight:** A Stream is NOT a data structure. It's a **pipeline** — a description of operations to perform on data. The data flows through the pipeline lazily, element by element.
 
 **Analogy:** Think of a Stream like a water pipe:
+```
 - **Source** = the faucet (your collection)
 - **Intermediate operations** = filters, valves (filter, map, flatMap)
 - **Terminal operation** = the tap where water comes out (collect, forEach, reduce)
@@ -272,14 +276,18 @@ DoubleSummaryStatistics stats = orders.stream()
 // Sequential (default)
 double sum1 = orders.stream()
     .mapToDouble(Order::total)
+```java
     .sum();
 
 // Parallel — uses ForkJoinPool automatically
 double sum2 = orders.parallelStream()
+```
     .mapToDouble(Order::total)
+```java
     .sum();
 
 **When to use parallel:**
+```
 - Large datasets (>10,000 elements)
 - CPU-intensive operations per element
 - No shared mutable state between operations

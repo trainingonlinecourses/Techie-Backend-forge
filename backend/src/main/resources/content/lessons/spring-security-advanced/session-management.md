@@ -28,18 +28,24 @@ Spring Security's **default is already `changeSessionId()`** (keep the session, 
 http.sessionManagement(sm -> sm
     .maximumSessions(1)                        // one active session per user
     .maxSessionsPreventsLogin(true)            // new login rejected (vs. kicking the old one)
+```java
     .expiredUrl("/login?expired"));
+```
 
 The two semantics: `maxSessionsPreventsLogin(false)` (default) **invalidates the oldest session** — the user gets silently logged out elsewhere; `true` **rejects the new login**. Choose per product: banking = reject new; internal tool = kick old.
 
 **`SessionRegistry`** is the bookkeeping that makes this work (and powers "show all sessions of user X", "kill a session remotely"):
 
+```java
 @Bean
 SessionRegistry sessionRegistry() { return new SessionRegistryImpl(); }
 
 // Audit / admin: enumerate and destroy sessions
+```
 List<SessionInformation> sessions = sessionRegistry.getAllSessions(user, false);
+```java
 sessions.forEach(s -> s.expireNow());
+```
 
 Register sessions by adding `http.sessionManagement(sm -> sm.sessionRegistry(sessionRegistry()))` — concurrent-session control **requires** the registry.
 
@@ -54,8 +60,10 @@ The default in-memory `HttpSession` dies on restart and breaks load-balanced dep
 </dependency>
 ```
 
+```java
 @EnableRedisHttpSession(defaultMaxInactiveIntervalSeconds = 3600)  // 1h TTL
 public class SessionConfig { }
+```
 
 Now: sessions survive restarts, any instance serves any user, and the session has a **server-enforced TTL** (the Redis key expires). The same pattern covers JDBC-backed sessions (`spring-session-jdbc`) when Redis isn't in the stack.
 

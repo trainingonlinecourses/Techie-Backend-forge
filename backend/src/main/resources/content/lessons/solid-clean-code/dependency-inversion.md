@@ -25,6 +25,7 @@ The payoff: swap the database, the email provider, or the payment gateway **with
 
 ## The Violation — Business Logic Glued to Infrastructure
 
+```java
 // HIGH-LEVEL business logic, tightly coupled to a LOW-LEVEL detail:
 class UserService {
     // Direct dependency on a concrete class — and its constructor!
@@ -35,6 +36,7 @@ class UserService {
         repository.save(new User(email));
     }
 }
+```
 
 Problems:
 
@@ -101,11 +103,13 @@ public class App {
 - **The concrete choice lives in the composition root** — the one place that knows "we use Postgres" is `App.main` (in Spring: the container/`@Configuration`). Business logic is database-agnostic.
 - **Testing is trivial** — supply an in-memory fake:
 
+```java
 UserRepository fake = new UserRepository() {
     public void save(User u) { saved.add(u); }
     public User findById(long id) { return null; }
 };
 UserService service = new UserService(fake);   // test the rules, no DB
+```
 
 - **Swapping infrastructure** (Postgres → MongoDB, SMTP → SendGrid, file storage → S3) = new implementation class + new wiring line. `UserService` never changes.
 
@@ -150,7 +154,9 @@ DIP costs indirection: every abstraction is a layer. Judgment calls:
 - **Use the abstraction when** the implementation may vary (DB choice, external API, third-party vendor) or must be faked in tests.
 - **Skip it when** the "dependency" is a stable JDK class (`List`, `String`, `LocalDate`) or a genuinely fixed internal utility. Don't write `interface StringHelper` — you're not going to swap `String`.
 
+```java
 The pragmatic signal: **would you ever have a second implementation (or a test fake)?** If yes, abstract; if the concrete class is truly final, skip.
+```
 
 ## Common Beginner Pitfalls
 

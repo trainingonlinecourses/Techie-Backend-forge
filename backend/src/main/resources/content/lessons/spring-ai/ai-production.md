@@ -22,13 +22,16 @@ LLM calls cost money per token — the org controls it with:
 | **Token budget** | Enforce a per-request max (`maxTokens`), alert on per-user spend |
 | **Rate limits** | Per-user/per-key limits at the API layer |
 
+```java
 @Cacheable(cacheNames = "ai.answers", key = "#question", unless = "#result == null")
 public String cachedAnswer(String question) { ... }
+```
 
 ## Fallbacks & resilience
 
 Models fail: rate limits, timeouts, provider outages. The API must survive:
 
+```java
 @Service
 public class ResilientAssistant {
 
@@ -41,6 +44,7 @@ public class ResilientAssistant {
         }
     }
 }
+```
 
 Add: timeouts (`ChatOptions` `requestTimeout`), retries with backoff (Spring Retry), and a circuit breaker (Resilience4j) for sustained outages.
 
@@ -68,7 +72,9 @@ public SseEmitter stream(@RequestParam String question) {
 
 ## MCP: the ecosystem standard
 
+```java
 **MCP** (Model Context Protocol) standardizes how AI tools talk to systems — servers expose tools/resources; clients (Claude, IDEs, your app) consume them. Spring AI has first-class MCP support:
+```
 
 ```xml
 <dependency>

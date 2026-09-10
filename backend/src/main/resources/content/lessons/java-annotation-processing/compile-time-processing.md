@@ -117,9 +117,11 @@ public class ToStringProcessor extends AbstractProcessor {
             TypeElement typeElement = (TypeElement) element;
             String className = typeElement.getSimpleName().toString();
             String packageName = processingEnv.getElementUtils()
+```java
                 .getPackageOf(typeElement).getQualifiedName().toString();
 
             // Collect all fields
+```
             List<VariableElement> fields = new ArrayList<>();
             for (Element enclosed : typeElement.getEnclosedElements()) {
                 if (enclosed.getKind() == ElementKind.FIELD) {
@@ -201,10 +203,12 @@ com.example.ToStringProcessor
 ```
 
 ### Auto-service (Google)
+```java
 @AutoService(Processor.class)  // auto-generates the service file
 @SupportedAnnotationTypes("ToString")
 @SupportedSourceVersion(SourceVersion.RELEASE_21)
 public class ToStringProcessor extends AbstractProcessor { }
+```
 
 ---
 

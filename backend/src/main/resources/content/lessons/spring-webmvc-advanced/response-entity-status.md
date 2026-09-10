@@ -15,7 +15,9 @@ docs:
 
 A controller that returns an object gets `200 OK` and a JSON body from Spring's default. `ResponseEntity<T>` gives you the **whole HTTP response**: status, headers, and body — the tool for when "200 + JSON" isn't the right answer.
 
+```java
 @GetMapping("/api/orders/{id}")
+```
 public ResponseEntity<Order> getOrder(@PathVariable Long id) {
     return orderService.findById(id)
         .map(o -> ResponseEntity.ok(o))                       // 200 + body
@@ -45,7 +47,9 @@ Getting status codes right is a core API quality issue — teams maintain a tabl
 | Server bug | 500 Internal Server Error |
 | Dependency down / timeout | 502/503/504 gateway variants |
 
+```java
 **The 401 vs 403 distinction** is the most common review point: 401 = "identify yourself (or your credentials are wrong)"; 403 = "I know who you are, you're not allowed". Returning 403 for unauthenticated requests breaks clients that react to 401 by prompting for credentials.
+```
 
 ## How we use it in an organization: the scenarios
 
@@ -78,8 +82,10 @@ public ResponseEntity<Order> create(@Valid @RequestBody OrderRequest r, UriCompo
 
 @GetMapping("/api/profile")
 public ResponseEntity<Profile> profile() {
+```java
     Profile p = profileService.current();
     return ResponseEntity.ok()
+```
         .eTag("\"" + p.version() + "\"")            // version → ETag
         .lastModified(p.updatedAt().toEpochMilli())
         .body(p);
@@ -88,9 +94,11 @@ public ResponseEntity<Profile> profile() {
 The client sends `If-None-Match: "v3"`; the server compares and can answer **304 Not Modified** with no body — saving bandwidth on every unchanged read. A `WebRequest` argument automates this:
 
 public ResponseEntity<Profile> profile(WebRequest request) {
+```java
     if (request.checkNotModified(profileService.currentVersion())) {
         return null;   // framework sends 304
     }
+```
     ...
 }
 

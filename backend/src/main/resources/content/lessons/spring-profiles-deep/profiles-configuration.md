@@ -255,7 +255,9 @@ features:
 @Component
 public class FeatureFlags {
     @Value("${features.new-checkout:false}")
+```java
     private boolean newCheckoutEnabled;
+```
 
     @Value("${features.dark-mode:false}")
     private boolean darkModeEnabled;

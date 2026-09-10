@@ -12,11 +12,13 @@ docs:
 
 A race condition happens when the outcome depends on the timing of thread execution. Two threads read the same data, both decide to act, and one thread's work overwrites the other's.
 
+```java
 // Race condition: check-then-act
 if (map.containsKey(key)) {     // Thread 1 checks: true
     // Thread 2 removes key here!
     return map.get(key);         // Thread 1: NullPointerException
 }
+```
 
 ---
 
@@ -24,6 +26,7 @@ if (map.containsKey(key)) {     // Thread 1 checks: true
 
 ### Check-Then-Act
 
+```java
 // ❌ Broken
 if (account.getBalance() >= amount) {
     account.withdraw(amount);  // Another thread may have withdrawn between check and action
@@ -35,24 +38,29 @@ synchronized (account) {
         account.withdraw(amount);
     }
 }
+```
 
 ### Read-Modify-Write
 
 // ❌ Broken: counter++ is three operations
 counter++;  // read → increment → write
 
+```java
 // ✅ Fixed with AtomicInteger
 AtomicInteger counter = new AtomicInteger(0);
 counter.incrementAndGet();  // atomic
+```
 
 ### Lazy Initialization
 
+```java
 // ❌ Broken: two threads may create two instances
 if (instance == null) {
     instance = new Singleton();
 }
 
 // ✅ Fixed: synchronized or volatile + double-checked locking
+```
 
 ---
 
@@ -184,6 +192,7 @@ public boolean decrementIfPositive(String productId) {
 
 ### Scenario 2: Double-checked locking
 
+```java
 // ✅ Correct implementation
 public class Config {
     private static volatile Config instance;
@@ -199,6 +208,7 @@ public class Config {
         return instance;
     }
 }
+```
 
 ---
 

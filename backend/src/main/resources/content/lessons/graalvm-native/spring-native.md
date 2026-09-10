@@ -82,14 +82,18 @@ The heart is the **AOT processing phase** that runs during the native build:
 3. native-image compiles everything into the executable.
 ```
 
+```java
 **The result:** your Spring Boot app's *whole initialization* (component scanning, bean wiring, property binding) is decided at build time and baked in — which is *why* startup is milliseconds: the app isn't scanning and wiring at runtime; it's already wired. This is the deep reason native + Spring Boot is a *different execution model*, not just a faster JVM: **configuration-time work moved to build time.**
+```
 
 ## Hints: The Extension Point You Own
 
+```java
 The automation covers the standard stack; your custom dynamic edges need **hints**. The two forms:
 
 
 **What this code does — step by step:**
+```
 
 1. Form 1 — annotation-based (the common case):
 2. "Jackson must be able to reflect into these types":
@@ -146,7 +150,9 @@ Native images are **immutable** in a key sense: `application.properties` inside 
 - **External config files** — `spring.config.additional-location` works.
 - **Profile-specific files inside the app** — *only the profiles active at build time are included*. A `application-prod.properties` the build never saw isn't in the binary. The rule: **pass `-Dspring.profiles.active=prod` to the native build** (and to the runtime for env-driven values).
 
+```java
 This is the ConfigMap/Secrets lesson's spirit taken to its logical end: the image is the immutable application; *everything* variable lives in the environment.
+```
 
 ## The Native Build Troubleshooting Ladder
 

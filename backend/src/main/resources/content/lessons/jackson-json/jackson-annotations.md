@@ -67,6 +67,7 @@ public class UserDto {
 
 When a class has no no-arg constructor and isn't a record, Jackson needs help building it. `@JsonCreator` marks the constructor (or static factory) that maps JSON keys to parameters:
 
+```java
 public class ImmutablePoint {
     private final int x;
     private final int y;
@@ -80,11 +81,13 @@ public class ImmutablePoint {
     public int getX() { return x; }
     public int getY() { return y; }
 }
+```
 
 **The pattern:** immutable classes (final fields, no setters) need `@JsonCreator` on the constructor, with `@JsonProperty` naming each parameter (Jackson matches constructor params to JSON keys by name — without the annotation, the param *names* are used, which needs the `-parameters` compiler flag; the annotations make it explicit and robust). The same annotation works on a `static` factory method (`@JsonCreator public static Point of(@JsonProperty("x") int x, ...)`).
 
 ## Deserialization-Only and Serialization-Only Control
 
+```java
 // READ-only field (output only, never accepted from input):
 @JsonProperty(access = JsonProperty.Access.READ_ONLY)
 private String computedTotal;      // e.g., server-computed — input ignored
@@ -92,6 +95,7 @@ private String computedTotal;      // e.g., server-computed — input ignored
 // WRITE-only field (input only, never emitted):
 @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 private String password;           // accept on signup, never echo back
+```
 
 `Access.READ_ONLY`/`WRITE_ONLY` are the surgical version of the direction control: a server-computed field shouldn't be accepted from clients (READ_ONLY — their value is ignored), and a password shouldn't be emitted (WRITE_ONLY). The `password` case is the classic: accepted on input, never serialized back.
 

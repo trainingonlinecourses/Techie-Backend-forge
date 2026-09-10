@@ -38,14 +38,17 @@ float f = 42;
 
 **The org trap:** `long → float` and `long → double` are widening but can lose precision. A `long` with value `9_000_000_000_000_000_001L` becomes `9.0E18f` — the trailing `1` is lost. If exact values matter (money, IDs), use `BigDecimal` instead of `float`/`double`.
 
+```java
 long big = 9_000_000_000_000_000_001L;
 float f = big;              // 9.0E18f — lost precision
 System.out.println(big == (long) f);  // false — the round-trip is lossy
+```
 
 ## Narrowing conversions — truncation you must request
 
 A narrowing conversion goes from a larger type to a smaller type. Java requires an explicit cast because data may be lost:
 
+```java
 long l = 1000L;
 int i = (int) l;           // safe: 1000 fits in int
 long big = 3_000_000_000L;
@@ -54,11 +57,14 @@ int truncated = (int) big; // overflow: -1294967296 — silent truncation!
 double d = 3.99;
 int whole = (int) d;       // 3 — truncates, does NOT round
 int rounded = (int) Math.round(d);  // 4 — use Math.round for rounding
+```
 
 **The bytes trap:** `byte` is signed (-128 to 127). Casting an `int` > 127 to `byte` wraps around:
 
+```java
 byte b = (byte) 200;       // -56 — binary representation is 11001000, which is -56 as signed byte
 byte b2 = (byte) 128;      // -128 — wraps to negative
+```
 // Always mask for unsigned interpretation: int unsigned = b & 0xFF;  → 200
 
 ## Autoboxing — convenience with a cost
@@ -89,6 +95,7 @@ Integer b = 20;
 Integer sum = a + b;
 ```
 
+```java
 **Performance in loops:** Autoboxing inside a tight loop allocates thousands of objects:
 
 // BAD — allocates 10M Integer objects
@@ -102,11 +109,13 @@ long total = 0L;
 for (int i = 0; i < 10_000_000; i++) {
     total += i;
 }
+```
 
 ## The Integer cache trap — == lies
 
 Java caches `Integer` objects for values -128 to 127. This makes `==` *appear* to work for small numbers but fail for large ones:
 
+```java
 public class Main {
 
     public static void main(String[] args) {
@@ -120,13 +129,16 @@ public class Main {
         System.out.println(c.equals(d));  // true — always use .equals() for wrapper comparison
     }
 }
+```
 
 **The org rule:** never use `==` to compare `Integer`, `Long`, `Double`, or any wrapper type. Always use `.equals()`. Autoboxed values in ternaries and method returns may or may not be cached.
 
+```java
 // This cache behavior makes == unreliable across JVM implementations:
 Integer x = methodReturn128();
 Integer y = methodReturn128();
 // x == y depends on whether the method returns cached or new instances
+```
 
 ## char ↔ int conversions
 
@@ -184,6 +196,7 @@ public class Main {
 
 **Payment service:** casting `long` cents to `BigDecimal` without losing precision:
 
+```java
 // WRONG: double loses cents
 BigDecimal amount = new BigDecimal(19.99);  // may be 19.9899999...
 
@@ -203,6 +216,7 @@ public static int safeInt(String value, int defaultValue) {
 // Usage: int port = safeInt(config.get("server.port"), 8080);
 
 **Enum from int:** the reverse of ordinal:
+```
 
 public static <E extends Enum<E>> E fromOrdinal(Class<E> enumType, int ordinal) {
     E[] values = enumType.getEnumConstants();

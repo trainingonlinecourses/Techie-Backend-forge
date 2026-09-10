@@ -71,6 +71,7 @@ COMMIT;
 
 Postgres doesn't lock everything — it runs transactions concurrently and **aborts the loser** with `40001` (serialization_failure). Your application must retry:
 
+```java
 // Spring + SERIALIZABLE requires retry logic
 @Transactional(isolation = Isolation.SERIALIZABLE)
 public void reconcile() { ... }
@@ -84,6 +85,7 @@ for (int attempt = 0; attempt < 3; attempt++) {
         // retry — the loser of the race
     }
 }
+```
 
 ## Row-Level Locking: SELECT FOR UPDATE
 
@@ -154,12 +156,14 @@ class IsolationTest {
     void serializableAbortsConcurrentUpdates() throws Exception {
         // two threads updating the same account with SERIALIZABLE
         // → one succeeds, the other gets CannotSerializeTransactionException
+```java
         assertThrows(CannotSerializeTransactionException.class, ...);
     }
 
     @Test
     void forUpdateSerializesTransfers() throws Exception {
         // two concurrent transfers with FOR UPDATE
+```
         // → both succeed (one waits), balance consistent
         assertEquals(0, accountRepository.sumBalances());
     }

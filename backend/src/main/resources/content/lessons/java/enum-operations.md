@@ -157,6 +157,7 @@ public class Main {
 
 Each enum constant can **override an abstract method**, turning the enum into a strategy pattern without separate classes:
 
+```java
 public enum PaymentMethod {
     CREDIT_CARD {
         @Override
@@ -191,6 +192,7 @@ PaymentMethod method = PaymentMethod.valueOf(userChoice);
 method.process(orderTotal);      // dispatches to the right implementation
 
 **Line-by-line breakdown:**
+```
 - Each constant (`CREDIT_CARD`, `BANK_TRANSFER`, `CRYPTO`) is an **anonymous subclass** of `PaymentMethod` that overrides `process()`
 - `public abstract void process(...)` — declared in the enum body; every constant must implement it or the code won't compile
 - `processWithFee()` — a concrete shared method; all constants inherit it without overriding
@@ -207,6 +209,7 @@ method.process(orderTotal);      // dispatches to the right implementation
 public enum HttpStatus {
     OK(200, "Success"),
     NOT_FOUND(404, "Not Found"),
+```java
     INTERNAL_SERVER_ERROR(500, "Internal Server Error");
 
     private final int code;
@@ -223,6 +226,7 @@ public enum HttpStatus {
 
     // Lookup by code — the "reverse map" pattern
     private static final Map<Integer, HttpStatus> BY_CODE =
+```
         Arrays.stream(values()).collect(Collectors.toMap(HttpStatus::getCode, s -> s));
 
     public static HttpStatus fromCode(int code) {
@@ -238,6 +242,7 @@ public enum HttpStatus {
 
 ## Comparing enums: == vs .equals()
 
+```java
 Status a = Status.ACTIVE;
 Status b = Status.ACTIVE;
 
@@ -246,6 +251,7 @@ if (a == b) { /* always true for same constant */ }
 
 // .equals() works too but is redundant (and may be overridden by a custom equals — rare but possible)
 if (a.equals(b)) { /* also true, but slower and unnecessary */ }
+```
 
 **Rule:** use `==` for enum comparison. It's null-safe (won't throw NPE if left side is null), faster (no method call), and semantically correct (enums are singletons).
 
@@ -286,25 +292,33 @@ status = status.next();
 status = next();
 ```
 
+```java
 **Scenario 2 — Feature flags using EnumSet:**
 public enum Feature { DARK_MODE, BETA_FEATURES, ANALYTICS, NOTIFICATIONS }
+```
 
 EnumSet<Feature> enabledFeatures = EnumSet.of(Feature.DARK_MODE, Feature.ANALYTICS);
 
+```java
 // Check in templates/controllers
 if (enabledFeatures.contains(Feature.DARK_MODE)) {
     // show dark mode toggle
 }
 
 **Scenario 3 — Permission matrix using EnumMap:**
+```
 EnumMap<Role, EnumSet<Permission>> permissions = new EnumMap<>(Role.class);
+```java
 permissions.put(Role.ADMIN, EnumSet.allOf(Permission.class));
 permissions.put(Role.USER, EnumSet.of(Permission.READ, Permission.WRITE));
 permissions.put(Role.VIEWER, EnumSet.of(Permission.READ));
 
 // Check permission
+```
 EnumSet<Permission> userPerms = permissions.getOrDefault(Role.USER, EnumSet.noneOf(Permission.class));
+```java
 if (userPerms.contains(Permission.DELETE)) { /* denied */ }
+```
 
 ## Common mistakes
 

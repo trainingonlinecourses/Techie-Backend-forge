@@ -26,6 +26,7 @@ A handler matches only when every condition holds. This is content negotiation a
 
 ## Path patterns and variables
 
+```java
 @GetMapping("/api/orders/{orderId}")                        // one variable
 public Order getOrder(@PathVariable Long orderId) { ... }
 
@@ -37,28 +38,33 @@ public Order getNumericOrder(@PathVariable Long orderId) { ... }
 
 @GetMapping("/files/{path:.*}")                             // catch-all (matches slashes)
 public Resource getFile(@PathVariable String path) { ... }
+```
 
 Rules teams enforce: `@PathVariable` names match the `{}` names; path variables are **the resource id, never the query** (`/api/orders/123`, not `/api/orders?id=123`); regex constraints reject nonsense early (a `Long` variable with a non-numeric path still 400s on binding, but the regex makes it explicit).
 
 ## Consumes / Produces — the negotiation conditions
 
+```java
 @PostMapping(path = "/api/upload", consumes = "multipart/form-data")
 public UploadResult upload(@RequestParam("file") MultipartFile file) { ... }
 
 @GetMapping(path = "/api/report", produces = {MediaType.APPLICATION_JSON_VALUE,
                                                MediaType.APPLICATION_PDF_VALUE})
 public Report report() { ... }   // negotiated by the client's Accept header
+```
 
 - `consumes` rejects requests whose body isn't in the listed formats (415 Unsupported Media Type otherwise).
 - `produces` picks the handler whose output format matches the client's `Accept` — two handlers on the same path can differ only by `produces` (JSON vs XML vs PDF), and Spring negotiates.
 
 ## Params and headers as routing conditions
 
+```java
 @GetMapping("/api/search")
 public Result search(@RequestParam String q) { ... }
 
 // Same path, different behavior based on a header or param — rarely needed, but available:
 @GetMapping(path = "/api/orders", params = "status=shipped")
+```
 public List<Order> shippedOnly() { ... }
 
 @GetMapping(path = "/api/orders", headers = "X-API-Version=2")

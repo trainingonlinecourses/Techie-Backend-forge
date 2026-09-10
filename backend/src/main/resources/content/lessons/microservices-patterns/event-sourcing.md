@@ -335,8 +335,10 @@ With traditional storage, the wrong data is already written and you'd need a dat
 
 Customer service asks: "What was John's balance on March 3rd?"
 
+```java
 Account account = accountStore.loadUntil("john-123", Instant.parse("2024-03-03T23:59:59Z"));
 // Replay only events up to March 3 — get exact historical state
+```
 
 ---
 

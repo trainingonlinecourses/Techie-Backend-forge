@@ -18,13 +18,17 @@ docs:
 
 A business operation often spans several services: place an order (order service), reserve stock (inventory), charge the card (payment), schedule shipping (shipping). A *distributed transaction* across all of them — the classic ACID transaction — is precisely what microservices gave up: no single database, no global lock, no rollback across services. **The saga pattern** is the industry's answer: the operation is a *sequence of local transactions*, each with its own database, and if one fails, **compensating transactions** undo the ones before it.
 
+```java
 **The mental model:** a saga is a long road trip with hotel bookings. Each leg (booking a hotel) is a local, independent transaction. If a later leg fails (the next hotel is full), you don't "roll back" the whole trip — you *compensate*: cancel the earlier hotels (each with its own cancellation). The trip as a whole either completes or unwinds — but the unwinding is a series of deliberate *undo actions*, not an atomic rollback. There's no global transaction manager; the participants cooperate through events.
 
 **The critical distinction:** compensation is **not** rollback. Rollback restores the *previous state* (atomic, instant). Compensation performs *new actions* that undo the *effect*: "CancelPayment" refunds the charge; "ReleaseStock" returns reserved units. A compensation can fail, take time, and is itself a real business operation — which is why sagas are designed with eventual consistency and compensating steps in mind from the start.
+```
 
 ## Choreography: The Event-Driven Saga
 
+```java
 **Choreographed sagas** are pure event-driven architecture: each service does its local transaction and *publishes an event*; the next service reacts to the event; failures publish *failure events* that trigger compensations:
+```
 
 ```text
 OrderPlaced ──▶ InventoryService: reserve stock
@@ -75,7 +79,9 @@ public class InventorySagaStep {
 }
 ```
 
+```java
 **The choreography pros:** zero central coordinator, pure events, each service independent. **The cons:** the flow is *implicit* — scattered across listeners — and hard to see or debug; adding a step means wiring new events; loops are possible. For short, simple sagas, choreography is the natural fit — it's just event-driven programming with compensations.
+```
 
 ## Orchestration: The Central Conductor
 
@@ -115,9 +121,11 @@ public class OrderSagaOrchestrator {
 }
 ```
 
+```java
 **The orchestration pros:** the flow is *explicit* — one component, a visible state machine, easy to trace and test; failure handling is centralized. **The cons:** the orchestrator is a single point of coupling (and, if poorly built, a bottleneck) — a "smart" component that must itself be reliable.
 
 **The choice:** **choreography** for short, naturally event-driven flows; **orchestration** when the saga is long, failure paths are complex, or the flow must be visible and audited (which is most real business sagas).
+```
 
 ## The Saga Reliability Requirements
 
@@ -131,9 +139,11 @@ A saga is reliable only if its parts are:
 
 ## The Two Kinds of Failure
 
+```java
 **Technical failures** (a service is down, a timeout): handled by retries and timeouts within the saga framework — the step is retried, or the saga fails over to compensation after N attempts.
 
 **Business failures** (stock is actually unavailable): *not* a retry situation — the saga must compensate what's done and stop. Distinguishing the two ("retry this; compensate that") is a core saga design decision, and it's why saga frameworks distinguish "retryable" from "terminal" errors.
+```
 
 ## Sagas vs the Alternatives
 
@@ -148,7 +158,9 @@ The layering to notice: sagas are built *on* the event-driven fundamentals — e
 
 ## Recap
 
+```java
 Sagas are the distributed-transaction substitute for multi-service business operations: a sequence of local transactions, each in its own database, with **compensating actions** that unwind the completed steps when a later one fails. **Choreographed sagas** are pure events (each step publishes, failures cascade compensations — simple but implicit); **orchestrated sagas** use a central state-machine coordinator (explicit, traceable, better for complex flows). The reliability requirements are strict: local transactions per step, idempotency everywhere, compensations designed in advance, persistent saga state, and retryable-vs-terminal failure distinction. Sagas aren't magic — they're the disciplined acceptance that cross-service operations are eventually consistent and deliberately unwindable, and that's the honest, production-grade answer to the question ACID can't answer across services.
+```
 
 ## References
 

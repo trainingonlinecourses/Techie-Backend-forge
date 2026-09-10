@@ -61,6 +61,7 @@ public class RateLimitAutoConfiguration {
 
 ## Configuration properties
 
+```java
 @ConfigurationProperties(prefix = "rate-limit")
 public class RateLimitProperties {
     private int maxRequests = 100;          // default: 100
@@ -69,6 +70,7 @@ public class RateLimitProperties {
 
     // getters and setters...
 }
+```
 
 ```yaml
 # application.yml — user just adds this
@@ -135,6 +137,7 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
 
 ## org scenario — audit logging starter
 
+```java
 @AutoConfiguration
 @ConditionalOnClass(AuditEvent.class)
 @EnableConfigurationProperties(AuditProperties.class)
@@ -152,6 +155,7 @@ public class AuditAutoConfiguration {
         return new AuditInterceptor(svc, props.getExcludePaths());
     }
 }
+```
 
 ```yaml
 # Teams enable with one property

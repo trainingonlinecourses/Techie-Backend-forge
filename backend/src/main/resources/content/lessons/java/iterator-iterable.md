@@ -18,10 +18,12 @@ Java's `for-each` loop (`for (Item item : items)`) does not require an array —
 Behind the scenes, `for (Item item : items)` is syntactic sugar for:
 
 Iterator<Item> it = items.iterator();
+```java
 while (it.hasNext()) {
     Item item = it.next();
     // body
 }
+```
 
 **Why this matters:** if you implement `Iterable` on your custom collection, it becomes compatible with `for-each`, `StreamSupport.stream()`, `Stream.of()`, `Collection.addAll()`, and every library that accepts `Iterable<T>` (Spring's `JpaRepository`, Guava's `Lists.newArrayList()`, etc.).
 
@@ -47,16 +49,22 @@ A database query returns 100K records, but loading them all into memory causes a
 public class PagedEntityIterator<T> implements Iterator<T> {
 
     private final Function<Integer, Page<T>> pageFetcher;
+```java
     private int currentPage = 0;
+```
     private Iterator<T> currentBatch;
+```java
     private boolean hasMore = true;
+```
 
     public PagedEntityIterator(Function<Integer, Page<T>> pageFetcher) {
+```java
         this.pageFetcher = pageFetcher;
         loadNextPage();
     }
 
     private void loadNextPage() {
+```
         Page<T> page = pageFetcher.apply(currentPage++);
         currentBatch = page.getContent().iterator();
         hasMore = !page.isLast();
@@ -93,7 +101,9 @@ public void processAllOrders() {
 public class AuditLogBatch implements Iterable<AuditEntry> {
 
     private final List<AuditEntry> entries;
+```java
     private final BatchSender sender;
+```
 
     public AuditLogBatch(List<AuditEntry> entries, BatchSender sender) {
         this.entries = entries;
@@ -117,7 +127,9 @@ public class AuditLogBatch implements Iterable<AuditEntry> {
 }
 
 // Spring Data works with Iterable — JPA repositories accept Iterable<T> for batch delete
+```java
 auditLogRepository.deleteAll(auditLogBatch);  // our Iterable, not a List
+```
 
 ### Scenario 3: Iterator pattern in Stream API
 
@@ -143,16 +155,19 @@ public class OrderQueue implements Iterable<Order> {
 
 List<String> names = new ArrayList<>(List.of("Alice", "Bob", "Charlie"));
 
+```java
 for (String name : names) {
     if (name.equals("Bob")) {
         names.remove(name);  // ConcurrentModificationException!
     }
 }
+```
 
 The iterator detects that `names` was structurally modified and throws. **Safe alternatives:**
 
 // Option 1: use Iterator.remove()
 Iterator<String> it = names.iterator();
+```java
 while (it.hasNext()) {
     if (it.next().equals("Bob")) {
         it.remove();  // safe — iterator tracks its own modification
@@ -163,9 +178,12 @@ while (it.hasNext()) {
 names.removeIf(name -> name.equals("Bob"));
 
 // Option 3: collect to a new list
+```
 List<String> filtered = names.stream()
     .filter(name -> !name.equals("Bob"))
+```java
     .toList();
+```
 
 ## Common mistakes
 

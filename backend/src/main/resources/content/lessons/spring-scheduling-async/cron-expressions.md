@@ -66,7 +66,9 @@ Using `*` in both day fields is ambiguous — Spring treats `* *` as "every day 
 
 ### W — nearest weekday (day-of-month only)
 "0 0 9 15W * ?"      // 9 AM on the weekday nearest the 15th
+```java
 If the 15th is a Saturday, this fires Friday the 14th; if Sunday, Monday the 16th.
+```
 
 ### # — nth weekday (day-of-week only)
 "0 0 9 ? * 2#1"      // 9 AM on the first Monday of the month
@@ -105,19 +107,24 @@ The same code, clean:
 
 By default, cron expressions evaluate in the JVM's default timezone — which is the **server's** timezone. A 3 AM job on a server in UTC runs at 3 AM UTC, not 3 AM your time. Fix it explicitly:
 
+```java
 @Scheduled(cron = "0 0 3 * * *", zone = "Asia/Kolkata")
 public void nightlyReport() { ... }
+```
 
 The `zone` attribute accepts any `java.time.ZoneId` string. For schedules from configuration:
 
 @Scheduled(cron = "${app.jobs.cron}", zone = "${app.jobs.zone}")
+```java
 public void job() { ... }
+```
 
 ## Testing Cron Expressions
 
 Never trust a cron string by eye. Options:
 
 1. **Spring's `CronExpression`** (available since Spring 5.3):
+```java
 public class Main {
 
     public static void main(String[] args) {
@@ -126,8 +133,10 @@ public class Main {
         System.out.println("Next run: " + next);
     }
 }
+```
 
 2. **Unit test the next-fire times**:
+```java
 @Test
 void cronFiresAtThreeAm() {
     CronExpression cron = CronExpression.parse("0 0 3 * * *");
@@ -135,6 +144,7 @@ void cronFiresAtThreeAm() {
     Instant next = cron.next(base);
     assertEquals(Instant.parse("2026-08-19T03:00:00Z"), next);
 }
+```
 
 3. **Online validators** (crontab.guru etc.) for quick sanity — but remember they assume 5-field Unix cron; mentally add the seconds field.
 

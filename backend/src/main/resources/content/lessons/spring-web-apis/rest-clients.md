@@ -30,11 +30,13 @@ public class PaymentClient {
         this.client = builder
             .baseUrl("https://payments.internal/api")
             .defaultHeader("X-Tenant", "acme")
+```java
             .build();
     }
 
     public Payment create(CreatePaymentRequest req) {
         return client.post().uri("/payments")
+```
             .contentType(MediaType.APPLICATION_JSON)
             .body(req)
             .retrieve()
@@ -51,13 +53,17 @@ client = builder.requestFactory(new JdkClientHttpRequestFactory(
 - **Error handling** — `retrieve()` throws `RestClientResponseException` on 4xx/5xx; decide the strategy:
 
 .retrieve()
+```java
 .onStatus(s -> s.value() >= 500, (req, res) -> { throw new UpstreamDownException(res.getStatusText()); })
 .body(Payment.class);
 
 // Or the "exchange" variant for full control (also lets you read the error body):
+```
 .exchange((req, res) -> res.getStatusCode().is2xxSuccessful()
     ? res.bodyTo(Payment.class)
+```java
     : handleError(res));
+```
 
 - **Retry** — RestClient itself doesn't retry; wrap with **Spring Retry** (`@Retryable` on the calling service method or a `RetryTemplate`) for idempotent calls (GETs, PUTs with idempotency keys — never blind POSTs).
 
@@ -66,11 +72,15 @@ client = builder.requestFactory(new JdkClientHttpRequestFactory(
 Mono<Payment> payment = WebClient.create("https://payments.internal/api")
     .post().uri("/payments").bodyValue(req)
     .retrieve()
+```java
     .bodyToMono(Payment.class);
 
 // Streaming a feed:
+```
 Flux<Event> events = client.get().uri("/events")
+```java
     .retrieve().bodyToFlux(Event.class);
+```
 
 Blocking-free end to end (Netty, no thread-per-request), streaming bodies, backpressure — the WebFlux module covers the model; here the point is: in a **reactive** stack, use WebClient; in a servlet stack, RestClient is simpler and debuggable.
 

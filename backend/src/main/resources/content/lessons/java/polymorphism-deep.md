@@ -21,8 +21,10 @@ This is the foundation of the **Template Method**, **Strategy**, **Decorator**, 
 
 ## Compile-time vs runtime type
 
+```java
 Animal animal = new Dog();  // compile-time type: Animal, runtime type: Dog
 animal.makeSound();          // dispatches to Dog.makeSound()
+```
 
 The **compile-time type** determines what methods the compiler allows you to call. The **runtime type** determines which implementation executes. Java's dispatch uses the runtime type.
 
@@ -77,6 +79,7 @@ p.execute(request);
 
 Since Java 5, an overriding method can return a **narrower** (more specific) type than the parent:
 
+```java
 public class OrderBuilder {
 
     public Order build() {
@@ -93,6 +96,7 @@ public class InternationalOrderBuilder extends OrderBuilder {
         return order;
     }
 }
+```
 
 This means callers of `InternationalOrderBuilder.build()` get an `InternationalOrder` without a cast, while callers of the parent `OrderBuilder` still get `Order`. It is one of the few cases where overriding a method *strengthens* the contract.
 
@@ -220,6 +224,7 @@ Adding a new export format means writing a new subclass. The `export()` algorith
 
 ### Scenario 3: instanceof pattern matching (Java 16+)
 
+```java
 public String describe(Object obj) {
     return switch (obj) {
         case Order o    -> "Order: " + o.orderId();
@@ -229,6 +234,7 @@ public String describe(Object obj) {
         default         -> "Unknown: " + obj.getClass().getSimpleName();
     };
 }
+```
 
 Pattern matching replaces verbose `instanceof` + cast chains with readable, compiler-checked dispatch.
 

@@ -12,6 +12,7 @@ docs:
 
 Without volatile or synchronized, one thread's writes may never be seen by another thread. The JVM can reorder instructions and cache values in CPU registers.
 
+```java
 // BROKEN: one thread may never see the other's write
 boolean running = true;
 
@@ -23,6 +24,7 @@ running = false;  // Thread 1 may loop forever!
 
 
 **What this code does — step by step:**
+```
 
 1. FIXED with volatile
 2. Thread 1
@@ -46,12 +48,14 @@ running = false;
 
 `volatile` guarantees visibility (all threads see the latest write) but NOT atomicity.
 
+```java
 volatile int counter = 0;
 
 // Safe: reading is always the latest value
 int value = counter;
 
 // NOT safe: increment is not atomic
+```
 counter++;  // This is actually: read → increment → write (race condition!)
 
 **Use volatile for:**
@@ -65,12 +69,14 @@ counter++;  // This is actually: read → increment → write (race condition!)
 
 `synchronized` guarantees both visibility AND atomicity. It acquires a monitor lock.
 
+```java
 synchronized (lock) {
     // Only one thread can execute this block at a time
     counter++;
 }
 
 **Use synchronized for:**
+```
 - Compound operations (`counter++`)
 - Protecting mutable shared state
 - When you need both visibility and atomicity

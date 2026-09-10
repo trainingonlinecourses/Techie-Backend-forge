@@ -32,6 +32,7 @@ Start with URL rules, add method security where *business logic* needs guards.
 
 ## Method security
 
+```java
 @Configuration
 @EnableMethodSecurity                     // turns on @PreAuthorize etc.
 public class SecurityConfig { ... }
@@ -49,6 +50,7 @@ public class PaymentService {
     @PreAuthorize("#iban == authentication.principal.user().iban or hasRole('ADMIN')")
     public void manage(String iban) { ... }
 }
+```
 
 ## Authorities vs roles
 
@@ -57,7 +59,9 @@ Authorities are the raw strings in the token/principal. Spring Security conventi
 // Give users fine-grained permissions (org pattern):
 public Collection<? extends GrantedAuthority> getAuthorities() {
     List<GrantedAuthority> authorities = new ArrayList<>();
+```java
     authorities.add(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()));
+```
     authorities.addAll(user.getPermissions().stream()        // "account:read", "payment:create"
             .map(SimpleGrantedAuthority::new)
             .toList());

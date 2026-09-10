@@ -14,9 +14,11 @@ docs:
 
 Three tests that differ only in input/output are three maintenance problems:
 
+```java
 @Test void rejectsNegative() { assertThrows(..., () -> validate(-1)); }
 @Test void rejectsZero()     { assertThrows(..., () -> validate(0)); }
 @Test void acceptsTen()      { assertEquals(OK, validate(10)); }
+```
 
 `@ParameterizedTest` collapses them into one test with a **table of inputs** — when a bug shows up, you fix the logic once and the whole table re-verifies.
 
@@ -59,21 +61,27 @@ Rules of thumb: `@ValueSource` for scalars, `@CsvSource` for input→expected ta
 
 `@CsvSource` handles quotes: `"a,b"` is one field with a comma, `'x'` swaps in single quotes. Arguments convert automatically for common types; register a `@ConvertWith` or `@CsvTo`-style factory for custom types:
 
+```java
 @ParameterizedTest
 @CsvSource({ "2026-08-17,PENDING" })
 void appliesEffectiveDate(@JavaTimeConversionPattern("yyyy-MM-dd") LocalDate date, String status) { ... }
+```
 
 (Or simply accept `String` and convert in the test body — often clearer than converters.)
 
 ## Display names: make the report a spec
 
+```java
 @ParameterizedTest(name = "amount {0} is rejected")
 @ValueSource(ints = { -1, 0 })
 void rejectsInvalid(int amount) { ... }
+```
 
 @ParameterizedTest(name = "{0} → actionable={1}")
+```java
 @CsvSource({ "PENDING,true", "SHIPPED,false" })
 void isActionable(String status, boolean expected) { ... }
+```
 
 `{0}`, `{1}` reference arguments; the report reads "amount -1 is rejected" — the failure tells you *which row* broke without opening the file.
 
@@ -92,11 +100,13 @@ Stream<DynamicTest> fromContractFile() throws IOException {
 
 If you don't want a property-testing library (jqwik/quicktheories), a cheap approximation is `@MethodSource` + random values with invariants:
 
+```java
 @ParameterizedTest
 @MethodSource("randomOrders")
 void totalNeverNegative(Order o) {
     assertTrue(o.total().signum() >= 0, "total must never be negative");
 }
+```
 
 ## Key takeaways
 

@@ -68,6 +68,7 @@ This is the same `MessageSource` as i18n (see the i18n lesson) — validation me
 
 ## @ModelAttribute binding errors — the form-flow variant
 
+```java
 @PostMapping("/register")
 public String register(@Valid @ModelAttribute("form") RegisterForm form,
                        BindingResult binding) {
@@ -77,6 +78,7 @@ public String register(@Valid @ModelAttribute("form") RegisterForm form,
     userService.register(form);
     return "redirect:/login";                    // PRG — see the redirect lesson
 }
+```
 
 With `@ModelAttribute`, the `BindingResult` must immediately follow the validated parameter — the framework validates, and *you* decide the outcome (re-render vs redirect), unlike the `@RequestBody` path where the advice handles it.
 
@@ -86,10 +88,12 @@ With `@ModelAttribute`, the `BindingResult` must immediately follow the validate
 
 **Scenario 2 — cross-field validation.** Bean Validation's field constraints can't check "end ≥ start". Options: a class-level custom constraint, `@ScriptAssert`, or a `@AssertTrue` method on the DTO:
 
+```java
 public record BookingRequest(Instant start, Instant end) {
     @AssertTrue(message = "end must be after start")
     public boolean isRangeValid() { return end.isAfter(start); }
 }
+```
 
 **Scenario 3 — group-based create vs update.** `@Validated(CreateGroup.class)` on the controller param activates only the create-group constraints (see the method-validation lesson for the service-side version).
 

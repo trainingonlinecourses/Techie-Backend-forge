@@ -52,6 +52,7 @@ public record UserResponse(
     Long id,
     String name,
     String email
+```java
 ) {
     // No passwordHash, no SSN, no deleted flag
 }
@@ -62,6 +63,7 @@ public UserResponse getUser(@PathVariable Long id) {
     return new UserResponse(user.getId(), user.getName(), user.getEmail());
     // Only safe fields are returned
 }
+```
 
 ### Why DTOs Exist
 
@@ -289,6 +291,7 @@ public record TransactionRequest(
     @NotNull Long toAccountId,
     @Positive BigDecimal amount,
     String description
+```java
 ) {}
 // ^ Client sends only what's needed — server adds timestamp, generates ID
 
@@ -296,6 +299,7 @@ public record TransactionRequest(
 public record PostResponse(Long id, String content, String authorName,
     Instant createdAt, int likeCount, boolean isLikedByMe) {}
 // ^ Includes computed fields (likeCount, isLikedByMe) — not in database
+```
 
 ### Key Takeaways
 

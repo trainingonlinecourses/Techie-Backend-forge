@@ -19,10 +19,12 @@ Before Spring Boot, setting up a Spring application required:
 3. Deploying to an external server (Tomcat, Jetty) — download WAR, configure it, deploy.
 4. Adding dozens of dependencies with exact version numbers.
 
+```java
 **Beginner mental model:** Spring Boot is like ordering a complete meal at a restaurant instead of shopping for ingredients, cooking, and plating yourself. Spring gave you the ingredients; Spring Boot gives you the full meal with a recipe.
 
 
 **What this code does — step by step:**
+```
 
 1. BEFORE Spring Boot (traditional Spring): 1. web.xml — 50 lines of XML to configure a servlet. 2. applicationContext.xml — 100 lines to configure beans. 3. pom.xml — 30 dependencies with exact versions. 4. Deploy WAR to Tomcat manually. Total: ~3 hours to get a "Hello World" running
 2. AFTER Spring Boot:

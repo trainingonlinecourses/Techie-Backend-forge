@@ -61,6 +61,7 @@ spring:
 
 Better yet, use `spring-boot-devtools` with a custom restart strategy:
 
+```java
 @Configuration
 public class DevToolsConfig {
 
@@ -69,6 +70,7 @@ public class DevToolsConfig {
         return new ConditionalOnDevToolsRestart();
     }
 }
+```
 
 ---
 

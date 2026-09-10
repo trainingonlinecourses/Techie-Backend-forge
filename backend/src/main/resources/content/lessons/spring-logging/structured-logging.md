@@ -121,6 +121,7 @@ services:
 
 ### Scenario 2: Custom log fields
 
+```java
 // Add custom fields to every log line
 @Component
 public class RequestContextFilter implements Filter {
@@ -139,6 +140,7 @@ public class RequestContextFilter implements Filter {
         }
     }
 }
+```
 
 ---
 

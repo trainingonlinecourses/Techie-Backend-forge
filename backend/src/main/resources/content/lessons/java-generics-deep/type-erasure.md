@@ -42,11 +42,13 @@ And at the call site:
 
 // What YOU write:
 Box<String> box = new Box<>();
+```java
 String s = box.get();
 
 // What the compiler emits:
 Box box = new Box();          // no type arguments survive
 String s = (String) box.get(); // a cast is inserted for you
+```
 
 Notice the key mechanics: `T` was replaced with `Object` (its erasure), and the compiler inserted a cast at the point where you read a value back. The type checking happened at compile time; the runtime only needs the cast to keep the old bytecode contract. This is why your `get()` call can never throw a surprise `ClassCastException` — the compiler already verified that only `String`s went in.
 
@@ -55,8 +57,10 @@ Notice the key mechanics: `T` was replaced with `Object` (its erasure), and the 
 If a type parameter has a bound, it erases to the bound instead of `Object`:
 
 public static <T extends Comparable<T>> T max(List<T> list) { ... }
+```java
 // erases to:
 public static Comparable max(List list) { ... }
+```
 
 That's why the `compareTo` call worked in the previous lesson: after erasure, `T` is `Comparable`, and `Comparable` has `compareTo`. The bound serves double duty — it lets *you* call methods on `T` at compile time, and it determines the erasure.
 

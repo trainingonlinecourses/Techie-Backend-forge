@@ -128,7 +128,9 @@ steps:
   - run: ./mvnw -B verify
 ```
 
+```java
 This runs 2×2 = 4 builds. Use matrices for supported-versions testing; keep the deploy job matrix-free.
+```
 
 ## Secrets and Environment
 

@@ -42,6 +42,7 @@ public class FileUploadController {
 
     @PostMapping("/upload")
     public ResponseEntity<FileMetadata> upload(
+```java
             @RequestParam("file") MultipartFile file,
             @RequestParam(defaultValue = "general") String category) {
 
@@ -58,6 +59,7 @@ public class FileUploadController {
 public class FileStorageService {
 
     private final Path storageRoot;
+```
 
     public FileStorageService(@Value("${app.storage.root:/data/uploads}") String root) {
         this.storageRoot = Path.of(root);
@@ -82,7 +84,9 @@ public class FileStorageService {
 
 ## Download: streaming with Content-Disposition
 
+```java
 @GetMapping("/download/{category}/{filename}")
+```
 public ResponseEntity<Resource> download(
         @PathVariable String category,
         @PathVariable String filename) {
@@ -123,10 +127,14 @@ public class S3FileStorageService {
                 .bucket(bucket)
                 .key(key)
                 .contentType(file.getContentType())
+```java
                 .build();
+```
 
             s3.putObject(request,
+```java
                 RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
+```
 
             return "https://" + bucket + ".s3.amazonaws.com/" + key;
 
@@ -158,6 +166,7 @@ fetch('/api/files/upload', {
 
 @PostMapping("/profile/picture")
 public ResponseEntity<Void> uploadProfilePicture(
+```java
         @RequestParam("file") MultipartFile file) {
 
     // Validate before storing
@@ -173,6 +182,7 @@ public ResponseEntity<Void> uploadProfilePicture(
     storageService.store(file, "profile-pictures");
     return ResponseEntity.ok().build();
 }
+```
 
 ### Scenario 2: bulk CSV import with streaming
 
@@ -210,11 +220,13 @@ public ResponseEntity<PresignedUrl> getPresignedUploadUrl(
         .bucket(bucket)
         .key(key)
         .contentType(contentType)
+```java
         .build();
 
     PresignedPutObjectRequest presigned = presigner.presignPutObject(request);
 
     return ResponseEntity.ok(new PresignedUrl(
+```
         presigned.url().toString(),
         key,
         presigned.expiration().toEpochMilli()

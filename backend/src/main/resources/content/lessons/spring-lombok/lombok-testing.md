@@ -12,6 +12,7 @@ docs:
 
 Lombok works great with testing frameworks, but there are specific gotchas with Jackson (JSON), JPA (entities), and Mockito (mocking). Here's how to avoid them.
 
+```java
 // ✅ Good: DTO with Jackson
 @Data @Builder @NoArgsConstructor @AllArgsConstructor
 public class UserDto {
@@ -27,6 +28,7 @@ public class User {
     private Long id;
     private String name;
 }
+```
 
 ---
 
@@ -146,6 +148,7 @@ TestOrder order = TestData.anOrder().id(1L).build();
 
 ### Scenario 2: JPA entity with Lombok
 
+```java
 @Entity
 @Getter @Setter
 @EqualsAndHashCode(of = "id")  // only use ID for equality
@@ -168,6 +171,7 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Role role;
 }
+```
 
 ---
 

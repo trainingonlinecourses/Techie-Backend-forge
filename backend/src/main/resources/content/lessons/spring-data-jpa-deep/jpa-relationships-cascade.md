@@ -35,10 +35,12 @@ public class OrderItem {
 
 **The rule every JPA developer learns the hard way:** you must maintain **both sides** of the association in memory (add to `order.items` AND set `item.order`), because Hibernate writes the FK from the owning side's state. A helper method on the aggregate is the standard pattern:
 
+```java
 public void addItem(OrderItem item) {
     items.add(item);
     item.setOrder(this);     // keep both sides in sync — otherwise the FK is never set!
 }
+```
 
 ## Cascade types — what operations propagate
 

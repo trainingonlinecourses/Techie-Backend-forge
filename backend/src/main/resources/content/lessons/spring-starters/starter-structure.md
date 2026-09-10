@@ -53,6 +53,7 @@ com.example.auto.MyAutoConfiguration
 
 ### Configuration Class
 
+```java
 package com.example.auto;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -70,6 +71,7 @@ public class MyAutoConfiguration {
         return new MyService();
     }
 }
+```
 
 ### pom.xml
 

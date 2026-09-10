@@ -18,7 +18,9 @@ A Docker image is a **frozen snapshot** of an application and everything it need
 
 Why "works on my machine" disappears with Docker: the image *is* the machine. The same image runs identically on your laptop, the CI server, and the production cluster — because it contains its own environment.
 
+```java
 The mental model: the Dockerfile describes *construction steps* (install Java, copy the jar, set the command), Docker executes them, and the result is an immutable artifact. The image is the deliverable; the container is a *running instance* of it.
+```
 
 ## The Anatomy of a Dockerfile
 

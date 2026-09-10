@@ -16,12 +16,14 @@ Every scheduled task in this module so far assumes a **single instance**. The mo
 
 ## The Problem
 
+```java
 @Scheduled(cron = "0 0 3 * * *")
 public void reconcile() {
     // runs on EVERY replica in a cluster ❌
 }
 
 With 3 replicas, the job runs 3×. For idempotent jobs that's wasteful; for most jobs it's a correctness bug.
+```
 
 ## Approaches
 
@@ -66,6 +68,7 @@ CREATE TABLE shedlock (
 
 ### 3. Configure the lock provider
 
+```java
 @Configuration
 @EnableSchedulerLock(defaultLockAtMostFor = "15m")
 public class ShedLockConfig {
@@ -75,9 +78,11 @@ public class ShedLockConfig {
         return new JdbcTemplateLockProvider(dataSource);
     }
 }
+```
 
 ### 4. Annotate jobs
 
+```java
 @Service
 public class NightlyJobs {
 
@@ -87,6 +92,7 @@ public class NightlyJobs {
         // runs on exactly ONE node
     }
 }
+```
 
 - `lockAtMostFor` — how long the lock may be held in the worst case (node crash). Must be longer than the longest possible run.
 - `lockAtLeastFor` — minimum hold time, prevents a fast job from re-firing immediately after completion.
@@ -99,6 +105,7 @@ If a node grabs the lock and dies, ShedLock waits `lockAtMostFor` before letting
 
 Beyond locking individual jobs, you can elect a single **leader** for the whole application — useful when only the leader should consume from a queue or refresh a shared cache:
 
+```java
 @Service
 public class LeaderService {
 
@@ -115,6 +122,7 @@ public class LeaderService {
     // Better: re-check leadership each run
     public boolean isLeader() { return isLeader; }
 }
+```
 
 Careful: the node that holds the lock *this minute* may lose it *next minute*. Use leadership to gate short tasks, not to hold long-lived state.
 
@@ -139,6 +147,7 @@ The official Kubernetes client library (`io.kubernetes:client-java`) provides `L
 
 Distributed locks reduce duplicate runs — they don't eliminate them (clock skew, expired locks, split brain). Every scheduled job that touches shared state should also be **idempotent**: running it twice must produce the same result as running it once.
 
+```java
 public void reconcile() {
     // Process only invoices in state PENDING and flip them to PROCESSED atomically
     int updated = invoiceRepository.markPendingAsProcessing();
@@ -148,6 +157,7 @@ public void reconcile() {
     }
     // ...only THIS run processes the claimed rows
 }
+```
 
 The atomic `UPDATE ... WHERE status='PENDING' RETURNING` claim pattern makes even an unlocked double-run safe.
 
@@ -162,6 +172,7 @@ Whatever mechanism you choose, track:
 
 A simple Micrometer counter on job outcomes pays for itself the first time a job silently doubles:
 
+```java
 @SchedulerLock(name = "nightly-reconcile", lockAtMostFor = "30m")
 public void reconcile() {
     try {
@@ -172,6 +183,7 @@ public void reconcile() {
         throw e;
     }
 }
+```
 
 ## Summary
 
@@ -183,7 +195,9 @@ public void reconcile() {
 | K8s Lease | Native leader election on Kubernetes |
 | Claim-based idempotency | The pattern every job should have anyway |
 
+```java
 Distributed scheduling is one lock, one expiry, and one idempotency guarantee away from safe. Start with ShedLock + claim-based processing; graduate to Quartz or K8s leader election only when the requirements actually demand them.
+```
 
 ## References
 

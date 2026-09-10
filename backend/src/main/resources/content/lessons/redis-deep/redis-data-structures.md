@@ -4,8 +4,10 @@ module: redis-deep
 order: 2
 minutes: 27
 topics: ["Redis", "data structures", "strings", "hashes", "sorted sets", "caching"]
+```java
 summary: import redis.clients.jedis.Jedis;
 docs:
+```
   - title: "Redis Data Types (redis.io)"
     url: "https://redis.io/docs/latest/develop/data-types/"
   - title: "An Introduction to Redis Data Types (redis.io)"
@@ -20,7 +22,9 @@ docs:
 
 **The mental model:** Redis is a giant, fast, shared dictionary with *typed values*. Unlike a plain key-value store where values are opaque blobs, Redis knows what each value *is* (a list? a set? a hash?) and can run efficient operations *inside* the structure server-side — `LPUSH`, `SADD`, `ZINCRBY` — without shipping data back and forth to your application. The operations live next to the data, so they're atomic and fast.
 
+```java
 **Why in-memory matters:** a disk read is ~10,000× slower than a RAM read. Databases optimize for durability and big data; Redis optimizes for *speed* on the working set. The classic architecture: hot data lives in Redis (fast reads), the authoritative copy lives in Postgres (durable writes) — Redis as a caching layer in front of the database, exactly how Spring Boot apps wire it.
+```
 
 ## The Five Core Structures
 
@@ -106,14 +110,17 @@ Redis has one flat key space — no tables, no schemas. The convention is the **
 
 Every Redis key can carry a **time-to-live** — the key auto-deletes after N seconds:
 
+```java
 redis.setex("cache:user:42", 300, json);     // cache for 5 minutes
 Long ttl = redis.ttl("cache:user:42");       // seconds remaining
 redis.persist("cache:user:42");              // remove the expiry
+```
 
 TTLs are what keep caches from growing forever and stale data from living forever. The pattern: read Redis → if miss, load from DB, store with TTL → serve. The TTL bounds staleness: at worst, data is as old as the TTL.
 
 ## Pipelining and Atomicity: Doing More, Faster
 
+```java
 **Pipelining** batches many commands into one round trip — the difference between 1000 network round trips and 1:
 
 Pipeline p = redis.pipelined();
@@ -121,6 +128,7 @@ for (int i = 0; i < 1000; i++) p.set("k" + i, "v" + i);
 p.sync();   // all 1000 sent together
 
 **MULTI/EXEC** gives *transactions*: commands buffer, then execute atomically — no other client's commands interleave. Redis single-threaded execution model means each command is already atomic; MULTI extends that to a *sequence*. (Lua scripts give even richer atomicity — the basis of the Redis rate-limiter patterns.)
+```
 
 ## Recap
 

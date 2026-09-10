@@ -281,29 +281,37 @@ public class OrderItem {
 ## Real-World Scenarios
 
 ### Scenario 1: Parsing SOAP responses from a payment gateway
+```java
 // SOAP services return XML — JAXB unmarshals it into typed objects
 SOAPMessage response = callPaymentGateway(request);
 JAXBContext ctx = JAXBContext.newInstance(PaymentResponse.class);
+```
 PaymentResponse result = (PaymentResponse) ctx.createUnmarshaller()
+```java
     .unmarshal(response.getSOAPBody().extractContentAsDocument());
 if (result.isApproved()) { ... }
+```
 
 ### Scenario 2: Generating reports in XML format for a government system
+```java
 // Government tax APIs often require XML submissions
 TaxReturn taxReturn = buildTaxReturn(user, deductions);
 JAXBContext ctx = JAXBContext.newInstance(TaxReturn.class);
 Marshaller m = ctx.createMarshaller();
 m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 m.marshal(taxReturn, new File("tax-submission-2024.xml"));
+```
 
 ### Scenario 3: Migrating between XML schemas
 // Old system uses <usr_name>, new system uses <username>
+```java
 // Map both to the same field with @XmlElement
 @XmlRootElement(name = "user")
 public class UnifiedUser {
     @XmlElement(name = "usr_name")      // old schema element name
     private String name;
 }
+```
 
 ## Common Beginner Pitfalls
 

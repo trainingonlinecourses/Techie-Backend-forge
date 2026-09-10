@@ -82,6 +82,7 @@ try (var scope = new StructuredTaskScope.ShutdownOnFailure()) {
 
 ## org patterns
 
+```java
 **Parallel API aggregation:** call 3 microservices simultaneously, combine results:
 
 public OrderDetails getOrderDetails(long orderId) throws Exception {
@@ -97,6 +98,7 @@ public OrderDetails getOrderDetails(long orderId) throws Exception {
 }
 
 **Retry with fallback:** first try with timeout, fallback to cached:
+```
 
 try (var scope = new StructuredTaskScope.ShutdownOnSuccess<Data>()) {
     scope.fork(() -> freshDataService.get(key));       // primary

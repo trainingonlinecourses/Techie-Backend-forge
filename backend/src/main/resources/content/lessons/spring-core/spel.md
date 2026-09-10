@@ -113,10 +113,14 @@ public class AppConfig {
 public class FeatureFlags {
 
     @Value("#{${app.feature.cache-enabled:false} ? 'redis' : 'concurrent-map'}")
+```java
     private String cacheType;                                // "redis" if enabled, "concurrent-map" otherwise
+```
 
     @Value("#{${app.profile} == 'production' ? 'INFO' : 'DEBUG'}")
+```java
     private String logLevel;                                 // INFO in prod, DEBUG elsewhere
+```
 
     @Value("#{${app.replicas:1} > 1 ? true : false}")
     private boolean multiInstance;                           // True if multiple replicas
@@ -124,6 +128,7 @@ public class FeatureFlags {
 
 ### 4. SpEL in Annotations
 
+```java
 // @Scheduled with SpEL:
 @Scheduled("#{@cronConfig.orderCleanup}")                    // References a bean's method that returns cron expression
 public void cleanupOldOrders() { ... }
@@ -137,6 +142,7 @@ public User findUser(String userId, String region) { ... }
 public User getUser(String userId) { ... }
 
 @PostFilter("filterObject.region == authentication.details.region")
+```
 public List<Order> getAllOrders() { ... }
 
 ---

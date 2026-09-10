@@ -4,8 +4,10 @@ module: spring-webmvc-advanced
 order: 13
 minutes: 18
 topics: ["ViewResolver", "Thymeleaf", "View", "model attributes", "redirect vs forward", "template engines"]
+```java
 summary: A controller returns a logical view name; a ViewResolver turns it into rendered HTML. Understanding the resolver chain, the model, and the redirect...
 docs:
+```
   - title: "View resolution"
     url: "https://docs.spring.io/spring-framework/reference/web/webmvc.html#mvc-viewresolver"
 ---
@@ -32,6 +34,7 @@ View.render(model, request, response)
 
 Spring checks resolvers **in order** and uses the first that resolves:
 
+```java
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
@@ -42,6 +45,7 @@ public class WebConfig implements WebMvcConfigurer {
         registry.jsp("/WEB-INF/jsp/", ".jsp");   // JSP last
     }
 }
+```
 
 Precedence is configuration order: put the primary engine first.
 
@@ -86,6 +90,7 @@ Thymeleaf templates are valid HTML that render in the browser even before the se
 - `model.addAttribute(...)` — per-request data.
 - `@ModelAttribute` methods — populated for **every** handler in the controller:
 
+```java
 @Controller
 public class BaseController {
 
@@ -99,6 +104,7 @@ public class BaseController {
         return authentication == null ? null : userService.find(authentication.getName());
     }
 }
+```
 
 These appear in every template as `${appName}`, `${currentUser}`.
 
@@ -113,12 +119,14 @@ These appear in every template as `${appName}`, `${currentUser}`.
 
 Never return a view directly after a state-changing POST — a refresh would resubmit:
 
+```java
 @PostMapping("/courses")
 public String create(@Valid @ModelAttribute CourseForm form, BindingResult result) {
     if (result.hasErrors()) return "course/form";
     Course course = courseService.create(form);
     return "redirect:/courses/" + course.getId();   // PRG
 }
+```
 
 ### Redirect Attributes
 
@@ -141,17 +149,20 @@ Controller methods may return:
 - `void` + `@ResponseStatus` — body written directly
 - `ResponseEntity` / `@ResponseBody` — no view at all
 
+```java
 @GetMapping("/courses/{id}")
 public ModelAndView detail(@PathVariable Long id) {
     ModelAndView mav = new ModelAndView("course/detail");
     mav.addObject("course", courseService.findById(id));
     return mav;
 }
+```
 
 ## Content Negotiation With Views
 
 The same data as HTML **or** JSON depending on `Accept`:
 
+```java
 @GetMapping("/courses/{id}")
 public String detail(@PathVariable Long id, Model model) {
     model.addAttribute("course", courseService.findById(id));
@@ -162,6 +173,7 @@ public String detail(@PathVariable Long id, Model model) {
 public @ResponseBody CourseDto detailJson(@PathVariable Long id) {
     return CourseDto.from(courseService.findById(id));
 }
+```
 
 `produces` routes `Accept: application/json` to the second handler; browsers (HTML Accept) get the view.
 
@@ -190,11 +202,13 @@ class ViewTest {
             .andExpect(status().isOk())
             .andExpect(view().name("course/detail"))
             .andExpect(model().attributeExists("course"))
+```java
             .andExpect(content().string(containsString("Spring Boot")));
     }
 
     @Test
     void postRedirectsAfterCreate() throws Exception {
+```
         mockMvc.perform(post("/courses")
                 .param("title", "New Course"))
             .andExpect(status().is3xxRedirection())

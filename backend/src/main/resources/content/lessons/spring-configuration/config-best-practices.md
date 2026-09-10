@@ -47,10 +47,12 @@ The test: *"would this value change if I deployed to another environment?"* If y
 
 ### 2. Secrets fail fast when missing
 
+```java
 // BAD — secret defaults let misconfig slip through
 private final String apiKey = "dev-key-placeholder";     // goes to prod as-is!
 
 // GOOD — no default: startup fails with a clear error if unset
+```
 //   app.api-key: ${API_KEY}
 
 A secret with a default is a **silent security hole** — the app starts with the placeholder and "works" until it hits the real API and gets 401s. Require secrets via a placeholder with **no default** so boot fails loudly in an environment that forgot to provide them.
@@ -111,6 +113,7 @@ Production overrides come from **env vars** (platform secret managers), not from
 
 ### 6. Fail fast — validate at startup
 
+```java
 // Use a startup validator so misconfiguration never reaches users:
 @ConfigurationProperties(prefix = "app")
 @Validated
@@ -118,6 +121,7 @@ public record AppProperties(
         @NotBlank String dbUrl,
         @NotBlank String apiKey,
         @Min(1) int maxRetries) {}
+```
 
 Boot validation + `@Validated` = the app **refuses to start** with invalid config. A 10-second startup failure is a gift compared to a 2 AM outage from a bad value discovered at runtime.
 

@@ -48,12 +48,14 @@ public class JwtService {
         this.props = props;
         SecretKey key = new SecretKeySpec(props.jwt().secret().getBytes(UTF_8), "HmacSHA256");
         JWKSource<SecurityContext> jwkSource = new ImmutableSecret<>(key);
+```java
         this.encoder = new NimbusJwtEncoder(jwkSource);        // HS256 signing
         this.decoder = NimbusJwtDecoder.withSecretKey(key).macAlgorithm(MacAlgorithm.HS256).build();
     }
 
     public String issue(User user) {
         Instant now = Instant.now();
+```
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .issuer("backendforge-academy")
                 .issuedAt(now)
@@ -77,6 +79,7 @@ public class JwtService {
 
 ## The authentication filter
 
+```java
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
 
@@ -101,6 +104,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         chain.doFilter(request, response);
     }
 }
+```
 
 Registered in the chain: `http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)`.
 
@@ -116,7 +120,9 @@ http
     .authorizeHttpRequests(a -> a
         .requestMatchers("/api/auth/**", "/actuator/health").permitAll()
         .anyRequest().authenticated())
+```java
     .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+```
 
 ## JWT best practices
 

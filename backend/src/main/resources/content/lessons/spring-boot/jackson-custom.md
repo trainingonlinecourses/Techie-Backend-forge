@@ -46,6 +46,7 @@ public class JacksonConfig {
 
 You can't annotate a class you don't own. Mixins let you add Jackson annotations to any class:
 
+```java
 public abstract class InetAddressMixin {
     @JsonProperty("address")
     @JsonGetter("address")
@@ -58,6 +59,7 @@ public Jackson2ObjectMapperBuilderCustomizer inetAddressMixin() {
     return builder -> builder.mixIn(InetAddress.class, InetAddressMixin.class);
 }
 // Now InetAddress serializes as {"address": "192.168.1.1"} instead of {}
+```
 
 ## Naming strategies — camelCase, snake_case, kebab-case
 
@@ -71,10 +73,12 @@ spring:
     time-zone: UTC
 ```
 
+```java
 // Or per-controller via annotation
 @JsonPropertyNaming(PropertyNamingStrategies.SnakeCase.class)
 @RestController
 public class UserController { }
+```
 
 ## Per-field control with annotations
 
@@ -121,6 +125,7 @@ public class JacksonConfig {
 
 ## org scenarios
 
+```java
 **Enum as string in API:**
 
 public enum OrderStatus {
@@ -144,10 +149,13 @@ public enum OrderStatus {
 
 public record UserResponse(
     long id,
+```
     String displayName,
+```java
     @JsonIgnore String passwordHash,       // never serialize
     @JsonInclude(Include.NON_NULL) String email  // only if set
 ) {}
+```
 
 ## Key takeaways
 

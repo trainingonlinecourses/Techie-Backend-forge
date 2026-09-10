@@ -43,6 +43,7 @@ A 100-message prefetch of 10KB messages = 1MB buffered *per consumer thread*. Wi
 
 ## Concurrency
 
+```java
 @Bean
 public SimpleRabbitListenerContainerFactory factory(ConnectionFactory connectionFactory) {
     SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
@@ -53,6 +54,7 @@ public SimpleRabbitListenerContainerFactory factory(ConnectionFactory connection
     factory.setBatchListener(true);               // batch mode (below)
     return factory;
 }
+```
 
 `maxConcurrentConsumers` only grows when the queue is busy — Spring monitors queue depth and scales the pool up and down. Start at 1–4 concurrent consumers; scale with load tests, not guesswork.
 
@@ -65,29 +67,35 @@ Queue: [A, B, C]
 Consumer 1 takes A, Consumer 2 takes B → B may finish before A
 ```
 
+```java
 **If order matters** (money movements, state machines):
 
 // Option 1: one consumer per queue
 factory.setConcurrentConsumers(1);
 
 // Option 2: partition by key — one queue per partition (like Kafka)
+```
 //   routing key = orderId → all events for one order hit one queue
 
+```java
 public void orderEvent(OrderEvent event) {
     String partition = "orders." + (event.orderId().hashCode() % 8);
     template.convertAndSend("orders.exchange", partition, event);
 }
 
 Per-key partitioning with 8 queues gives parallelism *and* per-order ordering. The universal rule: **order only matters within the same key; partition by key.**
+```
 
 ## Idempotency + Ordering
 
 Even with perfect ordering, redelivery can reorder (a requeued message goes to the back). Idempotent consumers make "out of order" harmless:
 
+```java
 @RabbitListener(queues = "orders.new")
 public void onOrderCreated(OrderEvent event) {
     orderStateMachine.apply(event);   // state machine rejects stale transitions
 }
+```
 
 A state machine that only accepts legal transitions (NEW → PAID, never PAID → NEW) tolerates duplicates and reordering gracefully.
 
@@ -141,8 +149,10 @@ public RabbitListenerErrorHandler rabbitErrorHandler(MeterRegistry registry) {
     return (amqpMessage, message, listenerException) -> {
         registry.counter("amqp.listener.errors",
             "listener", listenerException.getFailedListenerMethod().toString())
+```java
             .increment();
         log.error("Listener failed", listenerException.getCause());
+```
         throw listenerException;   // → retry ladder / DLQ
     };
 }

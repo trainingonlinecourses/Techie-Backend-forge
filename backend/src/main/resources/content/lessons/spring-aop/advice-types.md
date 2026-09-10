@@ -20,6 +20,7 @@ Advice is the action taken by an aspect at a particular join point. Spring AOP p
 
 Runs **before** the join point. Cannot prevent the join point from executing (unless it throws an exception).
 
+```java
 @Aspect
 @Component
 public class BeforeAdviceExample {
@@ -35,6 +36,7 @@ public class BeforeAdviceExample {
         // But cannot prevent execution (unless throwing exception)
     }
 }
+```
 
 #### Use Cases
 - **Logging** — Log method entry with parameters
@@ -83,6 +85,7 @@ public void beforeMethod(JoinPoint joinPoint) {
 
 Runs **after** the join point, regardless of whether it completed normally or threw an exception. Similar to a `finally` block.
 
+```java
 @Aspect
 @Component
 public class AfterAdviceExample {
@@ -93,6 +96,7 @@ public class AfterAdviceExample {
         // Always runs, even if exception was thrown
     }
 }
+```
 
 #### Use Cases
 - **Cleanup** — Release resources
@@ -102,6 +106,7 @@ public class AfterAdviceExample {
 
 #### Difference from @AfterReturning and @AfterThrowing
 
+```java
 // @After runs in ALL cases
 @After("execution(* com.acme.service.*.*(..))")
 public void afterMethod(JoinPoint jp) {
@@ -119,6 +124,7 @@ public void afterReturning(JoinPoint jp, Object result) {
 public void afterThrowing(JoinPoint jp, Exception ex) {
     log.error("Runs only on exception: {}", ex.getMessage());
 }
+```
 
 ### 3. @AfterReturning — Successful Return Advice
 
@@ -132,6 +138,7 @@ public class AfterReturningAdviceExample {
         pointcut = "execution(* com.acme.service.*.*(..))",
         returning = "result"
     )
+```java
     public void afterReturning(JoinPoint joinPoint, Object result) {
         log.info("Method {} returned: {}", 
                  joinPoint.getSignature().getName(), result);
@@ -139,15 +146,18 @@ public class AfterReturningAdviceExample {
     
     // Can specify return type for more precise matching
     @AfterReturning(
+```
         pointcut = "execution(* com.acme.service.*.*(..))",
         returning = "result"
     )
+```java
     public void afterReturningString(JoinPoint joinPoint, String result) {
         log.info("Method returned String: {}", result);
     }
     
     // Can modify the returned object (by returning a new value)
     @AfterReturning(
+```
         pointcut = "execution(com.acme.model.User com.acme.service.*.*(..))",
         returning = "user"
     )
@@ -168,11 +178,13 @@ public class AfterReturningAdviceExample {
 
 The `returning` attribute binds the return value to a parameter:
 
+```java
 @AfterReturning(pointcut = "execution(* *(..))", returning = "result")
 public void afterReturning(JoinPoint jp, Object result) {
     // result is the return value
     // Type must match (or be compatible with) the actual return type
 }
+```
 
 ### 4. @AfterThrowing — Exception Advice
 
@@ -186,6 +198,7 @@ public class AfterThrowingAdviceExample {
         pointcut = "execution(* com.acme.service.*.*(..))",
         throwing = "ex"
     )
+```java
     public void afterThrowing(JoinPoint joinPoint, Exception ex) {
         log.error("Method {} threw exception: {}", 
                   joinPoint.getSignature().getName(), ex.getMessage());
@@ -193,15 +206,18 @@ public class AfterThrowingAdviceExample {
     
     // Can specify exception type for more precise matching
     @AfterThrowing(
+```
         pointcut = "execution(* com.acme.service.*.*(..))",
         throwing = "ex"
     )
+```java
     public void afterThrowingIO(JoinPoint joinPoint, IOException ex) {
         log.error("IO Exception: {}", ex.getMessage());
     }
     
     // Can catch specific exception types
     @AfterThrowing(
+```
         pointcut = "execution(* com.acme.service.*.*(..))",
         throwing = "ex"
     )
@@ -220,11 +236,13 @@ public class AfterThrowingAdviceExample {
 
 The `throwing` attribute binds the exception to a parameter:
 
+```java
 @AfterThrowing(pointcut = "execution(* *(..))", throwing = "ex")
 public void afterThrowing(JoinPoint jp, Exception ex) {
     // ex is the thrown exception
     // Can be a specific exception type
 }
+```
 
 ### 5. @Around — Around Advice
 
@@ -310,6 +328,7 @@ public Object aroundMethod(ProceedingJoinPoint joinPoint) throws Throwable {
 
 #### Combining All Advice Types
 
+```java
 @Aspect
 @Component
 public class ComprehensiveAspect {
@@ -350,6 +369,7 @@ public class ComprehensiveAspect {
         }
     }
 }
+```
 
 ## Advice Ordering
 
@@ -359,6 +379,7 @@ When multiple aspects apply to the same join point, their execution order is det
 
 Control aspect ordering with `@Order`:
 
+```java
 @Aspect
 @Component
 @Order(1)
@@ -378,6 +399,7 @@ public class LoggingAspect {
         log.info("Logging (order 2)");
     }
 }
+```
 
 **Lower order = higher priority**. For `@Before` advice, lower order runs first. For `@After` advice, lower order runs last (reverse order).
 
@@ -394,6 +416,7 @@ When the same aspect has multiple advice types, Spring guarantees this order:
 7. **@After**
 8. **@Around** (complete)
 
+```java
 @Aspect
 @Component
 public class OrderingDemo {
@@ -426,6 +449,7 @@ public class OrderingDemo {
         log.info("5. AfterThrowing");
     }
 }
+```
 
 Output:
 ```
@@ -463,9 +487,11 @@ public class PerformanceMonitoringAspect {
                 .tag("class", joinPoint.getSignature().getDeclaringType().getSimpleName())
                 .tag("method", joinPoint.getSignature().getName())
                 .tag("status", "success")
+```java
                 .register(meterRegistry));
             return result;
         } catch (Throwable t) {
+```
             sample.stop(Timer.builder("method.execution")
                 .tag("class", joinPoint.getSignature().getDeclaringType().getSimpleName())
                 .tag("method", joinPoint.getSignature().getName())
@@ -478,6 +504,7 @@ public class PerformanceMonitoringAspect {
 
 ### 2. Security Authorization Aspect
 
+```java
 @Aspect
 @Component
 public class SecurityAuthorizationAspect {
@@ -510,6 +537,7 @@ public class SecurityAuthorizationAspect {
         }
     }
 }
+```
 
 ### 3. Caching Aspect
 
@@ -567,6 +595,7 @@ public class CachingAspect {
 
 ### 4. Retry Aspect
 
+```java
 @Aspect
 @Component
 public class RetryAspect {
@@ -609,9 +638,11 @@ public class RetryAspect {
         return false;
     }
 }
+```
 
 ### 5. Transaction Propagation Aspect
 
+```java
 @Aspect
 @Component
 public class TransactionPropagationAspect {
@@ -645,11 +676,13 @@ public class TransactionPropagationAspect {
         return false;
     }
 }
+```
 
 ## Advanced Techniques
 
 ### 1. Modifying Arguments
 
+```java
 @Around("execution(* com.acme.service.*.*(..))")
 public Object modifyArguments(ProceedingJoinPoint joinPoint) throws Throwable {
     Object[] args = joinPoint.getArgs();
@@ -662,9 +695,11 @@ public Object modifyArguments(ProceedingJoinPoint joinPoint) throws Throwable {
     
     return joinPoint.proceed(args);
 }
+```
 
 ### 2. Modifying Return Value
 
+```java
 @AfterReturning(pointcut = "execution(* com.acme.service.*.*(..))", returning = "result")
 public Object modifyReturnValue(JoinPoint joinPoint, Object result) {
     if (result instanceof User) {
@@ -674,9 +709,11 @@ public Object modifyReturnValue(JoinPoint joinPoint, Object result) {
     }
     return result;
 }
+```
 
 ### 3. Suppressing Exceptions
 
+```java
 @Around("execution(* com.acme.service.*.*(..))")
 public Object suppressException(ProceedingJoinPoint joinPoint) throws Throwable {
     try {
@@ -686,9 +723,11 @@ public Object suppressException(ProceedingJoinPoint joinPoint) throws Throwable 
         return null; // Return null instead of throwing
     }
 }
+```
 
 ### 4. Multiple Proceed Calls
 
+```java
 @Around("execution(* com.acme.cache.*.*(..))")
 public Object withRetry(ProceedingJoinPoint joinPoint) throws Throwable {
     int attempts = 3;
@@ -706,11 +745,13 @@ public Object withRetry(ProceedingJoinPoint joinPoint) throws Throwable {
     
     throw new IllegalStateException("Should not reach here");
 }
+```
 
 ## Common Mistakes
 
 ### 1. Forgetting to Call proceed()
 
+```java
 // WRONG — method never executes
 @Around("execution(* com.acme.service.*.*(..))")
 public Object around(ProceedingJoinPoint jp) throws Throwable {
@@ -719,9 +760,11 @@ public Object around(ProceedingJoinPoint jp) throws Throwable {
     log.info("After");
     return null;
 }
+```
 
 ### 2. Catching Throwable Without Re-throwing
 
+```java
 // WRONG — swallows all exceptions
 @Around("execution(* com.acme.service.*.*(..))")
 public Object around(ProceedingJoinPoint jp) throws Throwable {
@@ -732,9 +775,11 @@ public Object around(ProceedingJoinPoint jp) throws Throwable {
         return null; // Swallows exception
     }
 }
+```
 
 ### 3. Not Handling Checked Exceptions
 
+```java
 // WRONG — doesn't declare checked exceptions
 @Around("execution(* com.acme.service.*.*(..))")
 public Object around(ProceedingJoinPoint jp) {
@@ -744,6 +789,7 @@ public Object around(ProceedingJoinPoint jp) {
         throw new RuntimeException(t);
     }
 }
+```
 
 ## Summary
 

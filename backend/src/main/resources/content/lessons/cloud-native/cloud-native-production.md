@@ -77,9 +77,11 @@ public class DatabaseHealthIndicator implements HealthIndicator {
             conn.isValid(5);  // Line 1: Check if DB is reachable
             return Health.up()                    // Line 2: App is healthy
                 .withDetail("database", "reachable")
+```java
                 .build();
         } catch (Exception e) {
             return Health.down()                  // Line 3: App is unhealthy
+```
                 .withDetail("database", e.getMessage())
                 .build();
         }

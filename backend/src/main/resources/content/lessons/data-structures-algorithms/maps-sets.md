@@ -18,9 +18,11 @@ docs:
 
 A list answers "does this contain x?" by scanning every element — O(n). A **map** (dictionary) answers it in O(1): instead of searching, it *computes where x must be* and jumps there. The mechanism is the **hash function**: a function that turns any key into a number (the *hash code*), which is then mapped to a bucket. Look up the bucket, and your key is either there or it isn't.
 
+```java
 **The mental model:** a library with books arranged by the first letter of the title. Finding "War and Peace" doesn't require scanning the shelves — you walk to the W section. The first letter is a crude hash function. A good hash function spreads books evenly across sections; a terrible one piles everything into one section, and you're back to scanning (collisions). A **hash table** is that idea made rigorous: an array of buckets + a hash function that spreads keys uniformly.
 
 **The set** is the same machinery without values — just "is this present?" HashSet and HashMap share the exact same internals in Java (HashSet is literally a HashMap with dummy values).
+```
 
 ## The HashMap in Action
 

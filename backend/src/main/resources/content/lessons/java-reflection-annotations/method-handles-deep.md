@@ -124,7 +124,9 @@ public class DispatchDemo {
         Processor p = new Processor();
 
         handlers.put("add",    lookup.findVirtual(Processor.class, "add",
+```java
                 MethodType.methodType(int.class, int.class, int.class)));
+```
         handlers.put("mult",   lookup.findVirtual(Processor.class, "multiply",
                 MethodType.methodType(int.class, int.class, int.class)));
 

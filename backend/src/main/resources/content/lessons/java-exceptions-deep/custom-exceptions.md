@@ -35,6 +35,7 @@ Creating an exception per *message* is over-engineering; creating one per *failu
 
 ## Building a Custom Exception, Step by Step
 
+```java
 // A checked custom exception: the compiler forces callers to plan for it.
 public class AccountLockedException extends Exception {
 
@@ -58,6 +59,7 @@ public class AccountLockedException extends Exception {
     public String getAccountId() { return accountId; }
     public int getLockoutMinutes() { return lockoutMinutes; }
 }
+```
 
 **Walking through it:** extending `Exception` makes this *checked* (callers must catch or declare it); extend `RuntimeException` instead if you want it unchecked. The class adds two domain fields, `accountId` and `lockoutMinutes`, captured at throw time. The first constructor builds a useful message from them and delegates to `super(message)`. The second adds the `Throwable cause` parameter and passes it to `super(message, cause)` — this is the *wrapping* pattern: when a lower-level failure (say, a database timeout) causes the account lock, the cause chain preserves the original exception for debugging. The getters let handlers act on the data: show a countdown, log the account id, notify security.
 
@@ -65,6 +67,7 @@ Why carry fields instead of just a message? Because a *typed* field is stable an
 
 ## Throwing and Handling the Custom Exception
 
+```java
 public class LoginService {
     // The signature DECLARES the checked exception — part of the contract.
     public void login(String accountId, String password)
@@ -80,6 +83,7 @@ public class LoginService {
     private boolean isLocked(String id) { return true; /* demo */ }
     private int lockoutMinutesLeft(String id) { return 15; /* demo */ }
 }
+```
 
 And the caller handles it by type:
 
@@ -107,6 +111,7 @@ public class Main {
 
 Real applications have layers: controller → service → repository. An `SQLException` from deep in the data layer should not leak its raw type (and stack) to the controller. The standard pattern — used heavily in Spring — is to **wrap at the boundary**:
 
+```java
 public class UserRepository {
     public User findById(long id) {
         try {
@@ -119,6 +124,7 @@ public class UserRepository {
         }
     }
 }
+```
 
 `UserNotFoundException` is checked (extends Exception) or unchecked (extends RuntimeException) depending on the layer's contract — Spring convention is unchecked for data-access failures. The `cause` parameter keeps `getCause()` pointing at the `SQLException`, so logs still show the full chain: `UserNotFoundException ← SQLException ← connect timeout`.
 

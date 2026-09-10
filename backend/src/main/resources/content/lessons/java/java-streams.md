@@ -228,8 +228,10 @@ List<Integer> result = List.of(1, 2, 3, 4, 5).stream()
     .peek(n -> System.out.println("After filter: " + n))    // prints 3, 4, 5
     .map(n -> n * 10)
     .peek(n -> System.out.println("After map: " + n))       // prints 30, 40, 50
+```java
     .toList();
 // Result: [30, 40, 50]
+```
 
 ## Terminal Operations — executing the pipeline
 
@@ -410,7 +412,9 @@ IntStream.range(0, 1000).parallel()
 // SAFE: use collect (thread-safe terminal operation)
 List<Integer> safeList = IntStream.range(0, 1000).parallel()
     .boxed()
+```java
     .collect(Collectors.toList());  // thread-safe collection
+```
 
 ## How we use it in organizations
 

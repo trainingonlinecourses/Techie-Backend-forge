@@ -70,6 +70,7 @@ public void publishPending() {
 
 **The at-least-once contract:** the relay publishes, then marks done. Crash between publish and mark → the event is re-published on the next tick → **duplicates are possible** — which is why consumers must be idempotent (dedupe on event id). The relay can also retry failures with a dead-letter/backoff policy: a permanently-failing event (malformed payload) gets quarantined, not infinitely retried.
 
+```java
 **3. Idempotent consumers** — the pattern's completion:
 
 @KafkaListener(topics = "orders")
@@ -79,6 +80,7 @@ public void onOrderPlaced(OrderPlaced event) {
     emailService.sendReceipt(event.customerId());
     processedEvents.record(event.eventId());               // mark handled
 }
+```
 
 ## Why the Outbox Beats the Alternatives
 
@@ -99,7 +101,9 @@ public void onOrderPlaced(OrderPlaced event) {
 Postgres WAL ──▶ Debezium ──▶ Kafka topic (the events)
 ```
 
+```java
 This is the production-grade relay: the DB's own log is the trigger, so events flow the instant a transaction commits. The scheduled-poll relay is the simpler self-contained version; CDC is the scaler.
+```
 
 **2. Ordering.** The relay must publish in `created_at` order (hence `findTop50By...OrderByCreatedAt`) so events for one aggregate arrive in sequence. Consumers keyed by `aggregate_id` get per-entity ordering from Kafka.
 

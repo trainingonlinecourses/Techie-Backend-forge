@@ -63,6 +63,7 @@ public class User {
 ```
 
 With Lombok:
+```java
 @Data
 public class User {
     private Long id;
@@ -70,9 +71,11 @@ public class User {
     private String email;
     // Total: 5 lines — Lombok generates everything
 }
+```
 
 ### Core Lombok Annotations
 
+```java
 **1. @Data — The Swiss Army Knife**
 @Data  // Generates getters, setters, toString, equals, hashCode, requiredArgsConstructor
 public class User {
@@ -98,10 +101,12 @@ public class User {
 }
 
 // Usage:
+```
 User user = User.builder()
     .id(1L)
     .name("Alice")
     .email("alice@example.com")
+```java
     .build();
 
 **4. @Slf4j — Logger**
@@ -120,6 +125,7 @@ public class User {
     private String name;
     private String email;
 }
+```
 
 ### Lombok vs Java Records
 

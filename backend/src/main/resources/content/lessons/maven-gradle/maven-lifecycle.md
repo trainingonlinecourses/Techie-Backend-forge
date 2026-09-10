@@ -22,7 +22,9 @@ Maven isn't a build script — it's a **fixed lifecycle** with pluggable goals. 
 | `clean` | Delete build output |
 | `site` | Generate project documentation |
 
+```java
 Each lifecycle is an ordered list of **phases**; each phase is a slot where **plugin goals** execute.
+```
 
 ## The Default Lifecycle (the important one)
 

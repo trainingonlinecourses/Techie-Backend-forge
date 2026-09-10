@@ -4,8 +4,10 @@ module: kubernetes-deep
 order: 3
 minutes: 27
 topics: ["Helm", "HorizontalPodAutoscaler", "kubectl", "observability", "day-2 ops", "GitOps"]
+```java
 summary: Deploying a helloworld pod teaches the concepts; running a production system teaches the tooling. This lesson is the professional layer: Helm (pack...
 docs:
+```
   - title: "Helm (helm.sh)"
     url: "https://helm.sh/docs/"
   - title: "Horizontal Pod Autoscaling (kubernetes.io)"
@@ -16,11 +18,15 @@ docs:
 
 ## The Concept: The Tooling Around the Cluster
 
+```java
 Deploying a hello-world pod teaches the concepts; running a production system teaches the *tooling*. This lesson is the professional layer: **Helm** (package and version your manifests), **autoscaling** (let the cluster match demand), the **kubectl workflow** (the daily diagnostics), and the **day-2 reality** (observability, upgrades, GitOps). These are the things every "Kubernetes in production" story is actually about.
+```
 
 ## Helm: The Package Manager for Kubernetes
 
+```java
 Raw YAML manifests are fine for one service; a real system has dozens (Deployment, Service, Ingress, ConfigMap, Secret, autoscaler, ...) repeated across environments. **Helm** packages all of it into a **chart** — a versioned, templated bundle:
+```
 
 ```text
 payments-chart/

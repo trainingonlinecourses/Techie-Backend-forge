@@ -138,10 +138,12 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     // JPQL (Java Persistence Query Language) — works across databases:
     @Query("SELECT o FROM Order o WHERE o.status = :status AND o.total > :minTotal")
     List<Order> findHighValueOrders(@Param("status") OrderStatus status,
+```java
                                      @Param("minTotal") BigDecimal minTotal);
 
     // Native SQL (database-specific):
     @Query(value = "SELECT * FROM orders WHERE total > :minTotal ORDER BY created_date DESC",
+```
            nativeQuery = true)
     List<Order> findLargeOrders(@Param("minTotal") BigDecimal minTotal);
 
@@ -203,6 +205,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     // Find orders in a date range with a minimum total
     @Query("SELECT o FROM Order o WHERE o.createdDate BETWEEN :start AND :end AND o.total >= :minTotal")
     Page<Order> findByDateRangeAndMinTotal(
+```java
         @Param("start") LocalDateTime start,
         @Param("end") LocalDateTime end,
         @Param("minTotal") BigDecimal minTotal,
@@ -210,6 +213,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     // Complex search with multiple optional filters
     @Query("SELECT o FROM Order o WHERE " +
+```
            "(:status IS NULL OR o.status = :status) AND " +
            "(:customerId IS NULL OR o.customer.id = :customerId) AND " +
            "(:minTotal IS NULL OR o.total >= :minTotal)")
@@ -255,16 +259,19 @@ public class Order {
 }
 ```
 
+```java
 @Configuration
 @EnableJpaAuditing                           // Enable auditing globally
 public class JpaConfig {
 }
+```
 
 ### Scenario 3: Custom Repository Implementation
 
 // When method names and @Query aren't enough:
 public interface OrderRepositoryCustom {
     List<OrderSummary> findOrderSummariesByRegion(String region);
+```java
 }
 
 // Implementation:
@@ -274,6 +281,7 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
     private EntityManager em;
 
     @Override
+```
     public List<OrderSummary> findOrderSummariesByRegion(String region) {
         return em.createQuery(
             "SELECT new OrderSummary(c.region, COUNT(o), SUM(o.total)) " +

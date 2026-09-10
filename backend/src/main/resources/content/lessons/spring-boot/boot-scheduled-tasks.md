@@ -19,6 +19,7 @@ Spring's `@Scheduled` annotation runs methods on a timer. Behind the scenes, a `
 
 ## Configuration
 
+```java
 @Configuration
 @EnableScheduling
 @EnableAsync
@@ -44,6 +45,7 @@ public class SchedulingConfig implements SchedulingConfigurer {
         return scheduler;
     }
 }
+```
 
 ## @Scheduled timing strategies
 
@@ -133,11 +135,13 @@ public class ScheduledTasks {
 @SchedulerLock(name = "dailyReport",
     lockAtLeastFor = "PT5M",       // minimum lock duration
     lockAtMostFor = "PT30M")       // maximum lock duration
+```java
 public void dailyReport() {
     // Only one pod executes this — ShedLock ensures mutual exclusion
     Report report = reportService.generate();
     emailService.send(report);
 }
+```
 
 ShedLock uses a database table (`shedlock`) to coordinate. When pod A acquires the lock, pod B sees it's already locked and skips.
 
@@ -173,6 +177,7 @@ public Executor taskExecutor() {
 
 ### Scenario 1: cache refresh every 5 minutes
 
+```java
 @Component
 @Primary
 public class CacheRefreshScheduler {
@@ -187,6 +192,7 @@ public class CacheRefreshScheduler {
         log.info("Cache refreshed: {} products", catalog.size());
     }
 }
+```
 
 ### Scenario 2: retry failed jobs every 30 minutes
 
@@ -211,6 +217,7 @@ public class FailedJobRetryScheduler {
 
 ### Scenario 3: database cleanup
 
+```java
 @Component
 public class CleanupScheduler {
 
@@ -221,6 +228,7 @@ public class CleanupScheduler {
         log.info("Cleaned up {} expired sessions", deleted);
     }
 }
+```
 
 ## Common mistakes
 

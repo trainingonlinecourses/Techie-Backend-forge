@@ -14,7 +14,9 @@ docs:
 
 ## The Concept: A Time Machine for Your Code
 
+```java
 **Git** is a **version control system**: it records snapshots of your project over time, so you can look back, compare, revert, and branch. Every developer on a team works against the same history; every change is attributable and reversible.
+```
 
 The core mental model — **Git stores snapshots, not changes**:
 

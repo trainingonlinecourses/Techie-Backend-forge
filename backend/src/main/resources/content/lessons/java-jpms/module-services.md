@@ -19,7 +19,9 @@ module payment.api {
 
 // Module B: provides an implementation
 module payment.stripe {
+```java
     requires payment.api;
+```
     provides com.payment.api.PaymentProvider
         with com.stripe.StripePaymentProvider;
 }
@@ -109,13 +111,17 @@ module logging.api {
 }
 
 module logging.logback {
+```java
     requires logging.api;
+```
     provides com.logging.api.LoggerProvider
         with com.logging.logback.LogbackLoggerProvider;
 }
 
 module logging.log4j {
+```java
     requires logging.api;
+```
     provides com.logging.api.LoggerProvider
         with com.logging.log4j.Log4jLoggerProvider;
 }

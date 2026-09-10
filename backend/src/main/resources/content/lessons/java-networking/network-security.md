@@ -18,7 +18,9 @@ docs:
 
 A raw socket sends bytes in plaintext: anyone on the network path (a Wi-Fi eavesdropper, a router, an ISP) can read everything — passwords, tokens, credit card numbers. **TLS (Transport Layer Security)**, the successor to SSL, wraps the socket in a *cryptographic envelope*: the two parties first prove their identities with **certificates**, then negotiate a secret key, then exchange data encrypted with that key. Everything HTTPS does, it does through TLS.
 
+```java
 **The mental model:** TLS is a two-phase conversation. Phase one, the **handshake**: the client says "hello," the server presents its **certificate** (a signed statement of "I am api.example.com" issued by a trusted authority), the client verifies the signature, and both sides derive a shared secret via public-key cryptography. Phase two: all further messages are encrypted with the shared secret — fast symmetric encryption. The envelope is closed; only the two parties hold the key.
+```
 
 ## The Three Questions TLS Answers
 
@@ -43,6 +45,7 @@ The beautiful part: **for the 99% case you write no TLS code at all.** `HttpsURL
 
 Search for "trust all certificates" in any codebase and you'll find the most dangerous snippet in Java networking:
 
+```java
 // DANGEROUS — NEVER do this in production:
 TrustManager[] trustAll = new TrustManager[] {
     new X509TrustManager() {
@@ -54,6 +57,7 @@ TrustManager[] trustAll = new TrustManager[] {
 SSLContext ctx = SSLContext.getInstance("TLS");
 ctx.init(null, trustAll, new SecureRandom());
 // Now every certificate is "accepted" — including an attacker's.
+```
 
 **Why it's catastrophic:** `checkServerTrusted` doing nothing means the client accepts *any* certificate — including one a man-in-the-middle generates on the spot. The encryption still happens, but you're encrypting to the *attacker*. This pattern appears in tutorials to bypass self-signed certificates in dev, then gets copy-pasted into production. If you must bypass verification in a dev environment, scope it to dev config only and add a loud comment; in production, fix the certificate problem, don't disable the check.
 
@@ -72,10 +76,12 @@ keytool -importcert -trustcacerts -alias my-internal-ca \
 
 Now Java trusts certificates signed by your internal CA — normal code, no bypass.
 
+```java
 **3. Use a custom trust store per client (scoped, not global):**
 
 System.setProperty("javax.net.ssl.trustStore", "/etc/app/truststore.jks");
 System.setProperty("javax.net.ssl.trustStorePassword", "changeit");
+```
 
 or better, build an `SSLContext` with a `TrustManagerFactory` loaded from your own trust store — the same "just trust these CAs" semantics, without touching the JVM-wide store.
 

@@ -15,6 +15,7 @@ docs:
 
 In traditional imperative code, you use try-catch:
 
+```java
 // Traditional (imperative):
 try {
     User user = userService.findById(id);
@@ -22,6 +23,7 @@ try {
 } catch (NotFoundException e) {
     return ResponseEntity.notFound().build();
 }
+```
 
 In reactive code, errors travel **through the stream** — they propagate downstream until handled. An unhandled error kills the entire stream. You need to handle errors **reactively**.
 
@@ -30,7 +32,9 @@ userService.findById(id)                    // Mono<User>
     .map(user -> ResponseEntity.ok(user))   // This NEVER runs if findById fails
     .onErrorResume(e ->                      // Handle the error in the stream
         Mono.just(ResponseEntity.notFound().build())
+```java
     );
+```
 
 ### Error Propagation Rules
 
@@ -199,8 +203,10 @@ public class ReactiveGlobalErrorHandler {
     // Catch-all handler:
     @ExceptionHandler(Exception.class)
     public Mono<ResponseEntity<ErrorResponse>> handleGeneric(Exception e) {
+```java
         log.error("Unhandled exception", e);
         return Mono.just(ResponseEntity
+```
             .status(HttpStatus.INTERNAL_SERVER_ERROR)
             .body(new ErrorResponse(500, "Something went wrong")));
     }

@@ -19,6 +19,7 @@ When you write `System.out.println("Hello")` and run it, three things happen:
 2. **Load**: The JVM reads the `.class` file and loads it into memory.
 3. **Execute**: The JVM interprets or JIT-compiles the bytecode to machine code.
 
+```java
 **Beginner mental model:** Think of Java like a universal translator. You write in English (Java source code), it translates to a neutral language (bytecode), and then any computer with a JVM can execute it. That's why Java is "write once, run anywhere."
 
 // You write this (HelloWorld.java):
@@ -30,6 +31,7 @@ public class HelloWorld {
 
 // javac compiles it to HelloWorld.class (bytecode — not human-readable)
 // The JVM reads HelloWorld.class and executes it
+```
 
 ## JDK vs JRE vs JVM
 
@@ -86,10 +88,6 @@ The JVM has two execution modes:
 1. Java starts by INTERPRETING bytecode — quick startup. After running a method 10,000+ times, the JIT compiler kicks in: It compiles that method to native machine code — 10-100x faster. The compiled code is cached — next call runs the fast native version
 2. This is why Java can be slow on the first request but fast after warmup: Request 1: interpreted (50ms). Request 2: interpreted (50ms). ... Request 10,000: JIT compiles the method (takes extra time this once). Request 10,001: native code (5ms!)
 
-The same code, clean:
-
-```java
-```
 
 You can control JIT with flags:
 ```bash
@@ -134,11 +132,13 @@ Heap Memory
 └── Old Generation (long-lived objects — promoted from Young)
 ```
 
+```java
 // When you create an object, it goes to Eden Space
 User user = new User("Alice");  // allocated in Eden
 
 // After many GC cycles, if 'user' is still referenced, it's promoted to Old Gen
 // This is called "generational collection" — most objects die young
+```
 
 ### GC algorithms
 

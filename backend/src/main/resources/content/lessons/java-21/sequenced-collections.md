@@ -12,6 +12,7 @@ docs:
 
 Before Java 21, getting the first or last element of a collection required awkward workarounds:
 
+```java
 // Getting the first element — verbose
 String first = list.isEmpty() ? null : list.get(0);
 
@@ -20,12 +21,15 @@ String last = list.isEmpty() ? null : list.get(list.size() - 1);
 
 // Reversing a list
 Collections.reverse(list);  // mutates the original!
+```
 
 Java 21 introduced the **SequencedCollection** interface with clean methods:
 
+```java
 // JAVA 21: Clean, readable, safe
 String first = list.getFirst();    // throws NoSuchElementException if empty
 String last = list.getLast();
+```
 SequencedCollection<String> reversed = list.reversed();  // returns a VIEW, doesn't mutate
 
 ---
@@ -134,6 +138,7 @@ public class SequencedCollectionsDemo {
 
 ### Scenario 1: LRU Cache implementation
 
+```java
 public class LRUCache<K, V> {
     private final LinkedHashMap<K, V> cache;
     private final int maxSize;
@@ -159,11 +164,13 @@ public class LRUCache<K, V> {
         }
     }
 }
+```
 
 ### Scenario 2: Undo/Redo stack
 
 public class UndoRedoStack<T> {
     private final ArrayList<T> history = new ArrayList<>();
+```java
     private int position = -1;
 
     public void push(T item) {
@@ -174,6 +181,7 @@ public class UndoRedoStack<T> {
         history.add(item);
         position = history.size() - 1;
     }
+```
 
     public Optional<T> undo() {
         if (position > 0) {

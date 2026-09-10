@@ -23,10 +23,12 @@ public User create(@RequestBody User user) {
 }
 
 With proper exception handling:
+```java
 // Same request, but now:
 // 400 Bad Request
 // { "error": "DUPLICATE_EMAIL", "message": "Email already registered", "field": "email" }
 // Client knows exactly what to fix
+```
 
 ### @RestControllerAdvice — The Global Handler
 
@@ -69,6 +71,7 @@ public class GlobalExceptionHandler {
 
 ### Custom Exception Classes
 
+```java
 // Base application exception
 public class AppException extends RuntimeException {
     private final String code;
@@ -100,6 +103,7 @@ public class InsufficientBalanceException extends AppException {
               "Required: " + required + ", Available: " + available);
     }
 }
+```
 
 ### RFC 7807 Problem Details Format
 
@@ -112,11 +116,13 @@ public record ProblemDetail(
     String detail,
     String instance,
     Map<String, String> errors
+```java
 ) {
     public static ProblemDetail of(int status, String type, String title, String detail) {
         return new ProblemDetail(status, type, title, detail, null, null);
     }
 }
+```
 
 ```json
 {
@@ -134,6 +140,7 @@ public record ProblemDetail(
 
 ### Exception Handler Priority
 
+```java
 @RestControllerAdvice
 public class ExceptionHandlers {
     
@@ -158,6 +165,7 @@ public class ExceptionHandlers {
         return ProblemDetail.of(500, "internal", "Internal Error", "An unexpected error occurred");
     }
 }
+```
 
 ### Common Mistakes
 

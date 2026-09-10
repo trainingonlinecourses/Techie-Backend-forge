@@ -32,6 +32,7 @@ Think about `Collections.max`. It takes a collection and returns the largest ele
 
 Compare these two:
 
+```java
 // Wildcard version: loses the exact type. You get a Number back,
 // even if you passed a list of Integers.
 static Number firstNumber(List<? extends Number> list) {
@@ -39,6 +40,7 @@ static Number firstNumber(List<? extends Number> list) {
 }
 
 // Generic method: preserves the exact type.
+```
 // Call with List<Integer> -> you get Integer back.
 static <T> T first(List<T> list) {
     return list.get(0);

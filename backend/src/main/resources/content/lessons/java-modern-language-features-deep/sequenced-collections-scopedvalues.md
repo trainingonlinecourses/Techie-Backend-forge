@@ -197,10 +197,12 @@ The scoping is the point. You bind the value at the top of the request handling,
 
 In a structured concurrency setting, the binding is inherited by subtasks:
 
+```java
 // Structured concurrency with ScopedValue (incubating API)
 import java.lang.ScopedValue;
 import java.util.List;
 import java.util.concurrent.StructuredTaskScope;
+```
 
 static final ScopedValue<String> USER = ScopedValue.newInstance();
 
@@ -306,6 +308,7 @@ This shows the model: bind context at the top, read it anywhere in the call tree
 
 A scoped value can only be read within a binding scope. If you call `USER.get()` outside a `where().run()` scope, it throws an exception.
 
+```java
 // WRONG: reading a scoped value outside its scope
 static void bad() {
     System.out.println(CURRENT_USER.get());   // throws ScopedValue.CalloutException
@@ -317,6 +320,7 @@ static void good(String username) {
         System.out.println(CURRENT_USER.get());   // OK — inside the scope
     });
 }
+```
 
 This is the safety mechanism of scoped values. They are not global variables. They are bound for a specific scope, and reading them outside that scope is an error.
 

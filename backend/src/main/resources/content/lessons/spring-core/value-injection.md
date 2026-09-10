@@ -78,6 +78,7 @@ Immutable `final` fields, testable constructor, no hidden wiring. Record-based c
 **Scenario 1 — wiring env-specific values into a component.** The deployment sets env vars; the code reads them via `@Value`:
 
 @Value("${cloud.region:us-east-1}")
+```java
 private String region;
 // locally defaults to us-east-1; in prod the env var CLOUD_REGION wins
 
@@ -88,6 +89,7 @@ private int poolSize;
 
 @Value("#{T(java.util.concurrent.TimeUnit).SECONDS.toMillis(30)}")
 private long timeoutMs;                          // static-method SpEL
+```
 
 **Scenario 3 — test overrides.** `@SpringBootTest(properties = "app.mail.host=localhost:2525")` overrides the `@Value` resolution for tests — the property source stack handles it without touching prod config.
 

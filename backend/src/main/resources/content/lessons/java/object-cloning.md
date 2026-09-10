@@ -13,9 +13,11 @@ docs:
 
 ## The concept: reference copies vs value copies
 
+```java
 Order a = new Order(1, "PAID");
 Order b = a;              // NOT a copy — a and b are the SAME object
 b.setStatus("REFUNDED");  // a.status is now REFUNDED too!
+```
 
 Copying an object has two depths:
 
@@ -77,6 +79,7 @@ public final class Order {
 
 `List.copyOf(...)` (Java 10+) returns an immutable copy in one call — the modern tool for this exact pattern. The rule: **immutable inside, immutable at the boundary** — the internal list is never handed out by reference.
 
+```java
 **Scenario 2 — versioned domain objects (the "edit draft" pattern).** A change request starts as a copy of the current state so the original stays intact until approval:
 
 Order working = Order.copyOf(original);     // independent working copy
@@ -84,6 +87,7 @@ working.applyChanges(edit);                 // mutate the copy freely
 if (approver.ok(working)) orderRepo.save(working);
 
 **Scenario 3 — deep copy for cache or messaging.** When an object crosses a trust boundary (put into a cache, sent to a queue, handed to a plugin), a deep copy prevents aliasing bugs — the receiver can't corrupt the sender's object.
+```
 
 ## Deep copy techniques
 

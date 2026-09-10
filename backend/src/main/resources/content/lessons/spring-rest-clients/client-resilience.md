@@ -22,7 +22,9 @@ The single most important mindset for backend-to-backend calls: **the remote ser
 4. **Fallbacks** — serve *something* (cached data, a default) when the call fails.
 5. **Bulkheads / rate limits** — isolate failures so one slow dependency can't exhaust your threads.
 
+```java
 The classic real-world analogy: a fire alarm system. It doesn't just *call* the fire department once (retry); if the department is unreachable it stops dialing for a while and sounds the alarm locally (circuit breaker), and it has sprinklers (fallback) so damage is contained.
+```
 
 ## The Code Walkthrough
 
@@ -132,9 +134,11 @@ A bulkhead partitions resources: each dependency gets its own thread pool, so on
 Bulkhead bulkhead = Bulkhead.of("catalog", BulkheadConfig.custom()
         .maxConcurrentCalls(10)      // at most 10 concurrent catalog calls
         .maxWaitDuration(Duration.ofMillis(500))
+```java
         .build());
 
 When the catalog is slow, at most 10 threads wait on it; the other 190 threads serve everything else normally. Without bulkheads, a single dying dependency can take down the entire service by hogging every thread.
+```
 
 ## Testing Resilience
 

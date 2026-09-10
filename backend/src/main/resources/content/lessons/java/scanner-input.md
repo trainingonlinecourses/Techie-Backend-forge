@@ -12,6 +12,7 @@ docs:
 
 Every program eventually needs data from outside itself. In desktop tools and coding exercises that data comes from **standard input** (the keyboard). Java's most beginner-friendly tool for it is `java.util.Scanner` — a text parser that breaks an incoming stream into **tokens** (words, numbers, lines) and converts them to typed values.
 
+```java
 import java.util.Scanner;                       // bring in the class
 
 public class Greeter {
@@ -22,6 +23,7 @@ public class Greeter {
         System.out.println("Hello, " + name + "!");
     }
 }
+```
 
 Line by line:
 
@@ -34,6 +36,7 @@ Line by line:
 
 This trips up virtually every beginner. Watch:
 
+```java
 public class Main {
 
     public static void main(String[] args) {
@@ -46,14 +49,17 @@ public class Main {
         String name = sc.nextLine();     // returns "" instantly — it consumed the leftover '\n'!
     }
 }
+```
 
 Why: `nextInt()` stops as soon as it has a valid number. The **newline you typed is still sitting in the buffer**, and the very next `nextLine()` sees it as "user pressed Enter on an empty line."
 
 The standard fix — clear the leftovers:
 
+```java
 int age = sc.nextInt();
 sc.nextLine();                   // consume the dangling '\n' — throw the empty token away
 String name = sc.nextLine();     // now this genuinely waits for a name
+```
 
 ## Reading Different Types
 

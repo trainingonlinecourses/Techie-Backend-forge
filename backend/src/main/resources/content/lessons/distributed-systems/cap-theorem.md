@@ -56,10 +56,6 @@ B can't reach A. B must decide:
 1. A CP choice: the majority must agree before the write is durable. (etcd/ZooKeeper quorum writes). A write to the minority side → error, not silent acceptance
 2. An AP choice: any node accepts the write and replicates async. (Cassandra/DynamoDB hinted handoff). Reads may lag — eventual consistency
 
-The same code, clean:
-
-```java
-```
 
 ## Consistency Models: The Spectrum
 
@@ -72,7 +68,9 @@ The same code, clean:
 | **Monotonic reads** | Reads never go backward in time | Replica routing |
 | **Eventual** | Replicas converge, given time | DNS, Cassandra, cache invalidation |
 
+```java
 The Spring-app reality: your **primary database** is the strong-consistency anchor (single-master Postgres = linearizable writes); your **cache, replicas, and message queue** are eventually consistent. The skill is knowing which operations need which model.
+```
 
 ## PACELC: The Theorem That Includes Normal Operation
 

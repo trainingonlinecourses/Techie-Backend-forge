@@ -112,6 +112,7 @@ public class CreateUserRequest {
 
 Create your own validation annotations:
 
+```java
 // Step 1: Define the annotation
 @Target({ElementType.FIELD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
@@ -139,6 +140,7 @@ public class ContactRequest {
     @PhoneNumber String phone;
     @NotBlank String name;
 }
+```
 
 ### Nested Validation
 
@@ -182,6 +184,7 @@ public class OrderItem {
 
 Handle validation errors gracefully:
 
+```java
 @RestControllerAdvice
 public class ValidationExceptionHandler {
     
@@ -199,6 +202,7 @@ public class ValidationExceptionHandler {
         // Returns: {"name": "Name is required", "email": "Email must be valid"}
     }
 }
+```
 
 ### Validation Groups
 

@@ -142,12 +142,15 @@ Design the code vocabulary deliberately:
 | `RATE_LIMITED` | Too many requests | Back off and retry |
 | `INTERNAL` | Server bug | Generic error + retry |
 
+```java
 Codes are additive and versioned like the schema: adding codes is safe; renaming breaks clients.
+```
 
 ## Validation Errors — Field-Level Detail
 
 GraphQL validates input *before* resolvers run (the schema's types). For deeper validation (business rules), throw with structured details:
 
+```java
 class InvalidInputException extends RuntimeException {
     private final Map<String, String> fieldErrors;
     InvalidInputException(Map<String, String> fieldErrors) {
@@ -158,13 +161,16 @@ class InvalidInputException extends RuntimeException {
 }
 
 // In the handler:
+```
 error = GraphqlErrorBuilder.newError()
         .message("Validation failed")
         .path(params.getPath())
         .extensions(java.util.Map.of(
                 "code", "VALIDATION_ERROR",
                 "fieldErrors", ((InvalidInputException) ex).fieldErrors()))
+```java
         .build();
+```
 
 Clients map `fieldErrors` onto form fields — the GraphQL equivalent of REST's `400` + field messages.
 

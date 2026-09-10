@@ -113,9 +113,12 @@ public class UserController {
 
 ## PUT vs PATCH
 
+```java
 // PUT — replace the entire resource
 @PutMapping("/{id}")
+```
 public ResponseEntity<UserResponse> replaceUser(
+```java
         @PathVariable Long id,
         @RequestBody CreateUserRequest request) {
 
@@ -126,6 +129,7 @@ public ResponseEntity<UserResponse> replaceUser(
 
 // PATCH — partial update
 @PatchMapping("/{id}")
+```
 public ResponseEntity<UserResponse> patchUser(
         @PathVariable Long id,
         @RequestBody PatchUserRequest request) {
@@ -152,6 +156,7 @@ public record PatchUserRequest(
     String name,
     String email,
     Integer age
+```java
 ) {
     // A flag to distinguish "not sent" from "sent as null"
     private boolean nameExplicitlySet;
@@ -161,7 +166,9 @@ public record PatchUserRequest(
 
 // Simple approach: use a Map and check for key existence
 @PatchMapping(value = "/{id}", consumes = "application/merge-patch+json")
+```
 public ResponseEntity<UserResponse> mergePatchUser(
+```java
         @PathVariable Long id,
         @RequestBody Map<String, Object> patch) {
 
@@ -181,6 +188,7 @@ public ResponseEntity<UserResponse> mergePatchUser(
     User updated = userService.save(user);
     return ResponseEntity.ok(toResponse(updated));
 }
+```
 
 ---
 
@@ -202,9 +210,11 @@ public class ProfileController {
 
     @PatchMapping
     public ResponseEntity<ProfileResponse> updateProfile(@RequestBody PatchProfileRequest request) {
+```java
         Profile profile = profileService.getCurrentUserProfile();
 
         // Only update fields that were sent
+```
         Optional.ofNullable(request.displayName()).ifPresent(profile::setDisplayName);
         Optional.ofNullable(request.avatarUrl()).ifPresent(profile::setAvatarUrl);
         Optional.ofNullable(request.emailNotifications()).ifPresent(profile::setEmailNotifications);
@@ -256,7 +266,9 @@ public class OrderController {
 
 ### Scenario 3: Product Price Update
 
+```java
 @PatchMapping("/{id}/price")
+```
 public ResponseEntity<ProductResponse> updatePrice(
         @PathVariable Long id,
         @RequestBody Map<String, BigDecimal> body) {

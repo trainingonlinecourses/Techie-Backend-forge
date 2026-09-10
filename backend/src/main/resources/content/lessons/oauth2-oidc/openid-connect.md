@@ -16,9 +16,11 @@ docs:
 
 ## The Concept: Who Are You? (Not Just: What May You Do?)
 
+```java
 OAuth2 answers "what can this app do *for* the user?" — but it famously does **not** answer "who *is* the user?" A resource server can verify a token's validity and scope while remaining ignorant of the person behind it. **OpenID Connect (OIDC)** is OAuth2 extended with *authentication*: it adds the **ID token** — a JWT asserting the user's identity — plus standardized discovery and user-profile endpoints. "Sign in with Google" is OIDC; the API call afterward is OAuth2.
 
 **The mental model:** OAuth2 is the valet key (access); OIDC is the *photo ID* (identity). When you sign in with Google, you get both: the ID token is the ID card the app checks to know it's you ("Ada, verified by Google"), and the access token is the valet key it uses to act for you. The distinction is why the two coexist: authorization without authentication is meaningless ("this app may read lessons — for whom?"), and OIDC is the standard way to add the "for whom."
+```
 
 ## The ID Token
 
@@ -67,7 +69,9 @@ GET https://auth.academy.com/.well-known/openid-configuration
 
 ## The UserInfo Endpoint
 
+```java
 The ID token carries basic identity; the **UserInfo endpoint** returns the full standardized profile — called with the *access* token (never the ID token):
+```
 
 ```text
 GET https://auth.academy.com/oauth2/userinfo

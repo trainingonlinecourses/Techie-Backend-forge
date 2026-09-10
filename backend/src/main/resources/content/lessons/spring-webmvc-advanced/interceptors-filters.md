@@ -122,6 +122,7 @@ public class WebConfig implements WebMvcConfigurer {
 
 **Why interceptors over filters for auth?** Interceptors know the *handler* — you can skip auth for `@PublicEndpoint`-annotated methods:
 
+```java
 @Override
 public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
                          Object handler) {
@@ -132,6 +133,7 @@ public boolean preHandle(HttpServletRequest request, HttpServletResponse respons
     }
     return authenticate(request, response);
 }
+```
 
 ## HandlerMethodArgumentResolver
 
@@ -225,12 +227,14 @@ class InterceptorTest {
     @Test
     void auditInterceptorLogsRequests() throws Exception {
         mockMvc.perform(get("/api/courses"))
+```java
             .andExpect(status().isOk());
         // assert the audit log contains the request (capture appender)
     }
 
     @Test
     void currentUserResolved() throws Exception {
+```
         mockMvc.perform(get("/api/me")
                 .requestAttr("authenticatedUserId", "u1"))
             .andExpect(status().isOk())

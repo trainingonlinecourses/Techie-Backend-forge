@@ -17,6 +17,7 @@ Pattern matching lets you check the type of an object and extract its components
 
 ## Record patterns in instanceof
 
+```java
 public class Main {
 
     public static void main(String[] args) {
@@ -40,9 +41,11 @@ public class Main {
         }
     }
 }
+```
 
 ## Pattern matching with switch
 
+```java
 // Sealed interface + records = exhaustive pattern matching
 sealed interface Shape permits Circle, Rectangle, Triangle {}
 record Circle(double radius) implements Shape {}
@@ -62,9 +65,11 @@ double area(Shape shape) {
 }
 
 **The org power:** the compiler enforces that every case is handled. Add a new record to the sealed interface, and the compiler tells you exactly which switches need updating. No missed cases at runtime.
+```
 
 ## Guarded patterns — conditions within cases
 
+```java
 String describe(int value) {
     return switch (value) {
         case int n when n < 0  -> "negative: " + n;
@@ -82,11 +87,13 @@ String categorize(Package pkg) {
         case Package(String name, double weight)                   -> "standard: " + name;
     };
 }
+```
 
 ## Sealed classes — the exhaustiveness engine
 
 Sealed classes restrict which classes can implement them. Combined with pattern matching, the compiler knows the full set of possibilities:
 
+```java
 // Java 17+ sealed interface
 public sealed interface PaymentResult
     permits PaymentSuccess, PaymentFailure, PaymentPending {}
@@ -104,6 +111,7 @@ String display(PaymentResult result) {
     };
     // If you add a new permit, every switch that doesn't handle it fails to compile
 }
+```
 
 ## Nested patterns — deep destructuring
 

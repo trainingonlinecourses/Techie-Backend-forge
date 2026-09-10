@@ -16,6 +16,7 @@ Concurrency bugs don't crash at compile time — they corrupt data under load, h
 
 ## 1. Race Conditions
 
+```java
 **Definition**: the outcome depends on the interleaving of threads — a check-then-act window where two threads can both observe the same pre-condition and act inconsistently.
 
 public class BookingService {
@@ -41,16 +42,21 @@ public void book() {
         if (seats.compareAndSet(current, current - 1)) return;  // atomic claim
     }
 }
+```
 
 ## 2. Deadlock
 
 **Definition**: two or more threads each hold a lock the other needs — all wait forever.
 
 // Thread A: transfer(a→b)
+```java
 synchronized (accountA) { synchronized (accountB) { ... } }
+```
 
 // Thread B: transfer(b→a)
+```java
 synchronized (accountB) { synchronized (accountA) { ... } }
+```
 
 **Recognition**: threads stuck forever (jstack shows both `WAITING` on each other's monitors), thread dump shows the cycle:
 
@@ -62,15 +68,18 @@ synchronized (accountB) { synchronized (accountA) { ... } }
 **Fixes** (in order of preference):
 
 1. **Lock ordering** — always acquire locks in a global order (by id, by name):
+```java
 Account first = a.id() < b.id() ? a : b;
 Account second = a.id() < b.id() ? b : a;
 synchronized (first) { synchronized (second) { ... } }
+```
 2. **Timeout** — `tryLock(timeout)` and back off instead of waiting forever.
 3. **Single lock** — one lock per subsystem beats lock nesting.
 4. **Lock-free** — atomics and immutable data eliminate the cycle entirely.
 
 ## 3. Livelock
 
+```java
 **Definition**: threads aren't blocked — they're *spinning*, each undoing the other's progress forever.
 
 // Two threads, both politely yielding on contention — neither progresses
@@ -85,9 +94,11 @@ while (!tryLock()) {
 while (!lock.tryLock()) {
     Thread.sleep(ThreadLocalRandom.current().nextLong(1, 50));  // jitter breaks the symmetry
 }
+```
 
 ## 4. Starvation
 
+```java
 **Definition**: a thread is *runnable* but never gets scheduled — others keep winning the lock.
 
 // Non-fair lock: a burst of thread A acquisitions starves thread B
@@ -95,6 +106,7 @@ while (!lock.tryLock()) {
 ReentrantLock lock = new ReentrantLock(true);   // fair — FCFS, prevents starvation
 
 **Recognition**: one thread never progresses while others complete; thread dump shows it RUNNABLE but the same others always hold the lock.
+```
 
 **Fix**: fair locks (`new ReentrantLock(true)`), or redesign to reduce contention (striped locks, atomics).
 
@@ -102,6 +114,7 @@ ReentrantLock lock = new ReentrantLock(true);   // fair — FCFS, prevents starv
 
 Not a lock problem — a *memory* problem. Without a happens-before edge, thread B may never see thread A's write:
 
+```java
 // ❌ No happens-before: the loop may run forever
 private boolean done = false;       // not volatile!
 threadA: done = true;
@@ -111,6 +124,7 @@ threadB: while (!done) { }          // may never see the write
 private volatile boolean done = false;
 
 **Recognition**: infinite loops, stale values that "should" have updated, works after adding a print (which incidentally syncs).
+```
 
 ## Detection Toolkit
 

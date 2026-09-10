@@ -26,6 +26,7 @@ Three common algorithms:
 
 ### Scenario 1: Per-user rate limiting with Bucket4j
 
+```java
 @Component
 public class UserRateLimiter {
     private final Bucket userBucket;
@@ -41,6 +42,7 @@ public class UserRateLimiter {
         return userBucket.tryConsume(1);
     }
 }
+```
 
 ### Scenario 2: Filter-based rate limiting
 
@@ -98,8 +100,10 @@ public class DistributedRateLimiter {
                 redis.call('EXPIRE', KEYS[1], ARGV[4])
                 return 1
             end
+```java
             return 0
         """;
+```
 
         Long allowed = redis.execute(
             new DefaultRedisScript<>(script, Long.class),
@@ -117,6 +121,7 @@ public class DistributedRateLimiter {
 
 Different endpoints have different limits:
 
+```java
 @Configuration
 public class RateLimitConfig {
     @Bean
@@ -128,11 +133,13 @@ public class RateLimitConfig {
         return limits;
     }
 }
+```
 
 ### Scenario 5: Rate limit headers
 
 Always inform clients about their rate limit status:
 
+```java
 @Component
 public class RateLimitResponseHeaders {
     public void addHeaders(HttpServletResponse response, int limit, int remaining, long resetSeconds) {
@@ -141,6 +148,7 @@ public class RateLimitResponseHeaders {
         response.setHeader("X-RateLimit-Reset", String.valueOf(resetSeconds));
     }
 }
+```
 
 Output:
 ```

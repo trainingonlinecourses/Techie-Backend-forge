@@ -18,11 +18,13 @@ The N+1 problem is the most common JPA performance killer: one query for the par
 
 // The innocent-looking code
 List<Course> courses = courseRepository.findAll();
+```java
 for (Course c : courses) {
     for (Lesson l : c.getLessons()) {     // 🔥 lazy load per course
         process(l);
     }
 }
+```
 
 ```sql
 -- What actually hits the DB:
@@ -68,8 +70,10 @@ One query, lessons loaded eagerly for this query only. **Caveats**:
 
 ## Fix 2: @EntityGraph (declarative)
 
+```java
 @EntityGraph(attributePaths = {"lessons", "lessons.quiz"})
 @Query("select c from Course c where c.published = true")
+```
 List<Course> findAllWithLessonsAndQuizzes();
 
 Same effect as the fetch join, declared on the method. Supports nested paths — the cleanest option for multi-level graphs.
@@ -96,10 +100,12 @@ SELECT * FROM lessons WHERE course_id IN (1, 2, 3, ..., 50);   -- 2 queries for 
 
 For read-heavy, rarely-changing data, cache the entities:
 
+```java
 @Entity
 @Cacheable
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Course { ... }
+```
 
 ```yaml
 spring:

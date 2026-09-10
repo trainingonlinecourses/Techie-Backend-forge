@@ -32,10 +32,12 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void configureMessageBroker(MessageBrokerRegistry config) {
         config.enableSimpleBroker("/topic", "/queue");  // in-memory broker
         config.setApplicationDestinationPrefixes("/app");  // client → server prefix
+```java
     }
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
+```
         registry.addEndpoint("/ws")
             .setAllowedOrigins("*")  // in production, restrict to your domain
             .withSockJS();  // SockJS fallback for older browsers
@@ -154,11 +156,13 @@ public class OrderService {
 
     public Order updateStatus(String orderId, String newStatus) {
         Order order = repository.findById(orderId)
+```java
             .orElseThrow(() -> new NotFoundException(orderId));
         order.setStatus(newStatus);
         Order saved = repository.save(order);
 
         // Push update to dashboard subscribers
+```
         messaging.convertAndSend("/topic/orders.status",
             new OrderStatusUpdate(saved.id(), saved.status(), Instant.now()));
 
@@ -168,6 +172,7 @@ public class OrderService {
 
 ### Scenario 2: real-time collaborative document
 
+```java
 @Controller
 public class DocumentHandler {
 
@@ -179,6 +184,7 @@ public class DocumentHandler {
         messaging.convertAndSend("/topic/doc." + edit.documentId(), edit);
     }
 }
+```
 
 ## Common mistakes
 

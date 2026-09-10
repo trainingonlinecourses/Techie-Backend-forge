@@ -61,10 +61,12 @@ public class Point {
 }
 ```
 
+```java
 **Records** eliminate ALL that boilerplate with one line:
 
 // New way — same functionality, one line!
 public record Point(int x, int y) {}
+```
 
 That's it. The compiler automatically generates:
 - ✅ Private final fields (`x` and `y`)
@@ -78,7 +80,9 @@ That's it. The compiler automatically generates:
 ## How Records Work Under the Hood
 
 When you write:
+```java
 public record Point(int x, int y) {}
+```
 
 The compiler generates something equivalent to:
 
@@ -230,6 +234,7 @@ public class Main {
 
 Records can have extra fields and methods, but the extra fields must be `static`:
 
+```java
 public record Student(String name, int age, String major) {
 
     // Static fields are allowed
@@ -261,11 +266,13 @@ public record Student(String name, int age, String major) {
 Student s = Student.create("Alice", 20, "CS");
 System.out.println(s.isAdult());  // true
 System.out.println(s介绍());    // Alice (20, CS)
+```
 
 ### Records Implementing Interfaces
 
 Records can implement interfaces (but cannot extend classes — they're implicitly `final`):
 
+```java
 public interface Printable {
     String format();
 }
@@ -291,6 +298,7 @@ public record Product(String id, String name, double price) implements Printable
 
 Product p = new Product("P001", "Laptop", 999.99);
 System.out.println(p.format());  // [P001] Laptop - $999.99
+```
 
 ### Generic Records
 
@@ -318,6 +326,7 @@ public class Main {
 
 If you've used Lombok, you know `@Data`, `@Value`, and `@AllArgsConstructor`. Records do the same thing but are part of the language:
 
+```java
 // Lombok way
 @Data
 @AllArgsConstructor
@@ -328,6 +337,7 @@ public class Point {
 
 // Java Record way — no library needed
 public record Point(int x, int y) {}
+```
 
 | Feature | Records | Lombok |
 |---------|---------|--------|
@@ -408,8 +418,10 @@ public class UserController {
             request.email(),
             request.password(),
             request.role()
+```java
         );
         return ResponseEntity.ok(new UserResponse(
+```
             user.getId(),
             user.getUsername(),
             user.getEmail(),
@@ -430,6 +442,7 @@ public record DatabaseConfig(
     String password,
     int maxConnections,
     Duration timeout
+```java
 ) {
     public DatabaseConfig {
         // Defaults via compact constructor
@@ -442,6 +455,7 @@ public record DatabaseConfig(
         return "jdbc:postgresql://" + host + ":" + port + "/" + database;
     }
 }
+```
 
 ### Scenario 3: Domain Events
 
@@ -450,6 +464,7 @@ public record UserRegistered(
     String userId,
     String email,
     LocalDateTime occurredAt
+```java
 ) {
     public UserRegistered {
         occurredAt = LocalDateTime.now();
@@ -457,11 +472,13 @@ public record UserRegistered(
 }
 
 public record OrderPlaced(
+```
     String orderId,
     String userId,
     List<String> productIds,
     BigDecimal totalAmount,
     LocalDateTime occurredAt
+```java
 ) {
     public OrderPlaced {
         occurredAt = LocalDateTime.now();
@@ -485,9 +502,11 @@ public class UserService {
         publisher.publishEvent(new UserRegistered(user.getId(), email, LocalDateTime.now()));
     }
 }
+```
 
 ### Scenario 4: Value Objects (DDD)
 
+```java
 // Value objects that represent domain concepts
 public record Money(BigDecimal amount, Currency currency) {
     public Money {
@@ -510,6 +529,7 @@ public record Money(BigDecimal amount, Currency currency) {
         return new Money(amount, Currency.getInstance("USD"));
     }
 }
+```
 
 ---
 

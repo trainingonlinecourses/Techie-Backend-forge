@@ -25,6 +25,7 @@ Spring Data JPA is great — until you need exact SQL, raw performance, or a que
 
 Spring Boot auto-configures a `JdbcTemplate` from the `DataSource`. Inject it anywhere:
 
+```java
 @Repository
 public class CourseJdbcRepository {
 
@@ -34,6 +35,7 @@ public class CourseJdbcRepository {
         this.jdbcTemplate = jdbcTemplate;
     }
 }
+```
 
 ## Querying With RowMapper
 
@@ -55,14 +57,18 @@ private static final RowMapper<Course> courseRowMapper = (rs, rowNum) ->
         rs.getLong("id"),
         rs.getString("title"),
         rs.getString("level"),
+```java
         rs.getInt("minutes"));
+```
 
 Or with a `BeanPropertyRowMapper` for simple cases (column names → property names):
 
 return jdbcTemplate.queryForObject(
     "SELECT * FROM courses WHERE id = ?",
+```java
     new BeanPropertyRowMapper<>(Course.class),
     id);
+```
 
 ## The Query Method Family
 
@@ -77,11 +83,13 @@ return jdbcTemplate.queryForObject(
 public List<Course> findByLevel(String level) {
     return jdbcTemplate.query(
         "SELECT * FROM courses WHERE level = ? ORDER BY title",
+```java
         courseRowMapper, level);
 }
 
 public long countByLevel(String level) {
     return jdbcTemplate.queryForObject(
+```
         "SELECT COUNT(*) FROM courses WHERE level = ?",
         Long.class, level);
 }
@@ -100,9 +108,11 @@ public int updateMinutes(Long id, int minutes) {
 
 `update` returns the affected row count — the natural check for "did it exist?":
 
+```java
 public boolean deleteIfExists(Long id) {
     return jdbcTemplate.update("DELETE FROM courses WHERE id = ?", id) > 0;
 }
+```
 
 ### Insert With Generated Keys
 
@@ -150,11 +160,13 @@ jdbcTemplate.batchUpdate(
     "INSERT INTO courses (title, level, minutes) VALUES (?, ?, ?)",
     courses,
     100,                                  // batch size
+```java
     (ps, course) -> {
         ps.setString(1, course.getTitle());
         ps.setString(2, course.getLevel());
         ps.setInt(3, course.getMinutes());
     });
+```
 
 ## SQL Injection Safety
 
@@ -162,11 +174,15 @@ jdbcTemplate.batchUpdate(
 
 // ❌ INJECTION: title concatenated into SQL
 jdbcTemplate.query(
+```java
     "SELECT * FROM courses WHERE title = '" + title + "'", ...);
 
 // ✅ SAFE: parameterized
+```
 jdbcTemplate.query(
+```java
     "SELECT * FROM courses WHERE title = ?", courseRowMapper, title);
+```
 
 A parameterized query cannot be injected — the value is data, never code. This is the single most important rule of raw SQL in any language.
 
@@ -174,11 +190,15 @@ A parameterized query cannot be injected — the value is data, never code. This
 
 Records make RowMappers trivial:
 
+```java
 public record CourseRow(Long id, String title, String level, int minutes) {}
+```
 
 private static final RowMapper<CourseRow> ROW_MAPPER = (rs, n) ->
+```java
     new CourseRow(rs.getLong("id"), rs.getString("title"),
         rs.getString("level"), rs.getInt("minutes"));
+```
 
 public List<CourseRow> findAll() {
     return jdbcTemplate.query("SELECT * FROM courses ORDER BY id", ROW_MAPPER);
@@ -188,12 +208,14 @@ public List<CourseRow> findAll() {
 
 Spring translates raw SQLExceptions into meaningful DataAccessExceptions:
 
+```java
 try {
     jdbcTemplate.update("INSERT INTO courses ...", ...);
 } catch (DuplicateKeyException e) {
     // specific: duplicate primary key — no SQLException parsing
     throw new CourseCodeExistsException();
 }
+```
 
 The hierarchy (via `SQLErrorCodeSQLExceptionTranslator`) maps vendor codes to Spring exceptions: `DuplicateKeyException`, `DataIntegrityViolationException`, `EmptyResultDataAccessException` (queryForObject found nothing), `IncorrectResultSizeDataAccessException` (found >1).
 

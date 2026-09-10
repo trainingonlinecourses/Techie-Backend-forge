@@ -26,6 +26,7 @@ The key mistake teams make: using byte streams for text. When you read text with
 
 Java IO is built on the **decorator pattern**: you wrap a base stream in progressively more capable wrappers.
 
+```java
 // Base: a raw byte stream from a file
 InputStream raw = new FileInputStream("data.bin");
 
@@ -34,19 +35,25 @@ InputStream buffered = new BufferedInputStream(raw);
 
 // Decorator: GZip decompression
 InputStream decompressed = new GZIPInputStream(buffered);
+```
 
 // Now read — every read() goes through GZip → Buffered → File
+```java
 byte[] data = decompressed.readAllBytes();
+```
 
 Each wrapper adds a capability without the others knowing. This is elegant but verbose — Java 7's try-with-resources simplifies cleanup:
 
+```java
 try (InputStream in = new GZIPInputStream(new BufferedInputStream(new FileInputStream("data.bin")))) {
     byte[] data = in.readAllBytes();
     // process data
 }  // automatically closed in reverse order, even on exception
+```
 
 ## Character streams: Reader/Writer
 
+```java
 // Reading text — Reader handles encoding
 try (BufferedReader reader = new BufferedReader(
         new InputStreamReader(new FileInputStream("orders.csv"), StandardCharsets.UTF_8))) {
@@ -64,6 +71,7 @@ try (BufferedWriter writer = new BufferedWriter(
     writer.write("Order processed");
     writer.newLine();
 }
+```
 
 **Java 8+ simplification:** `Files.newBufferedReader()` and `Files.newBufferedWriter()` eliminate the decorator chain:
 
@@ -73,8 +81,10 @@ try (BufferedReader reader = Files.newBufferedReader(Path.of("orders.csv"), Stan
 
 **Java 11+ further simplification:** `readString()` and `writeString()`:
 
+```java
 String content = Files.readString(Path.of("config.yml"));
 Files.writeString(Path.of("output.txt"), "Order processed\n");
+```
 
 ## NIO: channels and buffers
 

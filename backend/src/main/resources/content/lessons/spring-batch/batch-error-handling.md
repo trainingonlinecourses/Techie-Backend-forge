@@ -26,7 +26,9 @@ Batch jobs fail in two flavors: **poison records** (this row is bad, always will
     .retry(DataAccessResourceFailureException.class).retryLimit(3)
     .retryBackOffPolicy(new FixedBackOffPolicy())         // configure delay
     .noRollback(ValidationException.class)                // don't waste a rollback
+```java
     .build();
+```
 
 ## Skip: poison records must not kill the job
 
@@ -38,6 +40,7 @@ Batch jobs fail in two flavors: **poison records** (this row is bad, always will
 - Exceed `skipLimit` → the step fails with `SkipLimitExceededException`.
 - **Log skipped items** with a `SkipListener` so they can be reprocessed later:
 
+```java
 @Bean
 SkipListener<Transaction, Statement> skipListener() {
     return new SkipListener<>() {
@@ -46,6 +49,7 @@ SkipListener<Transaction, Statement> skipListener() {
         public void onSkipInWrite(Statement item, Throwable t) { log.warn("skipped write {}", item, t); }
     };
 }
+```
 
 The classic skip use-case: an ETL where a vendor sends one malformed row per file — fail the whole night run, or skip 3 bad rows and alert? Skip + alert.
 
@@ -53,7 +57,9 @@ The classic skip use-case: an ETL where a vendor sends one malformed row per fil
 
 .retry(DataAccessResourceFailureException.class)  // e.g. connection blips
 .retryLimit(3)
+```java
 .retryBackOffPolicy(new ExponentialBackOffPolicy()); // 1s, 2s, 4s…
+```
 
 - Retry is **per item**: the same item is re-processed (re-read from the reader's buffer for chunk restart) up to `retryLimit` times.
 - **Rollback happens on retry exhaustion** unless the exception is in `noRollback(...)`.

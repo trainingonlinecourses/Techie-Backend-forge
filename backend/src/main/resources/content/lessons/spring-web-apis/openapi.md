@@ -34,6 +34,7 @@ No annotations needed for the basics: `@RestController` + DTOs + `@Valid` constr
 
 The generated descriptor is only as good as the metadata you add:
 
+```java
 @Operation(summary = "Create an order", description = "Validates stock and reserves payment")
 @ApiResponses({
     @ApiResponse(responseCode = "201", description = "Order created", content = @Content(schema = @Schema(implementation = OrderDto.class))),
@@ -41,14 +42,17 @@ The generated descriptor is only as good as the metadata you add:
     @ApiResponse(responseCode = "401", description = "Missing or invalid token")
 })
 @PostMapping("/orders")
+```
 ResponseEntity<OrderDto> create(@Valid @RequestBody CreateOrderRequest req) { ... }
 
+```java
 public record CreateOrderRequest(
     @Schema(example = "ada@example.com", description = "Customer contact email")
     @Email String contact,
     @Schema(minimum = "0.01")
     @Positive BigDecimal amount
 ) {}
+```
 
 - `@Schema` adds examples/descriptions to DTOs — examples make the UI (and your testers) far more useful.
 - Constraint annotations (`@NotNull`, `@Size`, `@Email`) are **translated into the schema** automatically (required, min/max length, format) — one more reason to validate with Bean Validation.

@@ -19,11 +19,13 @@ Redis is an **in-memory data structure store**: strings, hashes, lists, sets, so
 - **`RedisTemplate<K,V>`** — generic operations per type: `opsForValue()`, `opsForHash()`, `opsForList()`, `opsForSet()`, `opsForZSet()`, `opsForStream()`.
 - **`StringRedisTemplate`** — the string-only specialization; the one you reach for first (most Redis usage is strings).
 
+```java
 stringRedisTemplate.opsForValue().set("session:" + userId, token, Duration.ofHours(2));
 String token = stringRedisTemplate.opsForValue().get("session:" + userId);
 
 redisTemplate.opsForZSet().add("leaderboard", playerId, score);        // sorted set
 Long rank = redisTemplate.opsForZSet().reverseRank("leaderboard", playerId);
+```
 
 ## Hash mapping: @RedisHash entities
 
@@ -32,7 +34,9 @@ Spring Data Redis maps entities to Redis hashes with repository support:
 @RedisHash("cart")
 public class Cart {
     @Id String id;                    // key: cart:<id>
+```java
     String userId;
+```
     List<CartLine> lines;             // nested objects as JSON
     @Indexed String status;           // indexable field — enables finder queries
 }
@@ -46,15 +50,19 @@ public interface CartRepository extends CrudRepository<Cart, String> { }
 
 ## TTLs: the discipline that keeps Redis healthy
 
+```java
 // Every write should ask: "when should this die?"
 template.opsForValue().set("otp:" + phone, code, Duration.ofMinutes(5));
 template.opsForValue().set("cache:product:" + id, json, Duration.ofHours(1));
+```
 
 - **Rate limiting** — the atomic increment-and-expire pattern (the fixed-window limiter this academy's API module implements):
 
+```java
 Long count = template.opsForValue().increment("rl:" + userId + ":" + minute);
 if (count == 1) template.expire("rl:" + userId + ":" + minute, Duration.ofSeconds(60));
 if (count > 100) throw new RateLimitExceededException();
+```
 
 - Unbounded keys (no TTL, no eviction policy) are how Redis OOMs in production. Set a default `maxmemory-policy` (e.g. `allkeys-lru`) as the safety net even if every key has TTL.
 
@@ -78,8 +86,10 @@ spring.cache.type: redis
 spring.data.redis.host: localhost
 ```
 
+```java
 @Cacheable(value = "products", key = "#id", unless = "#result == null")
 Product find(Long id) { ... }   // first call hits DB, rest hit Redis
+```
 
 ## Key takeaways
 

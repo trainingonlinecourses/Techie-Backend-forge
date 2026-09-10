@@ -109,10 +109,12 @@ public class GathererDemo {
 // Process 100 users at a time for bulk email
 users.stream()
     .gather(window(100))
+```java
     .forEach(batch -> emailService.sendBatch(batch));
 
 **Scenario 2: Real-time sensor averaging**
 // Average temperature readings over 5-minute windows
+```
 sensorReadings.stream()
     .gather(window(300))  // 5 per second × 300 = 5 min
     .map(GathererDemo::averageTemperature)
@@ -123,10 +125,12 @@ sensorReadings.stream()
 Stream.of("a", "b", "a", "c", "b", "d")
     .gather(Gatherer.of(
         HashSet::new,
+```java
         (seen, item, downstream) -> {
             if (seen.add(item)) downstream.push(item);
             return true;
         }
+```
     ))
     .forEach(System.out::println);
 // Output: a b c d

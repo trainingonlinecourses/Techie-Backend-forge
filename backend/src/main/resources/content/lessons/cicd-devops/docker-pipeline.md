@@ -4,15 +4,19 @@ module: cicd-devops
 order: 1
 minutes: 22
 topics: ["Dockerfile", "multi-stage builds", "layers", "image size", "CI docker build", "registry"]
+```java
 summary: CI produces a jar; Docker turns it into a deployable unit. The Dockerfile you write decides build time, image size, attack surface, and how fast yo...
 docs:
+```
   - title: "Docker best practices"
     url: "https://docs.docker.com/build/building/best-practices/"
 ---
 
 # The Docker Build Pipeline
 
+```java
 CI produces a jar; Docker turns it into a **deployable unit**. The Dockerfile you write decides build time, image size, attack surface, and how fast your deploys roll. This lesson covers multi-stage builds, layer caching, and the pipeline that ships the image.
+```
 
 ## Multi-Stage Builds
 
@@ -41,7 +45,9 @@ The runtime image contains only the JRE + jar — the Maven toolchain, sources, 
 
 ## Layer Caching: The Order That Matters
 
+```java
 Docker caches layers; a layer only rebuilds when its inputs change. Order the instructions so *frequent changes come last*:
+```
 
 ```dockerfile
 COPY pom.xml .

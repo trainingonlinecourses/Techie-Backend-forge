@@ -13,6 +13,7 @@ docs:
 
 Before Java 8, if you wanted to pass *behavior* to a method — like a sorting rule, a filter, or a callback — you had to create an anonymous inner class. That meant six lines of boilerplate for one line of logic:
 
+```java
 // The OLD way (pre-Java 8): anonymous inner class
 Runnable r = new Runnable() {
     @Override
@@ -20,11 +21,14 @@ Runnable r = new Runnable() {
         System.out.println("Hello");
     }
 };
+```
 
 Java 8 introduced **lambda expressions** — a concise way to write inline implementations of functional interfaces. The same code becomes:
 
+```java
 // The NEW way (Java 8+): lambda
 Runnable r = () -> System.out.println("Hello");
+```
 
 That's it. One line. No ceremony. The compiler infers everything.
 
@@ -83,7 +87,9 @@ Comparator<Employee> byNameThenAge = (e1, e2) -> {
 
 Lambdas can "capture" variables from the surrounding scope. This is called **closure**:
 
+```java
 String prefix = "Order: ";                     // effectively final variable
+```
 Consumer<String> logOrder = order -> {
     System.out.println(prefix + order);         // captures 'prefix'
 };
@@ -94,6 +100,7 @@ logOrder.accept("A123");                        // prints "Order: A123"
 - The lambda gets a **copy** of the variable's value, not a reference
 - You cannot modify a captured local variable from inside the lambda
 
+```java
 public class Main {
 
     public static void main(String[] args) {
@@ -104,6 +111,7 @@ public class Main {
         Runnable printCounter = () -> System.out.println(fixedCounter); // OK — effectively final
     }
 }
+```
 
 ---
 
@@ -171,44 +179,58 @@ public class LambdaDemo {
 
 In a microservices system, services register event handlers:
 
+```java
 // Define event types
 record OrderEvent(String orderId, String type, Map<String, Object> data) {}
 
 // Register handlers using lambdas
+```
 Map<String, Consumer<OrderEvent>> handlers = Map.of(
     "CREATED",   event -> orderService.sendConfirmation(event.orderId()),
     "CANCELLED", event -> inventoryService.restoreStock(event.data()),
     "SHIPPED",   event -> notificationService.notifyCustomer(event.orderId())
+```java
 );
 
 // Dispatch events
+```
 Consumer<OrderEvent> handler = handlers.get(event.type());
+```java
 if (handler != null) {
     handler.accept(event);
 }
 
 **Why lambdas here:** Each handler is a small, focused piece of behavior. Without lambdas, you'd need a separate class for each handler — four classes instead of four lambdas.
+```
 
 ### Scenario 2: API gateway request transformation
 
 // Define transformation pipelines
 Function<Request, Request> addAuth = req -> 
+```java
     req.withHeader("Authorization", "Bearer " + tokenService.getToken());
+```
 
 Function<Request, Request> addCorrelationId = req ->
+```java
     req.withHeader("X-Correlation-ID", UUID.randomUUID().toString());
+```
 
 Function<Request, Request> addTimestamp = req ->
+```java
     req.withHeader("X-Request-Time", Instant.now().toString());
 
 // Compose transformations
+```
 Function<Request, Request> pipeline = addAuth
     .andThen(addCorrelationId)
+```java
     .andThen(addTimestamp);
 
 Request enrichedRequest = pipeline.apply(originalRequest);
 
 **Why lambdas here:** Functional composition lets you build pipelines from small, testable pieces.
+```
 
 ### Scenario 3: Retry logic with exponential backoff
 

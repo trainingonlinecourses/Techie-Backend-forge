@@ -16,9 +16,11 @@ docs:
 
 ## The Concept: Where Do Related Things Live?
 
+```java
 The document model's core design decision: when a customer has orders, do the orders live *inside* the customer document (**embedding**) or in their own documents pointing back at the customer (**referencing**)? There is no "always do X" answer — the choice follows from how your application *reads and writes* the data. Get it right and your queries are one read; get it wrong and you're either shipping enormous documents or doing manual joins.
 
 **The mental model:** embedding is carrying your wallet with cash and cards inside it — everything you need on one trip, one object. Referencing is a checkbook with a registry — each check references an account elsewhere; the book stays thin, but cashing a check means going to the bank (a second read). The question is always: *do you typically need the related data together, and how big is it?*
+```
 
 ## The Three Relationship Shapes
 
@@ -78,7 +80,9 @@ Plus two more hard rules:
   "total": 99.5 }
 ```
 
+```java
 The trade-off is explicit: reads become single-document (fast), but the copy can go stale if the customer renames. The rule: **denormalize for display, normalize for integrity.** Update the copy only when the change is user-visible (rename) and tolerate eventual consistency; never denormalize data that must be exact (prices, balances).
+```
 
 **Pattern C — Two-way referencing with application-side joins:** store ids on both sides (`customer.orderIds` and `order.customerId`) when you need both directions. MongoDB's aggregation framework (`$lookup`) performs server-side joins across collections — the escape hatch when referencing needs a join after all:
 
@@ -110,7 +114,9 @@ Document modeling is *application-driven*: you design for the reads and writes y
 
 ## Recap
 
+```java
 The document model's central design choice is embed vs reference. Embed when related data is small, bounded, and always read/written with its parent; reference when the "many" side is unbounded or independently queried. Denormalize small copies for display-only fields to make reads single-document, but never denormalize integrity-critical data. Remember the two laws: **atomicity follows the document** (update-together data lives together) and **documents have practical size limits** (unbounded arrays belong elsewhere). Model from your access patterns, and the MongoDB design — often derided as "schema-less chaos" — becomes as deliberate as any relational design, just with different trade-offs.
+```
 
 ## References
 

@@ -33,6 +33,7 @@ Spring's philosophy: checked exceptions signal "handle me, maybe it's fine"; run
 
 ## Explicit Rollback Rules
 
+```java
 // Roll back on specific exceptions
 @Transactional(rollbackFor = {IOException.class, FileUploadException.class})
 public void createCourse(CourseDto dto) throws IOException { ... }
@@ -44,6 +45,7 @@ public void fragileOperation() throws Exception { ... }
 // Never roll back on this one
 @Transactional(noRollbackFor = OptimisticLockException.class)
 public void updateWithRetryHandled() { ... }
+```
 
 **The rule**: declare `rollbackFor` explicitly whenever a checked exception can fail the operation — otherwise the default commits a half-done write.
 
@@ -70,25 +72,31 @@ public class CourseService {
 }
 ```
 
+```java
 **The boundary is the business operation**: the service method that must be all-or-nothing. Controllers orchestrate HTTP; repositories do single operations; services own the transaction.
+```
 
 ### Repository-Level Transactions
 
+```java
 @Repository
 public interface CourseRepository extends JpaRepository<Course, Long> {
     // Each repository method participates in the caller's tx (REQUIRED)
     // — no @Transactional needed on the repository itself
 }
+```
 
 Spring Data repositories are already transactional (each method joins or creates one). Don't add `@Transactional` to repository methods — the service owns the boundary.
 
 ## readOnly = true: The Contract
 
+```java
 @Transactional(readOnly = true)
 public CourseDto getCourse(Long id) {
     Course course = courseRepository.findById(id).orElseThrow();
     return CourseDto.from(course);
 }
+```
 
 What `readOnly` really does:
 
@@ -96,10 +104,12 @@ What `readOnly` really does:
 - **JPA flush mode set to MANUAL** — no dirty-checking flushes (performance)
 - **Does NOT prevent writes** — a readOnly tx can still insert if you try (JPA throws on flush of new entities in some providers, but it's not a hard guarantee)
 
+```java
 @Transactional(readOnly = true)
 public void sneaky() {
     repository.save(entity);   // ⚠️ not prevented by readOnly in all providers
 }
+```
 
 Treat `readOnly` as documentation + optimization hint, not a write guard. For hard write-prevention, use a read-only datasource/user.
 
@@ -128,6 +138,7 @@ public CourseDto createCourse(CourseDto dto) {
 
 ## The Event-Transaction Pattern
 
+```java
 @Transactional
 public void placeOrder(OrderDto dto) {
     Order order = orderRepository.save(toEntity(dto));
@@ -141,6 +152,7 @@ public void placeOrder(OrderDto dto) {
 public void onOrderPlaced(OrderPlaced event) {
     emailService.sendConfirmation(event.order());   // only after commit
 }
+```
 
 `@TransactionalEventListener(AFTER_COMMIT)` is the declarative version of the synchronization pattern — the event listener runs only after the transaction commits.
 
@@ -154,6 +166,7 @@ class RollbackRuleTest {
     @Test
     void checkedExceptionRollsBackWithRule() {
         assertThrows(IOException.class,
+```java
             () -> courseService.createCourseFails(dto));
 
         assertEquals(0, courseRepository.count());   // rolled back ✅
@@ -161,6 +174,7 @@ class RollbackRuleTest {
 
     @Test
     void defaultCommitsOnCheckedException() {
+```
         assertThrows(IOException.class,
             () -> courseService.createCourseDefault(dto));
 

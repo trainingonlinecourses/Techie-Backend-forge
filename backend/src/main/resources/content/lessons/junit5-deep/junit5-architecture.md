@@ -26,6 +26,7 @@ JUnit 5 isn't one library — it's an *architecture* of three cooperating projec
 
 ## The Test Lifecycle: What Runs and When
 
+```java
 import org.junit.jupiter.api.*;
 
 class LifecycleDemo {
@@ -62,6 +63,7 @@ class LifecycleDemo {
 }
 
 **Walking through the lifecycle:**
+```
 
 - **Default instance-per-test:** JUnit creates a *new instance of the test class for each test method*. That's why `@BeforeAll`/`@AfterAll` must be `static` — there's no instance yet when they run. (You can opt into per-class instances with `@TestInstance(Lifecycle.PER_CLASS)` — useful for stateful or `@BeforeAll`-on-instance setups.)
 - **Per-test setup/teardown:** `@BeforeEach`/`@AfterEach` run around every test — the place to reset state, start/stop mocks, open/close resources.
@@ -72,6 +74,7 @@ The lifecycle is *the* contract of test isolation: each test starts clean, and `
 
 ## The Core Annotations
 
+```java
 import org.junit.jupiter.api.*;
 
 class AnnotationDemo {
@@ -98,6 +101,7 @@ class AnnotationDemo {
     @RepeatedTest(3)
     void repeatedTest() { }      // runs 3 times (RepetitionInfo available)
 }
+```
 
 **The everyday set:** `@Test` (the test itself), `@Disabled` (temporarily off, with a reason — the reason is *required* discipline so nobody forgets why), `@DisplayName` (report/IDE readability), `@Tag` (the grouping mechanism — run "fast" tests in CI, exclude "slow" ones), `@Timeout` (the hang-guard — a test that blocks forever fails instead of hanging the build), `@RepeatedTest` (flakiness detection). The philosophical point: JUnit 5 treats *test structure as API* — display names, tags, and timeouts are first-class, not comments.
 

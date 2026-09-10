@@ -16,10 +16,12 @@ docs:
 
 A blocking HTTP call (RestClient) occupies a thread for the whole round trip: the thread sits idle waiting for the server. With thousands of concurrent calls, you need thousands of threads. **Reactive** clients flip the model: instead of *blocking and waiting*, you **describe what you want** and get a *future-like* object (`Mono` = 0 or 1 result, `Flux` = 0..n results). The actual work happens on shared, non-blocking event-loop threads, and your continuation runs **when the response arrives** — no thread is ever idle-waiting.
 
+```java
 // Blocking (RestClient): thread waits
 Course course = restClient.get().uri("/api/courses/1").retrieve().body(Course.class);
 
 // Reactive (WebClient): returns immediately with a Mono
+```
 Mono<Course> future = webClient.get().uri("/api/courses/1").retrieve().bodyToMono(Course.class);
 
 The first call *hangs* the calling thread until data arrives. The second returns in microseconds — the `Mono` is a *promise* that will emit the `Course` (or an error) when the server answers. You attach `.map(...)`, `.flatMap(...)`, `.subscribe(...)` to process the result when it comes.
@@ -130,7 +132,9 @@ If you're on WebFlux but need a blocking result in one place (e.g., a `@Schedule
 
 Course course = webClient.get().uri("/api/courses/1").retrieve()
         .bodyToMono(Course.class)
+```java
         .block(Duration.ofSeconds(5));   // wait (bounded) for the result
+```
 
 Never call `block()` inside a reactive pipeline (it blocks an event-loop thread — the exact anti-pattern). Use it only at *imperative boundaries* (scheduled jobs, `@PostConstruct`, plain tests).
 

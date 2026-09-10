@@ -72,10 +72,12 @@ management:
 
 Or dynamically per-request with a `Sampler`:
 
+```java
 @Bean
 public Sampler sampler() {
     return Sampler.ALWAYS_SAMPLE;   // demo only
 }
+```
 
 ## Adding Custom Spans
 
@@ -102,6 +104,7 @@ public class RecommendationService {
 
 Or declaratively with `@Observed` (Micrometer Observation):
 
+```java
 @Configuration
 public class ObservationConfig {
     @Bean
@@ -111,6 +114,7 @@ public class ObservationConfig {
 }
 
 @Observed(name = "recommendations.fetch")
+```
 public List<Recommendation> fetch(String userId) { ... }
 
 `@Observed` is the modern approach — it produces **both** metrics and traces from one annotation, because an Observation is metrics + tracing + logging together.
@@ -151,11 +155,13 @@ Now in your log system, search `traceId=4bf92f...` and see every service's log l
 
 Pass business context without threading it through every method:
 
+```java
 // Add baggage to outgoing requests
 Span.current().baggage().update("tenant.id", tenantId);
 
 // Read it in another service
 String tenant = Span.current().baggage().get("tenant.id");
+```
 
 Configure baggage fields to propagate:
 
@@ -181,6 +187,7 @@ The Micrometer facade means switching backends = changing one dependency + endpo
 
 ## Testing Traces
 
+```java
 @SpringBootTest
 class TracingTest {
 
@@ -194,6 +201,7 @@ class TracingTest {
         assertEquals("value", span.context().traceId() != null ? "value" : null);
     }
 }
+```
 
 Better: assert spans reached a test Zipkin receiver, or use `TestObservationRegistry` for `@Observed` methods.
 

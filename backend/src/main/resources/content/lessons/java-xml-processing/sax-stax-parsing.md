@@ -246,6 +246,7 @@ public class Main {
 
 ### Key StAX Advantage: Conditional Parsing
 
+```java
 // You can skip entire subtrees — something SAX can't do easily
 while (reader.hasNext()) {
     int event = reader.next();
@@ -264,6 +265,7 @@ while (reader.hasNext()) {
     }
     // Process other elements normally...
 }
+```
 
 ---
 
@@ -286,12 +288,14 @@ while (reader.hasNext()) {
 ### Processing a 50 GB B2B Data Feed
 
 public List<Order> parseGiantEdiXml(String filePath) throws Exception {
+```java
     XMLInputFactory factory = XMLInputFactory.newInstance();
     // Disable external entities (security!)
     factory.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, "");
     factory.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
     
     XMLEventReader reader = factory.createXMLEventReader(new FileInputStream(filePath));
+```
     List<Order> orders = new ArrayList<>();
     Order currentOrder = null;
     
@@ -329,16 +333,20 @@ public List<Order> parseGiantEdiXml(String filePath) throws Exception {
 
 Both SAX and StAX are vulnerable to **XXE (XML External Entity) attacks** unless you explicitly disable external entities:
 
+```java
 // For SAX
 SAXParserFactory factory = SAXParserFactory.newInstance();
+```
 factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
 factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
 factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
 
+```java
 // For StAX
 XMLInputFactory factory = XMLInputFactory.newInstance();
 factory.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, "");
 factory.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+```
 
 Without these settings, an attacker could inject `<!ENTITY xxe SYSTEM "file:///etc/passwd">` and exfiltrate server files.
 

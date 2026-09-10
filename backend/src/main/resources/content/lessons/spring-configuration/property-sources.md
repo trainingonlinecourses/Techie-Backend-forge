@@ -113,6 +113,7 @@ Two rules make this usable:
 
 A `PropertySource` is a `Map`-like over keys; you can implement one backed by anything (a database, an HTTP endpoint, a vault):
 
+```java
 import org.springframework.core.env.PropertySource;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.context.annotation.Bean;
@@ -130,6 +131,7 @@ public class DbPropertySourceConfig {
     // Register it FIRST so it beats application.properties:
     // (via EnvironmentPostProcessor or ApplicationContextInitializer in real apps)
 }
+```
 
 This is how Spring Cloud Config works: the config client registers a remote-backed property source, and every `${...}` in your app resolves against it — your code never knows the config came from a server. Same abstraction, different backing.
 

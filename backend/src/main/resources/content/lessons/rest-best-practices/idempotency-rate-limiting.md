@@ -137,6 +137,7 @@ public class RateLimitInterceptor implements HandlerInterceptor {
         String clientKey = clientKey(request);   // IP, API key, or user id
         Bucket bucket = buckets.computeIfAbsent(clientKey, this::newBucket);
 
+```java
         if (bucket.tryConsume(1)) {
             return true;
         }
@@ -166,6 +167,7 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
+```
         registry.addInterceptor(interceptor)
             .addPathPatterns("/api/**")
             .excludePathPatterns("/api/auth/**");   // don't rate-limit login (or do, carefully)
@@ -180,7 +182,9 @@ In a cluster, in-memory buckets are per-instance (3 replicas = 3× the limit). B
 public ProxyManager<String> bucketProxyManager(RedisConnectionFactory factory) {
     RedisBasedProxyManager<String> manager = RedisBasedProxyManager
         .builderFor(new LettuceBasedRedisClient(factory))
+```java
         .build();
+```
     return new ProxyManager<String>() {
         public Bucket getProxy(String key, Supplier<BucketConfiguration> config) {
             return manager.getProxy(key, config);
@@ -190,11 +194,13 @@ public ProxyManager<String> bucketProxyManager(RedisConnectionFactory factory) {
 
 ### Multiple Tiers
 
+```java
 // Per-key: 10 req/s
 Bandwidth perKey = Bandwidth.classic(10, Refill.greedy(1, Duration.ofSeconds(1)));
 // Global: 1000 req/s across all keys
 Bandwidth global = Bandwidth.classic(1000, Refill.greedy(100, Duration.ofSeconds(1)));
 Bucket bucket = Bucket.builder().addLimit(perKey).addLimit(global).build();
+```
 
 ## The 429 Response
 
@@ -237,7 +243,9 @@ public <T> T withRetry(Supplier<T> call, int maxAttempts) {
 | Cluster-wide limits | Bucket4j + Redis ProxyManager | In-memory buckets are per-instance |
 | Backoff | `Retry-After` header | Clients honor it, with jitter |
 
+```java
 Idempotency makes retries *safe*; rate limiting makes the API *available*. Together they're what turns an API from a prototype into a service other teams can depend on.
+```
 
 ## References
 

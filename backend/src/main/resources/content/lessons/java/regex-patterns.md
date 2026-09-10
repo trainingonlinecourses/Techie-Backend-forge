@@ -27,6 +27,7 @@ The engine is **greedy by default** — quantifiers consume as much as possible,
 
 The most common performance bug: compiling the pattern on every call.
 
+```java
 // WRONG — compiles the regex every request (expensive)
 boolean ok = email.matches("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}$");
 
@@ -40,11 +41,13 @@ public final class EmailValidator {
         return email != null && EMAIL.matcher(email).matches();
     }
 }
+```
 
 `Pattern.compile` is the expensive part — it parses the regex into a state machine. `matcher(...)` and the match itself are cheap. A **`static final` Pattern** is the standard, and `Pattern` is immutable and thread-safe so one instance serves every thread. `String.matches` compiles a fresh pattern each call — fine for validation scripts, a disaster in a hot request path.
 
 ## How we use it in an organization: real scenarios
 
+```java
 **Scenario 1 — extracting values with groups:**
 
 // Parse "GET /api/orders/12345 HTTP/1.1" from an access log
@@ -54,6 +57,7 @@ if (m.matches()) {
     String method = m.group(1);   // GET
     String path   = m.group(2);   // /api/orders/12345
 }
+```
 
 Groups are the `( ... )` captures; `group(1)`, `group(2)`… retrieve them. `group(0)` is the whole match.
 
@@ -61,6 +65,7 @@ Groups are the `( ... )` captures; `group(1)`, `group(2)`… retrieve them. `gro
 
 // Remove HTML tags and control characters from a user-supplied bio before rendering
 String clean = rawBio.replaceAll("<[^>]*>", "")      // strip tags
+```java
                      .replaceAll("[\\p{Cntrl}]", "")  // strip control chars
                      .trim();
 
@@ -79,6 +84,7 @@ while (m.find()) {
     String key = m.group(1); // rate_limit
     String val = m.group(2); // 1000
 }
+```
 
 `find()` scans for the *next* match anywhere; `matches()` requires the whole string to match; `lookingAt()` anchors at the start only. Choosing the right one is a common review comment.
 

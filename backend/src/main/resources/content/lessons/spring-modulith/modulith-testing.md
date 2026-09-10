@@ -52,12 +52,14 @@ class BillingFulfillmentIntegration {
     void paidOrderTriggersFulfillment(Scenario scenario) {
         scenario.stimulate(() -> billingService.markPaid(order))
             .andWaitForEventOfType(OrderPaid.class)
+```java
             .toArrive();
             // if a listener failed, the wait times out — the test fails loudly
     }
 
     @Test
     void failedListenerLeavesPublicationPending(Scenario scenario) {
+```
         // a listener that throws → the event publication stays incomplete:
         scenario.stimulate(() -> billingService.markPaid(order))
             .andWaitForEventOfType(OrderPaid.class)

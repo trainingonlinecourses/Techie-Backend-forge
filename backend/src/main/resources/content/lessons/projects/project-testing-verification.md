@@ -154,16 +154,20 @@ class ProjectIntegrationTest {
             """;
         
         ResponseEntity<String> createResponse = restTemplate.postForEntity(
+```java
             "/api/tasks", new HttpEntity<>(createBody, headers), String.class);
         assertEquals(HttpStatus.CREATED, createResponse.getStatusCode());
         
         // Read
+```
         ResponseEntity<String> getResponse = restTemplate.getForEntity(
+```java
             "/api/tasks/1", String.class);
         assertEquals(HttpStatus.OK, getResponse.getStatusCode());
         assertTrue(getResponse.getBody().contains("Integration Test"));
         
         // Update
+```
         String updateBody = """
             {
                 "title": "Updated Task",

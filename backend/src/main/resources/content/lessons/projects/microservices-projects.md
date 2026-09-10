@@ -165,13 +165,16 @@ public class OrderService {
 }
 ```
 
+```java
 **InventoryClient.java**
 package com.backendforge.orderservice.client;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
+```
 
 @FeignClient(name = "inventory-service", url = "${inventory-service.url}")
+```java
 public interface InventoryClient {
     
     @GetMapping("/api/inventory/{productId}")
@@ -180,6 +183,7 @@ public interface InventoryClient {
     @PostMapping("/api/inventory/{productId}/reduce")
     void reduceStock(@PathVariable Long productId, @RequestParam int quantity);
 }
+```
 
 ### Inventory Service
 
@@ -202,13 +206,16 @@ public class InventoryService {
     
     public boolean checkStock(Long productId, int quantity) {
         Stock stock = repository.findByProductId(productId)
+```java
             .orElse(new Stock(productId, 0));
         return stock.getQuantity() >= quantity;
     }
     
     @Transactional
     public void reduceStock(Long productId, int quantity) {
+```
         Stock stock = repository.findByProductId(productId)
+```java
             .orElseThrow(() -> new RuntimeException("Product not in inventory"));
         
         if (stock.getQuantity() < quantity) {
@@ -220,6 +227,7 @@ public class InventoryService {
     }
     
     public void addStock(Long productId, int quantity) {
+```
         Stock stock = repository.findByProductId(productId)
             .orElse(new Stock(productId, 0));
         stock.setQuantity(stock.getQuantity() + quantity);
@@ -229,6 +237,7 @@ public class InventoryService {
 
 ### Payment Service
 
+```java
 **PaymentService.java**
 package com.backendforge.paymentservice.service;
 
@@ -262,6 +271,7 @@ public class PaymentService {
             .orElseThrow(() -> new RuntimeException("Payment not found"));
     }
 }
+```
 
 ### docker-compose.yml
 ```yaml
@@ -406,20 +416,24 @@ public class JwtService {
             .setIssuedAt(new Date())
             .setExpiration(new Date(System.currentTimeMillis() + accessTokenExpiration))
             .signWith(signingKey, SignatureAlgorithm.HS256)
+```java
             .compact();
     }
     
     public String generateRefreshToken(String userId) {
         return Jwts.builder()
+```
             .setSubject(userId)
             .setIssuedAt(new Date())
             .setExpiration(new Date(System.currentTimeMillis() + refreshTokenExpiration))
             .signWith(signingKey, SignatureAlgorithm.HS256)
+```java
             .compact();
     }
     
     public Claims extractClaims(String token) {
         return Jwts.parserBuilder()
+```
             .setSigningKey(signingKey)
             .build()
             .parseClaimsJws(token)
@@ -470,6 +484,7 @@ public class JwtService {
 ```
 
 ### NotificationService.java
+```java
 package com.backendforge.notification.service;
 
 import com.backendforge.notification.entity.Notification;
@@ -514,6 +529,7 @@ public class NotificationService {
         repository.save(notification);
     }
 }
+```
 
 ---
 

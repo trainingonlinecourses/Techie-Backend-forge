@@ -24,6 +24,7 @@ When a controller method throws an exception, Spring Boot's default error handli
 
 ## Custom exceptions — meaningful error types
 
+```java
 // Base exception for all business errors
 public class BusinessException extends RuntimeException {
     private final String errorCode;
@@ -63,6 +64,7 @@ public class InsufficientFundsException extends BusinessException {
     public BigDecimal getAttempted() { return attempted; }
     public BigDecimal getAvailable() { return available; }
 }
+```
 
 ## @ControllerAdvice — global exception handling
 

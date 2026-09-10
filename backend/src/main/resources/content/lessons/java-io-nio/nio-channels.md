@@ -124,6 +124,7 @@ If we had called `get()` without flipping, we'd read zeros from index 2 onward �
 
 The pattern that powers high-concurrency servers:
 
+```java
 Selector selector = Selector.open();
 SocketChannel ch = SocketChannel.open();
 ch.configureBlocking(false);                    // non-blocking mode
@@ -137,6 +138,7 @@ while (true) {
         }
     }
 }
+```
 
 The concept: instead of one thread per connection waiting on a read, one thread calls `select()`, which sleeps until *any* of the thousands of registered channels has data ready. The OS tells the selector which keys are ready; the thread processes just those, then loops. This is the **event loop / reactor** model — one thread serving thousands of connections.
 
@@ -152,7 +154,9 @@ The channels must be in **non-blocking mode** (`configureBlocking(false)`) for t
 | High-concurrency servers (thousands of sockets) | NIO channels + selector, or Netty/WebFlux on top |
 | Virtual-thread-friendly blocking I/O (Java 21+) | Plain `java.io` — virtual threads make blocking cheap |
 
+```java
 Rule of thumb: **write your app code with blocking I/O**; let the frameworks (Tomcat, Netty, WebFlux) do NIO underneath. Only hand-roll selectors when you're building a networking library.
+```
 
 ## Common Beginner Pitfalls
 

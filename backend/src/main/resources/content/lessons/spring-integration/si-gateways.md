@@ -22,6 +22,7 @@ Here's the integration dilemma: the *internal* machinery of Spring Integration i
 
 ## The Gateway Interface
 
+```java
 // A plain interface — this is ALL the application code needs:
 public interface OrderGateway {
 
@@ -36,6 +37,7 @@ public interface OrderGateway {
     @Header("contentType", "application/json")
     void markProcessed(Long orderId);
 }
+```
 
 **The magic:** this interface is never implemented by hand. Spring Integration *proxies* it (the dynamic-proxy mechanism from the reflection module) and connects each method to a channel:
 
@@ -98,6 +100,7 @@ CompletableFuture<OrderReceipt> future = orderGateway.placeOrderAsync(req);
 
 ## The Service Activator: Where the Work Happens
 
+```java
 The gateway sends; the **service activator** receives and does the real work:
 
 // A plain Spring bean method as an endpoint:
@@ -112,6 +115,7 @@ public class OrderService {
         return new OrderReceipt(order.getId(), order.getStatus());
     }
 }
+```
 
 **The method contract:** the incoming message's payload is passed as the parameter; the return value becomes the outgoing message's payload (routed to `outputChannel` → the gateway's reply channel). The service activator is the bridge from *messaging* back to *normal Spring code* — the same bean-method pattern as `@KafkaListener`, just for channels. Method parameters can be `Message<T>` (full access to headers), the payload type, or annotated (`@Header`, `@Payload`).
 

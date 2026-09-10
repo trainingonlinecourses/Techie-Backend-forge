@@ -187,6 +187,7 @@ public class HappensBeforeDemo {
 
 ### Scenario 1: Graceful shutdown
 
+```java
 public class GracefulShutdown {
     private volatile boolean shutdownRequested = false;
 
@@ -201,9 +202,11 @@ public class GracefulShutdown {
         cleanup();
     }
 }
+```
 
 ### Scenario 2: Double-checked locking (correct version)
 
+```java
 public class Singleton {
     private static volatile Singleton instance;  // volatile is essential!
 
@@ -218,6 +221,7 @@ public class Singleton {
         return instance;
     }
 }
+```
 
 ---
 

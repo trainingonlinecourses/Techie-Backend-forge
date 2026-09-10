@@ -15,9 +15,11 @@ docs:
 
 In imperative code, you call a method and check the result:
 
+```java
 // Imperative: simple and straightforward
 User user = userService.findById("123");
 assertEquals("Alice", user.getName());
+```
 
 In reactive code, the result is a **Mono/Flux** — nothing happens until you subscribe. You can't just call `.getName()` on a `Mono<User>`. You need special tools to test reactive streams.
 
@@ -367,7 +369,9 @@ class WebSocketIntegrationTest {
 @Test
 void shouldTimeoutWhenServiceIsSlow() {
     Mono<String> result = slowService.fetchData()
+```java
         .timeout(Duration.ofSeconds(2));                          // 2 second timeout
+```
 
     StepVerifier.withVirtualTime(() -> result)
         .thenAwait(Duration.ofSeconds(3))                        // Fast-forward past timeout

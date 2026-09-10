@@ -105,12 +105,14 @@ public class PaymentService {
 
 ## The Spring Integration
 
+```java
 @CircuitBreaker(name = "paymentGateway", fallbackMethod = "chargeFallback")
 public PaymentResult charge(ChargeRequest request) { ... }
 
 public PaymentResult chargeFallback(ChargeRequest request, Throwable t) {
     return PaymentResult.declined("gateway temporarily unavailable");
 }
+```
 
 With Resilience4j + Spring Boot, the `@CircuitBreaker` annotation wraps the method; the `fallbackMethod` serves a degraded response when the breaker is open. Add `spring-boot-starter-aop` and the `resilience4j-spring-boot3` dependency, and configuration can live in properties:
 

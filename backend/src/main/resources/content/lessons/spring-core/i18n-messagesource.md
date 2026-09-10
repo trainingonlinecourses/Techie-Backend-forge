@@ -36,6 +36,7 @@ Spring Boot picks up `messages*.properties` automatically (`spring.messages.base
 
 ## Using MessageSource in code
 
+```java
 @Service
 public class NotificationService {
     private final MessageSource messages;
@@ -44,6 +45,7 @@ public class NotificationService {
     String text = messages.getMessage("order.confirmed", new Object[]{orderId, customer},
             LocaleContextHolder.getLocale());
 }
+```
 
 - **Arguments** fill `{0}`, `{1}` placeholders.
 - `LocaleContextHolder.getLocale()` picks up the current request's locale (set by MVC's locale resolution).
@@ -63,6 +65,7 @@ Or use ICU-style with `ResourceBundleMessageSource` — either way, plurals belo
 
 What determines the request's locale?
 
+```java
 // Default: AcceptHeaderLocaleResolver — uses the Accept-Language header.
 // To make it switchable by URL param (…?lang=fr), configure:
 @Bean
@@ -71,10 +74,13 @@ LocaleResolver localeResolver() {
     r.setDefaultLocale(Locale.ENGLISH);
     return r;
 }
+```
 
 `LocaleChangeInterceptor` reads a `lang` request param and updates the resolver:
 
+```java
 registry.addInterceptor(new LocaleChangeInterceptor());  // in WebMvcConfigurer#addInterceptors
+```
 
 The chain: request → `LocaleChangeInterceptor` (param, optional) → `LocaleResolver` (session/header/cookie) → `LocaleContextHolder` → `MessageSource` lookup.
 

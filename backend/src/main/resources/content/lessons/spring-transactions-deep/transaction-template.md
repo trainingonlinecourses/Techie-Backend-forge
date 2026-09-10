@@ -16,6 +16,7 @@ docs:
 
 ## The Setup
 
+```java
 @Service
 public class ImportService {
 
@@ -25,11 +26,13 @@ public class ImportService {
         this.txTemplate = new TransactionTemplate(txManager);
     }
 }
+```
 
 `PlatformTransactionManager` is the bean Spring uses internally for `@Transactional`. Wrapping it in a `TransactionTemplate` gives you programmatic control with the same semantics.
 
 ## The Two Callback Forms
 
+```java
 // With a result
 public ImportResult doInTransaction() {
     return txTemplate.execute(status -> {
@@ -45,6 +48,7 @@ public void doWork() {
         auditService.log("updated");
     });
 }
+```
 
 - Normal return → **commit**
 - Exception → **rollback** (and the exception propagates)
@@ -55,8 +59,10 @@ public void doWork() {
 The case `@Transactional` can't express:
 
 public ImportResult importInChunks(List<Course> courses) {
+```java
     int succeeded = 0;
     int failed = 0;
+```
 
     for (List<Course> chunk : partition(courses, 500)) {
         try {
@@ -75,14 +81,17 @@ Each chunk is its **own transaction**: a failure rolls back only that chunk, and
 
 ## Configuring the Template
 
+```java
 TransactionTemplate tx = new TransactionTemplate(txManager);
 tx.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
 tx.setIsolationLevel(TransactionDefinition.ISOLATION_SERIALIZABLE);
 tx.setTimeout(30);   // seconds — abort if the tx runs longer
 tx.setReadOnly(true);
+```
 
 Use per-use-case configuration when different methods need different semantics:
 
+```java
 private TransactionTemplate serializable() {
     TransactionTemplate tx = new TransactionTemplate(txManager);
     tx.setIsolationLevel(TransactionDefinition.ISOLATION_SERIALIZABLE);
@@ -93,6 +102,7 @@ private TransactionTemplate serializable() {
 public void reconcile() {
     serializable().executeWithoutResult(status -> reconcileCore());
 }
+```
 
 ## Mixing Declarative and Programmatic
 
@@ -139,6 +149,7 @@ public void importWithDecision(List<Course> courses) {
 
 ## The Self-Invocation Escape Hatch
 
+```java
 @Service
 public class PaymentService {
 
@@ -158,6 +169,7 @@ public class PaymentService {
     @Transactional
     public void charge(ChargeRequest req) { ... }
 }
+```
 
 Or replace `self.charge(req)` with a `TransactionTemplate` — same isolation, no proxy trickery:
 

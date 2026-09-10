@@ -15,12 +15,14 @@ docs:
 
 A file upload is an HTTP request whose body is `multipart/form-data` — a sequence of **parts**, each with its own headers, carrying either a form field or a file with a filename and content type. Spring MVC parses this into `MultipartFile` instances; the `MultipartResolver` (auto-configured in Spring Boot) handles the parsing, including spooling large uploads to disk instead of memory.
 
+```java
 @PostMapping("/api/documents")
 public DocumentUpload upload(@RequestParam("file") MultipartFile file,
                              @RequestParam String description) {
     // file.getOriginalFilename(), file.getSize(), file.getContentType()
     // file.getInputStream() — stream the content, don't read it all into memory
 }
+```
 
 ## The essential limits (configure, don't assume defaults)
 
@@ -39,6 +41,7 @@ The `file-size-threshold` matters: small files stay in memory; larger ones spill
 
 **Scenario 1 — streaming large uploads.** For big files, never call `file.getBytes()` (loads the whole thing into RAM). Stream with `transferTo` (the framework's optimized copy) or read the stream in chunks:
 
+```java
 @PostMapping("/api/videos")
 public void uploadVideo(@RequestParam("file") MultipartFile file) throws IOException {
     Path dest = Path.of(uploadDir, UUID.randomUUID() + "-" + sanitize(file.getOriginalFilename()));
@@ -46,9 +49,11 @@ public void uploadVideo(@RequestParam("file") MultipartFile file) throws IOExcep
 }
 
 **Scenario 2 — validating before storing.** Check type, size, and content *before* writing anything:
+```
 
 private static final Set<String> ALLOWED = Set.of("image/png", "image/jpeg", "application/pdf");
 
+```java
 if (file.isEmpty()) throw new BadRequestException("empty file");
 if (file.getSize() > MAX) throw new PayloadTooLargeException("too large");
 if (!ALLOWED.contains(file.getContentType())) throw new BadRequestException("unsupported type");
@@ -58,17 +63,24 @@ if (!ALLOWED.contains(file.getContentType())) throw new BadRequestException("uns
 
 s3.putObject(bucket, key, file.getInputStream(), s3Meta(file));
 // URL = /api/files/{key} — the app serves a signed link, not the bytes
+```
 
 Production teams almost always put uploads in object storage, not the app's filesystem — the app stays stateless and horizontally scalable. Local disk is for dev and small internal tools.
 
+```java
 **Scenario 4 — serving files with Content-Disposition.** Download endpoint that forces a filename:
 
 @GetMapping("/api/files/{id}/download")
+```
 public ResponseEntity<Resource> download(@PathVariable Long id) {
+```java
     StoredFile f = fileRepo.findById(id).orElseThrow();
     return ResponseEntity.ok()
+```
         .header(HttpHeaders.CONTENT_DISPOSITION,
+```java
                 "attachment; filename=\"" + f.originalName() + "\"")
+```
         .contentType(MediaType.parseMediaType(f.contentType()))
         .body(new InputStreamResource(f.openStream()));
 }

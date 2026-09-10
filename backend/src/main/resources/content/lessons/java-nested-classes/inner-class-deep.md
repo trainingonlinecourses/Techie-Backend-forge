@@ -14,6 +14,7 @@ An **inner class** (also called a member inner class) is a non-static class defi
 
 Think of it like this: an inner class is like a room inside a house. The room can access the house's kitchen, bathroom, and living room directly. But this also means the room can't exist without the house — if the house is destroyed, the room goes with it.
 
+```java
 public class House {
     private String address = "123 Main St";
     
@@ -38,6 +39,7 @@ public class House {
         room.describe();  // "Bedroom is in house at 123 Main St"
     }
 }
+```
 
 ---
 
@@ -205,11 +207,13 @@ public class HttpRequest {
 public class ShoppingCart {
     private List<String> items = new ArrayList<>();
     
+```java
     public void addItem(String item) {
         items.add(item);
     }
     
     // Inner class implementing Iterator
+```
     public class CartIterator implements Iterator<String> {
         private int index = 0;
         
@@ -230,6 +234,7 @@ public class ShoppingCart {
     }
     
     public Iterator<String> iterator() {
+```java
         return new CartIterator();
     }
     
@@ -240,6 +245,7 @@ public class ShoppingCart {
         cart.addItem("Keyboard");
         
         // Inner class accesses outer's items list
+```
         Iterator<String> it = cart.iterator();
         while (it.hasNext()) {
             System.out.println(it.next());

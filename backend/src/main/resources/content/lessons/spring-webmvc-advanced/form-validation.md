@@ -27,6 +27,7 @@ REST APIs validate `@RequestBody`. Classic MVC apps bind **form data** to model 
 @PostMapping("/register")
 public String register(@Valid @ModelAttribute RegistrationForm form,
                        BindingResult bindingResult,
+```java
                        Model model) {
     if (bindingResult.hasErrors()) {
         return "register";          // re-render the form with errors
@@ -34,6 +35,7 @@ public String register(@Valid @ModelAttribute RegistrationForm form,
     userService.register(form);
     return "redirect:/welcome";
 }
+```
 
 Spring binds `request.getParameter("email")` → `form.email`, runs validation, and populates `BindingResult`. The order matters: **`BindingResult` must immediately follow the `@Valid` parameter**, or Spring throws a 500 instead of binding errors.
 
@@ -60,12 +62,14 @@ public String register(@Valid @ModelAttribute RegistrationForm form,
 
 ## Bean Validation on the Form
 
+```java
 public record RegistrationForm(
     @NotBlank @Email String email,
     @NotBlank @Size(min = 8, max = 64) String password,
     @NotBlank String firstName,
     @NotNull @Min(13) Integer age
 ) {}
+```
 
 Full constraint toolbox:
 
@@ -82,6 +86,7 @@ Full constraint toolbox:
 
 ## Custom Constraint Validator
 
+```java
 @Target({ElementType.FIELD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = PhoneNumberValidator.class)
@@ -103,11 +108,13 @@ public class PhoneNumberValidator
         return PHONE.matcher(value).matches();
     }
 }
+```
 
 ## Grouped Validation
 
 Different rules per operation on the same form:
 
+```java
 public class AccountForm {
     public interface Create {}
     public interface Update {}
@@ -125,6 +132,7 @@ public String create(@Validated(AccountForm.Create.class) @ModelAttribute Accoun
                      BindingResult bindingResult) { ... }
 
 Registration requires the password; an update doesn't touch it.
+```
 
 ## Server-Side Validation Is Mandatory
 
@@ -189,11 +197,13 @@ class RegistrationFormTest {
                 .param("password", "s3cret!!")
                 .param("firstName", "Ada")
                 .param("age", "30"))
+```java
             .andExpect(status().is3xxRedirection());
     }
 
     @Test
     void invalidFormRerendersWithErrors() throws Exception {
+```
         mockMvc.perform(post("/register")
                 .param("email", "not-an-email")
                 .param("password", "x")

@@ -15,6 +15,7 @@ docs:
 
 `@DataJpaTest` boots only the **JPA layer** — repositories, the `EntityManager`, and the transaction machinery — without controllers, services, or security:
 
+```java
 @DataJpaTest
 class OrderRepositoryTest {
     @Autowired OrderRepository orderRepo;
@@ -28,6 +29,7 @@ class OrderRepositoryTest {
         assertThat(orderRepo.findByStatus("PAID")).hasSize(1);
     }
 }
+```
 
 Each test method runs in a **transaction that rolls back** after the test — fast, isolated, no cleanup code. The slice is the right home for: derived-query correctness, JPQL syntax, mappings (columns/relations), and constraint behavior.
 
@@ -66,6 +68,7 @@ Teams often run **both**: an H2 suite in the fast path (every push) and the Test
 
 JPA defers writes until flush. A test that saves and immediately asserts a *query* can see stale state:
 
+```java
 @Test
 void saveThenQuery() {
     orderRepo.save(new Order("PAID"));
@@ -73,12 +76,15 @@ void saveThenQuery() {
     // (the INSERT is pending; the same persistence context may return it,
     //  a fresh query in another context might not — nondeterministic)
 }
+```
 
 The fix — force the flush, and clear the context to simulate a fresh read:
 
+```java
 orderRepo.saveAndFlush(new Order("PAID"));      // INSERT now
 entityManager.clear();                          // detach — next query is a real SELECT
 assertThat(orderRepo.findByStatus("PAID")).hasSize(1);
+```
 
 `TestEntityManager.persistAndFlush` and `clear` are exactly for this. Tests that assert *query results* (not just object identity) should always flush + clear — otherwise they can pass vacuously against the in-memory context.
 

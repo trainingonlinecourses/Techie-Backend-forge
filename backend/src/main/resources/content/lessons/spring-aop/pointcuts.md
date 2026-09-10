@@ -200,9 +200,11 @@ Matches methods annotated with a specific annotation:
 
 ### Combining @annotation with execution
 
+```java
 // Public methods annotated with @Cacheable
 @Pointcut("@annotation(org.springframework.cache.annotation.Cacheable) && execution(public * *(..))")
 public void cachedPublicMethods() {}
+```
 
 ## @within — Type Annotations
 
@@ -312,6 +314,7 @@ Excludes matches:
 
 ### Named Pointcuts (Reusable)
 
+```java
 @Aspect
 @Component
 public class LoggingAspect {
@@ -332,9 +335,11 @@ public class LoggingAspect {
         log.info("Auditable service call: {}", jp.getSignature().getName());
     }
 }
+```
 
 ### Inline Pointcuts (One-time Use)
 
+```java
 @Aspect
 @Component
 public class LoggingAspect {
@@ -349,6 +354,7 @@ public class LoggingAspect {
         log.info("Auditable repository call: {}", jp.getSignature().getName());
     }
 }
+```
 
 ### Pointcut Composition in XML
 
@@ -434,10 +440,6 @@ When a pointcut doesn't match as expected, use these debugging techniques:
 1. The method signature must match exactly. If the method is: public User findById(Long id). Use: execution(* com.acme.service.*.findById(Long))
 2. If you want any parameters: Use: execution(* com.acme.service.*.findById(..))
 
-The same code, clean:
-
-```java
-```
 
 ### 3. Enable AOP Proxy Logging
 
@@ -450,6 +452,7 @@ logging:
 
 ### 4. Test with a Simple Aspect
 
+```java
 @Aspect
 @Component
 public class DebugAspect {
@@ -459,6 +462,7 @@ public class DebugAspect {
         log.debug("Matched: {}", jp.getSignature());
     }
 }
+```
 
 ## Common Pitfalls
 
@@ -472,6 +476,7 @@ public class DebugAspect {
 
 ### 2. Internal Method Calls
 
+```java
 @Service
 public class OrderService {
     public void processOrder() {
@@ -481,15 +486,18 @@ public class OrderService {
     @Transactional
     public void validateOrder() { ... }
 }
+```
 
 AOP proxies intercept calls through the proxy, not internal calls within the same object.
 
 ### 3. Final Methods
 
+```java
 // CGLIB cannot proxy final methods
 public final void method() { ... }
 
 // This will fail at startup
+```
 
 ### 4. Private Methods
 

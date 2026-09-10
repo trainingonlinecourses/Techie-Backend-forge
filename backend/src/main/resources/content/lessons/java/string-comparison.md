@@ -15,6 +15,7 @@ docs:
 
 The single most common beginner bug in Java — and it appears in production code far more often than it should:
 
+```java
 public class Main {
 
     public static void main(String[] args) {
@@ -24,6 +25,7 @@ public class Main {
         System.out.println(a.equals(b));  // true    same characters
     }
 }
+```
 
 `==` on two references asks "are these the *same object*?" — it does not compare content. Strings compare content with **`equals`** (and the variants below). The confusion persists because the **string pool** makes `==` *appear* to work for literals: `"hello" == "hello"` is true (both point at the pooled literal), so the bug hides until a string comes from user input, a database, or `new`.
 
@@ -65,12 +67,14 @@ Objects.equals(a, b)
 
 ## How we use it in an organization: the scenarios
 
+```java
 **Scenario 1 — status/state matching.** The canonical org code:
 
 if ("PAID".equals(order.getStatus())) { ... }          // literal FIRST — null-safe!
 if (order.getStatus().equals("PAID")) { ... }           // NPE if status is null!
 
 // The literal-first idiom ("Yoda") exists for a reason: "PAID".equals(x) never NPEs
+```
 
 Teams standardize on **`"constant".equals(variable)`** so a null variable can't throw. Same pattern for `case`-style matching with `equalsIgnoreCase` when input case varies (user-typed values, external codes).
 
@@ -79,24 +83,30 @@ Teams standardize on **`"constant".equals(variable)`** so a null variable can't 
 // Wrong for user-facing sorting: "é" vs "e", "ä" vs "a" order by code point, not language
 list.sort(Comparator.comparing(Person::name));          // code-point order — ok for ASCII codes
 
+```java
 // Right for display: locale-aware collation
 Collator collator = Collator.getInstance(Locale.GERMAN);
+```
 list.sort(Comparator.comparing(Person::name, collator::compare));
 
 The org rule: **ASCII/code/identifier ordering → `compareTo`; human-language sorting → `Collator`.** For backend code comparing status codes, ids, or enum names, `compareTo` is correct.
 
 **Scenario 3 — the identity-comparison exception.** There is *one* legitimate `==` on strings: when you've **guaranteed interning** — `String.intern()` or literals — and want reference equality for speed:
 
+```java
 // Rare, deliberate — a hot path comparing pooled literals
 if (status == Status.PAID_NAME) { ... }   // only safe if both are interned/literals
+```
 
 This is an optimization for ultra-hot loops; teams generally ban it in review because the guarantee is fragile. Use `equals`.
 
+```java
 **Scenario 4 — input normalization before comparison.** The robust pattern: normalize once at the boundary, then compare confidently:
 
 // In a request DTO setter / validator:
 String normalized = raw.trim().toLowerCase(Locale.ROOT);   // Locale.ROOT avoids Turkish-i surprises
 if (normalized.equals("admin")) { ... }
+```
 
 `toLowerCase()` *without* a locale uses the default locale — the classic **Turkish-i bug** (`"I".toLowerCase()` becomes `ı` in Turkish locale). Always pass `Locale.ROOT` for code/identifier normalization.
 

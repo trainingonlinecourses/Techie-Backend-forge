@@ -12,10 +12,12 @@ docs:
 
 Method references are shorthand for lambdas that simply call an existing method. If a lambda body does nothing but invoke a method, you can replace it with a method reference:
 
+```java
 // Lambda
 Function<String, Integer> parser = s -> Integer.parseInt(s);
 
 // Method reference — same thing, shorter
+```
 Function<String, Integer> parser = Integer::parseInt;
 
 **The four kinds:**
@@ -116,7 +118,9 @@ Map<String, Consumer<OrderEvent>> handlers = Map.of(
     "CREATED",  orderNotificationService::sendConfirmation,
     "SHIPPED",  trackingService::updateTracking,
     "CANCELLED", refundService::processRefund
+```java
 );
+```
 
 ---
 
@@ -137,10 +141,12 @@ public class Main {
         // Method reference — clear
         list.forEach(System.out::println);
 
+```java
         // Lambda — clearer than a method reference
         list.forEach(name -> System.out.println("User: " + name));
 
         // Lambda — method reference would be obscure
+```
         list.stream().filter(name -> name.length() > 5 && name.startsWith("A"))
     }
 }

@@ -12,6 +12,7 @@ docs:
 
 Spring Boot can validate configuration properties at startup using Jakarta Validation. This catches bad config immediately instead of failing at runtime.
 
+```java
 @Data
 @ConfigurationProperties(prefix = "app.mail")
 @Validated  // enables validation
@@ -22,6 +23,7 @@ public class MailProperties {
     @Min(1) @Max(65535)
     private int port = 587;
 }
+```
 
 If `app.mail.host` is missing, the app fails to start with a clear error.
 
@@ -29,6 +31,7 @@ If `app.mail.host` is missing, the app fails to start with a clear error.
 
 ## Line-by-Line Walkthrough
 
+```java
 import jakarta.validation.constraints.*;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
@@ -60,6 +63,7 @@ public class StorageProperties {
         private String region = "us-east-1";
     }
 }
+```
 
 ---
 
@@ -67,6 +71,7 @@ public class StorageProperties {
 
 ### Scenario 1: Custom validator
 
+```java
 @Component
 public class StoragePropertiesValidator implements Validator {
 
@@ -83,6 +88,7 @@ public class StoragePropertiesValidator implements Validator {
         }
     }
 }
+```
 
 ### Scenario 2: Profile-specific validation
 

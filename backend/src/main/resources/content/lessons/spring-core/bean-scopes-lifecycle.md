@@ -26,6 +26,7 @@ docs:
 
 Step 6 is where AOP proxies are created — that's why `@Transactional`, `@Async`, `@Cacheable` and security annotations work: the context hands out a **proxy** that adds behavior around your bean.
 
+```java
 @Component
 public class LifecycleLogger implements BeanPostProcessor {
     @Override
@@ -35,6 +36,7 @@ public class LifecycleLogger implements BeanPostProcessor {
         return bean;
     }
 }
+```
 
 ## The stereotypes
 
@@ -46,6 +48,7 @@ public class LifecycleLogger implements BeanPostProcessor {
 | `@Controller` / `@RestController` | Web layer | request mapping, message conversion |
 | `@Configuration` + `@Bean` | Factory methods for beans | full control, non-component classes |
 
+```java
 @Configuration
 public class InfrastructureConfig {
     @Bean
@@ -54,9 +57,11 @@ public class InfrastructureConfig {
     @Bean
     public RestClient billingClient(RestClient.Builder builder) { ... }
 }
+```
 
 ## Lifecycle annotations
 
+```java
 @Component
 public class CacheWarmer {
     @PostConstruct
@@ -65,6 +70,7 @@ public class CacheWarmer {
     @PreDestroy
     public void flush() { /* runs on graceful shutdown */ }
 }
+```
 
 `@PostConstruct` is for *your* initialization; for infrastructure-level hooks use `ApplicationRunner`/`CommandLineRunner` (Boot) or `InitializingBean`.
 
@@ -72,6 +78,7 @@ public class CacheWarmer {
 
 The default scope shares one instance across the whole app. Mutable fields on a singleton = shared mutable state = data races and cross-request contamination:
 
+```java
 // WRONG — request data leaks between users
 @Service
 public class BadService {
@@ -84,6 +91,7 @@ public class BadService {
 public class GoodService {
     public Result doWork(String user) { ... }    // no fields at all
 }
+```
 
 ## Where beans come from
 

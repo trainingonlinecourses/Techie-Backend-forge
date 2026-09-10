@@ -12,7 +12,9 @@ docs:
 
 # Clean Architecture and the Dependency Rule
 
+```java
 Clean Architecture (Uncle Bob) generalizes hexagonal: concentric circles of responsibility, with **the dependency rule** — source code dependencies point *inward only*. Outer circles (frameworks, UI, DB) depend on inner circles (use cases, entities); never the reverse.
+```
 
 ## The Circles
 
@@ -44,6 +46,7 @@ Clean Architecture (Uncle Bob) generalizes hexagonal: concentric circles of resp
 
 ## Entities: The Innermost
 
+```java
 // Entity — pure, no framework
 public class Course {
     private final CourseId id;
@@ -65,6 +68,7 @@ public class Course {
 
     // ... no imports beyond java.*
 }
+```
 
 ## Use Cases: Application-Specific Rules
 
@@ -128,6 +132,7 @@ JPA adapter implements it. The use case depends on the *interface*, not the fram
 
 Crossing a boundary means translating — don't leak DTOs into the use case:
 
+```java
 // Controller's DTO (outer layer)
 public record PublishRequest(Long courseId, String reason) {}
 
@@ -135,11 +140,14 @@ public record PublishRequest(Long courseId, String reason) {}
 public record PublishCourseCommand(CourseId courseId, String reason) {}
 
 @PostMapping("/{id}/publish")
+```
 public ResponseEntity<Void> publish(@PathVariable Long id,
+```java
                                     @RequestBody PublishRequest request) {
     publish.publish(new PublishCourseCommand(CourseId.of(id), request.reason()));
     return ResponseEntity.noContent().build();
 }
+```
 
 The mapping happens at the boundary — the use case never sees the HTTP DTO.
 
@@ -175,7 +183,9 @@ public class JpaCourseRepository implements CourseRepository {
 }
 ```
 
+```java
 Pragmatic note: many teams annotate entities directly for simplicity (the "pragmatic clean architecture" school). The strict form keeps the domain pristine; the pragmatic form accepts framework coupling in exchange for less mapping code. Choose deliberately.
+```
 
 ## The Dependency Rule as Tests
 
@@ -207,10 +217,12 @@ class ArchitectureTest {
     static final ArchRule domainRule = classes()
         .that().resideInAPackage("..domain..")
         .should().onlyDependOnClassesThat()
+```java
         .resideInAnyPackage("..domain..", "java..");
 
     @ArchTest
     static final ArchRule dependencyRule = layeredArchitecture()
+```
         .consideringAllDependencies()
         .layer("Controllers").definedBy("..adapter.in..")
         .layer("UseCases").definedBy("..application..")

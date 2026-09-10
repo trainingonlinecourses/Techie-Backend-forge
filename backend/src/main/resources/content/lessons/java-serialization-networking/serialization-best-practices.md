@@ -10,6 +10,7 @@ docs:
 
 ## The Concept, From Zero
 
+```java
 **Serialization** is converting an object to a byte stream so it can be saved to a file, sent over a network, or stored in a database. **Deserialization** is converting it back.
 
 // Serializable — marker interface (no methods to implement)
@@ -27,6 +28,7 @@ out.close();
 ObjectInputStream in = new ObjectInputStream(new FileInputStream("user.dat"));
 User restored = (User) in.readObject();
 in.close();
+```
 
 ---
 
@@ -193,7 +195,9 @@ public final class Money implements Serializable {
 
 ### Scenario 1: Caching with serialization
 
+```java
 import java.io.*;
+```
 
 public class CacheEntry<T> implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -220,11 +224,14 @@ public class CacheEntry<T> implements Serializable {
 
 // Usage
 CacheEntry<User> cachedUser = new CacheEntry<>(user, 30 * 60 * 1000);  // 30 min TTL
+```java
 ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream("cache.dat"));
 out.writeObject(cachedUser);
+```
 
 ### Scenario 2: Session persistence
 
+```java
 import java.io.*;
 
 public class SessionManager {
@@ -257,6 +264,7 @@ public class UserSession implements Serializable {
     
     // getters and setters
 }
+```
 
 ---
 
@@ -276,10 +284,6 @@ public class UserSession implements Serializable {
 1. Instead of Java serialization: ❌ ObjectOutputStream out = new ObjectOutputStream(...); ✅ ObjectMapper mapper = new ObjectMapper(); mapper.writeValue(new File("data.json"), object);
 2. Or for binary: ✅ Protocol Buffers. ✅ Avro. ✅ MessagePack
 
-The same code, clean:
-
-```java
-```
 
 ---
 

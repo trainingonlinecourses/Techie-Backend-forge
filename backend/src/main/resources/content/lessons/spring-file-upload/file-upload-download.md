@@ -12,6 +12,7 @@ docs:
 
 Spring Boot makes file upload simple with `MultipartFile`:
 
+```java
 @PostMapping("/upload")
 public ResponseEntity<?> upload(@RequestParam("file") MultipartFile file) {
     String filename = file.getOriginalFilename();
@@ -20,6 +21,7 @@ public ResponseEntity<?> upload(@RequestParam("file") MultipartFile file) {
     String contentType = file.getContentType();
     // Save to disk, database, or cloud storage
 }
+```
 
 ---
 

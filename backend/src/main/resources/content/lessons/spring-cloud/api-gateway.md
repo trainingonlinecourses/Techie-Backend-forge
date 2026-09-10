@@ -21,7 +21,9 @@ client ──▶ GATEWAY (:9090) ──lb://ORDER-SERVICE──▶ order-service
                   └── auth check, rate limit, tracing, logging (edge filters)
 ```
 
+```java
 Spring Cloud Gateway is **reactive** (WebFlux-based) — no Tomcat/Spring MVC in the gateway app; it proxies requests efficiently without blocking threads.
+```
 
 ## 1. The dependency (and what NOT to add)
 
@@ -125,6 +127,7 @@ spring:
                 fallbackUri: forward:/fallback/orders
 ```
 
+```java
 @RestController
 public class FallbackController {
     @GetMapping("/fallback/orders")
@@ -133,6 +136,7 @@ public class FallbackController {
                       "message", "Orders service is busy right now — try again shortly.");
     }
 }
+```
 
 When the breaker opens, the gateway returns the fallback **without the client ever seeing a 500** — graceful degradation at the front door.
 

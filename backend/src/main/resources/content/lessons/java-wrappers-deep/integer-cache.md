@@ -12,6 +12,7 @@ docs:
 
 Java caches small wrapper objects to avoid creating millions of identical objects. When you write `Integer x = 42`, Java calls `Integer.valueOf(42)` which returns a cached object for values -128 to 127.
 
+```java
 public class Main {
 
     public static void main(String[] args) {
@@ -24,6 +25,7 @@ public class Main {
         System.out.println(c == d);  // false — different objects
     }
 }
+```
 
 ---
 
@@ -79,6 +81,7 @@ public class Main {
 
 ### Scenario 1: HashMap key comparison
 
+```java
 public class Main {
 
     public static void main(String[] args) {
@@ -93,9 +96,11 @@ public class Main {
         System.out.println(key1 == key2);  // true (lucky — cached)
     }
 }
+```
 
 ### Scenario 2: Thread safety of cache
 
+```java
 // The cache is thread-safe — Integer.valueOf() is synchronized internally
 // Multiple threads can safely use cached values
 ExecutorService pool = Executors.newFixedThreadPool(10);
@@ -105,6 +110,7 @@ for (int i = 0; i < 1000; i++) {
         // ...
     });
 }
+```
 
 ---
 

@@ -39,12 +39,14 @@ CREATE INDEX idx_courses_level_minutes ON courses (level, minutes);
 
 In JPA, via `@Index`:
 
+```java
 @Entity
 @Table(indexes = {
     @Index(name = "idx_courses_level", columnList = "level"),
     @Index(name = "idx_courses_level_minutes", columnList = "level, minutes")
 })
 public class Course { ... }
+```
 
 ## Composite Indexes: Column Order Is Everything
 
@@ -59,7 +61,9 @@ CREATE INDEX idx ON courses (level, minutes, id);
 | `WHERE minutes > 30` | ❌ (skips the leftmost column) |
 | `WHERE level = ? ORDER BY minutes` | ✅ (sorted by the index) |
 
+```java
 **The rule**: put the most selective / most-filtered column first; the index only helps queries that use its *leftmost prefix*.
+```
 
 ## Covering Indexes: Index-Only Scans
 
@@ -128,6 +132,7 @@ Bitmap Heap Scan on courses  (cost=... rows=9000)
 
 ## The Common Index Set for a Spring Entity
 
+```java
 @Entity
 @Table(name = "courses", indexes = {
     @Index(name = "idx_courses_code", columnList = "code", unique = true),
@@ -135,6 +140,7 @@ Bitmap Heap Scan on courses  (cost=... rows=9000)
     @Index(name = "idx_courses_status_created", columnList = "status, created_at DESC")
 })
 public class Course { ... }
+```
 
 ## Summary
 

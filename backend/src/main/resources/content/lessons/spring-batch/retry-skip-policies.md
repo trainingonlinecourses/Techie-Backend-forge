@@ -65,6 +65,7 @@ public RetryPolicy retryPolicy() {
     policy.setExceptionsToRetry(Set.of(
         ConnectTimeoutException.class,
         DatabaseAccessException.class
+```java
     ));
     return policy;
 }
@@ -81,6 +82,7 @@ public BackOffPolicy backOffPolicy() {
 @Bean
 public Step processStep(JobRepository jobRepository, PlatformTransactionManager txManager) {
     return new StepBuilder("processStep", jobRepository)
+```
         .<InputRecord, OutputRecord>chunk(100, txManager)
         .reader(reader())
         .processor(processor())
@@ -189,6 +191,7 @@ public Step robustStep(JobRepository jobRepository, PlatformTransactionManager t
 
 ### Scenario 1: API Integration with Rate Limits
 
+```java
 @Component
 public class ExternalApiProcessor implements ItemProcessor<Order, ProcessedOrder> {
 
@@ -205,6 +208,7 @@ public class ExternalApiProcessor implements ItemProcessor<Order, ProcessedOrder
         return new ProcessedOrder(order, result.getTransactionId());
     }
 }
+```
 
 ### Scenario 2: File Import with Bad Records
 

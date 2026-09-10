@@ -89,6 +89,7 @@ resilience4j:
 
 ### Usage with @CircuitBreaker
 
+```java
 @Service
 public class OrderService {
 
@@ -107,14 +108,17 @@ public class OrderService {
             .orElse(new User(userId, "Unknown User", "unknown@example.com"));
     }
 }
+```
 
 ### Retry + Circuit Breaker
 
+```java
 @CircuitBreaker(name = "userService", fallbackMethod = "getUserFallback")
 @Retry(name = "userService")  // Retry before circuit breaker trips
 public User getUser(String userId) {
     return userClient.getUser(userId);
 }
+```
 
 ---
 
@@ -131,11 +135,13 @@ public class CircuitBreakerMetrics {
             .onEvent(event -> {
                 log.info("Circuit Breaker Event: {} - State: {}",
                     event.getCircuitBreakerName(),
+```java
                     event.getEventType());
             });
 
         // Register health indicator
         registry.getAllCircuitBreakers().forEach(cb -> {
+```
             Gauge.builder("resilience4j.circuitbreaker.state", cb,
                 bcb -> bcb.getState().ordinal())
                 .tag("name", cb.getName())
@@ -150,6 +156,7 @@ public class CircuitBreakerMetrics {
 
 ### Scenario 1: Payment Gateway Circuit Breaker
 
+```java
 @Service
 public class PaymentService {
 
@@ -173,9 +180,11 @@ public class PaymentService {
             "Payment queued for processing. Gateway temporarily unavailable.");
     }
 }
+```
 
 ### Scenario 2: User Profile with Cache Fallback
 
+```java
 @Service
 public class UserProfileService {
 
@@ -201,6 +210,7 @@ public class UserProfileService {
         return UserProfile.unknown(userId);
     }
 }
+```
 
 ### Scenario 3: Multi-Service Aggregation with Fallbacks
 

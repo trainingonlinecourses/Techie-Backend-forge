@@ -13,23 +13,28 @@ docs:
 **Serialization** converts an object to a byte stream (for storage, network transfer, or caching). **Deserialization** converts it back:
 
 // Serialize: Object → byte[]
+```java
 User user = new User("Alice", 30);
 ByteArrayOutputStream bos = new ByteArrayOutputStream();
 ObjectOutputStream oos = new ObjectOutputStream(bos);
 oos.writeObject(user);
 byte[] bytes = bos.toByteArray();
+```
 
 // Deserialize: byte[] → Object
+```java
 ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
 ObjectInputStream ois = new ObjectInputStream(bis);
 User restored = (User) ois.readObject();
 
 **⚠️ Warning:** Java serialization has known security vulnerabilities. For new projects, use JSON, Protocol Buffers, or records instead.
+```
 
 ---
 
 ## Serializable vs Externalizable
 
+```java
 // Serializable — marker interface, JVM handles everything
 public class User implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -55,6 +60,7 @@ public class User implements Externalizable {
         age = in.readInt();
     }
 }
+```
 
 ---
 
@@ -214,6 +220,7 @@ public class UserSession implements Serializable {
 
 ### Scenario 2: Caching with Redis
 
+```java
 // Redis stores serialized objects — ensure Serializable
 @Serializable
 @RedisHash("users")
@@ -223,6 +230,7 @@ public class User implements Serializable {
     private String name;
     // ...
 }
+```
 
 ---
 

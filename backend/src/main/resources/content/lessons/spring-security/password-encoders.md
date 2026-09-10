@@ -1,6 +1,8 @@
 ---
 title: Password Storage — BCrypt, Argon2 and DelegatingPasswordEncoder
+```java
 summary: Why plaintext and hashes without salt fail, BCrypt/Argon2 semantics, the {id} encoded-password format, and the upgrade path for legacy systems.
+```
 order: 11
 minutes: 18
 topics: [password-storage, bcrypt, argon2, delegatingpasswordencoder, salting, hash, password-upgrade]
@@ -23,10 +25,12 @@ The OWASP standard today: **Argon2id** (modern) or **BCrypt** (ubiquitous, battl
 
 ## How Spring Security encodes
 
+```java
 @Bean
 public PasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder(12);   // work factor 12 — ~200-400ms per hash
 }
+```
 
 `BCryptPasswordEncoder.encode(raw)` returns a **self-describing string**:
 
@@ -65,6 +69,7 @@ public PasswordEncoder passwordEncoder() {
 
 ## How we use it in an organization: the scenarios
 
+```java
 **Scenario 1 — user registration and login.** The service layer never sees the raw password outside the encode/verify boundary:
 
 @Service
@@ -92,6 +97,7 @@ public User authenticate(String email, String raw) {
     }
     return u;
 }
+```
 
 **Scenario 3 — import from an old system.** During a migration, imports come as `{MD5}` or `{noop}` hashes *temporarily* — the delegating encoder lets them sign in, and the login-time rehash upgrades them without a forced password reset (force-reset only the `{noop}` population, since plaintext imports are genuinely dangerous).
 

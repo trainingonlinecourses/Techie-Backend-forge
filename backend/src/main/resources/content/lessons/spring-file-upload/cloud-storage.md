@@ -12,17 +12,21 @@ docs:
 
 Cloud object stores (S3, GCS, Azure Blob) handle file storage at scale — unlimited capacity, built-in redundancy, and CDN integration. Spring Boot integrates via AWS SDK or Spring Cloud GCP.
 
+```java
 // AWS S3 via Spring Cloud AWS
 @Autowired
 private S3Client s3;
 
 // Upload
+```
 s3.putObject(PutObjectRequest.builder()
     .bucket("my-bucket")
     .key("uploads/file.pdf")
     .build(),
     RequestBody.fromFile(new File("file.pdf"))
+```java
 );
+```
 
 ---
 
@@ -39,9 +43,11 @@ PresignedPutObjectRequest presigned = s3Presigner.presignPutObject(
             .key("uploads/" + filename)
             .build())
         .build()
+```java
 );
 
 return presigned.url().toString();
+```
 
 ---
 
@@ -148,15 +154,18 @@ public class CloudStorageService {
 
 ### Scenario 1: Pre-signed upload from frontend
 
+```java
 @GetMapping("/upload-url")
 public ResponseEntity<Map<String, String>> getUploadUrl(@RequestParam String filename) {
     String key = "uploads/" + UUID.randomUUID() + "_" + filename;
     String url = cloudStorage.getUploadUrl(key, Duration.ofMinutes(10));
     return ResponseEntity.ok(Map.of("uploadUrl", url, "key", key));
 }
+```
 
 ### Scenario 2: Streaming download
 
+```java
 @GetMapping("/download/{key}")
 public void download(@PathVariable String key, HttpServletResponse response) throws IOException {
     response.setContentType("application/octet-stream");
@@ -167,6 +176,7 @@ public void download(@PathVariable String key, HttpServletResponse response) thr
         s3Stream.transferTo(response.getOutputStream());
     }
 }
+```
 
 ---
 

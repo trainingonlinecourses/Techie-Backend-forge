@@ -133,13 +133,16 @@ public Optional<String> getCustomerCity(Customer customer) {
 
 // If the transformation itself returns Optional, use flatMap
 public Optional<Order> findOrder(String orderId) {
+```java
     return Optional.ofNullable(orderId)       // Line 1: Wrap the ID
         .flatMap(id -> orderRepo.findById(id));  // Line 2: flatMap because findById returns Optional
+```
     // Line 3: Without flatMap, you'd get Optional<Optional<Order>> (wrong!)
 }
 
 ### Pattern 3: orElse / orElseGet / orElseThrow — providing defaults
 
+```java
 // orElse — simple default value
 String name = getCustomerName().orElse("Anonymous");
 
@@ -147,16 +150,21 @@ String name = getCustomerName().orElse("Anonymous");
 String name = getCustomerName().orElseGet(() -> generateDefaultName());
 
 // orElseThrow — throw exception if empty
+```
 Customer customer = findCustomer(id)
+```java
     .orElseThrow(() -> new NotFoundException("Customer not found: " + id));
+```
 
 ### Pattern 4: filter — conditional check
 
 // Only keep the value if it matches a condition
 Optional<String> email = Optional.of("alice@example.com")
     .filter(e -> e.contains("@"))       // Line 1: Keep if contains @
+```java
     .filter(e -> e.length() > 5);       // Line 2: Keep if longer than 5 chars
 // Line 3: Returns Optional.empty() if filter fails
+```
 
 ## When NOT to use Optional
 

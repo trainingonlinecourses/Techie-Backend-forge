@@ -31,6 +31,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     @Query("select o from Order o where o.amount > :min and o.status = :status")
     List<Order> overAmount(@Param("min") BigDecimal min, @Param("status") OrderStatus status);
 
+```java
     // Update/delete are @Modifying — they bypass the persistence context!
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("update Order o set o.status = :status where o.createdAt < :cutoff")
@@ -39,6 +40,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     // Eager-load the lines in ONE query (kills the n+1):
     @EntityGraph(attributePaths = "lines")
     @Query("select o from Order o where o.id = :id")
+```
     Optional<Order> findWithLines(@Param("id") Long id);
 }
 
@@ -55,12 +57,14 @@ Use native queries for store-specific power (locking, window functions, dialect 
 
 Don't drag 40-column entities for a dropdown. Projections limit the SELECT:
 
+```java
 // Interface projection — Spring Data fills it from matching properties:
 public interface OrderSummary {
     Long getId();
     String getCustomer();
     BigDecimal getAmount();
 }
+```
 
 List<OrderSummary> findSummariesByStatus(OrderStatus status);
 
@@ -68,15 +72,19 @@ List<OrderSummary> findSummariesByStatus(OrderStatus status);
 @Query("select new com.app.dto.OrderStats(o.customer, count(o)) from Order o group by o.customer")
 List<OrderStats> statsPerCustomer();
 
+```java
 Projections turn a full-entity query into a narrow one — less data over the wire, less mapping. (The same idea as DTOs at the REST boundary; the capstone applies it end to end.)
+```
 
 ## 5. Paging and sorting
 
 Page<Order> page = repo.findByCustomerId(customerId,
+```java
     PageRequest.of(0, 20, Sort.by("createdAt").descending()));
 page.getTotalElements();  page.getTotalPages();  page.getContent();
 
 // From a controller, accept Pageable directly (Spring resolves ?page=0&size=20&sort=createdAt,desc):
+```
 Page<Order> list(Pageable pageable) { return repo.findAll(pageable); }
 
 - `Page` = content + total count (an extra COUNT query — use `Slice` when you only need hasNext).

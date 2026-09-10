@@ -4,8 +4,10 @@ module: java-time-api
 order: 1
 minutes: 24
 topics: ["DateTimeFormatter", "ISO-8601", "parsing", "patterns", "locales"]
+```java
 summary: Data crosses system boundaries as text: a JSON field, a CSV column, a log line, a query parameter. Converting a LocalDate to text is formatting; co...
 docs:
+```
   - title: "DateTimeFormatter (Java SE API)"
     url: "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/time/format/DateTimeFormatter.html"
 ---
@@ -161,7 +163,9 @@ The API-level practice: send **`OffsetDateTime`** (ISO-8601 with offset) in JSON
 
 `DateTimeFormatter` is **immutable and thread-safe** — one instance can be shared as a `static final` field across all threads, unlike the old `SimpleDateFormat` (which was famously unsafe to share and caused corrupted output in multi-threaded code). Make your formatters `static final` constants:
 
+```java
 public static final DateTimeFormatter API_DATE = DateTimeFormatter.ISO_LOCAL_DATE;
+```
 
 ## Common Beginner Pitfalls
 

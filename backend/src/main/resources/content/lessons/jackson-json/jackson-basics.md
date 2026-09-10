@@ -106,6 +106,7 @@ mapper.enable(com.fasterxml.jackson.databind.SerializationFeature.INDENT_OUTPUT)
 
 ## The Spring Boot Integration
 
+```java
 // Spring Boot auto-configures the ObjectMapper bean:
 @RestController
 class LessonController {
@@ -117,6 +118,7 @@ class LessonController {
     @GetMapping("/lessons/{id}")
     Lesson get(@PathVariable Long id) { ... }
 }
+```
 
 **The invisible magic:** `@RequestBody` tells Spring "deserialize the body into this type" (it uses the configured `ObjectMapper`); the return value of a `@RestController` method is serialized by the same mapper. `@JsonIgnoreProperties`, `@JsonProperty`, `@JsonFormat` annotations on your DTOs customize per-type. The ecosystem: `ResponseEntity<T>` for status codes, `Page<T>` for pagination, records for DTOs — all flowing through the same translator.
 

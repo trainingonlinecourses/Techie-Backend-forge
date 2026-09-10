@@ -18,7 +18,9 @@ docs:
 
 Beyond the fundamentals, production SQL is a handful of recurring recipes: **upserts** (insert or update depending on existence), **pivots** (rows → columns), **time bucketing** (group events into hours/days/weeks), **date series** (fill missing dates), and **FILTER aggregates** (conditional sums without CASE). Each pattern solves a problem that otherwise forces awkward multi-query workarounds — and each is a small, learnable idiom.
 
+```java
 **The mental model:** these patterns are the "standard library" of SQL. Beginners re-implement them with application code (fetch-then-decide, loop-per-day, CASE-in-Java); professionals let the database do it in one statement — faster, atomic, and correct under concurrency.
+```
 
 ## Pattern 1: Upsert — ON CONFLICT
 

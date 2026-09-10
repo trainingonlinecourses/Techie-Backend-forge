@@ -18,7 +18,9 @@ docs:
 
 The worst deployment anti-pattern is *baking configuration into the image*: change a database URL, a feature flag, a log level → rebuild and redeploy the container. **ConfigMaps** (non-secret config) and **Secrets** (sensitive config) decouple configuration from the image: the same image runs in dev, staging, and prod, differing only in the config injected at deploy time. One image, many environments.
 
+```java
 **The mental model:** the container image is the binary of your app; ConfigMaps and Secrets are the *settings files* handed to it when it starts. Same program, different settings per environment — no rebuilds, no "prod image" vs "dev image". Spring Boot's entire externalized-config philosophy (properties, profiles, env vars) is the natural partner: K8s provides the config; Spring reads it.
+```
 
 ## ConfigMap: Non-Secret Configuration
 
@@ -97,7 +99,9 @@ stringData:                 # plain-text here; K8s base64-encodes for storage
 - **Sealed Secrets** — encrypts secrets in Git (the SealedSecret controller decrypts them in-cluster).
 - **Vault** — the heavyweight: dynamic credentials, rotation, audit.
 
+```java
 The modern rule: **never store real secrets in Git; store them in a secret manager and sync (or reference) them into the cluster.** A Secret in Git is a breach waiting to happen.
+```
 
 **Injecting Secrets** is identical to ConfigMaps (env vars via `secretKeyRef`, or mounted files):
 

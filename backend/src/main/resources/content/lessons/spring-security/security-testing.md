@@ -22,26 +22,32 @@ class AccountControllerSecurityTest {
     @Test
     void anonymous_request_is_rejected_with_401() throws Exception {
         mockMvc.perform(get("/api/accounts/iban-1"))
+```java
                 .andExpect(status().isUnauthorized());
     }
 
     @Test
     @WithMockUser(username = "alice", roles = "USER")
     void authenticated_user_can_read() throws Exception {
+```
         mockMvc.perform(get("/api/accounts/iban-1"))
+```java
                 .andExpect(status().isOk());
     }
 
     @Test
     @WithMockUser(username = "bob", roles = "USER")
     void user_cannot_call_admin_endpoint() throws Exception {
+```
         mockMvc.perform(delete("/api/accounts/iban-1"))
+```java
                 .andExpect(status().isForbidden());
     }
 
     @Test
     @WithMockUser(username = "admin", roles = "ADMIN")
     void admin_can_call_admin_endpoint() throws Exception {
+```
         mockMvc.perform(delete("/api/accounts/iban-1"))
                 .andExpect(status().isNoContent());
     }
@@ -59,11 +65,15 @@ class ApiIntegrationTest {
     void login_then_call_protected_endpoint() throws Exception {
         String body = mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
+```java
                         .content("{\"username\":\"admin\",\"password\":\"admin123\"}"))
+```
                 .andExpect(status().isOk())
+```java
                 .andReturn().getResponse().getContentAsString();
 
         String token = objectMapper.readTree(body).get("token").asText();
+```
 
         mockMvc.perform(get("/api/progress")
                         .header("Authorization", "Bearer " + token))

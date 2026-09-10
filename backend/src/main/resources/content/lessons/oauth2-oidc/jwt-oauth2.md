@@ -57,10 +57,6 @@ The registered claims (`iss`, `sub`, `aud`, `exp`, `iat`, `nbf`) are standardize
 
 1. The resource server's validation checklist (what Spring Security does): 1. SIGNATURE — verify with the issuer's public key. 2. EXPIRY (exp) — reject if now > exp. 3. ISSUER (iss) — must match the expected authorization server. 4. AUDIENCE (aud) — must include THIS resource server. 5. NBF (not before) — reject if used too early. 6. ALGORITHM — must be a whitelisted algorithm (never "none"!).
 
-The same code, clean:
-
-```java
-```
 
 **The attacks these checks prevent:**
 
@@ -101,8 +97,10 @@ public class SecurityConfig {
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))
+```java
             // requests need a valid JWT; method-level security refines by
             // scope/authority:
+```
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/lessons/**").hasAuthority("SCOPE_read:lessons")
                 .anyRequest().authenticated());

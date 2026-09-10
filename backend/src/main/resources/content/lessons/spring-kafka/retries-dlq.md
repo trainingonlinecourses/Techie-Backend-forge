@@ -75,6 +75,7 @@ With a failed-deserialization function of `sendToDlq`, malformed records go stra
 
 ## Manual retry control — when you need it
 
+```java
 @KafkaListener(topics = "payments", groupId = "payment-ledger")
 public void onPaymentCaptured(PaymentCaptured event) {
     try {
@@ -83,6 +84,7 @@ public void onPaymentCaptured(PaymentCaptured event) {
         throw new RetryableException("db unavailable", e);   // container retries
     }
 }
+```
 
 `RetryableException` tells the container "retry me". Any other exception → default behavior (or DLT, per config). Reserve this for cases where `@RetryableTopic` doesn't fit (e.g. you need custom logic to decide retryability).
 

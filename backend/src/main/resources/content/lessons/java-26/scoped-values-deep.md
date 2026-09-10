@@ -15,6 +15,7 @@ docs:
 // OLD: ThreadLocal — memory leaks, not virtual-thread-friendly
 private static final ThreadLocal<User> currentUser = new ThreadLocal<>();
 
+```java
 public void handleRequest() {
     currentUser.set(user);        // Store user for this thread
     try {
@@ -25,6 +26,7 @@ public void handleRequest() {
 }
 
 **Problems with ThreadLocal:**
+```
 1. **Memory leaks** — if you forget `remove()`, values persist
 2. **Virtual threads** — millions of virtual threads = millions of ThreadLocal copies
 3. **Inheritance** — child threads don't automatically inherit ThreadLocal values
@@ -35,12 +37,14 @@ public void handleRequest() {
 // JAVA 21+: Clean, safe, auto-cleaned
 private static final ScopedValue<User> currentUser = ScopedValue.newInstance();
 
+```java
 public void handleRequest() {
     ScopedValue.where(currentUser, user).run(() -> {
         processOrder();  // currentUser.get() works here
     });
     // currentUser.get() throws here — scope ended, auto-cleaned
 }
+```
 
 ---
 

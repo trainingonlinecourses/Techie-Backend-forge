@@ -167,6 +167,7 @@ public class WrapperClassesDemo {
 
 ### Scenario 1: Safe parsing with default
 
+```java
 public static int safeParseInt(String input, int defaultValue) {
     try {
         return Integer.parseInt(input.strip());
@@ -177,9 +178,11 @@ public static int safeParseInt(String input, int defaultValue) {
 
 // Usage
 int port = safeParseInt(config.get("server.port"), 8080);
+```
 
 ### Scenario 2: Nullable database values
 
+```java
 // JPA entities often use wrappers for nullable columns
 @Entity
 public class Employee {
@@ -192,6 +195,7 @@ public class Employee {
         return age != null ? age : defaultAge;
     }
 }
+```
 
 ### Scenario 3: Safe arithmetic with overflow
 

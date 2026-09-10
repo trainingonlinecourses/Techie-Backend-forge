@@ -38,6 +38,7 @@ Spring Shell lets you build **interactive command-line applications** using the 
 </dependency>
 ```
 
+```java
 package com.example.cli;
 
 import org.springframework.boot.SpringApplication;
@@ -49,6 +50,7 @@ public class CliApplication {
         SpringApplication.run(CliApplication.class, args);
     }
 }
+```
 
 ---
 
@@ -110,6 +112,7 @@ public class UserCommands {
      * Usage:  user create --email alice@acme.com --name "Alice Smith" --role admin
      * 
      * Multiple @ShellOption parameters become named options (flags).
+```java
      */
     @ShellMethod(value = "Create a new user", key = "user create")
     public String createUser(
@@ -127,6 +130,7 @@ public class UserCommands {
     }
 
     /**
+```
      * List all users with optional filtering.
      * 
      * Usage:  user list --role admin
@@ -142,10 +146,12 @@ public class UserCommands {
         if (role != null) {
             result = result.stream()
                 .filter(u -> u.getRole().name().equals(role))
+```java
                 .toList();
         }
 
         if (active) {
+```
             result = result.stream()
                 .filter(User::isActive)
                 .toList();
@@ -198,6 +204,7 @@ public class DatabaseCommands {
 
     @ShellMethod(value = "Run SQL query", key = "db query",
                  availability = "isDatabaseAvailable")
+```java
     public String query(
             @ShellOption String sql) {
         // Only available when connected to database
@@ -205,6 +212,7 @@ public class DatabaseCommands {
     }
 
     /**
+```
      * Controls whether 'db' commands appear in help and tab-completion.
      * Return true = commands available, false = commands hidden.
      */

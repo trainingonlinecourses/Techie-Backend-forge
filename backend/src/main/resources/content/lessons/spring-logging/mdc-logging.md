@@ -12,6 +12,7 @@ docs:
 
 MDC (Mapped Diagnostic Context) lets you add key-value data to all log lines from the current thread. It's how you add request IDs, user IDs, and other context to logs without passing them everywhere.
 
+```java
 // Add context
 MDC.put("requestId", "abc-123");
 MDC.put("userId", "42");
@@ -19,6 +20,7 @@ MDC.put("userId", "42");
 log.info("Processing order");  // automatically includes requestId and userId
 
 // Output: 14:30:15 INFO [http-nio-8080-exec-1] [requestId=abc-123, userId=42] MyService - Processing order
+```
 
 ---
 
@@ -103,6 +105,7 @@ logging:
 
 ### Scenario 2: Async MDC propagation
 
+```java
 // MDC is ThreadLocal — doesn't propagate to async threads
 // Use ContextCopyingDecorator for @Async methods
 @Component
@@ -120,6 +123,7 @@ public class ContextCopyingDecorator implements TaskDecorator {
         };
     }
 }
+```
 
 ---
 

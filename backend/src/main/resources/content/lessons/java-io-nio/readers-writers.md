@@ -89,12 +89,14 @@ public class ReaderWriterDemo {
 
 Sometimes you have bytes (e.g., from a socket or an `InputStream`) but want text APIs:
 
+```java
 // Wrap an InputStream, decode as UTF-8, buffer, read lines:
 try (BufferedReader r = new BufferedReader(
         new InputStreamReader(in, StandardCharsets.UTF_8))) {
     String line;
     while ((line = r.readLine()) != null) { ... }
 }
+```
 
 `InputStreamReader` is the *decoder bridge*: bytes in, chars out. `OutputStreamWriter` is the *encoder bridge*: chars in, bytes out. The charset argument is where you control the encoding — always pass it.
 

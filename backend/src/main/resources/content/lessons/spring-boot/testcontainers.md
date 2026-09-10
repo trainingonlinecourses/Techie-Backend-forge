@@ -17,6 +17,7 @@ An in-memory database (H2) is *almost* production — until a Postgres-only feat
 
 ## The minimal setup
 
+```java
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class OrderRepositoryIT {
@@ -30,6 +31,7 @@ class OrderRepositoryIT {
         // repository.save(...); repository.findById(...) — against real Postgres
     }
 }
+```
 
 `@ServiceConnection` (Boot 3.1+) reads the container's connection info and configures the matching `DataSource`/connection factory automatically — no hard-coded JDBC URL. Without it, you'd extract `getJdbcUrl()` manually into a `DynamicPropertySource`:
 
@@ -50,6 +52,7 @@ Starting a container per test class is slow. The standard patterns:
 
 ## Testing more than the database
 
+```java
 @Container
 @ServiceConnection
 static KafkaContainer kafka = new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:7.6.0"));
@@ -57,6 +60,7 @@ static KafkaContainer kafka = new KafkaContainer(DockerImageName.parse("confluen
 @Container
 @ServiceConnection
 static RedisContainer redis = new RedisContainer(DockerImageName.parse("redis:7-alpine"));
+```
 
 The same pattern covers MongoDB, Elasticsearch, RabbitMQ, MySQL, even **`LocalStackContainer`** for AWS services. `@ServiceConnection` supports all of them — one annotation per container, zero manual config. That's how you integration-test the outbox pattern, the cache, and the event pipeline with their real peers.
 

@@ -78,11 +78,13 @@ public class InspectDemo {
         for (Method m : clazz.getMethods()) {
             System.out.println("  " + m.getReturnType().getSimpleName() +
                                " " + m.getName() + "(" +
+```java
                                params(m) + ")");
         }
 
         System.out.println("=== DECLARED (incl. private, incl. only this class) ===");
         for (Field f : clazz.getDeclaredFields()) {
+```
             System.out.println("  " + Modifier.toString(f.getModifiers()) +
                                " " + f.getType().getSimpleName() + " " + f.getName());
         }
@@ -140,6 +142,7 @@ public class InvokeDemo {
 
 ## Accessing Private Fields — and the Cost
 
+```java
 import java.lang.reflect.Field;
 
 public class PrivateAccessDemo {
@@ -159,6 +162,7 @@ public class PrivateAccessDemo {
         System.out.println(value);    // classified
     }
 }
+```
 
 `setAccessible(true)` is the "master key" — it bypasses Java's access control for that member. Frameworks use it constantly (Spring's field injection, ORM hydration, serialization of private state). But it also breaks encapsulation, and in modern Java (17+) it's gated: the `java.lang.reflect` access-control module and `--add-opens` flags exist precisely to stop arbitrary code from reaching into JDK internals. Use it only where you own both sides of the contract.
 

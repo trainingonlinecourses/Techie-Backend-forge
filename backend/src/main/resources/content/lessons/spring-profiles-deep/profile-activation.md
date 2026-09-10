@@ -59,13 +59,17 @@ java -Dspring.profiles.active=dev -jar app.jar
 
 SpringApplicationBuilder app = new SpringApplicationBuilder(Application.class)
     .profiles("dev", "local")
+```java
     .build();
+```
 
 ### 6. Test Annotation
 
+```java
 @SpringBootTest
 @ActiveProfiles("test")
 class UserServiceTest { }
+```
 
 ---
 

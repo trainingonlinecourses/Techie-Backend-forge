@@ -17,7 +17,9 @@ A **package** does two jobs at once:
 
 Physically, packages map to **folders**. If you declare:
 
+```java
 package com.acme.billing;   // must be the FIRST line of the file (comments allowed above)
+```
 
 …then the compiler expects `BillingService.class` to live in folder `com/acme/billing/`. The fully qualified name of your class becomes `com.acme.billing.BillingService` — that's its unique address in the entire JVM.
 
@@ -43,6 +45,7 @@ private java.util.List<String> items = new java.util.ArrayList<>();  // legal bu
 
 ### Same-name collision — where imports earn their keep
 
+```java
 import java.sql.Date;                 // this file's default meaning of 'Date'
 
 public class Report {
@@ -52,23 +55,28 @@ public class Report {
         // both Date types coexist in one file
     }
 }
+```
 
 When two types share a simple name, you import one and fully-qualify the other.
 
 ### Wildcard imports
 
+```java
 import java.util.*;      // every public type directly inside java.util (NOT subpackages)
+```
 
 - Convenient, but if `java.util` and your own code both define `List`, compilation fails with "ambiguous name" until you qualify explicitly.
 - Most style guides (Google's included) prefer **explicit imports** because code review shows exactly which type is used without an IDE.
 
 ### Static imports — for constants and helpers
 
+```java
 import static java.lang.Math.max;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 int bigger = max(3, 7);              // instead of Math.max(3, 7)
 assertEquals(4, cart.itemCount());   // common in tests
+```
 
 Use sparingly — overusing static imports hides where a method comes from.
 

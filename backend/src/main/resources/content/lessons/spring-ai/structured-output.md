@@ -25,22 +25,28 @@ String response = chatClient.prompt()
         .user(u -> u
                 .text("""
                         Classify this transaction as approved or rejected, with reasons.
+```java
                         Transaction: {txn}
                         {format}
+```
                         """)
                 .param("txn", txn.toString())
                 .param("format", converter.getFormat()))     // "Respond in JSON with this schema..."
         .call()
+```java
         .content();
 
 FraudDecision decision = converter.convert(response);         // parse + validate
+```
 
 The converter injects the JSON schema into the prompt and parses the model's answer into the record. Guard with validation (`@Valid`) — models can return fields that don't exist.
 
 ## MapOutputConverter: when you just need key/values
 
+```java
 MapOutputConverter converter = new MapOutputConverter();
 Map<String, Object> summary = converter.convert(response);
+```
 
 ## Function calling: the model calls YOUR code
 
@@ -55,6 +61,7 @@ public class OrderTools {
     public String orderStatus(String orderId) {
         return orders.findById(orderId)
                 .map(o -> "Order %s is %s, total %s".formatted(o.getId(), o.getStatus(), o.getTotal()))
+```java
                 .orElse("Order not found: " + orderId);
     }
 }
@@ -64,6 +71,7 @@ public class AiConfig {
     @Bean
     ChatClient chatClient(ChatClient.Builder builder, OrderTools tools) {
         return builder
+```
                 .defaultSystem("You are an order assistant. Use the orderStatus tool to answer questions about orders.")
                 .defaultTools(ToolCallbacks.from(tools))          // register the tool
                 .build();

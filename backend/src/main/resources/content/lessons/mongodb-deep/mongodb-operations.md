@@ -101,16 +101,20 @@ public interface OrderRepository extends MongoRepository<Order, String> {
     List<Order> findByItemsProductId(String productId);     // Query nested array
     Page<Order> findByStatus(String status, Pageable pageable);
 
+```java
     // @Query with MongoDB query syntax:
     @Query("{ 'status': ?0, 'total': { $gte: ?1 } }")
+```
     List<Order> findHighValueOrders(String status, double minTotal);
 
+```java
     // Aggregation:
     @Aggregation(pipeline = {
         "{ $match: { status: ?0 } }",
         "{ $group: { _id: '$customerName', total: { $sum: '$total' } } }",
         "{ $sort: { total: -1 } }"
     })
+```
     List<Document> getTopCustomersByStatus(String status);
 }
 
@@ -234,6 +238,7 @@ Query query = Query.query(Criteria.where("attributes.color").is("black")
 
 ### Scenario 2: Logging/Analytics (Time Series)
 
+```java
 @Document(collection = "events")
 @Indexed(name = "timestamp_idx", direction = IndexDirection.DESCENDING)
 public class AnalyticsEvent {
@@ -246,11 +251,14 @@ public class AnalyticsEvent {
 }
 
 // Find events in the last 24 hours:
+```
 Query query = Query.query(
     Criteria.where("timestamp").gte(Instant.now().minus(Duration.ofHours(24)))
+```java
 );
 query.with(Sort.by(Sort.Direction.DESC, "timestamp"));
 query.limit(1000);
+```
 
 ### Scenario 3: Chat Messages (Embedded vs Referenced)
 

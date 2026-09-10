@@ -102,6 +102,7 @@ The math forces the discipline: **the layers must fit inside the caller's patien
 
 A good fallback isn't "null". It's the *best valid answer available*:
 
+```java
 // Serve from cache when the source is down:
 public Course getCourse(long id) {
     try {
@@ -115,6 +116,7 @@ public Course getCourse(long id) {
         throw new ServiceUnavailableException("catalog down, no cache");
     }
 }
+```
 
 The rules:
 

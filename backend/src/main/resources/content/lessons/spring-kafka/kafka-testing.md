@@ -25,6 +25,7 @@ docs:
 
 The `spring-kafka-test` dependency ships an in-process Kafka broker — no Docker needed, fast, perfect for logic tests:
 
+```java
 @SpringBootTest
 @EmbeddedKafka(partitions = 1, topics = { "orders", "notifications" })
 class OutboxFlowTest {
@@ -39,6 +40,7 @@ class OutboxFlowTest {
         await().atMost(5, TimeUnit.SECONDS).until(() -> processedStore.contains("order-1"));
     }
 }
+```
 
 Key rules for embedded tests:
 
@@ -90,12 +92,14 @@ Use short backoff in tests (`@RetryableTopic(backoff = @Backoff(delay = 100, mul
 
 Use a real Kafka container when you need: multiple brokers (replication), schema registry integration, or production-fidelity behavior. `spring-kafka-test` also ships `KafkaContainer` via `testcontainers`:
 
+```java
 @Testcontainers
 class KafkaContainerIT {
     @Container
     static final KafkaContainer KAFKA = new KafkaContainer(DockerImageName
             .parse("confluentinc/cp-kafka:7.6.0"));
 }
+```
 
 The trade-off: Docker required, slower, but catches real-broker bugs (serde headers, partition behavior) that embedded mode glosses over. Common strategy: **embedded for fast CI unit-ish tests, containers for the critical flows.**
 

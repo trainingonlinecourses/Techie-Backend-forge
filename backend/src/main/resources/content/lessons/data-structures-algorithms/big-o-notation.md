@@ -112,7 +112,9 @@ Big-O deliberately throws away precision to capture the *shape*:
 
 ## Space Complexity: The Forgotten Half
 
+```java
 Big-O applies to memory too: how does *extra* memory grow with input? An in-place sort needs O(1) extra space; a merge sort's auxiliary arrays need O(n); recursion depth can be O(n) (a recursive binary search is O(log n) stack space). Production incidents often come from space, not time — a "fast" algorithm that allocates O(n²) memory dies on big inputs. Ask both questions about every algorithm: time? space?
+```
 
 ## What Big-O Does NOT Tell You
 
@@ -122,7 +124,9 @@ Big-O applies to memory too: how does *extra* memory grow with input? An in-plac
 
 ## The Habit That Pays Off
 
+```java
 Before you write an algorithm, *predict* its complexity; after you write it, *verify* against a doubling test: run it on n and 2n inputs and check whether the time roughly doubles (O(n)), quadruples (O(n²)), or stays flat (O(1)/O(log n)). This simple experiment catches complexity mistakes that benchmarks alone hide. And when a reviewer asks "what's the complexity of this?", the answer should be immediate — because the complexity *is* the specification of how the code behaves at scale.
+```
 
 ## Recap
 

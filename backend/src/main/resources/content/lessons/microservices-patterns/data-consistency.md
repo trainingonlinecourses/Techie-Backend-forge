@@ -215,6 +215,7 @@ User changes their email. The profile service saves it, but the search index tak
 - For 5 seconds, searching by the new email won't find the user — this is acceptable (eventual consistency).
 - The user themselves sees their new email immediately (read-your-writes).
 
+```java
 // The profile service guarantees read-your-writes by reading from its own DB
 // for the next few seconds, and falling back to the search index after
 public User findByEmail(String email) {
@@ -222,9 +223,11 @@ public User findByEmail(String email) {
     return profileRepository.findByEmail(email)
         .orElseGet(() -> searchIndex.findByEmail(email));   // Fall back to eventual index
 }
+```
 
 ### Scenario 3: Distributed Lock for Critical Operations
 
+```java
 @Service
 public class InventoryService {
 
@@ -253,6 +256,7 @@ public class InventoryService {
 }
 
 **Line-by-line explained:**
+```
 - `redisson.getLock("inventory:" + productId)` — Creates a distributed lock for this specific product. Only one service instance can hold it at a time.
 - `lock.lock(5, TimeUnit.SECONDS)` — Wait up to 5 seconds to acquire the lock. If another instance holds it, we wait. After 5s, we fail fast.
 - The actual inventory check and update happens inside the lock — preventing two simultaneous orders from overselling the same product.
@@ -269,10 +273,6 @@ Every cross-service flow should have a consistency decision table:
 
 1. Part of the design review document: . Flow: Place Order → Charge Payment → Ship. . Step | Consistency | Max Skew | Reconciliation. ------------------|---------------|-----------|----------------. Order + Outbox | Atomic | 0ms | None (same TX). Payment charge | Idempotent | 30s | PaymentReconciler. Mark order PAID | Eventual | 5min | OrderReconciler. Ship item | Eventual | 15min | InventoryReconciler. Send email | Best-effort | 1hr | DeadLetterHandler
 
-The same code, clean:
-
-```java
-```
 
 ---
 

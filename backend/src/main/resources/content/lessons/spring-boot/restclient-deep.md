@@ -21,36 +21,46 @@ Think of it as a **postman for your code** — you build requests step by step a
 
 ## Why RestClient Over RestTemplate?
 
+```java
 // ❌ Old way — RestTemplate (verbose, hard to read)
 RestTemplate restTemplate = new RestTemplate();
 
 // Simple GET
+```
 User user = restTemplate.getForObject("https://api.example.com/users/1", User.class);
 
+```java
 // POST with headers
 HttpHeaders headers = new HttpHeaders();
 headers.setContentType(MediaType.APPLICATION_JSON);
+```
 HttpEntity<String> entity = new HttpEntity<>("{\"name\":\"Alice\"}", headers);
 ResponseEntity<User> response = restTemplate.postForEntity(
     "https://api.example.com/users", entity, User.class
+```java
 );
 
 // ✅ New way — RestClient (clean, fluent, readable)
+```
 RestClient client = RestClient.create("https://api.example.com");
 
 // Simple GET
 User user = client.get()
     .uri("/users/1")
     .retrieve()
+```java
     .body(User.class);
 
 // POST with headers
+```
 User user = client.post()
     .uri("/users")
     .contentType(MediaType.APPLICATION_JSON)
     .body(Map.of("name", "Alice"))
     .retrieve()
+```java
     .body(User.class);
+```
 
 ---
 
@@ -66,7 +76,9 @@ RestClient client = RestClient.builder()
     .baseUrl("https://api.example.com")
     .defaultHeader("Authorization", "Bearer " + token)
     .defaultHeader("Accept", MediaType.APPLICATION_JSON_VALUE)
+```java
     .build();
+```
 
 ### GET Requests
 
@@ -76,15 +88,21 @@ RestClient client = RestClient.create("https://jsonplaceholder.typicode.com");
 String body = client.get()
     .uri("/posts/1")
     .retrieve()
+```java
     .body(String.class);
 
 // GET with path variables
+```
 Post post = client.get()
+```java
     .uri("/posts/{id}", 1)
+```
     .retrieve()
+```java
     .body(Post.class);
 
 // GET with query parameters
+```
 List<Post> posts = client.get()
     .uri(uriBuilder -> uriBuilder
         .path("/posts")
@@ -106,17 +124,21 @@ Post newPost = client.post()
         "userId", 1
     ))
     .retrieve()
+```java
     .body(Post.class);
 
 // POST and get the full response (including status code, headers)
+```
 ResponseEntity<Post> response = client.post()
     .uri("/posts")
     .contentType(MediaType.APPLICATION_JSON)
     .body(Map.of("title", "Hello"))
+```java
     .toEntity(Post.class);
 
 int statusCode = response.getStatusCode().value();  // 201
 Post created = response.getBody();
+```
 
 ### PUT and DELETE
 
@@ -126,21 +148,27 @@ client.put()
     .contentType(MediaType.APPLICATION_JSON)
     .body(Map.of("title", "Updated Title", "body", "Updated body", "userId", 1))
     .retrieve()
+```java
     .toBodilessEntity();  // No response body expected
 
 // PATCH — partial update
+```
 client.patch()
     .uri("/posts/1")
     .contentType(MediaType.APPLICATION_JSON)
     .body(Map.of("title", "Only Title Updated"))
     .retrieve()
+```java
     .toBodilessEntity();
 
 // DELETE
+```
 client.delete()
     .uri("/posts/1")
     .retrieve()
+```java
     .toBodilessEntity();
+```
 
 ---
 
@@ -155,7 +183,9 @@ public class Main {
 
         try {
             User user = client.get()
+```java
                 .uri("/users/{id}", 999)
+```
                 .retrieve()
                 .body(User.class);
         } catch (HttpClientErrorException.NotFound e) {
@@ -217,6 +247,7 @@ public class Main {
 RestClient client = RestClient.builder()
     .baseUrl("https://api.example.com")
     .requestInterceptor(new LoggingInterceptor())
+```java
     .build();
 
 // Custom interceptor
@@ -231,6 +262,7 @@ public class LoggingInterceptor implements ClientHttpRequestInterceptor {
         return response;
     }
 }
+```
 
 ### Custom Headers Per Request
 
@@ -239,7 +271,9 @@ User user = client.get()
     .header("X-Request-Id", UUID.randomUUID().toString())
     .header("Accept-Language", "en-US")
     .retrieve()
+```java
     .body(User.class);
+```
 
 ---
 
@@ -256,22 +290,26 @@ public class PaymentService {
         this.paymentClient = builder
             .baseUrl("https://api.stripe.com/v1")
             .defaultHeader("Authorization", "Bearer " + stripeApiKey)
+```java
             .build();
     }
 
     public PaymentIntent createPayment(BigDecimal amount, String currency) {
         return paymentClient.post()
+```
             .uri("/payment_intents")
             .contentType(MediaType.APPLICATION_FORM_URLENCODED)
             .body("amount=" + amount.multiply(BigDecimal.valueOf(100)).intValue()
                 + "&currency=" + currency)
             .retrieve()
+```java
             .body(PaymentIntent.class);
     }
 
     public PaymentIntent retrievePayment(String paymentIntentId) {
         return paymentClient.get()
             .uri("/payment_intents/{id}", paymentIntentId)
+```
             .retrieve()
             .body(PaymentIntent.class);
     }
@@ -294,7 +332,9 @@ public class OrderService {
     public OrderSummary createOrder(String userId, List<OrderItem> items) {
         // Validate user exists
         User user = userClient.get()
+```java
             .uri("/api/users/{id}", userId)
+```
             .retrieve()
             .body(User.class);
 
@@ -315,10 +355,12 @@ public class WebhookService {
     public WebhookService(RestClient.Builder builder) {
         this.webhookClient = builder
             .baseUrl("https://hooks.slack.com")
+```java
             .build();
     }
 
     public void sendSlackNotification(String webhookUrl, String message) {
+```
         webhookClient.post()
             .uri(webhookUrl.replace("https://hooks.slack.com", ""))
             .contentType(MediaType.APPLICATION_JSON)

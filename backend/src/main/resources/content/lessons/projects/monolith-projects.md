@@ -129,6 +129,7 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
     List<Task> findByStatus(TaskStatus status);
     List<Task> findByPriority(TaskPriority priority);
     List<Task> findByTitleContainingIgnoreCase(String keyword);
+```java
 }
 
 **TaskService.java**
@@ -148,6 +149,7 @@ public class TaskService {
     public TaskService(TaskRepository repository) {
         this.repository = repository;
     }
+```
     
     public List<Task> getAllTasks() {
         return repository.findAll();
@@ -232,6 +234,7 @@ public class TaskController {
     
     @GetMapping("/status/{status}")
     public List<Task> getTasksByStatus(@PathVariable TaskStatus status) {
+```java
         return service.getTasksByStatus(status);
     }
 }
@@ -266,24 +269,29 @@ class TaskControllerTest {
         Task task = new Task();
         task.setTitle("Learn Spring Boot");
         task.setDescription("Complete the tutorials");
+```
         
         mockMvc.perform(post("/api/tasks")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(task)))
             .andExpect(status().isCreated())
             .andExpect(jsonPath("$.title").value("Learn Spring Boot"))
+```java
             .andExpect(jsonPath("$.status").value("TODO"));
     }
     
     @Test
     void shouldGetAllTasks() throws Exception {
+```
         mockMvc.perform(get("/api/tasks"))
             .andExpect(status().isOk())
+```java
             .andExpect(jsonPath("$").isArray());
     }
     
     @Test
     void shouldReturn404ForNonexistentTask() throws Exception {
+```
         mockMvc.perform(get("/api/tasks/999"))
             .andExpect(status().isNotFound());
     }
@@ -521,6 +529,7 @@ public class Order {
     public void setStatus(OrderStatus status) { this.status = status; }
     public List<OrderItem> getItems() { return items; }
     public void setItems(List<OrderItem> items) { this.items = items; }
+```java
     public BigDecimal getTotalAmount() { return totalAmount; }
     public void setTotalAmount(BigDecimal total) { this.totalAmount = total; }
 }
@@ -570,9 +579,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
+```
     List<Product> findByCategory(String category);
     List<Product> findByPriceBetween(java.math.BigDecimal min, java.math.BigDecimal max);
     List<Product> findByNameContainingIgnoreCase(String name);
+```java
 }
 
 **CartRepository.java**
@@ -583,7 +594,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface CartRepository extends JpaRepository<CartItem, Long> {
+```
     List<CartItem> findBySessionId(String sessionId);
+```java
     void deleteBySessionId(String sessionId);
 }
 
@@ -595,8 +608,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface OrderRepository extends JpaRepository<Order, Long> {
+```
     List<Order> findByCustomerEmail(String email);
     List<Order> findByStatus(com.backendforge.ecommerce.entity.OrderStatus status);
+```java
 }
 
 **ProductService.java**
@@ -615,6 +630,7 @@ public class ProductService {
     public ProductService(ProductRepository repository) {
         this.repository = repository;
     }
+```
     
     public List<Product> getAllProducts() {
         return repository.findAll();
@@ -677,22 +693,27 @@ public class CartService {
     }
     
     public List<CartItem> getCart(String sessionId) {
+```java
         return cartRepository.findBySessionId(sessionId);
     }
     
     @Transactional
     public CartItem addToCart(String sessionId, Long productId, int quantity) {
+```
         Product product = productRepository.findById(productId)
+```java
             .orElseThrow(() -> new RuntimeException("Product not found"));
         
         if (!product.isInStock() || product.getStockQuantity() < quantity) {
             throw new RuntimeException("Insufficient stock");
         }
+```
         
         List<CartItem> existing = cartRepository.findBySessionId(sessionId);
         CartItem item = existing.stream()
             .filter(i -> i.getProduct().getId().equals(productId))
             .findFirst()
+```java
             .orElse(new CartItem());
         
         item.setSessionId(sessionId);
@@ -704,15 +725,18 @@ public class CartService {
     
     @Transactional
     public void removeFromCart(String sessionId, Long productId) {
+```
         List<CartItem> items = cartRepository.findBySessionId(sessionId);
         items.stream()
             .filter(i -> i.getProduct().getId().equals(productId))
             .findFirst()
             .ifPresent(cartRepository::delete);
+```java
     }
     
     @Transactional
     public Order checkout(String sessionId, String email) {
+```
         List<CartItem> cartItems = cartRepository.findBySessionId(sessionId);
         if (cartItems.isEmpty()) {
             throw new RuntimeException("Cart is empty");

@@ -15,6 +15,7 @@ docs:
 
 A browser enforces the **same-origin policy**: `https://app.example.com` cannot read responses from `https://api.example.com` unless the API explicitly allows it via CORS headers. It's not an attack blocker — it's a browser rule for *who may read*.
 
+```java
 @Bean
 CorsConfigurationSource corsConfigurationSource(AppProperties props) {
     CorsConfiguration cfg = new CorsConfiguration();
@@ -26,6 +27,7 @@ CorsConfigurationSource corsConfigurationSource(AppProperties props) {
     source.registerCorsConfiguration("/**", cfg);
     return source;
 }
+```
 
 Rules: allowlist exact origins (no `*` with credentials), match methods/headers to what you actually use, and know that **CORS is enforced by the browser, not the server** — curl can always call you.
 
@@ -46,7 +48,9 @@ http.csrf(AbstractHttpConfigurer::disable);
 
 ## Security headers
 
+```java
 Spring Security sets sane defaults; tune the important ones:
+```
 
 ```yaml
 server:
@@ -55,9 +59,13 @@ server:
 
 http.headers(h -> h
     .contentSecurityPolicy(csp -> csp.policyDirectives(
+```java
         "default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:"))
+```
     .httpStrictTransportSecurity(hsts -> hsts.includeSubDomains(true).maxAgeInSeconds(31536000))
+```java
     .frameOptions(f -> f.sameOrigin()));
+```
 
 | Header | Blocks |
 |---|---|
@@ -68,6 +76,7 @@ http.headers(h -> h
 
 ## Rate limiting & brute-force defense
 
+```java
 @Component
 public class RateLimitFilter extends OncePerRequestFilter {
     private final Cache<String, AtomicInteger> attempts = Caffeine.newBuilder()
@@ -85,6 +94,7 @@ public class RateLimitFilter extends OncePerRequestFilter {
         chain.doFilter(req, res);
     }
 }
+```
 
 Also: lock accounts after N failed logins (or back off), validate input at the boundary, and never trust client-supplied identity.
 

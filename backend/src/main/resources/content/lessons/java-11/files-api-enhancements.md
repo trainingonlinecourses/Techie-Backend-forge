@@ -12,6 +12,7 @@ docs:
 
 Before Java 11, reading a file into a String required 4-5 lines of boilerplate. Java 11 added `readString()` and `writeString()` to `Files`:
 
+```java
 // PRE-JAVA 11: Reading a file
 String content = new String(Files.readAllBytes(Path.of("config.yml")));
 
@@ -23,6 +24,7 @@ Files.write(Path.of("output.txt"), "Hello".getBytes());
 
 // JAVA 11: One line
 Files.writeString(Path.of("output.txt"), "Hello");
+```
 
 ---
 

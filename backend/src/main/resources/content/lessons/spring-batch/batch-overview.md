@@ -17,7 +17,9 @@ Some workloads can't (or shouldn't) run in a request: nightly payroll runs, migr
 
 ## The mental model
 
+```java
 A **Job** is a sequence of **Steps**; each Step processes data through the classic pipeline:
+```
 
 ```
 ItemReader ──▶ ItemProcessor ──▶ ItemWriter
@@ -81,7 +83,9 @@ JobInstance (logical job) → JobExecution (one run) → StepExecution (per step
 Jobs run on `ApplicationRunner` at startup by default (`spring.batch.job.enabled=false` to disable), or on demand — via `JobLauncher.run(job, params)`, from a controller, or scheduled:
 
 JobExecution ex = jobLauncher.run(statementJob,
+```java
     new JobParametersBuilder().addLong("runId", System.currentTimeMillis()).toJobParameters());
+```
 
 ## When NOT to use batch
 

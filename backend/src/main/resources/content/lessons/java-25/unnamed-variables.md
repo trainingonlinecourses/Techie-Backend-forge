@@ -231,12 +231,14 @@ public Optional<User> findUser(String id) {
 
 ### Scenario 2: Try-with-resources for side effects
 
+```java
 public void copyFile(String from, String to) throws IOException {
     try (var _ = new FileInputStream(from);    // opened for side effect
          var out = new FileOutputStream(to)) {
         in.transferTo(out);  // 'in' is the from stream
     }
 }
+```
 
 ---
 

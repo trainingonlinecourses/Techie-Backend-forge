@@ -18,12 +18,14 @@ In the classic Spring era, deploying meant: install Tomcat on a server, drop you
 
 **Spring Boot flips this**: the web server (Tomcat by default, but also Jetty or Undertow) is a **library inside your application**. Your `main` method starts the whole thing — server included:
 
+```java
 @SpringBootApplication
 public class AcademyApplication {
     public static void main(String[] args) {
         SpringApplication.run(AcademyApplication.class, args);   // starts Tomcat too
     }
 }
+```
 
 When this runs, Spring Boot:
 

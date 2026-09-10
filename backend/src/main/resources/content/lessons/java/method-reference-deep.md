@@ -12,8 +12,10 @@ docs:
 
 A **method reference** is a shortcut: when a lambda does nothing but call one existing method, you can name that method instead of writing the lambda.
 
+```java
 // These two lines do EXACTLY the same thing:
 Function<String, Integer> lenLambda = s -> s.length();   // lambda: take s, return s.length()
+```
 Function<String, Integer> lenRef    = String::length;    // reference: "the length method of String"
 
 Read `::` as "refer to". No parentheses, no arguments listed — the compiler already knows what arguments to pass because the **target functional interface** defines them. `Function<String,Integer>` promises "give me a String, I'll give you an Integer", and `String::length` fits that shape perfectly.
@@ -25,41 +27,55 @@ Method references are not magic — they compile to lambdas under the hood. They
 ### Kind 1 — Static method: `ClassName::staticMethod`
 
 Function<String, Integer> parser = Integer::parseInt;
+```java
 // same as: s -> Integer.parseInt(s)
+```
 
 List<String> raw = List.of("42", "17", "99");
 List<Integer> nums = raw.stream()
         .map(Integer::parseInt)     // each string flows into parseInt as its single argument
+```java
         .toList();
+```
 
 The stream hands each element as the argument. You write zero parameters — the pipeline shape supplies them.
 
 ### Kind 2 — Bound (instance of a specific object): `object::instanceMethod`
 
+```java
 String prefix = "ORDER-";
+```
 Function<String, String> tagger = prefix::concat;
+```java
 // 'prefix' is a SPECIFIC object captured here
 // same as: s -> prefix.concat(s)
 
 tagger.apply("1001");   // "ORDER-1001"
+```
 
 "Bound" = bound to one particular receiver (`prefix`) fixed in advance.
 
 ### Kind 3 — Unbound (instance method of the parameter): `ClassName::instanceMethod`
 
 BiFunction<String, String, Boolean> contains = String::contains;
+```java
 // same as: (haystack, needle) -> haystack.contains(needle)
 // first parameter becomes the RECEIVER, the rest become arguments
+```
 
 Comparator<String> byLength = Comparator.comparing(String::length);
+```java
 // same as comparing(s -> s.length())
+```
 
 This is the workhorse inside streams:
 
 List<String> names = people.stream()
         .map(Person::getName)       // unbound: each Person element is the receiver
         .sorted()                   // Comparable on the resulting strings
+```java
         .toList();
+```
 
 ### Kind 4 — Constructor: `ClassName::new`
 

@@ -60,6 +60,7 @@ public class InventoryClient {
 
 RestTemplate throws `HttpClientErrorException` (4xx) or `HttpServerErrorException` (5xx) by default. A custom error handler maps these to domain exceptions:
 
+```java
 public class CustomErrorHandler implements ResponseErrorHandler {
 
     @Override
@@ -83,6 +84,7 @@ public class CustomErrorHandler implements ResponseErrorHandler {
         }
     }
 }
+```
 
 ## WebClient — the modern choice
 
@@ -102,6 +104,7 @@ public class WebClientConfig {
                 return response.doOnNext(r -> log.info("Response: {}", r.statusCode()));
             })
             .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(1024 * 1024))
+```java
             .build();
     }
 }
@@ -119,6 +122,7 @@ public class InventoryClientWebClient {
     public Inventory checkStock(String productId) {
         return webClient.get()
             .uri("/inventory/{id}", productId)
+```
             .retrieve()
             .bodyToMono(Inventory.class)
             .block();  // blocks until response arrives
@@ -126,16 +130,20 @@ public class InventoryClientWebClient {
 
     // Reactive (non-blocking)
     public Mono<Inventory> checkStockReactive(String productId) {
+```java
         return webClient.get()
             .uri("/inventory/{id}", productId)
+```
             .retrieve()
             .bodyToMono(Inventory.class);
     }
 
     // With error handling
     public Mono<Inventory> checkStockSafe(String productId) {
+```java
         return webClient.get()
             .uri("/inventory/{id}", productId)
+```
             .retrieve()
             .onStatus(HttpStatusCode::is4xxClientError, response ->
                 response.bodyToMono(ErrorBody.class)

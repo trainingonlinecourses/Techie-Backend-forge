@@ -14,16 +14,20 @@ docs:
 
 ## The Concept: The "One Job" Contract
 
+```java
 A lambda doesn't float in the void — it must *implement* something. That something is a **functional interface**: an interface with **exactly one abstract method**. The lambda provides the body of that one method; the interface supplies the type, the name, the parameter types, and the return type.
+```
 
 Think of it like a job posting: "We need a person who can do *one task*: `apply` — take an input, return an output." The interface is the job description; the lambda is the candidate who fills it. Because there's exactly one abstract method, the compiler always knows which method the lambda is implementing — no ambiguity.
 
 The annotation `@FunctionalInterface` makes the contract explicit and asks the compiler to verify it:
 
+```java
 @FunctionalInterface
 interface Greeter {
     String greet(String name);     // exactly ONE abstract method
 }
+```
 
 If you add a second abstract method, the compiler refuses to compile — the interface is no longer functional, and lambdas can't target it.
 
@@ -114,9 +118,11 @@ public class FunctionalInterfaceDemo {
 
 @FunctionalInterface
 interface Transformer<T> {
+```java
     T transform(T value);
 
     // default methods are allowed — they're not abstract
+```
     default Transformer<T> andThen(Transformer<T> after) {
         return value -> after.transform(transform(value));
     }
@@ -134,10 +140,14 @@ Rules for a functional interface:
 
 When a method is overloaded with different functional interfaces, the compiler can't always tell which lambda type you meant:
 
+```java
 // Both take a functional interface — ambiguous!
 // void handle(Function<String,Integer> f) {...}
+```
 // void handle(Consumer<String> c) {...}
+```java
 // handle(s -> s.length());   // COMPILE ERROR: which one?
+```
 
 Fix: cast to the target type (`handle((Function<String,Integer>) s -> s.length())`) or rename the methods. In practice this is rare — just know it exists.
 

@@ -20,14 +20,17 @@ app:
     dark-mode: false
 ```
 
+```java
 @Component
 @ConditionalOnProperty(name = "app.features.new-search", havingValue = "true")
 public class NewSearchService { ... }
+```
 
 ---
 
 ## Profile-Based Feature Flags
 
+```java
 @Component
 @Profile("feature-checkout-v2")
 public class CheckoutV2Service implements CheckoutService { ... }
@@ -35,6 +38,7 @@ public class CheckoutV2Service implements CheckoutService { ... }
 @Component
 @Profile("!feature-checkout-v2")
 public class CheckoutV1Service implements CheckoutService { ... }
+```
 
 ```yaml
 # Enable in production
@@ -60,7 +64,9 @@ More fine-grained than profiles:
     havingValue = "true",
     matchIfMissing = true  // default to enabled
 )
+```java
 public class CacheService { ... }
+```
 
 ---
 
@@ -79,6 +85,7 @@ app:
 
 ### Scenario 2: A/B testing
 
+```java
 @Component
 @ConditionalOnProperty(name = "app.experiment.search-algo", havingValue = "tfidf")
 public class TfIdfSearch implements SearchAlgorithm { }
@@ -86,6 +93,7 @@ public class TfIdfSearch implements SearchAlgorithm { }
 @Component
 @ConditionalOnProperty(name = "app.experiment.search-algo", havingValue = "bm25")
 public class Bm25Search implements SearchAlgorithm { }
+```
 
 ---
 

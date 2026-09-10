@@ -17,6 +17,7 @@ docs:
 
 In traditional Java, YOU create objects and manage their dependencies:
 
+```java
 // WITHOUT IoC — you create everything yourself
 public class OrderService {
     // Line 1: YOU create the repository — tight coupling!
@@ -29,6 +30,7 @@ public class OrderService {
 }
 
 **Problems with this approach:**
+```
 1. `OrderService` is hardcoded to `PostgresOrderRepository` — can't switch to MongoDB without changing code
 2. Can't test without a real database — no way to inject a mock
 3. `OrderService` is responsible for BOTH creating AND using the repository
@@ -99,6 +101,7 @@ public class AcademyApplication {
 
 ### BeanFactory vs ApplicationContext
 
+```java
 // BeanFactory — the raw container (rarely used directly)
 BeanFactory factory = new DefaultListableBeanFactory();
 OrderService svc = factory.getBean(OrderService.class);  // Basic: just create and inject
@@ -106,6 +109,7 @@ OrderService svc = factory.getBean(OrderService.class);  // Basic: just create a
 // ApplicationContext — the full container (what you always use)
 ApplicationContext ctx = new AnnotationConfigApplicationContext(AppConfig.class);
 OrderService svc = ctx.getBean(OrderService.class);  // Full: events, i18n, resources, AOP
+```
 
 | Feature | BeanFactory | ApplicationContext |
 |---|---|---|

@@ -98,7 +98,9 @@ public class AuthConfig {
 return new ProviderManager(List.of(
     new LdapAuthenticationProvider(ldapContextSource, ldapAuthoritiesPopulator), // employees
     daoProvider                                                                   // customers
+```java
 ));
+```
 
 **Scenario 3 — API-key authentication for machine clients.** A provider that validates an `X-Api-Key` header against a table of service accounts, producing an `Authentication` with service-account authorities — same architecture, different credential type.
 

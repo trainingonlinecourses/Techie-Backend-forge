@@ -29,6 +29,7 @@ TTL:   1800 seconds (30 minutes)
 
 ## Complete Configuration
 
+```java
 package com.example.config;
 
 import org.springframework.context.annotation.Bean;
@@ -44,6 +45,7 @@ import java.time.Duration;
 
 @Configuration
 @EnableRedisHttpSession(
+```
     maxInactiveIntervalInSeconds = 1800,  // 30 minutes
     redisNamespace = "myapp",             // Key prefix
     flushMode = FlushMode.ON_SAVE        // When to persist
@@ -64,7 +66,9 @@ public class SessionConfig {
     @Bean
     public LettuceConnectionFactory connectionFactory() {
         RedisStandaloneConfiguration config =
+```java
             new RedisStandaloneConfiguration("localhost", 6379);
+```
 
         LettuceClientConfiguration clientConfig =
             LettuceClientConfiguration.builder()

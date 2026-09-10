@@ -34,6 +34,7 @@ A test suite isn't "a bunch of tests" — it's a *portfolio with a strategy*. Th
 
 The highest-leverage organizational habit is *naming*: a well-named test is executable documentation. The convention that works:
 
+```java
 // Naming = a sentence: methodUnderTest_scenario_expectedResult
 // or the behavior-first style: should_expected_when_condition
 class PaymentServiceTest {
@@ -50,6 +51,7 @@ class PaymentServiceTest {
     @Test
     void refund_overRefund_throwsIllegalArgument() { }
 }
+```
 
 **The three rules:** name the *behavior* (not the implementation), state the *scenario* and the *expectation* explicitly, and let the report read like a specification — "charge valid card deducts balance" tells a reviewer what the system guarantees. (JUnit 5's `@DisplayName` gives you full sentences with spaces for reports: `@DisplayName("charging a declined card throws PaymentDeclined")`.)
 

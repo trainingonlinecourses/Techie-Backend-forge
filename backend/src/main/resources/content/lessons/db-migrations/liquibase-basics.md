@@ -41,7 +41,9 @@ Two files instead of one: the **master changelog** lists include directives; eac
 
 ## SQL when you need it
 
+```java
 Declarative covers 90%; the other 10% (window functions, backfills, data transforms) belongs in raw SQL — Liquibase allows it in any format:
+```
 
 ```xml
 <changeSet id="3" author="ada">

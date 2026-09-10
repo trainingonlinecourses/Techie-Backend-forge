@@ -90,16 +90,19 @@ public class EmailAutoConfiguration {
 
 ### Step 2: Create Properties Class
 
+```java
 package com.yourcompany.email.autoconfigure;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties(prefix = "app.email")
 public record EmailProperties(
+```
     String host,
     int port,
     String username,
     String password,
+```java
     boolean enabled
 ) {
     // Default values
@@ -109,6 +112,7 @@ public record EmailProperties(
         enabled = true;
     }
 }
+```
 
 ### Step 3: Register with Spring Boot
 
@@ -281,6 +285,7 @@ class EmailAutoConfigurationTest {
         new ApplicationContextRunner()
             .withConfiguration(AutoConfigurations.of(EmailAutoConfiguration.class))
             .withPropertyValues("app.email.enabled=true")
+```java
             .run(context -> {
                 assertThat(context).hasSingleBean(EmailService.class);
                 assertThat(context).hasSingleBean(EmailProperties.class);
@@ -290,6 +295,7 @@ class EmailAutoConfigurationTest {
     @Test
     void shouldNotCreateEmailServiceWhenDisabled() {
         new ApplicationContextRunner()
+```
             .withConfiguration(AutoConfigurations.of(EmailAutoConfiguration.class))
             .withPropertyValues("app.email.enabled=false")
             .run(context -> {

@@ -94,8 +94,10 @@ Better: use the **logstash-logback-encoder** dependency and `LogstashEncoder`, w
 
 For request tracing, put a correlation ID in the **MDC** (inherited by all log lines from that thread):
 
+```java
 MDC.put("correlationId", reqId);   // set in a servlet filter
 try { ... } finally { MDC.remove("correlationId"); }
+```
 
 Every line in that request then carries the same ID — the field that makes log-diving possible across services.
 

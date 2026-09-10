@@ -20,6 +20,7 @@ Enums in Java are not just named constants. Each enum constant is a full class i
 ## The Code
 
 ### Pattern 1: Input Validation
+```java
 public enum LogLevel {
     DEBUG(0), INFO(1), WARN(2), ERROR(3), FATAL(4);
 
@@ -46,6 +47,7 @@ LogLevel level = LogLevel.fromString(userInput);
 if (level.isAtLeast(LogLevel.WARN)) {
     alertService.send(level.name() + ": " + message);
 }
+```
 
 ### Pattern 2: State Machine
 
@@ -95,6 +97,7 @@ state.canCancel();
 ```
 
 ### Pattern 3: Strategy Dispatch
+```java
 public enum PaymentMethod {
     CREDIT_CARD {
         public void process(BigDecimal amount) {
@@ -118,6 +121,7 @@ public enum PaymentMethod {
 // Usage: no if-else chain
 PaymentMethod method = PaymentMethod.valueOf(order.getPaymentType());
 method.process(order.getTotal());
+```
 
 ## Line-by-Line Explanation
 

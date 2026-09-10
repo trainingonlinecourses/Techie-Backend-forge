@@ -78,9 +78,13 @@ T[] array = (T[]) new Object[5];
 
 // Hypothetical (illegal) code:
 List<String>[] array = new List<String>[2];
+```java
 Object[] objArray = array;              // arrays are covariant: List[] IS-A Object[]
+```
 objArray[0] = new ArrayList<Integer>(); // sneaks an Integer-list in
+```java
 String s = array[0].get(0);             // ClassCastException — Integer pulled as String
+```
 
 The array's runtime check (`ArrayStoreException`) would protect you — but only for the *component type* (`List`), not the *type argument* (`String`). Since the JVM can't see `String`, no runtime check can catch the bad element. The `ClassCastException` fires later, at the read. The compiler therefore bans the whole construct. **Practical rule: prefer `List<T>` over `T[]` whenever you're writing generic code.** Lists are the generic-friendly collection.
 

@@ -4,8 +4,10 @@ module: redis-deep
 order: 3
 minutes: 28
 topics: ["cache-aside", "rate limiting", "queues", "distributed locks", "Redis patterns", "counter"]
+```java
 summary: Redis's structures are ingredients; patterns are the recipes — proven arrangements of structures and commands that solve recurring production probl...
 docs:
+```
   - title: "Redis Patterns (redis.io)"
     url: "https://redis.io/docs/latest/develop/use/patterns/"
   - title: "Cache-Aside Pattern (Microsoft Learn)"
@@ -16,7 +18,9 @@ docs:
 
 ## The Concept: Recipes for Real Problems
 
+```java
 Redis's structures are ingredients; **patterns** are the recipes — proven arrangements of structures and commands that solve recurring production problems. Every serious Redis user reaches for the same handful: cache-aside reads, cache invalidation, rate limiting, queues, distributed locks, and atomic counters. This lesson walks through each with working code and the reasoning behind the design.
+```
 
 ## Pattern 1: Cache-Aside (Lazy Loading)
 
@@ -57,6 +61,7 @@ public class CacheAside {
 
 ## Pattern 2: Write-Through and Invalidation
 
+```java
 Cache-aside handles reads; *writes* need a decision. Two classic approaches:
 
 // Option A — invalidate on write: let the next read repopulate.
@@ -72,11 +77,13 @@ public void updateProductWriteThrough(Long id, Product p) {
 }
 
 **Invalidation (A) is usually the better default:** deleting is idempotent and avoids the "write the cache but crash before the DB" inconsistency window. The subtle bug to avoid: updating the cache *before* the DB commit can leave the cache ahead of the DB if the commit fails. Delete-after-commit sidesteps the whole class.
+```
 
 ## Pattern 3: Rate Limiting — The Fixed Window and the Token Bucket
 
 Rate limiting with Redis uses atomic increments. The **fixed window** is the simplest:
 
+```java
 // Allow at most 10 requests per minute per user.
 public boolean allowRequest(String userId) {
     String key = "ratelimit:" + userId + ":" + currentMinute();
@@ -84,6 +91,7 @@ public boolean allowRequest(String userId) {
     if (count == 1) redis.expire(key, 60); // first hit sets the TTL
     return count <= 10;
 }
+```
 
 `incr` is atomic — under any concurrency, no two threads can read the same count. The first increment establishes the key and arms its 60-second expiry (setting expire only on first hit avoids resetting the window on every call).
 
@@ -91,12 +99,14 @@ The **sliding window / token bucket** is smoother (no cliff at minute boundaries
 
 ## Pattern 4: Work Queues — Reliable Task Distribution
 
+```java
 Lists give FIFO queues; the **blocking variant** gives reliable worker coordination:
 
 // Producer — push work to the tail:
 redis.rpush("queue:emails", json);
 
 // Consumer — block up to 30s waiting for work from the head:
+```
 List<String> job = redis.blpop(30, "queue:emails");
 // blpop blocks the thread until work arrives or timeout — no busy-polling.
 
@@ -136,12 +146,14 @@ if (acquired) {
 
 ## Pattern 6: Atomic Counters and Leaderboards
 
+```java
 // Page views — atomic, concurrent-safe:
 redis.incr("stats:page:home");
 
 // Leaderboard — sorted set, updated atomically:
 redis.zincrby("leaderboard", 1, "user:" + userId);
 // Top 10 instantly:
+```
 Set<String> top = redis.zrevrange("leaderboard", 0, 9);
 
 `incr` and `zincrby` are single atomic commands — no read-modify-write races under load, no lost updates. This is the pattern behind every "views", "likes", "wins" counter and ranking in production systems.

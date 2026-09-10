@@ -54,6 +54,7 @@ public class UserPrincipal implements UserDetails {
 
 ## Wiring the provider and manager
 
+```java
 @Bean
 DaoAuthenticationProvider authenticationProvider(UserDetailsService uds, PasswordEncoder encoder) {
     DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
@@ -66,6 +67,7 @@ DaoAuthenticationProvider authenticationProvider(UserDetailsService uds, Passwor
 AuthenticationManager authenticationManager(DaoAuthenticationProvider provider) {
     return new ProviderManager(provider);
 }
+```
 
 `DaoAuthenticationProvider` does the security-critical part: it loads the user, runs `passwordEncoder.matches(raw, hash)` (constant-time comparison), and rejects on failure.
 
@@ -82,6 +84,7 @@ public AuthResponse login(@Valid @RequestBody LoginRequest req) {
 
 ## Registration: encode before saving
 
+```java
 @Transactional
 public AuthResponse register(RegisterRequest req) {
     if (users.existsByUsername(req.username())) {
@@ -93,6 +96,7 @@ public AuthResponse register(RegisterRequest req) {
     users.save(user);
     return new AuthResponse(jwtService.issue(user), UserDto.from(user));
 }
+```
 
 ## Failure modes to know
 

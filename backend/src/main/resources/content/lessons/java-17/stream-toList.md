@@ -15,20 +15,26 @@ Before Java 16, collecting a stream to a list required a verbose collector:
 // OLD WAY
 List<String> names = people.stream()
     .map(Person::name)
+```java
     .collect(Collectors.toList());  // verbose
 
 // JAVA 16+
+```
 List<String> names = people.stream()
     .map(Person::name)
+```java
     .toList();  // simple!
+```
 
 **Key difference:** `toList()` returns an **unmodifiable** list. `Collectors.toList()` returns a mutable `ArrayList`.
 
+```java
 var list = Stream.of(1, 2, 3).toList();
 // list.add(4);  // UnsupportedOperationException — it's unmodifiable!
 
 var mutableList = Stream.of(1, 2, 3).collect(Collectors.toList());
 mutableList.add(4);  // OK — it's a mutable ArrayList
+```
 
 ---
 

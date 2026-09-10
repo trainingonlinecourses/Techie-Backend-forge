@@ -27,10 +27,12 @@ Spring's `CacheManager` is the plug point of the whole abstraction. Understand t
 
 The default. Zero configuration, unlimited size, no TTL — entries live until evicted or the JVM dies.
 
+```java
 @Bean
 public CacheManager cacheManager() {
     return new ConcurrentMapCacheManager("courses", "users");
 }
+```
 
 - ✅ No dependencies, works everywhere
 - ❌ No TTL, unbounded (memory leak risk), per-instance only
@@ -58,7 +60,9 @@ Or per-region via `CaffeineCache` instances:
 public CacheManager cacheManager() {
     CaffeineCacheManager manager = new CaffeineCacheManager();
     manager.registerCustomCache("courses",
+```java
         Caffeine.newBuilder().maximumSize(10_000).expireAfterWrite(Duration.ofHours(1)).build());
+```
     manager.registerCustomCache("user-sessions",
         Caffeine.newBuilder().maximumSize(1_000).expireAfterWrite(Duration.ofMinutes(5)).build());
     return manager;
@@ -82,7 +86,9 @@ Expose this via an Actuator endpoint or Micrometer and you can see whether the c
 
 ## JCacheCacheManager (Ehcache 3)
 
+```java
 JSR-107 is a Java standard; Ehcache 3 is the reference implementation. Configuration lives in an XML file, which some teams prefer for tuning:
+```
 
 ```xml
 <dependency>
@@ -105,15 +111,18 @@ JSR-107 is a Java standard; Ehcache 3 is the reference implementation. Configura
 </config>
 ```
 
+```java
 @Bean
 public JCacheCacheManager cacheManager(CacheManager jcache) {
     return new JCacheCacheManager(jcache);
 }
+```
 
 ## CompositeCacheManager: Mixing Stores
 
 Different data, different stores — one app, both:
 
+```java
 @Bean
 public CacheManager cacheManager(CacheManager caffeine, CacheManager redis) {
     CompositeCacheManager composite = new CompositeCacheManager();
@@ -123,11 +132,13 @@ public CacheManager cacheManager(CacheManager caffeine, CacheManager redis) {
 }
 
 Reads check Redis first, then Caffeine. Note: composite managers are read-mostly; writes go to the first manager that has the cache.
+```
 
 ## CacheManager as a Strategy
 
 The entire point of the abstraction: switch stores without touching business code.
 
+```java
 // Dev profile: in-memory
 @Profile("dev")
 @Bean
@@ -141,6 +152,7 @@ public CacheManager devCacheManager() {
 public RedisCacheManager prodCacheManager(RedisConnectionFactory factory) {
     return RedisCacheManager.create(factory);
 }
+```
 
 Business code stays `@Cacheable("courses")` — the CacheManager is selected by profile at runtime.
 

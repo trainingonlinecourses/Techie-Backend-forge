@@ -16,7 +16,9 @@ docs:
 
 Application validation is the *first* line of defense — but it's not enough. Every app has bugs, every API has a path you forgot to validate, every future consumer of the database (another service, a data migration, a manual fix) bypasses your code entirely. **Constraints** are the *database's own* rules: the database refuses to store data that violates them, no matter who or what tries.
 
+```java
 Think of a building's safety systems: fire alarms (app validation) warn people; but the *structural* rules — load limits, exit requirements, materials (constraints) — are enforced by the building code itself. You can't waive them by forgetting to check.
+```
 
 Constraint failures surface as errors (`CHECK constraint violated`, `duplicate key violates unique constraint`) — which is *good*: bad data is stopped at the door with a clear signal, instead of corrupting the database silently.
 

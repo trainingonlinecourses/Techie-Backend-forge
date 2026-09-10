@@ -4,15 +4,19 @@ module: cicd-devops
 order: 3
 minutes: 25
 topics: ["Deployment", "Service", "Ingress", "probes", "resource limits", "rolling update", "kubectl"]
+```java
 summary: The Docker image is your unit; Kubernetes is the orchestrator that runs it, scales it, restarts it, and routes traffic to it. This lesson walks a c...
 docs:
+```
   - title: "Kubernetes concepts"
     url: "https://kubernetes.io/docs/concepts/"
 ---
 
 # Deploying Spring Boot to Kubernetes
 
+```java
 The Docker image is your unit; Kubernetes is the orchestrator that runs it, scales it, restarts it, and routes traffic to it. This lesson walks a complete Spring Boot deployment: Deployment, Service, Ingress, probes, limits, and a zero-downtime rollout.
+```
 
 ## The Objects
 
@@ -202,7 +206,9 @@ kubectl rollout undo deployment/backend        # instant rollback
     kubectl rollout status deployment/backend --timeout=300s
 ```
 
+```java
 Or with a GitOps tool (ArgoCD/Flux): CI pushes the image tag into a git repo; the operator applies it. Git becomes the single source of truth for *what's running*.
+```
 
 ## Zero-Downtime Checklist
 

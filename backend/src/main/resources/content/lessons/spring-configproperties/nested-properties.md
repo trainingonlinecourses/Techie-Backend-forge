@@ -22,6 +22,7 @@ app:
       protocol: TLS
 ```
 
+```java
 @Data
 @ConfigurationProperties(prefix = "app.mail")
 public class MailProperties {
@@ -35,6 +36,7 @@ public class MailProperties {
         private String protocol;
     }
 }
+```
 
 ---
 
@@ -50,10 +52,12 @@ public class AppProperties {
     // 2. List binding
     private List<String> allowedOrigins = new ArrayList<>();
 
+```java
     // 3. Map binding
     private Map<String, Feature> features = new HashMap<>();
 
     // 4. List of objects
+```
     private List<Server> servers = new ArrayList<>();
 
     @Data

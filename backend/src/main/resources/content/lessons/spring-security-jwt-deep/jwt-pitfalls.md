@@ -32,7 +32,9 @@ A JWT's trust model rests on one assumption: **only the server can produce a val
 Jwts.parser()
         .verifyWith(hmacKey)          // jjwt: key-pinned => alg fixed, 'none' rejected
         .build()
+```java
         .parseSignedClaims(token);
+```
 
 Modern libraries reject `none` by default *when you verify with a key*. The rule: **verification behavior must never be decided by attacker-controlled data** (the header). The key pins everything.
 
@@ -45,10 +47,12 @@ The server expects **RS256** (asymmetric: private key signs, public key verifies
 3. Signs it with the **public key as the HMAC secret**.
 4. If the server verifies HS256 tokens using "the key" (and that key happens to be the public key) — the forgery validates.
 
+```java
 **The fix:** a library that ties the algorithm to the key type and *refuses to switch*:
 
 // jjwt: the key type determines the algorithm family; you cannot
 // "reuse" an RSA public key as an HMAC secret for verification.
+```
 .verifyWith(publicKey)     // only RS256/ES256-style signatures accepted
 
 Also: never accept `alg` values you didn't configure; and if you support multiple algorithms, keep them explicitly separated.
@@ -101,6 +105,7 @@ If the access token also rides a cookie (automatic with requests), a malicious s
 
 ## Attack 6 — Replay and Theft of Refresh Tokens
 
+```java
 A stolen refresh token (from a log, a proxy, a leak) lets the attacker mint access tokens. Rotation (previous lesson) is the core defense; **reuse detection** turns theft into an alarm:
 
 // If the same refresh token is presented TWICE, rotation means the second
@@ -110,6 +115,7 @@ if (repository.findByToken(value).isEmpty()
     revokeAllForUser(attackerGuess);     // kill the whole session family
     alertSecurity("refresh token reuse detected");
 }
+```
 
 ## The Hardening Checklist
 

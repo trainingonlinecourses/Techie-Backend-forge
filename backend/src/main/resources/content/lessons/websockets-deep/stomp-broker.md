@@ -80,6 +80,7 @@ public class ChatController {
 }
 ```
 
+```java
 // The config: enable STOMP with an in-memory broker
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
@@ -100,6 +101,7 @@ public class StompConfig implements WebSocketMessageBrokerConfigurer {
         registry.addEndpoint("/ws").withSockJS();          // the connect URL
     }
 }
+```
 
 ### Walking Through Each Part
 
@@ -134,7 +136,9 @@ stompClient.connect({}, () => {
 });
 ```
 
+```java
 The browser subscribes and sends through one connection; the server routes via destinations.
+```
 
 ## STOMP vs Raw WebSocket
 

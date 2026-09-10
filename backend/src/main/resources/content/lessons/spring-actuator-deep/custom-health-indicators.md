@@ -44,9 +44,11 @@ public class ExternalApiHealthIndicator implements HealthIndicator {
             return Health.down()
                 .withDetail("api", apiUrl)
                 .withDetail("status", response.getStatusCode())
+```java
                 .build();
         } catch (Exception e) {
             return Health.down()
+```
                 .withDetail("api", apiUrl)
                 .withException(e)
                 .build();

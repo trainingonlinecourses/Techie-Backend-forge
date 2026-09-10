@@ -81,11 +81,15 @@ Timers give count, sum, max, and (with `publishPercentileHistogram`) percentiles
 
 Gauge.builder("queue.size", queue, BlockingQueue::size)
     .description("Pending tasks in queue")
+```java
     .register(registry);
 
 // For cached values, use a supplier:
+```
 Gauge.builder("cache.hit.ratio", this, CacheMetrics::hitRatio)
+```java
     .register(registry);
+```
 
 ### DistributionSummary — sizes of things
 
@@ -93,9 +97,11 @@ DistributionSummary summary = DistributionSummary.builder("order.amount")
     .description("Order amounts")
     .baseUnit("USD")
     .publishPercentileHistogram()
+```java
     .register(registry);
 
 summary.record(order.getTotal());
+```
 
 ## Tags: The Dimension That Makes Metrics Usable
 
@@ -105,9 +111,11 @@ Counter.builder("api.requests")
     .tag("endpoint", "/api/courses")
     .tag("method", "GET")
     .tag("status", "404")
+```java
     .register(registry);
 
 The same counter, sliced by any tag at query time. A metric without tags is a number; a metric with tags is a dashboard.
+```
 
 ## Naming Conventions
 
@@ -144,8 +152,10 @@ public class ExternalApiClient {
         this.calls = Timer.builder("external.api.latency")
             .tag("provider", "payments-gateway")
             .publishPercentileHistogram()
+```java
             .register(registry);
         this.errors = Counter.builder("external.api.errors")
+```
             .tag("provider", "payments-gateway")
             .register(registry);
     }
@@ -164,6 +174,7 @@ public class ExternalApiClient {
 
 ## Testing Metrics
 
+```java
 @SpringBootTest
 class MetricsTest {
 
@@ -181,6 +192,7 @@ class MetricsTest {
         assertEquals(1, counter.count());
     }
 }
+```
 
 Or assert against the Prometheus endpoint:
 

@@ -12,8 +12,10 @@ docs:
 
 Primitives (`int`, `double`, `boolean`) are fast and simple. Wrappers (`Integer`, `Double`, `Boolean`) add object features: nullability, generics support, and utility methods.
 
+```java
 int count = 0;           // primitive: fast, cannot be null
 Integer countObj = null;  // wrapper: slower, can be null, works with generics
+```
 
 ---
 
@@ -24,11 +26,13 @@ Integer countObj = null;  // wrapper: slower, can be null, works with generics
 - Array elements (primitive arrays are faster than wrapper arrays)
 - Math and calculations
 
+```java
 // Fast: primitive array
 int[] numbers = new int[1_000_000];
 for (int i = 0; i < numbers.length; i++) {
     numbers[i] = i * 2;
 }
+```
 
 ## When to Use Wrappers
 
@@ -37,10 +41,12 @@ for (int i = 0; i < numbers.length; i++) {
 - Method return types that signal "no value"
 - Database mappings (JPA entities)
 
+```java
 public class User {
     private Integer age;  // null means "not provided"
     private boolean active;  // primitive: always has a value
 }
+```
 
 ---
 

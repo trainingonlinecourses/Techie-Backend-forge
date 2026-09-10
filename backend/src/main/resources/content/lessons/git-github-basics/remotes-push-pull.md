@@ -18,7 +18,9 @@ So far, Git was local: your repository, your history, on your machine. **Remotes
 
 The mental model: **your local repository and the remote are two copies of the same history.** You *push* your commits to the remote (sharing them), and *pull* the remote's commits down (incorporating others' work). The remote is usually called `origin` — the canonical shared copy.
 
+```java
 Think of a shared notebook: everyone has their own copy. When you finish a section, you mail your copy's new pages to the central notebook (push); before you start, you take the central notebook's latest pages (pull) so you're working from the current state.
+```
 
 ## The Code Walkthrough
 

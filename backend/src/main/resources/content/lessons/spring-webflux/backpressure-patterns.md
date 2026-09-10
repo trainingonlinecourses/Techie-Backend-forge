@@ -22,7 +22,9 @@ docs:
 // Without backpressure — 1 million events per second, but consumer handles 100/s
 Flux.range(1, 1_000_000)
     .map(this::processEvent)  // Consumer is overwhelmed!
+```java
     .subscribe();             // 💥 Memory overflow after a few seconds
+```
 
 ### The Solution: Backpressure Strategies
 
@@ -30,7 +32,9 @@ Flux.range(1, 1_000_000)
 Flux.range(1, 1_000_000)
     .onBackpressureBuffer(1000)  // Buffer up to 1000 items
     .map(this::processEvent)     // Consumer processes at its own pace
+```java
     .subscribe();
+```
 
 ---
 
@@ -59,30 +63,36 @@ Flux.range(1, 1_000_000)
 Flux.range(1, 1_000_000)
     .onBackpressureDrop()            // Drop items when consumer is busy
     .map(this::processEvent)
+```java
     .subscribe();
 
 // If consumer can't keep up, new items are simply discarded
 // Good for: metrics, real-time data where old data doesn't matter
+```
 
 ### 3. Latest — Keep Only the Most Recent
 
 Flux.range(1, 1_000_000)
     .onBackpressureLatest()          // Keep only the latest item
     .map(this::processEvent)
+```java
     .subscribe();
 
 // When consumer catches up, it gets the LATEST item
 // Good for: stock prices, sensor readings where only current value matters
+```
 
 ### 4. Error — Fail on Backpressure
 
 Flux.range(1, 1_000_000)
     .onBackpressureError()           // Throw exception when backpressured
     .map(this::processEvent)
+```java
     .subscribe();
 
 // Throws BackpressureException immediately
 // Good for: systems where data loss is unacceptable
+```
 
 ---
 
@@ -94,10 +104,12 @@ Flux.range(1, 1_000_000)
 Flux.range(1, 1_000_000)
     .limitRate(100)                  // Request 100 items at a time
     .map(this::processEvent)
+```java
     .subscribe();
 
 // Consumer processes 100, then requests 100 more
 // Producer never overwhelms consumer
+```
 
 ### Using `publishOn` for Parallel Processing
 
@@ -105,7 +117,9 @@ Flux.range(1, 1_000_000)
     .publishOn(Schedulers.boundedElastic())  // Process on elastic pool
     .limitRate(100)                           // Request 100 at a time
     .map(this::processEvent)                  // Process in parallel
+```java
     .subscribe();
+```
 
 ---
 

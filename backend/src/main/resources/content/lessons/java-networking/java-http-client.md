@@ -114,8 +114,10 @@ public class Main {
                 .uri(URI.create("https://api.example.com/users"))
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(
+```java
                         "{\"name\":\"Ada\",\"role\":\"admin\"}"))
                 .build();
+```
 
         HttpResponse<String> response = client.send(request,
                 HttpResponse.BodyHandlers.ofString());
@@ -130,9 +132,13 @@ public class Main {
 The body handler decides *what to do with* the response bytes:
 
 HttpResponse<String>   asString  = client.send(req, HttpResponse.BodyHandlers.ofString());
+```java
 HttpResponse<byte[]>   asBytes   = client.send(req, HttpResponse.BodyHandlers.ofByteArray());
+```
 HttpResponse<Path>     asFile    = client.send(req, HttpResponse.BodyHandlers.ofFile(
+```java
                                                Path.of("download.zip")));
+```
 HttpResponse<Void>     asDiscard = client.send(req, HttpResponse.BodyHandlers.discarding());
 
 `ofFile` streams the body straight to disk — perfect for downloads without loading the whole file into memory. `discarding()` keeps only status/headers. For custom needs, `ofInputStream()` hands you the raw stream, and you can implement `BodyHandler`/`BodySubscriber` for full control (that's how streaming/partial responses are built).
@@ -171,8 +177,10 @@ public class Main {
 `HttpClient` also has a first-class WebSocket client — one connection, bidirectional, message-framed:
 
 WebSocket ws = client.newWebSocketBuilder()
+```java
         .buildAsync(URI.create("wss://example.com/chat"), listener).join();
 ws.sendText("hello", true);   // send a text frame
+```
 
 (With a `WebSocket.Listener` handling `onOpen`, `onText`, `onClose`.) For chat, live feeds, and push notifications, this removes the need for third-party WebSocket libraries.
 

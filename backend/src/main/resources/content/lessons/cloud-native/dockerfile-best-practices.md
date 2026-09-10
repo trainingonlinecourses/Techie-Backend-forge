@@ -13,7 +13,9 @@ docs:
 
 ## The multi-stage pattern
 
+```java
 The classic mistake: one stage that installs the JDK + Maven, compiles, and runs — shipping a multi-GB image full of build tools and source. **Multi-stage builds** split it: the *builder* stage compiles; the *runner* stage contains only the JRE + the jar.
+```
 
 ```dockerfile
 # ── Stage 1: builder (JDK + Maven, cached aggressively) ──

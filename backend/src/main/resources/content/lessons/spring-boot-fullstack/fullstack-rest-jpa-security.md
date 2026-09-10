@@ -76,6 +76,7 @@ Plus cross-cutting concerns:
 
 ### Step 2: Entity — The Database Model
 
+```java
 @Entity
 @Table(name = "tasks")
 public class Task {
@@ -137,6 +138,7 @@ public class Task {
     public enum Priority { LOW, MEDIUM, HIGH, CRITICAL }
     public enum Status { TODO, IN_PROGRESS, IN_REVIEW, DONE }
 }
+```
 
 ### Step 3: User Entity
 
@@ -185,6 +187,7 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
     @Query("SELECT t FROM Task t WHERE t.createdAt >= :since ORDER BY t.priority DESC")
     List<Task> findRecentTasks(@Param("since") LocalDateTime since);
     
+```java
     // Native SQL query
     @Query(value = "SELECT COUNT(*) FROM tasks WHERE status = :status", nativeQuery = true)
     long countByStatus(@Param("status") String status);
@@ -192,6 +195,7 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
+```
     Optional<User> findByUsername(String username);
     boolean existsByUsername(String username);
 }
@@ -204,17 +208,21 @@ public record CreateTaskRequest(
     @Size(max = 2000) String description,
     Task.Priority priority,
     Long assigneeId
+```java
 ) {}
 
 public record UpdateTaskRequest(
     @Size(max = 200) String title,
     @Size(max = 2000) String description,
+```
     Task.Priority priority,
     Task.Status status
+```java
 ) {}
 
 // Response DTO — what the client receives
 public record TaskResponse(
+```
     Long id,
     String title,
     String description,
@@ -409,12 +417,14 @@ class TaskControllerTest {
             .andExpect(status().isCreated())
             .andExpect(jsonPath("$.title").value("Fix bug"))
             .andExpect(jsonPath("$.priority").value("HIGH"))
+```java
             .andExpect(jsonPath("$.status").value("TODO"));
     }
     
     @Test
     void shouldRejectBlankTitle() throws Exception {
         CreateTaskRequest request = new CreateTaskRequest("", null, Task.Priority.LOW, null);
+```
         
         mockMvc.perform(post("/api/tasks")
                 .contentType(MediaType.APPLICATION_JSON)

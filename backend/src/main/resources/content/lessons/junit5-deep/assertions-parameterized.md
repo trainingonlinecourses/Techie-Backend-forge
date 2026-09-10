@@ -134,12 +134,14 @@ class ParameterizedDemo {
 
 ## Customizing the Display Names
 
+```java
 @ParameterizedTest
 @CsvSource({ "2, 1", "3, 2", "10, 55" })
 @DisplayName("fib({0}) = {1}")
 void fib(int n, long expected) {
     // each invocation shows: fib(2) = 1, fib(3) = 2, fib(10) = 55
 }
+```
 
 The `{0}`, `{1}` placeholders inject the invocation arguments into the display name — the report reads like a table of cases instead of `[1]`, `[2]`, `[3]`.
 

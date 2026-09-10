@@ -15,11 +15,13 @@ docs:
 
 When you run a Java program, the JVM doesn't load all your code at once. It loads classes **on demand** — when they're first referenced. Class loading is the process of finding the `.class` file, reading its bytecode, and putting it into memory.
 
+```java
 // This triggers class loading:
 Order order = new Order();  // Line 1: JVM loads Order.class when this line executes
                             // Line 2: Before this, Order.class wasn't loaded
 
 **The three steps of class loading:**
+```
 1. **Loading** — Find the `.class` file and read the bytecode
 2. **Linking** — Verify the bytecode, allocate memory for static fields, resolve references
 3. **Initialization** — Run static initializers (`static { }` blocks, static field assignments)
@@ -85,10 +87,6 @@ When a class loader needs to load a class, it **delegates to its parent first**:
 1. The delegation model prevents this: Your classloader loads: java.lang.String (malicious). Bootstrap classloader loads: java.lang.String (real). Without delegation: two String classes exist → chaos
 2. With delegation: parent loaders always win → consistent behavior
 
-The same code, clean:
-
-```java
-```
 
 ## How Spring Boot uses class loading
 

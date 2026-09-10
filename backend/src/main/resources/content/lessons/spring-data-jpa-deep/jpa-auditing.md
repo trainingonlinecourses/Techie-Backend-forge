@@ -22,12 +22,15 @@ Almost every table needs "when was this row created, when last changed, and by w
 
 Enable it with one annotation:
 
+```java
 @Configuration
 @EnableJpaAuditing
 public class JpaConfig { }
+```
 
 ## The mapped superclass — one base for all entities
 
+```java
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)   // the hook that fills the fields
 public abstract class Auditable {
@@ -56,6 +59,7 @@ public class Order extends Auditable {
     private String status;
     // ...
 }
+```
 
 `@EntityListeners(AuditingEntityListener.class)` is the wiring — it's the `BeanPostProcessor`-style hook that observes persist/update events. Every entity extending `Auditable` gets the four columns automatically, consistently named and typed.
 

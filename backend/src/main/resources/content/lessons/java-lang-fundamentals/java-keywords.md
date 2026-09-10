@@ -30,6 +30,7 @@ These keywords introduce something new into the program.
 
 **`abstract`** — Marks a class or method as incomplete. An abstract class cannot be instantiated directly (you cannot write `new AbstractClass()`), and an abstract method has a signature but no body; any concrete subclass must provide the body. Use it when a concept is shared but not fully defined.
 
+```java
 // An abstract class: shared behaviour, but not meant to be instantiated on its own
 public abstract class Shape {
     protected String colour;
@@ -56,21 +57,25 @@ public class Circle extends Shape {
         return Math.PI * radius * radius;
     }
 }
+```
 
 In this example, `Shape` is abstract because there is no such thing as a generic "shape" with a calculable area — you need a specific kind. `Circle` extends `Shape` and supplies `area()`.
 
 **`assert`** — Used to write assertions, which are checks the programmer believes should always be true. If an assertion fails at runtime, the JVM throws an `AssertionError`. Assertions are a debugging aid; they are disabled by default at runtime and are not a substitute for real validation of user input.
 
+```java
 // An assertion says "I believe this condition is always true here"
 int divide(int numerator, int denominator) {
     assert denominator != 0 : "denominator must not be zero";
     return numerator / denominator;
 }
+```
 
 The second part after the colon is an optional message attached to the error. Because assertions are off by default, they do not slow down production code — the JVM simply skips them unless you start the JVM with `-ea` (enable assertions).
 
 **`boolean`** — A primitive type that can hold only two values: `true` or `false`. It is the type of every condition in Java — every `if`, `while`, and `for` test, every comparison with `==`, `<`, `>`, and so on. You cannot cast an arbitrary number or object to `boolean`; the condition must really be a boolean expression.
 
+```java
 public class Main {
 
     public static void main(String[] args) {
@@ -82,9 +87,11 @@ public class Main {
         }
     }
 }
+```
 
 **`break`** — Exits the nearest enclosing loop or `switch` immediately. Execution continues with the statement after the loop or switch. It is useful when you have found what you were looking for and want to stop searching.
 
+```java
 // Stop searching as soon as we find the first matching user
 User firstAdmin = null;
 for (User u : users) {
@@ -93,16 +100,20 @@ for (User u : users) {
         break;   // exit the loop right now
     }
 }
+```
 
 **`byte`** — A primitive integer type that holds whole numbers in the range -128 to 127. It is an 8-bit signed value. Use it when memory matters (large arrays of small numbers) or when you are working with binary data, not when you need a general-purpose counter.
 
+```java
 // byte holds small integers; useful for raw binary data
 byte[] fileChunk = new byte[1024];
 byte flag = 1;        // within range -128..127
 byte large = 200;     // COMPILATION ERROR — 200 is outside the range
+```
 
 **`case`** — Marks one branch of a `switch` statement or switch expression. Each `case` gives a value to compare against the switch's selector, and execution jumps to the matching case. In a traditional switch, execution then "falls through" unless you write `break`; in a switch expression, each case produces a value and does not fall through.
 
+```java
 // Using case in a switch expression (Java 14+)
 String weather = "rain";
 
@@ -112,9 +123,11 @@ String advice = switch (weather) {
     case "snow"  -> "wear boots";
     default       -> "check the forecast";
 };
+```
 
 **`catch`** — Introduces the block that handles an exception thrown by the `try` block. The `catch` block declares the type of exception it handles, and the JVM passes the caught exception into it as a variable so you can inspect or log it.
 
+```java
 public class Main {
 
     public static void main(String[] args) {
@@ -126,14 +139,18 @@ public class Main {
         }
     }
 }
+```
 
 **`char`** — A primitive type that holds a single 16-bit Unicode character. It is the building block of Java strings. A `char` literal is written in single quotes: `'A'`, `'€'`, `'\n'`.
 
+```java
 char firstLetter = "Alice".charAt(0);   // 'A'
 char newline = '\n';
+```
 
 **`class`** — Introduces a class declaration. A class is the blueprint for objects: it defines the fields (state) and methods (behaviour) that objects of that class will have. Every object in Java is an instance of some class.
 
+```java
 // class defines a blueprint for Account objects
 public class Account {
     private final String owner;
@@ -148,17 +165,21 @@ public class Account {
         this.balance += amount;
     }
 }
+```
 
 **`const`** — A reserved keyword that is **not currently used** in Java. It exists in the language only for historical reasons and potential future use. You cannot use it as an identifier, but you will never write a working Java program that uses `const`.
 
+```java
 // const is reserved but unused in Java today
 // This is NOT valid Java — there is no const keyword in use:
 // const int MAX = 100;   // compilation error: not a valid Java statement
+```
 
 Use `final` instead when you want a constant.
 
 **`continue`** — In a loop, skips the rest of the current iteration and jumps to the loop's update and condition-check steps, effectively starting the next iteration. Use it when some iterations should be skipped without stopping the whole loop.
 
+```java
 // Skip even numbers; print only odd ones
 for (int i = 0; i < 10; i++) {
     if (i % 2 == 0) {
@@ -166,9 +187,11 @@ for (int i = 0; i < 10; i++) {
     }
     System.out.println(i);   // prints 1, 3, 5, 7, 9
 }
+```
 
 **`default`** — Used in two places. In a `switch`, it is the branch taken when no `case` matches. In an interface, it introduces a method with a body, so that interface methods can provide a default implementation without forcing every implementing class to override them. Both uses are part of the same keyword but different contexts.
 
+```java
 public class Main {
 
     public static void main(String[] args) {
@@ -196,9 +219,11 @@ public class Main {
         }
     }
 }
+```
 
 **`do`** — Introduces a `do-while` loop, which executes its body **once before** testing the condition. This guarantees at least one iteration, which is useful when you need to ask for input at least once.
 
+```java
 public class Main {
 
     public static void main(String[] args) {
@@ -211,14 +236,18 @@ public class Main {
         } while (age < 1 || age > 120);
     }
 }
+```
 
 **`double`** — A primitive floating-point type, a 64-bit double-precision number. It is the most common type for decimal calculations in Java, though it is not suitable for money where exact decimal arithmetic is required (use `BigDecimal` for that).
 
+```java
 double pi = 3.141592653589793;
 double price = 19.99;
+```
 
 **`else`** — The fallback branch of an `if` statement. If the `if` condition is false, the `else` block runs. You can also chain `else if` to test several conditions in order.
 
+```java
 public class Main {
 
     public static void main(String[] args) {
@@ -231,6 +260,7 @@ public class Main {
         }
     }
 }
+```
 
 **`enum`** — Declares an enumerated type — a fixed set of constant values that are known at compile time. An enum is a full class, so it can have fields, methods, and constructors. It is far safer than using plain integers for a fixed set of options.
 
@@ -257,14 +287,17 @@ public class Main {
 
 **`extends`** — Indicates that a class is inheriting from a superclass, or that an interface is inheriting from another interface. The subclass or sub-interface gains the members of the parent and can add its own or override the parent's behaviour.
 
+```java
 // Circle extends Shape: it inherits the fields and methods of Shape
 public class Circle extends Shape {
     private double radius;
     // Circle adds its own field and provides area()
 }
+```
 
 **`final`** — Has three related meanings. On a variable, it means the value cannot be reassigned once set (for a primitive) or the reference cannot be changed (for an object — the object is still mutable). On a method, it means subclasses cannot override it. On a class, it means the class cannot be subclassed. It is the closest thing Java has to a "constant" declaration.
 
+```java
 // final on a variable: the reference cannot change
 final String HOME = System.getProperty("user.home");
 // HOME = "/tmp";   // compilation error — cannot reassign a final variable
@@ -282,9 +315,11 @@ public final class ImmutablePoint {
         this.y = y;
     }
 }
+```
 
 **`finally`** — Introduces a block that runs after the `try` block completes, whether or not an exception was thrown. It is the right place for cleanup that must happen — closing a file, releasing a connection, freeing a resource. Even if the `try` returns early, the `finally` block still runs (except in extreme cases like `System.exit`).
 
+```java
 public class Main {
 
     public static void main(String[] args) {
@@ -302,13 +337,17 @@ public class Main {
         }
     }
 }
+```
 
 **`float`** — A primitive floating-point type, a 32-bit single-precision number. It uses half the memory of `double` but has less precision. Use it only when you have many numbers and memory matters, or when matching an external format that uses 32-bit floats.
 
+```java
 float light = 0.5f;      // note the 'f' suffix for float literals
+```
 
 **`for`** — Introduces a `for` loop, which repeats a block a fixed number of times or over a collection. Java has three forms: the classic `for(init; condition; update)`, the enhanced `for-each` loop over collections and arrays, and (since Java 8) the `for` loop over a stream's elements. The enhanced loop is the one most readers will use most often.
 
+```java
 public class Main {
 
     public static void main(String[] args) {
@@ -323,15 +362,19 @@ public class Main {
         }
     }
 }
+```
 
 **`goto`** — A reserved keyword that is **not currently used** in Java. Like `const`, it exists for historical reasons and possible future use, but Java has no `goto` statement. You cannot use it as an identifier.
 
+```java
 // goto is reserved but not used in Java
 // This is NOT valid Java:
 // goto end;   // compilation error
+```
 
 **`if`** — Tests a condition and runs one block if the condition is true. It is the most basic decision-making construct in Java. Every condition — every `if`, `else if`, `while`, `for`, and `switch` — must be a `boolean` expression.
 
+```java
 public class Main {
 
     public static void main(String[] args) {
@@ -343,9 +386,11 @@ public class Main {
         }
     }
 }
+```
 
 **`implements`** — Indicates that a class is providing the methods required by one or more interfaces. An interface defines a contract — a list of methods a class promises to have — and `implements` is the keyword that makes a class keep that promise.
 
+```java
 interface PaymentProcessor {
     void process(double amount);
 }
@@ -356,18 +401,24 @@ class StripeProcessor implements PaymentProcessor {
         // talk to the Stripe API...
     }
 }
+```
 
 **`import`** — Tells the compiler which classes from other packages you want to use without writing the full package name each time. It does not copy anything into your code; it simply shortens the names you type. Importing a package does not automatically import its subpackages.
 
+```java
 // Import so you can write ArrayList instead of java.util.ArrayList
 import java.util.ArrayList;
 import java.util.HashMap;
+```
 
 List<String> names = new ArrayList<>();
+```java
 Map<String, Integer> scores = new HashMap<>();
+```
 
 **`instanceof`** — Tests whether an object is an instance of a given type, or a subclass of that type. It returns `true` if the object is not null and is assignment-compatible with the type. Before Java 16, it was commonly used with a cast; now you can use pattern matching to do both in one step.
 
+```java
 public class Main {
 
     public static void main(String[] args) {
@@ -383,11 +434,14 @@ public class Main {
         }
     }
 }
+```
 
 **`int`** — A primitive integer type, a 32-bit signed whole number. It is the default choice for counters, indices, and general-purpose whole numbers. Its range is roughly -2 billion to +2 billion.
 
+```java
 int count = 42;
 int index = 0;
+```
 
 **`interface`** — Declares an interface — a contract that defines method signatures (and, since Java 8, `default` and `static` methods with bodies). A class that implements the interface promises to provide implementations for the interface's abstract methods. Interfaces let you write code against a type, not a concrete class.
 
@@ -399,31 +453,38 @@ interface Repository<T> {
 
 **`long`** — A primitive integer type, a 64-bit signed whole number. It is used when the numbers exceed the `int` range — timestamps in milliseconds since the epoch are a classic use case.
 
+```java
 long timestamp = System.currentTimeMillis();   // milliseconds since 1970
 long big = 10_000_000_000L;                   // underscore for readability; L suffix
+```
 
 **`native`** — Marks a method that is implemented not in Java but in platform-specific native code (usually C or C++). The body of a `native` method is replaced by a semicolon, and the actual implementation is provided by the JVM or a native library loaded with `System.loadLibrary`.
 
+```java
 // A native method: implemented in C, loaded from a native library
 public class Sensor {
     static { System.loadLibrary("sensor"); }
 
     public native double readTemperature();
 }
+```
 
 This is used for low-level system access, performance-critical code, or interfacing with existing native libraries, but most application code never uses it.
 
 **`new`** — Creates a new object by calling a class's constructor. It allocates memory for the object, runs the constructor to initialise it, and returns a reference to the new object. Arrays are also created with `new`.
 
+```java
 // new creates a new object
 Account acc = new Account("Alice", 100.0);
 
 // new also creates arrays
 int[] numbers = new int[10];
 String[] names = new String[]{"A", "B", "C"};
+```
 
 **`non-sealed`** — (Java 17+) Used on a class or interface that is part of a sealed hierarchy but is allowed to be extended by anyone. A `sealed` class restricts which classes may extend it; a `non-sealed` class says "I am part of that hierarchy, but I choose to open my subclassing back up."
 
+```java
 // A sealed hierarchy
 sealed class Shape permits Circle, Square { }
 
@@ -433,23 +494,29 @@ final class Circle extends Shape { }
 // Square is non-sealed — others may extend it
 non-sealed class Square extends Shape { }
 class FancySquare extends Square { }   // allowed
+```
 
 **`null`** — A literal, not a keyword, but worth mentioning here. `null` represents the absence of a reference — it means "no object". A variable of any reference type can hold `null`. Using `null` incorrectly is one of the most common sources of `NullPointerException`.
 
+```java
 String name = null;   // name currently refers to nothing
 if (name == null) {
     System.out.println("no name set");
 }
+```
 
 **`package`** — Declares the package that a class belongs to. It must be the first non-comment line in a source file. The package name corresponds to the folder structure in which the source file lives, and it helps organise large codebases and avoid name collisions.
 
+```java
 // This file must live in the folder com/backendforge/academy/
 package com.backendforge.academy;
 
 public class AcademyApplication { }
+```
 
 **`private`** — The most restrictive access modifier. A `private` member (field, method, constructor) is visible only inside the class that declares it. It is the default choice for internal state — hide the details, expose only what is needed.
 
+```java
 public class User {
     private String password;   // only this class can see it
 
@@ -458,27 +525,33 @@ public class User {
         return BCrypt.checkpw(candidate, password);
     }
 }
+```
 
 **`protected`** — An access level between `private` and `public`. A `protected` member is visible inside the same class, other classes in the same package, and subclasses — even subclasses in other packages. It is useful when you want to let subclasses hook into internal behaviour without exposing it to the whole world.
 
+```java
 public class AuditLog {
     protected void log(String message) {
         // subclasses and same-package classes can call this
     }
 }
+```
 
 **`public`** — The least restrictive access modifier. A `public` class, method, or field is visible to any other class that can reach it. It is the API surface — what you intend other code to use.
 
+```java
 public class AccountService {
     public Account findAccount(String id) {
         // any class can call this
     }
 }
+```
 
 ### Group 2 — Control-Flow Keywords
 
 **`return`** — Exits the current method and, optionally, gives back a value to the caller. If the method's return type is `void`, you can write `return;` to exit early. If the method returns a value, the `return` statement must provide an expression of that type.
 
+```java
 int max(int a, int b) {
     return a > b ? a : b;   // returns the larger value
 }
@@ -489,14 +562,18 @@ void log(String msg) {
     }
     System.out.println(msg);
 }
+```
 
 **`short`** — A primitive integer type, a 16-bit signed value. It is rarely used in modern Java because it saves little memory and the JVM often promotes it to `int` anyway, but it still exists and is useful when working with legacy formats or tightly packed data.
 
+```java
 short port = 8080;
 // short max = 40000;   // compilation error — exceeds 16-bit range
+```
 
 **`static`** — Means "belongs to the class, not to any particular instance". A `static` field is shared by all instances of the class — there is only one copy. A `static` method can be called without creating an object, and it cannot access instance fields directly because there is no `this` in a static context. `static` is also used in `static` blocks that run once when the class is loaded.
 
+```java
 public class Config {
     // One copy shared by every instance
     public static final String APP_NAME = "BackendForge";
@@ -506,9 +583,11 @@ public class Config {
         return 1000;
     }
 }
+```
 
 **`strictfp`** — A modifier that forces floating-point calculations to use strict IEEE 754 rules, so the results are the same on every platform. Without it, the JVM is allowed to use extra precision on some operations for performance. In practice, it is rarely used today because modern JVMs already give consistent results, but the keyword still exists.
 
+```java
 // strictfp: guarantee identical results across platforms
 strictfp double computePI() {
     double sum = 0.0;
@@ -517,9 +596,11 @@ strictfp double computePI() {
     }
     return sum;
 }
+```
 
 **`super`** — Refers to the immediate superclass of the current class. Use `super()` to call the superclass's constructor, and `super.methodName()` to call an overridden method on the superclass. It is the way a subclass can build on what the parent provides instead of replacing it entirely.
 
+```java
 public class SavingsAccount extends Account {
     private double interestRate;
 
@@ -534,9 +615,11 @@ public class SavingsAccount extends Account {
         // then add interest-specific behaviour if needed
     }
 }
+```
 
 **`switch`** — A multi-way branch based on the value of an expression. It compares the expression against `case` labels and runs the matching branch. Java has two forms: the traditional `switch` statement with fall-through, and the newer switch expression (Java 14+) that returns a value and does not fall through.
 
+```java
 // switch statement
 int day = 3;
 String dayName;
@@ -554,9 +637,11 @@ String dayName2 = switch (day) {
     case 3 -> "Wednesday";
     default -> "Unknown";
 };
+```
 
 **`synchronized`** — Used to make a block or method thread-safe by acquiring an intrinsic lock. Only one thread can execute a `synchronized` block on a given object at a time; other threads block until the lock is released. It is an older concurrency tool — `java.util.concurrent` provides more granular options today, but `synchronized` is still the simplest way to protect shared state.
 
+```java
 // Thread-safe counter using synchronized
 public class Counter {
     private int count = 0;
@@ -569,9 +654,11 @@ public class Counter {
         return count;
     }
 }
+```
 
 **`this`** — Refers to the current instance of the class. Use it to distinguish an instance field from a parameter with the same name, to pass the current object to another method, or to call another constructor in the same class with `this(...)`.
 
+```java
 public class User {
     private String name;
 
@@ -583,25 +670,31 @@ public class User {
         return new User(newName);
     }
 }
+```
 
 **`throw`** — Throws an exception explicitly. The `throw` statement takes an exception object (either a new one or one you caught and are re-throwing) and hands it to the JVM, which then looks for a `catch` block that can handle it.
 
+```java
 void setAge(int age) {
     if (age < 0) {
         throw new IllegalArgumentException("age cannot be negative: " + age);
     }
     this.age = age;
 }
+```
 
 **`throws`** — Declares which checked exceptions a method might propagate to its caller. It does not throw the exception itself; it documents the contract so callers know they must handle or declare those exceptions. Only checked exceptions need to appear in a `throws` clause; unchecked exceptions (like `IllegalArgumentException`) do not.
 
+```java
 // This method declares that it may throw IOException
 public String readConfig(String path) throws IOException {
     return Files.readString(Paths.get(path));
 }
+```
 
 **`transient`** — Marks a field as not part of an object's serialized form. When an object is serialized (converted to a byte stream for storage or transmission), `transient` fields are skipped. Use it for fields that should not be saved — temporary caches, derived values, or sensitive data that should not leave memory.
 
+```java
 public class Session {
     private String username;
     private String token;
@@ -609,9 +702,11 @@ public class Session {
     // The password hash should not be serialised to disk or a queue
     private transient String passwordHash;
 }
+```
 
 **`try`** — Introduces a block of code that might throw an exception. The `try` block is followed by one or more `catch` blocks that handle specific exception types, and optionally a `finally` block for cleanup. The `try-with-resources` form (Java 7+) automatically closes resources that implement `AutoCloseable`.
 
+```java
 public class Main {
 
     public static void main(String[] args) {
@@ -633,16 +728,20 @@ public class Main {
         }
     }
 }
+```
 
 **`void`** — Indicates that a method does not return a value. It is not a type you can store in a variable; it only appears in a method declaration. A `void` method still does work — it might print, update state, or throw an exception — but it hands nothing back to the caller.
 
+```java
 // void: the method does work but returns nothing
 public void printBalance() {
     System.out.println("balance: " + balance);
 }
+```
 
 **`volatile`** — Marks a field as always being read from and written to main memory, not cached in a thread's local registers or CPU cache. This guarantees that changes made by one thread are immediately visible to other threads, which is weaker than a lock but sufficient for certain simple flags.
 
+```java
 // volatile: one thread's write is immediately visible to others
 public class Worker {
     private volatile boolean running = true;
@@ -657,9 +756,11 @@ public class Worker {
         running = false;
     }
 }
+```
 
 **`while`** — Introduces a `while` loop, which tests a condition before each iteration and runs the body only while the condition is true. Unlike `do-while`, a `while` loop may execute zero times if the condition is false at the start.
 
+```java
 public class Main {
 
     public static void main(String[] args) {
@@ -670,6 +771,7 @@ public class Main {
         }
     }
 }
+```
 
 ### Group 3 — Class and Object Keywords
 

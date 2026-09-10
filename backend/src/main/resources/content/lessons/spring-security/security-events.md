@@ -26,14 +26,17 @@ Spring Security publishes **events** for every authentication and authorization 
 
 Wiring the publisher (Spring Security 6 — in Boot 3 it's auto-wired when the context has a publisher):
 
+```java
 @Bean
 public AuthenticationEventPublisher authenticationEventPublisher(
         ApplicationEventPublisher applicationEventPublisher) {
     return new DefaultAuthenticationEventPublisher(applicationEventPublisher);
 }
+```
 
 Then a listener observes everything:
 
+```java
 @Component
 public class SecurityAuditListener {
     private final AuditLog auditLog;
@@ -53,11 +56,13 @@ public class SecurityAuditListener {
         auditLog.failure(event.getAuthentication().getName(), "account-locked");
     }
 }
+```
 
 ## How we use it in an organization: the scenarios
 
 **Scenario 1 — the failed-login ledger.** Every failed login appended to an audit store (DB table, log stream). This is the raw material for: **lockout policy** (after N failures, disable — implemented in the `UserDetails`/lockout service), **brute-force detection** (same IP, many users; same user, many IPs), and **incident investigation** ("was the attacker trying this account?").
 
+```java
 @EventListener
 public void onFailure(AuthenticationFailureBadCredentialsEvent e) {
     String name = e.getAuthentication().getName();
@@ -73,6 +78,7 @@ public void onSuccess(AuthenticationSuccessEvent e) {
 }
 
 **Scenario 3 — account-state changes.** Locked, disabled, expired events feed both the audit and the *user-facing* message ("Your account is locked — contact support").
+```
 
 **Scenario 4 — authorization denials.** `AuthorizationDeniedEvent` records *attempted but denied* access — the signal for over-privileged users and probing:
 

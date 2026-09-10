@@ -81,6 +81,7 @@ interface C extends A {
 
 Interfaces can have static methods, which belong to the interface itself (not to implementing classes):
 
+```java
 public interface Money {
     long cents();
     String currency();
@@ -105,6 +106,7 @@ public interface Money {
 // Usage:
 Money price = Money.of(1999, "USD");
 Money total = Money.sum(price, Money.of(500, "USD"));
+```
 
 **The org pattern:** use static methods on interfaces for factory methods (`of()`, `from()`, `valueOf()`), comparison utilities (`Comparator.naturalOrder()`), and validation helpers. The interface becomes a self-contained domain object.
 
@@ -163,18 +165,22 @@ new NotificationService(new SlackSender());
 
 **Use an abstract class when:** sharing state, constructors, or non-public helpers among closely related classes in a hierarchy (e.g., `AbstractList` provides most of `List`'s methods).
 
+```java
 // Interface: a capability that any class can have
 public interface Loggable {
     default String logContext() { return getClass().getSimpleName(); }
 }
 
 // Abstract class: shared implementation for a family
+```
 public abstract class BaseRepository<T> {
+```java
     private final JdbcTemplate jdbc;
 
     protected BaseRepository(JdbcTemplate jdbc) {
         this.jdbc = jdbc;
     }
+```
 
     protected List<T> queryForList(String sql, RowMapper<T> mapper) {
         return jdbc.query(sql, mapper);

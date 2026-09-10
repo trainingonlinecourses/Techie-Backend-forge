@@ -20,6 +20,7 @@ The basics lesson covered `@Mock` and stubbing. The professional workflow adds t
 
 ## @InjectMocks: Let Mockito Wire the Dependencies
 
+```java
 @ExtendWith(MockitoExtension.class)
 class OrderServiceTest {
 
@@ -43,6 +44,7 @@ class OrderServiceTest {
         verify(orderRepo).save(any());
     }
 }
+```
 
 **Walking through it:** `@InjectMocks` constructs a real `OrderService` and injects the `@Mock` fields by type — **constructor injection preferred**, then setter, then field. The mock fields must match the service's constructor parameters (by type) or its setters/fields. The payoff: no manual `new OrderService(orderRepo, paymentService, clock)` boilerplate, and adding a dependency to the service just means adding a `@Mock` field.
 

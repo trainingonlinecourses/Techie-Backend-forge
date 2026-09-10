@@ -16,7 +16,9 @@ docs:
 
 Every Dockerfile instruction that *adds data* (`RUN`, `COPY`, `ENV`) creates a **layer** — an immutable filesystem delta. The final image is a **stack of layers**, each one recording only *what changed* in that step.
 
+```java
 Think of it like a stack of transparent overhead sheets: each sheet has one change drawn on it; the full picture is all sheets stacked. If a later sheet is identical to one already stacked elsewhere, you reuse the sheet instead of redrawing it.
+```
 
 Two consequences make layers the heart of Docker's efficiency:
 

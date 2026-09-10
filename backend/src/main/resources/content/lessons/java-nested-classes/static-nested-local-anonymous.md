@@ -72,6 +72,7 @@ import java.util.Comparator;
 public class StringProcessor {
     
     public List<String> processStrings(List<String> input) {
+```java
         // Local class — defined inside a method
         class Processor {
             String prefix;
@@ -93,8 +94,10 @@ public class StringProcessor {
         
         // Use local class
         Processor processor = new Processor("[", "]");
+```
         List<String> result = new ArrayList<>();
         
+```java
         for (String s : input) {
             if (processor.matches(s)) {
                 result.add(processor.process(s));
@@ -106,6 +109,7 @@ public class StringProcessor {
     
     public static void main(String[] args) {
         StringProcessor sp = new StringProcessor();
+```
         List<String> data = List.of("[hello]", "[world]", "test", "[java]");
         
         List<String> processed = sp.processStrings(data);
@@ -181,6 +185,7 @@ public class AnonymousClassDemo {
 
 ### Static Nested: Helper classes that don't need outer
 
+```java
 public class OrderService {
     // Static nested — no outer reference needed
     public static class OrderValidator {
@@ -204,12 +209,14 @@ public class OrderService {
         }
     }
 }
+```
 
 ### Local: Method-specific logic
 
 public class DataProcessor {
     
     public List<Employee> findTopEarners(List<Employee> employees, double threshold) {
+```java
         // Local class for this specific filter
         class HighEarnerFilter {
             boolean matches(Employee e) {
@@ -223,6 +230,7 @@ public class DataProcessor {
         
         HighEarnerFilter filter = new HighEarnerFilter();
         return employees.stream()
+```
             .filter(filter::matches)
             .toList();
     }
@@ -230,6 +238,7 @@ public class DataProcessor {
 
 ### Anonymous: One-time implementations
 
+```java
 public class EventSystem {
     
     public void setupListeners() {
@@ -252,6 +261,7 @@ public class EventSystem {
         worker.start();
     }
 }
+```
 
 ---
 

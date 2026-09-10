@@ -18,7 +18,9 @@ docs:
 
 Redis is *in-memory* — its entire dataset lives in RAM, and RAM is volatile: power loss, crash, or restart wipes it. For a cache, that's often fine (a cold cache rebuilds itself from the database). But for session data, leaderboards, queues, or any Redis data you'd hate to lose, you need **persistence**: a mechanism that saves the dataset to disk so Redis can recover it after a restart.
 
+```java
 **The mental model:** think of a spreadsheet you're editing. RDB persistence is like periodically saving a full copy of the file (snapshot). AOF persistence is like keeping an *append-only transaction log* — every change is written to a journal as it happens. The snapshot gives you a consistent point-in-time copy; the journal lets you replay *every* change. Each has different costs, and Redis lets you run both, neither, or one.
+```
 
 ## RDB: Point-in-Time Snapshots
 

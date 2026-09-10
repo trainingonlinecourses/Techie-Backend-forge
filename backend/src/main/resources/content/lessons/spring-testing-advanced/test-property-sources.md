@@ -115,6 +115,7 @@ logging:
   level:
     com.example.academy: DEBUG              # Verbose logging for debugging
 
+```java
 @SpringBootTest
 @ActiveProfiles("test")                     // Activate the test profile
 class PaymentServiceTest {
@@ -126,6 +127,7 @@ class PaymentServiceTest {
         // H2 in-memory database
     }
 }
+```
 
 ---
 

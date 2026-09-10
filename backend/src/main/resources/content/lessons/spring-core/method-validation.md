@@ -42,6 +42,7 @@ The value: **the service self-documents and self-defends** — a caller passing 
 
 ## How we use it in an organization: the scenarios
 
+```java
 **Scenario 1 — the multi-entry-point service.** The same service method is called by a controller, a message consumer, and a batch job. Field validation on the DTO only fires in the controller path; the consumer and batch callers bypass it. **Method validation enforces the contract at the service boundary for every caller:**
 
 @Service @Validated
@@ -60,14 +61,17 @@ public class CustomerService {
     public void create(@Validated(CreateGroup.class) @Valid CustomerDto dto) { ... }
     public void update(@Validated(UpdateGroup.class) @Valid CustomerDto dto) { ... }
 }
+```
 // @NotNull(groups = CreateGroup.class) on email → required on create, optional on update
 
+```java
 **Scenario 3 — return-value contracts.** A repository or client wrapper guarantees non-null results:
 
 public interface ProductClient {
     @NotNull
     Product fetch(@NotBlank String sku);   // "never returns null" — enforced, not hoped
 }
+```
 
 **Scenario 4 — programmatic validation for reused rules.** When you need the same rule outside a bean method, `Validator` works directly:
 

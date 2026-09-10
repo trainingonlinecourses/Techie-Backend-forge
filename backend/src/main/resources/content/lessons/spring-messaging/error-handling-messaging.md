@@ -67,6 +67,7 @@ public class OrderConsumer {
 }
 ```
 
+```java
 // ---- The retry advice: bounded retries with backoff, then error channel ----
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -100,6 +101,7 @@ public class RetryConfig {
         return advice;
     }
 }
+```
 
 ### Walking Through Each Part
 
@@ -121,6 +123,7 @@ A message that always fails (malformed payload, a code bug) will: fail → retry
 
 Brokers deliver **at least once** — the same message may arrive twice (consumer crashed after processing but before acking). Therefore:
 
+```java
 // The consumer MUST tolerate duplicates:
 @ServiceActivator(inputChannel = "orders.processed")
 public void handle(Order order) {
@@ -128,6 +131,7 @@ public void handle(Order order) {
         process(order);                          // runs once per order id
     }
 }
+```
 
 Idempotency patterns: a `processed` table keyed by message id, a dedupe set, or natural idempotency (a `SET balance = balance - x` that's safe to re-run... no — for financial ops use a unique constraint on the operation id).
 

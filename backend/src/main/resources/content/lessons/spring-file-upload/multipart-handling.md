@@ -12,6 +12,7 @@ docs:
 
 Multipart is the HTTP standard for uploading files. Spring Boot wraps the raw multipart data in `MultipartFile` objects that are easy to work with.
 
+```java
 @PostMapping("/upload")
 public ResponseEntity<?> upload(@RequestParam("file") MultipartFile file) {
     String name = file.getOriginalFilename();
@@ -19,6 +20,7 @@ public ResponseEntity<?> upload(@RequestParam("file") MultipartFile file) {
     byte[] bytes = file.getBytes();
     return ResponseEntity.ok("Uploaded: " + name + " (" + size + " bytes)");
 }
+```
 
 ---
 
@@ -127,6 +129,7 @@ public class FileUploadController {
 
 ### Scenario 1: Image upload with validation
 
+```java
 @PostMapping("/avatar")
 public ResponseEntity<?> uploadAvatar(@RequestParam("file") MultipartFile file) {
     // Validate file type
@@ -151,9 +154,11 @@ public ResponseEntity<?> uploadAvatar(@RequestParam("file") MultipartFile file) 
     // ... save to storage
     return ResponseEntity.ok(Map.of("filename", filename));
 }
+```
 
 ### Scenario 2: Streaming large files
 
+```java
 @PostMapping("/large")
 public ResponseEntity<?> uploadLarge(@RequestParam("file") MultipartFile file) throws IOException {
     // Don't load entire file into memory
@@ -163,6 +168,7 @@ public ResponseEntity<?> uploadLarge(@RequestParam("file") MultipartFile file) t
     }
     return ResponseEntity.ok("Uploaded");
 }
+```
 
 ---
 

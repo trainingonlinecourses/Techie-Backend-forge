@@ -16,9 +16,11 @@ docs:
 
 ## The Concept: From "Do This" to "This Happened"
 
+```java
 Traditional (request-driven) architecture is built on *commands*: service A *calls* service B and waits — "please create the invoice, here's the order." **Event-driven architecture (EDA)** is built on *facts*: services *publish what happened* ("OrderPlaced") and other services react asynchronously. The producer doesn't know — or care — who reacts; the consumer doesn't know who published. The coupling is replaced by a shared vocabulary of events flowing through a **message broker** (Kafka, RabbitMQ, or an event bus).
 
 **The mental model:** the request-driven world is a phone call — direct, synchronous, and *coupling*: if the person you're calling is busy, you wait; if they change their number, your call breaks. The event-driven world is a newspaper — the publisher writes the story (event) and anyone may subscribe. The publisher never calls anyone; subscribers read what interests them, whenever they can. The decoupling is total: new subscribers join without the publisher knowing, and a slow subscriber never blocks a publisher.
+```
 
 **Why the industry shifted:** request-driven monoliths *couple* every feature — a new "send email on order" feature means editing the order service. Event-driven systems let features *attach*: a new service subscribes to `OrderPlaced` and the order service never changes. This is the scalability (each service scales independently), the resilience (a subscriber's outage doesn't break the publisher), and the extensibility (new consumers, zero producer changes) that microservices promised.
 
@@ -76,11 +78,15 @@ public void recordSale(OrderPlaced event) {
 - **Data-change events (CDC)** — "a row changed in table X" — captured from the database's transaction log (Debezium). The pragmatic bridge: existing systems become event producers without code changes.
 - **Operational events** — deployment, health, metrics — the platform's own facts.
 
+```java
 The discipline: **events are facts, not commands.** An event says "this happened"; a command says "do this." If a consumer must *do* something, the request-driven pattern (API call) or a *command message* (RabbitMQ-style) is the right tool — mixing the two muddies the semantics.
+```
 
 ## The Hard Parts: What EDA Actually Costs
 
+```java
 The sales pitch is decoupling; the fine print is the *new problems*:
+```
 
 1. **Eventual consistency.** The email might lag the order by seconds (or minutes under load). "Show me my order — was the receipt sent?" has no synchronous answer. *The fix:* design for eventual consistency (sagas, compensating actions), never assume a subscriber has processed an event.
 2. **At-least-once delivery.** Brokers may deliver an event twice (retries, crashes between process-and-commit). *The fix:* **idempotent consumers** — processing `OrderPlaced` twice must produce the same result (dedupe on `eventId`, unique constraints).
@@ -98,9 +104,11 @@ The rest of this module covers the big three:
 
 ## When to Choose EDA (and When Not To)
 
+```java
 **Choose EDA when:** multiple services/features must react to the same fact; the reactions can be asynchronous; you need independent scaling or resilience (a consumer's failure must not break the producer); you want new features to attach without touching producers.
 
 **Don't choose EDA when:** the operation needs a synchronous answer (a user waits for the result — keep the API call); the flow is a simple linear sequence (request-driven is simpler); the team isn't ready for eventual consistency, idempotency, and monitoring complexity. **The pragmatic rule:** start request-driven; introduce events at the boundaries where the decoupling pays — and never let a broker become the team's first distributed-systems lesson under production load.
+```
 
 ## Recap
 

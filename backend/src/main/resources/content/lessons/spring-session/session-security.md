@@ -61,7 +61,9 @@ public class SecurityConfig {
 http.sessionManagement(session -> session
     // Prevents fixation by creating a new session ID after login
     .sessionFixation().migrateSessionId()  // Default
+```java
 );
+```
 
 | Strategy | Behavior | Best For |
 |----------|----------|----------|
@@ -78,9 +80,11 @@ http.sessionManagement(session -> session
     .maximumSessions(1)                    // One session per user
     .maxSessionsPreventsLogin(false)        // Kick out old session
     .expiredUrl("/login?expired=true")     // Where to redirect
+```java
 );
 
 **When user A logs in from Device 1, then logs in from Device 2:**
+```
 - `maxSessionsPreventsLogin(false)` → Device 1 is logged out, Device 2 succeeds
 - `maxSessionsPreventsLogin(true)` → Device 2 is rejected, Device 1 stays
 

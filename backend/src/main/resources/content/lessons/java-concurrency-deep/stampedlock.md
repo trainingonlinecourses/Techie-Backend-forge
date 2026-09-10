@@ -52,6 +52,7 @@ rwLock.writeLock().lock();
 
 ### 1. Exclusive Write Lock
 
+```java
 StampedLock lock = new StampedLock();
 
 // Write lock — exclusive access
@@ -62,9 +63,11 @@ try {
 } finally {
     lock.unlockWrite(stamp);  // ALWAYS unlock in finally
 }
+```
 
 ### 2. Pessimistic Read Lock
 
+```java
 // Read lock — shared access (multiple readers allowed)
 long stamp = lock.readLock();
 try {
@@ -73,6 +76,7 @@ try {
 } finally {
     lock.unlockRead(stamp);
 }
+```
 
 ### 3. Optimistic Read (The Superpower!)
 
@@ -272,6 +276,7 @@ public class ConfigurationCache {
 
 ### Scenario 2: Financial Account Balance
 
+```java
 public class BankAccount {
 
     private final StampedLock lock = new StampedLock();
@@ -309,6 +314,7 @@ public class BankAccount {
         }
     }
 }
+```
 
 ---
 

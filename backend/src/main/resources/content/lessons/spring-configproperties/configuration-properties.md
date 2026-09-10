@@ -31,12 +31,14 @@ public record AppProperties(
     String name,
     DatabaseProperties database,
     FeatureProperties features
+```java
 ) {
     public record DatabaseProperties(String url, PoolProperties pool) {
         public record PoolProperties(int maxSize, int minIdle) {}
     }
     public record FeatureProperties(boolean cacheEnabled, int rateLimit) {}
 }
+```
 
 // Access: appProperties.database().pool().maxSize() → 20
 
@@ -162,9 +164,11 @@ app:
 @ConfigurationProperties(prefix = "app.external-apis")
 public record ExternalApisProperties(
     Map<String, ApiConfig> apis
+```java
 ) {
     public record ApiConfig(String url, String key, Duration timeout, int retryAttempts) {}
 }
+```
 
 ---
 

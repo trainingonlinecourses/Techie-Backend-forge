@@ -54,10 +54,14 @@ Aggregation agg = Aggregation.newAggregation(
     Aggregation.match(Criteria.where("status").is("COMPLETED")),
     Aggregation.group("customerId").sum("amount").as("total"),
     Aggregation.sort(Sort.by(Direction.DESC, "total")),
+```java
     Aggregation.limit(10));
+```
 
 AggregationResults<CustomerTotal> results =
+```java
     mongoTemplate.aggregate(agg, "orders", CustomerTotal.class);
+```
 
 `MongoTemplate` is the escape hatch for pipeline queries, `$lookup` (the closest thing to a join), `$unwind`, and raw updates — when repository methods aren't enough.
 
@@ -65,11 +69,13 @@ AggregationResults<CustomerTotal> results =
 
 Multi-document transactions work on replica sets (and `mongod` standalone since 4.0 in limited form):
 
+```java
 @Transactional
 public void moveStock(Product p, int qty) {
     productRepo.save(p.decrement(qty));      // two documents, one transaction
     stockRepo.record(p.getId(), qty);
 }
+```
 
 Spring Data Mongo honors `@Transactional` when the connection is configured with transactions enabled. The catch: transactions are single-node by default and have overhead — use them for genuine multi-document invariants, not for every write.
 

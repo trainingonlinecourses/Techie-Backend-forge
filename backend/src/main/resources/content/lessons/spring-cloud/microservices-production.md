@@ -19,12 +19,14 @@ A monolith updates the database in one transaction. A microservice can't: the cu
 
 Write the side effect **in the same transaction** as the state change, then a relay publishes it:
 
+```java
 @Transactional
 public void createOrder(Order order) {
     orders.save(order);                                             // 1. business state
     outbox.save(new OutboxEvent("order.created", order.getId()));   // 2. event, SAME tx
 }
 // OutboxRelay (polling or CDC) publishes committed events to Kafka and marks them sent
+```
 
 If the process crashes between save and publish, the un-published row is still in the outbox — nothing is lost. This is the pattern that makes "exactly-once-ish" event delivery achievable in practice.
 
@@ -39,14 +41,18 @@ OrderService: create order (tx) ──▶ PaymentService: charge (tx)
 OrderService: cancel order (compensating tx) ◀── PaymentService: refund (compensation)
 ```
 
+```java
 Choreographed (each service publishes events, next acts) or orchestrated (a coordinator service drives steps). Rules: every step has a compensating step; every step is idempotent.
+```
 
 ### 3. Idempotency everywhere
 
 Network retries mean the same message can arrive twice. Every mutating endpoint/service must be idempotent:
 
+```java
 if (transfers.existsByIdempotencyKey(key)) throw new DuplicateTransferException(key);
 // or: unique constraint on the key, retries return the original result
+```
 
 ## Inter-service security
 

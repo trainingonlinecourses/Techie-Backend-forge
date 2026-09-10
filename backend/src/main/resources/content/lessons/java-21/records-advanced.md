@@ -14,12 +14,15 @@ docs:
 ### Records Are More Than You Think
 
 Most developers know records as simple data holders:
+```java
 public record Point(int x, int y) {}
+```
 
 But records have powerful features that make them essential for real-world Java:
 
 ### Compact Constructors for Validation
 
+```java
 public record Range(int min, int max) {
     // Compact constructor — validates without duplicating field names
     public Range {
@@ -35,9 +38,11 @@ public record Range(int min, int max) {
     // Range valid = new Range(1, 10);     // OK
     // Range invalid = new Range(10, 5);   // Throws exception
 }
+```
 
 ### Records with Custom Methods
 
+```java
 public record Money(BigDecimal amount, Currency currency) {
     // Compact constructor with validation
     public Money {
@@ -69,9 +74,11 @@ public record Money(BigDecimal amount, Currency currency) {
         return currency.getCurrencyCode() + " " + amount;
     }
 }
+```
 
 ### Records as Map Keys
 
+```java
 public record Coordinate(int row, int col) {
     // Records automatically generate good equals() and hashCode()
     // Perfect for use as Map keys
@@ -83,6 +90,7 @@ grid.put(new Coordinate(1, 2), "Target");
 
 // Lookups work correctly because records have proper equals/hashCode
 String value = grid.get(new Coordinate(1, 2)); // "Target"
+```
 
 ### Records with Builder Pattern
 
@@ -93,17 +101,22 @@ public record CreateUserRequest(
     @Email String email,
     @NotBlank String password,
     String phone
+```java
 ) {}
 
 // Usage:
+```
 CreateUserRequest request = CreateUserRequest.builder()
     .name("Alice")
     .email("alice@example.com")
     .password("secret123")
+```java
     .build();
+```
 
 ### Records in Sealed Hierarchies
 
+```java
 // Records work perfectly with sealed classes
 public sealed interface Shape 
     permits Circle, Rectangle, Triangle {
@@ -130,6 +143,7 @@ static double area(Shape shape) {
         // No default needed — compiler knows all cases
     };
 }
+```
 
 ### Records vs Classes Decision Guide
 

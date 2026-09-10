@@ -13,6 +13,7 @@ docs:
 
 Before Java 16, creating a simple data class required dozens of lines of boilerplate:
 
+```java
 // OLD WAY: A simple Point class
 public final class Point {
     private final int x;
@@ -38,6 +39,7 @@ public final class Point {
 
 // JAVA 16+: Same thing in one line
 public record Point(int x, int y) {}
+```
 
 The compiler automatically generates:
 - **Constructor** with all fields (canonical constructor)
@@ -201,11 +203,13 @@ public class RecordsDemo {
 
 ### Scenario 1: API DTOs (Data Transfer Objects)
 
+```java
 // Before Java 16: 50+ lines per DTO with Lombok or manual boilerplate
 // After: 1 line each
 
 record CreateUserRequest(String name, String email, String password) {}
 record UserResponse(String id, String name, String email, Instant createdAt) {}
+```
 record ApiResponse<T>(boolean success, String message, T data) {}
 
 // Usage
@@ -216,6 +220,7 @@ public ApiResponse<UserResponse> createUser(CreateUserRequest request) {
 
 ### Scenario 2: Domain value objects
 
+```java
 record Money(BigDecimal amount, Currency currency) {
     public Money {
         Objects.requireNonNull(amount);
@@ -234,10 +239,12 @@ record Money(BigDecimal amount, Currency currency) {
 // No accidental mutation — ever
 Money price = Money.usd(new BigDecimal("29.99"));
 // price.amount().add(...) would need reassignment, which isn't possible
+```
 
 ### Scenario 3: Event sourcing
 
 record OrderCreated(String orderId, String customerId, List<String> items, Instant timestamp) {}
+```java
 record OrderShipped(String orderId, String trackingNumber, Instant timestamp) {}
 record OrderCancelled(String orderId, String reason, Instant timestamp) {}
 
@@ -252,6 +259,7 @@ String describeEvent(OrderEvent event) {
         case OrderCancelled e -> "Order " + e.orderId() + " cancelled: " + e.reason();
     };
 }
+```
 
 ---
 

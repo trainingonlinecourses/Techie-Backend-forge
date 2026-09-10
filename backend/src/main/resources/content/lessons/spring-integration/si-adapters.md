@@ -18,7 +18,9 @@ docs:
 
 Everything so far has been *in-process*: messages flowing through channels and stations inside your JVM. The real world is outside: files on disk, HTTP APIs, database rows, Kafka topics, JMS queues. **Adapters** are the doors — the endpoints that connect a flow to an external system in either direction. **Inbound adapters** bring the outside *in* (a file appears → a message enters the flow); **outbound adapters** push the flow *out* (a message → a file written, an HTTP call, a DB insert). The flow stays identical; only the doors differ.
 
+```java
 **The mental model:** the integration flow is the factory floor; adapters are the loading docks. The *inbound* dock watches the driveway (a directory, an HTTP endpoint, a queue) and brings each arrival onto the floor as a message. The *outbound* dock takes finished messages and ships them (writes a file, calls an API, inserts a row). You build the floor once; swap the docks to change what you integrate with.
+```
 
 ## File Adapters: The Classic Integration
 
@@ -147,6 +149,7 @@ public IntegrationFlow kafkaInbound() {
             .from(Kafka.inboundChannelAdapter(kafkaConsumerFactory(),
                     new ConsumerProperties("orders")))
             .handle("orderService", "applyEvent")
+```java
             .get();
 }
 
@@ -154,6 +157,7 @@ public IntegrationFlow kafkaInbound() {
 @Bean
 public IntegrationFlow kafkaOutbound() {
     return IntegrationFlow
+```
             .from("publishedChannel")
             .handle(Kafka.outboundChannelAdapter(kafkaTemplate())
                     .topic("orders"))
@@ -173,7 +177,9 @@ public IntegrationFlow kafkaOutbound() {
 
 ## Recap
 
+```java
 Adapters are the doors between the flow and the outside world: **inbound** (file polls, HTTP endpoints, JDBC row-polls, Kafka/JMS/AMQP consumption) bring external events in as messages; **outbound** (file writes, HTTP calls, JDBC inserts, broker publishes) ship messages out. The flow grammar stays identical regardless of the door — swap adapters to change what you integrate with. The production discipline is uniform across all of them: claim-then-process for idempotency, bounded batches, temp-file writes, header context, and error channels. Master the adapters and Spring Integration becomes the universal integrator — one grammar, every system.
+```
 
 ## References
 

@@ -106,11 +106,13 @@ Spring, notably, largely abandons checked exceptions for its own abstractions (`
 
 When you catch an exception, you hold an object with three useful pieces:
 
+```java
 catch (IOException e) {
     String message  = e.getMessage();      // human-readable description
     Throwable cause = e.getCause();        // the wrapped underlying failure
     e.printStackTrace();                   // full stack trace for logs
 }
+```
 
 - **`getMessage()`** — the short description ("File not found: config.yml").
 - **`getCause()`** — the *original* exception that this one wraps, enabling the chain `SQLException ← DataAccessException ← ServiceException` to be walked back to the root cause.

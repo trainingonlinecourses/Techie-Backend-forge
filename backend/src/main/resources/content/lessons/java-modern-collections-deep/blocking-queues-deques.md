@@ -78,6 +78,7 @@ Line by line:
 
 The distinction between the exception-throwing and the special-value methods matters. If you use `remove()` on an empty queue, you get a `NoSuchElementException`. If you use `poll()`, you get `null`. In a loop that drains a queue, `poll()` is usually what you want, because you can check for `null` to know when you are done.
 
+```java
 // Draining a queue safely with poll()
 while (true) {
     String item = queue.poll();
@@ -86,6 +87,7 @@ while (true) {
     }
     process(item);
 }
+```
 
 ### Deque — A Double-Ended Queue
 
@@ -311,11 +313,14 @@ The fix is to use a bounded queue and let the producer block when the queue is f
 // SAFE: bounded queue with backpressure
 BlockingQueue<String> queue = new ArrayBlockingQueue<>(1000);
 
+```java
 // Producer blocks when queue is full — consumer controls the pace
 // queue.put(item);   // blocks if 1000 items are already queued
+```
 
 Another common mistake is to use `size()` on a concurrent queue as part of a control decision. The size of a concurrent queue is a snapshot that can be stale the instant you read it. If you use `size()` to decide whether the queue is "too full," you might make the decision based on a size that is already wrong. If you need flow control, use a bounded queue that blocks on `put` — that is the correct backpressure mechanism, not a manual `size()` check.
 
+```java
 // BAD: using size() for flow control — race condition
 if (queue.size() < 1000) {
     queue.put(item);   // another thread might have added items between size() and put()
@@ -323,6 +328,7 @@ if (queue.size() < 1000) {
 
 // GOOD: use a bounded blocking queue — the queue handles backpressure internally
 boundedQueue.put(item);   // blocks when full, no manual size check needed
+```
 
 ## A Code Example — A Small Thread Pool Using a BlockingQueue
 

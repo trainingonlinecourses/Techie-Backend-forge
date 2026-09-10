@@ -4,8 +4,10 @@ module: java-collections-deep
 order: 3
 minutes: 22
 topics: ["big-O", "ArrayList vs LinkedList", "memory overhead", "capacity", "primitive collections"]
+```java
 summary: BigO is theory; real collections have constants, memory layouts, and cache behavior. This lesson covers the practical performance landscape: ArrayL...
 docs:
+```
   - title: "Collections performance"
     url: "https://docs.oracle.com/en/java/javase/21/core/collections.html"
 ---
@@ -31,6 +33,7 @@ Big-O is theory; real collections have constants, memory layouts, and cache beha
 List<Integer> array = new ArrayList<>();
 List<Integer> linked = new LinkedList<>();
 
+```java
 for (int i = 0; i < 1_000_000; i++) {
     array.add(i);
     linked.add(i);
@@ -39,6 +42,7 @@ for (int i = 0; i < 1_000_000; i++) {
 // LinkedList: ~400ms   (40× slower!)
 
 **Why**: every LinkedList node is a separate heap allocation (24+ bytes of object headers + next/prev pointers) — cache-unfriendly scattered memory. ArrayList is a single contiguous array — sequential, prefetch-friendly.
+```
 
 | Scenario | Winner |
 |----------|--------|
@@ -64,15 +68,19 @@ for (int i = 0; i < 1_000_000; i++) {
 
 ## Primitive Collections: When You Need Speed
 
+```java
 // Trove / fastutil / Eclipse Collections — primitive-specialized collections
 IntArrayList values = new IntArrayList();   // no boxing
 values.add(42);
 int v = values.getInt(0);
+```
 
 Or the JDK's own primitive arrays:
 
+```java
 int[] raw = new int[1_000_000];
 // vs
+```
 List<Integer> boxed = new ArrayList<>(1_000_000);
 
 For big numeric workloads (100k+ elements), primitive collections are 3–10× faster and use a fraction of the memory.
@@ -81,15 +89,18 @@ For big numeric workloads (100k+ elements), primitive collections are 3–10× f
 
 // ❌ grows 13 times, copying each time
 List<String> list = new ArrayList<>();
+```java
 for (int i = 0; i < 100_000; i++) list.add(item(i));
 
 // ✅ one allocation
+```
 List<String> list = new ArrayList<>(100_000);
 
 Same rule for maps (`new HashMap<>(expected)`) and `StringBuilder` (`new StringBuilder(estimatedLength)`).
 
 ## The Iteration Trap
 
+```java
 // ❌ O(n) lookups on top of iteration
 for (String key : map.keySet()) {
     Course c = map.get(key);   // each get is O(1) but the total is 2× traversal + hash
@@ -99,6 +110,7 @@ for (String key : map.keySet()) {
 for (Map.Entry<String, Course> e : map.entrySet()) {
     Course c = e.getValue();
 }
+```
 
 And the capacity trap: `for (String k : hashMap.keySet())` on a 1M-capacity map with 10 entries still scans 1M slots.
 
@@ -108,20 +120,26 @@ And the capacity trap: `for (String k : hashMap.keySet())` on a 1M-capacity map 
 List<Course> list = ...;
 list.sort(Comparator.comparing(Course::title));        // O(n log n)
 
+```java
 // Parallel sort for big arrays
 int[] data = ...;
 Arrays.parallelSort(data);                             // fork/join on large inputs
+```
 
 JDK sorts are excellent — don't hand-roll. Use `Arrays.parallelSort` only for large primitive arrays (small inputs pay a thread-pool overhead).
 
 ## Contains: The Hidden O(n)
 
+```java
 // ❌ contains on a list is O(n) — 10k items = 10k comparisons
 if (userRoles.contains("ADMIN")) { ... }
 
 // ✅ contains on a set is O(1)
+```
 Set<String> adminRoles = Set.of("ADMIN", "SUPERUSER");
+```java
 if (adminRoles.contains(role)) { ... }
+```
 
 The single most common performance bug in Java code: `List.contains` in a loop (accidental O(n²)). If you check membership, use a `HashSet`.
 

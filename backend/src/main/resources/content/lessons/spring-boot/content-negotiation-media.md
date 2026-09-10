@@ -101,6 +101,7 @@ public class User {
 
 Use content negotiation for API versioning:
 
+```java
 @RestController
 @RequestMapping("/api/v1/products")
 public class ProductControllerV1 {
@@ -127,12 +128,14 @@ public class ApiVersionConfig implements WebMvcConfigurer {
         configurer.mediaType("v2", MediaType.parseMediaType("application/vnd.myapp.v2+json"));
     }
 }
+```
 
 ### Scenario 3: Custom MessageConverter for CSV export
 
 @Component
 public class CsvMessageConverter<T> extends AbstractGenericHttpMessageConverter<List<T>> {
 
+```java
     private final CsvMapper csvMapper = new CsvMapper();
 
     public CsvMessageConverter() {
@@ -140,6 +143,7 @@ public class CsvMessageConverter<T> extends AbstractGenericHttpMessageConverter<
     }
 
     @Override
+```
     protected void writeInternal(List<T> objects, Type type,
                                  HttpOutputMessage outputMessage) throws IOException {
         ObjectWriter writer = csvMapper.writerWithSchemaFor(
@@ -151,6 +155,7 @@ public class CsvMessageConverter<T> extends AbstractGenericHttpMessageConverter<
 // Controller endpoint that returns CSV
 @GetMapping("/export")
 public List<Order> exportOrders(
+```java
         @RequestHeader("Accept") String accept,
         @RequestParam(defaultValue = "json") String format) {
     if ("text/csv".equals(accept) || "csv".equals(format)) {
@@ -158,6 +163,7 @@ public List<Order> exportOrders(
     }
     return orderService.findAll();
 }
+```
 
 ## Common mistakes
 

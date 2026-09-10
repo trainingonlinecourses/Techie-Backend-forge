@@ -17,10 +17,6 @@ Not all JARs have a `module-info.java`. The module system handles these as **aut
 
 1. A JAR without module-info.java (like most third-party libraries). When placed on the module path, it becomes an automatic module: - Module name is derived from the JAR filename. - ALL packages are exported (no encapsulation). - Can require other modules
 
-The same code, clean:
-
-```java
-```
 
 **Automatic module naming rules:**
 - `my-library-1.0.jar` → module name `my.library` (remove version, replace `-` with `.`)

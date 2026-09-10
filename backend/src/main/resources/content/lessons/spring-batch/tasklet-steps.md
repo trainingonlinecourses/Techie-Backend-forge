@@ -70,12 +70,14 @@ public class BatchConfig {
     public Step cleanupStep(JobRepository jobRepository, PlatformTransactionManager txManager) {
         return new StepBuilder("cleanupStep", jobRepository)
             .tasklet(cleanupTasklet, txManager)
+```java
             .build();
     }
 
     @Bean
     public Job cleanupJob(JobRepository jobRepository, Step cleanupStep) {
         return new JobBuilder("cleanupJob", jobRepository)
+```
             .start(cleanupStep)
             .build();
     }
@@ -135,10 +137,12 @@ public class DatabaseMaintenanceTasklet implements Tasklet {
         jdbcTemplate.update("""
             INSERT INTO orders_archive
             SELECT * FROM orders WHERE created_at < ?
+```java
             """, LocalDate.now().minusYears(1));
 
         // Delete archived records
         int deleted = jdbcTemplate.update("""
+```
             DELETE FROM orders WHERE created_at < ?
             """, LocalDate.now().minusYears(1));
 
@@ -153,6 +157,7 @@ public class DatabaseMaintenanceTasklet implements Tasklet {
 
 ### System Command Execution
 
+```java
 @Component
 public class SystemCommandTasklet implements Tasklet {
 
@@ -178,6 +183,7 @@ public class SystemCommandTasklet implements Tasklet {
         return RepeatStatus.FINISHED;
     }
 }
+```
 
 ### Conditional Execution
 
@@ -215,6 +221,7 @@ public class ConditionalTasklet implements Tasklet {
 public Step deleteOldFilesStep(JobRepository jobRepository, PlatformTransactionManager txManager) {
     return new StepBuilder("deleteOldFiles", jobRepository)
         .tasklet(deleteOldFilesTasklet, txManager)
+```java
         .build();
 }
 
@@ -222,6 +229,7 @@ public Step deleteOldFilesStep(JobRepository jobRepository, PlatformTransactionM
 @Bean
 public Step processOrdersStep(JobRepository jobRepository, PlatformTransactionManager txManager) {
     return new StepBuilder("processOrders", jobRepository)
+```
         .<Order, ProcessedOrder>chunk(100, txManager)
         .reader(orderReader(null))
         .processor(orderProcessor())

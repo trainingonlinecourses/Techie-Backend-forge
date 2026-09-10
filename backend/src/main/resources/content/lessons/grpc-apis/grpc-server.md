@@ -81,6 +81,7 @@ public class CourseGrpcService extends CourseServiceGrpc.CourseServiceImplBase {
         Course course = repository.findById(request.getId())
             .orElseThrow(() -> Status.NOT_FOUND
                 .withDescription("Course " + request.getId() + " not found")
+```java
                 .asRuntimeException());
 
         responseObserver.onNext(toReply(course));
@@ -89,6 +90,7 @@ public class CourseGrpcService extends CourseServiceGrpc.CourseServiceImplBase {
 
     private CourseReply toReply(Course c) {
         return CourseReply.newBuilder()
+```
             .setId(c.getId()).setTitle(c.getTitle())
             .setLevel(c.getLevel()).setMinutes(c.getMinutes())
             .build();
@@ -116,12 +118,14 @@ gRPC has 17 standardized error codes — the equivalent of HTTP status but typed
 throw Status.INVALID_ARGUMENT
     .withDescription("minutes must be positive")
     .withCause(e)
+```java
     .asRuntimeException();
 
 // With metadata
 Metadata trailers = new Metadata();
 trailers.put(Key.of("trace-id", Metadata.ASCII_STRING_MARSHALLER), traceId);
 throw Status.INTERNAL.asRuntimeException(trailers);
+```
 
 ## Server Streaming
 
@@ -168,10 +172,12 @@ public class GrpcServerInterceptor implements ServerInterceptor {
 
 Configured via `GrpcServerConfigurer`:
 
+```java
 @Bean
 public GrpcServerConfigurer serverConfigurer() {
     return builder -> builder.intercept(grpcServerInterceptor);
 }
+```
 
 ## Configuring the Server
 
@@ -196,13 +202,19 @@ class GrpcServerTest {
         Server server = InProcessServerBuilder.forName("test")
             .directExecutor()
             .addService(new CourseGrpcService(repository))
+```java
             .build().start();
+```
 
         ManagedChannel channel = InProcessChannelBuilder.forName("test")
+```java
             .directExecutor().build();
+```
 
         CourseServiceGrpc.CourseServiceBlockingStub stub =
+```java
             CourseServiceGrpc.newBlockingStub(channel);
+```
 
         CourseReply reply = stub.getCourse(
             CourseRequest.newBuilder().setId(1L).build());

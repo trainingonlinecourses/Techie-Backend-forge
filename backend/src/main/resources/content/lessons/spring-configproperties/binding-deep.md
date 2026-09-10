@@ -34,6 +34,7 @@ public record PaymentProperties(
      * Records auto-generate the constructor.
      * @DefaultValue provides fallback values.
      * Relaxed binding: "api-key" in YAML → apiKey in Java.
+```java
      */
     public record RetryProperties(
         @DefaultValue("3") int maxAttempts,
@@ -41,6 +42,7 @@ public record PaymentProperties(
     ) {}
 
     public record GatewayConfig(
+```
         String url,
         String apiKey,
         @DefaultValue("5000") int timeoutMs
@@ -139,6 +141,7 @@ app:
 
 Add `@Validated` and Jakarta Bean Validation constraints:
 
+```java
 @ConfigurationProperties(prefix = "app.email")
 @Validated
 public record EmailProperties(
@@ -148,6 +151,7 @@ public record EmailProperties(
     @Min(1) @Max(100) int maxRecipients,
     @NotBlank String apiKey
 ) {}
+```
 
 ```yaml
 app:

@@ -22,10 +22,6 @@ A transaction spanning multiple services cannot use a database rollback — each
 1. A single logical operation across services: 1. Create order (Order service). 2. Charge card (Payment service). 3. Reserve inventory (Inventory service). 4. Ship (Shipping service)
 2. If step 3 fails, steps 1-2 already committed. No global rollback exists.
 
-The same code, clean:
-
-```java
-```
 
 ## The Saga Structure
 
@@ -128,6 +124,7 @@ public class OrderSaga {
 
 Better — persistent, resumable:
 
+```java
 @Entity
 public class SagaState {
     @Id private String sagaId;
@@ -137,6 +134,7 @@ public class SagaState {
 }
 
 **Pros**: the whole flow in one place, resumable, testable. **Cons**: the orchestrator is a coupling point and a potential bottleneck.
+```
 
 ## Choreography vs. Orchestration
 
@@ -150,7 +148,9 @@ public class SagaState {
 | Debugging | Harder | Easier |
 | Failure isolation | Best | Coordinator is a SPOF (mitigate) |
 
+```java
 **The rule**: choreography for simple, loosely-coupled flows; orchestration when the flow is complex, must be resumable, or needs a clear owner.
+```
 
 ## The Saga State Machine
 
@@ -163,9 +163,11 @@ public class OrderSagaMachine {
         "CHARGED",     new Action("RESERVING", inventory::reserve),
         "RESERVED",    new Action("SHIPPING", shipping::ship),
         "SHIPPED",     new Action(null, saga::complete)
+```java
     );
 
     private final Map<String, Action> compensations = Map.of(
+```
         "CHARGING",    new Action(null, payments::refund),
         "RESERVING",   new Action(null, inventory::unreserve)
     );

@@ -22,7 +22,9 @@ Why model first? The diagram forces you to answer the hard questions *cheaply* �
 - What are the *cardinalities* — how many of one relate to how many of another?
 - Where does each attribute belong? (A student's email on the student; a course's duration on the course.)
 
+```java
 A 30-minute diagram session catches the modeling errors that a 3-month build would otherwise discover in production. The diagram is the blueprint; the SQL is the construction.
+```
 
 ## The Notation (Chen / Crow's Foot)
 
@@ -56,7 +58,9 @@ A student can be in many enrollments; a course can be in many enrollments — ma
 
 ## The Code Walkthrough — A Full Example
 
+```java
 **Requirements:** "A student can enroll in many courses. Each course has many lessons. Each lesson belongs to one course. A student can mark lessons complete. Courses have one instructor; instructors teach many courses."
+```
 
 **Step 1 — entities:** `STUDENT`, `COURSE`, `LESSON`, `INSTRUCTOR`. (Note: "enrollment" and "completion" are *relationships with attributes* — they'll become tables later.)
 

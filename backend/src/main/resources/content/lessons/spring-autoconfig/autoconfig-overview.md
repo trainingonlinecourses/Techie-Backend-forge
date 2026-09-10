@@ -18,6 +18,7 @@ When you add `spring-boot-starter-data-jpa` to your project, Spring Boot automat
 
 You didn't write any configuration. That's **auto-configuration** — Spring Boot configures your application based on what's on the classpath.
 
+```java
 @SpringBootApplication  // includes @EnableAutoConfiguration
 public class MyApp {
     public static void main(String[] args) {
@@ -26,6 +27,7 @@ public class MyApp {
 }
 
 // @SpringBootApplication = @Configuration + @EnableAutoConfiguration + @ComponentScan
+```
 
 ---
 
@@ -168,6 +170,7 @@ public class MetricsAutoConfiguration {
 
 ### Scenario 2: Database auto-configuration with multiple databases
 
+```java
 @AutoConfiguration
 @ConditionalOnClass(JdbcTemplate.class)
 public class MultiDatabaseAutoConfiguration {
@@ -185,6 +188,7 @@ public class MultiDatabaseAutoConfiguration {
         // MySQL for secondary
     }
 }
+```
 
 ---
 

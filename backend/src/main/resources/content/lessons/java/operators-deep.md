@@ -100,17 +100,20 @@ Line-by-line:
 
 ## The Ternary Operator — Useful but Dangerous
 
+```java
 // Simple case — fine:
 String label = (age >= 18) ? "Adult" : "Minor";
 
 // Nested ternary — NEVER DO THIS:
 // String result = (x > 0) ? "positive" : (x == 0) ? "zero" : "negative";
 // This is unreadable and error-prone. Use an if/else or switch expression instead.
+```
 
 **Org rule:** Most style guides cap ternaries at one level of nesting. Beyond that, use `if/else` or `switch` expressions — readability wins over cleverness.
 
 ## String Concatenation in Loops — The Hidden N² Problem
 
+```java
 // ❌ BAD — creates a new String object on every iteration (O(n²) time)
 String result = "";
 for (int i = 0; i < 100000; i++) {
@@ -123,6 +126,7 @@ for (int i = 0; i < 100000; i++) {
     sb.append("item-").append(i).append("\n");
 }
 String result = sb.toString();
+```
 
 Line-by-line:
 

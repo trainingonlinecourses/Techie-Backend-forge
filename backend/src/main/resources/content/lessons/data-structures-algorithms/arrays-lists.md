@@ -99,6 +99,7 @@ List<String> words = new ArrayList<>(List.of("a", "b", "c"));
 
 // CORRECT: remove through the iterator — safe and O(n) total.
 Iterator<String> it = words.iterator();
+```java
 while (it.hasNext()) {
     if (it.next().equals("b")) it.remove();
 }
@@ -106,6 +107,7 @@ while (it.hasNext()) {
 // WRONG: modifying the list while iterating throws
 // ConcurrentModificationException:
 // for (String w : words) { if (w.equals("b")) words.remove(w); }
+```
 
 The enhanced for-loop hides the iterator; calling `list.remove` while iterating changes the structure the iterator relies on, and Java's *fail-fast* design throws `ConcurrentModificationException` rather than silently corrupt the iteration. Removing through the iterator itself is the sanctioned path.
 

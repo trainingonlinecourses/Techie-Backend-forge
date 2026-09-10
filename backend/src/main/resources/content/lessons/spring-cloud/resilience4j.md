@@ -51,6 +51,7 @@ public class OrderLookup {
 
 ## Feign + breaker + fallback (the pattern used in the demo)
 
+```java
 @FeignClient(name = "inventory-service", fallback = InventoryClientFallback.class)
 public interface InventoryClient {
     @GetMapping("/api/inventory/{sku}")
@@ -64,6 +65,7 @@ public class InventoryClientFallback implements InventoryClient {
         return new InventoryStock(sku, 0, "CIRCUIT_OPEN_FALLBACK");
     }
 }
+```
 
 ```yaml
 spring:

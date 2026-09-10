@@ -18,9 +18,11 @@ docs:
 
 A unit test isolates *one* class. But real classes depend on other classes — repositories, web clients, clocks — and those dependencies bring their own baggage: databases to set up, networks to reach, state to manage. **Mocking** replaces a real dependency with a **test double**: a stand-in object you fully control, which records how it was called and answers with values you dictate. The class under test behaves exactly as it would against the real dependency — but the test is fast, deterministic, and needs no infrastructure.
 
+```java
 **The mental model:** a mock is a stunt double for a collaborator. The hero (your service) performs the scene (the business logic) while the stunt double (the mock repository) plays the dangerous part (the database) — perfectly, every time, following your script. The mock doesn't *do* anything real; it *says* the lines you wrote and *reports back* who said what to it. Two powers follow: **stubbing** (program the mock's answers) and **verification** (assert what the code said to it).
 
 **The crucial distinction:** a *mock* (what Mockito makes) is not a *fake*. A fake (like an in-memory repository) is a working lightweight implementation. A mock has *no behavior at all* until you stub it — it's a programmable recording device. That's why mocks are right for *interaction* testing (did the service call the repository with the right arguments?) and wrong for testing real logic you actually own (that belongs in the real class's own tests).
+```
 
 ## Your First Mock
 
@@ -111,6 +113,7 @@ void stubbingStyles() {
 
 ## Verification: Did the Code Say the Right Thing?
 
+```java
 Stubbing controls the mock's *answers*; **verification** checks the code's *calls* — the interaction assertions:
 
 @Test
@@ -132,6 +135,7 @@ void chargeDeductsBalanceAndSaves() {
     // At least / at most:
     verify(repo, atLeastOnce()).findById(anyString());
 }
+```
 
 **The verification vocabulary:** `times(n)` (exactly n), `never()`, `atLeastOnce()`, `atMostOnce()`, `atLeast(n)`. The argument matcher `argThat(...)` asserts on the *arguments passed* — the strongest interaction check ("the service saved an account with balance 800"). The discipline: **verify what you care about and nothing more** — verifying every interaction makes tests brittle (any refactor breaks them); verifying none misses the point of mocking.
 

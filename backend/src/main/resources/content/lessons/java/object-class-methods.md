@@ -12,11 +12,15 @@ docs:
 
 Here is a fact that surprises most beginners: **every single class you ever write in Java automatically extends `java.lang.Object`** — even when you don't write `extends` at all.
 
+```java
 public class Customer { }
+```
 
 Behind the scenes the compiler treats this as:
 
+```java
 public class Customer extends Object { }
+```
 
 Why does this matter? Because it means **every object in your application already has 11 methods** the moment it is created: `toString()`, `equals()`, `hashCode()`, `getClass()`, `clone()`, `finalize()`, `wait()` (3 overloads), and `notify()`/`notifyAll()`. You never wrote them — they came free from `Object`.
 
@@ -28,6 +32,7 @@ The catch: the inherited default implementations are usually **not what you want
 
 ### What the default does
 
+```java
 public class Main {
 
     public static void main(String[] args) {
@@ -36,6 +41,7 @@ public class Main {
         // Prints something like: Customer@1b6d3586
     }
 }
+```
 
 Line by line:
 
@@ -84,6 +90,7 @@ Now logging `c` prints `Customer{id=42, email='amy@corp.com'}` — immediately u
 
 ### What the default does
 
+```java
 public class Main {
 
     public static void main(String[] args) {
@@ -92,6 +99,7 @@ public class Main {
         System.out.println(a.equals(b)); // false !!
     }
 }
+```
 
 The default `equals()` is just `==` — it compares **memory addresses**, asking "is this literally the same object?" Two separate objects holding identical data are *not* the same object, so it returns false.
 
@@ -145,10 +153,12 @@ public class Main {
 
 The fix:
 
+```java
 @Override
 public int hashCode() {
     return Objects.hash(id);   // utility builds hash from the SAME fields used in equals()
 }
+```
 
 - `Objects.hash(...)` takes your equality fields and combines them safely.
 - Use exactly the same field list as `equals()`. Fewer or more fields breaks the contract.
@@ -159,8 +169,10 @@ public int hashCode() {
 ## Method 4: `getClass()` — "What am I, really?"
 
 Object obj = new ArrayList<String>();
+```java
 System.out.println(obj.getClass());              // class java.util.ArrayList
 System.out.println(obj.getClass().getSimpleName()); // ArrayList
+```
 
 - Returns the **runtime class**, ignoring the declared variable type.
 - It's `final` — you cannot override it. Every object honestly reports its actual type.
@@ -170,10 +182,12 @@ Frameworks live on this method: Spring inspects `getClass()` plus annotations to
 
 ## Method 5: `clone()` — copying objects (and why orgs avoid it)
 
+```java
 @Override
 public Customer clone() throws CloneNotSupportedException {
     return (Customer) super.clone();   // shallow-copies all fields bitwise
 }
+```
 
 - Requires implementing the marker interface `Cloneable`, otherwise `super.clone()` throws.
 - Produces a **shallow copy**: nested objects are shared between original and clone — mutating the clone's address mutates the original's too.

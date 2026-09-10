@@ -34,9 +34,11 @@ The mechanics: every consumer group has a **group coordinator** (one of the brok
 
 // Explicitly choosing the strategy:
 props.put("partition.assignment.strategy",
+```java
           "org.apache.kafka.clients.consumer.RoundRobinAssignor");
 
 For most applications the default (sticky) is right; the strategy matters when you have many topics or observe uneven load.
+```
 
 ## The Lifecycle: Join, Process, Rebalance
 

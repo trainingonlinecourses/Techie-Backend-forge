@@ -41,21 +41,27 @@ public class RagService {
     public String ask(String question) {
         // 1. RETRIEVE: find the most relevant chunks
         List<Document> relevant = vectorStore.similaritySearch(
+```java
                 SearchRequest.builder().query(question).topK(4).build());
 
         // 2. AUGMENT: stuff them into the prompt with instructions
+```
         String context = relevant.stream()
                 .map(d -> "Source: " + d.getMetadata().get("lesson") + "\n" + d.getContent())
+```java
                 .collect(Collectors.joining("\n\n---\n\n"));
 
         // 3. GENERATE: answer grounded in the context
         return chatClient.prompt()
+```
                 .system("""
                         You are a documentation assistant. Answer ONLY from the provided
                         context. If the context doesn't contain the answer, say so.
                         Cite the source lesson ids you used.
                         """)
+```java
                 .user(u -> u.text("Context:\n{context}\n\nQuestion: {question}")
+```
                         .param("context", context)
                         .param("question", question))
                 .call()
@@ -102,7 +108,9 @@ public record CitedAnswer(String answer, List<String> sources) {}
 
 // collect which lessons/docs the model used, return them to the UI:
 List<String> sourcesUsed = relevant.stream().map(d -> (String) d.getMetadata().get("lesson")).toList();
+```java
 return new CitedAnswer(answer, sourcesUsed);
+```
 
 Users (and auditors) can verify: *the assistant says X, citing lesson Y.* This academy's own chat assistant returns `sources` exactly this way.
 

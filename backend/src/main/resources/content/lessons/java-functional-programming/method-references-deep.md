@@ -16,7 +16,9 @@ docs:
 
 Many lambdas are nothing but a forwarding call:
 
+```java
 names.forEach(name -> System.out.println(name));
+```
 
 The lambda exists *only* to call `System.out.println(name)`. Writing the `name ->` wrapper adds noise without adding meaning. Java gives you a shorthand — the **method reference**:
 
@@ -117,15 +119,19 @@ Prefer the reference when it's a **direct forwarding call**:
 // GOOD — reference, matches intent
 items.stream().map(Item::getPrice).toList();
 
+```java
 // OK but noisier — lambda
 items.stream().map(item -> item.getPrice()).toList();
+```
 
 Prefer the lambda when you're **adding logic** around the call:
 
+```java
 // GOOD — lambda, there's extra work
 items.stream().map(item -> item.getPrice() * (1 - discount)).toList();
 
 // Bad — a reference can't express this
+```
 items.stream().map(Item::getPrice)  // (can't apply the discount)
 
 Rule of thumb: if the body is *exactly* one method call, use `::`. If there's arithmetic, conditions, or multiple calls, use a lambda.
@@ -136,7 +142,9 @@ If a method is overloaded, the functional interface's signature picks the right 
 
 // String has valueOf(int), valueOf(double), valueOf(Object), ...
 Function<Integer, String> f = String::valueOf;    // picks valueOf(int) — Integer unboxes
+```java
 System.out.println(f.apply(42).getClass().getSimpleName());   // String
+```
 
 The compiler selects the overload whose parameter types match the target signature. Ambiguity is possible with `null`-tolerant overloads (`valueOf(Object)` vs primitives), but the compiler resolves by target typing in most cases.
 

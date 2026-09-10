@@ -18,8 +18,10 @@ When you launch concurrent tasks, you need to:
 
 Before structured concurrency, this was error-prone:
 
+```java
 // OLD: Easy to forget cleanup, hard to propagate errors
 ExecutorService executor = Executors.newFixedThreadPool(10);
+```
 CompletableFuture<User> userFuture = CompletableFuture.supplyAsync(() -> fetchUser(id), executor);
 CompletableFuture<List<Order>> ordersFuture = CompletableFuture.supplyAsync(() -> fetchOrders(id), executor);
 CompletableFuture<Profile> profileFuture = CompletableFuture.supplyAsync(() -> fetchProfile(id), executor);
@@ -57,6 +59,7 @@ try (var scope = new StructuredTaskScope.ShutdownOnFailure()) {
 
 ## Shutdown Strategies
 
+```java
 // ShutdownOnFailure: If ANY task fails, cancel all others
 try (var scope = new StructuredTaskScope.ShutdownOnFailure()) {
     scope.fork(() -> fetchUser(id));
@@ -65,6 +68,7 @@ try (var scope = new StructuredTaskScope.ShutdownOnFailure()) {
 }
 
 // ShutdownOnSuccess: If ANY task succeeds, cancel the rest
+```
 try (var scope = new StructuredTaskScope.ShutdownOnSuccess<String>()) {
     scope.fork(() -> serviceA.call());
     scope.fork(() -> serviceB.call());

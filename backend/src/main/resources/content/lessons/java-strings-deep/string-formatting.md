@@ -16,7 +16,9 @@ docs:
 
 Concatenation with `+` gets ugly fast when you want control over layout:
 
+```java
 String line = "Total: $" + total + " — discount " + pct + "% off — " + count + " items";
+```
 
 Three problems:
 
@@ -24,9 +26,11 @@ Three problems:
 2. **No precision control** — `59.9` prints as `59.9`, `59.0` as `59.0`, `3.14159265...` as a long mess.
 3. **Readability** — the *shape* of the output is buried inside the expression.
 
+```java
 **Formatting** separates *what you want to print* (a template with placeholders) from *the values* you plug in:
 
 String line = String.format("Total: $%.2f — discount %d%% off — %d items", total, pct, count);
+```
 
 The template `"Total: $%.2f — discount %d%% off — %d items"` shows the exact output shape. `%.2f`, `%d` are **format specifiers** — placeholders that say "put a floating-point number here, rounded to 2 decimals" and "put an integer here".
 
@@ -121,6 +125,7 @@ public class FormatDemo {
 
 `%t` conversions format dates and times (need `java.time` types):
 
+```java
 import java.time.LocalDateTime;
 
 public class Main {
@@ -131,6 +136,7 @@ public class Main {
         System.out.printf("%tF %<tT%n", now);   // 2026-08-18 14:30:05
     }
 }
+```
 
 `%tF` = ISO date, `%<tT` = time; the `<` flag means "reuse the previous argument", so we don't pass `now` twice.
 

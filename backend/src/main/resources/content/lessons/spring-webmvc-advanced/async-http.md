@@ -33,7 +33,9 @@ The servlet thread returns immediately; Spring's `WebMvcAsyncTask` runs the `Cal
 
 ## DeferredResult — completion from anywhere
 
+```java
 @GetMapping("/api/order/{id}/status")
+```
 public DeferredResult<OrderStatus> status(@PathVariable Long id) {
     DeferredResult<OrderStatus> result = new DeferredResult<>(30_000L);  // timeout 30s
     orderStatusService.subscribe(id, status -> result.setResult(status)); // callback fires later
@@ -44,6 +46,7 @@ This is the pattern for **long-polling**, event-driven completion (message consu
 
 ## Streaming and Server-Sent Events
 
+```java
 @GetMapping("/api/export.csv")
 public StreamingResponseBody export() {
     return out -> {
@@ -62,6 +65,7 @@ public SseEmitter feed() {
     feedService.register(emitter);           // emitter.send(event) pushes to the client
     return emitter;
 }
+```
 
 - `StreamingResponseBody` streams a large generated body (CSV/JSON-lines/PDF) without buffering it all in memory — a big win for exports of millions of rows.
 - `SseEmitter` is one-way push: the client opens a normal HTTP connection and the server pushes events (`data:` lines). Perfect for notifications, job progress, price ticks — anything where the server has new data to send as it appears. (Bidirectional push = WebSockets; SSE is simpler and rides on plain HTTP.)
@@ -78,9 +82,11 @@ public SseEmitter feed() {
 
 CompletableFuture.allOf(callA, callB, callC)
     .thenApply(v -> combine(callA.join(), callB.join(), callC.join()))
+```java
     .whenComplete((r, ex) -> {
         if (ex != null) result.setErrorResult(ex); else result.setResult(r);
     });
+```
 
 ## Pitfalls
 

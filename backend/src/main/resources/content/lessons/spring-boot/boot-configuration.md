@@ -123,6 +123,7 @@ app:
       - application/pdf
 ```
 
+```java
 **Enable the binding:**
 @SpringBootApplication
 @EnableConfigurationProperties(StorageProperties.class)  // bind StorageProperties
@@ -132,6 +133,7 @@ public class AcademyApplication { ... }
 @SpringBootApplication
 @ConfigurationPropertiesScan    // auto-discovers all @ConfigurationProperties
 public class AcademyApplication { ... }
+```
 
 ## Profile-specific configuration
 
@@ -205,10 +207,6 @@ Spring Boot checks multiple locations, in this priority order (highest first):
 3. 3. OS environment variables. Export SERVER_PORT=9090
 4. 4. application-{profile}.yml. 5. application.yml. 6. @PropertySource annotations. 7. Default properties (lowest priority)
 
-The same code, clean:
-
-```java
-```
 
 // Example: environment variable overrides application.yml
 // application.yml says: server.port=8080
@@ -253,6 +251,7 @@ public record FeatureFlags(
     boolean aiTutorEnabled,
     int maxCoursesPerUser,
     String maintenanceMessage
+```java
 ) {}
 
 @Service
@@ -270,6 +269,7 @@ public class RegistrationService {
         // ... registration logic
     }
 }
+```
 
 # application.yml
 app:

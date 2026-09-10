@@ -80,11 +80,13 @@ public class StreamDemo {
 
 **Part 1 — writing with decoration.** `new FileOutputStream("out.bin")` is the raw byte sink to the file. Wrapping it in `BufferedOutputStream` adds an internal buffer (8 KB by default): the `write` calls land in the buffer, and the buffer is flushed to disk in bigger, fewer system calls. **Decorating** — wrapping one stream in another to add behavior — is the core design pattern of `java.io` (it's the Decorator pattern).
 
+```java
 **Part 2 — reading in a loop.** The universal read idiom:
 
 byte[] buffer = new byte[4096];
 int bytesRead;
 while ((bytesRead = in.read(buffer)) != -1) { ... }
+```
 
 `read(buffer)` fills up to `buffer.length` bytes and returns how many it actually got — which can be **less than requested** (a stream delivers whatever is available). `-1` means end of stream. Always loop on the *returned count*, never assume the buffer is full. This pattern handles files, sockets, and pipes identically.
 
@@ -100,14 +102,17 @@ Streams hold **OS resources** (file handles, sockets). If you forget to close, y
 
 Never do the old-style manual close in `finally` unless you're on truly ancient Java:
 
+```java
 // DON'T write this in modern Java:
 OutputStream out = null;
 try { out = ...; ... } finally { if (out != null) out.close(); }
+```
 
 ## The Decorator Pattern in Practice
 
 Streams compose, and the composition is the feature:
 
+```java
 public class Main {
 
     public static void main(String[] args) {
@@ -122,6 +127,7 @@ public class Main {
         }
     }
 }
+```
 
 Reading the chain **from the inside out**: `FileInputStream` gets bytes from the file → `GZIPInputStream` decompresses them → `InputStreamReader` decodes bytes to chars (UTF-8) → `BufferedReader` groups chars into lines. Each layer adds one behavior. This is why stream-based code is so flexible — and why it looks nested.
 
@@ -129,7 +135,9 @@ Reading the chain **from the inside out**: `FileInputStream` gets bytes from the
 
 For **small** files, Java 11+ gives a one-liner:
 
+```java
 String content = Files.readString(Path.of("out.bin"));   // loads whole file
+```
 
 This is clean for config files and templates. But it loads everything into memory — for a 2 GB log you'd die. Rule of thumb:
 

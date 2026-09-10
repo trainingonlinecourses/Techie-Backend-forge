@@ -22,7 +22,9 @@ Every method in Java has an implicit contract: "what can go wrong here, and who 
 
 **Unchecked exceptions** — `RuntimeException` and its subclasses (plus `Error`s) — carry no such requirement. The compiler lets them fly through any method without declaration. The message: "this is a programming error or an unrecoverable condition; you don't plan for it, you fix the code."
 
+```java
 The naming is precise: **checked** = the compiler checks that you handled it; **unchecked** = the compiler does not check.
+```
 
 ## The Two Sides in Action
 
@@ -73,7 +75,9 @@ public class CheckedDemo {
 
 ## The Deep Reason: Who Can Recover?
 
+```java
 The philosophical core: **checked exceptions are for failures the caller can reasonably do something about.** The file may exist on your machine and not on the server; the caller might have a fallback. The network may drop; the caller might retry. These failures are *part of the environment*, and the signature documents them so callers can plan.
+```
 
 Unchecked exceptions are for failures where **no caller can meaningfully recover at the point of failure**: `NullPointerException` means there's a bug to fix; `IllegalArgumentException` means someone passed bad data — the right response is to fix the caller, not to catch-and-continue. If you catch a `NullPointerException` and keep going, you're not handling a failure, you're papering over a bug.
 
@@ -98,6 +102,7 @@ Why is that OK? Because a database hiccup deep in a repository is usually *not* 
 
 Your own code gets to choose — and the tie-breaker is *who handles it*:
 
+```java
 // CHECKED — the immediate caller is expected to handle this specifically:
 public class PaymentService {
     public void refund(String txnId) throws InsufficientBalanceException { ... }
@@ -113,6 +118,7 @@ public class Config {
     }
     // No caller needs to catch this; the app's startup failure handler owns it.
 }
+```
 
 ## The Sharp Edges
 

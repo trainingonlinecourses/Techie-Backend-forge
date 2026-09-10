@@ -14,6 +14,7 @@ docs:
 
 Spring's **event system** implements the **Observer pattern** — one part of your application publishes an event, and any number of listeners can react to it without the publisher knowing who's listening. This **decouples** your code: the order service doesn't need to know about the notification service, the audit service, or the analytics service.
 
+```java
 // Publisher: "I created an order, someone deal with it"
 applicationEventPublisher.publishEvent(new OrderCreatedEvent(order));
 
@@ -28,6 +29,7 @@ void auditOrder(OrderCreatedEvent event) { /* record audit */ }
 void updateInventory(OrderCreatedEvent event) { /* deduct stock */ }
 
 **Why events over direct method calls?**
+```
 - Adding a new consumer doesn't change the publisher
 - Listeners can run asynchronously (don't block the request)
 - Transactions can be synchronized (run after commit)
@@ -75,6 +77,7 @@ public class OrderService {
 
 `@TransactionalEventListener` solves this:
 
+```java
 @Component
 public class OrderNotificationListener {
 
@@ -95,6 +98,7 @@ public class OrderNotificationListener {
 }
 
 **Phases:**
+```
 - `AFTER_COMMIT` — Runs only if the transaction commits successfully (most common)
 - `AFTER_ROLLBACK` — Runs only if the transaction rolls back
 - `AFTER_COMPLETION` — Runs after commit or rollback (always)
@@ -127,6 +131,7 @@ public class AnalyticsListener {
 
 When multiple listeners react to the same event and order matters:
 
+```java
 @Component
 public class InventoryListener {
     @EventListener
@@ -153,6 +158,7 @@ public class NotificationListener {
         emailService.send(event.getCustomerId(), "Order confirmed");
     }
 }
+```
 
 ### Scenario 5: Conditional event listeners
 
@@ -174,6 +180,7 @@ Spring Expression Language (SpEL) in the `condition` attribute evaluates against
 
 Spring publishes events automatically that you can listen to:
 
+```java
 @Component
 public class ApplicationEventHandler {
 
@@ -193,6 +200,7 @@ public class ApplicationEventHandler {
         metricsService.incrementActiveSessions();
     }
 }
+```
 
 ## Event pattern: Domain events
 

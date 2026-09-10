@@ -54,6 +54,7 @@ import java.lang.annotation.*;
 
 The `@Target` meta-annotation restricts where an annotation may appear:
 
+```java
 import java.lang.annotation.*;
 
 // This annotation may only appear on methods (and constructors).
@@ -70,6 +71,7 @@ public @interface Entity { }
 @Target({ElementType.FIELD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface NotNull { }
+```
 
 The common `ElementType` values: `TYPE` (classes/interfaces/records/enums), `METHOD`, `FIELD`, `PARAMETER`, `CONSTRUCTOR`, `LOCAL_VARIABLE`, `ANNOTATION_TYPE` (meta-annotations like `@Target` themselves), `PACKAGE`, and `TYPE_USE` (which allows annotations in generic type arguments, e.g. `List<@NotNull String>`).
 
@@ -130,11 +132,13 @@ public class RateLimitProcessor {
         if (charge.isAnnotationPresent(RateLimit.class)) {
             RateLimit rl = charge.getAnnotation(RateLimit.class);
             System.out.println("charge: " + rl.maxRequests() +
+```java
                                " requests per " + rl.window());
             // -> charge: 10 requests per 1s
         }
         if (history.isAnnotationPresent(RateLimit.class)) {
             RateLimit rl = history.getAnnotation(RateLimit.class);
+```
             System.out.println("history: " + rl.maxRequests() +
                                " per " + rl.window());
             // -> history: 100 per 1m

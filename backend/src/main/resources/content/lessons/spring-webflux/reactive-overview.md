@@ -185,7 +185,9 @@ The classic example: a blocking service that sleeps 200ms per call with a 200-th
 - **Blocking third-party libraries** — JDBC, blocking SDKs. Forcing them into reactive is an antipattern
 - **Team experience** — if the team knows servlet and has deadlines, the learning curve is real
 
+```java
 **The honest industry pattern:** most services should stay servlet; WebFlux is the right tool for the hot paths.
+```
 
 ## A real-world scenario — API Gateway
 
@@ -205,10 +207,12 @@ public class GatewayController {
     
     @GetMapping("/api/products/{id}")
     public Mono<ProductAggregate> getProduct(@PathVariable String id) {
+```java
         return Mono.zip(                                    // Line 1: Call 3 services in parallel
             webClient.get().uri("/products/{id}", id).retrieve().bodyToMono(Product.class),
             webClient.get().uri("/reviews/{id}", id).retrieve().bodyToMono(Reviews.class),
             webClient.get().uri("/inventory/{id}", id).retrieve().bodyToMono(Stock.class)
+```
         ).map(tuple -> new ProductAggregate(                 // Line 2: Combine results
             tuple.getT1(), tuple.getT2(), tuple.getT3()
         ));

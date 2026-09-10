@@ -174,6 +174,7 @@ logging:
     org.springframework.context.annotation: DEBUG
 ```
 
+```java
 // Custom logger for specific auto-configuration
 @Configuration
 @ConditionalOnClass(CustomService.class)
@@ -188,6 +189,7 @@ public class CustomAutoConfiguration {
         return new CustomService();
     }
 }
+```
 
 ---
 

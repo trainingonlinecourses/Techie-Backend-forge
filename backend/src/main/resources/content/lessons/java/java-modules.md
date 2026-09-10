@@ -129,8 +129,10 @@ module orders.service {   // Auto-generated name
 
 // Module: com.myapp.payment
 module com.myapp.payment {
+```java
     exports com.myapp.payment.api;      // Public: PaymentService, PaymentResult
     // com.myapp.payment.stripe is NOT exported — internal implementation
+```
 
     provides com.myapp.payment.api.PaymentProcessor
         with com.myapp.payment.stripe.StripeProcessor;   // Stripe is the implementation

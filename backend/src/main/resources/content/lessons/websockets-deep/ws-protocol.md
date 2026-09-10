@@ -57,6 +57,7 @@ A message may span multiple frames (fragmentation) and frames may be **masked** 
 
 ## The Code Walkthrough — Spring's WebSocket Handler
 
+```java
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.*;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
@@ -94,6 +95,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
         System.out.println("disconnected: " + session.getId());
     }
 }
+```
 
 ### Walking Through Each Part
 

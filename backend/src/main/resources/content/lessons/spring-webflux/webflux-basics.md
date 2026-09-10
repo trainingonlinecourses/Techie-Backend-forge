@@ -93,6 +93,7 @@ The response stays open and pushes events as the `Flux` produces them — no pol
 
 WebFlux supports RFC 7807 problem details like servlet does:
 
+```java
 @RestControllerAdvice
 public class ApiExceptionHandler {
 
@@ -103,6 +104,7 @@ public class ApiExceptionHandler {
         return pd;
     }
 }
+```
 
 `Mono.error(...)` / thrown exceptions in reactive chains are routed to `@RestControllerAdvice` the same way as servlet.
 

@@ -4,8 +4,10 @@ module: spring-messaging
 order: 3
 minutes: 23
 topics: ["channels", "point-to-point vs pub-sub channels", "pollable vs subscribable", "channel adapters"]
+```java
 summary: If messaging is a plumbing system, channels are the pipes. Producers write into a channel; consumers read from it. The channel is the coupling poin...
 docs:
+```
   - title: "Message channels (Spring Integration)"
     url: "https://docs.spring.io/spring-integration/reference/channel.html"
 ---
@@ -14,7 +16,9 @@ docs:
 
 ## The Concept: The Channels Are the Architecture
 
+```java
 If messaging is a plumbing system, **channels** are the pipes. Producers write into a channel; consumers read from it. The channel *is* the coupling point — and its type determines the semantics:
+```
 
 - **Point-to-point channel** — one message, one consumer (queue semantics in-process).
 - **Publish-subscribe channel** — one message, every subscriber (topic semantics in-process).

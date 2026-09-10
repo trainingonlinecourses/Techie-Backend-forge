@@ -16,7 +16,9 @@ docs:
 
 A **JWT** (JSON Web Token) is a compact, URL-safe string that carries **claims** (statements about a subject — "user 42 is an admin", "this token expires at ...") and is **cryptographically signed** so nobody can tamper with it. It solves a core stateless-auth problem: *how does a server trust "who you are" without looking anything up?*
 
+```java
 Think of it as a **signed passport**. The passport contains facts about you (name, nationality) — the *claims*. It's signed by the issuing authority's seal — the *signature* — so any border agent can verify it's authentic without calling the issuing country. The agent doesn't need a database lookup; the signature is the proof.
+```
 
 A JWT looks like this:
 
@@ -126,7 +128,9 @@ public class JwtStructureDemo {
 
 ### Walking Through Each Part
 
+```java
 **Step 1 — encode header and payload.** The header and payload are JSON documents; base64url-encoding makes them URL-safe. Note they are **not encrypted** — anyone can decode them. That's by design: JWTs carry *verifiable*, not *secret*, data. Never put secrets in a JWT payload.
+```
 
 **Step 2 — sign.** The signature input is literally `header + "." + payload`; HMAC-SHA256 with the shared secret produces the signature. Only someone holding the secret can produce this value — which is why the token can't be forged (by someone without the secret) or tampered with (any change invalidates the signature).
 

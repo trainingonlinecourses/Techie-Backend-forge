@@ -121,9 +121,11 @@ CompletableFuture<DashboardData> dashboardFuture = CompletableFuture.allOf(
     userFuture.join(),
     ordersFuture.join(),
     productsFuture.join()
+```java
 ));
 
 // All three ran in parallel — total time = slowest one, not sum of all
+```
 
 ### Wait for Any
 
@@ -140,6 +142,7 @@ CompletableFuture<String> fastest = CompletableFuture.anyOf(source1, source2, so
 ## Exception Handling
 
 CompletableFuture<String> future = CompletableFuture
+```java
     .supplyAsync(() -> {
         if (Math.random() > 0.5) {
             throw new RuntimeException("API call failed!");
@@ -154,11 +157,13 @@ CompletableFuture<String> future = CompletableFuture
     .thenApply(result -> result.toUpperCase());
 
 // Result is either "SUCCESS" or "FALLBACK VALUE"
+```
 
 ### Multiple Exception Handlers
 
 CompletableFuture<String> future = CompletableFuture
     .supplyAsync(() -> riskyOperation())
+```java
     .exceptionally(ex -> {
         if (ex instanceof TimeoutException) {
             return "Timed out — using cached data";
@@ -168,11 +173,13 @@ CompletableFuture<String> future = CompletableFuture
             return "Unknown error — using default";
         }
     });
+```
 
 ### handle (Process Either Success or Failure)
 
 CompletableFuture<String> future = CompletableFuture
     .supplyAsync(() -> riskyOperation())
+```java
     .handle((result, ex) -> {
         if (ex != null) {
             log.error("Operation failed", ex);
@@ -180,6 +187,7 @@ CompletableFuture<String> future = CompletableFuture
         }
         return result;
     });
+```
 
 ---
 
@@ -189,6 +197,7 @@ CompletableFuture<String> future = CompletableFuture
 CompletableFuture<String> future = CompletableFuture
     .supplyAsync(() -> slowOperation())
     .orTimeout(5, TimeUnit.SECONDS)  // Fail after 5 seconds
+```java
     .exceptionally(ex -> {
         if (ex instanceof TimeoutException) {
             return "Operation timed out";
@@ -197,9 +206,12 @@ CompletableFuture<String> future = CompletableFuture
     });
 
 // Java 8 workaround
+```
 CompletableFuture<String> future = CompletableFuture
     .supplyAsync(() -> slowOperation())
+```java
     .completeOnTimeout("Default value", 5, TimeUnit.SECONDS);
+```
 
 ---
 
@@ -253,6 +265,7 @@ public class DashboardAggregator {
 
 public <T> CompletableFuture<T> retryWithBackoff(
         Supplier<T> operation,
+```java
         int maxRetries,
         long initialDelayMs) {
 
@@ -280,6 +293,7 @@ public <T> CompletableFuture<T> retryWithBackoff(
         })
         .thenCompose(Function.identity());
 }
+```
 
 ### Scenario 3: Timeout with Fallback
 

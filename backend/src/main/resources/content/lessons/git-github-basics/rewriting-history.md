@@ -122,7 +122,9 @@ The reflog means **almost nothing is unrecoverable** — even a botched `--hard`
 | Force-push your own unshared feature branch | ⚠️ Rarely OK (your branch, no collaborators) |
 | Force-push shared main | ❌ Never |
 
+```java
 **The test before rewriting:** *has anyone else pulled this history?* If yes — don't rewrite; add a new commit instead. If no — reshape freely.
+```
 
 ## Common Beginner Pitfalls
 

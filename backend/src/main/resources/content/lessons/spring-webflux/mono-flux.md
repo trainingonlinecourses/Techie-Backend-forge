@@ -46,8 +46,10 @@ Flux.range(1, 10)
     .map(i -> i * 2)
     .subscribe(System.out::println);   // ← now it runs (prints 2..20)
 
+```java
 // Blocking escape hatches (tests, main methods — NEVER in a server request):
 int v = Mono.just(42).block();                 // block until done
+```
 List<Integer> l = Flux.range(1, 5).collectList().block();
 
 ## The operator toolbox
@@ -90,11 +92,15 @@ Errors travel down the pipeline as events. Handle them with operators, not `try/
 Mono<Customer> customer = repo.findById(id)
         .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
         .onErrorResume(DataAccessException.class, e -> Mono.just(Customer.empty())) // fallback value
+```java
         .onErrorReturn(Customer.empty());                    // blanket fallback
 // doOnError: observe only (log); doFinally: always run (cleanup)
+```
 Mono<Customer> c = repo.findById(id)
         .doOnError(e -> log.warn("lookup failed", e))
+```java
         .doFinally(sig -> metrics.count(sig));
+```
 
 - `switchIfEmpty` — provide an alternate publisher when the source completes empty (the reactive "optional or fallback").
 - `onErrorResume` — recover with another publisher (like a catch that returns a value).
@@ -107,7 +113,9 @@ A `Flux` from `interval` is **unbounded**: if you `subscribe` and process slowly
 Flux.interval(Duration.ofMillis(10))
     .onBackpressureBuffer(1000)      // buffer up to 1000 (then error) — bounded
     .limitRate(100)                  // request 100 at a time from upstream
+```java
     .subscribe(...);
+```
 
 In practice you rarely write this — databases and HTTP clients apply backpressure automatically. But it's why reactive systems don't blow up memory under load: **a slow consumer propagates its demand upstream**.
 

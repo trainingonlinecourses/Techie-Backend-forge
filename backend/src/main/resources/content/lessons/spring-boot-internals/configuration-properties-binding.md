@@ -38,6 +38,7 @@ Problems:
 
 **`@ConfigurationProperties`** binds a *namespace* of properties into one **typed, immutable-friendly object**:
 
+```java
 @ConfigurationProperties(prefix = "mail")
 public class MailProperties {
     private String host;
@@ -48,15 +49,18 @@ public class MailProperties {
     private Duration timeout = Duration.ofSeconds(10);
     // getters & setters (or Java records in Boot 3)
 }
+```
 
 Then inject the whole thing:
 
+```java
 @Service
 class EmailService {
     private final MailProperties props;
 
     EmailService(MailProperties props) { this.props = props; }   // one dependency, typed
 }
+```
 
 ## Relaxed Binding — "mail.host" Means Many Things
 
@@ -152,8 +156,10 @@ public record MailProperties(
         String host,
         int port,
         String from,
+```java
         boolean tls,
         Duration timeout) {}
+```
 
 Bind via `@EnableConfigurationProperties` and constructor injection; no setters needed. Records make config objects immutable and trivially testable.
 

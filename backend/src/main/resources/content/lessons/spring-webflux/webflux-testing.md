@@ -22,11 +22,13 @@ void flux_emits_in_order() {
     StepVerifier.create(Flux.just("a", "b", "c"))
             .expectNext("a", "b", "c")
             .expectComplete()
+```java
             .verify();
 }
 
 @Test
 void error_chain() {
+```
     StepVerifier.create(service.load("missing"))
             .expectError(CustomerNotFound.class)
             .verify();
@@ -66,17 +68,21 @@ class CustomerApiTest {
         client.post().uri("/api/customers")
                 .bodyValue(new Customer("Ada", "ada@example.com"))
                 .exchange()
+```java
                 .expectStatus().isCreated();
+```
 
         client.get().uri("/api/customers")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBodyList(Customer.class)
+```java
                 .hasSize(1);
     }
 
     @Test
     void missing_customer_is_404() {
+```
         client.get().uri("/api/customers/999")
                 .exchange()
                 .expectStatus().isNotFound()
@@ -95,7 +101,9 @@ void sse_stream_emits() {
             .exchange()
             .expectStatus().isOk()
             .returnResult(Quote.class)
+```java
             .getResponseBody();
+```
 
     StepVerifier.create(quotes.take(3))
             .expectNextCount(3)

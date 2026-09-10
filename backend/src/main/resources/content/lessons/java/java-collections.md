@@ -500,11 +500,13 @@ public class SessionCache {
     }
 
     public Optional<UserSession> getSession(String userId) {
+```java
         return Optional.ofNullable(sessions.get(userId));  // O(1) — returns Optional for null safety
     }
 
     public void invalidateExpired() {
         Instant cutoff = Instant.now().minus(Duration.ofMinutes(30));
+```
         sessions.entrySet().removeIf(entry ->      // remove all expired sessions
             entry.getValue().getLastAccess().isBefore(cutoff)
         );

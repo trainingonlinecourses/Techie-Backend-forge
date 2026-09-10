@@ -28,6 +28,7 @@ These apps start up, do their work, and either keep running (background service)
 
 The simplest way: tell Spring Boot not to start a web server.
 
+```java
 @SpringBootApplication
 public class BatchApplication {
     public static void main(String[] args) {
@@ -38,6 +39,7 @@ public class BatchApplication {
 }
 
 **Line-by-line walkthrough:**
+```
 
 1. **`setWebApplicationType(WebApplicationType.NONE)`** — This tells Spring Boot "don't start Tomcat, Jetty, or Netty. Don't even load web-related auto-configuration." The app starts faster, uses less memory, and has no ports open.
 
@@ -60,6 +62,7 @@ spring:
 
 `CommandLineRunner` is a bean that runs **exactly once** after the application context is fully loaded. It receives the raw command-line arguments:
 
+```java
 @Component
 public class DataMigrationRunner implements CommandLineRunner {
 
@@ -89,6 +92,7 @@ public class DataMigrationRunner implements CommandLineRunner {
 }
 
 **Run it:**
+```
 ```bash
 java -jar myapp.jar migrate              # triggers the migration
 java -jar myapp.jar                      # skips it
@@ -147,6 +151,7 @@ java -jar myapp.jar --format=pdf report1.csv report2.csv
 
 `CommandLineRunner` and `ApplicationRunner` run once and return. For services that need to keep running (processing queue messages, watching files, running scheduled tasks), you need something that keeps the JVM alive:
 
+```java
 @SpringBootApplication
 public class QueueProcessorApplication {
     public static void main(String[] args) {
@@ -177,9 +182,11 @@ public class MessageListener implements CommandLineRunner {
         });
     }
 }
+```
 
 **How it stays alive:** The `executor.submit()` starts a daemon thread. Spring Boot's main thread is blocked by `SpringApplication.run()` waiting for a shutdown signal (Ctrl+C / SIGTERM). The background thread processes messages until the app is stopped.
 
+```java
 **For scheduled tasks (no background thread needed):**
 @Component
 public class DailyReportJob {
@@ -190,6 +197,7 @@ public class DailyReportJob {
         // ... work ...
     }
 }
+```
 
 The `@Scheduled` annotation keeps the Spring context alive (the task scheduler thread pool is a non-daemon thread). No manual thread management needed.
 
@@ -215,10 +223,12 @@ The `@Scheduled` annotation keeps the Spring context alive (the task scheduler t
 2. **Graceful shutdown:** Implement `DisposableBean` or `@PreDestroy` to clean up resources (close database connections, finish in-flight work, flush logs).
 
 3. **Exit codes:** Use `System.exit()` or Spring Boot's `ExitCodeGenerator` to signal success/failure to orchestrators (Kubernetes, systemd):
+```java
    @Bean
    public ExitCodeGenerator exitCodeGenerator() {
        return () -> someCondition ? 0 : 1;
    }
+```
 
 4. **Logging:** Non-web apps should log to stdout (container convention) or a file, not the web server's access log.
 

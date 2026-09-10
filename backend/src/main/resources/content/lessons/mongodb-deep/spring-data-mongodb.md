@@ -46,6 +46,7 @@ public class Product {
     private boolean inStock;
     private List<String> tags = List.of();
 
+```java
     // getters/setters (or use a record/immutable style with Jackson)
 }
 
@@ -55,14 +56,17 @@ import java.util.List;
 public interface ProductRepository extends MongoRepository<Product, String> {
 
     // Derived queries — method name becomes the query:
+```
     List<Product> findByName(String name);
     List<Product> findByPriceLessThan(double max);
     List<Product> findByInStockTrue();
     List<Product> findByTagsContaining(String tag);       // array contains
     List<Product> findByPriceBetween(double min, double max);
+```java
     long countByInStockTrue();
 
     // Sorting and paging are parameters, not name parts:
+```
     List<Product> findByInStockTrueOrderByPriceAsc();
 }
 
@@ -93,12 +97,14 @@ public interface ProductRepository extends MongoRepository<Product, String> {
     @Query("{ 'price': { $gte: ?0, $lte: ?1 }, 'inStock': true }")
     List<Product> findInPriceRange(double min, double max);
 
+```java
     // Aggregation pipelines run server-side:
     @Aggregation(pipeline = {
         "{ $match: { inStock: true } }",
         "{ $group: { _id: '$category', total: { $sum: '$price' } } }",
         "{ $sort: { total: -1 } }"
     })
+```
     List<CategoryTotal> totalValueByCategory();
 }
 
@@ -150,11 +156,13 @@ public class InventoryService {
 
 MongoDB supports multi-document transactions (replica sets required). Spring Data integrates them with the same `@Transactional` you know from JPA:
 
+```java
 @Transactional
 public void placeOrder(String customerId, Order order) {
     orderRepo.save(order);
     customerRepo.incrementOrderCount(customerId);  // atomic together
 }
+```
 
 Spring maps `@Transactional` onto MongoDB's session-based transactions. Still, the document-model discipline stands: prefer designing for single-document atomicity (embed what must update together), and use transactions for the rare multi-document invariants.
 

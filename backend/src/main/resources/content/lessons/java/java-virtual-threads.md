@@ -17,6 +17,7 @@ docs:
 
 But here's the real problem: most of those threads are **waiting**. They're waiting for a database query, an HTTP call, or a file read. The thread is alive but doing nothing — just consuming memory.
 
+```java
 // This is the blocking model — the thread waits while the database thinks
 public Order getOrder(String id) {
     Order order = database.query(id);     // Thread BLOCKS here — doing NOTHING for 50ms
@@ -29,6 +30,7 @@ public Order getOrder(String id) {
 
 
 **What this code does — step by step:**
+```
 
 1. Virtual threads — millions of cheap threads, scheduled by the JVM
 2. Line 1: Create an executor that gives each task its own virtual thread
@@ -121,11 +123,13 @@ public class OrderController {
 
 ### Rule 1: Never pool virtual threads
 
+```java
 // WRONG — pooling defeats the purpose
 ExecutorService pool = Executors.newFixedThreadPool(100);  // Platform threads
 
 // RIGHT — one virtual thread per task
 ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();  // Virtual threads
+```
 
 Virtual threads are cheap (a few KB each). Pooling them is like pooling objects — you create them when needed and let the GC collect them.
 
@@ -163,7 +167,9 @@ try {
 // For CPU-bound work, use platform threads
 ExecutorService cpuExecutor = Executors.newFixedThreadPool(
     Runtime.getRuntime().availableProcessors()  // One thread per CPU core
+```java
 );
+```
 
 Virtual threads are for I/O-bound work (database, HTTP, file). CPU-bound work (rendering, encryption, heavy computation) doesn't benefit from virtual threads.
 

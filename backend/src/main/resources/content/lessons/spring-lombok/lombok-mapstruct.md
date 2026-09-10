@@ -15,6 +15,7 @@ docs:
 
 Lombok is a Java library that **generates boilerplate code at compile time**. Instead of writing getters, setters, constructors, equals/hashCode, toString, and builders by hand, Lombok generates them for you.
 
+```java
 // WITHOUT Lombok — you write 100+ lines
 public class User {
     private String name;
@@ -47,11 +48,13 @@ public class User {
     private String email;
     private int age;
 }
+```
 
 ### What is MapStruct?
 
 MapStruct is a code generator that creates **type-safe mapping code** between Java objects. Instead of manually copying fields from one object to another, MapStruct generates the mapping code at compile time.
 
+```java
 // WITHOUT MapStruct — manual mapping
 public UserDTO toDTO(User user) {
     UserDTO dto = new UserDTO();
@@ -66,6 +69,7 @@ public UserDTO toDTO(User user) {
 public interface UserMapper {
     UserDTO toDTO(User user);
 }
+```
 
 ---
 
@@ -124,15 +128,20 @@ Order order = Order.builder()
     .shippingAddress("123 Main St")
     .paymentMethod(PaymentMethod.CREDIT_CARD)
     .expedited(true)
+```java
     .build();
 
 // Partial update with builder
+```
 Order updated = order.toBuilder()
     .shippingAddress("456 Oak Ave")
+```java
     .build();
+```
 
 ### @Value — Immutable Objects
 
+```java
 import lombok.Value;
 
 @Value  // Like @Data but immutable (all fields are final, no setters)
@@ -151,9 +160,11 @@ public class Money {
 // Usage
 Money price = new Money(new BigDecimal("29.99"), Currency.USD);
 // price.setAmount(...) — COMPILE ERROR: no setter!
+```
 
 ### @Slf4j — Automatic Logger
 
+```java
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j  // Generates: private static final Logger log = LoggerFactory.getLogger(UserService.class);
@@ -175,9 +186,11 @@ public class UserService {
         log.info("User deleted: {}", id);
     }
 }
+```
 
 ### @ToString — Debug-Friendly Output
 
+```java
 import lombok.ToString;
 
 @ToString(exclude = {"password", "creditCard"})  // Exclude sensitive fields
@@ -190,9 +203,11 @@ public class Customer {
     // toString() outputs: "Customer(name=John, email=john@example.com)"
     // password and creditCard are NOT included
 }
+```
 
 ### @EqualsAndHashCode — Proper Object Comparison
 
+```java
 import lombok.EqualsAndHashCode;
 
 @EqualsAndHashCode(callSuper = true)  // Include parent class fields
@@ -203,6 +218,7 @@ public class PremiumCustomer extends Customer {
 
 // Two PremiumCustomer objects are equal if ALL fields match
 // (including inherited fields from Customer)
+```
 
 ---
 
@@ -387,6 +403,7 @@ public interface OrderMapper {
 
 ### Reverse Mapping
 
+```java
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface ProductMapper {
     
@@ -400,6 +417,7 @@ public interface ProductMapper {
     @Mapping(target = "category", expression = "java(dto.getCategoryId() != null ? categoryRepository.findById(dto.getCategoryId()).orElse(null) : null)")
     Product toEntity(ProductDTO dto);
 }
+```
 
 ---
 
@@ -548,6 +566,7 @@ public class UserController {
 @NamedQueries({
     @NamedQuery(name = "Product.findByCategory",
         query = "SELECT p FROM Product p WHERE p.category = :category")
+```java
 })
 public class Product {
     
@@ -573,8 +592,10 @@ public class Product {
     private Category category;
     
     @Builder.Default  // Default to empty list
+```
     private List<Tag> tags = new ArrayList<>();
     
+```java
     public boolean isInStock() {
         return stockQuantity != null && stockQuantity > 0;
     }
@@ -590,6 +611,7 @@ public class Product {
 // Repository
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
+```
     
     List<Product> findByCategoryName(String categoryName);
     

@@ -28,7 +28,9 @@ Two mental models tell you what to measure:
 - **S**aturation — how much is queued/waiting?
 - **E**rrors — what's failing?
 
+```java
 Apply RED to every service you own; USE to every resource (DB, queue, thread pool).
+```
 
 ## Business Metrics: The Product View
 
@@ -114,12 +116,16 @@ Rules:
 // ❌ Cardinality explosion: one series per user!
 Counter.builder("api.requests")
     .tag("userId", userId)      // 1M users = 1M time series
+```java
     .register(registry);
 
 // ❌ Same: request-scoped values
+```
 Counter.builder("api.requests")
     .tag("requestId", UUID.randomUUID().toString())
+```java
     .register(registry);
+```
 
 Every unique tag combination is a **time series**. Prometheus chokes past ~100k series per instance. Rule of thumb: tags should have < 100 stable values. `userId`, `requestId`, `email` are metrics poison.
 
@@ -127,6 +133,7 @@ Every unique tag combination is a **time series**. Prometheus chokes past ~100k 
 
 Trim and rename metrics centrally with `MeterFilter`:
 
+```java
 @Bean
 public MeterFilter meterFilter() {
     return MeterFilter.denyNameStartsWith("jvm.buffer");          // drop noisy
@@ -142,6 +149,7 @@ public MeterFilter cardinalityGuard() {
     return MeterFilter.maximumAllowableTags("http.server.requests", "uri", 500,
         MeterFilter.deny());
 }
+```
 
 The cardinality guard is a production lifesaver: unbounded URI tags (from user-supplied paths) get dropped past a threshold instead of flooding the backend.
 
@@ -158,6 +166,7 @@ The cardinality guard is a production lifesaver: unbounded URI tags (from user-s
 
 ## Testing Custom Metrics
 
+```java
 @Test
 void placingOrderIncrementsBusinessMetric() {
     checkoutService.placeOrder(cart(100.00));
@@ -168,6 +177,7 @@ void placingOrderIncrementsBusinessMetric() {
     DistributionSummary value = registry.find("checkout.order.value").summary();
     assertEquals(100.0, value.takeSnapshot().max(), 0.001);
 }
+```
 
 ## Summary
 

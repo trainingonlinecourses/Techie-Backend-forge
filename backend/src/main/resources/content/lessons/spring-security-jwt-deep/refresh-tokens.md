@@ -21,7 +21,9 @@ A single long-lived JWT is a liability: a stolen token works until expiry, and y
 - **Access token** — short-lived (5–15 min), carries identity/roles, validated statelessly on every request.
 - **Refresh token** — long-lived (days–weeks), *not* sent on every request; used only to mint **new access tokens**.
 
+```java
 The security math: a stolen access token is useful for minutes (bounded blast radius); a stolen refresh token is still dangerous, but because refresh tokens are **server-side records**, you can *revoke* them — detect theft, rotate them, and kill the session. You get short-token safety with long-session UX.
+```
 
 ## The Flow
 

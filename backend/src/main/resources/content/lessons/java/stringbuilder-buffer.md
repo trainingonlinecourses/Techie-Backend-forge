@@ -15,6 +15,7 @@ docs:
 
 `String` is immutable — every `+` creates a **new** string by copying both operands. In a loop, that's O(n²):
 
+```java
 // WRONG — each iteration allocates a new String and copies everything so far
 String csv = "";
 for (Order o : orders) {
@@ -26,6 +27,7 @@ StringBuilder csv = new StringBuilder(orders.size() * 8);   // pre-size: avoid r
 for (Order o : orders) {
     csv.append(o.id()).append(',');
 }
+```
 
 The single-threaded **`StringBuilder`** is the standard mutable string builder. **`StringBuffer`** is its thread-safe twin — every method synchronized — which costs performance for zero benefit in single-threaded code. **The org rule: `StringBuilder` by default; `StringBuffer` only for genuinely shared, mutable, multi-threaded buffers (nearly never).**
 

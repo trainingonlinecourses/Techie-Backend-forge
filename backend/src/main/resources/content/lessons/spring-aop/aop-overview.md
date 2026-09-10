@@ -18,6 +18,7 @@ Aspect-Oriented Programming (AOP) complements Object-Oriented Programming (OOP) 
 
 Consider logging in a typical application. Without AOP, you'd scatter logging calls throughout every service method:
 
+```java
 @Service
 public class OrderService {
     public Order createOrder(OrderRequest request) {
@@ -46,6 +47,7 @@ public class OrderService {
         }
     }
 }
+```
 
 This violates the **DRY principle** — the logging, timing, and error handling code is identical across methods. AOP lets you extract this into a single, reusable module.
 
@@ -55,6 +57,7 @@ This violates the **DRY principle** — the logging, timing, and error handling 
 
 A **join point** is a point during the execution of a program, such as the execution of a method or the handling of an exception. In Spring AOP, join points always represent **method execution**. This is a key limitation — Spring AOP only supports method-level join points, unlike AspectJ which can intercept field access, constructors, and static initializers.
 
+```java
 // Every public method in this class is a potential join point
 @Service
 public class UserService {
@@ -62,11 +65,13 @@ public class UserService {
     public User create(CreateUserDto dto) { ... }  // join point
     private User mapToEntity(CreateUserDto dto) { ... } // NOT a join point (private)
 }
+```
 
 ### Pointcut
 
 A **pointcut** is a predicate that matches join points. It's the "where" — which join points do you want to intercept? Pointcuts are defined using **pointcut designators** and **expressions**.
 
+```java
 // This pointcut matches all public methods in the service layer
 @Pointcut("execution(public * com.acme.service.*.*(..))")
 public void serviceMethods() {}
@@ -78,6 +83,7 @@ public void methodsWithLongParam() {}
 // This pointcut matches methods annotated with @Transactional
 @Pointcut("@annotation(org.springframework.transaction.annotation.Transactional)")
 public void transactionalMethods() {}
+```
 
 ### Advice
 
@@ -89,6 +95,7 @@ public void transactionalMethods() {}
 4. **@AfterThrowing** — Runs only if the join point throws an exception
 5. **@Around** — Wraps the join point, giving you complete control
 
+```java
 @Aspect
 @Component
 public class LoggingAspect {
@@ -128,21 +135,25 @@ public class LoggingAspect {
         }
     }
 }
+```
 
 ### Aspect
 
 An **aspect** is a modularization of a concern that cuts across multiple classes. It's a class that combines pointcuts and advice. In Spring AOP, aspects are typically implemented as regular Spring beans.
 
+```java
 @Aspect
 @Component
 public class PerformanceMonitoringAspect {
     // Pointcut + Advice = Aspect
 }
+```
 
 ### Introduction (or Inter-type Declaration)
 
 **Introduction** (also called inter-type declaration) allows you to add new methods or fields to existing classes. For example, you might introduce a `Monitorable` interface to classes that should be monitored:
 
+```java
 @Aspect
 @Component
 public class MonitorableIntroduction {
@@ -161,6 +172,7 @@ public class DefaultMonitorable implements Monitorable {
     public boolean isMonitorEnabled() { return enabled; }
     public void setMonitorEnabled(boolean enabled) { this.enabled = enabled; }
 }
+```
 
 ### Weaving
 
@@ -206,9 +218,11 @@ spring:
 
 Or via `@EnableAspectJAutoProxy`:
 
+```java
 @Configuration
 @EnableAspectJAutoProxy(proxyTargetClass = true)
 public class AopConfig {}
+```
 
 ## Pointcut Designators
 
@@ -374,6 +388,7 @@ For more advanced needs, consider **AspectJ** which supports compile-time and lo
 
 ## Testing Aspects
 
+```java
 @SpringBootTest
 class LoggingAspectTest {
     
@@ -391,6 +406,7 @@ class LoggingAspectTest {
         assertTrue(logAppender.contains("Exiting: UserService.findById"));
     }
 }
+```
 
 ## Summary
 

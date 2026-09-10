@@ -125,12 +125,14 @@ Tests need the schema. Options:
 
 1. **Flyway migrations run against the Testcontainers DB** — the tests use the *same* migrations as production. This is the gold standard: migrations are tested before they ever hit prod.
 
+```java
 @DataJdbcTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class ... {
     @Container @ServiceConnection static PostgreSQLContainer<?> postgres = ...;
     // Flyway auto-runs the migrations; schema is production-identical
 }
+```
 
 2. **`spring.sql.init`** — simple `schema.sql`/`data.sql` for throwaway tests.
 

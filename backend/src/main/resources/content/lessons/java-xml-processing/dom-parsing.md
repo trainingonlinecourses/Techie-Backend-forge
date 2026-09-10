@@ -85,6 +85,7 @@ DocumentBuilder builder = factory.newDocumentBuilder();
 
 ### Step 2: Parse XML into a Document
 
+```java
 // Parse from a file
 Document doc = builder.parse(new File("employees.xml"));
 
@@ -95,6 +96,7 @@ Document doc = builder.parse(new InputSource(new StringReader(xmlString)));
 Document doc = builder.parse(connection.getInputStream());
 
 **What happens internally:**
+```
 1. The parser reads the XML byte stream
 2. Validates against the DTD/XSD if configured
 3. Builds a complete tree of Node objects
@@ -148,6 +150,7 @@ public class Main {
 - `getElementsByTagName("name")` — searches ALL descendants recursively. If a grandchild element is also named "name", it gets included.
 - `getChildNodes()` — returns only direct children (including text nodes and whitespace nodes).
 
+```java
 public class Main {
 
     public static void main(String[] args) {
@@ -162,6 +165,7 @@ public class Main {
         }
     }
 }
+```
 
 ### Step 4: Modify the Document
 
@@ -210,14 +214,17 @@ firstEmp.getElementsByTagName("role").item(0).setTextContent("Lead Developer");
 
 ### Step 5: Serialize Back to XML
 
+```java
 // Create a Transformer that converts DOM tree back to XML text
 TransformerFactory tf = TransformerFactory.newInstance();
 Transformer transformer = tf.newTransformer();
 
 // Optional: make it pretty-printed
 transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+```
 transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
 
+```java
 // Write to a file
 DOMSource source = new DOMSource(doc);
 StreamResult result = new StreamResult(new File("employees-modified.xml"));
@@ -227,6 +234,7 @@ transformer.transform(source, result);
 StringWriter writer = new StringWriter();
 transformer.transform(source, new StreamResult(writer));
 String xmlString = writer.toString();
+```
 
 ---
 
@@ -235,6 +243,7 @@ String xmlString = writer.toString();
 ### Scenario 1: Configuration File Management
 Many enterprises store application configuration in XML. DOM is perfect for reading AND modifying these files:
 
+```java
 public class ConfigManager {
     private Document configDoc;
     private File configFile;
@@ -280,6 +289,7 @@ ConfigManager config = new ConfigManager("app-config.xml");
 System.out.println(config.getValue("database", "url"));   // jdbc:postgresql://...
 config.setValue("database", "pool-size", "20");
 config.save();
+```
 
 ### Scenario 2: SOAP Response Processing
 Legacy enterprise systems often communicate via SOAP XML:
@@ -303,6 +313,7 @@ public OrderStatus parseSoapResponse(String soapXml) throws Exception {
 ### Scenario 3: Build Pipeline Configuration
 Maven's `pom.xml` is itself parsed with DOM-like APIs. You might need to read or modify build configs programmatically:
 
+```java
 public void addDependency(Document pomDoc, String groupId, String artifactId, String version) {
     NodeList deps = pomDoc.getElementsByTagName("dependencies");
     Element dependencies = (Element) deps.item(0);
@@ -315,6 +326,7 @@ public void addDependency(Document pomDoc, String groupId, String artifactId, St
     dep.appendChild(g); dep.appendChild(a); dep.appendChild(v);
     dependencies.appendChild(dep);
 }
+```
 
 ---
 

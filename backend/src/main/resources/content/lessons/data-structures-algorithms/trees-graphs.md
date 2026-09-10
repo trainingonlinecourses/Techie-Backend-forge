@@ -18,11 +18,13 @@ docs:
 
 Lists and maps organize data *linearly*. **Trees and graphs** organize *relationships* — and they're everywhere in software: file systems (directories nest), HTML (the DOM), databases (indexes are trees), social networks (friendship graphs), routing (pathfinding), and dependency resolution (which packages depend on which).
 
+```java
 **The tree** is a hierarchy: one **root** node, and every other node has exactly one **parent**. No cycles, no loops — following parents always leads to the root. It's the org chart, the folder structure, the family tree.
 
 **The graph** is a network: nodes (**vertices**) connected by **edges**, with no such restriction. Anything can connect to anything, cycles are allowed. It's the road map, the social network, the dependency graph. A tree is actually a *special case* of a graph (a connected, acyclic graph).
 
 **The mental model:** a tree is one-way streets in a hierarchy — every node knows its parent, and there's exactly one path from root to any node. A graph is a road network — many routes, many loops, and you may need to *search* for a path. Trees let you navigate by following structure; graphs require you to explore.
+```
 
 ## A Binary Tree in Java
 
@@ -190,7 +192,9 @@ Graphs are stored two ways, and the choice matters:
 
 ## Recap
 
+```java
 Trees are rooted hierarchies with one parent per node and no cycles; binary search trees impose ordering (left < node < right) to get O(log n) search and sorted in-order traversal — provided they stay balanced (that's what red-black trees and B-trees do). Graphs are unrestricted networks explored by BFS (queue, shortest paths, O(V+E)) or DFS (stack/recursion, path existence, cycles), represented as adjacency lists or matrices. Every "dependency", "route", and "hierarchy" problem in software is one of these two shapes — and choosing the right traversal and representation is most of the battle.
+```
 
 ## References
 

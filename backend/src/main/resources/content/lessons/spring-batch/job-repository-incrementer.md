@@ -43,10 +43,12 @@ JobParameters params = new JobParametersBuilder()
     .addString("input.file", "/data/orders-2024-01-15.csv")
     .addDate("process.date", LocalDate.now())
     .addLong("run.id", System.currentTimeMillis())  // Unique run identifier
+```java
     .toJobParameters();
 
 // Launch the job
 JobExecution execution = jobLauncher.run(processOrdersJob, params);
+```
 
 ### Parameter Types
 
@@ -118,6 +120,7 @@ public class DailyDateIncrementer implements JobParametersIncrementer {
 
 // If a job fails, you can restart it from where it stopped
 JobExecution lastExecution = jobRepository.getLastJobExecution(
+```java
     jobInstance, jobParameters);
 
 if (lastExecution != null && lastExecution.getStatus() == BatchStatus.FAILED) {
@@ -125,6 +128,7 @@ if (lastExecution != null && lastExecution.getStatus() == BatchStatus.FAILED) {
     // It will restart from the last successful chunk
     jobLauncher.run(failedJob, jobParameters);
 }
+```
 
 ### Controlling Restart
 
@@ -155,12 +159,14 @@ public class DailyReportJobConfig {
             .start(reportStep)
             .incrementer(new RunIdIncrementer())  // Allow re-runs
             .preventRestart()                     // Don't restart failed reports
+```java
             .build();
     }
 
     @Bean
     public Step reportStep(JobRepository jobRepository, PlatformTransactionManager txManager) {
         return new StepBuilder("reportStep", jobRepository)
+```
             .<SalesData, Report>chunk(500, txManager)
             .reader(salesDataReader())
             .processor(reportProcessor())
@@ -179,12 +185,14 @@ public class DataMigrationConfig {
         return new JobBuilder("dataMigration", jobRepository)
             .start(migrateStep)
             .incrementer(new RunIdIncrementer())
+```java
             .build();  // Can restart if it fails mid-migration
     }
 
     @Bean
     public Step migrateStep(JobRepository jobRepository, PlatformTransactionManager txManager) {
         return new StepBuilder("migrateStep", jobRepository)
+```
             .<LegacyUser, ModernUser>chunk(200, txManager)
             .reader(legacyUserReader())
             .processor(userConverter())

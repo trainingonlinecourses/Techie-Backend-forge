@@ -38,6 +38,7 @@ JPA's magic — "I changed the field and it saved itself" — is the **persisten
 
 ## What "Managed" Means
 
+```java
 @Transactional
 public void updateTitle(Long id, String title) {
     Course course = courseRepository.findById(id).orElseThrow();
@@ -48,6 +49,7 @@ public void updateTitle(Long id, String title) {
     // At flush/commit, Hibernate dirty-checks and issues:
     //   UPDATE courses SET title = ? WHERE id = ?
 }
+```
 
 **Dirty checking**: Hibernate snapshots the entity state at load; at flush it compares — changed fields generate UPDATEs. The `save()` call on a managed entity is a **no-op** (it just returns the same managed instance).
 
@@ -55,6 +57,7 @@ public void updateTitle(Long id, String title) {
 
 The persistence context is also a **cache**: the same entity loaded twice returns the same instance.
 
+```java
 @Transactional
 public void demonstrateCache() {
     Course a = courseRepository.findById(1L).orElseThrow();
@@ -63,6 +66,7 @@ public void demonstrateCache() {
     assertSame(a, b);          // SAME instance — only ONE query ran
     // SELECT ran once; the second find hit the context
 }
+```
 
 This is why two loads of the same entity can't drift — they're the same object until flushed.
 
@@ -75,6 +79,7 @@ This is why two loads of the same entity can't drift — they're the same object
 | Explicit `flush()` | Your code forces it |
 | `IDENTITY` insert | Immediately (must get the id) |
 
+```java
 @Transactional
 public void flushExamples() {
     Course c = new Course("Spring");
@@ -84,6 +89,7 @@ public void flushExamples() {
     entityManager.flush();             // force the INSERT now
     Long idAfter = c.getId();          // now populated
 }
+```
 
 **The classic surprise**: with `SEQUENCE` ids, `save()` doesn't return an id until flush. With `IDENTITY`, the INSERT fires immediately (which kills batch inserts — see the mapping lesson).
 
@@ -95,8 +101,10 @@ Dirty checking happens for **every managed entity at flush**. With a huge first-
 @Transactional(readOnly = true)
 public List<Course> list() { ... }      // Hibernate skips dirty checks
 
+```java
 // Or detach: stop tracking
 entityManager.detach(course);
+```
 
 ## Detached Entities: The Merge Pattern
 
@@ -128,6 +136,7 @@ public void update(CourseDto dto) {
 
 ## Clearing the Context
 
+```java
 @Transactional
 public void processAll() {
     for (Course c : courseRepository.findAll()) {
@@ -136,6 +145,7 @@ public void processAll() {
     }
     // without clearing, the context holds every processed course in memory
 }
+```
 
 For long loops, `clear()` (or batch-size-flush patterns) prevents memory blowup — the persistence context would otherwise keep every entity alive until commit.
 
@@ -144,11 +154,13 @@ For long loops, `clear()` (or batch-size-flush patterns) prevents memory blowup 
 The persistence context defines the lazy-loading window:
 
 // ❌ Lazy access after the tx → LazyInitializationException
+```java
 public CourseDto getCourse(Long id) {
     Course c = courseRepository.findById(id).orElseThrow();
     // tx ends here (no @Transactional)
     return new CourseDto(c, c.getLessons().size());   // 💥 no session
 }
+```
 
 ## Summary
 

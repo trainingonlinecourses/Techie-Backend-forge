@@ -16,7 +16,9 @@ docs:
 
 Every HTTP message has a body (the content) and **headers** — the *metadata* that tells both sides how to interpret it: what format the body is in, who's sending it, how long it can be cached, what's allowed next.
 
+```java
 Think of mailing a package: the letter is the body; the envelope's stamps, labels, and return address are the headers. The post office (and the receiver) act on the envelope *before* opening the letter — that's exactly how proxies, caches, and servers treat headers.
+```
 
 Headers come in three flavors:
 

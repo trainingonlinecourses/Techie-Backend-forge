@@ -110,10 +110,13 @@ Four statuses are first-class:
 | `OUT_OF_SERVICE` | Intentionally stopped (maintenance) | Stop routing, don't restart |
 | `UNKNOWN` | Can't determine | Treat as unhealthy |
 
+```java
 Health.outOfService().withDetail("reason", "scheduled maintenance").build();
+```
 
 ## Timeout Discipline
 
+```java
 Health checks run on the scheduler thread; a slow dependency makes health checks pile up. Always bound the check:
 
 @Override
@@ -125,6 +128,7 @@ public Health health() {
         return Health.down().withDetail("reason", "timeout after 1.5s").build();
     }
 }
+```
 
 ## Health Groups
 
@@ -195,11 +199,13 @@ class HealthTest {
     void healthReportsUp() throws Exception {
         mockMvc.perform(get("/actuator/health"))
             .andExpect(status().isOk())
+```java
             .andExpect(jsonPath("$.status").value("UP"));
     }
 
     @Test
     void readinessIncludesCustomIndicator() throws Exception {
+```
         mockMvc.perform(get("/actuator/health/readiness"))
             .andExpect(jsonPath("$.components.paymentGateway.status").exists());
     }

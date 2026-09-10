@@ -109,6 +109,7 @@ public class Main {
 
 ## The hidden cost — memory leak trap
 
+```java
 // DANGER: intern() in a loop can fill the pool and crash the JVM
 for (int i = 0; i < 1_000_000; i++) {
     String unique = new String("user-" + i);  // each is unique content
@@ -117,6 +118,7 @@ for (int i = 0; i < 1_000_000; i++) {
 }
 
 **Why this happens:** The pool lives in Metaspace (native memory), which is limited. Each interned string stays forever (or until GC runs a Full GC). In a loop creating millions of unique strings, the pool explodes.
+```
 
 ## Modern Java — the pool is less important
 

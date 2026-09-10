@@ -14,13 +14,17 @@ Before Java 10 (available in Java 11 LTS), you had to declare the type of every 
 
 Map<String, List<Order>> ordersByCustomer = new HashMap<>();
 List<String> names = Arrays.asList("Alice", "Bob");
+```java
 HttpClient client = HttpClient.newHttpClient();
+```
 
 Java 10 introduced `var` — the compiler infers the type from the right-hand side:
 
 var ordersByCustomer = new HashMap<String, List<Order>>();  // inferred as HashMap<String, List<Order>>
 var names = Arrays.asList("Alice", "Bob");                   // inferred as List<String>
+```java
 var client = HttpClient.newHttpClient();                      // inferred as HttpClient
+```
 
 **Key rule:** `var` only works for **local variables** with an initializer. NOT for fields, method parameters, or return types.
 
@@ -155,9 +159,11 @@ public void processOrder(String orderId) {
 
     var items = order.getItems().stream()
         .filter(item -> item.getQuantity() > 0)
+```java
         .toList();
 
     var total = items.stream()
+```
         .mapToDouble(Item::getPrice)
         .sum();
 

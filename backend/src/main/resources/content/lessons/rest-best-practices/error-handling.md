@@ -62,6 +62,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(CourseNotFoundException.class)
     public ProblemDetail handleNotFound(CourseNotFoundException ex) {
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(
+```java
             HttpStatus.NOT_FOUND, ex.getMessage());
         problem.setTitle("Course not found");
         problem.setProperty("courseId", ex.getCourseId());
@@ -71,7 +72,9 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(DuplicateCourseCodeException.class)
     public ProblemDetail handleDuplicate(DuplicateCourseCodeException ex) {
+```
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(
+```java
             HttpStatus.CONFLICT, ex.getMessage());
         problem.setTitle("Duplicate course code");
         return problem;
@@ -79,7 +82,9 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ProblemDetail handleIllegal(IllegalArgumentException ex) {
+```
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(
+```java
             HttpStatus.BAD_REQUEST, ex.getMessage());
         problem.setTitle("Invalid request");
         return problem;
@@ -88,6 +93,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ProblemDetail handleUnexpected(Exception ex) {
         log.error("Unexpected error", ex);
+```
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(
             HttpStatus.INTERNAL_SERVER_ERROR, "Something went wrong");
         problem.setTitle("Internal Server Error");
@@ -102,8 +108,10 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 @ExceptionHandler(MethodArgumentNotValidException.class)
 public ProblemDetail handleValidation(MethodArgumentNotValidException ex) {
     ProblemDetail problem = ProblemDetail.forStatusAndDetail(
+```java
         HttpStatus.BAD_REQUEST, "Validation failed");
     problem.setTitle("Validation error");
+```
     problem.setProperty("fieldErrors", ex.getBindingResult().getFieldErrors().stream()
         .map(e -> Map.of(
             "field", e.getField(),
@@ -154,8 +162,10 @@ public class GlobalExceptionHandler {
     public ProblemDetail handleUnexpected(Exception ex) {
         String traceId = tracer.currentSpan() != null
             ? tracer.currentSpan().context().traceId()
+```java
             : "unknown";
         log.error("Unexpected error [traceId={}]", traceId, ex);
+```
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(
             HttpStatus.INTERNAL_SERVER_ERROR, "Something went wrong");
         problem.setProperty("traceId", traceId);
@@ -167,6 +177,7 @@ public class GlobalExceptionHandler {
 
 Prefer meaningful domain exceptions over ad-hoc `IllegalStateException`s:
 
+```java
 public class CourseNotFoundException extends RuntimeException {
     private final String courseId;
     public CourseNotFoundException(String courseId) {
@@ -177,6 +188,7 @@ public class CourseNotFoundException extends RuntimeException {
 }
 
 Throw them from the service layer; the advice maps them. Services stay decoupled from HTTP.
+```
 
 ## Testing Error Responses
 
@@ -192,14 +204,18 @@ class ErrorHandlingTest {
             .andExpect(status().isNotFound())
             .andExpect(jsonPath("$.status").value(404))
             .andExpect(jsonPath("$.title").value("Course not found"))
+```java
             .andExpect(jsonPath("$.courseId").value("nope"));
     }
 
     @Test
     void invalidBodyReturnsFieldErrors() throws Exception {
+```
         mockMvc.perform(post("/api/courses")
                 .contentType(MediaType.APPLICATION_JSON)
+```java
                 .content("{\"title\":\"\"}"))
+```
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$.fieldErrors[0].field").value("title"));
     }
@@ -217,7 +233,9 @@ class ErrorHandlingTest {
 | Leakage | Never expose internals; log them server-side |
 | Tests | Assert the JSON shape, not just the status |
 
+```java
 Consistent errors are a feature — they cut support cost, enable good client SDKs, and make your API pleasant to integrate against. Spend the 30 minutes on the advice class; it pays back on every endpoint.
+```
 
 ## References
 

@@ -41,6 +41,7 @@ Every custom endpoint is a Spring bean annotated with `@Endpoint`. Inside it, yo
 
 Let's build an endpoint that monitors a message queue:
 
+```java
 package com.example.actuator;
 
 import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
@@ -52,6 +53,7 @@ import org.springframework.stereotype.Component;
 import java.util.Map;
 
 /**
+```
  * Custom Actuator endpoint at /actuator/queueHealth
  * 
  * Shows queue depth, consumer lag, and error rate
@@ -115,6 +117,7 @@ public class QueueHealthEndpoint {
      * 
      * @WriteOperation — changes state.
      * Returns true if the pause succeeded.
+```java
      */
     @WriteOperation
     public boolean pauseQueue(@Selector String queueName) {
@@ -122,6 +125,7 @@ public class QueueHealthEndpoint {
     }
 
     /**
+```
      * DELETE /actuator/queueHealth/{queueName}
      * 
      * @DeleteOperation — removes data (e.g., clears the queue).
@@ -140,11 +144,13 @@ public class QueueHealthEndpoint {
 - `@Component` — Registers this as a Spring bean so it gets picked up automatically
 - `@Endpoint(id = "queueHealth")` — Tells Actuator this is a custom endpoint. The `id` becomes the URL: `/actuator/queueHealth`
 
+```java
     private final QueueMonitor monitor;
 
     public QueueHealthEndpoint(QueueMonitor monitor) {
         this.monitor = monitor;
     }
+```
 - Constructor injection of your `QueueMonitor` service. This is how your endpoint accesses real application data.
 
     @ReadOperation
@@ -189,6 +195,7 @@ A common pattern is using `@Selector` with path variables:
  *   GET /actuator/queueHealth              → all queues
  *   GET /actuator/queueHealth/orders       → orders queue
  *   GET /actuator/queueHealth/orders/latency → specific metric
+```java
  */
 @Endpoint(id = "queueHealth")
 @Component
@@ -205,6 +212,7 @@ public class QueueHealthEndpoint {
             @Selector String name,
             @Selector String metric) { ... }
 }
+```
 
 ---
 
@@ -230,12 +238,14 @@ public class RateLimiterEndpoint {
             "remaining", limiter.getRemaining(),
             "resetAt", limiter.getResetTime().toString(),
             "topClients", limiter.getTopClients(5)
+```java
         );
     }
 
     @ReadOperation
     public Map<String, Object> clientStatus(@Selector String clientId) {
         return Map.of(
+```
             "clientId", clientId,
             "used", limiter.getClientUsage(clientId),
             "limit", limiter.getClientLimit(clientId),
@@ -282,11 +292,13 @@ class QueueHealthEndpointTest {
         .then()
             .statusCode(200)
             .body("orders.status", notNullValue())
+```java
             .body("notifications.depth", greaterThanOrEqualTo(0));
     }
 
     @Test
     void shouldReturnSingleQueueHealth() {
+```
         given()
             .baseUri("http://localhost:" + port)
         .when()

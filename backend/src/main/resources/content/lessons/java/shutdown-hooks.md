@@ -30,6 +30,7 @@ When the JVM receives a shutdown signal:
 4. If a hook throws, the JVM may skip remaining hooks.
 5. After hooks complete (or timeout), the JVM exits.
 
+```java
 public class Application {
 
     public static void main(String[] args) {
@@ -55,6 +56,7 @@ public class Application {
 }
 
 **Order is NOT guaranteed.** Hooks run concurrently in separate threads. If broker depends on the database being available during shutdown, you need explicit ordering within the hooks.
+```
 
 ## Ordering shutdown hooks
 
@@ -68,10 +70,12 @@ public class ShutdownManager {
 
     public void init() {
         Runtime.getRuntime().addShutdownHook(new Thread(this::shutdown));
+```java
     }
 
     private void shutdown() {
         // Run in reverse registration order — last registered shuts down first
+```
         List<Runnable> reversed = new ArrayList<>(shutdownActions);
         Collections.reverse(reversed);
 
@@ -94,6 +98,7 @@ manager.init();
 
 ## System.exit() and hooks
 
+```java
 public static void main(String[] args) {
     Runtime.getRuntime().addShutdownHook(new Thread(() -> {
         System.out.println("Hook running");  // THIS WILL execute
@@ -103,6 +108,7 @@ public static void main(String[] args) {
     System.exit(0);  // triggers hooks, then JVM exits
     System.out.println("After exit");  // NEVER reached
 }
+```
 
 `System.exit(0)` triggers orderly shutdown (hooks run). `System.halt(0)` forces immediate termination (hooks are skipped).
 
@@ -135,6 +141,7 @@ When Kubernetes sends SIGTERM, Spring:
 
 ### Scenario 2: deregister from service discovery
 
+```java
 @Component
 public class ServiceRegistryHook {
 
@@ -152,9 +159,11 @@ public class ServiceRegistryHook {
         System.out.println("Deregistered from service discovery");
     }
 }
+```
 
 ### Scenario 3: flushing audit logs
 
+```java
 @Component
 public class AuditFlushHook {
 
@@ -167,6 +176,7 @@ public class AuditFlushHook {
         System.out.println("Audit logs flushed");
     }
 }
+```
 
 ## Spring @PreDestroy vs shutdown hooks
 
@@ -178,6 +188,7 @@ Spring's `@PreDestroy` is NOT a shutdown hook. It runs during Spring's context c
 4. Spring destroys beans (calling `@PreDestroy` methods).
 5. Spring stops the embedded server.
 
+```java
 @Component
 public class MyService {
 
@@ -188,6 +199,7 @@ public class MyService {
         // But HTTP server is still running
     }
 }
+```
 
 ## Common mistakes
 

@@ -18,6 +18,7 @@ Think of a news subscription. You don't call the newspaper every morning asking 
 
 In code, this solves a fundamental coupling problem. Consider a `UserService` that creates a user. Without observers:
 
+```java
 void createUser(User u) {
     repo.save(u);
     emailService.sendWelcome(u);        // UserService KNOWS about email
@@ -25,11 +26,14 @@ void createUser(User u) {
     auditLog.record(u);                 // ...and audit
     // adding a 5th consequence = editing UserService again
 }
+```
 
 `UserService` is coupled to every downstream concern, and every new concern edits it. With observers, `UserService` just publishes an event ("a user was created") and knows nothing about who listens:
 
+```java
 // UserService: publishes; has NO knowledge of listeners
 eventPublisher.publish(new UserCreatedEvent(u));
+```
 
 Email, analytics, and audit each become *observers* that subscribe to `UserCreatedEvent` — added and removed without touching `UserService`. This is **decoupling**: the producer and consumers depend only on the *event type*, never on each other.
 

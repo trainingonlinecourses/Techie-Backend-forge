@@ -12,12 +12,14 @@ docs:
 
 `NullPointerException` is the most common runtime error in Java. Tony Hoare, who invented null calls it his "billion-dollar mistake."
 
+```java
 // DANGEROUS: Any of these can throw NullPointerException
 String name = employee.getDepartment().getManager().getName();
 
 **Optional** is a container that represents a value that *might or might not exist*. It forces you to handle the absence case explicitly:
 
 // SAFE: Optional forces you to handle the empty case
+```
 Optional<String> name = Optional.ofNullable(employee)
     .map(Employee::getDepartment)
     .map(Department::getManager)
@@ -31,8 +33,10 @@ Optional<String> name = Optional.ofNullable(employee)
 // Present value — never null
 Optional<String> present = Optional.of("hello");
 
+```java
 // Nullable value — might be null
 String maybeNull = someMethod();
+```
 Optional<String> nullable = Optional.ofNullable(maybeNull);
 
 // Empty — definitely no value
@@ -150,11 +154,15 @@ public Optional<User> findById(String id) {
 
 // Usage — no NPE possible
 User user = userRepository.findById(userId)
+```java
     .orElseThrow(() -> new NotFoundException("User not found: " + userId));
+```
 
 String displayName = userRepository.findById(userId)
     .map(User::getDisplayName)
+```java
     .orElse("Anonymous");
+```
 
 ### Scenario 2: Configuration with fallback chain
 

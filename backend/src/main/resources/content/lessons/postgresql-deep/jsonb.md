@@ -50,6 +50,7 @@ CREATE TABLE course_metadata (
 
 ## Writing JSONB
 
+```java
 @Entity
 public class CourseMetadata {
 
@@ -58,6 +59,7 @@ public class CourseMetadata {
     @JdbcTypeCode(SqlTypes.JSON)          // Hibernate 6+ maps String ↔ jsonb
     private String attributes;            // JSON text in the entity
 }
+```
 
 ```sql
 INSERT INTO course_metadata (course_id, attributes)
@@ -142,6 +144,7 @@ WHERE course_id = 1;
 
 The winning pattern — strict rows + JSONB extras:
 
+```java
 @Entity
 public class Course {
 
@@ -152,6 +155,7 @@ public class Course {
     @JdbcTypeCode(SqlTypes.JSON)
     private String metadata;            // jsonb: flexible extras
 }
+```
 
 ```sql
 -- Hybrid query: indexed column + jsonb filter
@@ -186,8 +190,10 @@ class JsonbTest {
     void findsByNestedAttribute() {
         jdbcTemplate.update("""
             INSERT INTO course_metadata (course_id, attributes)
+```java
             VALUES (1, '{"tags":["java"],"rating":4.8}')
             """);
+```
 
         List<Long> ids = jdbcTemplate.query("""
             SELECT course_id FROM course_metadata

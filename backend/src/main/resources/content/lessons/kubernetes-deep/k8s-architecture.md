@@ -75,7 +75,9 @@ spec:
         - containerPort: 8080
 ```
 
+```java
 **Why pods and not bare containers?** The pod is the scheduling unit — Kubernetes schedules pods, not containers. It gives containers in the same pod a shared identity (IP, localhost, shared volumes) — the pattern for sidecars (a logging sidecar next to the app container). The key facts: **each pod gets its own IP**; **pods are ephemeral** — treat them as cattle (they die and are replaced, with new IPs); and the stable way to reach pods is the *Service*, not the pod IP.
+```
 
 ## Declarative State: The Core Loop
 

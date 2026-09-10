@@ -49,7 +49,9 @@ new FlatFileItemWriterBuilder<Order>()
     .names("id", "customer", "amount")
     .headerCallback(w -> w.write("id,customer,amount"))
     .shouldDeleteIfEmpty(true)
+```java
     .build();
+```
 
 Write to a **staging name first, then rename** (`.transactional` + append-to-target patterns exist for this) — a half-written target file on a crashed run is the classic flat-file writer failure.
 
@@ -59,14 +61,18 @@ new JsonItemReaderBuilder<Order>()
     .name("jsonReader")
     .resource(new FileSystemResource("/data/orders.json"))
     .jsonObjectReader(new JacksonJsonObjectReader<>(Order.class))
+```java
     .build();
 
 // Process every file in an FTP drop directory:
+```
 new MultiResourceItemReaderBuilder<Order>()
     .name("allFiles")
     .resources(fileSystemResources)   // Resource[] — use a pattern like /drop/*.csv
     .delegate(singleFileReader())     // the per-file reader
+```java
     .build();
+```
 
 `MultiResourceItemReader` feeds each resource through the delegate sequentially — the pattern for directory-based ingestion.
 
@@ -82,7 +88,9 @@ Some jobs need header/footer records (a total line). Use **state in the processo
 
 new FlatFileItemWriterBuilder<Order>()
     .footerCallback(w -> w.write("total," + totalService.sum()))
+```java
     .build();
+```
 
 ## Key takeaways
 

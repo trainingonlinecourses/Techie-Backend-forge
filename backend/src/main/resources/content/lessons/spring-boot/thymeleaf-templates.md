@@ -35,7 +35,9 @@ public class GreetingController {
     @GetMapping("/greeting")
     public String greeting(Model model) {       // Model = bag of key/value pairs for the template
         model.addAttribute("username", "Amy");  // template reads this as ${username}
+```java
         model.addAttribute("today", LocalDate.now());
+```
         return "greeting";                      // logical view name → templates/greeting.html
     }
 }
@@ -61,11 +63,13 @@ Line by line:
 
 ## Iteration & Conditionals
 
+```java
 @GetMapping("/orders")
 public String orders(Model model) {
     model.addAttribute("orders", orderService.findAll());
     return "order-list";
 }
+```
 
 ```html
 <tr th:each="order : ${orders}">                        <!-- loop over the list -->
@@ -150,7 +154,9 @@ Fragments are how template projects get a shared navbar/footer without a JS fram
 
 **Scenario 2 — Transactional emails.** Order confirmation emails are Thymeleaf templates rendered with `TemplateEngine.process(...)` then sent via SMTP — same templating skills reused outside the browser.
 
+```java
 **Scenario 3 — SEO-critical public pages.** Product listing pages must be crawlable with fast first paint. Server-rendered Thymeleaf ships complete HTML instantly; an SPA would need extra SSR infrastructure for the same result.
+```
 
 ## Common Mistakes
 

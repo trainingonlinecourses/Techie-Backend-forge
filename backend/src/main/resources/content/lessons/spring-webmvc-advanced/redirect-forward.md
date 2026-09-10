@@ -18,6 +18,7 @@ A controller returning a view or a URL can do two very different things:
 - **Forward** — the *server* internally dispatches to another handler; the browser never knows; the URL bar doesn't change; one request round-trip.
 - **Redirect** — the server replies `302 Found` (or `303 See Other`, `307`, `308`) with a `Location` header; the *browser* then issues a fresh GET to that location; the URL changes; two round-trips.
 
+```java
 @GetMapping("/old-path")
 public String forwardToNew() {
     return "forward:/new-path";      // internal dispatch — same request
@@ -27,6 +28,7 @@ public String forwardToNew() {
 public String redirectToNew() {
     return "redirect:/new-path";     // HTTP 302 + Location — browser follows
 }
+```
 
 The distinction matters for **POST/Redirect/GET (PRG)** — the canonical form-handling pattern.
 
@@ -41,6 +43,7 @@ When a browser POSTs a form and the server responds with a *rendered page direct
 4. Refresh → re-GETs /orders/123     ← harmless, idempotent
 ```
 
+```java
 @PostMapping("/orders")
 public String createOrder(@Valid @ModelAttribute OrderForm form,
                           RedirectAttributes attrs) {
@@ -48,6 +51,7 @@ public String createOrder(@Valid @ModelAttribute OrderForm form,
     attrs.addFlashAttribute("success", "Order " + id + " created");
     return "redirect:/orders/" + id;      // PRG — never render directly after a POST
 }
+```
 
 The success message survives the redirect because it rides in **flash attributes**.
 
@@ -55,6 +59,7 @@ The success message survives the redirect because it rides in **flash attributes
 
 Flash attributes live in the session for exactly one redirect: set them before the `redirect:`, and the *next* request (the redirected GET) reads them once, then they're gone:
 
+```java
 @PostMapping("/orders")
 public String createOrder(...) {
     attrs.addFlashAttribute("message", "Order created");   // visible only on next request
@@ -66,11 +71,13 @@ public String listOrders(Model model) {
     // model now contains "message" automatically — from the flash
     // (Spring merges flash attributes into the model on the receiving handler)
 }
+```
 
 This is the correct way to pass success/error messages after a redirect — **never** via query string (leaks in URLs, history, logs) and never via the session as a manual attribute (leaks when not cleared).
 
 ## RedirectView and explicit responses
 
+```java
 @GetMapping("/shortlink/{code}")
 public RedirectView resolve(@PathVariable String code) {
     Link l = linkRepo.findByCode(code).orElseThrow();
@@ -78,6 +85,7 @@ public RedirectView resolve(@PathVariable String code) {
     rv.setStatusCode(HttpStatus.MOVED_PERMANENTLY);   // 301 — permanent link, cacheable
     return rv;
 }
+```
 
 - `RedirectView` gives programmatic control (status code, context-relative vs absolute, `http10Compatible`).
 - A `String` return with `redirect:` prefix is the common idiom; `RedirectView` when you need the explicit status (301 vs 302).
@@ -85,6 +93,7 @@ public RedirectView resolve(@PathVariable String code) {
 
 ## How we use it in an organization: the scenarios
 
+```java
 **Scenario 1 — legacy URL migration.** Old paths redirect (301) to new ones so bookmarks, links, and SEO equity transfer:
 
 @GetMapping("/products/item/{oldId}")
@@ -92,6 +101,7 @@ public RedirectView legacy(@PathVariable String oldId) {
     return new RedirectView("/products/" + catalog.rebase(oldId), true, false, false);
     // 301 so search engines update their indexes
 }
+```
 
 **Scenario 2 — login flow redirect-after-auth.** Spring Security's `defaultSuccessUrl("/dashboard", true)` uses `alwaysUse` to redirect to the intended page; `SavedRequest` preserves the originally-requested URL across the login round-trip — the "redirect back where I was" behavior.
 

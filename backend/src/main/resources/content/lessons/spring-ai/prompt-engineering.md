@@ -57,12 +57,14 @@ public class PromptPatterns {
                 """)
             .user("Explain " + topic)
             .call()
+```java
             .content();
     }
 
     // Pattern 2: Chain of Thought (step-by-step reasoning)
     public String solveProblem(String problem) {
         return chatClient.prompt()
+```
             .system("""
                 You are a problem solver. Think step by step:
                 1. Identify the key information
@@ -73,12 +75,14 @@ public class PromptPatterns {
                 """)
             .user(problem)
             .call()
+```java
             .content();
     }
 
     // Pattern 3: Output format control
     public String generateStructured(String task) {
         return chatClient.prompt()
+```
             .system("""
                 Generate output in EXACTLY this JSON format:
                 {
@@ -106,12 +110,16 @@ public String classifyCode(String codeSnippet) {
             Here are examples of correct classifications:
 
             Example 1:
+```java
             Input: "public class Singleton { private static Singleton instance; private Singleton(){} public static Singleton getInstance(){ if(instance==null) instance=new Singleton(); return instance; } }"
             Output: {"pattern": "Singleton", "confidence": 0.95, "explanation": "Private constructor + static getInstance = classic Singleton"}
+```
 
             Example 2:
             Input: "public interface Observer { void update(String event); } public class EventBus { private List<Observer> observers = new ArrayList<>(); public void notify(String event) { observers.forEach(o -> o.update(event)); } }"
+```java
             Output: {"pattern": "Observer", "confidence": 0.90, "explanation": "Subject maintains list of observers, notifies on events"}
+```
 
             Now classify this code:
             """)
@@ -131,12 +139,16 @@ public class PromptTemplateService {
     public String generateLesson(LessonRequest request) {
         return chatClient.prompt()
             .system("""
+```java
                 You are a {topic} expert teaching {audience} students.
                 The lesson should be approximately {minutes} minutes long.
                 Difficulty level: {difficulty}.
+```
                 """)
             .user("""
+```java
                 Create a lesson on: {topic}
+```
                 Include:
                 1. Concept explanation
                 2. Code examples (Java)
@@ -148,15 +160,19 @@ public class PromptTemplateService {
             .param("minutes", request.minutes())
             .param("difficulty", request.difficulty())
             .call()
+```java
             .content();
     }
 
     // Template for code review:
     public String reviewCode(String code, String standards) {
         return chatClient.prompt()
+```
             .system("""
                 You are a code reviewer. Review against these standards:
+```java
                 {standards}
+```
 
                 Rate each finding: LOW, MEDIUM, HIGH, CRITICAL
                 Format: line number, severity, description, suggestion
@@ -247,12 +263,16 @@ public LessonResponse generateLesson(String topic) {
 public String reviewWithStandards(String code, List<String> standards) {
     String standardsText = standards.stream()
         .map(s -> "- " + s)
+```java
         .collect(Collectors.joining("\n"));
 
     return chatClient.prompt()
+```
         .system("""
             You are a senior code reviewer. Review code against these standards:
+```java
             {standards}
+```
 
             For each issue found:
             1. Line number (approximate)

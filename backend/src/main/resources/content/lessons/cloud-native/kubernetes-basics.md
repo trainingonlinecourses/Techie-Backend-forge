@@ -31,7 +31,9 @@ Kubernetes is a **container orchestrator**: it takes declarative descriptions of
 
 ## The objects you'll actually write
 
+```java
 **Pod** — the atomic unit: one or more containers sharing a network namespace and volume. Never create pods directly; the Deployment owns them.
+```
 
 ```yaml
 apiVersion: apps/v1

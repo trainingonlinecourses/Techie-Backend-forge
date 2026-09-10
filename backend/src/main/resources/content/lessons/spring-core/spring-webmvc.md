@@ -26,6 +26,7 @@ HTTP request
   → HTTP response
 ```
 
+```java
 @RestController
 @RequestMapping("/api/accounts")
 public class AccountController {
@@ -43,6 +44,7 @@ public class AccountController {
         return service.create(req);
     }
 }
+```
 
 ## Argument resolution (what the framework fills in for you)
 
@@ -52,7 +54,9 @@ Spring resolves method parameters automatically: `@PathVariable`, `@RequestParam
 
 `@RestController` + Jackson = automatic JSON. `HttpMessageConverters` map request/response bodies. Jackson's rules that matter in review:
 
+```java
 record AccountView(String iban, Money balance, @JsonFormat(shape = STRING) BigDecimal amount) {}
+```
 // - ISO-8601 for dates (JavaTimeModule)
 // - @JsonIgnore for fields that must never leak (password hashes!)
 // - DTOs, never entities, over the wire
@@ -86,6 +90,7 @@ public class ApiExceptionHandler {
 | Sees | Raw request/response | Handler + ModelAndView |
 | Use | Security, CORS, request logging | Authz per handler, view prep |
 
+```java
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class RequestLoggingFilter extends OncePerRequestFilter {
@@ -99,6 +104,7 @@ public class RequestLoggingFilter extends OncePerRequestFilter {
                 res.getStatus(), ms);
     }
 }
+```
 
 > **Why it matters (organizational view)** — MVC is the contract your APIs are built on. Teams standardize: thin controllers (no business logic), DTOs in/out, `@Valid` at the boundary, one `@RestControllerAdvice` for uniform errors, and filters for cross-cutting HTTP concerns. Understanding the pipeline (filters → DispatcherServlet → interceptors → converters) explains most "where do I hook X?" questions.
 

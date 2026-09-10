@@ -23,11 +23,15 @@ On failure at step 3:
        compensate: refund payment (if already charged) → release inventory → mark order failed
 ```
 
+```java
 Each step commits **permanently**; the saga's job is to run the compensating steps when a later step fails. Eventually consistent by design — the saga's "atomicity" is *eventual*, not instantaneous.
+```
 
 ## Choreography: events, no central brain
 
+```java
 Each service publishes an event when its step completes; the next service reacts:
+```
 
 ```
 OrderService:  creates order, publishes OrderCreated
@@ -107,7 +111,9 @@ The rule that separates good sagas: **every failure mode above is designed befor
 | **Saga** | eventual via compensation | seconds-to-minutes | business transactions across services (orders, bookings) |
 | Outbox (single-writer) | atomic *publication* | n/a — it's a delivery mechanism | the reliable event transport sagas run on |
 
+```java
 Sagas don't replace the outbox — **they run on top of it**: the outbox guarantees the step's event/publish is atomic with its DB write; the saga guarantees the multi-step flow reaches a consistent end state.
+```
 
 ## Key takeaways
 

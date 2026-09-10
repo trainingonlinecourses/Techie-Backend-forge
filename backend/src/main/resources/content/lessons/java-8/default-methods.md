@@ -41,6 +41,7 @@ public interface List<E> extends Collection<E> {
 
 ## Syntax
 
+```java
 public class Main {
 
     public static void main(String[] args) {
@@ -65,6 +66,7 @@ public class Main {
         }
     }
 }
+```
 
 ---
 
@@ -161,6 +163,7 @@ System.out.println(userCache.getOrDefault("u2", Guest));
 
 ### Scenario 1: Versioned API contracts
 
+```java
 public interface PaymentProcessor {
     PaymentResult process(PaymentRequest request);
 
@@ -179,6 +182,7 @@ public interface PaymentProcessor {
         return processWithRetry(request, 3);  // fallback to retry logic
     }
 }
+```
 
 ### Scenario 2: Mixin-style capabilities
 

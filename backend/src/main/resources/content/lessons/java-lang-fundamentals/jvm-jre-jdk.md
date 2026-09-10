@@ -43,6 +43,7 @@ The **JVM** (Java Virtual Machine) is the engine. It is a specification (defined
 
 The JVM is the reason for "write once, run anywhere" (WORA). You compile Java source to **bytecode** (`.class` files), and that bytecode is the same on every platform. Each platform (Windows, Linux, macOS, ARM, etc.) has its own JVM implementation that knows how to execute that bytecode on that platform. You do not recompile for each target — the same `.class` file runs on any JVM.
 
+```java
 // Compile once, run anywhere
 // javac Hello.java   produces Hello.class
 // java Hello         runs on any OS with a JVM
@@ -52,6 +53,7 @@ public class Hello {
         System.out.println("Hello, World!");
     }
 }
+```
 
 The bytecode in `Hello.class` is platform-neutral. A Windows JVM reads the same bytecode and produces Windows machine code; a Linux JVM on ARM reads the same bytecode and produces ARM machine code. The JVM is the translator.
 
@@ -63,8 +65,10 @@ Understanding the JVM's internal memory model explains `StackOverflowError`, `Ou
 
 The **heap** is the runtime data area from which memory for all class instances and arrays is allocated. The heap is shared across all threads. When you write `new Customer()`, the object's memory comes from the heap. The heap is managed by the garbage collector — when an object is no longer reachable, the GC reclaims its space.
 
+```java
 // Heap: every 'new' allocates here
 Customer c = new Customer("Alice");   // the Customer object is on the heap
+```
 
 The reference `c` itself (the 4- or 8-byte pointer) is on the stack, but the object it points to is on the heap. This split — reference on the stack, object on the heap — is why two variables can point to the same object, why passing an object to a method lets the method mutate it, and why `null` is a valid value for any reference.
 
@@ -85,12 +89,14 @@ Each thread has its own **Java Virtual Machine Stack**. The stack stores **frame
 
 When you call a method, a new frame is pushed onto the thread's stack. When the method returns, the frame is popped. When the stack runs out of space (e.g., infinite recursion), you get a `StackOverflowError`.
 
+```java
 // Each call adds a frame to the stack
 static void recurse(int n) {
     if (n == 0) return;
     recurse(n - 1);   // each call pushes a new frame
 }
 // recurse(1_000_000)  — eventually StackOverflowError
+```
 
 Local variables live only as long as their frame is on the stack. When `recurse` returns, its local variable `n` is gone. This is why local variables are not shared between threads — each thread has its own stack.
 
@@ -170,6 +176,7 @@ You can write your own classloader by extending `ClassLoader` and overriding `fi
 - **Hot-reload** in development tools — loading a new version of a class without restarting the JVM.
 - **OSGi, Jigsaw, and dynamic module systems**.
 
+```java
 // A minimal custom classloader that loads a class from a byte array
 class ByteArrayClassLoader extends ClassLoader {
     private final Map<String, byte[]> classes = new HashMap<>();
@@ -190,6 +197,7 @@ class ByteArrayClassLoader extends ClassLoader {
 var loader = new ByteArrayClassLoader();
 loader.store("com.example.Foo", compileSomehow());
 Class<?> foo = loader.loadClass("com.example.Foo");
+```
 
 But be careful: a class is identified by its **fully qualified name AND the classloader that loaded it**. `com.example.Foo` loaded by classloader A is a different type than `com.example.Foo` loaded by classloader B. You cannot cast between them — you get ` ClassCastException` even though the names match. This is the root of many "classloader hell" bugs in application servers.
 
@@ -220,6 +228,7 @@ The JVM starts by interpreting bytecode (slowly). As it runs, the **JIT compiler
 
 This is why Java startup can be slow (the JVM is warming up, interpreting, and profiling) but long-running services are fast — the JIT has optimized the hot paths. It is also why microbenchmarks that run too briefly give misleading results: the JIT has not had time to optimize. (This is the motivation behind **JMH** — the Java Microbenchmark Harness — which ensures the JVM reaches a steady state before measuring.)
 
+```java
 // The JIT eventually inlines and optimizes hot loops
 static long sum(long n) {
     long total = 0;
@@ -232,6 +241,7 @@ static long sum(long n) {
 // or replaced with a closed-form formula (n*(n+1)/2) if the JIT recognizes it.
 
 The end user does not control the JIT directly, but understanding it helps explain performance behavior: don't micro-optimize Java code based on a single short run; write clean code and let the JIT do its job; use JMH for real benchmarks.
+```
 
 ### "Write Once, Run Anywhere" — What It Actually Means
 
@@ -292,7 +302,9 @@ In the lab, you will inspect a compiled class file with `javap -c` to read the b
 
 ## Summary
 
+```java
 The JDK is the development kit (compiler + tools + runtime), the JRE is the runtime environment (JVM + core libraries), and the JVM is the virtual machine that loads bytecode, verifies it, executes it (interpreting and JIT-compiling hot methods to native code), and manages memory (heap, stack, method area, PC registers). The heap holds objects and is managed by the garbage collector, usually split into young and old generations; each thread has its own stack of method frames and a PC register; the method area (Metaspace) holds class metadata and static variables. Classes are loaded on demand by a hierarchy of classloaders that delegate to parents, which is why you cannot shadow core JDK classes and why the same class loaded by two different classloaders is two different types. The bytecode verifier ensures loaded bytecode is safe before execution. "Write once, run anywhere" means the same bytecode runs on any platform with a JVM — but only if you avoid platform-specific APIs. Understanding this architecture is the foundation for everything that follows: GC tuning, classloader debugging, reflection, dynamic proxies, and native image compilation.
+```
 
 ## References
 

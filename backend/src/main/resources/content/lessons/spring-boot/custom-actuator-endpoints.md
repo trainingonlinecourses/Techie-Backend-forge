@@ -30,8 +30,10 @@ public class PaymentGatewayHealthIndicator implements HealthIndicator {
             var status = client.ping();                       // cheap probe, short timeout
             return status.isUp()
                 ? Health.up().withDetail("latencyMs", status.latencyMs()).build()
+```java
                 : Health.down().withDetail("reason", status.reason()).build();
         } catch (Exception e) {
+```
             return Health.down(e).build();                    // exception → DOWN with cause
         }
     }
@@ -45,6 +47,7 @@ public class PaymentGatewayHealthIndicator implements HealthIndicator {
 
 @Component
 @Endpoint(id = "queueDepth")                                // → /actuator/queueDepth
+```java
 public class QueueDepthEndpoint {
     private final MessageQueue queue;
 
@@ -62,6 +65,7 @@ public class QueueDepthEndpoint {
     public void purge() { ... }                              // DELETE — purge the queue
     public record QueueDepthInfo(long pending, int consumers) {}
 }
+```
 
 Operations: `@ReadOperation` (GET), `@WriteOperation` (POST), `@DeleteOperation` (DELETE). Custom endpoints are how teams expose *their* knobs: cache eviction, feature-flag refresh, job triggers, queue stats — visible to ops without a bespoke admin UI.
 
@@ -85,11 +89,13 @@ management.endpoint.health.probes.enabled=true
 
 **Scenario 2 — a manual "reload config" knob.** `@WriteOperation` on a config endpoint: ops POSTs to refresh a feature flag without restarting:
 
+```java
 @Component @Endpoint(id = "featureFlags")
 public class FeatureFlagEndpoint {
     @WriteOperation
     public void refresh(@Selector String name) { flagService.reload(name); }
 }
+```
 
 **Scenario 3 — cache statistics for capacity planning.** A `@ReadOperation` exposing hit-rate, size, and eviction counts — the data that tells you when a cache needs a bigger limit.
 

@@ -16,7 +16,9 @@ docs:
 
 `Method.invoke(Object, args)` is slow because the JVM can't optimize through it — the call site is opaque to the JIT. `MethodHandle` provides the same dynamic invocation but is **inlineable by the JIT**: after a few invocations, the JIT compiles the handle call into direct machine code, approaching the speed of a direct method call.
 
+```java
 **The mental model:** reflection is like calling through a switchboard (every call goes through an operator); a MethodHandle is like having the direct number (the JIT wires it straight through after the first few calls).
+```
 
 ## Creating method handles
 
@@ -147,17 +149,23 @@ int result = (int) sumArray.invoke(new int[]{1, 2, 3, 4});
 
 ## MethodHandles.Lookup — access control
 
+```java
 // The lookup context determines what you can access
 MethodHandles.Lookup publicLookup = MethodHandles.lookup();      // caller's access rights
+```
 MethodHandles.Lookup privateLookup = MethodHandles.privateLookupIn(
+```java
     MyClass.class, MethodHandles.lookup());  // full access to MyClass's members
 
 // Find private fields/methods (only with the right lookup)
+```
 MethodHandle privateMethod = privateLookup.findVirtual(
     MyClass.class, "secretMethod",
+```java
     MethodType.methodType(String.class));
 
 **Access rules:**
+```
 | Lookup type | Can access |
 |---|---|
 | `lookup()` | Public methods of all classes; protected/package/private of the calling class |
@@ -199,8 +207,10 @@ public class DynamicMapper {
 DynamicMapper mapper = new DynamicMapper();
 MethodHandles.Lookup lookup = MethodHandles.lookup();
 MethodHandle jsonSerialize = lookup.findVirtual(JsonUtils.class, "toJson",
+```java
     MethodType.methodType(String.class, Object.class));
 mapper.registerSerializer(Order.class, jsonSerialize.bindTo(JsonUtils.class));
+```
 
 ## Common mistakes
 

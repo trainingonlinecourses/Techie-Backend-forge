@@ -74,6 +74,7 @@ The cardinal rule of `BeanPostProcessor`: **return the bean** — possibly a wra
 
 **Scenario 3 — the proxy you already use.** `@Transactional` is not magic — Spring's `InfrastructureAdvisorAutoProxyCreator` (a `BeanPostProcessor`) sees the `@Transactional` annotation on your service, builds an `Advisor`, and returns a **CGLIB/JDK proxy** from `postProcessAfterInitialization`:
 
+```java
 @Service
 public class PaymentService {
     @Transactional
@@ -81,6 +82,7 @@ public class PaymentService {
 }
 // At runtime the injected PaymentService is a PROXY whose method calls
 // first hit the transaction interceptor, then your real method.
+```
 
 That's why self-invocation (`this.someTransactionalMethod()`) bypasses transactions — the proxy isn't in the path; the real object is.
 

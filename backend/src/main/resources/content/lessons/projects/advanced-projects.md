@@ -40,13 +40,16 @@ import java.util.List;
 public class PlaceOrderCommand {
     private String userId;
     private List<OrderItemCommand> items;
+```java
     private String shippingAddress;
     
     // Getters and Setters
     public String getUserId() { return userId; }
     public void setUserId(String userId) { this.userId = userId; }
+```
     public List<OrderItemCommand> getItems() { return items; }
     public void setItems(List<OrderItemCommand> items) { this.items = items; }
+```java
     public String getShippingAddress() { return shippingAddress; }
     public void setShippingAddress(String addr) { this.shippingAddress = addr; }
     
@@ -75,9 +78,12 @@ import java.util.List;
 public class OrderAggregate {
     private String orderId;
     private String userId;
+```
     private List<OrderItem> items = new ArrayList<>();
+```java
     private OrderStatus status;
     private BigDecimal totalAmount;
+```
     private List<DomainEvent> events = new ArrayList<>();
     
     public enum OrderStatus {
@@ -125,8 +131,10 @@ public class OrderAggregate {
     public String getOrderId() { return orderId; }
     public String getUserId() { return userId; }
     public List<OrderItem> getItems() { return items; }
+```java
     public OrderStatus getStatus() { return status; }
     public BigDecimal getTotalAmount() { return totalAmount; }
+```
     public List<DomainEvent> getEvents() { return events; }
     public void clearEvents() { events.clear(); }
     
@@ -213,6 +221,7 @@ public class OrderQueryService {
     }
     
     public List<OrderView> searchOrders(String keyword) {
+```java
         return readRepository.findByKeyword(keyword);
     }
     
@@ -227,6 +236,7 @@ public class OrderQueryService {
     }
     
     public void onOrderConfirmed(OrderConfirmedEvent event) {
+```
         OrderView view = readRepository.findById(event.getOrderId())
             .orElseThrow();
         view.setStatus("CONFIRMED");
@@ -271,6 +281,7 @@ public class BankAccount {
     private AccountStatus status;
     private List<DomainEvent> changes = new ArrayList<>();
     
+```java
     public enum AccountStatus { ACTIVE, FROZEN, CLOSED }
     
     public static BankAccount open(String accountId, String ownerName, BigDecimal initialDeposit) {
@@ -322,6 +333,7 @@ public class BankAccount {
     }
     
     // Rebuild from events (how we get current state)
+```
     public static BankAccount rebuild(List<DomainEvent> events) {
         BankAccount account = new BankAccount();
         for (DomainEvent event : events) {
@@ -470,6 +482,7 @@ public class OrderSagaOrchestrator {
 
 ### Spring Cloud Config Server
 
+```java
 **ConfigServerApplication.java**
 package com.backendforge.configserver;
 
@@ -484,6 +497,7 @@ public class ConfigServerApplication {
         SpringApplication.run(ConfigServerApplication.class, args);
     }
 }
+```
 
 ### Config Client
 

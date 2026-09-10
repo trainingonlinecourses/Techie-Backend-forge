@@ -234,6 +234,7 @@ public class AtomicsAndLocksDemo {
 
 ### Scenario 1: High-performance rate limiter
 
+```java
 public class RateLimiter {
     private final AtomicInteger tokens;
     private final int maxTokens;
@@ -255,9 +256,11 @@ public class RateLimiter {
         }
     }
 }
+```
 
 ### Scenario 2: Reader-writer cache
 
+```java
 public class RWCache<K, V> {
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
     private final Map<K, V> cache = new HashMap<>();
@@ -287,6 +290,7 @@ public class RWCache<K, V> {
         }
     }
 }
+```
 
 ---
 

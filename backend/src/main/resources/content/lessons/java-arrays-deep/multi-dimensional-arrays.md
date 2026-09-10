@@ -40,13 +40,17 @@ public class Main {
 
 ### Line-by-Line Breakdown
 
+```java
 int[][] grid = new int[3][4];
+```
 - `int[][]` — The type is "array of arrays of int"
 - `new int[3]` — Creates an array of 3 elements, each element is a reference
 - `[4]` — Each of those 3 elements is initialized as an `int[4]`
 - In memory: 1 outer array + 3 inner arrays (each with 4 ints)
 
+```java
 grid[1][2] = 42;
+```
 - `grid[1]` → gets the second inner array (row 1)
 - `[2]` → gets the third element in that row
 - Java checks bounds: throws `ArrayIndexOutOfBoundsException` if out of range
@@ -104,6 +108,7 @@ public class MatrixOps {
      * 
      * Time complexity: O(n³) — for each element, we do n multiplications.
      * For large matrices (>1000x1000), use parallel streams or specialized libraries.
+```java
      */
     public static int[][] multiply(int[][] a, int[][] b) {
         int rowsA = a.length;
@@ -125,7 +130,9 @@ public class MatrixOps {
     }
 
     /**
+```
      * Transpose a matrix (swap rows and columns).
+```java
      */
     public static int[][] transpose(int[][] matrix) {
         int rows = matrix.length;
@@ -141,6 +148,7 @@ public class MatrixOps {
     }
 
     /**
+```
      * Print a matrix in readable format.
      */
     public static void print(int[][] matrix) {

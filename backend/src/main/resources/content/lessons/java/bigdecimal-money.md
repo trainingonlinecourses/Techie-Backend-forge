@@ -31,9 +31,11 @@ A billing system that computes `0.1 + 0.2` and gets `0.30000000000000004` will, 
 
 `BigDecimal` stores an **unscaled integer** and a **scale** (number of digits after the decimal point):
 
+```java
 BigDecimal price = new BigDecimal("19.99");   // unscaled 1999, scale 2
 BigDecimal qty   = new BigDecimal("3");        // unscaled 3, scale 0
 BigDecimal total = price.multiply(qty);        // 59.97, scale 2
+```
 
 Two rules the codebase enforces:
 
@@ -67,11 +69,13 @@ public class InvoiceCalculator {
 
 `divide` can produce a non-terminating decimal (`10 / 3 = 3.3333…`). Without a scale and rounding mode it throws `ArithmeticException`. The rule: **every `divide` passes a scale and RoundingMode** — the compiler can't enforce it, so it lives in the review checklist and in static-analysis config:
 
+```java
 // Fails at runtime: ArithmeticException: Non-terminating decimal expansion
 // BigDecimal ratio = gross.divide(total);
 
 // Correct — always specify scale + rounding
 BigDecimal ratio = gross.divide(total, 6, RoundingMode.HALF_UP); // keep 6 digits for ratios
+```
 
 ## Comparing and storing money
 

@@ -26,6 +26,7 @@ docs:
 
 ## A working aspect
 
+```java
 @Aspect
 @Component
 public class ServiceTimingAspect {
@@ -53,6 +54,7 @@ public class ServiceTimingAspect {
         }
     }
 }
+```
 
 ## How Spring AOP works: proxies
 
@@ -65,6 +67,7 @@ The context injects the **proxy**; your class is the target inside. This is the 
 
 ## The self-invocation trap (top-10 Spring bug)
 
+```java
 @Service
 public class OrderService {
     @Transactional
@@ -73,6 +76,7 @@ public class OrderService {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void inner() { /* ... */ }
 }
+```
 
 Because `this` is the raw bean (not the proxy), `inner()`'s `@Transactional` never runs. Fixes:
 

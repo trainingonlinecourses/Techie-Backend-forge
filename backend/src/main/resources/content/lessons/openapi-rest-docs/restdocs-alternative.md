@@ -36,7 +36,9 @@ Because the snippets come from real, passing test executions, **the docs are alw
 | Best for | Fast, interactive docs + client gen | Precise, tested, hand-curated docs |
 | Staleness risk | Low (code-driven) | Almost zero (test-driven) |
 
+```java
 **The hybrid** (common in production): REST Docs for the *hand-written* narrative docs, plus springdoc for the machine-readable spec and Swagger UI. Many teams pick one; sophisticated teams use both for different audiences.
+```
 
 ## The Code Walkthrough
 

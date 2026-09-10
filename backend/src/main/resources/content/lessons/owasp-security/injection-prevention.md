@@ -16,7 +16,9 @@ docs:
 
 ## The Concept: Untrusted Input That Becomes Code
 
+```java
 **Injection** happens when untrusted input (from a form, a URL, an API body) is combined with an *interpreter* — SQL, NoSQL query, OS command, LDAP — in a way that lets the input *change the meaning* of the instruction. The attacker isn't just providing data; they're providing *code* that the interpreter executes. It's the third most critical web risk, and it's almost always a *developer error* — a missing parameterization — rather than an exotic attack.
+```
 
 **The mental model:** SQL is a sentence with a grammar. Your code builds the sentence by *gluing strings*; the attacker's input contains *punctuation and keywords* that hijack the grammar. `' OR '1'='1` isn't a name — it's a *clause* that makes the WHERE always true. Parameterization is the fix because it changes the grammar: the `?` placeholder reserves a slot where the input can only ever be a *value* — punctuation in the value stays punctuation in the value, never becoming grammar. The sentence is fixed; only the words change.
 
@@ -38,7 +40,9 @@ String sql = "SELECT * FROM users WHERE name = '" + name + "'";
 jdbcTemplate.query(sql, ...);
 ```
 
+```java
 Each payload works because the input is *interpreted as SQL grammar*. The quotes in the input close the string literal the developer opened; the attacker's keywords then write new clauses. The damage scales from data theft (return every row) to data destruction.
+```
 
 ## The Fix: Parameterization, Always
 
@@ -46,13 +50,17 @@ Each payload works because the input is *interpreted as SQL grammar*. The quotes
 jdbcTemplate.query(
     "SELECT * FROM users WHERE name = ?",
     (rs, i) -> new User(rs.getString("id"), rs.getString("name")),
+```java
     name);                                    // <- the value, bound separately
 
 // With named parameters (Spring's NamedParameterJdbcTemplate):
+```
 namedJdbc.query(
     "SELECT * FROM users WHERE name = :name",
     Map.of("name", name),
+```java
     (rs, i) -> new User(rs.getString("id"), rs.getString("name")));
+```
 
 **What happens under the hood:** the SQL string with `?` is *compiled* (parsed) once, and the parameters are sent separately. The database knows the structure is `WHERE name = <value>`; the input can only fill the value slot. `admin' --` becomes the literal *string* `admin' --` — it's stored/compared as data, never parsed as grammar. **This is the single most important rule in web security: never build SQL by string concatenation; always bind parameters.**
 
@@ -66,13 +74,17 @@ The same rule extends through the stack:
 
 Parameterization binds *values* — it cannot bind *identifiers* (table/column names), because identifiers are grammar by nature. Dynamic ordering and dynamic columns are where injection sneaks back in:
 
+```java
 // VULNERABLE — the sort column is grammar, not a value:
 String sql = "SELECT * FROM products ORDER BY " + sortColumn;
 //   sortColumn = "price; DROP TABLE products; --"  -> injection!
 
 // SAFE — NEVER bind identifiers; whitelist them instead:
+```
 List<String> ALLOWED = List.of("price", "name", "created_at");
+```java
 if (!ALLOWED.contains(sortColumn)) sortColumn = "price";   // deny by default
+```
 
 **The rule:** identifiers come from a *whitelist you control*, never from user input directly. The same applies to dynamic table names, dynamic `GROUP BY` columns, and dynamic SQL fragments — each is a grammar slot that parameterization can't protect.
 
@@ -112,7 +124,9 @@ The principle generalizes: **any interpreter that receives untrusted input — S
 
 ## The Defense-in-Depth Layers
 
+```java
 Parameterization is the primary defense; real systems layer more:
+```
 
 1. **Parameterized queries** — the fix itself (primary).
 2. **Input validation** — reject/coerce at the boundary: types, lengths, allowed-character sets (`@Valid`, `@Pattern`). Validation alone is *not sufficient* (encodings and edge cases evade it), but it shrinks the attack surface.

@@ -47,10 +47,12 @@ Line-by-line:
 Now sorting works automatically:
 
 List<Employee> team = List.of(
+```java
     new Employee("Amy", 80000),
     new Employee("Bob", 60000),
     new Employee("Charlie", 90000)
 );
+```
 
 List<Employee> sorted = team.stream().sorted().toList();
 // Result: Bob (60000), Amy (80000), Charlie (90000) — sorted by salary
@@ -85,6 +87,7 @@ team.stream().sorted(byNameThenSalary).forEach(System.out::println);
 
 List<String> names = List.of("Charlie", null, "Amy", "Bob");
 
+```java
 // This throws NullPointerException:
 names.stream().sorted().toList();  // ❌ null has no compareTo
 
@@ -93,6 +96,7 @@ names.stream().sorted(Comparator.nullsFirst(Comparator.naturalOrder())).toList()
 
 // Fix 2: nulls last (null sorts after everything)
 names.stream().sorted(Comparator.nullsLast(Comparator.naturalOrder())).toList();
+```
 
 **Org scenario:** A customer list has some entries without emails. Sorting by email with `Comparator.comparing(Customer::getEmail)` would NPE on the nulls. The org standard is `Comparator.comparing(Customer::getEmail, Comparator.nullsLast(Comparator.naturalOrder()))` — put missing data at the bottom, don't crash.
 
@@ -114,7 +118,9 @@ return employees.stream().sorted(cmp).toList();
 TreeSet<Incident> bySeverity = new TreeSet<>(
     Comparator.comparing(Incident::getSeverity).reversed()  // most severe first
               .thenComparing(Incident::getCreatedAt)        // oldest first if same severity
+```java
 );
+```
 
 ## Common Mistakes
 

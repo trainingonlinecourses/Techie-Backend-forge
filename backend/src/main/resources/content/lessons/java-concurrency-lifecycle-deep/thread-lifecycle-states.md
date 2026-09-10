@@ -149,6 +149,7 @@ The three blocking states have specific causes. If you see a thread in `BLOCKED`
 
 A critical rule: **`sleep()` and `wait()` are not the same.** `sleep()` does not release locks; `wait()` does. This is the single most important distinction to internalize.
 
+```java
 public class SleepVsWait {
     static final Object lock = new Object();
 
@@ -174,6 +175,7 @@ public class SleepVsWait {
         }
     }
 }
+```
 
 Line by line:
 
@@ -187,6 +189,7 @@ There are three historical ways to create a thread, and one modern way. Understa
 
 **1. Subclass `Thread`** — override `run()`. Simple, but limited: you can only subclass one class, so your thread cannot extend anything else. Rarely used in production.
 
+```java
 class Worker extends Thread {
     private final String task;
     Worker(String task) { this.task = task; }
@@ -197,9 +200,11 @@ class Worker extends Thread {
 }
 // usage:
 new Worker("job-1").start();
+```
 
 **2. Implement `Runnable` and pass it to `Thread`** — the classic approach. Separates the task (what to do) from the thread (how to run it). Preferred over subclassing Thread.
 
+```java
 public class Main {
 
     public static void main(String[] args) {
@@ -207,6 +212,7 @@ public class Main {
         new Thread(job, "worker-1").start();
     }
 }
+```
 
 **3. `ThreadFactory` / `ExecutorService`** — in production, you almost never create raw `Thread` objects. You use an `ExecutorService` (thread pool), which creates threads via a `ThreadFactory`. This is how Spring and every modern backend creates threads. The pool manages lifecycle, reuse, and limits.
 
@@ -238,6 +244,7 @@ Three methods tell you whether a thread is alive and whether it has been interru
 
 The interrupt flag is how one thread asks another to stop. You do not force a thread to stop — there is no `Thread.stop()` in modern Java (it was deprecated because it could leave objects in inconsistent states). Instead, you set the interrupt flag, and the target thread checks it and exits cooperatively.
 
+```java
 public class InterruptDemo {
     public static void main(String[] args) throws InterruptedException {
         Thread worker = new Thread(() -> {
@@ -261,6 +268,7 @@ public class InterruptDemo {
         worker.join();
     }
 }
+```
 
 Line by line:
 
@@ -275,6 +283,7 @@ The golden rule: **never swallow `InterruptedException` without restoring the in
 
 When the JVM starts, the main thread is a **user thread** (non-daemon). The JVM shuts down when **all user threads have terminated**. Daemon threads are background threads that do not prevent shutdown — when only daemon threads remain, the JVM exits.
 
+```java
 public class DaemonDemo {
     public static void main(String[] args) throws InterruptedException {
         Thread daemon = new Thread(() -> {
@@ -292,6 +301,7 @@ public class DaemonDemo {
         System.out.println("main exiting — daemon will be aborted even though its loop is infinite");
     }
 }
+```
 
 Line by line:
 

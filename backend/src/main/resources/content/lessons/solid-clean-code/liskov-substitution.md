@@ -86,6 +86,7 @@ A Square is *mathematically* a rectangle, but as *mutable classes with setters*,
 
 ## The Better Design — Composition Over Broken Inheritance
 
+```java
 // Option A: Square as an independent class (no inheritance)
 class Square {
     private int side;
@@ -106,6 +107,7 @@ record Rectangle(int width, int height) implements Shape {
 record Square(int side) implements Shape {
     public int area() { return side * side; }
 }
+```
 
 With **immutable** shapes there is no "set width" to break — a `Square` is simply a `Shape` with one dimension. The whole class of violations evaporates. This is a general lesson: LSP violations are often born from *mutable state* in inheritance — the subclass can't honor the parent's mutation contract.
 
@@ -113,6 +115,7 @@ With **immutable** shapes there is no "set width" to break — a `Square` is sim
 
 ### 1. The "throws" widening
 
+```java
 // Parent contract: load never throws checked exceptions the caller must handle
 class Loader {
     Data load() { ... }
@@ -128,9 +131,11 @@ class RemoteLoader extends Loader {
 }
 
 If callers weren't told "load may throw", any code that assumed success breaks. (Checked exceptions in the signature are a *compiled* contract; runtime throws are a *silent* one — the latter is the danger.)
+```
 
 ### 2. The "weakened guarantee"
 
+```java
 class SortedList {
     void add(String s) { ... }    // contract: stays sorted
 }
@@ -139,9 +144,11 @@ class WeirdList extends SortedList {
     @Override
     void add(String s) { list.add(s); }   // NOT sorted anymore — contract broken
 }
+```
 
 ### 3. The "impossible operation"
 
+```java
 class Bird {
     void fly() { ... }
 }
@@ -150,12 +157,15 @@ class Penguin extends Bird {
     @Override
     void fly() { throw new UnsupportedOperationException(); }   // penguins can't fly
 }
+```
 
 A `List<Bird>` containing a `Penguin` breaks any code that calls `fly()` on everything. The fix: don't put `fly()` on the base `Bird` — model capability separately (`interface Flyable { void fly(); }`).
 
 ## The Practical "Is-A" Test
 
+```java
 Before extending a class, ask: **can every parent behavior be honored by the child, under all conditions, with the same results?** If the child must override methods to *do nothing*, *throw*, or *behave differently* — it is not a subtype; use composition or an interface instead.
+```
 
 Also worth remembering: **prefer interfaces over inheritance for behavior sharing.** An interface is a pure contract — no mutable state, no inherited implementation to break. Records + interfaces (the Option B above) sidestep most LSP landmines by construction.
 

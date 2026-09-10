@@ -12,18 +12,22 @@ docs:
 
 Before Java 16, type-checking and casting required two separate steps:
 
+```java
 // OLD WAY: check then cast
 if (obj instanceof String) {
     String s = (String) obj;       // explicit cast — redundant and error-prone
     System.out.println(s.length());
 }
+```
 
 Java 16 introduced **pattern matching for instanceof** — combine the check and cast into one:
 
+```java
 // JAVA 16+: check and bind in one step
 if (obj instanceof String s) {
     System.out.println(s.length());  // 's' is already a String
 }
+```
 
 The variable `s` is only in scope inside the `if` block (and `else` block if it's a negative check).
 
@@ -173,6 +177,7 @@ public class PatternMatchingDemo {
 
 ### Scenario 1: Exception handling with details
 
+```java
 public void handleException(Exception e) {
     if (e instanceof NullPointerException npe) {
         log.error("NPE at: " + npe.getStackTrace()[0]);
@@ -183,6 +188,7 @@ public void handleException(Exception e) {
         retryOperation();
     }
 }
+```
 
 ### Scenario 2: API response handling
 

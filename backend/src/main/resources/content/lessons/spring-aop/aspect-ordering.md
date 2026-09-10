@@ -119,6 +119,7 @@ public class LoggingAspect {
 
 ### Default Ordering (Without @Order)
 
+```java
 @Aspect
 @Component
 // No @Order — default priority is LOWEST (runs last among ordered aspects)
@@ -127,6 +128,7 @@ public class MetricsAspect {
 }
 
 **Default rules:**
+```
 1. Aspects with `@Order` run first, sorted by value (lower = first)
 2. Aspects without `@Order` run last, in undefined order relative to each other
 3. Spring's built-in `@Transactional` has a default order of `Ordered.LOWEST_PRECEDENCE` (runs last)
@@ -184,6 +186,7 @@ public class PerformanceAspect {
 
 ### Scenario 2: Aspect Conflict (Same Order)
 
+```java
 @Aspect
 @Component
 @Order(100)    // Both have order 100 — which runs first?
@@ -194,11 +197,13 @@ public class AspectA { ... }
 @Order(100)    // Ambiguous! Spring uses alphabetical order of class names
 public class AspectB { ... }
 // AspectA runs first (A < B alphabetically)
+```
 
 **Fix:** Give them distinct order values: `@Order(100)` and `@Order(200)`.
 
 ### Scenario 3: Combining with Spring's Built-in Aspects
 
+```java
 // Spring's @Transactional has default order = LOWEST_PRECEDENCE
 // Your custom aspects with @Order(100) run BEFORE @Transactional
 
@@ -207,6 +212,7 @@ public class AspectB { ... }
 @Component
 @Order(Ordered.LOWEST_PRECEDENCE - 10)   // Just before the default
 public class AfterTransactionAspect { ... }
+```
 
 ---
 

@@ -33,6 +33,7 @@ The problem is **thread-per-request** architecture. When a web server gets 10,00
 
 ### How Virtual Threads Differ from Platform Threads
 
+```java
 public class ThreadComparison {
     public static void main(String[] args) {
         // Platform thread — expensive, OS-managed
@@ -49,6 +50,7 @@ public class ThreadComparison {
         // But virtual threads use ~1000x less memory
     }
 }
+```
 
 ### Creating Virtual Threads
 

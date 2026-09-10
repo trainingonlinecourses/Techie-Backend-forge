@@ -30,12 +30,15 @@ LLM apps add dimensions traditional apps don't have: **prompts**, **tokens**, **
 
 With the bridge on the classpath, Spring AI emits **spans** for model calls — request/response, tokens, model, and embedding/vector-store operations. Attach a trace id to every chat turn:
 
+```java
 // propagate the request's trace id into the prompt logging:
 String traceId = TraceContextHolder.getCurrentSpanContext().getTraceId();
 log.info("chat trace={} question={}", traceId, question);
+```
 
 ## Tokens & cost: measure money
 
+```java
 ChatResponse response = chatClient.prompt().user(q).call().chatResponse();
 TokenUsage usage = response.getMetadata().getUsage();
 // usage.getPromptTokens(), usage.getCompletionTokens(), usage.getTotalTokens()
@@ -43,11 +46,13 @@ TokenUsage usage = response.getMetadata().getUsage();
 registry.counter("ai.tokens", "type", "prompt").increment(usage.getPromptTokens());
 registry.counter("ai.tokens", "type", "completion").increment(usage.getCompletionTokens());
 registry.counter("ai.cost", "model", modelName).increment(estimateCost(usage));
+```
 
 Track tokens per user (abuse detection), per feature (cost attribution), per model.
 
 ## Latency & errors
 
+```java
 Timer.Sample sample = Timer.start(registry);
 try {
     return chatClient.prompt()...call().content();
@@ -55,11 +60,13 @@ try {
     sample.stop(registry.timer("ai.call.duration", "model", modelName));
 }
 // alert on: p95 latency, error rate, cost/day
+```
 
 ## Evaluation: does it actually answer well?
 
 Quality isn't a metric endpoint — it's a **test discipline**:
 
+```java
 @Test
 void rag_answers_from_context_not_hallucination() {
     String answer = ragService.ask("What does spring-boot-starter-web include?");
@@ -67,6 +74,7 @@ void rag_answers_from_context_not_hallucination() {
     assertThat(answer).contains("Tomcat");
     assertThat(answer).contains("Jackson");
 }
+```
 
 The org-standard layers:
 
@@ -78,20 +86,26 @@ The org-standard layers:
 // LLM-as-judge: score faithfulness on a scale
 String score = judgeClient.prompt()
         .user("""
+```java
                 Answer: {answer}
                 Context: {context}
+```
                 Score 1-5 how faithful the answer is to the context, and explain.
                 """)
+```java
         .call().content();
+```
 
 ## Prompt versioning
 
 Prompts are code that changes behavior:
 
+```java
 public final class Prompts {
     public static final String SUPPORT_V1 = "You are...";   // keep old versions around
     public static final String SUPPORT_V2 = "You are... (revised)";
 }
+```
 
 Version prompts, log which version produced which answer, and A/B before shipping a prompt change.
 

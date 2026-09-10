@@ -16,10 +16,12 @@ docs:
 ## The Concept, From Zero
 
 Most beginners think enums are just a fancy way to write `public static final int`:
+```java
 // The C way (fragile, not type-safe)
 public static final int STATUS_ACTIVE = 0;
 public static final int STATUS_INACTIVE = 1;
 public static final int STATUS_BANNED = 2;
+```
 
 Java enums are **full classes**. Each constant is an instance of the enum class. This means enums can have:
 - **Fields** (each constant can carry data)
@@ -102,6 +104,7 @@ public class WeightCalculator {
 
 This is where enums become truly powerful. Each constant can **implement a different method**:
 
+```java
 public enum Operation {
     // (1) Each constant implements calculate() differently
     ADD("+") {
@@ -148,6 +151,7 @@ public enum Operation {
 }
 
 **Line-by-line explanation:**
+```
 
 | Line | What it does | Why it matters |
 |------|-------------|----------------|
@@ -155,6 +159,7 @@ public enum Operation {
 | `public abstract double apply(...)` | Abstract method forces each constant to implement | Compile error if you forget to implement for a new constant |
 | `Operation.fromSymbol("+")` | Static lookup method | Type-safe way to convert user input to enum constant |
 
+```java
 **Usage:**
 double result = Operation.MULTIPLY.apply(4, 5);  // 20.0
 Operation op = Operation.fromSymbol("+");          // Operation.ADD
@@ -177,6 +182,7 @@ public double calculate(String op, double a, double b) {
 public double calculate(Operation op, double a, double b) {
     return op.apply(a, b);  // Adding a new operation = adding a new enum constant
 }
+```
 
 ### Step 3: EnumSet and EnumMap — Blazing-Fast Collections
 
@@ -288,6 +294,7 @@ String url = DatabaseConfig.get().getUrl();
 ## Real-World Scenarios
 
 ### Scenario 1: Order status state machine
+```java
 public enum OrderStatus {
     PENDING {
         @Override public OrderStatus next() { return CONFIRMED; }
@@ -309,6 +316,7 @@ public enum OrderStatus {
     public abstract OrderStatus next();
     public abstract String describe();
 }
+```
 
 ### Scenario 2: Database column mapping
 public enum ColumnType {

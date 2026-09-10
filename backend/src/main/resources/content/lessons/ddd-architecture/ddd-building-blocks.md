@@ -61,6 +61,7 @@ public class Order {
 
 A value object has no identity — two objects with the same values are interchangeable.
 
+```java
 public record Money(BigDecimal amount, Currency currency) {
 
     public Money {
@@ -83,6 +84,7 @@ public record Money(BigDecimal amount, Currency currency) {
 }
 
 **Value-object rules**:
+```
 - Immutable
 - Equality by values, not identity
 - Self-validating (cannot be constructed invalid)
@@ -148,6 +150,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
 When a rule involves multiple aggregates, it doesn't belong in any one — it becomes a **domain service** (not an application service):
 
+```java
 @Service
 public class OrderPricingService {     // DOMAIN service — pure business logic
 
@@ -157,6 +160,7 @@ public class OrderPricingService {     // DOMAIN service — pure business logic
         return base.subtract(discount);
     }
 }
+```
 
 ## The Layers
 
@@ -220,12 +224,14 @@ class OrderTest {
         order.confirm();
 
         assertThrows(IllegalStateException.class,
+```java
             () -> order.addLine(product("P2"), 1));
     }
 
     @Test
     void cannotConfirmEmptyOrder() {
         Order order = new Order(1L);
+```
         assertThrows(IllegalStateException.class, order::confirm);
     }
 }

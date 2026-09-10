@@ -44,6 +44,7 @@ public class DataLoader implements ApplicationRunner {
 
 ### Basic Usage
 
+```java
 @Component
 public class StartupInitializer implements CommandLineRunner {
 
@@ -57,9 +58,11 @@ public class StartupInitializer implements CommandLineRunner {
         }
     }
 }
+```
 
 ### Multiple Runners with @Order
 
+```java
 @Component
 @Order(1)
 public class DatabaseMigration implements CommandLineRunner {
@@ -89,6 +92,7 @@ public class HealthChecker implements CommandLineRunner {
         // Verify database, Redis, etc. are reachable
     }
 }
+```
 
 ### Conditional Execution
 
@@ -109,6 +113,7 @@ public class DevDataLoader implements CommandLineRunner {
 
 ### With Dependencies (Constructor Injection)
 
+```java
 @Component
 public class DataSeeder implements CommandLineRunner {
 
@@ -144,6 +149,7 @@ public class DataSeeder implements CommandLineRunner {
         userRepository.save(admin);
     }
 }
+```
 
 ---
 
@@ -151,6 +157,7 @@ public class DataSeeder implements CommandLineRunner {
 
 ApplicationRunner is similar but receives an `ApplicationArguments` object that provides structured access to command-line arguments:
 
+```java
 @Component
 public class SmartStarter implements ApplicationRunner {
 
@@ -174,6 +181,7 @@ public class SmartStarter implements ApplicationRunner {
         }
     }
 }
+```
 
 ```bash
 # Running with arguments
@@ -224,7 +232,9 @@ public class SchemaValidator implements CommandLineRunner {
         List<String> tables = jdbcTemplate.queryForList(
             "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'",
             String.class
+```java
         );
+```
 
         List<String> required = List.of("users", "orders", "products", "audit_log");
         for (String table : required) {
@@ -240,6 +250,7 @@ public class SchemaValidator implements CommandLineRunner {
 
 ### Scenario 2: Feature Flag Initialization
 
+```java
 @Component
 public class FeatureFlagLoader implements CommandLineRunner {
 
@@ -264,6 +275,7 @@ public class FeatureFlagLoader implements CommandLineRunner {
         log.info("Loaded {} feature flags", flags.size());
     }
 }
+```
 
 ### Scenario 3: Cache Warming
 
@@ -287,15 +299,21 @@ public class CacheWarmer implements CommandLineRunner {
 
         // Warm product catalog cache
         List<Product> popularProducts = productRepo.findTop100ByOrderBySalesDesc();
+```java
         Cache productCache = cacheManager.getCache("products");
+```
         popularProducts.forEach(p ->
             productCache.put(p.getId(), new CachedProduct(p))
+```java
         );
         log.info("Warmed products cache with {} items", popularProducts.size());
 
         // Warm user session cache
+```
         List<User> activeUsers = userRepo.findLastActiveWithin(Duration.ofDays(7));
+```java
         Cache userCache = cacheManager.getCache("users");
+```
         activeUsers.forEach(u ->
             userCache.put(u.getId(), new CachedUser(u))
         );
@@ -305,6 +323,7 @@ public class CacheWarmer implements CommandLineRunner {
 
 ### Scenario 4: Startup Health Checks
 
+```java
 @Component
 @Order(3)
 public class HealthChecker implements CommandLineRunner {
@@ -343,6 +362,7 @@ public class HealthChecker implements CommandLineRunner {
         log.info("All health checks passed!");
     }
 }
+```
 
 ---
 

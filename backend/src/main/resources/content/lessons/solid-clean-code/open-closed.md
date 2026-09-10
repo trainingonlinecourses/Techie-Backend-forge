@@ -20,10 +20,13 @@ The **Open/Closed Principle** (the *O* in SOLID) is a one-liner with huge conseq
 
 Meaning: you should be able to *add new behavior* without *editing existing, working code*. New features arrive as **new code** (new classes, new branches at a dispatch point) — not as edits inside old methods that already work.
 
+```java
 Why does this matter? Every edit to working code risks breaking it. The code that shipped and passed tests is a *known quantity*; the moment you edit it, it's an unknown. OCP maximizes the amount of code you never touch: old behavior stays verified, new behavior arrives additive.
+```
 
 ## The Violation — The Ever-Growing Switch
 
+```java
 // Every new report type edits this method — OCP violated:
 class ReportGenerator {
 
@@ -37,6 +40,7 @@ class ReportGenerator {
         throw new IllegalArgumentException("unknown type: " + type);
     }
 }
+```
 
 Adding Excel support means **editing** `ReportGenerator.generate` — touching the working method, risking the three existing formats, and making the class grow forever. Every addition is a modification.
 

@@ -14,7 +14,9 @@ docs:
 
 ## The Concept: Who Should Decide Which Object to Create?
 
+```java
 Imagine a pizza restaurant. The customer says "I want a pizza." The kitchen decides *which* pizza — margherita, pepperoni, or veggie — based on what's ordered, what's in stock, or the time of day. The customer never names a specific kitchen station; they just get a pizza.
+```
 
 In code, the same situation appears constantly: you need an object, but *which* concrete class it should be depends on data, configuration, or context — and you'd rather not scatter `if`/`switch` chains creating objects all over your codebase.
 
@@ -24,15 +26,19 @@ In code, the same situation appears constantly: you need an object, but *which* 
 
 Without a factory:
 
+```java
 // The caller knows EVERY concrete type — and must change when types change
 Pizza pizza;
 if (order.contains("pepperoni")) pizza = new PepperoniPizza();
 else if (order.contains("veggie")) pizza = new VeggiePizza();
 else pizza = new MargheritaPizza();
+```
 
 With a factory:
 
+```java
 Pizza pizza = PizzaFactory.create(order);   // the caller knows NOTHING concrete
+```
 
 Now adding `PizzaQuattroFormaggi` changes **one** place (the factory) instead of every call site. The caller depends on the `Pizza` *interface* — a stable abstraction — not on volatile implementations. This is dependency inversion in miniature: high-level code depends on an abstraction, and the factory owns the concrete choices.
 
@@ -43,7 +49,9 @@ Two related patterns, commonly confused:
 - **Factory Method** — a single method (often overridden in subclasses) that creates one product. "One method, one family of products."
 - **Abstract Factory** — an interface for creating a *family* of related products without specifying their concrete classes. "A factory of factories — create UI button AND checkbox AND text field for a consistent look."
 
+```java
 This lesson covers Factory Method (the everyday one); Abstract Factory is its bigger sibling used when products come in coordinated families.
+```
 
 ## The Code Walkthrough
 

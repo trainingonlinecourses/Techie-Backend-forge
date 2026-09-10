@@ -13,6 +13,7 @@ docs:
 
 ## The concept: the prototype-in-singleton trap
 
+```java
 A singleton bean is created **once**; its dependencies are injected **once** at startup. If you inject a **prototype**-scoped bean into a singleton, you get *one* instance, captured at startup — every call after that reuses the same object, which defeats the whole point of prototype scope:
 
 @Component
@@ -24,6 +25,7 @@ public class AuditService {
     @Autowired private AuditEvent event;   // WRONG — captured ONCE, same id forever
     public void record(String action) { log.info("{} {}", action, event.id()); }
 }
+```
 
 Every `record()` call logs the *same* event id. The fix isn't a new annotation — it's **deferring the lookup to call time**. Spring gives you three mechanisms, from simplest to most powerful.
 

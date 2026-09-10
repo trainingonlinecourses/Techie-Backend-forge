@@ -121,11 +121,13 @@ public class ProductionMetricsConfig {
 
 **Negation:** `@Profile("!prod")` means "load this bean in every profile EXCEPT prod."
 
+```java
 @Bean
 @Profile("!prod")
 public DataSource devDataSource() {
     return new EmbeddedDatabaseBuilder().setType(H2).build();  // H2 for non-prod
 }
+```
 
 ## Profile groups
 
@@ -145,6 +147,7 @@ Now `--spring.profiles.active=production` activates `prod`, `metrics`, and `audi
 
 Combine `@Profile` with other conditions for fine-grained control:
 
+```java
 @Component
 @Profile("prod & monitoring")
 @ConditionalOnProperty(name = "management.prometheus.enabled", havingValue = "true")
@@ -152,11 +155,13 @@ public class CustomPrometheusExporter {
     // Only loads when prod profile is active AND monitoring profile is active
     // AND prometheus is enabled in properties
 }
+```
 
 ## How we use it in organizations
 
 ### Scenario 1: different payment gateways per environment
 
+```java
 @Configuration
 public class PaymentGatewayConfig {
 
@@ -178,6 +183,7 @@ public class PaymentGatewayConfig {
         return new MockPaymentGateway();  // always succeeds
     }
 }
+```
 
 Developers use `local` (mock), QA uses `sandbox` (test keys), production uses `prod` (real keys). Zero config changes needed to switch.
 
@@ -192,17 +198,20 @@ public class TestDatabaseConfig {
         return new EmbeddedDatabaseBuilder()
             .setType(EmbeddedDatabaseType.H2)
             .addScript("schema-test.sql")
+```java
             .build();
     }
 
     @Bean
     public FlywayMigrationStrategy flywayStrategy() {
+```
         return Flyway::migrate;  // run migrations on test DB
     }
 }
 
 ### Scenario 3: scheduled tasks only in production
 
+```java
 @Component
 @Profile("prod")
 public class DailyReportScheduler {
@@ -214,6 +223,7 @@ public class DailyReportScheduler {
         s3Service.upload(report);
     }
 }
+```
 
 Developers do not get spammed with daily reports during local development.
 

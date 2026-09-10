@@ -74,11 +74,15 @@ public record IntegrationProps(
     String baseUrl,
     @Min(1) @Max(30) int connectTimeoutSeconds,
     List<String> allowedIpRanges
+```java
 ) {}
+```
 
 Records + constructor binding give typed, immutable config with validation, no boilerplate. The record is registered as a bean via `@EnableConfigurationProperties(IntegrationProps.class)` or `@ConfigurationPropertiesScan`.
 
+```java
 **Scenario 2 — secrets stay out of the class, config comes from env.** The class declares the shape; the values come from the environment (deployment env vars, secret manager). Validation ensures the *shape* is right before anything runs:
+```
 
 ```properties
 # application.properties — defaults for local dev
@@ -88,11 +92,13 @@ app.integrations.connect-timeout-seconds=5
 APP_INTEGRATIONS_BASE_URL=https://payments.internal
 ```
 
+```java
 **Scenario 3 — JSR-380 custom constraint for cross-field rules.** Bean Validation annotations cover single fields; a custom constraint handles relationships (e.g., backoff must be smaller than the overall timeout):
 
 @Target({ElementType.TYPE}) @Retention(RUNTIME)
 @Constraint(validatedBy = TimeoutConsistencyValidator.class)
 public @interface ConsistentTimeouts { String message() default "backoff must be < timeout"; }
+```
 
 **Scenario 4 — test overrides.** `@SpringBootTest(properties = "app.payments.provider=stub")` supplies test values; with validation, a wrong test value fails the test context instead of silently testing the wrong thing.
 

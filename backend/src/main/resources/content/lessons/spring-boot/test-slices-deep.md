@@ -35,12 +35,14 @@ class OrderControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id").value(1))
             .andExpect(jsonPath("$.company").value("ACME"))
+```java
             .andExpect(jsonPath("$.totalCents").value(1999));
     }
 
     @Test
     void shouldReturn404() throws Exception {
         when(orderService.getOrder(99L)).thenThrow(new NotFoundException("Order not found"));
+```
 
         mockMvc.perform(get("/api/orders/99"))
             .andExpect(status().isNotFound())
@@ -66,11 +68,13 @@ class AdminControllerTest {
     @WithMockUser(roles = "ADMIN")
     void adminCanAccess() throws Exception {
         mockMvc.perform(get("/api/admin/stats"))
+```java
             .andExpect(status().isOk());
     }
 
     @Test
     void unauthenticatedGets401() throws Exception {
+```
         mockMvc.perform(get("/api/admin/stats"))
             .andExpect(status().isUnauthorized());
     }
@@ -113,6 +117,7 @@ class OrderRepositoryTest {
 
 Create your own slice to test a specific layer:
 
+```java
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
@@ -124,17 +129,21 @@ Create your own slice to test a specific layer:
 public @interface AuditTest {
     // Your custom annotation — loads only audit-related beans
 }
+```
 
 Or use `@ImportAutoConfiguration` to control exactly which auto-configurations load:
 
+```java
 @DataJpaTest
 @ImportAutoConfiguration(AuditAutoConfiguration.class)  // add just this one
 class AuditEventRepositoryTest {
     // Loads JPA + audit auto-config, nothing else
 }
+```
 
 ## Common mistakes
 
+```java
 **Mistake 1: loading too many beans**
 
 // WRONG: @SpringBootTest loads everything — slow and fragile
@@ -167,9 +176,12 @@ class OrderControllerTest {
 verify(orderService).processOrder(any());  // tests how, not what
 
 // RIGHT: verify the output
+```
 mockMvc.perform(post("/api/orders").contentType(APPLICATION_JSON).content(json))
     .andExpect(status().isCreated())
+```java
     .andExpect(jsonPath("$.id").isNumber());
+```
 
 ## Key takeaways
 

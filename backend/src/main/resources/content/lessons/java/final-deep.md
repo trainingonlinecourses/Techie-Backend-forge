@@ -29,12 +29,15 @@ When a `final` field is set in a constructor, the Java Memory Model (JMM) guaran
 
 This is why immutable value objects almost always use `final` fields:
 
+```java
 public record Money(BigDecimal amount, Currency currency) {
     // record fields are implicitly final — safe publication guaranteed
 }
+```
 
 Even pre-Java-16, the pattern was:
 
+```java
 public class Money {
     private final BigDecimal amount;   // safe publication
     private final Currency currency;   // safe publication
@@ -47,6 +50,7 @@ public class Money {
     public BigDecimal amount() { return amount; }
     public Currency currency() { return currency; }
 }
+```
 
 If `amount` were not `final`, a thread reading `money.amount()` from a different thread could see `null` even after the constructor completed — the JMM has no obligation to reorder the writes for visibility.
 
@@ -93,6 +97,7 @@ public class PremiumAccount extends BankAccount {
 
 A `final` class cannot be subclassed. The JDK uses this extensively: `String`, `Integer`, `LocalDate` are all `final`.
 
+```java
 public final class UserId {
     private final String value;
 
@@ -114,6 +119,7 @@ public final class UserId {
     @Override
     public String toString() { return "UserId(" + value + ")"; }
 }
+```
 
 **Why `final`?** Because `equals`/`hashCode`/`toString` are defined on the assumption that `value` never changes and no subclass alters behavior. If someone extended `UserId` and added a field, `equals` might not compare it, leading to hidden bugs in hash maps.
 
@@ -158,7 +164,9 @@ public record PaymentProperties(
     @DefaultValue("1000") Duration timeout,
     @DefaultValue("false") boolean sandboxMode,
     List<String> supportedCurrencies
+```java
 ) {}
+```
 
 Records make every field `final`. This means the configuration is **immutable after construction** — no thread can accidentally mutate it. Spring's `@ConfigurationProperties` binding creates the object once at startup; `final` guarantees no thread can change `retryAttempts` mid-request.
 

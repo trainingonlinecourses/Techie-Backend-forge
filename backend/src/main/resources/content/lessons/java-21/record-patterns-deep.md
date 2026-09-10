@@ -12,6 +12,7 @@ docs:
 
 Records hold data. Pattern matching lets you extract that data. **Record patterns** combine both — you can deconstruct a record and bind its components in a single expression:
 
+```java
 public class Main {
 
     public static void main(String[] args) {
@@ -29,11 +30,13 @@ public class Main {
         // x and y are automatically bound as local variables
     }
 }
+```
 
 ---
 
 ## Basic Destructuring
 
+```java
 record Point(int x, int y) {}
 record Person(String name, int age) {}
 
@@ -46,11 +49,13 @@ if (obj instanceof Point(int x, int y)) {
 if (obj instanceof Person(String name, int age) && age > 18) {
     System.out.println("Adult: " + name);
 }
+```
 
 ---
 
 ## Nested Destructuring
 
+```java
 record Address(String city, String zip) {}
 record Person(String name, Address address) {}
 
@@ -58,6 +63,7 @@ record Person(String name, Address address) {}
 if (obj instanceof Person(String name, Address(String city, String zip))) {
     System.out.println(name + " lives in " + city + " " + zip);
 }
+```
 
 ---
 
@@ -179,6 +185,7 @@ public class RecordPatternsDemo {
 
 ### Scenario 1: JSON tree processing
 
+```java
 // Process JSON-like structures
 sealed interface JsonValue permits JsonString, JsonNumber, JsonBoolean, JsonNull, JsonObject, JsonArray {}
 record JsonString(String value) implements JsonValue {}
@@ -186,6 +193,7 @@ record JsonNumber(double value) implements JsonValue {}
 record JsonBoolean(boolean value) implements JsonValue {}
 record JsonNull() implements JsonValue {}
 record JsonObject(Map<String, JsonValue> members) implements JsonValue {}
+```
 record JsonArray(List<JsonValue> elements) implements JsonValue {}
 
 String prettyPrint(JsonValue value, int indent) {
@@ -206,10 +214,12 @@ String prettyPrint(JsonValue value, int indent) {
 
 ### Scenario 2: Compiler AST processing
 
+```java
 sealed interface Stmt permits IfStmt, WhileStmt, AssignStmt, Block {}
 record IfStmt(Expr condition, Stmt thenBranch, Stmt elseBranch) implements Stmt {}
 record WhileStmt(Expr condition, Stmt body) implements Stmt {}
 record AssignStmt(String variable, Expr value) implements Stmt {}
+```
 record Block(List<Stmt> statements) implements Stmt {}
 
 void compile(Stmt stmt) {

@@ -36,6 +36,7 @@ public class NotificationService {
 
 **The self-invocation trap:** `@Async` works through AOP proxies. If you call `this.sendWelcomeEmail()` from the same class, the proxy is bypassed — it runs synchronously on the calling thread:
 
+```java
 @Service
 public class UserService {
     @Autowired private NotificationService notifications;
@@ -52,9 +53,11 @@ public class UserService {
         notifications.sendWelcomeEmail(user);  // runs async
     }
 }
+```
 
 ## Configuring the thread pool
 
+```java
 @Configuration
 @EnableAsync
 public class AsyncConfig implements AsyncConfigurer {
@@ -79,6 +82,7 @@ public class AsyncConfig implements AsyncConfigurer {
         };
     }
 }
+```
 
 ## Exception handling in @Async
 
@@ -111,6 +115,7 @@ public void handleRequest(ReportRequest request) {
 
 ## Scheduling @Async tasks
 
+```java
 @Service
 public class CleanupService {
 
@@ -122,9 +127,11 @@ public class CleanupService {
         sessionRepository.deleteOlderThan(Duration.ofDays(30));
     }
 }
+```
 
 ## org scenarios
 
+```java
 **Email service:** async email sending so the HTTP response returns immediately:
 
 @Async
@@ -143,17 +150,22 @@ public void audit(User user, String action, Map<String, Object> details) {
 }
 
 **Parallel task execution:** combine multiple @Async calls:
+```
 
 CompletableFuture<User> userFuture = userService.getUserAsync(userId);
 CompletableFuture<List<Order>> ordersFuture = orderService.getOrdersAsync(userId);
 CompletableFuture<Stats> statsFuture = analyticsService.getStatsAsync(userId);
 
+```java
 // All three run in parallel — combine when ready
 CompletableFuture.allOf(userFuture, ordersFuture, statsFuture).join();
+```
 
 UserProfile profile = new UserProfile(
     userFuture.join(), ordersFuture.join(), statsFuture.join()
+```java
 );
+```
 
 ## Key takeaways
 

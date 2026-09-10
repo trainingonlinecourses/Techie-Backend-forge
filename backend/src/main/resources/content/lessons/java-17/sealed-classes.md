@@ -15,6 +15,7 @@ docs:
 
 Imagine you're building a payment system. You have a `Payment` class with three subtypes: `CreditCardPayment`, `BankTransferPayment`, and `CryptoPayment`. Right now, ANY class can extend `Payment` — even ones you don't control.
 
+```java
 // Anyone can add a new payment type
 public class EvilPayment extends Payment { ... }
 
@@ -26,6 +27,7 @@ public sealed class Payment
 }
 
 **Now the compiler knows ALL possible subtypes.** This enables:
+```
 - Exhaustiveness checking in switch expressions
 - Better optimization by the JVM
 - Clear intent — you document your design decisions
@@ -94,6 +96,7 @@ public final class Triangle extends Shape {
 
 ### The Three Modifiers for Permitted Subclasses
 
+```java
 // 1. FINAL — cannot be extended
 public final class Circle extends Shape { ... }
 
@@ -103,11 +106,13 @@ public sealed class Polygon extends Shape
 
 // 3. NON-SEALED — removes restrictions (someone else can extend)
 public non-sealed class CustomShape extends Shape { ... }
+```
 
 ### Exhaustive Pattern Matching
 
 This is the **killer feature** of sealed classes. The compiler knows ALL subtypes, so you get exhaustiveness checking:
 
+```java
 public class ShapePrinter {
     static String describe(Shape shape) {
         return switch (shape) {
@@ -120,16 +125,19 @@ public class ShapePrinter {
         };
     }
 }
+```
 
 ### In the Same Package or Module
 
 By default, permitted subclasses must be in the **same package** or **same module**:
 
+```java
 // In package com.example.shapes
 public sealed class Shape permits Circle, Rectangle { ... }
 
 // Circle and Rectangle must be in:
 // 1. Same package (com.example.shapes), OR
+```
 // 2. Same module (if module system is used)
 
 You can override this with `permits` in a different compilation unit (Java 17 relaxes this).
@@ -138,13 +146,16 @@ You can override this with `permits` in a different compilation unit (Java 17 re
 
 **1. API Response Types**
 public sealed interface ApiResponse<T> 
+```java
     permits SuccessResponse, ErrorResponse, LoadingResponse {
 }
+```
 
 public record SuccessResponse<T>(T data, int statusCode) implements ApiResponse<T> {}
 public record ErrorResponse<T>(String message, String errorCode) implements ApiResponse<T> {}
 public record LoadingResponse<T>() implements ApiResponse<T> {}
 
+```java
 **2. Domain Events**
 public sealed interface DomainEvent 
     permits OrderCreated, OrderShipped, OrderDelivered, OrderCancelled {
@@ -164,6 +175,7 @@ public record Literal(double value) implements Expr {}
 public record Add(Expr left, Expr right) implements Expr {}
 public record Multiply(Expr left, Expr right) implements Expr {}
 public record Negate(Expr operand) implements Expr {}
+```
 
 ### Line-by-Line Code Explanation
 

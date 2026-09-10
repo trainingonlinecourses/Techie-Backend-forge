@@ -16,7 +16,9 @@ docs:
 
 ## The Concept: Attacking Through the Browser
 
+```java
 Two of the most misunderstood web attacks share a theme: they abuse the *browser's trust*. **XSS (Cross-Site Scripting)** makes your application *execute the attacker's JavaScript* in a victim's browser — giving the attacker everything the page can do. **CSRF (Cross-Site Request Forgery)** makes the victim's browser *send authenticated requests* the victim never intended — "you logged into my bank; now this page quietly tells your bank to transfer money." One executes attacker code in your app; the other rides the victim's session to your app.
+```
 
 **The mental model — XSS:** your page is a stage, and the attacker's script is an uninvited actor. Anywhere your app renders *untrusted input as HTML*, the input can contain `<script>` (or event handlers like `<img onerror=...>`) that runs with your page's privileges: read cookies, call your APIs as the logged-in user, deface the page. The browser trusts your origin — so the attacker's code, once inside your origin, gets that trust.
 
@@ -30,9 +32,11 @@ Two of the most misunderstood web attacks share a theme: they abuse the *browser
 GET /search?q=<script>alert('xss')</script>
 Response: <p>You searched for: <script>alert('xss')</script></p>
 ```
+```java
 The victim must click a crafted link; the script runs in the response.
 
 **2. Stored (persistent) XSS** — the input is *saved* and rendered later, for every visitor (a comment, a profile field):
+```
 
 ```text
 Comment submitted: <script>fetch('/api/account').then(...send to attacker...)</script>
@@ -71,7 +75,9 @@ Content-Security-Policy: default-src 'self'; script-src 'self';
 
 3. **HttpOnly cookies** — `Set-Cookie: session=...; HttpOnly` — JavaScript can't read the cookie, so XSS can't *steal the session* (it can still act *as* the session in the page, but the cookie itself is safe from exfiltration).
 
+```java
 The layered view: escaping prevents the script from forming; CSP blocks it if it forms anyway; HttpOnly protects the session if it somehow runs. Defense in depth, three independent layers.
+```
 
 ## CSRF: The Attack and the Fixes
 
@@ -82,11 +88,13 @@ The layered view: escaping prevents the script from forming; CSP blocks it if it
 <!-- (cookies are origin-scoped, not page-scoped). Bank executes the transfer. -->
 ```
 
+```java
 **The preconditions:** a state-changing request (GET with side effects, or POST) that relies *only* on the session cookie for authentication, with no unpredictable value the attacker can't know.
 
 **The defenses (layered):**
 
 **1. Synchronizer token (the standard)** — the server embeds an unpredictable token in the form/session; every state-changing request must carry it:
+```
 
 ```html
 <form method="POST" action="/transfer">
@@ -139,7 +147,9 @@ public class CorsConfig {
 
 ## Recap
 
+```java
 XSS and CSRF are browser-trust attacks: XSS makes your page *execute attacker JavaScript* (reflected, stored, or DOM) — prevented by output escaping at the framework level, with CSP and HttpOnly cookies as the safety net. CSRF makes the victim's browser *send authenticated requests* the victim never intended — prevented by Spring Security's CSRF tokens (default), SameSite cookies, and Origin checks; token-based APIs are inherently resistant. CORS is the separate rule about cross-origin *reads*, configured as an exact allowlist and never as a credentials-bearing wildcard. The mental model to keep: **the browser trusts your origin and auto-sends your cookies — your defenses must ensure that trust can only be used by your page, for your user's intent.**
+```
 
 ## References
 

@@ -122,12 +122,14 @@ public class TokenService {
 
 ## Password Verification — Why PasswordEncoder Matters
 
+```java
 // Spring Security's PasswordEncoder — bcrypt by default in modern Boot
 PasswordEncoder encoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
 
 String hash = encoder.encode("correct horse battery staple");   // $2a$10$...
 boolean ok = encoder.matches("correct horse battery staple", hash);   // true
 boolean no = encoder.matches("guess", hash);                           // false
+```
 
 - **Never store raw passwords** — store the bcrypt hash (a salted, deliberately slow hash).
 - **`matches` is constant-time-ish** — it compares hashes, not strings, so timing attacks can't recover the password.

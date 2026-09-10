@@ -18,7 +18,9 @@ Before Java 17, writing multi-line strings was painful. You had to use `+` conca
 String old = "SELECT u.id, u.name, u.email\n" +
              "FROM users u\n" +
              "WHERE u.active = true\n" +
+```java
              "ORDER BY u.name";
+```
 
 **The problem:** Every `\n` is an escape code. Every `"` inside the string needs `\"`. Every `\` needs `\\`. It's ugly, error-prone, and hard to read.
 
@@ -29,9 +31,11 @@ String modern = """
         FROM users u
         WHERE u.active = true
         ORDER BY u.name
+```java
         """;
 
 **Same result, dramatically cleaner code.** No escape characters. No concatenation. Just write what you mean.
+```
 
 ### Why Text Blocks Exist
 
@@ -48,18 +52,22 @@ A text block starts with `"""` followed by a mandatory newline:
 // CORRECT — newline after opening """
 String good = """
     Hello World
+```java
     """;
 
 // WRONG — no newline after opening """
 // This is actually NOT a text block, it's regular concatenation
 // String bad = """Hello World""";
+```
 
 The closing `"""` must be on its own line and determines the **indentation stripping**:
 
 String s = """
         This line is indented by 8 spaces
         This line is also indented by 8 spaces
+```java
     """;  // The closing """ at column 4 strips 4 spaces from every line
+```
 
 **The rule:** The closing `"""` position defines the left margin. All leading whitespace up to that column is stripped from every line.
 
@@ -121,12 +129,14 @@ public class IndentationDemo {
         String a = """
 Hello
   World
+```java
 """;
         System.out.println("---a---");
         System.out.println(a);
         System.out.println("---a---");
         
         // Closing """ at column 4 — strips 4 spaces
+```
         String b = """
             Hello
               World
@@ -161,9 +171,11 @@ public class LineEndings {
         String s = """
                 line1
                 line2
+```java
                 """;
         
         // You can control trailing newline with \
+```
         String t = """
                 line1\
                 line2""";
@@ -273,10 +285,14 @@ public class MigrationV2 {
 **3. Code Generation**
 public class DtoGenerator {
     public String generateDto(String className, List<String> fields) {
+```java
         StringBuilder sb = new StringBuilder();
+```
         sb.append("""
+```java
                 public record %s("""
                 .formatted(className));
+```
         
         String fieldList = fields.stream()
             .map(f -> "    String " + f)

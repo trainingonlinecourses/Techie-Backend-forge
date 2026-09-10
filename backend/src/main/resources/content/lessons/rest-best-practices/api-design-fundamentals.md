@@ -103,7 +103,9 @@ GET /api/quiz-answers?lessonId=7
 
 Spring mappings:
 
+```java
 @GetMapping("/courses/{id}")
+```
 public ResponseEntity<CourseDto> get(@PathVariable Long id) {
     return courseService.findById(id)
         .map(ResponseEntity::ok)
@@ -127,9 +129,11 @@ public ResponseEntity<Void> delete(@PathVariable Long id) {
 
 Let clients choose the representation:
 
+```java
 @GetMapping(value = "/courses/{id}", produces = {MediaType.APPLICATION_JSON_VALUE,
                                                   MediaType.APPLICATION_XML_VALUE})
 public CourseDto get(@PathVariable Long id) { ... }
+```
 
 Honor `Accept` headers; use `Accept: application/json` and `Content-Type: application/json` consistently. Spring handles both automatically via `produces`/`consumes` and the `Accept` header.
 
@@ -160,7 +164,9 @@ Three mainstream strategies (covered in depth in a later lesson):
 
 HATEOS = return links along with data:
 
+```java
 @GetMapping("/courses/{id}")
+```
 public ResponseEntity<CourseDto> get(@PathVariable Long id) {
     CourseDto dto = courseService.findById(id).orElseThrow();
     dto.addLink(linkTo(methodOn(CourseController.class).get(id)).withSelfRel());

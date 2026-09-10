@@ -4,8 +4,10 @@ module: java-streams-deep
 order: 3
 minutes: 22
 topics: ["stream idioms", "flatMap", "Optional streams", "nullable streams", "grouping patterns", "refactoring loops"]
+```java
 summary: The previous lessons covered the mechanics; this one is the vocabulary. These are the stream idioms that appear in every real codebase — flatMap fo...
 docs:
+```
   - title: "Stream usage patterns"
     url: "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/stream/package-summary.html"
 ---
@@ -20,13 +22,17 @@ The previous lessons covered the mechanics; this one is the vocabulary. These ar
 List<Lesson> allLessons = courses.stream()
     .map(Course::lessons)         // Stream<List<Lesson>>
     .flatMap(List::stream)        // Stream<Lesson>
+```java
     .toList();
 
 // Multiple sources flattened
+```
 List<String> allTags = courses.stream()
     .flatMap(c -> c.tags().stream())
     .distinct()
+```java
     .toList();
+```
 
 `flatMap` is the answer to "each element produces many" — the map gives you collections, flatMap unwraps one level.
 
@@ -37,7 +43,9 @@ List<Lesson> lessons = courses.stream()
     .filter(Course::published)
     .flatMap(course -> course.lessons().stream()
         .sorted(Comparator.comparingInt(Lesson::order)))
+```java
     .toList();
+```
 
 ## Optional Bridges
 
@@ -45,7 +53,9 @@ List<Lesson> lessons = courses.stream()
 List<Course> results = slugs.stream()
     .map(slug -> repository.findBySlug(slug))    // Stream<Optional<Course>>
     .flatMap(Optional::stream)                    // Stream<Course> — drops empties
+```java
     .toList();
+```
 
 `Optional.stream()` turns present→1-element stream, empty→0-element stream. The pipeline skips misses without `filter(Optional::isPresent).map(Optional::get)`.
 
@@ -64,25 +74,32 @@ Stream<String> safe = Stream.ofNullable(courses)     // Stream<List<Course>> or 
 List<Course> eligible = courses.stream()
     .filter(Predicate.not(Course::archived))
     .filter(c -> c.published() && c.minutes() >= 10)
+```java
     .toList();
 
 // Predefined predicates, reused
+```
 Predicate<Course> longEnough = c -> c.minutes() >= 10;
 Predicate<Course> published = Course::published;
+```java
 courses.stream().filter(longEnough.and(published)).toList();
+```
 
 ## The Loop-to-Stream Refactoring
 
 // Before: imperative loop with mutation
 Map<String, List<Course>> byLevel = new HashMap<>();
+```java
 for (Course c : courses) {
     byLevel.computeIfAbsent(c.level(), k -> new ArrayList<>()).add(c);
 }
 
 // After: declarative, thread-safe, one line
+```
 Map<String, List<Course>> byLevel = courses.stream()
     .collect(Collectors.groupingBy(Course::level));
 
+```java
 // Before: search loop
 Course found = null;
 for (Course c : courses) {
@@ -91,20 +108,27 @@ for (Course c : courses) {
 if (found == null) throw new NotFoundException(slug);
 
 // After
+```
 Course found = courses.stream()
     .filter(c -> c.slug().equals(slug))
     .findFirst()
+```java
     .orElseThrow(() -> new NotFoundException(slug));
+```
 
 ## State Machines and Streams: The fold
 
+```java
 // Accumulate state across elements with reduce
 record RunningTotal(int count, int minutes) {}
+```
 
 RunningTotal total = courses.stream()
     .reduce(new RunningTotal(0, 0),
         (acc, c) -> new RunningTotal(acc.count() + 1, acc.minutes() + c.minutes()),
+```java
         (a, b) -> new RunningTotal(a.count() + b.count(), a.minutes() + b.minutes()));
+```
 
 The 3-arg reduce (identity, accumulator, combiner) is the fold — the combiner makes it parallel-safe.
 
@@ -114,11 +138,15 @@ The 3-arg reduce (identity, accumulator, combiner) is the fold — the combiner 
 Stream.generate(() -> counter.incrementAndGet())
     .filter(n -> n % 2 == 0)
     .limit(10)                     // bound!
+```java
     .toList();
+```
 
 Stream.iterate(0, n -> n + 1)
     .takeWhile(n -> n < 100)       // bound
+```java
     .toList();
+```
 
 Infinite streams are only safe with `limit`/`findFirst`/`takeWhile` — never collect one unbounded.
 
@@ -128,7 +156,9 @@ Infinite streams are only safe with `limit`/`findFirst`/`takeWhile` — never co
 List<Course> a = ...; List<Course> b = ...;
 List<Pair<Course, Course>> pairs = IntStream.range(0, Math.min(a.size(), b.size()))
     .mapToObj(i -> new Pair<>(a.get(i), b.get(i)))
+```java
     .toList();
+```
 
 ## Idiom Cheat Sheet
 
@@ -152,6 +182,7 @@ void flatMapsLessonsFromCourses() {
 
     List<Lesson> lessons = List.of(c1, c2).stream()
         .flatMap(c -> c.lessons().stream())
+```java
         .toList();
 
     assertEquals(3, lessons.size());
@@ -159,6 +190,7 @@ void flatMapsLessonsFromCourses() {
 
 @Test
 void skipsEmptyOptionals() {
+```
     List<String> slugs = List.of("exists", "missing", "exists2");
     List<Course> found = slugs.stream()
         .map(repository::findBySlug)

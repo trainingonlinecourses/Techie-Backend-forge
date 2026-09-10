@@ -36,6 +36,7 @@ public class AdminDemo {
             // Create a topic: 3 partitions (parallelism), replication 3
             // (fault tolerance — 3 brokers), retention 7 days.
             NewTopic orders = new NewTopic("orders", 3, (short) 3)
+```java
                     .configs(Map.of("retention.ms", "604800000"));
             try {
                 admin.createTopics(List.of(orders)).all().get();
@@ -47,13 +48,18 @@ public class AdminDemo {
             }
 
             // Describe the cluster and the topic:
+```
             admin.describeCluster().nodes().get()
+```java
                  .forEach(n -> System.out.println("Broker: " + n.host() + ":" + n.port()));
+```
             admin.describeTopics(List.of("orders")).allTopicNames().get()
                  .forEach((name, desc) -> System.out.println(
+```java
                      name + " -> " + desc.partitions().size() + " partitions"));
 
             // List consumer groups and their lag:
+```
             admin.listConsumerGroups().all().get()
                  .forEach(g -> System.out.println("Group: " + g.groupId()));
         }
@@ -99,7 +105,9 @@ kafka-consumer-groups.sh --bootstrap-server localhost:9092 \
 
 ## KRaft: Kafka Without ZooKeeper
 
+```java
 For most of Kafka's life, a ZooKeeper ensemble managed cluster metadata (broker registry, controller election) — a second distributed system to operate. **KRaft (KIP-500)** replaces ZooKeeper with Kafka's own internal metadata log — one less system to run, simpler operations, faster controller failover. KRaft is the modern deployment model (production-ready since Kafka 3.x, the default for new clusters in 4.x). If you're starting fresh, deploy KRaft; only legacy clusters still carry ZooKeeper.
+```
 
 ## The Production Hardening Checklist
 

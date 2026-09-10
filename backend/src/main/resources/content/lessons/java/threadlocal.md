@@ -213,6 +213,7 @@ public class TenantFilter extends OncePerRequestFilter {
 
 ### Scenario 3: The memory leak trap with thread pools
 
+```java
 // DANGEROUS: ThreadLocal in an ExecutorService with fixed thread pool
 ExecutorService executor = Executors.newFixedThreadPool(10);
 
@@ -225,9 +226,11 @@ for (int i = 0; i < 1_000_000; i++) {
         // The next 999,990 tasks will see the WRONG user
     });
 }
+```
 
 **Why this happens:** In a thread pool, threads are reused. When a task completes without calling `remove()`, the ThreadLocal value persists for the next task that reuses that thread. With 10 threads and 1M tasks, the first 10 tasks leave stale data that affects all subsequent tasks.
 
+```java
 **The fix — always remove in a finally block:**
 
 executor.submit(() -> {
@@ -238,6 +241,7 @@ executor.submit(() -> {
         currentUser.remove();  // ALWAYS clean up — no exceptions
     }
 });
+```
 
 ## InheritableThreadLocal — passing context to child threads
 
@@ -248,12 +252,14 @@ public class Main {
     public static void main(String[] args) {
         // Regular ThreadLocal — child thread gets NULL
         private static final ThreadLocal<String> parent = new ThreadLocal<>();
+```java
         parent.set("from-parent");
         new Thread(() -> {
             System.out.println(parent.get());  // null! child can't see parent's value
         }).start();
 
         // InheritableThreadLocal — child thread inherits parent's value
+```
         private static final InheritableThreadLocal<String> inheritable = new InheritableThreadLocal<>();
         inheritable.set("from-parent");
         new Thread(() -> {

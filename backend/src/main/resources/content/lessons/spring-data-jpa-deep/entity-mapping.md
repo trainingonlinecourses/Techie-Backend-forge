@@ -16,6 +16,7 @@ JPA mapping is where the object model meets the relational model — and where s
 
 ## Identifiers
 
+```java
 @Entity
 public class Course {
 
@@ -23,6 +24,7 @@ public class Course {
     @GeneratedValue(strategy = GenerationType.IDENTITY)   // DB sequence/identity
     private Long id;
 }
+```
 
 | Strategy | Mechanism | Use |
 |----------|-----------|-----|
@@ -31,6 +33,7 @@ public class Course {
 | `TABLE` | Emulated sequence | Legacy only |
 | `UUID` | App-generated | Distributed systems, offline entities |
 
+```java
 @Entity
 public class Course {
 
@@ -39,6 +42,7 @@ public class Course {
     @SequenceGenerator(name = "course_seq", sequenceName = "course_seq", allocationSize = 50)
     private Long id;
 }
+```
 
 **The batch-insert trap**: with `IDENTITY`, Hibernate can't batch inserts (it must execute to get the id). `SEQUENCE` with a healthy `allocationSize` enables batch inserts — a 10× write-speedup for imports.
 
@@ -51,6 +55,7 @@ public class Course {
     private List<Lesson> lessons = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)           // many lessons → one course (default LAZY)
+```java
     private Course course;
 
     @OneToOne                                    // one-to-one
@@ -58,6 +63,7 @@ public class Course {
 
     @ManyToMany                                  // many-to-many
     @JoinTable(name = "course_tags",
+```
         joinColumns = @JoinColumn(name = "course_id"),
         inverseJoinColumns = @JoinColumn(name = "tag_id"))
     private Set<Tag> tags = new HashSet<>();
@@ -101,6 +107,7 @@ public class Course {
 
 **`orphanRemoval = true`** — removing a child from the parent's collection deletes it from the DB. Without it, the child becomes an orphan row.
 
+```java
 **The #1 JPA bug — one-sided sync**:
 
 // ❌ ONLY the parent side set
@@ -111,11 +118,13 @@ public void addLesson(Lesson lesson) {
     lessons.add(lesson);
     lesson.setCourse(this);
 }
+```
 
 Without the back-reference, the FK column stays null — the "lesson has no course" mystery.
 
 ## Embedding Value Objects
 
+```java
 @Embeddable
 public class Address {
     private String street;
@@ -137,6 +146,7 @@ public class Customer {
     })
     private Address shippingAddress;   // two addresses, distinct columns
 }
+```
 
 Embedding maps value objects (the DDD kind) to columns — no separate table, no join.
 
@@ -156,6 +166,7 @@ spring:
 
 For entities in `Set`s and detached comparisons:
 
+```java
 @Entity
 public class Course {
 
@@ -174,6 +185,7 @@ public class Course {
         return Objects.hashCode(code);   // stable before and after persist
     }
 }
+```
 
 **Rule**: base `equals`/`hashCode` on a stable business key, never on the generated id — a transient entity's id is null, breaking `Set` semantics.
 
@@ -200,7 +212,9 @@ public class Course {
 | Naming | snake_case default |
 | equals/hashCode | Business key |
 
+```java
 Mapping is where JPA's magic becomes predictable: choose sequences for batchability, keep associations lazy, own the cascade semantics, and sync both sides. Get these right and the object-relational bridge stops leaking; get them wrong and every query becomes a debugging session.
+```
 
 ## References
 

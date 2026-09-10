@@ -34,6 +34,7 @@ The starter brings Lettuce (the modern Netty-based client), and Boot creates the
 
 ## RedisTemplate in Action
 
+```java
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -68,6 +69,7 @@ public class SessionService {
         return redis.keys("session:*").size();
     }
 }
+```
 
 **Walking through it:** `StringRedisTemplate` is the specialization where keys and values are `String`s — perfect for JSON payloads, tokens, and simple counters. `opsForValue()` returns the *value operations* view — the object-oriented face of the raw `SET`/`GET` commands. The `Duration` overload of `set` is the TTL in Spring idiom. And note the pattern: the service never touches sockets or protocol — it calls typed methods, and Spring handles the rest.
 
@@ -137,17 +139,21 @@ public class RedisConfig {
 
 Spring Data Redis can also act like a repository layer for your domain objects — `@RedisHash` + a `CrudRepository` interface, storing entities as hashes with automatic indexing:
 
+```java
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 
 @RedisHash("products")               // stored under products:{id}
 public record Product(
         @Id Long id,
+```
         String name,
+```java
         double price) {}
 
 // The repository — Spring generates the implementation:
 public interface ProductRepository extends CrudRepository<Product, Long> {}
+```
 
 Then `productRepository.save(p)`, `findById`, `findAll` work like JPA repositories but against Redis hashes. This is convenient for session-like or frequently-read entities — but note: Redis repositories are *not* a relational model; they suit fast lookup by id, not complex queries. For complex querying, keep Postgres; for ultra-fast id lookup, Redis.
 
@@ -155,6 +161,7 @@ Then `productRepository.save(p)`, `findById`, `findAll` work like JPA repositori
 
 The killer integration: Spring's **cache abstraction** (`@Cacheable`, `@CacheEvict`) with Redis as the provider:
 
+```java
 @Service
 public class LessonService {
 
@@ -169,6 +176,7 @@ public class LessonService {
     @CacheEvict(value = "lessons", key = "#id")
     public void updateLesson(Long id, LessonDto dto) { /* save */ }
 }
+```
 
 With `spring.cache.type=redis` and `spring.cache.redis.time-to-live=10m` in properties, `@Cacheable` reads Redis first and populates on miss — transparently. This is the standard way production Spring apps get sub-millisecond reads on hot data without writing a single Redis call. (The dedicated `spring-cache` module in this curriculum covers the abstraction in depth; this is its Redis backend.)
 

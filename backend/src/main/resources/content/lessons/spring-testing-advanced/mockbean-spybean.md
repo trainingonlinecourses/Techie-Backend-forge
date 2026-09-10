@@ -64,9 +64,11 @@ If you *don't* want resets (rare — usually a sign of poor isolation), `@MockBe
 
 **Scenario 2 — avoid the DB in service tests.** `@MockBean` the repository in a `@SpringBootTest` when you specifically test service orchestration, not persistence. (For repository behavior itself, use `@DataJpaTest` with a real DB — see the test-slices lesson.)
 
+```java
 **Scenario 3 — assert side effects happened.** Mock + verify — the "did we call the audit service?" assertion:
 
 verify(auditService).record(eq("ORDER_CREATED"), any(Order.class));
+```
 
 **Scenario 4 — stub time and randomness.** `@MockBean Clock` (return a fixed Instant) makes date-dependent logic deterministic in tests.
 
@@ -74,10 +76,12 @@ verify(auditService).record(eq("ORDER_CREATED"), any(Order.class));
 
 Spring Boot 3.4 introduced **`@MockitoBean`** and **`@MockitoSpyBean`** (from `org.springframework.test.context.bean.override.mockito`), and `@MockBean`/`@SpyBean` are deprecated. Why: the new annotations use Spring Framework 6.2's **`BeanOverride`** mechanism — they override the bean without rebuilding the whole context, work with cached contexts, and behave more predictably across slices. The migration is mechanical:
 
+```java
 // Old (deprecated in Boot 3.4+):
 @MockBean PaymentGateway paymentGateway;
 // New:
 @MockitoBean PaymentGateway paymentGateway;
+```
 
 If your project is on Boot 3.4+, write new tests with `@MockitoBean`; the behavior is the same, the machinery is cleaner.
 

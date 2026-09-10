@@ -15,12 +15,14 @@ docs:
 
 JUnit's `assertEquals` works, but its failure messages are terse and the API is limited. AssertJ is a **fluent assertion library**: `assertThat(actual).…` reads like a sentence, fails with messages that show the actual vs expected values, and covers collections, maps, exceptions, dates, paths and more — without a single custom matcher.
 
+```java
 import static org.assertj.core.api.Assertions.assertThat;
 
 assertThat(order.total()).isEqualByComparingTo(new BigDecimal("19.98"));  // BigDecimal-safe!
 assertThat(order.getStatus()).isEqualTo(OrderStatus.PENDING);
 assertThat(order.getLines()).hasSize(2).allMatch(l -> l.qty() > 0);
 assertThat(order.getCustomer().email()).endsWith("@example.com");
+```
 
 The killer feature for money: **`isEqualByComparingTo`** for `BigDecimal` — plain `assertEquals` on `new BigDecimal("19.9")` vs `new BigDecimal("19.90")` fails on scale, while AssertJ compares *value*.
 
@@ -29,16 +31,22 @@ The killer feature for money: **`isEqualByComparingTo`** for `BigDecimal` — pl
 assertThat(lines)
     .hasSize(2)
     .extracting(Line::productId)              // project a field — the money assert
+```java
     .containsExactly("p1", "p2")              // order matters; use containsExactlyInAnyOrder otherwise
     .doesNotContainNull();
+```
 
 assertThat(orderService.findByCustomer("ada"))
     .extracting(Order::status)
+```java
     .containsOnly(PENDING, COMPLETED);
+```
 
 assertThat(map)
     .containsEntry("tenant", "acme")
+```java
     .containsKeys("id", "name");
+```
 
 `extracting(Order::status)` + `containsExactly` is how you assert on *shapes of data* instead of whole objects — the whole test stays readable and the failure message lists exactly which elements didn't match.
 
@@ -47,11 +55,15 @@ assertThat(map)
 assertThatThrownBy(() -> service.create(null))
     .isInstanceOf(IllegalArgumentException.class)
     .hasMessageContaining("customer")
+```java
     .hasMessageStartingWith("Order requires");
 
 // or the more declarative form:
+```
 assertThatCode(() -> service.cancel(paidOrder))
+```java
     .doesNotThrowAnyException();
+```
 
 `assertThatThrownBy` chains type + message + cause assertions — the cause is where the real story hides (`hasCauseInstanceOf`). Never assert on the exception alone; assert the message too, or a refactor that breaks the contract goes unnoticed.
 
@@ -59,11 +71,13 @@ assertThatCode(() -> service.cancel(paidOrder))
 
 JUnit stops at the **first** failed assertion. `SoftAssertions` collects them all:
 
+```java
 SoftAssertions softly = new SoftAssertions();
 softly.assertThat(order.id()).isNotNull();
 softly.assertThat(order.total()).isEqualByComparingTo(new BigDecimal("19.98"));
 softly.assertThat(order.status()).isEqualTo(PENDING);
 softly.assertAll();   // throws with ALL collected failures at once
+```
 
 When one failed assert makes you rerun the test five times to find the rest, soft assertions fix it. Use them for **multi-field response validation** (a DTO's fields, a CSV row, a JSON payload) — the places where "fail fast" is just "fail repeatedly".
 
@@ -72,13 +86,17 @@ When one failed assert makes you rerun the test five times to find the rest, sof
 // Response DTO validation — the bread and butter of API tests:
 assertThat(response.getBody())
     .extracting(OrderDto::id, OrderDto::total, OrderDto::status)
+```java
     .containsExactly(orderId, new BigDecimal("19.98"), "PENDING");
 
 // Deep into the graph:
+```
 assertThat(orders)
     .flatExtracting(Order::getLines)          // one list of all lines across orders
     .extracting(Line::productId)
+```java
     .contains("p1");
+```
 
 `flatExtracting` and tuple-based `containsExactly(...)` assertions read like a spec table — ideal for asserting the *set* of a response without stringy parsing.
 
@@ -86,9 +104,11 @@ assertThat(orders)
 
 assertThat(order.createdAt())
     .isAfter(Instant.now().minusSeconds(5))
+```java
     .isBefore(Instant.now());
 
 assertThat(Path.of("target/test.csv")).exists().isRegularFile().hasSizeGreaterThan(0);
+```
 
 ## AssertJ + the rest of the starter
 

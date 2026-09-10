@@ -103,7 +103,9 @@ MessageChannel auditEvents() {
 }
 ```
 
+```java
 **The channel types are the coupling dial:** direct = synchronous call (transaction-safe, backpressure by blocking); queue = async buffer (producer never blocks, but the queue is a failure point — bounded queues and monitoring matter); publish-subscribe = one-to-many broadcast (each subscriber independent — the event-driven pattern in EIP clothing). Choosing the channel type is choosing the integration's semantics.
+```
 
 ## The Endpoints: The Pattern Library
 

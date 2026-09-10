@@ -60,6 +60,7 @@ public class OrderService {
 
 **Pattern 1 — static nested for grouped helpers.** The `Builder`, `Result`, or `Key` classes that belong to one type and need no outer state. `Map.Entry` and `Builder`-style classes are the canonical examples — static nesting is *namespacing*, not composition:
 
+```java
 public class Customer {
     public static class Address {          // belongs to Customer, needs nothing from it
         private final String street;
@@ -77,6 +78,7 @@ public class OrderList {
         public Order next() { return items[pos++]; }
     }
 }
+```
 
 **Pattern 3 — anonymous classes are legacy behavior-passing.** Before lambdas, every `Comparator`, `Runnable`, `ActionListener` was an anonymous class. Modern code uses **lambdas** — shorter, and they compile to the same functional interface:
 

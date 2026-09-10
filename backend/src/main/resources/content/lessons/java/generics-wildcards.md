@@ -24,9 +24,11 @@ This is surprising but correct: a `List<Dog>` is NOT a `List<Animal>`. If it wer
 
 Wildcards solve this by expressing **flexibility** at the boundary:
 
+```java
 List<? extends Animal> animals = dogs;  // OK — read-only view
 Animal a = animals.get(0);              // OK — we know it's at least an Animal
 animals.add(new Cat());                 // COMPILE ERROR — compiler can't guarantee safety
+```
 
 ## The three wildcard forms
 
@@ -34,6 +36,7 @@ animals.add(new Cat());                 // COMPILE ERROR — compiler can't guar
 
 Accepts any type. Used when the type parameter is irrelevant:
 
+```java
 public static void printList(List<?> list) {
     for (Object item : list) {
         System.out.println(item);
@@ -43,11 +46,13 @@ public static void printList(List<?> list) {
 printList(List.of(1, 2, 3));        // OK
 printList(List.of("a", "b", "c"));  // OK
 printList(List.of(new Dog()));       // OK
+```
 
 ### Upper-bounded: `? extends T`
 
 The wildcard is **some subtype of T**. You can **read** T from it but cannot **write** to it:
 
+```java
 public static double sum(List<? extends Number> numbers) {
     double total = 0;
     for (Number n : numbers) {   // read as Number — safe
@@ -55,6 +60,7 @@ public static double sum(List<? extends Number> numbers) {
     }
     return total;
 }
+```
 
 sum(List.of(1, 2, 3));              // List<Integer> — OK
 sum(List.of(1.5, 2.5));            // List<Double> — OK
@@ -110,6 +116,7 @@ public static <T> void copy(List<? super T> dest, List<? extends T> src) {
 
 A notification system that accepts any type of notification:
 
+```java
 public interface NotificationSender {
     // Producer: sends notifications, so extends
     void sendAll(List<? extends Notification> notifications);
@@ -132,6 +139,7 @@ public class EmailSender implements NotificationSender {
         handlers.add(new SpamHandler());
     }
 }
+```
 
 ### Scenario 2: Generic repositories
 

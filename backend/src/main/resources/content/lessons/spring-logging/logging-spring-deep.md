@@ -14,6 +14,7 @@ docs:
 ### Why Logging Matters
 
 Without logging:
+```java
 public Order createOrder(OrderRequest request) {
     Order order = new Order(request);
     orderRepository.save(order);
@@ -22,8 +23,10 @@ public Order createOrder(OrderRequest request) {
     return order;
     // Something fails in production — you have NO idea what happened
 }
+```
 
 With logging:
+```java
 public Order createOrder(OrderRequest request) {
     log.info("Creating order for user={} items={}", request.userId(), request.items().size());
     Order order = new Order(request);
@@ -36,11 +39,13 @@ public Order createOrder(OrderRequest request) {
     return order;
     // You know EXACTLY what happened and when
 }
+```
 
 ### SLF4J Basics
 
 Spring Boot uses **SLF4J** (Simple Logging Facade for Java) with **Logback** as the implementation:
 
+```java
 @RestController
 public class ProductController {
     
@@ -64,6 +69,7 @@ public class ProductController {
         return product;
     }
 }
+```
 
 ### Log Levels
 
@@ -107,6 +113,7 @@ public class ProductController {
 
 MDC adds context to every log line in the current thread:
 
+```java
 @Slf4j
 @RestController
 public class OrderController {
@@ -130,6 +137,7 @@ public class OrderController {
         }
     }
 }
+```
 
 ### Common Mistakes
 

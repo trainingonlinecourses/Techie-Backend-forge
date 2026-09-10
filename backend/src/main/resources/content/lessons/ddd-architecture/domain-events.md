@@ -23,7 +23,9 @@ public record OrderPlaced(
     Long customerId,
     Money total,
     Instant occurredAt
+```java
 ) {}
+```
 
 Events are immutable facts: they describe *what happened*, not what to do. Whoever receives them decides.
 
@@ -43,7 +45,9 @@ public class Order {
     }
 
     private final List<Object> events = new ArrayList<>();
+```java
     private void registerEvent(Object event) { events.add(event); }
+```
     public List<Object> drainEvents() {
         var drained = List.copyOf(events);
         events.clear();
@@ -75,13 +79,16 @@ public OrderId placeOrder(PlaceOrderCommand cmd) {
 
 Or declaratively with Spring:
 
+```java
 @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
 public void onOrderPlaced(OrderPlaced event) {
     loyaltyService.awardPoints(event.customerId(), event.total());
 }
+```
 
 ## The Event Handlers
 
+```java
 @Component
 public class OrderEventHandlers {
 
@@ -102,6 +109,7 @@ public class OrderEventHandlers {
         fraudService.evaluate(event.orderId());
     }
 }
+```
 
 Each handler is independent — one failing doesn't stop the others (async + after-commit).
 
@@ -119,7 +127,9 @@ public class Order {
     private final List<Object> applied = new ArrayList<>();
 
     public static Order replay(List<Object> events) {
+```java
         Order order = new Order();
+```
         events.forEach(order::apply);
         return order;
     }
@@ -153,11 +163,13 @@ Write side: Command → Aggregate → Domain Events → Event Store
 Read side:  Read Model (denormalized tables, ES indexes) → Queries
 ```
 
+```java
 // Write side — commands mutate the aggregate
 public void placeOrder(PlaceOrderCommand cmd) { ... }
 
 // Read side — queries hit optimized read models
 public record OrderSummary(Long orderId, String status, int lineCount) {}
+```
 
 public List<OrderSummary> recentOrders(Long customerId) {
     return readModelRepository.findByCustomerIdOrderByPlacedAtDesc(customerId);
@@ -173,8 +185,10 @@ The workshop technique: domain experts + engineers post **orange sticky notes (e
 
 Events outlive code. Version them:
 
+```java
 public record OrderPlacedV2(OrderId orderId, Long customerId, Money total,
                             String currency, Instant occurredAt) {}
+```
 
 Or add `eventVersion` and keep the parser tolerant — consumers must handle old versions during rollout.
 

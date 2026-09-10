@@ -79,7 +79,9 @@ Ask: *can this rule be violated if two parts change in different transactions?*
 // If lines and total could change separately, the invariant breaks:
 public class Invoice {
     private List<InvoiceLine> lines;
+```java
     private Money total;          // MUST be consistent with lines
+```
     // → lines and total must be in the SAME aggregate
 }
 
@@ -115,6 +117,7 @@ public class Order {
 
 ## The Transaction Rule
 
+```java
 // ONE aggregate per transaction
 @Transactional
 public void placeOrder(Long orderId) {
@@ -123,6 +126,7 @@ public void placeOrder(Long orderId) {
     orderRepository.save(order);
     // don't ALSO update the Customer aggregate in this tx
 }
+```
 
 When two aggregates must change together, the options are: domain events (eventual consistency) or a saga — never one fat transaction.
 
@@ -132,11 +136,13 @@ public class Order {
 
     private final List<Object> domainEvents = new ArrayList<>();
 
+```java
     public void confirm() {
         if (lines.isEmpty()) throw new IllegalStateException("empty order");
         this.status = OrderStatus.PLACED;
         domainEvents.add(new OrderConfirmedEvent(id, total()));
     }
+```
 
     public List<Object> pullDomainEvents() {
         List<Object> events = List.copyOf(domainEvents);
@@ -183,10 +189,12 @@ public class OrderEntity {                  // aggregate root entity
 
 ## Repository Scope
 
+```java
 public interface OrderRepository extends JpaRepository<OrderEntity, Long> {
     // One repository per aggregate root
     // NO OrderLineRepository — lines are inside Order
 }
+```
 
 ## Aggregate Rules Checklist
 
@@ -210,7 +218,9 @@ public interface OrderRepository extends JpaRepository<OrderEntity, Long> {
 | Transaction scope | One aggregate |
 | Persistence | Repository per root, cascade inner |
 
+```java
 The aggregate is where DDD meets the database: size it by *invariant*, reference by *id*, communicate by *events*, and transact by *one*. Teams that respect the boundary get clean concurrency and testable domain logic; teams that blur it get fat transactions and lock contention.
+```
 
 ## References
 

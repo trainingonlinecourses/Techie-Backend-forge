@@ -123,11 +123,13 @@ For each method in your interface, ask: *is there a legitimate client that needs
 
 If you *must* work with an existing fat interface, the **Adapter pattern** rescues you: implement the narrow interface you need by wrapping the fat one:
 
+```java
 class PrinterAdapter implements Printer {
     private final Machine machine;
     PrinterAdapter(Machine m) { this.machine = m; }
     public void print(String doc) { machine.print(doc); }   // only the needed method
 }
+```
 
 ## Common Beginner Pitfalls
 

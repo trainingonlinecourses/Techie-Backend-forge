@@ -22,22 +22,30 @@ String name = jdbcTemplate.queryForObject(
     "SELECT name FROM users WHERE id = ?",
     String.class,
     userId
+```java
 );
+```
 
 List<User> users = jdbcTemplate.query(
     "SELECT * FROM users WHERE age > ?",
     (rs, rowNum) -> new User(rs.getLong("id"), rs.getString("name")),
     18
+```java
 );
 
 // ✅ New way — JdbcClient (clean, fluent)
+```
 String name = jdbcClient.sql("SELECT name FROM users WHERE id = ?")
     .param(userId)
+```java
     .queryForObject(String.class);
+```
 
 List<User> users = jdbcClient.sql("SELECT * FROM users WHERE age > ?")
     .param(18)
+```java
     .query((rs, rowNum) -> new User(rs.getLong("id"), rs.getString("name")));
+```
 
 ---
 
@@ -45,6 +53,7 @@ List<User> users = jdbcClient.sql("SELECT * FROM users WHERE age > ?")
 
 ### Creating JdbcClient
 
+```java
 @Configuration
 public class DatabaseConfig {
 
@@ -53,6 +62,7 @@ public class DatabaseConfig {
         return JdbcClient.create(dataSource);
     }
 }
+```
 
 ### SELECT — Single Row
 
@@ -80,11 +90,13 @@ public class UserRepository {
             .param("email", email)
             .query((rs, rowNum) -> mapUser(rs))
             .stream()
+```java
             .findFirst();
     }
 
     private User mapUser(ResultSet rs) throws SQLException {
         return new User(
+```
             rs.getLong("id"),
             rs.getString("name"),
             rs.getString("email")
@@ -166,12 +178,14 @@ public int updateUser(Long id, String name, String email) {
         .param("id", id)
         .param("name", name)
         .param("email", email)
+```java
         .update();
 }
 
 // Delete user
 public int deleteUser(Long id) {
     return jdbcClient.sql("DELETE FROM users WHERE id = :id")
+```
         .param("id", id)
         .update();
 }
@@ -242,9 +256,11 @@ public class TransferService {
         jdbcClient.sql("UPDATE accounts SET balance = balance - :amount WHERE id = :id")
             .param("amount", amount)
             .param("id", fromId)
+```java
             .update();
 
         // Credit receiver
+```
         jdbcClient.sql("UPDATE accounts SET balance = balance + :amount WHERE id = :id")
             .param("amount", amount)
             .param("id", toId)
@@ -341,9 +357,12 @@ public class SearchRepository {
     private final JdbcClient jdbcClient;
 
     public List<User> searchUsers(String name, String email, Integer age) {
+```java
         StringBuilder sql = new StringBuilder("SELECT * FROM users WHERE 1=1");
+```
         List<Object> params = new ArrayList<>();
 
+```java
         if (name != null) {
             sql.append(" AND name ILIKE :name");
             params.add("%" + name + "%");
@@ -365,6 +384,7 @@ public class SearchRepository {
         }
 
         return query.query((rs, rowNum) -> new User(
+```
             rs.getLong("id"),
             rs.getString("name"),
             rs.getString("email")

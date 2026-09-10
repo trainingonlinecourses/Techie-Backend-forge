@@ -16,7 +16,9 @@ docs:
 
 ## The Concept: Two Ends of a Conversation
 
+```java
 Every network conversation in Java — HTTP requests, database connections, message queues — ultimately runs over **sockets**. A socket is the endpoint of a two-way communication link between two programs, possibly on different machines. One program opens a *server* socket and waits; the other opens a *client* socket and connects; once connected, both sides send and receive bytes.
+```
 
 **The mental model:** think of a phone call. The server is the business that publishes its phone number (IP address + port) and has someone waiting by the phone (`ServerSocket.accept()` — blocking until someone calls). The client dials the number (`new Socket(host, port)`). When the call connects, both people can talk at once — that's full-duplex communication over two streams. The call stays open until either side hangs up; the bytes flowing are whatever the protocol defines (HTTP text, JSON, binary data).
 
@@ -123,6 +125,7 @@ public class EchoClient {
 
 The server above handles one client at a time: while `handleClient` runs (blocked on `readLine`), the main loop can't `accept()` anyone else. For a real server, that's fatal — one slow client blocks everyone. The classic fix: **a thread per client**:
 
+```java
 try (ServerSocket server = new ServerSocket(9090)) {
     while (true) {
         Socket client = server.accept();
@@ -134,6 +137,7 @@ try (ServerSocket server = new ServerSocket(9090)) {
         }).start();
     }
 }
+```
 
 Now the accept loop never blocks on a conversation. This is exactly how the first generation of web servers worked — and it's the problem **virtual threads** (Java 21) and **NIO** solve with far better scalability: virtual threads let you write this same blocking style with thousands of concurrent clients, and NIO/reactor models (Netty, Spring WebFlux) avoid threads per connection entirely. You'll see both in the later lessons of this module.
 

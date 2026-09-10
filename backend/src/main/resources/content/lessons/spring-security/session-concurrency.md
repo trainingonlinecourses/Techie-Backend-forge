@@ -78,6 +78,7 @@ public class SecurityConfig {
 
 ### Session Repository (Persistent Sessions)
 
+```java
 @Configuration
 @EnableSpringHttpSession   // Enables Spring's session management
 public class SessionConfig {
@@ -88,6 +89,7 @@ public class SessionConfig {
         return new JdbcIndexedSessionRepository(new JdbcTransactionManager(dataSource));
     }
 }
+```
 
 ```properties
 # application.properties

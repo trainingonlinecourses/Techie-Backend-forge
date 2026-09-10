@@ -15,6 +15,7 @@ docs:
 
 Spring's `PlatformTransactionManager` decouples your code from the underlying transaction system (JDBC, JPA/Hibernate, JTA). You annotate; the manager begins, commits or rolls back.
 
+```java
 @Transactional
 public void transfer(String fromIban, String toIban, Money amount) {
     Account from = accounts.findByIban(fromIban);
@@ -23,6 +24,7 @@ public void transfer(String fromIban, String toIban, Money amount) {
     to.credit(amount);
     // one commit at method exit — or full rollback if anything throws
 }
+```
 
 ## How @Transactional really behaves
 
@@ -31,8 +33,10 @@ public void transfer(String fromIban, String toIban, Money amount) {
 3. On success: commit. On any `RuntimeException`: roll back.
 4. **Checked exceptions do NOT roll back** by default — configure `rollbackFor`:
 
+```java
 @Transactional(rollbackFor = {TransferException.class})   // roll back on checked too
 public void transfer(...) throws TransferException { ... }
+```
 
 ## Propagation & isolation
 

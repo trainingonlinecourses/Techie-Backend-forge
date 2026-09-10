@@ -330,6 +330,7 @@ public class SecureWebSocketHandler implements WebSocketHandler {
             .map(q -> q.split("token="))
             .filter(parts -> parts.length > 1)
             .map(parts -> parts[1])
+```java
             .orElse(null);
 
         if (token == null) {
@@ -337,6 +338,7 @@ public class SecureWebSocketHandler implements WebSocketHandler {
         }
 
         return tokenValidator.validate(token)
+```
             .flatMap(user -> handleAuthenticated(session, user))
             .switchIfEmpty(session.close(CloseStatus.POLICY_VIOLATION).then());
     }

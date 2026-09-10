@@ -55,6 +55,7 @@ numbers.add(42);
 
 A primitive cannot be `null`. But sometimes you need to indicate "no value":
 
+```java
 // If a method returns 0, is that a valid result or "not found"?
 int findUserAge(String name) {
     return -1;  // What if -1 is a valid age? Confusing!
@@ -64,6 +65,7 @@ int findUserAge(String name) {
 Integer findUserAge(String name) {
     return null;  // Clearly means "user not found" — no ambiguity
 }
+```
 
 ---
 
@@ -107,11 +109,15 @@ double first = prices.get(0);
 
 When you write `Integer a = 42;`, the compiler translates it to:
 
+```java
 Integer a = Integer.valueOf(42);  // This is what actually runs
+```
 
 And when you write `int b = a;`, the compiler translates it to:
 
+```java
 int b = a.intValue();  // This is what actually runs
+```
 
 ### The `valueOf()` Method and Integer Cache
 
@@ -192,12 +198,15 @@ public class Main {
 
 ### 1. NullPointerException on Unboxing
 
+```java
 Integer a = null;
 int b = a;  // 💥 NullPointerException!
 // Java tries to call a.intValue() on null
+```
 
 This is one of the most common bugs in Java. It often happens in collections:
 
+```java
 Map<String, Integer> ages = new HashMap<>();
 ages.put("Alice", 25);
 ages.put("Bob", null);  // Null is a valid value in a HashMap
@@ -211,6 +220,7 @@ Integer bobAge = ages.get("Bob");  // Use Integer, not int
 if (bobAge != null) {
     int age = bobAge;  // Safe to unbox now
 }
+```
 
 ### 2. Performance Cost of Autoboxing
 

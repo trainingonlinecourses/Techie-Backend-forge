@@ -51,6 +51,7 @@ public class MyAutoConfigurationTest {
     @Test
     void testBeanDisabled() {
         runner.withPropertyValues("my.starter.enabled=false")
+```java
             .run(context -> {
                 assertThat(context).doesNotHaveBean(MyService.class);
             });
@@ -59,6 +60,7 @@ public class MyAutoConfigurationTest {
     // 3. User can override the bean
     @Test
     void testUserOverride() {
+```
         runner.withUserConfiguration(UserCustomConfig.class)
             .run(context -> {
                 assertThat(context).hasSingleBean(MyService.class);

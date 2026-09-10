@@ -66,8 +66,10 @@ The spec now shows exactly the public contract: id, email, display name, roles. 
                                   "published": true
                                 }
                                 """))))
+```java
 @PostMapping
 public CourseDto create(@RequestBody @Valid CourseRequest req) { ... }
+```
 
 One realistic example request is worth a paragraph of prose. The consumer sees the *shape* of a real call and can copy-paste it. Add examples to: the request body, the success response, and at least one error response.
 

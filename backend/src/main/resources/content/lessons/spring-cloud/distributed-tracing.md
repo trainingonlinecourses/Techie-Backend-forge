@@ -104,6 +104,7 @@ Now any log aggregator (ELK, Loki, CloudWatch) can filter **by trace id** and re
 
 ## 5. Adding custom spans
 
+```java
 Instrumentation is automatic for HTTP; add spans for meaningful boundaries (DB queries, cache, business steps):
 
 Span span = tracer.nextSpan().name("cache.lookup").start();
@@ -112,6 +113,7 @@ try (Tracer.SpanInScope ws = tracer.withSpan(span)) {
 } finally {
     span.end();
 }
+```
 
 Keep custom spans minimal — automatic HTTP/DB spans cover 90% of debugging.
 

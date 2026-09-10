@@ -86,8 +86,10 @@ public class CourseController {
     // 201 with Location on create
     @PostMapping
     public ResponseEntity<CourseDto> create(@RequestBody @Valid CourseRequest req) {
+```java
         CourseDto created = service.create(req);
         return ResponseEntity
+```
                 .created(java.net.URI.create("/api/courses/" + created.id()))
                 .body(created);
     }
@@ -121,7 +123,9 @@ public class CourseController {
 
 ## The Error Body Contract
 
+```java
 The status code says *what class*; the body should say *what exactly*, in a machine-readable shape:
+```
 
 ```json
 {

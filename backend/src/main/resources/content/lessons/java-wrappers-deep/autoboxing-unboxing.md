@@ -25,6 +25,7 @@ int first = list.get(0); // unboxing: Integer → int
 
 Java caches `Integer` objects for values **-128 to 127**. This means two `Integer` objects in this range are the same object:
 
+```java
 public class Main {
 
     public static void main(String[] args) {
@@ -40,6 +41,7 @@ public class Main {
         System.out.println(c.equals(d));  // true
     }
 }
+```
 
 ---
 

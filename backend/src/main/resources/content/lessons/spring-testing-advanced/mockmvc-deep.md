@@ -21,29 +21,37 @@ MockMvc is the Swiss-army knife of Spring MVC testing: it drives the full dispat
 MockMvc mockMvc = MockMvcBuilders
     .standaloneSetup(new CourseController(courseService))
     .setControllerAdvice(new GlobalExceptionHandler())
+```java
     .build();
+```
 
 Explicit, isolated, instant. You wire exactly the beans the test needs.
 
 ### Web context (real config)
 
+```java
 @WebMvcTest(CourseController.class)
 class CourseControllerTest {
     @Autowired MockMvc mockMvc;   // wired from the slice
 }
+```
 
 Tests the real MVC configuration: converters, validation, interceptors, security.
 
 ## The Request DSL
 
 mockMvc.perform(
+```java
     get("/api/courses/{id}", 1L)
+```
         .header("Authorization", "Bearer " + token)
         .param("page", "0")
         .param("size", "20")
         .contentType(MediaType.APPLICATION_JSON)
         .accept(MediaType.APPLICATION_JSON)
+```java
         .content("{\"title\":\"New\"}")
+```
         .sessionAttr("cart", cart)
 )
 
@@ -97,7 +105,9 @@ jsonPath supports the full Jayway JsonPath syntax: filters, wildcards, deep scan
 
 mockMvc.perform(get("/api/courses/1"))
     .andDo(print())                       // dump request + response to stdout
+```java
     .andExpect(status().isOk());
+```
 
 `print()` is invaluable when a test fails — it shows the exact request/response including headers and body.
 
@@ -107,14 +117,18 @@ mockMvc.perform(get("/api/courses/1"))
 void invalidPayloadReturnsFieldErrors() throws Exception {
     mockMvc.perform(post("/api/courses")
             .contentType(MediaType.APPLICATION_JSON)
+```java
             .content("{\"title\":\"\",\"minutes\":-5}"))
+```
         .andExpect(status().isBadRequest())
         .andExpect(jsonPath("$.fieldErrors[*].field",
+```java
             containsInAnyOrder("title", "minutes")));
 }
 
 @Test
 void unknownEndpointReturnsStructured404() throws Exception {
+```
     mockMvc.perform(get("/api/nope"))
         .andExpect(status().isNotFound())
         .andExpect(jsonPath("$.status").value(404));
@@ -126,7 +140,9 @@ void unknownEndpointReturnsStructured404() throws Exception {
 void uploadsCsv() throws Exception {
     MockMultipartFile file = new MockMultipartFile(
         "file", "courses.csv", "text/csv",
+```java
         "1,Spring Boot\n2,Spring AOP\n".getBytes());
+```
 
     mockMvc.perform(multipart("/api/courses/import").file(file))
         .andExpect(status().isOk())
@@ -141,7 +157,9 @@ For `DeferredResult`, `CompletableFuture`, or SSE, MockMvc needs async handling:
 void asyncEndpointEventuallyResolves() throws Exception {
     MvcResult result = mockMvc.perform(get("/api/orders/async"))
         .andExpect(request().asyncStarted())      // dispatch started
+```java
         .andReturn();
+```
 
     mockMvc.perform(asyncDispatch(result))         // complete the async result
         .andExpect(status().isOk())
@@ -154,12 +172,14 @@ void asyncEndpointEventuallyResolves() throws Exception {
 @WithMockUser(username = "admin", roles = "ADMIN")
 void adminCanDelete() throws Exception {
     mockMvc.perform(delete("/api/courses/1"))
+```java
         .andExpect(status().isNoContent());
 }
 
 @Test
 @WithAnonymousUser
 void anonymousIs401() throws Exception {
+```
     mockMvc.perform(get("/api/courses/1"))
         .andExpect(status().isUnauthorized());
 }
@@ -167,7 +187,9 @@ void anonymousIs401() throws Exception {
 // Custom user:
 mockMvc.perform(get("/api/me")
         .with(user("alice").password("pw").roles("USER")))
+```java
     .andExpect(status().isOk());
+```
 
 ## Testing CSRF
 
@@ -175,22 +197,28 @@ mockMvc.perform(post("/api/courses")
         .with(csrf())                                  // auto CSRF token
         .contentType(MediaType.APPLICATION_JSON)
         .content(body))
+```java
     .andExpect(status().isCreated());
 
 // without csrf(): 403 Forbidden
+```
 
 ## Session and Cookies
 
 mockMvc.perform(get("/api/profile")
         .sessionAttr("userId", 42L))
+```java
     .andExpect(status().isOk());
 
 // capture a cookie and reuse it
 MvcResult result = mockMvc.perform(post("/login")).andReturn();
 Cookie session = result.getResponse().getCookie("JSESSIONID");
+```
 
 mockMvc.perform(get("/api/profile").cookie(session))
+```java
     .andExpect(status().isOk());
+```
 
 ## Best Practices
 

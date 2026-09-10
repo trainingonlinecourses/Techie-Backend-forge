@@ -29,6 +29,7 @@ Without idempotency, *any* retry-able operation can execute twice: payments, ord
 POST /api/payments
 Idempotency-Key: 8f14e45f-ea1a-4c2e
 
+```java
 @PostMapping("/payments")
 public ResponseEntity<?> createPayment(
         @RequestHeader("Idempotency-Key") String key,
@@ -50,6 +51,7 @@ public ResponseEntity<?> createPayment(
 }
 
 **The atomic claim is the whole trick** — the unique constraint on the key column makes two concurrent retries race safely (one inserts, the other reads the winner).
+```
 
 ## Mechanism 2: Natural Idempotency
 
@@ -105,6 +107,7 @@ public Order createOrder(CreateOrderCommand cmd) {
 
 Processes with states make duplicates harmless by *rejecting illegal transitions*:
 
+```java
 public enum OrderStatus { DRAFT, PLACED, PAID, CANCELLED }
 
 public class Order {
@@ -119,6 +122,7 @@ public class Order {
         this.status = OrderStatus.PAID;
     }
 }
+```
 
 A duplicate "pay" event arrives → status is already PAID → no-op. The state machine *is* the deduplication.
 
@@ -133,6 +137,7 @@ Message broker (at-least-once) ──▶ Consumer
   └─ Idempotent side effects (state machine, PUTs)   ← safety net
 ```
 
+```java
 @RabbitListener(queues = "orders.new")
 public void onOrderPlaced(OrderPlacedEvent event) {
     // Mechanism 3: unique claim
@@ -145,6 +150,7 @@ public void onOrderPlaced(OrderPlacedEvent event) {
     // Mechanism 2: natural idempotency for side effects (PUT to warehouse)
     warehouseClient.update(absoluteState);
 }
+```
 
 ## Distributed Locks vs. Idempotency
 

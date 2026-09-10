@@ -11,9 +11,11 @@ docs:
 
 ## The Concept, From Zero
 
+```java
 Synchronous REST calls have a hidden weakness: if service B is down, service A fails too — their fates are welded together. **Messaging** breaks that weld. Service A drops a message onto a **broker** (a durable post office) and moves on; service B picks it up whenever it can.
 
 **JMS (Java Message Service)** is the standard Java API for talking to such brokers (ActiveMQ, Artemis, IBM MQ, Amazon SQS-compatible...). Two delivery models:
+```
 
 | Model | Analogy | Who receives |
 |---|---|---|
@@ -48,6 +50,7 @@ public class OrderEventPublisher {
 
 One line does what raw JMS needs ~10 lines for (connections, sessions, producers). `convertAndSend` serializes the object using the configured converter — configure JSON like this:
 
+```java
 @Configuration
 public class JmsConfig {
 
@@ -59,6 +62,7 @@ public class JmsConfig {
         return converter;
     }
 }
+```
 
 The `_type` header carries the class name so the consumer can deserialize without compile-time knowledge of your sender code.
 
@@ -103,11 +107,13 @@ Acknowledge modes, from naive to robust:
 
 ## Real Organizational Scenarios
 
+```java
 **Scenario 1 — Surviving downstream outages.** An e-commerce platform publishes "order placed" events to a queue consumed by the email service. During an SMTP outage, emails pile up in the queue instead of failing checkouts; when SMTP recovers, the backlog drains automatically. Revenue path never touches the fragile path.
 
 **Scenario 2 — Load smoothing / spikes.** Flash-sale traffic produces 50k orders/minute but inventory can process 8k/min. The queue absorbs the difference — producers never block, consumers work at their own pace, nothing is dropped.
 
 **Scenario 3 — Fan-out with topics.** One "payment-captured" event fans out to fraud-check, analytics, loyalty-points, and notification services via a topic. Adding a fifth subscriber requires zero changes to the payment service — that's architectural decoupling paying off.
+```
 
 ## Common Mistakes
 

@@ -73,7 +73,9 @@ grype academy-api:1.0                   # Anchore Grype
 trivy image --severity CRITICAL,HIGH --exit-code 1 --ignore-unfixed academy-api:1.0
 ```
 
+```java
 **The practice:** every base image update and every release gets scanned; CI *fails* on critical/high vulnerabilities. Base images are updated **frequently** (a JRE image from 6 months ago contains 6 months of accumulated CVEs). Scanning without a cadence is theater.
+```
 
 ## Pillar 3 — No Secrets in Images
 

@@ -119,7 +119,9 @@ public class BodyLoggingFilter extends OncePerRequestFilter {
         // Only log body for POST/PUT/PATCH
         if (isWriteMethod(request.getMethod())) {
             ContentCachingRequestWrapper wrappedRequest =
+```java
                 new ContentCachingRequestWrapper(request);
+```
             ContentCachingResponseWrapper wrappedResponse =
                 new ContentCachingResponseWrapper(response);
 
@@ -151,6 +153,7 @@ public class BodyLoggingFilter extends OncePerRequestFilter {
 
 Block requests that exceed a per-IP rate limit:
 
+```java
 @Component
 public class RateLimitFilter extends OncePerRequestFilter {
 
@@ -171,6 +174,7 @@ public class RateLimitFilter extends OncePerRequestFilter {
         chain.doFilter(request, response);
     }
 }
+```
 
 ## Filter registration ordering
 

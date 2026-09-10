@@ -90,6 +90,7 @@ public class CurriculumHealthIndicator implements HealthIndicator {
 info.app.name=BackendForge Academy
 info.app.description=Java & Spring end-to-end course platform
 
+```java
 // dynamic info via InfoContributor:
 @Component
 public class VersionInfoContributor implements InfoContributor {
@@ -98,6 +99,7 @@ public class VersionInfoContributor implements InfoContributor {
         builder.withDetail("build", BuildInfo.buildNumber());   // from manifest/env
     }
 }
+```
 
 ### Walking Through Each Part
 
@@ -142,7 +144,9 @@ Actuator endpoints expose internals (`/actuator/env` shows environment variables
 http.securityMatcher("/actuator/**")
     .authorizeHttpRequests(auth -> auth
         .requestMatchers("/actuator/health/**").permitAll()   // platforms poll this
+```java
         .anyRequest().authenticated());
+```
 
 ## Common Beginner Pitfalls
 

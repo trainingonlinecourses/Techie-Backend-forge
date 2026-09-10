@@ -37,9 +37,11 @@ public class OrderController {
 
     @GetMapping("/{id}")
     public EntityModel<OrderDto> get(@PathVariable long id) {
+```java
         OrderDto dto = orderService.find(id);
 
         return EntityModel.of(dto,
+```
             linkTo(methodOn(OrderController.class).get(id)).withSelfRel(),
             linkTo(methodOn(CustomerController.class).get(dto.customerId())).withRel("customer"),
             dto.status() == PENDING
@@ -60,12 +62,10 @@ public class OrderController {
 1. "Hypermedia as the engine of application state" (HATEOAS, Fielding): the client asks "what may I do?" and the server answers with links.
 2. The honest middle ground — most teams: 1. Links for navigation (self, related aggregates) — followed by the client. 2. Links for *actions* as a contract signal — the client still knows the workflow,. But the server controls when it's available (conditional affordances).
 
-The same code, clean:
 
 ```java
-```
-
 Pure HATEOAS (clients that know *nothing* about the API shape) is elegant and rarely achieved in practice; the pragmatic value is **navigation links that can't rot** + **state-conditional actions**.
+```
 
 ## Pagination with CollectionModel
 
@@ -98,7 +98,9 @@ The paging links (`prev`/`next`) are the same idea as the OpenAPI pagination con
 | Clients you control but want navigation that can't rot | Internal BFFs with typed generated clients |
 | Admin tools / machine clients that benefit from discovery | Hypermedia as dogma — links no one follows are decoration |
 
+```java
 The test of good HATEOAS: **every link a client actually uses, and every action the state allows** — if the response carries a link the client never follows, it's JSON noise; if the state allows an action the response doesn't advertise, the API is lying.
+```
 
 ## Key takeaways
 

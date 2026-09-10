@@ -118,7 +118,9 @@ public class LocalDateTimeDemo {
 `LocalDate` and `LocalTime` implement `Comparable`, so:
 
 List<LocalDate> dates = List.of(LocalDate.of(2026, 1, 1), LocalDate.of(2025, 12, 31));
+```java
 dates.stream().sorted().toList();   // sorts chronologically
+```
 
 `isBefore`, `isAfter`, `isEqual` give boolean comparisons; `compareTo` gives ordering for sorters and streams.
 

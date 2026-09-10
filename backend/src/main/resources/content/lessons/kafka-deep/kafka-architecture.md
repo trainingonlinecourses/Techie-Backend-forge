@@ -16,11 +16,13 @@ docs:
 
 ## The Concept: A Commit Log for Your Whole System
 
+```java
 Kafka is a **distributed event-streaming platform** — but the cleanest way to understand it is as a *distributed commit log*: an append-only, ordered, replayable record of events. Producers write events; consumers read them; and crucially, **consumers don't delete what they read** — events persist for a configured retention window, and any consumer can re-read from any point. This is the fundamental break from message queues: in a queue, a message is consumed and gone; in Kafka, events are *stored facts* that many consumers can each read independently.
 
 **The mental model:** think of a town's public record office. Every event (birth, marriage, property transfer) is written to the register in order, forever (well, for the retention window). Anyone — the tax office, the census, the police — can read the register independently, each starting from whatever point they care about. Nobody "consumes" a birth certificate and destroys it for everyone else. Kafka is that register, distributed across many machines.
 
 **Why this changed the industry:** before Kafka, systems communicated by direct calls (HTTP) or queues (one-shot messages). Kafka's log model enables: **decoupling** (producers and consumers never know about each other), **replay** (reprocess historical events to rebuild state or fix bugs), **multiple consumers** (the same event feeds analytics, search, and billing independently), and **durability** (events survive, replicated across brokers).
+```
 
 ## The Core Pieces
 
@@ -45,15 +47,19 @@ Producers ──write──▶ [Topic: orders] ──read──▶ Consumer Grou
 
 The partition is the most important concept to internalize. Why partition at all?
 
+```java
 **Parallelism:** a topic with 3 partitions can be written by 3 producers in parallel and read by up to 3 consumers in parallel (one per partition). One partition = one ordered stream; partitions are what let Kafka scale horizontally.
+```
 
 **Ordering within a partition:** Kafka guarantees order **per partition**, not per topic. Events with the same key always go to the same partition (via `hash(key) % numPartitions`), so all events for a given entity (say, one customer's orders) are strictly ordered. This is the design contract: *if you need ordering, use a key that identifies the entity — the partition provides the order.*
 
+```java
 **The consequence to respect:** events for *different* keys can land in *different* partitions and have no global order. Systems that need global order (a single sequence number across everything) fight Kafka's model — the standard answer is to partition by the entity and keep ordering per entity, which is what almost all real systems actually need.
 
 // Producer: the KEY controls the partition. All "cust-42" events
 // go to the same partition -> guaranteed order per customer.
 producer.send(new ProducerRecord<>("orders", "cust-42", orderJson));
+```
 
 ## Producers, Consumers, and the Offset
 

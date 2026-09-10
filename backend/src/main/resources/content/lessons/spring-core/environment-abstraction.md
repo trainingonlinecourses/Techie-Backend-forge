@@ -55,6 +55,7 @@ app.features.new-checkout=false
 app.db.url=jdbc:h2:mem:testdb
 ```
 
+```java
 **Scenario 2 — reading the environment programmatically.** Feature toggles, region, or instance metadata:
 
 @Service
@@ -67,14 +68,17 @@ public class RegionRouter {
         return env.getProperty("cloud.region", "eu-central-1");  // default for local dev
     }
 }
+```
 
 `@Value` covers most needs; `Environment` is for dynamic lookups, defaults, and reading typed values (`getProperty("x", Integer.class)`).
 
+```java
 **Scenario 3 — active profiles in code.** Knowing which profile is active for conditional behavior:
 
 if (env.acceptsProfiles(Profiles.of("prod"))) {
     metricsRegistry.enable();   // only register prod-only collectors
 }
+```
 
 **Scenario 4 — test overrides.** `@SpringBootTest(properties = "app.db.url=jdbc:h2:mem:t")` adds a test property source *above* everything — tests override prod values cleanly without editing config files.
 

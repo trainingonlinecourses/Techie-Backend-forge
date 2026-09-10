@@ -28,6 +28,7 @@ If none handle it, the container's error page (or Spring Boot's `/error`) takes 
 
 Advice = global. Controller-local = overrides.
 
+```java
 @RestController
 @RequestMapping("/api/orders")
 public class OrderController {
@@ -39,6 +40,7 @@ public class OrderController {
             "Order " + ex.getOrderId() + " not found");
     }
 }
+```
 
 Spring picks the **most specific** handler: a controller-local `@ExceptionHandler` beats a global advice handler for the same exception type.
 
@@ -46,21 +48,25 @@ Spring picks the **most specific** handler: a controller-local `@ExceptionHandle
 
 `@ExceptionHandler` accepts multiple types — great for shared logic:
 
+```java
 @ExceptionHandler({OrderNotFoundException.class, CustomerNotFoundException.class})
 public ProblemDetail handleNotFound(RuntimeException ex) {
     return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
 }
+```
 
 ## @ResponseStatus on Exceptions
 
 The annotation-based shortcut — the exception *is* the response:
 
+```java
 @ResponseStatus(HttpStatus.NOT_FOUND)
 public class OrderNotFoundException extends RuntimeException {
     public OrderNotFoundException(String orderId) {
         super("Order " + orderId + " not found");
     }
 }
+```
 
 No advice needed for the common case. But once you want a consistent body (Problem Details, trace ids), the advice wins.
 
@@ -72,8 +78,10 @@ Handlers can take richer arguments than just the exception:
 public ProblemDetail handleValidation(MethodArgumentNotValidException ex,
                                      HttpServletRequest request) {
     ProblemDetail problem = ProblemDetail.forStatusAndDetail(
+```java
         HttpStatus.BAD_REQUEST, "Validation failed");
     problem.setProperty("path", request.getRequestURI());
+```
     problem.setProperty("fieldErrors", ex.getBindingResult().getFieldErrors()
         .stream().map(fe -> Map.of(
             "field", fe.getField(),
@@ -88,15 +96,18 @@ Available: `HttpServletRequest/Response`, `WebRequest`, `HandlerMethod`, plus th
 
 Spring can match handlers by the **cause chain** of a wrapped exception. When a `DataIntegrityViolationException` wraps a `ConstraintViolationException`, the most specific cause handler fires:
 
+```java
 @ExceptionHandler(ConstraintViolationException.class)
 public ProblemDetail handleConstraint(ConstraintViolationException ex) {
     // fires even when the exception is wrapped in another
 }
+```
 
 ## Async Exceptions
 
 For `@Async` / reactive code, exceptions don't surface through the controller path. Handle them where they run:
 
+```java
 @Configuration
 public class AsyncConfig implements AsyncConfigurer {
 
@@ -106,6 +117,7 @@ public class AsyncConfig implements AsyncConfigurer {
             log.error("Async method {} threw", method.getName(), ex);
     }
 }
+```
 
 ## The Error Page and /error
 
@@ -117,9 +129,11 @@ public class CustomErrorController implements ErrorController {
     @RequestMapping("/error")
     public ResponseEntity<Map<String, Object>> error(HttpServletRequest request) {
         Integer status = (Integer) request.getAttribute(
+```java
             RequestDispatcher.ERROR_STATUS_CODE);
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("status", status != null ? status : 500);
+```
         body.put("error", HttpStatus.resolve(status) != null
             ? HttpStatus.resolve(status).getReasonPhrase() : "Error");
         body.put("timestamp", Instant.now().toString());
@@ -140,6 +154,7 @@ server:
 
 ## Global Fallback: Catch-All Ordering
 
+```java
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -158,6 +173,7 @@ public class GlobalExceptionHandler {
             HttpStatus.INTERNAL_SERVER_ERROR, "Unexpected error");
     }
 }
+```
 
 Order matters at *runtime*: Spring picks the closest match in the hierarchy, so the catch-all only fires for truly unknown exceptions.
 
@@ -173,18 +189,22 @@ class ExceptionHandlingTest {
     void unmappedEndpointReturnsStructuredError() throws Exception {
         mockMvc.perform(get("/api/nonexistent"))
             .andExpect(status().isNotFound())
+```java
             .andExpect(jsonPath("$.status").value(404));
     }
 
     @Test
     void domainExceptionMapsToProblemDetails() throws Exception {
+```
         mockMvc.perform(get("/api/orders/nope"))
             .andExpect(status().isNotFound())
+```java
             .andExpect(jsonPath("$.detail").value(containsString("not found")));
     }
 
     @Test
     void internalErrorsDoNotLeakDetails() throws Exception {
+```
         mockMvc.perform(get("/api/orders/boom"))
             .andExpect(status().isInternalServerError())
             .andExpect(jsonPath("$.message").doesNotExist());

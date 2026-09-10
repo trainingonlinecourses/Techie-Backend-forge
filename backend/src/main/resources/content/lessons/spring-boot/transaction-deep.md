@@ -15,6 +15,7 @@ docs:
 
 `@Transactional` is Spring's declarative transaction management. You annotate a method (or class) and Spring wraps it in a database transaction: start, execute, commit on success, rollback on exception.
 
+```java
 @Transactional
 public void transferMoney(String fromAccount, String toAccount, BigDecimal amount) {
     Account sender = accountRepository.findById(fromAccount).orElseThrow();
@@ -27,6 +28,7 @@ public void transferMoney(String fromAccount, String toAccount, BigDecimal amoun
     accountRepository.save(receiver);
     // COMMIT happens here — if any exception, ROLLBACK
 }
+```
 
 Without `@Transactional`, each `save()` is its own transaction. If `save(receiver)` fails, the debit is already committed — money vanished.
 
@@ -44,6 +46,7 @@ Propagation defines what happens when a transactional method is called from with
 | `NEVER` | Must NOT have transaction; throw if one exists |
 | `NESTED` | Create savepoint within existing transaction |
 
+```java
 @Service
 public class OrderService {
 
@@ -57,6 +60,7 @@ public class OrderService {
         // Audit log commits independently — even if order rolls back, log survives
     }
 }
+```
 
 ## Isolation levels
 
@@ -81,6 +85,7 @@ public Report generateInventoryReport() {
 
 By default, Spring rolls back on **unchecked exceptions** (`RuntimeException` and subclasses) and **errors**. Checked exceptions do NOT trigger rollback:
 
+```java
 // This does NOT rollback on IOException (checked)
 @Transactional
 public void processFile(String path) throws IOException {
@@ -94,6 +99,7 @@ public void processFile(String path) throws IOException {
     repository.save(entity);
     throw new IOException("File not found");  // NOW rolls back
 }
+```
 
 **Never-final rule:** `@Transactional` on a `final` or `static` method is silently ignored. Spring uses CGLIB proxies, and final/static methods cannot be overridden.
 
@@ -101,6 +107,7 @@ public void processFile(String path) throws IOException {
 
 This is the #1 `@Transactional` bug in production:
 
+```java
 @Service
 public class OrderService {
 
@@ -116,6 +123,7 @@ public class OrderService {
         return order;
     }
 }
+```
 
 When `processOrder()` calls `createOrder()` on `this`, the call bypasses the Spring proxy entirely. No transaction is started. `save()` runs in autocommit mode.
 
@@ -124,6 +132,7 @@ When `processOrder()` calls `createOrder()` on `this`, the call bypasses the Spr
 2. Extract the transactional method to a separate `@Component`.
 3. Use `AopContext.currentProxy()`.
 
+```java
 @Service
 @RequiredArgsConstructor
 public class OrderService {
@@ -146,6 +155,7 @@ public class OrderService {
         return order;
     }
 }
+```
 
 ## Read-only transactions
 
@@ -158,16 +168,19 @@ public List<Order> getOrders(String customerId) {
 
 ## Transaction timeout
 
+```java
 @Transactional(timeout = 30)  // rolls back if not committed within 30 seconds
 public void longRunningBatch() {
     // process thousands of records
     // if it takes > 30 seconds, Spring throws TransactionTimedOutException
 }
+```
 
 ## How we use it in organizations
 
 ### Scenario 1: nested transactions with savepoints
 
+```java
 @Service
 public class PaymentService {
 
@@ -184,9 +197,11 @@ public class PaymentService {
         }
     }
 }
+```
 
 ### Scenario 2: REQUIRES_NEW for audit logging
 
+```java
 @Service
 public class AuditService {
 
@@ -197,9 +212,11 @@ public class AuditService {
         // Commits independently of the caller's transaction
     }
 }
+```
 
 ### Scenario 3: optimistic locking with @Version
 
+```java
 @Entity
 public class Account {
     @Id private String id;
@@ -219,6 +236,7 @@ public class AccountService {
         accountRepository.save(account);
     }
 }
+```
 
 ## Common mistakes
 

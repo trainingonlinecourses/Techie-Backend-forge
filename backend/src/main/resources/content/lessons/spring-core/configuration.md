@@ -161,10 +161,14 @@ public class AuthService {
 public class CustomConfig {
 
     @Value("${custom.api.key}")                            // Required — fails if missing
+```java
     private String apiKey;
+```
 
     @Value("${custom.api.timeout:30}")                     // Default value: 30
+```java
     private int timeout;
+```
 
     @Value("#{${custom.api.endpoints}}")                   // SpEL: parse map from properties
     private Map<String, String> endpoints;
@@ -241,6 +245,7 @@ public record RedisProperties(
 
 ### Scenario 3: @Profile for Environment-Specific Beans
 
+```java
 @Configuration
 @Profile("dev")                               // Only active in dev profile
 public class DevConfig {
@@ -265,6 +270,7 @@ public class ProdConfig {
         };
     }
 }
+```
 
 ---
 

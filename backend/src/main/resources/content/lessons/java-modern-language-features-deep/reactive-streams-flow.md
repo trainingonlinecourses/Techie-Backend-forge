@@ -32,7 +32,9 @@ Without backpressure, a fast publisher can flood a slow subscriber, and the subs
 
 A `Publisher<T>` is something that produces items of type `T` for subscribers. Its main method is:
 
+```java
 void subscribe(Subscriber<? super T> subscriber);
+```
 
 When a subscriber calls `subscribe`, the publisher creates a `Subscription` for that subscriber and calls the subscriber's `onSubscribe(subscription)`. Then the publisher may start sending items via `onNext`, and eventually calls `onComplete` (if it finishes normally) or `onError` (if it fails).
 
@@ -42,10 +44,12 @@ A publisher can have multiple subscribers. Each subscriber gets its own subscrip
 
 A `Subscriber<T>` consumes items of type `T`. Its methods:
 
+```java
 void onSubscribe(Subscription subscription);
 void onNext(T item);
 void onError(Throwable throwable);
 void onComplete();
+```
 
 - **`onSubscribe`** — called when the publisher is ready to send items. The subscriber receives the `Subscription` here and should store it so it can request items later.
 - **`onNext`** — called for each item. The subscriber processes the item. If the subscriber has requested only N items, it should receive at most N `onNext` calls before it requests more.
@@ -58,8 +62,10 @@ A common mistake is to request all items at once (`subscription.request(Long.MAX
 
 A `Subscription` represents the link between one publisher and one subscriber. Its methods:
 
+```java
 void request(long n);
 void cancel();
+```
 
 - **`request(n)`** — the subscriber asks the publisher to send up to `n` more items (via `onNext`). The publisher should respect this and not send more than `n` items until the subscriber requests more.
 - **`cancel()`** — the subscriber tells the publisher to stop sending items. After this, the publisher should not send more `onNext`, `onError`, or `onComplete` to this subscriber.
@@ -178,6 +184,7 @@ import java.util.concurrent.SubmissionPublisher;
 
 public class SubmissionPublisherDemo {
     static class PrintSubscriber implements Subscriber<String> {
+```java
         private Subscription sub;
 
         @Override
@@ -204,6 +211,7 @@ public class SubmissionPublisherDemo {
     }
 
     public static void main(String[] args) {
+```
         try (var publisher = new SubmissionPublisher<String>()) {
             publisher.subscribe(new PrintSubscriber());
 

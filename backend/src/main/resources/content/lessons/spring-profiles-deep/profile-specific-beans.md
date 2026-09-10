@@ -12,6 +12,7 @@ docs:
 
 `@Profile` registers a bean only when a specific Spring profile is active. This lets you swap entire implementations between environments without changing any code.
 
+```java
 // Only register when "dev" profile is active
 @Component
 @Profile("dev")
@@ -25,6 +26,7 @@ public class ConsoleNotificationService implements NotificationService {
 public class EmailNotificationService implements NotificationService {
     public void send(String msg) { /* send email */ }
 }
+```
 
 ---
 
@@ -45,10 +47,12 @@ spring:
 
 ### Default Profile
 
+```java
 // Fallback when no profile is active
 @Component
 @Profile("default")
 public class H2DataSourceConfig { ... }
+```
 
 ---
 
@@ -67,6 +71,7 @@ public class ProfileConfig {
         return new EmbeddedDatabaseBuilder()
             .setType(EmbeddedDatabaseType.H2)
             .addScript("schema-dev.sql")
+```java
             .build();
     }
 
@@ -74,6 +79,7 @@ public class ProfileConfig {
     @Profile("prod")
     public DataSource prodDataSource() {
         return DataSourceBuilder.create()
+```
             .url("jdbc:postgresql://prod-db:5432/myapp")
             .build();
     }
@@ -99,6 +105,7 @@ public class ProfileConfig {
 
 ### Scenario 1: Feature flags with profiles
 
+```java
 @Component
 @Profile("feature-search-v2")
 public class V2SearchService implements SearchService { ... }
@@ -106,9 +113,11 @@ public class V2SearchService implements SearchService { ... }
 @Component
 @Profile("!feature-search-v2")
 public class V1SearchService implements SearchService { ... }
+```
 
 ### Scenario 2: Testing with mocks
 
+```java
 @Component
 @Profile("test")
 public class MockPaymentGateway implements PaymentGateway {
@@ -116,6 +125,7 @@ public class MockPaymentGateway implements PaymentGateway {
         return PaymentResult.success("mock-123");
     }
 }
+```
 
 ---
 

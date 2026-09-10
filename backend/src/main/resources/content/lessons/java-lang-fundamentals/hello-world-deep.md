@@ -15,11 +15,13 @@ The Java Hello World program is the first thing almost every learner writes, and
 
 A Hello World program in Java is:
 
+```java
 public class HelloWorld {
     public static void main(String[] args) {
         System.out.println("Hello, World");
     }
 }
+```
 
 Three lines, but each line carries a piece of the contract between your code and the JVM.
 

@@ -18,25 +18,33 @@ Spring has three HTTP clients for calling REST APIs:
 2. **WebClient** (reactive) — non-blocking, reactive, complex
 3. **RestClient** (new in Spring 6.1) — blocking, fluent, modern
 
+```java
 **RestClient** is the modern replacement for RestTemplate. It's simpler, fluent, and supports the latest features:
 
 // Old way — RestTemplate
 RestTemplate restTemplate = new RestTemplate();
+```
 ResponseEntity<User> response = restTemplate.exchange(
     "https://api.example.com/users/{id}",
     HttpMethod.GET,
     null,
     new ParameterizedTypeReference<User>() {},
     userId
+```java
 );
 
 // New way — RestClient (cleaner, more readable)
+```
 RestClient client = RestClient.create("https://api.example.com");
 
 User user = client.get()
+```java
     .uri("/users/{id}", userId)
+```
     .retrieve()
+```java
     .body(User.class);
+```
 
 ### Creating RestClient
 
@@ -49,16 +57,20 @@ RestClient client = RestClient.builder()
     .defaultHeader("Authorization", "Bearer " + token)
     .defaultHeader("Accept", MediaType.APPLICATION_JSON_VALUE)
     .requestFactory(new JdkClientHttpRequestFactory())  // Java 11+ HttpClient
+```java
     .build();
 
 // With timeouts
+```
 RestClient client = RestClient.builder()
     .requestFactory(new JdkClientHttpRequestFactory(
         HttpClient.newBuilder()
             .connectTimeout(Duration.ofSeconds(5))
             .build()
     ))
+```java
     .build();
+```
 
 ### Making Requests
 
@@ -113,7 +125,9 @@ client.delete()
 
 // Handle specific status codes
 User user = client.get()
+```java
     .uri("/users/{id}", userId)
+```
     .retrieve()
     .onStatus(HttpStatusCode::is4xxClientError, (req, resp) -> {
         if (resp.getStatusCode().value() == 404) {
@@ -143,9 +157,11 @@ try {
 RestClient client = RestClient.builder()
     .requestInterceptor((request, body, execution) -> {
         log.info("→ {} {} {}bytes", request.getMethod(), request.getURL(), body.length);
+```java
         long start = System.currentTimeMillis();
         ClientHttpResponse response = execution.execute(request, body);
         long duration = System.currentTimeMillis() - start;
+```
         log.info("← {} {}ms", response.getStatusCode(), duration);
         return response;
     })
@@ -170,6 +186,7 @@ public class UserServiceClient {
     }
     
     public Optional<User> findById(Long id) {
+```java
         try {
             User user = client.get().uri("/users/{id}", id)
                 .retrieve().body(User.class);
@@ -187,13 +204,16 @@ public class PaymentGateway {
     
     public PaymentGateway(PaymentConfig config) {
         this.client = RestClient.builder()
+```
             .baseUrl(config.getBaseUrl())
             .defaultHeader("Authorization", "Bearer " + config.getApiKey())
+```java
             .build();
     }
     
     public PaymentResult charge(BigDecimal amount, String currency) {
         return client.post()
+```
             .uri("/v1/charges")
             .body(Map.of("amount", amount, "currency", currency))
             .retrieve()

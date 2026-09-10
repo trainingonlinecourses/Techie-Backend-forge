@@ -23,6 +23,7 @@ Spring Boot's `spring-boot-starter-test` brings Jupiter, AssertJ, Mockito, MockM
 
 ## The anatomy of a test
 
+```java
 class OrderServiceTest {
 
     private OrderService service;
@@ -41,6 +42,7 @@ class OrderServiceTest {
         assertNotNull(o.id());
     }
 }
+```
 
 The lifecycle in order: `@BeforeAll` (once, static) → `@BeforeEach` → `@Test` → `@AfterEach` → `@AfterAll` (once, static). **Each test runs on a fresh instance** — that's what makes tests independent and parallel-safe.
 
@@ -72,6 +74,7 @@ assertTrue(orders.stream().allMatch(o -> o.status() == PENDING),
 
 ## Display names, disabling, tagging
 
+```java
 @DisplayName("Order creation")
 @Tag("unit")                 // run groups: -Dgroups=unit (JUnit 5) or includeTags in Gradle
 class OrderServiceTest {
@@ -84,11 +87,13 @@ class OrderServiceTest {
     @Disabled("flaky — re-enable after the tax refactor (JIRA-123)")
     void taxEdgeCase() { ... }
 }
+```
 
 `@Disabled` with a reason, not a silence — the reason is what lets a future dev know whether to fix or delete.
 
 ## Nested tests and the ClassNameTest convention
 
+```java
 @Nested
 class ValidationTests {
     @Test void rejectsNullCustomer() { ... }
@@ -99,6 +104,7 @@ class ValidationTests {
 class MoneyTests {
     @Test void formatsWithTwoDecimals() { ... }
 }
+```
 
 `@Nested` groups give you readable test reports (like sections in a spec). Convention: test class `OrderServiceTest` next to `OrderService`, same package — Maven's Surefire picks up `*Test`, `Test*`, `*Tests`, `*TestCase` by default.
 

@@ -14,10 +14,12 @@ docs:
 
 `NullPointerException` is the most common Java error. It happens when you call a method on a null reference:
 
+```java
 String name = user.getName();  // What if user is null?
 int length = name.length();    // NullPointerException!
 
 **Optional** makes you handle the "maybe null" case explicitly:
+```
 
 Optional<String> name = Optional.ofNullable(user.getName());
 int length = name.map(String::length).orElse(0);

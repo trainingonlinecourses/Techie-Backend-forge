@@ -12,6 +12,7 @@ docs:
 
 Where you store uploaded files depends on your deployment. Local disk is simplest, but cloud storage (S3, GCS, Azure Blob) is needed for production apps with multiple instances.
 
+```java
 // Storage interface
 public interface FileStorage {
     String store(MultipartFile file) throws IOException;
@@ -28,6 +29,7 @@ public class LocalFileStorage implements FileStorage { ... }
 @Component
 @Profile("prod")
 public class S3FileStorage implements FileStorage { ... }
+```
 
 ---
 
@@ -81,6 +83,7 @@ public class S3FileStorage implements FileStorage {
     private final String bucket;
 
     public S3FileStorage(S3Client s3, @Value("${app.s3.bucket}") String bucket) {
+```java
         this.s3 = s3;
         this.bucket = bucket;
     }
@@ -88,11 +91,13 @@ public class S3FileStorage implements FileStorage {
     @Override
     public String store(MultipartFile file) throws IOException {
         String key = UUID.randomUUID() + "_" + file.getOriginalFilename();
+```
         s3.putObject(
             PutObjectRequest.builder().bucket(bucket).key(key).build(),
             software.amazon.awssdk.core.sync.RequestBody.fromInputStream(
                 file.getInputStream(), file.getSize()
             )
+```java
         );
         return key;
     }
@@ -100,13 +105,16 @@ public class S3FileStorage implements FileStorage {
     @Override
     public byte[] load(String filename) throws IOException {
         return s3.getObjectAsBytes(
+```
             software.amazon.awssdk.services.s3.model.GetObjectRequest.builder()
                 .bucket(bucket).key(filename).build()
+```java
         ).asByteArray();
     }
 
     @Override
     public void delete(String filename) {
+```
         s3.deleteObject(
             software.amazon.awssdk.services.s3.model.DeleteObjectRequest.builder()
                 .bucket(bucket).key(filename).build()
@@ -120,6 +128,7 @@ public class S3FileStorage implements FileStorage {
 
 ### Scenario 1: Database storage for small files
 
+```java
 @Entity
 public class Attachment {
     @Id @GeneratedValue
@@ -129,9 +138,11 @@ public class Attachment {
     @Lob
     private byte[] data;  // max ~16MB on most databases
 }
+```
 
 ### Scenario 2: Multi-tenant storage
 
+```java
 @Component
 public class TenantFileStorage implements FileStorage {
     private final Map<String, FileStorage> storages;
@@ -140,6 +151,7 @@ public class TenantFileStorage implements FileStorage {
         return storages.getOrDefault(tenantId, storages.get("default"));
     }
 }
+```
 
 ---
 

@@ -18,7 +18,9 @@ docs:
 
 Here's the trap: your test suite runs on the **JVM** — but production runs a **native binary**. The two execution models differ precisely at the seams native image cares about (reflection, resources, dynamic loading) — so a suite that's green on the JVM can ship a binary that crashes at first reflective call. The answer is two-tier testing: **JVM tests** for the fast, comprehensive loop, and **native tests** — the same suite, compiled AOT and run against the native binary — for the reachability gap. This lesson is that two-tier discipline.
 
+```java
 **The mental model:** the JVM test suite is the factory's quality control on the prototype line; the native test suite is QC on the *actual production line*. Prototype-line QC (JVM) is fast and catches logic bugs; production-line QC (native) is slow (native builds take minutes) but catches what only the real process can reveal: a class the analyzer missed, a resource not in the binary, a reflection hint forgotten. Both lines matter — and the gap between them is exactly the native-image risk surface.
+```
 
 ## The Two-Tier Setup
 

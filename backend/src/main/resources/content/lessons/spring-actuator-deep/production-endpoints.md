@@ -289,11 +289,13 @@ public class CompositeHealthIndicator implements HealthIndicator {
 
         if (db.getStatus() == Status.UP &&
             redis.getStatus() == Status.UP &&
+```java
             api.getStatus() == Status.UP) {
             return Health.up().build();
         }
 
         return Health.down()
+```
             .withDetail("database", db.getStatus())
             .withDetail("redis", redis.getStatus())
             .withDetail("externalApi", api.getStatus())

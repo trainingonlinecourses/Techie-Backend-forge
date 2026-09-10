@@ -25,7 +25,9 @@ Think of a city: every house has a unique address (primary key). A delivery truc
 
 ### 1. One-to-Many (1:N) — the workhorse
 
+```java
 One author has many courses; one course has one author:
+```
 
 ```sql
 CREATE TABLE authors (
@@ -44,7 +46,9 @@ CREATE TABLE courses (
 
 ### 2. Many-to-Many (M:N) — needs a join table
 
+```java
 A course has many students; a student takes many courses:
+```
 
 ```sql
 CREATE TABLE students (

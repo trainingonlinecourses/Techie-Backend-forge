@@ -53,7 +53,9 @@ spec:
           image: ghcr.io/org/backend:v2
 ```
 
+```java
 **Cost**: double the infrastructure while both are live. **Database**: schema must be compatible in both directions (the DB is shared; a v2 schema change breaks v1 during the switch window). Use expand/contract migrations.
+```
 
 ## Canary
 
@@ -96,12 +98,15 @@ spec:
       istioctl traffic-rule ...   # (concept: adjust weights)
 ```
 
+```java
 **Pros**: real production traffic on the new version, automatic detection of regressions. **Cons**: needs metric comparison infrastructure; two versions run concurrently.
+```
 
 ## Feature Flags
 
 Deploy the code **dark** — the feature exists but is off — then flip it per environment or per user:
 
+```java
 @Component
 public class FeatureFlags {
 
@@ -122,6 +127,7 @@ public class CheckoutService {
         return checkoutV1(cart, user);
     }
 }
+```
 
 **The killer combination**: ship `checkout-v2` dark, run it for your own team (internal flag), ramp to 1% (canary by flag), then 100% — *without a redeploy*. Rollback is flipping a boolean.
 
@@ -129,9 +135,11 @@ public class CheckoutService {
 
 The most important flag is the **kill switch** — a global "everything off" for a subsystem:
 
+```java
 if (flags.killSwitch("payments")) {
     throw new PaymentsUnavailableException();
 }
+```
 
 When the payment gateway misbehaves, ops flips one flag instead of redeploying.
 
@@ -185,7 +193,9 @@ The pipeline itself enforces the gate: no metrics comparison, no promotion.
 | Feature-level control without redeploys | Feature flags |
 | Schema changes | Expand/contract migrations always |
 
+```java
 Release strategy is risk management: how fast can you recover, and how much traffic do you expose to the unknown? Start with rolling + flags; add blue-green and canary where the blast radius justifies the complexity.
+```
 
 ## References
 

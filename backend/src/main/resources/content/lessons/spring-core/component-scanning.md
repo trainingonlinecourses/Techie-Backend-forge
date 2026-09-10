@@ -250,9 +250,11 @@ com.acme/
         classes = KafkaIngestService.class  // Exclude this bean in tests
     )
 )
+```java
 class OrderServiceTest {
     // KafkaIngestService is not created here — no need to mock it
 }
+```
 
 ### Scenario 3 — importing a third-party module
 
@@ -260,12 +262,15 @@ class OrderServiceTest {
 // @Import registers its configuration:
 @Configuration
 @Import(PaymentModuleConfig.class)      // Line 1: Import the library's config
+```java
 public class AppConfig {
     // Line 2: Now PaymentService, PaymentRepository, etc. are beans
 }
+```
 
 ### Scenario 4 — duplicate beans (the fail-fast feature)
 
+```java
 // If two classes have the same name, Spring fails fast:
 @Component("paymentService")
 class V1PaymentService { }
@@ -277,6 +282,7 @@ class V2PaymentService { }
 @Component("paymentService")
 @Primary                                    // This one wins when there's a conflict
 class V1PaymentService { }
+```
 
 ## Debugging component scanning
 
@@ -291,6 +297,7 @@ logging:
 
 ### Check if your bean is being created
 
+```java
 @Component
 public class MyBean implements CommandLineRunner {
     @Override
@@ -298,6 +305,7 @@ public class MyBean implements CommandLineRunner {
         System.out.println("MyBean is alive!");  // If you see this, the bean was created
     }
 }
+```
 
 ### The classic "bean not found" bug
 

@@ -177,10 +177,6 @@ public class Main {
 2. Memory: HashMap stores Entry objects with hash, key, value, next pointer. EnumMap stores a flat array of values (null for missing entries)
 3. Benchmark: EnumMap.put() is ~3x faster than HashMap.put() for enum keys. Benchmark: EnumMap.get() is ~4x faster than HashMap.get() for enum keys
 
-The same code, clean:
-
-```java
-```
 
 ---
 
@@ -248,6 +244,7 @@ public class Main {
 
 ### State Machine with Enums
 
+```java
 public class Main {
 
     public static void main(String[] args) {
@@ -282,6 +279,7 @@ public class Main {
         System.out.println(state.describe());
     }
 }
+```
 
 ---
 
@@ -293,10 +291,13 @@ public enum Role {
     GUEST(Permission.READ),
     USER(Permission.READ, Permission.WRITE),
     EDITOR(Permission.READ, Permission.WRITE, Permission.EXECUTE),
+```java
     ADMIN(Permission.values());
+```
     
     private final EnumSet<Permission> permissions;
     
+```java
     Role(Permission... perms) {
         this.permissions = EnumSet.copyOf(Arrays.asList(perms));
     }
@@ -304,6 +305,7 @@ public enum Role {
     public boolean can(Permission perm) {
         return permissions.contains(perm);
     }
+```
     
     public EnumSet<Permission> getPermissions() {
         return EnumSet.copyOf(permissions);

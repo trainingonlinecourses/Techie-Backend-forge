@@ -139,6 +139,7 @@ public class SecurityConfig {
 
 ### Global Exception Handler for Security Exceptions
 
+```java
 @RestControllerAdvice
 public class SecurityExceptionHandler {
 
@@ -179,6 +180,7 @@ public class SecurityExceptionHandler {
         return ResponseEntity.status(401).body(error);
     }
 }
+```
 
 ---
 

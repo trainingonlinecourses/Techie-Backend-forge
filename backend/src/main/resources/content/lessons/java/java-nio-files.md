@@ -61,6 +61,7 @@ try (Stream<String> lines = Files.lines(Path.of("big.csv"))) {
 
 ## Channels & ByteBuffer (bulk/zero-copy I/O)
 
+```java
 // Copy with a channel — the OS does the heavy lifting (zero-copy transfer)
 try (FileChannel in = FileChannel.open(Path.of("in.bin"));
      FileChannel out = FileChannel.open(Path.of("out.bin"), WRITE, CREATE)) {
@@ -72,16 +73,19 @@ try (FileChannel ch = FileChannel.open(Path.of("db.bin"))) {
     MappedByteBuffer buf = ch.map(FileChannel.MapMode.READ_ONLY, 0, ch.size());
     byte b = buf.get(1000);
 }
+```
 
 ## Asynchronous file I/O
 
 AsynchronousFileChannel ch = AsynchronousFileChannel.open(
+```java
         Path.of("log.bin"), StandardOpenOption.READ);
 ByteBuffer buf = ByteBuffer.allocate(4096);
 ch.read(buf, 0, null, new CompletionHandler<Integer, Void>() {
     public void completed(Integer read, Void attach) { ... }
     public void failed(Throwable e, Void attach) { ... }
 });
+```
 // Or the future style: Future<Integer> f = ch.read(buf, 0);
 
 Use async channels when a **single thread** must juggle many I/O operations (high-concurrency gateways). For ordinary applications, blocking I/O on a bounded thread pool is simpler and often faster.

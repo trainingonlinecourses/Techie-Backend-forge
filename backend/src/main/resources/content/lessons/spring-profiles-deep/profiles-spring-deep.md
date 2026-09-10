@@ -56,10 +56,12 @@ java -jar app.jar --spring.profiles.active=prod
 export SPRING_PROFILES_ACTIVE=prod
 ```
 
+```java
 **Option 4: Programmatic**
 SpringApplication app = new SpringApplication(App.class);
 app.setAdditionalProfiles("dev");
 app.run(args);
+```
 
 ### YAML Multi-Document Format
 

@@ -50,9 +50,11 @@ public class RedisCacheConfig {
                 .fromSerializer(new StringRedisSerializer()))
             .serializeValuesWith(RedisSerializationContext.SerializationPair
                 .fromSerializer(new GenericJackson2JsonRedisSerializer()))
+```java
             .disableCachingNullValues();
 
         return RedisCacheManager.builder(factory)
+```
             .cacheDefaults(config)
             .withCacheConfiguration("course-catalog",
                 RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofHours(1)))
@@ -98,8 +100,10 @@ redis-cli ttl 'courses::c1'
 
 `sync = true` works across the cluster because Redis supports it natively:
 
+```java
 @Cacheable(value = "courses", key = "#id", sync = true)
 public Course getCourse(String id) { ... }
+```
 
 With Redis, the lock is a distributed Redis lock, so a cold key is computed once even when 100 replicas request it simultaneously. This is one of the biggest wins of Redis over a local cache in a cluster.
 
@@ -124,6 +128,7 @@ public class CacheWarmer implements ApplicationRunner {
 
 Redis is a dependency — when it's down, every cached method throws. Decide the failure policy:
 
+```java
 @Cacheable(value = "courses", sync = true)
 public Course getCourse(String id) {
     try {
@@ -136,11 +141,13 @@ public Course getCourse(String id) {
 }
 
 "Fail open" (serve from DB) is usually right for reads; "fail closed" (throw) is right when serving stale data is worse than an error.
+```
 
 ## Local + Remote: Two-Level Cache
 
 For very hot data, layer Caffeine in front of Redis — L1 local, L2 shared:
 
+```java
 @Bean
 public CacheManager localCacheManager() {
     CaffeineCacheManager manager = new CaffeineCacheManager();
@@ -149,6 +156,7 @@ public CacheManager localCacheManager() {
 }
 
 L1 gives sub-microsecond hits; L2 gives cluster consistency with a 30s lag. The tradeoff: invalidation is eventually consistent within the L1 TTL.
+```
 
 ## Summary
 

@@ -18,9 +18,11 @@ docs:
 
 For decades, the relational model was the only game in town: tables, rows, columns, and joins enforced by rigid schemas. **MongoDB** is the most popular *document database*: instead of a table of uniform rows, you store **documents** — self-contained JSON-like objects — in **collections**. Each document can have its own shape; there are no tables to `ALTER`, no columns to declare, and related data lives *inside* the document rather than in a joined table.
 
+```java
 **The mental model:** a relational database is a set of spreadsheets with fixed columns — every row in "customers" must have the same fields, and related data (orders) lives in another spreadsheet linked by foreign keys. MongoDB is a filing cabinet of *folders*: each folder is a document describing one thing completely — a customer *with their orders nested inside*. You don't join; you open the folder.
 
 **Why does this matter?** For data that is naturally hierarchical and read as a whole (a user profile with addresses and preferences, a product with variants and reviews, a blog post with comments), the document model matches the *application's* object shape directly: the JSON you store is the object you use. No ORM mapping, no join queries, no schema migrations for adding a field.
+```
 
 ## Documents: JSON, But Richer
 

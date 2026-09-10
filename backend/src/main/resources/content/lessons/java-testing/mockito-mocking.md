@@ -79,12 +79,14 @@ when(repo.findById(1L)).thenReturn(Optional.of(o)).thenThrow(new RuntimeExceptio
 
 ## Verification: the "did it happen" grammar
 
+```java
 verify(repo).save(o);                              // called exactly once with o
 verify(repo, times(2)).save(o);
 verify(payments, never()).charge(any());
 verify(payments, atLeastOnce()).charge(any());
 verifyNoInteractions(notificationService);         // nothing touched this collaborator at all
 verifyNoMoreInteractions(repo);                    // no unexpected calls beyond what you verified
+```
 
 - `verify(...)` is about **behavior** ("the payment was attempted"), `when(...)` is about **data** ("it returns this"). Only verify what you'd assert as a business rule — over-verifying pins implementation details and makes every refactor a test rewrite.
 - `verifyNoMoreInteractions` is powerful and brittle — use it sparingly, where silent extra calls would be a real bug (e.g. a duplicate charge).
@@ -93,11 +95,13 @@ verifyNoMoreInteractions(repo);                    // no unexpected calls beyond
 
 A **spy** wraps a real object — real methods run unless stubbed:
 
+```java
 OrderService real = new OrderService(repo, payments);
 OrderService spy = spy(real);
 
 doReturn(true).when(spy).isEligibleForRefund(any());   // stub one method, run the rest for real
 spy.cancel(42L);                                       // real logic + stubbed guard
+```
 
 Use spies to test **real logic with one injected seam** — but a test that needs a spy is often a sign the class has too many internal seams (a candidate for extracting a collaborator).
 
@@ -105,11 +109,13 @@ Use spies to test **real logic with one injected seam** — but a test that need
 
 In Spring tests, Mockito mocks replace real beans for the *unit-under-test slice*:
 
+```java
 @WebMvcTest(OrderController.class)                 // only the web layer
 class OrderControllerTest {
     @MockBean OrderService service;                 // mocked into the context
     // MockMvc performs requests; service interactions are stubbed/verified
 }
+```
 
 (`@MockitoBean` in Boot 3.4+ is the newer name; `@MockBean` still works.) The rule from the testing pyramid: mock at the **service boundary** in slice tests, use real beans (Testcontainers) in `@SpringBootTest` integration tests.
 

@@ -12,7 +12,9 @@ docs:
 
 Look at the main method you've typed a hundred times:
 
+```java
 public static void main(String[] args) { }
+```
 
 That `String[] args` is not decoration. When you launch:
 
@@ -111,6 +113,7 @@ Style 2 requires lookahead logic (`if (arg.equals("--port")) port = Integer.pars
 
 **Scenario 3 — Real libraries exist.** For anything beyond ~3 flags, teams use Picocli or JCommander which handle parsing, validation, `--help` generation, and tab-completion:
 
+```java
 @Command(name = "recon")
 class ReconCommand implements Runnable {
     @Parameters(index = "0") String file;          // annotated field auto-populated from args
@@ -118,6 +121,7 @@ class ReconCommand implements Runnable {
 
     public void run() { /* ... */ }
 }
+```
 
 ## Common Mistakes
 

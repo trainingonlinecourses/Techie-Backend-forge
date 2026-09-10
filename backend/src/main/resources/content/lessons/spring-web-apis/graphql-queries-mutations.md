@@ -13,7 +13,9 @@ docs:
 
 ## Arguments and the input discipline
 
+```java
 Query arguments come from the schema; complex payloads use **input types** (never graph types — input types can't have resolvers, fields are just data):
+```
 
 ```graphql
 input OrderFilter { status: OrderStatus, minAmount: BigDecimal, customerId: ID }
@@ -21,9 +23,11 @@ input OrderFilter { status: OrderStatus, minAmount: BigDecimal, customerId: ID }
 type Query { orders(filter: OrderFilter, page: Int = 0, size: Int = 10): OrderConnection! }
 ```
 
+```java
 @QueryMapping
 public OrderConnection orders(@Argument OrderFilter filter,
                               @Argument int page, @Argument int size) { ... }
+```
 
 **Bean Validation works on input objects too** — validate `@Argument` payloads with `@Valid` and constraint annotations; violations become GraphQL errors automatically (the Spring Core validation lesson applies unchanged).
 

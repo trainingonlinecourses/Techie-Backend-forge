@@ -15,10 +15,12 @@ docs:
 
 A regular `HashMap` is not thread-safe. If two threads write to it simultaneously, you get data corruption:
 
+```java
 Map<String, Integer> map = new HashMap<>();
 // Thread 1: map.put("count", 1);
 // Thread 2: map.put("count", 2);
 // Race condition: one write may be lost, or internal structure corrupts
+```
 
 Even worse, `HashMap` uses a linked list internally. Concurrent modifications can create an infinite loop (the classic "CPU spike" bug).
 
@@ -211,6 +213,7 @@ public class ThreadSafeCache {
 public class RateLimiter {
     private final BlockingQueue<Instant> requests = new ArrayBlockingQueue<>(100);
     
+```java
     public boolean tryAcquire() {
         Instant now = Instant.now();
         requests.offer(now);  // Non-blocking add
@@ -222,6 +225,7 @@ public class RateLimiter {
 
 **3. Event Bus**
 public class EventBus {
+```
     private final ConcurrentHashMap<Class<?>, CopyOnWriteArrayList<Object>> listeners = new ConcurrentHashMap<>();
     
     public <T> void register(Class<T> eventType, Consumer<T> listener) {

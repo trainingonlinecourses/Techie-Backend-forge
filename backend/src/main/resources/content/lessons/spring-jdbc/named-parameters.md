@@ -16,6 +16,7 @@ docs:
 
 ## Setup
 
+```java
 @Repository
 public class CourseRepository {
 
@@ -25,6 +26,7 @@ public class CourseRepository {
         this.jdbcTemplate = jdbcTemplate;
     }
 }
+```
 
 Spring Boot auto-configures it from the `DataSource`. It wraps a `JdbcTemplate` under the hood — same features, named syntax.
 
@@ -105,8 +107,10 @@ public int[] insertAll(List<Course> courses) {
 Named parameters make the classic `IN (...)` dynamic list clean:
 
 public List<Course> findByIds(Collection<Long> ids) {
+```java
     MapSqlParameterSource params = new MapSqlParameterSource("ids", ids);
     return jdbcTemplate.query(
+```
         "SELECT * FROM courses WHERE id IN (:ids)",
         params, courseRowMapper);
 }
@@ -117,11 +121,13 @@ The template expands `:ids` into `(?, ?, ?...)` automatically — no manual comm
 
 Both APIs coexist:
 
+```java
 // Positional when you need it
 public int count() {
     return jdbcTemplate.getJdbcTemplate().queryForObject(
         "SELECT COUNT(*) FROM courses", Long.class).intValue();
 }
+```
 
 Use named parameters as the default; drop to the wrapped `JdbcTemplate` only for trivial scalar queries.
 
@@ -141,6 +147,7 @@ The `@Transactional` boundary wraps the template call — same as JPA.
 
 ## Testing
 
+```java
 @DataJpaTest   // or @JdbcTest for pure JDBC slice
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class CourseRepositoryTest {
@@ -157,6 +164,7 @@ class CourseRepositoryTest {
         assertEquals("Spring Boot", course.getTitle());
     }
 }
+```
 
 ## Summary
 

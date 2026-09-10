@@ -16,8 +16,10 @@ docs:
 
 ## The Problem With Full Context
 
+```java
 @SpringBootTest   // boots everything: DB, Redis, Kafka, security, the lot
 class CourseServiceTest { ... }
+```
 
 - 30–120s to start the context
 - Every test run re-initializes all dependencies
@@ -46,17 +48,23 @@ class CourseControllerTest {
     @Test
     void getCourseReturnsDto() throws Exception {
         when(courseService.findById(1L))
+```java
             .thenReturn(new CourseDto(1L, "Spring Boot"));
+```
 
         mockMvc.perform(get("/api/courses/1"))
             .andExpect(status().isOk())
+```java
             .andExpect(jsonPath("$.title").value("Spring Boot"));
     }
 
     @Test
     void missingCourseIs404() throws Exception {
+```
         when(courseService.findById(999L))
+```java
             .thenThrow(new CourseNotFoundException("999"));
+```
 
         mockMvc.perform(get("/api/courses/999"))
             .andExpect(status().isNotFound())
@@ -70,15 +78,19 @@ class CourseControllerTest {
 
 If the app has Spring Security, `@WebMvcTest` loads it — every request is 401 unless you permit:
 
+```java
 @WebMvcTest(CourseController.class)
 @AutoConfigureMockMvc(addFilters = false)      // skip security filters
 class CourseControllerTest { ... }
+```
 
 Or authenticate in tests:
 
 mockMvc.perform(get("/api/courses/1")
         .with(user("admin").roles("ADMIN")))
+```java
     .andExpect(status().isOk());
+```
 
 ## @DataJpaTest: Test the Repository, Real SQL
 
@@ -116,6 +128,7 @@ Key facts:
 
 ### Real Postgres in Slices
 
+```java
 @DataJpaTest
 @Testcontainers
 class CourseRepositoryTest {
@@ -126,6 +139,7 @@ class CourseRepositoryTest {
 
     @Autowired CourseRepository repository;
 }
+```
 
 `@ServiceConnection` wires the container into the test context automatically — no config properties needed.
 

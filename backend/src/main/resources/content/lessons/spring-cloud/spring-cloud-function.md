@@ -62,6 +62,7 @@ Functions compose the way they should — with `|`:
 spring.cloud.function.definition: validateOrder|planShipping
 ```
 
+```java
 @Bean
 Function<OrderCreated, OrderCreated> validateOrder() {
     return o -> { if (!o.valid()) throw new IllegalArgumentException(); return o; };
@@ -69,6 +70,7 @@ Function<OrderCreated, OrderCreated> validateOrder() {
 // validateOrder|planShipping = the pipeline, declared in config, reorderable without code
 
 **Routing** picks a function at runtime by a header/payload key:
+```
 
 ```yaml
 spring.cloud.function.routing.enabled: true
@@ -97,11 +99,13 @@ The honest guidance: it's a **deployment portability layer**, not an application
 
 The portability pays for itself in tests — the function is a plain Java call:
 
+```java
 @Test
 void plansShipping() {
     ShippingInstruction result = functions.planShipping().apply(new OrderCreated("42", "berlin"));
     assertThat(result.destination()).isEqualTo("berlin");
 }
+```
 
 The integration test replaces the transport: call the function, or use the Spring Cloud Stream test binder (`spring-cloud-stream-test-binder`) to assert it emits onto its binding — the same test-binder discipline as the Stream lesson.
 

@@ -15,9 +15,11 @@ docs:
 
 **SpEL** (Spring Expression Language) is a small expression language evaluated at runtime: literals, property access, method calls, operators, collections, and safe navigation (`?.`). Its value is that expressions are **data** — stored in annotations, config files, or databases and evaluated later against a context.
 
+```java
 ExpressionParser parser = new SpelExpressionParser();
 Expression exp = parser.parseExpression("'Hello '.concat(name)");
 String result = exp.getValue(new StandardEvaluationContext(), String.class); // context holds name
+```
 
 The **evaluation context** binds variables and root objects: `#root`, `#this`, named variables (`#name`), and registered functions. Production code rarely builds contexts directly — but it *uses* SpEL everywhere:
 
@@ -25,17 +27,21 @@ The **evaluation context** binds variables and root objects: `#root`, `#this`, n
 
 **1. Method security (the biggest use).** Every `@PreAuthorize` string is a SpEL expression:
 
+```java
 @PreAuthorize("hasRole('ADMIN') or #order.ownerId == authentication.principal.id")
 public Order getOrder(@P("order") OrderView order) { ... }
+```
 // #order → method argument; authentication.principal → the security context root
 
 **2. Caching keys.** `@Cacheable` key expressions evaluate SpEL against method args:
 
+```java
 @Cacheable(value = "products", key = "#id + '-' + #locale")
 public Product find(Long id, String locale) { ... }
 
 @Cacheable(value = "products", key = "#root.methodName + ':' + #id")   // root = method info
 @Cacheable(value = "quotes", condition = "#price > 100")              // conditional caching
+```
 
 **3. @Value.** `#{...}` for computed values (see the @Value lesson).
 
@@ -47,14 +53,18 @@ public Product find(Long id, String locale) { ... }
 
 When your app evaluates SpEL (e.g., a rule engine), the two context types matter:
 
+```java
 // 1. StandardEvaluationContext — full power (methods, types, property access)
 StandardEvaluationContext ctx = new StandardEvaluationContext();
 ctx.setVariable("order", order);
+```
 // ctx.setRootObject(...)  → #root
 
 // 2. SimpleEvaluationContext — deliberately limited (no type references, no constructors)
 SimpleEvaluationContext simple = SimpleEvaluationContext
+```java
     .forReadOnlyDataBinding().withInstanceMethods().build();
+```
 
 **The security rule:** use `SimpleEvaluationContext` for any expression from **untrusted input** (a user-supplied rule, a configurable filter). `StandardEvaluationContext` exposes `T(...)` type references, constructors, and bean access — a user-supplied expression could instantiate classes or call arbitrary static methods (**SpEL injection**, an RCE-class vulnerability).
 
@@ -74,18 +84,22 @@ SimpleEvaluationContext simple = SimpleEvaluationContext
 
 // Rule stored per tenant: "orders.amount > 500 and customer.tier == 'GOLD'"
 SimpleEvaluationContext ctx = SimpleEvaluationContext
+```java
     .forReadOnlyDataBinding().build();
 ctx.setVariable("orders", recentOrders);
 boolean eligible = ruleParser.parse(tenant.getRule()).getValue(ctx, Boolean.class);
+```
 
 `SimpleEvaluationContext` keeps tenant-supplied rules read-only — no `T(...)`, no methods that mutate, no RCE.
 
+```java
 **Scenario 2 — dynamic cache keys.** Keys that combine multiple args in a stable way (see above).
 
 **Scenario 3 — conditional event handling.** React only to specific event states:
 
 @EventListener(condition = "#event instanceof T(com.acme.PaymentEvent) and #event.amount > 1000")
 public void onLargePayment(PaymentEvent event) { ... }
+```
 
 **Scenario 4 — filter/search expressions in admin tools.** A stored filter string evaluated over collections (`#items.?[status == 'FAILED']`).
 

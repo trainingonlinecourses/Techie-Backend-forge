@@ -41,6 +41,7 @@ docs:
 
 ### Basic SSE Endpoint
 
+```java
 @RestController
 @RequestMapping("/api/events")
 public class EventController {
@@ -67,6 +68,7 @@ public class EventController {
         return emitter;
     }
 }
+```
 
 ### SseEmitter Manager
 
@@ -127,11 +129,13 @@ public class OrderNotificationService {
             "customer", event.getCustomerName(),
             "total", event.getTotal(),
             "timestamp", Instant.now().toString()
+```java
         ));
     }
 
     @EventListener
     public void onOrderStatusChanged(OrderStatusChangedEvent event) {
+```
         emitterManager.broadcast("order-status", Map.of(
             "orderId", event.getOrderId(),
             "oldStatus", event.getOldStatus(),
@@ -171,6 +175,7 @@ public class ReactiveEventController {
 
 ### Event Publisher
 
+```java
 @Service
 public class EventPublisher {
 
@@ -188,6 +193,7 @@ public class EventPublisher {
         return sink.asFlux();
     }
 }
+```
 
 ---
 

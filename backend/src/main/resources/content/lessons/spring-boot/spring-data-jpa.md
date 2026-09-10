@@ -21,7 +21,9 @@ public interface AccountRepository extends JpaRepository<Account, String> {
 
     List<Account> findByCustomerIdAndStatus(String customerId, AccountStatus status);
 
+```java
     long countByCurrency(String currency);
+```
 
     Page<Account> findByStatus(AccountStatus status, Pageable pageable);
 
@@ -32,6 +34,7 @@ public interface AccountRepository extends JpaRepository<Account, String> {
 
 ## Entities: the basics
 
+```java
 @Entity
 @Table(name = "accounts")
 public class Account {
@@ -53,6 +56,7 @@ public class Account {
     @JoinColumn(name = "customer_id")
     private Customer customer;
 }
+```
 
 Rules: entities have an identity (`@Id`), a no-arg constructor (JPA requirement), and accessors; **don't serialize entities directly to JSON** — map to DTOs/records at the boundary.
 
@@ -78,9 +82,11 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
 @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
 private List<Payment> payments = new ArrayList<>();
 
+```java
 @ManyToOne(fetch = FetchType.LAZY)
 @JoinColumn(name = "customer_id")
 private Customer customer;
+```
 
 **N+1 problem**: loading 100 accounts, then accessing `account.getCustomer()` for each → 1 query + 100 lazy loads. Fix with `join fetch` or `@EntityGraph`:
 
@@ -94,6 +100,7 @@ List<Account> findAllWithCustomer(AccountStatus status);
 
 ## Auditing with JPA
 
+```java
 @Configuration
 @EnableJpaAuditing
 public class JpaConfig {}
@@ -104,6 +111,7 @@ public abstract class AuditedEntity {
     @LastModifiedDate private Instant updatedAt;
 }
 // entity extends AuditedEntity — timestamps maintained automatically
+```
 
 ## Transactions with repositories
 

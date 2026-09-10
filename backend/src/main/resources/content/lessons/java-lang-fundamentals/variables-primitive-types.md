@@ -136,18 +136,23 @@ These four types hold whole numbers of different sizes. The choice between them 
 
 A key rule: integer arithmetic wraps around on overflow. If you add 1 to `Integer.MAX_VALUE` (2,147,483,647), you get `Integer.MIN_VALUE` (-2,147,483,648) — not an error. This is a common source of bugs.
 
+```java
 int max = Integer.MAX_VALUE;   // 2,147,483,647
 int overflow = max + 1;        // -2,147,483,648 — wraps, does not throw
 System.out.println(overflow);   // -2147483648
+```
 
 The JVM does not throw on integer overflow by default. In safety-critical code, you can check for overflow explicitly or use `Math.addExact`, which throws an `ArithmeticException` on overflow:
 
+```java
 int safe = Math.addExact(max, 1);   // throws ArithmeticException — overflow
+```
 
 ### The Floating-Point Types — float, double
 
 `float` and `double` hold decimal numbers, but they do it in binary floating-point, which means many decimal values cannot be represented exactly. This is the source of the classic "why is 0.1 + 0.2 not 0.3?" surprise.
 
+```java
 public class Main {
 
     public static void main(String[] args) {
@@ -156,9 +161,11 @@ public class Main {
         System.out.println(a + b);          // 0.30000000000000004 — not 0.3
     }
 }
+```
 
 This is not a Java problem — it is how binary floating-point works, and it affects Python, C, JavaScript, and most languages. The fix for money and other exact decimal values is `BigDecimal`, not `float` or `double`.
 
+```java
 import java.math.BigDecimal;
 
 public class Main {
@@ -170,6 +177,7 @@ public class Main {
         System.out.println(x.add(y));        // 0.3 exactly
     }
 }
+```
 
 Use `double` for measurements, scientific calculations, and cases where tiny imprecision is acceptable. Use `BigDecimal` for money, percentages that must be exact, and any calculation where the decimal value matters exactly.
 
@@ -179,8 +187,10 @@ Use `double` for measurements, scientific calculations, and cases where tiny imp
 
 This means a Java `String`'s `length()` is the number of `char`s, not the number of visible characters. An emoji can have `length()` 2.
 
+```java
 String emoji = "😀";
 System.out.println(emoji.length());   // 2 — one emoji, two char values (surrogate pair)
+```
 
 Do not use `char` as a small integer. If you need a small integer, use `short` or `byte`. If you need a character, use `char`. If you need a string, use `String`. The types are not interchangeable even though they all hold numbers under the hood.
 
@@ -188,6 +198,7 @@ Do not use `char` as a small integer. If you need a small integer, use `short` o
 
 `boolean` holds `true` or `false`. It is the type of every condition. Unlike C and some other languages, Java does not let you use numbers as booleans — `if (1)` is an error, and you must write `if (true)` or `if (x > 0)`.
 
+```java
 public class Main {
 
     public static void main(String[] args) {
@@ -202,6 +213,7 @@ public class Main {
         // if (1) { ... }   // compilation error — int cannot be converted to boolean
     }
 }
+```
 
 `boolean` values are the result of comparisons: `x > 0`, `name.equals("Alice")`, `list.isEmpty()`, `number % 2 == 0`. Every condition in every `if`, `while`, `for`, and `switch` boils down to a `boolean`.
 
@@ -231,14 +243,18 @@ double  d = f;
 
 Narrowing conversions — going the other way — are not automatic, because they can lose information.
 
+```java
 int i = 1000;
 // short s = i;        // compilation error — int might not fit in short
 short s = (short) i;   // explicit cast — the compiler says "I trust you"
+```
 
 For integers, narrowing casts truncate. For floating-point, casting to an integer discards the fractional part.
 
+```java
 double d = 3.99;
 int n = (int) d;   // 3 — not 4, the fractional part is discarded
+```
 
 ### Variable Scope — Where a Variable Lives
 
@@ -278,6 +294,7 @@ public class Main {
 
 Shadowing happens when a local variable or parameter has the same name as a field. The local one hides the field inside its scope, which is a common source of bugs.
 
+```java
 class User {
     private String name = "default";
 
@@ -286,6 +303,7 @@ class User {
         this.name = name;  // 'this.name' is the field; 'name' is the parameter
     }
 }
+```
 
 ## A Code Example — Declaring and Using Variables
 

@@ -35,6 +35,7 @@ Java uses pass-by-value. But here's the key insight: **for objects, the value be
 
 ### Type 1: Primitives — Copy of the Actual Value
 
+```java
 public static void main(String[] args) {
     int num = 10;
 
@@ -51,6 +52,7 @@ static void changeNumber(int n) {
 }
 
 **What happens step by step:**
+```
 
 ```
 Step 1: main() creates num = 10
@@ -70,6 +72,7 @@ Step 4: changeNumber() ends, n is destroyed
 
 ### Type 2: Objects — Copy of the Reference
 
+```java
 public static void main(String[] args) {
     int[] arr = {1, 2, 3};
 
@@ -83,6 +86,7 @@ public static void main(String[] args) {
 static void changeArray(int[] a) {
     a[0] = 99;  // This modifies the ORIGINAL array!
 }
+```
 
 **Why does this work? Because `a` is a COPY of the reference, pointing to the SAME object:**
 
@@ -106,6 +110,7 @@ Step 4: a is destroyed, but arr still points to the modified object
 
 ## The Proof: Reassigning a Reference
 
+```java
 public static void main(String[] args) {
     StringBuilder sb = new StringBuilder("Hello");
 
@@ -122,6 +127,7 @@ static void reassignReference(StringBuilder s) {
 }
 
 **What happened:**
+```
 
 ```
 Step 1: sb points to "Hello" object
@@ -147,6 +153,7 @@ Step 4: s goes out of scope
 
 ### Scenario 1: Changing an Object's Fields (Works!)
 
+```java
 class User {
     String name;
     int age;
@@ -171,9 +178,11 @@ static void modifyUser(User u) {
     u.name = "Bob";     // ✅ Works! We're modifying the shared object
     u.age = 30;         // ✅ Works! Same object
 }
+```
 
 ### Scenario 2: Reassigning the Reference (Doesn't Affect Original)
 
+```java
 public static void main(String[] args) {
     User user = new User("Alice", 25);
 
@@ -188,6 +197,7 @@ static void replaceUser(User u) {
     u = new User("Bob", 30);  // Creates NEW object, doesn't affect original
     System.out.println("Inside: " + u.name);      // Bob
 }
+```
 
 ### Scenario 3: Collections
 

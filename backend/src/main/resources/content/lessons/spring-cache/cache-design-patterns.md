@@ -4,15 +4,19 @@ module: spring-cache
 order: 2
 minutes: 25
 topics: ["cache-aside", "read-through", "write-through", "write-behind", "stampede", "anti-patterns"]
+```java
 summary: The annotations are syntax; the patterns are the actual design. This lesson covers the four canonical caching patterns, how they map to Spring, and...
 docs:
+```
   - title: "Cache patterns"
     url: "https://docs.spring.io/spring-framework/reference/integration/cache.html#cache-annotations-cacheable"
 ---
 
 # Cache Design Patterns & Anti-Patterns
 
+```java
 The annotations are syntax; the **patterns** are the actual design. This lesson covers the four canonical caching patterns, how they map to Spring, and the anti-patterns that silently corrupt production data.
+```
 
 ## Pattern 1: Cache-Aside (Lazy Loading)
 
@@ -23,6 +27,7 @@ The most common pattern — and exactly what `@Cacheable` implements by default:
 2. Write: update DB → evict cache entry
 ```
 
+```java
 @Cacheable(value = "courses", key = "#id", sync = true)   // read path
 public Course getCourse(String id) { ... }
 
@@ -30,10 +35,12 @@ public Course getCourse(String id) { ... }
 public void updateCourse(String id, CourseDto dto) { ... }
 
 **Pros**: simple, only hot data gets cached, easy to reason about.
+```
 **Cons**: first read after eviction pays a full DB round-trip (miss penalty); stampede risk without `sync`.
 
 ## Pattern 2: Read-Through
 
+```java
 The cache itself loads from the DB on a miss — the application only talks to the cache. Spring doesn't do this natively; you implement it in the service:
 
 @Service
@@ -48,11 +55,13 @@ public class CourseService {
 
 **Pros**: callers never touch the DB path; consistent API.
 **Cons**: same miss penalty; the "loader" lives in your service rather than the cache.
+```
 
 ## Pattern 3: Write-Through
 
 Writes go to the cache and the DB in the same transaction — `@CachePut`:
 
+```java
 @CachePut(value = "courses", key = "#course.id")
 @Transactional
 public Course saveCourse(Course course) {
@@ -61,11 +70,13 @@ public Course saveCourse(Course course) {
 
 **Pros**: reads are always fresh.
 **Cons**: doubles write latency; if the cache write fails after the DB commit, the cache goes stale silently.
+```
 
 ## Pattern 4: Write-Behind (Write-Back)
 
 Writes go to the cache immediately and flush to the DB asynchronously:
 
+```java
 @CachePut(value = "session-store", key = "#sessionId")
 public void touchSession(String sessionId, SessionData data) {
     // cached instantly; a background flusher persists to DB
@@ -74,6 +85,7 @@ public void touchSession(String sessionId, SessionData data) {
 
 **Pros**: very fast writes.
 **Cons**: data loss window if the app dies before the flush; complex. Rarely worth it for backend caches — use for session stores, counters, or queue buffers.
+```
 
 ## The Stampede Problem in Depth
 
@@ -84,6 +96,7 @@ With 100 concurrent cold misses:
 
 But `sync` has a subtlety: the lock is **per key within the cache manager**. If two *different* keys are cold, they still each run — correct. And in a Redis-backed cluster, the lock is distributed.
 
+```java
 **The deeper fix — probabilistic early expiration**: refresh entries *before* they expire, so a TTL expiry never coincides with a traffic spike:
 
 // Store an "expiresAt" hint inside the cached value
@@ -100,16 +113,19 @@ public Course getCourse(String id) {
     }
     return loadAndCache(id);
 }
+```
 
 ## The Anti-Patterns
 
 ### 1. Caching Everything
 
+```java
 // ❌ Cheap queries don't need caching — it adds complexity and staleness
 @Cacheable("users")
 public User getUser(String id) {
     return userRepository.findById(id).orElseThrow();
 }
+```
 
 A primary-key lookup in Postgres takes ~1ms with a warm buffer pool. Caching it buys little and risks stale user data. **Cache expensive queries, aggregations, and external calls — not trivial reads.**
 
@@ -128,20 +144,24 @@ A cache with no expiration is a slowly-growing pile of stale data. Every cache n
 
 ### 4. Caching Mutable Objects
 
+```java
 @Cacheable("courses")
 public Course getCourse(String id) {
     Course course = courseRepository.findById(id).orElseThrow();
     course.setViews(course.getViews() + 1);   // ❌ mutating the cached object
     return course;
 }
+```
 
 If callers mutate the returned object, they mutate the cached copy. **Return immutable objects or defensive copies.**
 
 ### 5. Cache Invalidation on the Wrong Thread/Instance
 
+```java
 // ❌ invalidating only the local instance's cache
 @CacheEvict("courses")
 public void updateCourse(...) { ... }
+```
 
 In a cluster, eviction must reach all replicas — which is why shared Redis (or a pub/sub invalidation channel) beats per-instance caches for writes.
 

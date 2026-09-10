@@ -130,6 +130,7 @@ public class RateLimitFilter extends OncePerRequestFilter {
 
 ### 4. Audit Logging
 
+```java
 @Component
 public class SecurityAuditListener {
 
@@ -154,6 +155,7 @@ public class SecurityAuditListener {
         return ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
     }
 }
+```
 
 ---
 

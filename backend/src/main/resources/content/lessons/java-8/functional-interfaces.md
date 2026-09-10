@@ -12,6 +12,7 @@ docs:
 
 A **functional interface** is an interface with exactly **one abstract method** (SAM — Single Abstract Method). This is what makes lambdas work in Java — a lambda expression is simply a concise implementation of a functional interface.
 
+```java
 // This is a functional interface — one abstract method
 @FunctionalInterface
 public interface StringProcessor {
@@ -24,6 +25,7 @@ StringProcessor trim = s -> s.trim();
 String result = upper.process("hello");  // "HELLO"
 
 **Why not just use interfaces with default methods?** Java 8 added default methods to interfaces. But a functional interface has exactly ONE abstract method — default methods don't count.
+```
 
 ---
 
@@ -46,7 +48,9 @@ Consumer<String> logger = msg -> log.info("Message: {}", msg);
 
 // Chaining consumers
 Consumer<String> printAndLog = printer.andThen(logger);
+```java
 printAndLog.accept("Hello");  // prints "Hello" then logs it
+```
 
 ### Supplier<T> — Produces a value (() -> T)
 Supplier<List<String>> listFactory = ArrayList::new;
@@ -54,8 +58,10 @@ Supplier<LocalDateTime> timestamp = LocalDateTime::now;
 
 // Lazy initialization
 Supplier<ExpensiveObject> lazy = () -> new ExpensiveObject();
+```java
 // Object is only created when .get() is called
 ExpensiveObject obj = lazy.get();
+```
 
 ### Function<T,R> — Transforms a value (T -> R)
 Function<String, Integer> toLength = String::length;
@@ -64,12 +70,16 @@ Function<Employee, String> getName = Employee::getName;
 // Composition
 Function<String, String> trim = String::trim;
 Function<String, String> upper = String::toUpperCase;
+```java
 Function<String, String> trimAndUpper = trim.andThen(upper);
 // trimAndUpper.apply("  hello  ") -> "HELLO"
+```
 
 Function<String, Integer> parse = Integer::parseInt;
 Function<Integer, String> backToString = Object::toString;
+```java
 Function<String, String> roundTrip = parse.andThen(backToString);
+```
 
 ### UnaryOperator<T> — Transforms same type (T -> T)
 UnaryOperator<String> toUpper = String::toUpperCase;
@@ -171,22 +181,26 @@ public class FunctionalInterfaceDemo {
 
 ### Scenario 1: Strategy pattern with functional interfaces
 
+```java
 // Instead of creating a class hierarchy for pricing strategies
 public interface PricingStrategy {
     double calculatePrice(Order order);
 }
 
 // Use functional interfaces directly
+```
 Map<String, Function<Order, Double>> pricingStrategies = Map.of(
     "STANDARD",  order -> order.basePrice(),
     "PREMIUM",   order -> order.basePrice() * 0.9,       // 10% discount
     "BULK",      order -> order.basePrice() * 0.75        // 25% discount
+```java
 );
 
 public double getPrice(Order order, String tier) {
     Function<Order, Double> strategy = pricingStrategies.get(tier);
     return strategy.apply(order);
 }
+```
 
 ### Scenario 2: Configurable validation
 
@@ -215,7 +229,9 @@ public class ValidationBuilder<T> {
 var validator = new ValidationBuilder<User>()
     .check(u -> u.name() != null, "Name is required")
     .check(u -> u.age() >= 18, "Must be at least 18")
+```java
     .check(u -> u.email().contains("@"), "Invalid email");
+```
 
 List<String> errors = validator.validate(user);
 

@@ -10,6 +10,7 @@ docs:
 
 ## The Concept, From Zero
 
+```java
 Lombok generates getters, setters, constructors, and more at compile time via annotation processing. You write one annotation; Lombok generates 50+ lines of code.
 
 // Without Lombok
@@ -33,6 +34,7 @@ public class User {
     private String name;
     private int age;
 }
+```
 
 ---
 
@@ -40,6 +42,7 @@ public class User {
 
 ### @Getter / @Setter
 
+```java
 @Getter
 @Setter
 public class User {
@@ -48,9 +51,11 @@ public class User {
 }
 
 // Generates: getName(), setName(), getAge(), setAge()
+```
 
 ### @Data (combines everything)
 
+```java
 @Data
 public class User {
     private String name;
@@ -58,9 +63,11 @@ public class User {
 }
 
 // Generates: getters, setters, toString, equals, hashCode, requiredArgsConstructor
+```
 
 ### @Value (immutable)
 
+```java
 @Value
 public class Money {
     double amount;
@@ -68,9 +75,11 @@ public class Money {
 }
 
 // Generates: getters only, final fields, all-args constructor, toString, equals, hashCode
+```
 
 ### @Builder
 
+```java
 @Builder
 public class User {
     private String name;
@@ -79,9 +88,11 @@ public class User {
 }
 
 // Usage: User.builder().name("Alice").age(30).email("alice@example.com").build()
+```
 
 ### @Slf4j
 
+```java
 @Slf4j
 public class MyService {
     public void doSomething() {
@@ -90,6 +101,7 @@ public class MyService {
 }
 
 // Generates: private static final Logger log = LoggerFactory.getLogger(MyService.class);
+```
 
 ---
 
@@ -153,6 +165,7 @@ public class LombokDemo {
 
 ### Scenario 1: DTO with validation
 
+```java
 @Data
 @Builder
 public class CreateOrderRequest {
@@ -162,9 +175,11 @@ public class CreateOrderRequest {
     private int quantity;
     private String notes;  // optional
 }
+```
 
 ### Scenario 2: Entity with selective mutation
 
+```java
 @Getter
 @ToString
 @EqualsAndHashCode(of = "id")
@@ -185,6 +200,7 @@ public class Order {
         this.status = OrderStatus.PENDING;
     }
 }
+```
 
 ---
 

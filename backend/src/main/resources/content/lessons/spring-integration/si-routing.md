@@ -4,8 +4,10 @@ module: spring-integration
 order: 5
 minutes: 26
 topics: ["routers", "transformers", "enrichers", "splitters", "aggregators", "content-based routing", "message transformation"]
+```java
 summary: Channels are the pipes; routers, transformers, enrichers, splitters, and aggregators are the verbs — the stations that decide where messages go and...
 docs:
+```
   - title: "Message Routing (Spring Integration Reference)"
     url: "https://docs.spring.io/spring-integration/reference/message-routing.html"
   - title: "Message Transformation (Spring Integration Reference)"
@@ -16,7 +18,9 @@ docs:
 
 ## The Concept: The Verbs of the Pipeline
 
+```java
 Channels are the pipes; **routers, transformers, enrichers, splitters, and aggregators** are the *verbs* — the stations that decide where messages go and what they look like when they get there. These are the Enterprise Integration Patterns that give integrations their intelligence: routing on content, transforming between formats, enriching with data from other sources, splitting batches, and recombining results. This lesson is the grammar of the pipeline.
+```
 
 **The mental model:** a package-sorting facility. The **router** reads the label and sends each package down the right conveyor (by region, by size, by type). The **transformer** re-labels packages (zip code → city, one format → another). The **enricher** tacks on extra information (look up the customer name). The **splitter** unpacks a pallet into individual boxes; the **aggregator** gathers the boxes back into a shipment. Each station does one job, and the flow composes them.
 

@@ -12,12 +12,14 @@ docs:
 
 In Java, the very first statement in a constructor must be either `this()` or `super()`. This restriction means you can't validate or compute arguments before passing them to the parent constructor:
 
+```java
 class PositiveNumber {
     PositiveNumber(int value) {
         // Can't validate before super()!
         super(value < 0 ? 0 : value);  // Workaround
     }
 }
+```
 
 Java 26 relaxes this restriction. You can now do calculations, validations, and even field assignments before calling `super()`.
 

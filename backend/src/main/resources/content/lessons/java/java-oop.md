@@ -495,6 +495,7 @@ public sealed interface OrderState permits
         OrderState.Accepted,
         OrderState.InProgress,
         OrderState.Completed,
+```java
         OrderState.Cancelled {
 
     record Created(Instant createdAt) implements OrderState {}
@@ -515,6 +516,7 @@ public String describeState(OrderState state) {
         // No 'default' needed — compiler knows all cases are covered!
     };
 }
+```
 
 ## Composition vs Inheritance — decision guide
 

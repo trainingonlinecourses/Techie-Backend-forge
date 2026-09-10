@@ -136,9 +136,11 @@ Fix: Use Caffeine or Guava Cache with `maximumSize` and `expireAfterWrite`.
 @Transactional
 public void processAllOrders() {
     List<Order> orders = orderRepository.findAll();   // All loaded into L1 cache
+```java
     for (Order order : orders) {
         process(order);                               // L1 cache grows with each entity
     }
+```
     // If this processes 1M orders, L1 cache holds 1M entities → OOM
 }
 

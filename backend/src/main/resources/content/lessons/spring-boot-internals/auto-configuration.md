@@ -28,9 +28,11 @@ It's a giant library of "if you have X, here's a sensible default configuration 
 
 Every auto-configuration is guarded by `@Conditional` annotations. The most important:
 
+```java
 @ConditionalOnClass(DataSource.class)          // only if the class is on the classpath
 @ConditionalOnMissingBean(DataSource.class)    // only if the USER hasn't defined one already
 class DataSourceAutoConfiguration { ... }
+```
 
 Two rules make it safe:
 

@@ -43,9 +43,11 @@ public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
 If instead your app uses **cookie sessions** (traditional server-rendered, or session-based auth), CSRF protection must stay **on**:
 
+```java
 http.csrf(Customizer.withDefaults());          // default ON for cookie-based apps
 // plus: http.csrf(csrf -> csrf.ignoringRequestMatchers("/api/webhook/**"));
 //       — public webhooks are exempt because they're unauthenticated
+```
 
 ## How we use it in an organization: the scenarios
 
@@ -89,7 +91,9 @@ Production rules: **explicit allow-list** (never `*` for credentialed requests),
 
 **Scenario 3 — third-party webhooks.** Public endpoints (`/api/webhook/stripe`) that are called by Stripe, not a browser, get **no CSRF** (unauthenticated — nothing to forge) but *do* need their own signature verification (HMAC of the body) — CSRF is not the defense for webhooks; signatures are.
 
+```java
 **Scenario 4 — same-origin deployments.** If the SPA and API share an origin (Vercel rewrite, Nginx proxy), CORS is unnecessary — the browser sees one origin. Many teams "fix" a CORS error by adding wildcard allow-origin; the *correct* fix is often a reverse-proxy so there's no cross-origin call at all (also avoids preflight latency on every request).
+```
 
 ## Pitfalls
 

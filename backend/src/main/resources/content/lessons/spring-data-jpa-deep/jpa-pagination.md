@@ -43,6 +43,7 @@ Slice:  SELECT * ... LIMIT 21 OFFSET 40                                    (1 qu
 
 @GetMapping("/api/orders")
 public Page<OrderSummary> list(@RequestParam(defaultValue = "0") int page,
+```java
                                @RequestParam(defaultValue = "20") int size,
                                @RequestParam(defaultValue = "createdAt,desc") String sort,
                                Pageable pageable) {
@@ -50,6 +51,7 @@ public Page<OrderSummary> list(@RequestParam(defaultValue = "0") int page,
     //   GET /api/orders?page=0&size=20&sort=createdAt,desc&sort=status,asc
     return orderRepo.findSummariesBy(pageable);
 }
+```
 
 Binding `Pageable` directly from query params (`?page=&size=&sort=`) is the Spring Data idiom; a `@PageableDefault` annotation sets safe defaults so a missing param can't blow up.
 
@@ -76,7 +78,9 @@ The cursor is the *last seen* (`createdAt`, `id`) pair — the composite key mus
 
 **Scenario 2 — activity feed / infinite scroll.** `Slice` or keyset cursor — the count query would double every feed request for no user value.
 
+```java
 **Scenario 3 — bulk export job.** Iterate with keyset pagination in a batch loop; each page is an index range-read and the job never re-scans skipped rows.
+```
 
 **Scenario 4 — search result paging.** If the UI shows total results, count once and cache; on large filtered sets, prefer `Slice` + "load more".
 

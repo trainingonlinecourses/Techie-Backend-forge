@@ -107,7 +107,9 @@ List<Product> products = operations.queryForList(query, Product.class);
 // "find products where name OR description contains 'wireless'"
 SearchQuery query = new NativeSearchQueryBuilder()
     .withQuery(QueryBuilders.multiMatchQuery("wireless", "name", "description"))
+```java
     .build();
+```
 
 ### Fuzzy search (typo-tolerant)
 
@@ -115,7 +117,9 @@ SearchQuery query = new NativeSearchQueryBuilder()
 SearchQuery query = new NativeSearchQueryBuilder()
     .withQuery(QueryBuilders.fuzzyQuery("name", "iphon")
         .fuzziness(Fuzziness.AUTO))  // Line 1: Allow typos
+```java
     .build();
+```
 
 ### Autocomplete
 
@@ -127,7 +131,9 @@ SearchQuery query = new NativeSearchQueryBuilder()
                 .prefix("wire")           // Line 1: User typed "wire"
                 .skipDuplicates(true)      // Line 2: No duplicate suggestions
                 .size(5)))                // Line 3: Top 5 suggestions
+```java
     .build();
+```
 
 ## Aggregations — analytics
 

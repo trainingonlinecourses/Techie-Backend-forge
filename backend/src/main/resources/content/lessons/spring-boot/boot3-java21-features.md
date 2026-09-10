@@ -50,12 +50,14 @@ public record CreateOrderRequest(@NotBlank String customerId,
 
 And **pattern matching** cleans up instanceof chains (e.g., in exception handlers and event listeners):
 
+```java
 if (obj instanceof Order order && order.status().equals("PAID")) { ... }
 // switch expressions over sealed types give exhaustive, checked dispatch:
 return switch (event) {
     case PaymentEvent p -> handlePayment(p);
     case RefundEvent r -> handleRefund(r);
 };
+```
 
 Spring's own code accepts records naturally: `@ConfigurationProperties` with constructor binding, repository projections, event payloads.
 

@@ -60,7 +60,9 @@ Each stage pulls from the previous. Elements flow through **one at a time**, ver
 // This never hangs — the pipeline pulls only until the first match
 Optional<Course> first = Stream.generate(() -> expensiveLoad())
     .filter(c -> c.isLong())
+```java
     .findFirst();
+```
 
 Short-circuiting terminal ops: `findFirst`, `findAny`, `anyMatch`, `allMatch`, `noneMatch`, `limit`.
 
@@ -86,15 +88,21 @@ Stateless stages process one element independently. **Stateful stages buffer**: 
 courses.stream()
     .sorted(Comparator.comparing(Course::title))
     .limit(5)                    // still sorts all before taking 5
+```java
     .toList();
+```
 
 ## peek: The Debugging Tool
 
 courses.stream()
+```java
     .peek(c -> log.debug("before filter: {}", c.id()))
+```
     .filter(c -> c.published())
+```java
     .peek(c -> log.debug("after filter: {}", c.id()))
     .toList();
+```
 
 `peek` is for debugging — it runs the consumer when the element passes that stage. Don't use it for side effects in production (it's not guaranteed to run without a terminal op, and its timing is unspecified).
 
@@ -122,7 +130,9 @@ int total = courses.stream()
 // Custom accumulation
 String joined = courses.stream()
     .map(Course::title)
+```java
     .reduce("", (a, b) -> a + ", " + b);
+```
 
 `reduce(identity, accumulator)` — identity is the result for an empty stream. For most cases, specialized ops (`sum`, `collect(joining())`) are clearer, but reduce is the escape hatch.
 
@@ -131,17 +141,23 @@ String joined = courses.stream()
 // Boxing avoided: IntStream, LongStream, DoubleStream
 int totalMinutes = courses.stream()
     .mapToInt(Course::minutes)
+```java
     .sum();
 
 double avg = courses.stream()
+```
     .mapToInt(Course::minutes)
     .average()
+```java
     .orElse(0.0);
+```
 
 IntSummaryStatistics stats = courses.stream()
     .mapToInt(Course::minutes)
+```java
     .summaryStatistics();
 // count, sum, min, max, average in one pass
+```
 
 Primitive streams are both faster (no boxing) and have the numeric ops you need.
 

@@ -4,15 +4,19 @@ module: cicd-devops
 order: 4
 minutes: 20
 topics: ["runbooks", "incident response", "postmortems", "logging in prod", "on-call", "blameless culture"]
+```java
 summary: Deployments are the easy part; operating production is where systems live or die. This lesson covers the operational layer: what to log, how to res...
 docs:
+```
   - title: "SRE book"
     url: "https://sre.google/sre-book/table-of-contents/"
 ---
 
 # Production Monitoring & Incident Response
 
+```java
 Deployments are the easy part; **operating** production is where systems live or die. This lesson covers the operational layer: what to log, how to respond to incidents, and how to turn outages into improvements.
+```
 
 ## Logging in Production
 
@@ -120,7 +124,9 @@ Follow-ups:
 
 ## Chaos: Test the Failure Modes
 
+```java
 Production is a system of systems; the only way to trust the failure modes is to practice them:
+```
 
 - **Game days** — simulate a dependency outage (kill the DB) and watch the app behave (fail open? queue? degrade?).
 - **Load tests** — before releases, not after.

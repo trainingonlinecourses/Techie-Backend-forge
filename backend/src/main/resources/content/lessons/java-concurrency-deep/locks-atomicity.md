@@ -22,6 +22,7 @@ Concurrency bugs are invisible: no compile error, no crash — just wrong result
 
 ## volatile: Visibility Only
 
+```java
 // volatile = visibility guarantee: reads always see the latest write
 private volatile boolean running = true;
 
@@ -30,9 +31,11 @@ public void stop() { running = false; }   // another thread's while loop sees th
 public void run() {
     while (running) { work(); }            // won't spin forever
 }
+```
 
 `volatile` guarantees visibility and ordering, but **not atomicity**:
 
+```java
 // ❌ NOT atomic — two threads can both read 5 and write 6
 private volatile int counter;
 counter++;     // read, add, write — three steps, racy
@@ -40,11 +43,13 @@ counter++;     // read, add, write — three steps, racy
 // ✅ atomic
 private final AtomicInteger counter = new AtomicInteger();
 counter.incrementAndGet();
+```
 
 **Rule**: `volatile` for flags and published immutable references; `Atomic*` for counters and single-value updates.
 
 ## synchronized: Mutual Exclusion
 
+```java
 public class Counter {
     private int count;
 
@@ -56,6 +61,7 @@ public class Counter {
         return count;
     }
 }
+```
 
 - Every object has an intrinsic lock (`monitor`).
 - `synchronized` on a method = lock the `this` object for the call.
@@ -64,6 +70,7 @@ public class Counter {
 
 ### The Static Method Lock
 
+```java
 public class Registry {
     private static final Map<String, Entry> entries = new HashMap<>();
 
@@ -71,9 +78,11 @@ public class Registry {
         entries.put(key, e);    // locks the Class object, not an instance
     }
 }
+```
 
 ## The synchronized Block
 
+```java
 // Lock a smaller critical section — less contention
 public void transfer(Account from, Account to, BigDecimal amount) {
     synchronized (from) {
@@ -83,18 +92,22 @@ public void transfer(Account from, Account to, BigDecimal amount) {
         }
     }
 }
+```
 
 This is where **deadlock** is born: two threads transferring in opposite directions each hold one account and wait for the other. The fix — always lock in a **global order**:
 
+```java
 // Lock by id order — no cycle possible
 Account first = from.id() < to.id() ? from : to;
 Account second = from.id() < to.id() ? to : from;
 synchronized (first) {
     synchronized (second) { ... }
 }
+```
 
 ## ReentrantLock: The Explicit Lock
 
+```java
 private final ReentrantLock lock = new ReentrantLock();
 
 public void process() {
@@ -105,6 +118,7 @@ public void process() {
         lock.unlock();              // ALWAYS in finally
     }
 }
+```
 
 ReentrantLock's advantages over synchronized:
 
@@ -116,6 +130,7 @@ ReentrantLock's advantages over synchronized:
 | Fairness | ❌ (mostly) | `new ReentrantLock(true)` |
 | Multiple conditions | ❌ | `newCondition()` |
 
+```java
 // The production pattern: non-blocking with timeout
 if (lock.tryLock(5, TimeUnit.SECONDS)) {
     try {
@@ -126,6 +141,7 @@ if (lock.tryLock(5, TimeUnit.SECONDS)) {
 } else {
     log.warn("Lock not acquired in 5s — proceeding with stale state");
 }
+```
 
 ## The Atomic Classes
 
@@ -153,6 +169,7 @@ AtomicLongArray, LongAdder, LongAccumulator
 
 ### CAS: Compare-And-Set
 
+```java
 // What incrementAndGet does under the hood:
 public int incrementAndGet() {
     for (;;) {
@@ -161,6 +178,7 @@ public int incrementAndGet() {
         if (compareAndSet(current, next)) return next;   // retry on contention
     }
 }
+```
 
 CAS is a hardware primitive (LOCK CMPXCHG) — **lock-free**: no blocking, no deadlock, no context switch. Contended CAS retries, which is why `LongAdder` exists for high contention.
 

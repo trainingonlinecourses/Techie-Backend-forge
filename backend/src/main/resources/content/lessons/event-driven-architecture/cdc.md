@@ -18,9 +18,11 @@ docs:
 
 Event-driven systems need events — but existing applications don't publish them. **Change Data Capture (CDC)** solves the retrofit: it turns *database changes* into events by reading the database's own **transaction log** (PostgreSQL's WAL, MySQL's binlog, SQL Server's log) — the append-only record the database already writes for every committed change. A CDC tool (the standard is **Debezium**) tails the log and publishes each change as an event: "row inserted", "row updated", "row deleted" — with the full before/after data.
 
+```java
 **The mental model:** the database keeps a *diary* (the transaction log) of everything it does, for its own crash-recovery. CDC reads that diary — no application code required, no changes to the existing app, no polling. Every insert/update/delete in the database becomes a stream of events *the moment it commits*. Legacy systems, monoliths, and anything with a database become event producers retroactively — the bridge between "we have a database" and "we want events."
 
 **Why this matters:** the outbox pattern made *new* code publish events transactionally; CDC makes *existing* code publish events without touching it. For a legacy monolith you can't (or won't) refactor, CDC is the way into event-driven architecture. And it's the standard production relay for the outbox pattern itself (Debezium reads the outbox table's changes).
+```
 
 ## How It Works
 

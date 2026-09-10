@@ -16,9 +16,11 @@ docs:
 
 ## The Concept: The Workload Controllers
 
+```java
 Pods are ephemeral — you almost never create them directly. You create **workload controllers** — objects that *manage* pods on your behalf — and the most important is the **Deployment**: it owns a **ReplicaSet** (the "keep N pods alive" enforcer), which owns the pods. The hierarchy matters because each layer has one job: the Deployment defines *what* (image, replicas, update strategy); the ReplicaSet maintains *the count*; the pods are the running instances. This lesson is the full workload story: resources, probes, updates, and the other controllers you'll meet.
 
 **The mental model:** the Deployment is a foreman. You tell the foreman "I want 3 workers doing this job, and if the job changes (new image), replace them gradually without stopping the site." The foreman (controller) keeps a checklist (ReplicaSet) and makes the workers (pods) match it — adding when one quits, replacing one by one when the work changes.
+```
 
 ## A Complete Deployment, With Everything
 

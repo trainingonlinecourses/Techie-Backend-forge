@@ -18,7 +18,9 @@ docs:
 
 courses.parallelStream()   // or .stream().parallel()
     .map(this::expensiveTransform)
+```java
     .toList();
+```
 
 The stream's `Spliterator` splits the source into chunks; a shared `ForkJoinPool.commonPool()` (one per JVM!) processes chunks in parallel and merges results.
 
@@ -39,14 +41,18 @@ Source (1000 elements)
 // ✅ Good parallel candidate: heavy, independent work
 List<Report> reports = ids.parallelStream()
     .map(id -> reportGenerator.generate(id))   // seconds each
+```java
     .toList();
 
 // ❌ Bad: trivial work — overhead dominates
+```
 List<Integer> squares = IntStream.range(0, 100)
     .parallel()
     .map(i -> i * i)                           // nanoseconds each
     .boxed()
+```java
     .toList();
+```
 
 ## The Shared Pool Trap
 
@@ -55,22 +61,30 @@ List<Integer> squares = IntStream.range(0, 100)
 
 You can't easily resize the common pool (system property `java.util.concurrent.ForkJoinPool.common.parallelism`), and you should rarely need to. **The fix is to use your own executor for long-running parallel work:**
 
+```java
 // Custom pool for blocking-heavy parallel work
 ExecutorService pool = Executors.newFixedThreadPool(8);
+```
 List<Report> reports = ids.stream()
     .map(id -> CompletableFuture.supplyAsync(
         () -> reportGenerator.generate(id), pool))
     .toList()
     .stream()
     .map(CompletableFuture::join)
+```java
     .toList();
+```
 
 Or with a parallel stream on a custom ForkJoinPool:
 
+```java
 ForkJoinPool customPool = new ForkJoinPool(8);
+```
 List<Report> reports = customPool.submit(() ->
         ids.parallelStream().map(id -> generate(id)).toList())
+```java
     .join();
+```
 
 ## Thread Safety: The Silent Corrupter
 
@@ -83,9 +97,11 @@ courses.parallelStream()
 // ✅ Collectors are thread-safe (concurrent-aware)
 List<Course> results = courses.parallelStream()
     .filter(Course::published)
+```java
     .collect(Collectors.toList());
 
 // ✅ Explicit concurrent collection
+```
 Set<String> levels = courses.parallelStream()
     .map(Course::level)
     .collect(Collectors.toConcurrentMap(
@@ -159,7 +175,9 @@ The reality:
 // ❌ Blocking HTTP calls on the COMMON pool — a slow API starves ALL parallel streams
 items.parallelStream()
     .map(item -> restClient.get().uri(item.url()).retrieve().body(String.class))
+```java
     .toList();
+```
 
 Blocking I/O on the common pool is an anti-pattern: 8 blocked threads = 8 dead cores for every other parallel stream in the app. **For I/O, use CompletableFuture with your own executor** (see the concurrency module).
 

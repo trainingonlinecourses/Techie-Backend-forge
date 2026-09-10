@@ -40,7 +40,9 @@ public class SupportService {
         return chatClient.prompt()
                 .system("You are {company}'s support assistant. Be concise and friendly.")
                 .user(u -> u
+```java
                         .text("Customer {name} asks: {question}")
+```
                         .param("company", "Acme")
                         .param("name", customerName)
                         .param("question", question))
@@ -54,16 +56,20 @@ public class SupportService {
 ## Messages: system, user, assistant
 
 List<Message> history = List.of(
+```java
         new SystemMessage("You are a coding tutor. Answer with Java examples."),
         new UserMessage("Explain @Transactional propagation."),
         new AssistantMessage("There are several propagation levels: REQUIRED, REQUIRES_NEW, ..."),
         new UserMessage("When would I use REQUIRES_NEW?")
 );
+```
 
 String answer = chatClient.prompt()
         .messages(history)
         .call()
+```java
         .content();
+```
 
 ## Streaming: tokens as they arrive
 
@@ -71,17 +77,21 @@ String answer = chatClient.prompt()
 Flux<String> stream = chatClient.prompt()
         .user("Write a haiku about Spring Boot")
         .stream()
+```java
         .content();
 
 // Consume chunk by chunk (e.g. server-sent events to the frontend)
 stream.subscribe(chunk -> sseSink.emit(chunk));
+```
 
 ## The full response object
 
+```java
 ChatResponse response = chatClient.prompt().user(q).call().chatResponse();
 response.getResult().getOutput().getText();   // the answer
 response.getResult().getMetadata();           // tokens, finish reason, model
 // response.getUsage().getPromptTokens(), .getCompletionTokens()
+```
 
 ## Building the "ask" endpoint (what this academy does)
 

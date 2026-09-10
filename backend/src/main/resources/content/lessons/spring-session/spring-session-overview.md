@@ -71,6 +71,7 @@ spring:
 
 ### Step 3: Annotate Your Application
 
+```java
 package com.example;
 
 import org.springframework.boot.SpringApplication;
@@ -86,6 +87,7 @@ public class Application {
 }
 
 **That's it.** Your sessions are now stored in Redis. Every instance of your app reads/writes to the same Redis, so sessions are shared.
+```
 
 ### Line-by-Line Breakdown
 
@@ -237,9 +239,11 @@ public class SessionEventListener {
 
         // Remove from active sessions
         redisTemplate.opsForSet()
+```java
             .remove("active:sessions", sessionId);
 
         // Notify other services
+```
         applicationEventPublisher.publishEvent(
             new UserLogoutEvent(sessionId));
     }

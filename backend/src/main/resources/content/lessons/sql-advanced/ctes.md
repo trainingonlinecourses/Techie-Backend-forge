@@ -117,7 +117,9 @@ SELECT * FROM org_tree ORDER BY depth, name;
 | Recursion | **yes** | no | no |
 | When to use | complex single query | simple inline need | a query you run everywhere |
 
+```java
 **The engineering rule:** use a **view** when the logic is genuinely shared across many queries (it's a schema object — indexed, permissions-able, versioned); use a **CTE** when the logic belongs to one query (it's self-contained and doesn't pollute the schema). The common smell — creating a view nobody else uses — argues for CTEs; the opposite smell — copying the same 30-line subquery into five queries — argues for a view.
+```
 
 ## Performance: What the Optimizer Does
 

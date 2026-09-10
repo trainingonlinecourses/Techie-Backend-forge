@@ -20,6 +20,7 @@ Streams are elegant — and occasionally the wrong tool. This lesson is the hone
 Files.readAllLines(Paths.get(file))
     .stream()
     .map(line -> writeToDb(line))     // throws IOException — DOESN'T COMPILE
+```java
     .toList();
 
 // ❌ Workaround — sneaky throws, terrible code
@@ -34,10 +35,13 @@ Files.readAllLines(Paths.get(file))
 **When I/O or checked exceptions are involved, a loop is honest:**
 
 // ✅ Plain loop — checked exceptions are natural
+```
 List<Long> ids = new ArrayList<>();
+```java
 for (String line : Files.readAllLines(path)) {
     ids.add(writeToDb(line));      // throws IOException — propagates cleanly
 }
+```
 
 ## 2. Debugging: The Stepper's Nightmare
 
@@ -49,11 +53,14 @@ courses.stream()
     .map(Lesson::title)
     .distinct()
     .sorted()
+```java
     .toList();
+```
 
 Breakpoints inside lambdas are usable but the *intermediate state* is invisible. A loop with named variables steps naturally:
 
 List<String> result = new ArrayList<>();
+```java
 for (Course c : courses) {
     if (!c.published()) continue;
     for (Lesson l : c.lessons()) {
@@ -62,9 +69,11 @@ for (Course c : courses) {
         result.add(l.title());
     }
 }
+```
 
 ## 3. Stateful or Ordered Side Effects
 
+```java
 // ❌ Sneaky state in a stream
 AtomicInteger index = new AtomicInteger();
 courses.stream().forEach(c -> c.setOrder(index.getAndIncrement()));
@@ -75,9 +84,11 @@ for (int i = 0; i < courses.size(); i++) {
 }
 
 Any stream that mutates shared state or depends on element *position* is a smell. The state is hidden inside lambdas; a loop shows it.
+```
 
 ## 4. Complex Control Flow
 
+```java
 // ❌ Stream forced into a control-flow shape
 for (Course c : courses) {
     if (c.archived()) {
@@ -88,17 +99,20 @@ for (Course c : courses) {
     }
     notify(c);
 }
+```
 
 Streams have `filter` (skip) but **no break** — "stop processing once a condition hits" is awkward (and error-prone with `limit`). Early-exit loops are loops.
 
 ## 5. Performance-Critical Inner Loops
 
+```java
 // Hot path, millions of iterations
 int[] data = ...;
 long sum = 0;
 for (int i = 0; i < data.length; i++) {   // no allocation, direct indexing
     if (data[i] > threshold) sum += data[i];
 }
+```
 
 Streams allocate pipeline objects, box primitives (unless `IntStream`), and pay indirection. For hot numeric loops, plain `for` over arrays is measurably faster — and clearer.
 
@@ -112,9 +126,11 @@ List<String> publishedTitles = courses.stream()
     .sorted(byMinutes)
     .map(Course::title)
     .limit(10)
+```java
     .toList();
 
 // ❌ Contorted — rewrite as a loop
+```
 courses.stream()
     .flatMap(c -> c.lessons().stream()
         .filter(l -> l.order() > c.startOrder()))    // references outer stream var
@@ -148,12 +164,14 @@ Pure transformation of a collection?
 List<Lesson> candidates = courses.stream()
     .filter(Course::published)
     .flatMap(c -> c.lessons().stream())
+```java
     .toList();                              // stream for the easy part
 
 for (Lesson l : candidates) {               // loop for control flow
     if (l.isCapstone()) break;
     schedule(l);
 }
+```
 
 This is the most common real-world pattern: streams for shape, loops for flow.
 
@@ -167,7 +185,9 @@ This is the most common real-world pattern: streams for shape, loops for flow.
 | One-line aggregation | Position/state logic |
 | Readable chains | Hot numeric loops |
 
+```java
 Streams and loops are complementary tools, not rivals. Use streams when the pipeline is a pure, readable transformation; use loops when control flow, exceptions, or debugging dominate. The best codebases mix both — each where it's honest.
+```
 
 ## References
 

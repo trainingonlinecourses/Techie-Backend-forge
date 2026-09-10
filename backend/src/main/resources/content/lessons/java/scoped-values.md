@@ -307,11 +307,13 @@ public class TenantContext {
 @Repository
 public class TenantAwareRepository {
     public List<User> findAllUsers() {
+```java
         DataSource ds = TenantContext.dataSource();  // Auto-routed!
         String tenant = TenantContext.tenantId();
 
         // Use the tenant-specific data source
         return jdbcTemplate.query(
+```
             "SELECT * FROM users WHERE tenant_id = ?",
             rowMapper,
             tenant

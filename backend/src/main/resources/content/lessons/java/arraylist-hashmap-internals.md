@@ -27,11 +27,15 @@ Capacity growth: 10 → 15 → 22 → 33 → 49 → 73 → ...
 
 // BAD: 14 resizes to hold 10,000 elements
 List<Order> orders = new ArrayList<>();
+```java
 for (int i = 0; i < 10_000; i++) orders.add(generateOrder());
 
 // GOOD: zero resizes
+```
 List<Order> orders = new ArrayList<>(10_000);
+```java
 for (int i = 0; i < 10_000; i++) orders.add(generateOrder());
+```
 
 **Thread safety:** `ArrayList` is **not** thread-safe. Two concurrent `add()` calls can corrupt the internal array (lost updates, `ArrayIndexOutOfBoundsException`). Use `Collections.synchronizedList()` or `CopyOnWriteArrayList` for concurrent access.
 
@@ -83,6 +87,7 @@ Pre-sizing eliminates 12 resize-and-rehash operations (each touching all 50K ent
 
 ### Scenario 2: custom hashCode() — the cache key disaster
 
+```java
 // BROKEN: default hashCode is identity-based
 public class CacheKey {
     private String userId;
@@ -98,13 +103,17 @@ CacheKey key2 = new CacheKey("user-1", "tenant-A");
 
 cache.put(key1, session);
 cache.get(key2);  // null — different hashCode, different bucket
+```
 
 **Fix:** always override `hashCode()` and `equals()` together, or use `record` which generates both:
 
+```java
 public record CacheKey(String userId, String tenantId) {}
+```
 
 ### Scenario 3: ConcurrentHashMap for concurrent access
 
+```java
 @Service
 public class RateLimiter {
 
@@ -116,11 +125,13 @@ public class RateLimiter {
         return count.incrementAndGet() <= 100;  // 100 requests per window
     }
 }
+```
 
 `ConcurrentHashMap` uses **segment locking** (bucket-level locks since Java 8) instead of a single lock, so concurrent `put()` calls on different buckets do not block each other.
 
 ### Scenario 4: LinkedHashMap for insertion-order iteration
 
+```java
 // Maintain insertion order — use case: LRU cache
 public class LruCache<K, V> extends LinkedHashMap<K, V> {
 
@@ -136,6 +147,7 @@ public class LruCache<K, V> extends LinkedHashMap<K, V> {
         return size() > maxSize;
     }
 }
+```
 
 When the map exceeds `maxSize`, it automatically evicts the *least recently accessed* entry. This works because `LinkedHashMap` maintains a doubly-linked list of entries in access order.
 

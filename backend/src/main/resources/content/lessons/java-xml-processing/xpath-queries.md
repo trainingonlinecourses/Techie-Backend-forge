@@ -66,6 +66,7 @@ self::employee               → The current node itself
 
 ### Step 1: Compile and Evaluate XPath
 
+```java
 public class Main {
 
     public static void main(String[] args) {
@@ -86,6 +87,7 @@ public class Main {
         }
     }
 }
+```
 
 ### Step 2: Different Return Types
 
@@ -150,9 +152,11 @@ XPath xpath = factory.newXPath();
 xpath.setNamespaceContext(new NamespaceContext() {
     public String getNamespaceURI(String prefix) {
         if ("emp".equals(prefix)) return "http://example.com/hr";
+```java
         return XMLConstants.NULL_NS_URI;
     }
     public String getPrefix(String namespaceURI) {
+```
         return "http://example.com/hr".equals(namespaceURI) ? "emp" : null;
     }
     public Iterator<String> getPrefixes(String namespaceURI) {
@@ -162,7 +166,9 @@ xpath.setNamespaceContext(new NamespaceContext() {
 
 // Now use the prefix in queries
 NodeList results = (NodeList) xpath.compile("//emp:employee[emp:department='HR']")
+```java
     .evaluate(doc, XPathConstants.NODESET);
+```
 
 ---
 
@@ -172,13 +178,17 @@ NodeList results = (NodeList) xpath.compile("//emp:employee[emp:department='HR']
 XML-formatted logs from enterprise systems:
 
 public List<String> findErrorMessages(String logXml) throws Exception {
+```java
     Document doc = parseXml(logXml);
     XPath xpath = XPathFactory.newInstance().newXPath();
     
     // Find all ERROR-level log entries from the last hour
+```
     NodeList errors = (NodeList) xpath.compile(
         "//logEntry[@level='ERROR' and @timestamp > '" + oneHourAgo() + "']//message"
+```java
     ).evaluate(doc, XPathConstants.NODESET);
+```
     
     List<String> messages = new ArrayList<>();
     for (int i = 0; i < errors.getLength(); i++) {
@@ -190,6 +200,7 @@ public List<String> findErrorMessages(String logXml) throws Exception {
 ### Scenario 2: CI/CD Pipeline Configuration
 Extracting build stages from a Jenkins/Maven XML config:
 
+```java
 public Map<String, String> extractBuildConfig(String pomXml) throws Exception {
     Document doc = parseXml(pomXml);
     XPath xpath = XPathFactory.newInstance().newXPath();
@@ -207,13 +218,16 @@ public Map<String, String> extractBuildConfig(String pomXml) throws Exception {
     
     return config;
 }
+```
 
 ### Scenario 3: Compliance Validation
 Checking XML documents against business rules:
 
 public List<String> validateCompliance(String invoiceXml) throws Exception {
+```java
     Document doc = parseXml(invoiceXml);
     XPath xpath = XPathFactory.newInstance().newXPath();
+```
     List<String> violations = new ArrayList<>();
     
     // Rule 1: Invoice must have a tax amount

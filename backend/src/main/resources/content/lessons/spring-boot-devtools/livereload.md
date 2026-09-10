@@ -52,10 +52,6 @@ Click the extension icon → it connects to `localhost:35729` → green indicato
 2. What triggers a refresh: - Static resource changes (HTML, CSS, JS). - Template changes (Thymeleaf, FreeMarker). - Property file changes. - Template engine configuration changes
 3. What does NOT trigger a refresh: - Java class changes (these trigger a restart, not just refresh). - Entity changes. - Configuration class changes
 
-The same code, clean:
-
-```java
-```
 
 ---
 

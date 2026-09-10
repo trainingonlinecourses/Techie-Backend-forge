@@ -4,8 +4,10 @@ module: java-advanced-language
 order: 2
 minutes: 18
 topics: ["Optional", "null safety", "exception hierarchy", "fail fast", "error handling idioms"]
+```java
 summary: Null references cause more production bugs than any other single feature. Optional is Java's answer for nullable return values; the exception hiera...
 docs:
+```
   - title: "Optional"
     url: "https://docs.oracle.com/en/java/javase/21/core/optional.html"
 ---
@@ -102,12 +104,15 @@ long id = courses.stream()
     .map(CourseRepository::findByTitle)
     .flatMap(Optional::stream)      // Java 9: Optional → Stream
     .map(Course::id)
+```java
     .orElse(-1L);
+```
 
 `Optional.stream()` turns an Optional into a 0-or-1-element stream — the clean bridge between Optional and stream pipelines.
 
 ## Null Annotations: Document the Contract
 
+```java
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 
@@ -119,11 +124,13 @@ public class CourseService {
     @Nullable
     public Course findInCache(String slug) { ... }
 }
+```
 
 With IDE support, `@Nullable`/`@NonNull` turn null bugs into warnings at the call site. Spring ships these annotations; add `-Xep:NullAway` or IDE inspections to enforce.
 
 ## Fail Fast vs. Fail Safe
 
+```java
 // FAIL FAST: reject bad input immediately
 public void enroll(String userId, Long courseId) {
     Objects.requireNonNull(userId, "userId is required");
@@ -135,6 +142,7 @@ public void enroll(String userId, Long courseId) {
 public Course getCourseOrDefault(String slug) {
     return repository.findBySlug(slug).orElse(defaultCourse);
 }
+```
 
 The discipline: **fail fast at boundaries** (controllers, service entry points), **fail safe in the middle** (lookups with defaults, cache misses).
 
@@ -153,6 +161,7 @@ Throwable
 
 ## Checked vs. Unchecked in Practice
 
+```java
 // Modern practice: runtime exceptions for domain errors
 public class CourseNotFoundException extends RuntimeException { ... }
 
@@ -164,9 +173,11 @@ public CourseDto get(@PathVariable String slug) {
 }
 
 Rule of thumb: **checked exceptions for recoverable external conditions** (file missing, connection refused) when the caller should decide; **unchecked for programmer errors** (bad args, null, invalid state).
+```
 
 ## The Three-Layer Error Pattern
 
+```java
 // Controller: translate to HTTP
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -183,6 +194,7 @@ public Course findBySlug(String slug) {
 }
 
 // Repository: return Optional
+```
 public Optional<Course> findBySlug(String slug) { ... }
 
 Repository → Optional; service → domain exception; controller → HTTP status. Each layer speaks its own language; nothing leaks.
@@ -192,18 +204,24 @@ Repository → Optional; service → domain exception; controller → HTTP statu
 @Test
 void missingCourseThrows() {
     assertThrows(CourseNotFoundException.class,
+```java
         () -> courseService.findBySlug("does-not-exist"));
 }
 
 @Test
 void optionalHandlesAbsence() {
+```
     Optional<Course> result = repository.findBySlug("nope");
+```java
     assertTrue(result.isEmpty());
+```
     assertEquals("Untitled", result.map(Course::title).orElse("Untitled"));
+```java
 }
 
 @Test
 void nullInputRejected() {
+```
     assertThrows(IllegalArgumentException.class,
         () -> courseService.enroll(null, 1L));
 }

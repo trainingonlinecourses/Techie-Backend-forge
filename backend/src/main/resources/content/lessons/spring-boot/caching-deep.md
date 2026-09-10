@@ -15,10 +15,12 @@ docs:
 
 Spring's cache abstraction adds caching to any method with annotations. It does not provide a cache implementation — it delegates to providers like Caffeine (in-process), Redis (distributed), or EhCache.
 
+```java
 @Cacheable("products")
 public Product findById(String id) {
     return repository.findById(id).orElseThrow();
 }
+```
 
 The first call queries the database. The result is stored in the "products" cache. The second call with the same `id` returns the cached value without touching the database.
 
@@ -73,17 +75,22 @@ public class ProductService {
 
 By default, Spring generates the key from all method parameters using a `SimpleKeyGenerator`. For custom keys:
 
+```java
 @Cacheable(value = "products", key = "#id")
 public Product findById(String id) { ... }
 
 @Cacheable(value = "orders", key = "#customerId + ':' + #status")
+```
 public List<Order> findByCustomerAndStatus(String customerId, String status) { ... }
 
+```java
 @Cacheable(value = "reports", key = "T(java.util.Objects).hash(#req)")
 public Report generate(ReportRequest req) { ... }
+```
 
 ## Conditional caching
 
+```java
 // Only cache if the result is not null
 @Cacheable(value = "users", unless = "#result == null")
 public User findById(String id) { ... }
@@ -91,6 +98,7 @@ public User findById(String id) { ... }
 // Only cache for admin users
 @Cacheable(value = "admin-data", condition = "#role == 'ADMIN'")
 public AdminData getAdminData(String role) { ... }
+```
 
 ## Cache providers
 
@@ -129,9 +137,11 @@ spring:
 public RedisCacheManager cacheManager(RedisConnectionFactory factory) {
     RedisCacheConfiguration config = RedisCacheConfiguration.defaultCacheConfig()
         .entryTtl(Duration.ofMinutes(10))
+```java
         .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer()));
 
     return RedisCacheManager.builder(factory)
+```
         .cacheDefaults(config)
         .withCacheConfiguration("products",
             RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofMinutes(30)))
@@ -159,6 +169,7 @@ public class ProductCatalogService {
 
 ### Scenario 2: user session cache
 
+```java
 @Service
 public class UserSessionService {
 
@@ -172,9 +183,11 @@ public class UserSessionService {
         sessionRepository.deleteByToken(token);
     }
 }
+```
 
 ### Scenario 3: multi-level cache (L1 Caffeine + L2 Redis)
 
+```java
 @Configuration
 public class MultiLevelCacheConfig {
 
@@ -191,6 +204,7 @@ public class MultiLevelCacheConfig {
         return new CompositeCacheManager(l1, l2);
     }
 }
+```
 
 ## Cache pitfalls
 

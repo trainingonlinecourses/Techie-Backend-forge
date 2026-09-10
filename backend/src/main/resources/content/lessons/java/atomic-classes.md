@@ -51,6 +51,7 @@ int val = counter.get();
 - `compareAndSet(6, 10)` — the CAS primitive: if current value is 6, set to 10 atomically; returns `false` if the value changed (caller can retry or give up)
 - `get()` — volatile read; always sees the latest committed value
 
+```java
 **How CAS works internally (simplified):**
 // AtomicInteger.incrementAndGet() pseudocode:
 public int incrementAndGet() {
@@ -61,15 +62,19 @@ public int incrementAndGet() {
     } while (!compareAndSet(old, new)); // CAS: if old is still current, set new; else retry
     return new;
 }
+```
 
 **The CAS retry loop:** if thread A reads `old=5`, then thread B changes it to `6` before A's CAS, A's CAS fails (expected 5, found 6). A re-reads (`old=6`), computes `new=7`, and retries CAS. Under low contention, the retry almost always succeeds on the first try.
 
 ## AtomicReference — lock-free object references
 
+```java
 import java.util.concurrent.atomic.AtomicReference;
+```
 
 AtomicReference<UserSession> currentSession = new AtomicReference<>();
 
+```java
 // Atomic operations on object references
 currentSession.set(new UserSession("alice", Instant.now()));
 UserSession old = currentSession.getAndSet(new UserSession("bob", Instant.now()));
@@ -81,8 +86,10 @@ boolean success = currentSession.compareAndSet(expected, updated);
 // success == false means another thread changed it between get() and CAS()
 
 **Real-world scenario — optimistic lock for a config object:**
+```
 AtomicReference<AppConfig> config = new AtomicReference<>(AppConfig.defaultConfig());
 
+```java
 // Hot-reload: atomically swap config if it hasn't changed since we read it
 void reloadConfig() {
     AppConfig current = config.get();
@@ -92,6 +99,7 @@ void reloadConfig() {
         log.info("Config already reloaded by another thread");
     }
 }
+```
 
 ## LongAdder — high-contention counters
 
@@ -138,21 +146,26 @@ long snapshot = requestCounter.sumThenReset();
 
 The **ABA problem:** thread A reads value `X`, thread B changes it to `Y` then back to `X`, thread A's CAS succeeds (seeing `X` again) — but the state has actually changed. `AtomicStampedReference` adds a **stamp** (version number) that changes on every modification:
 
+```java
 import java.util.concurrent.atomic.AtomicStampedReference;
+```
 
 AtomicStampedReference<String> ref = new AtomicStampedReference<>("A", 0);
 
+```java
 int[] stampHolder = new int[1];
 String current = ref.get(stampHolder);    // current = "A", stamp = 0
 
 // CAS with stamp — fails if either value OR stamp changed
 boolean success = ref.compareAndSet("A", "B", stampHolder[0], stampHolder[0] + 1);
 // success == false if another thread changed the value or incremented the stamp
+```
 
 **When you need it:** linked-lock-free data structures (ConcurrentLinkedQueue uses stamps internally), and scenarios where value recycling (ABA) is possible. Most application code doesn't need this — plain `AtomicReference` suffices.
 
 ## AtomicReferenceFieldUpdater — update a single field without wrapping the whole object
 
+```java
 public class Order {
     volatile String status;  // volatile is required for the updater
 
@@ -163,6 +176,7 @@ public class Order {
         return STATUS_UPDATER.compareAndSet(this, expected, newStatus);
     }
 }
+```
 
 **Why it exists:** wrapping every mutable field in an `AtomicReference<Order>` is wasteful (one extra object per field). The updater lets you do CAS on a single `volatile` field of an existing object — memory-efficient for high-cardinality objects.
 

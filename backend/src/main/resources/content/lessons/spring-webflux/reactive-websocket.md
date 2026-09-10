@@ -138,20 +138,26 @@ public class RoomWebSocketHandler implements WebSocketHandler {
                         // Add session to the room
                         rooms.computeIfAbsent(message.roomId(), k ->
                             ConcurrentHashMap.newKeySet()
+```java
                         ).add(session);
+```
                         sendToRoom(message.roomId(),
                             new ChatEvent("system", "server",
                                 session.getId() + " joined the room",
+```java
                                 Instant.now()));
                     }
                     case "leave" -> {
                         rooms.getOrDefault(message.roomId(), Set.of()).remove(session);
+```
                         sendToRoom(message.roomId(),
                             new ChatEvent("system", "server",
                                 session.getId() + " left the room",
+```java
                                 Instant.now()));
                     }
                     case "message" -> {
+```
                         sendToRoom(message.roomId(),
                             new ChatEvent("message", session.getId(),
                                 message.content(), Instant.now()));
@@ -242,11 +248,13 @@ public class NotificationWebSocketHandler implements WebSocketHandler {
 
     @Override
     public Mono<Void> handle(WebSocketSession session) {
+```java
         // Register this session for the user
         String userId = extractUserId(session);
         userSessions.put(userId, session);
 
         return session.receive()
+```
             .then()                                              // We don't expect messages — just listen
             .doFinally(signal -> userSessions.remove(userId))    // Clean up on disconnect
             .then();

@@ -12,6 +12,7 @@ docs:
 
 Before Java 21, switch only worked with primitives and enums. You couldn't switch on object types. Pattern matching for switch lets you match by type AND extract variables:
 
+```java
 // OLD: if-else chain for type checking
 Object obj = getSomething();
 if (obj instanceof String s) {
@@ -30,6 +31,7 @@ switch (obj) {
     case List<?> l  -> processList(l);
     default         -> throw new IllegalArgumentException("Unknown: " + obj);
 };
+```
 
 ---
 
@@ -37,6 +39,7 @@ switch (obj) {
 
 ### Guarded patterns (when clauses)
 
+```java
 // Match a type AND a condition
 String classify(Object obj) {
     return switch (obj) {
@@ -49,18 +52,22 @@ String classify(Object obj) {
         default                   -> "other";
     };
 }
+```
 
 ### Null handling
 
+```java
 // switch can now handle null — no more NullPointerException
 switch (obj) {
     case null    -> "null";
     case String s -> "string: " + s;
     default      -> "other";
 };
+```
 
 ### Exhaustive matching with sealed classes
 
+```java
 sealed interface Shape permits Circle, Rectangle, Triangle {}
 record Circle(double r) implements Shape {}
 record Rectangle(double w, double h) implements Shape {}
@@ -74,6 +81,7 @@ double area(Shape shape) {
         case Triangle t  -> 0.5 * t.b() * t.h();
     };
 }
+```
 
 ---
 
@@ -187,6 +195,7 @@ public class PatternMatchingSwitchDemo {
 
 ### Scenario 1: API error handling
 
+```java
 public ResponseEntity<?> handleServiceResult(ServiceResult result) {
     return switch (result) {
         case Success<?> s    -> ResponseEntity.ok(s.data());
@@ -196,9 +205,11 @@ public ResponseEntity<?> handleServiceResult(ServiceResult result) {
         case RateLimited r   -> ResponseEntity.status(429).body(Map.of("retryAfter", r.seconds()));
     };
 }
+```
 
 ### Scenario 2: AST evaluation
 
+```java
 public double evaluate(Expr expr) {
     return switch (expr) {
         case Literal l    -> l.value();
@@ -210,6 +221,7 @@ public double evaluate(Expr expr) {
         case Divide d     -> evaluate(d.left()) / evaluate(d.right());
     };
 }
+```
 
 ---
 

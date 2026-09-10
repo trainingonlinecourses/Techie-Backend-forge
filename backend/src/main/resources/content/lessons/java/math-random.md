@@ -49,7 +49,9 @@ Line-by-line notes on the non-obvious ones:
 
 ### 1. `Math.random()` — quick and dirty
 
+```java
 int dieRoll = (int) (Math.random() * 6) + 1;  // scale to [0..6), truncate, shift to 1..6
+```
 
 - Internally delegates to a shared `Random`. Fine for exercises; nobody should build features on it because you can't seed, test, or replace it.
 
@@ -84,6 +86,7 @@ Two production cautions:
 
 ### 3. `ThreadLocalRandom` & `SecureRandom` — the professional choices
 
+```java
 // Multi-threaded code: each thread gets its own generator, zero contention
 int roll = ThreadLocalRandom.current().nextInt(1, 7);   // bounds are inclusive-low, EXCLUSIVE-high
 
@@ -92,6 +95,7 @@ SecureRandom secure = new SecureRandom();
 byte[] tokenBytes = new byte[32];
 secure.nextBytes(tokenBytes);                            // cryptographically strong entropy
 String token = Base64.getUrlEncoder().withoutPadding().encodeToString(tokenBytes);
+```
 
 | Tool | Use for | Never use for |
 |---|---|---|

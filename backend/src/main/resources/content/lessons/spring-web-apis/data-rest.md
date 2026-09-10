@@ -90,12 +90,15 @@ public interface ProductRepository extends PagingAndSortingRepository<Product, L
 
 ### Change the path
 
+```java
 @RepositoryRestResource(path = "catalog")  // Line 1: Use /catalog instead of /products
 public interface ProductRepository extends PagingAndSortingRepository<Product, Long> {
 }
+```
 
 ### Disable specific HTTP methods
 
+```java
 @RepositoryRestResource
 public interface ProductRepository extends PagingAndSortingRepository<Product, Long> {
     // Disable DELETE for products (no deleting allowed!)
@@ -106,6 +109,7 @@ public interface ProductRepository extends PagingAndSortingRepository<Product, L
     
     // Better approach: use @RepositoryRestResource(exported = false)
 }
+```
 
 ### Add custom search endpoints
 
@@ -114,12 +118,14 @@ public interface ProductRepository extends PagingAndSortingRepository<Product, L
     
     // GET /products/search/findByCategoryAndPriceLessThan?category=electronics&price=500
     List<Product> findByCategoryAndPriceLessThan(
+```java
         @Param("category") String category,
         @Param("price") BigDecimal price
     );
     
     // GET /products/search/findByPriceRange?min=100&max=500
     @Query("SELECT p FROM Product p WHERE p.price BETWEEN :min AND :max")
+```
     List<Product> findByPriceRange(
         @Param("min") BigDecimal min,
         @Param("max") BigDecimal max

@@ -58,9 +58,11 @@ public class OrderService {
         this.orderCounter = Counter.builder("orders.created")
             .description("Total orders created")
             .tag("version", "v2")
+```java
             .register(registry);
 
         this.failedOrderCounter = Counter.builder("orders.failed")
+```
             .description("Total failed orders")
             .register(registry);
     }
@@ -82,16 +84,20 @@ public class OrderService {
 this.orderCounter = Counter.builder("orders.created")
     .description("Total orders created")
     .tag("version", "v2")
+```java
     .register(registry);
+```
 - `Counter.builder("orders.created")` — Names the metric. In Prometheus this becomes `orders_created_total`
 - `.description(...)` — Human-readable description that appears in the metrics endpoint
 - `.tag("version", "v2")` — A dimension label. You can filter by this in Grafana. Every unique tag combination is a separate time series
 - `.register(registry)` — Connects the counter to the Micrometer registry (which talks to Prometheus)
 
+```java
 orderCounter.increment();  // The counter goes up by 1
 orderCounter.increment(5); // The counter goes up by 5 (bulk increment)
 
 **Prometheus output:**
+```
 ```
 # HELP orders_created_total Total orders created
 # TYPE orders_created_total counter
@@ -172,9 +178,11 @@ public class PaymentService {
             sample.stop(Timer.builder("payment.processing")
                 .tag("status", "success")
                 .tag("provider", request.getProvider())
+```java
                 .register(registry));
             return result;
         } catch (PaymentException e) {
+```
             sample.stop(Timer.builder("payment.processing")
                 .tag("status", "failed")
                 .register(registry));
@@ -273,19 +281,23 @@ public class TenantMetrics {
             .tag("endpoint", endpoint)
             .tag("status", String.valueOf(status))
             .register(registry)
+```java
             .increment();
     }
 
     public void recordLatency(String tenantId, String operation, Duration duration) {
+```
         Timer.builder("tenant.operation.latency")
             .tag("tenant", tenantId)
             .tag("operation", operation)
             .publishPercentiles(0.5, 0.95, 0.99)  // Publish percentiles
             .register(registry)
+```java
             .record(duration);
     }
 
     public void gaugeActiveUsers(String tenantId, AtomicInteger count) {
+```
         Gauge.builder("tenant.active.users", count, AtomicInteger::get)
             .tag("tenant", tenantId)
             .register(registry);

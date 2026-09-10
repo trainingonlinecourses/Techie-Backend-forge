@@ -39,6 +39,7 @@ The **key** decides partitioning: same key → same partition → strict per-key
 
 ## Consumer — @KafkaListener
 
+```java
 @Component
 public class OrderEventConsumer {
 
@@ -50,6 +51,7 @@ public class OrderEventConsumer {
 }
 
 The method runs in the **consumer container**; returning normally commits the offset. Throwing triggers redelivery — which is why listeners must be **idempotent** (process by event id).
+```
 
 ## Configuration (application.yml)
 
@@ -86,10 +88,12 @@ public void onOrder(List<OrderCreated> batch) { // batch mode: use ConsumerRecor
 
 ## Callbacks and async errors
 
+```java
 CompletableFuture<SendResult<String, Object>> future = kafka.send("orders", key, event);
 future.whenComplete((res, ex) -> {
     if (ex != null) log.error("Failed to publish order event {}", event.orderId(), ex);
 });
+```
 
 `send` is async — check the future or listen for errors, and **never swallow producer exceptions silently** (the message is lost).
 

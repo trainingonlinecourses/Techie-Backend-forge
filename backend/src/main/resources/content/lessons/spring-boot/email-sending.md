@@ -39,6 +39,7 @@ spring:
 
 ## Plain text email
 
+```java
 @Service
 public class EmailService {
 
@@ -58,9 +59,11 @@ public class EmailService {
         mailSender.send(message);
     }
 }
+```
 
 ## HTML email with Thymeleaf template
 
+```java
 @Service
 public class TemplatedEmailService {
 
@@ -94,6 +97,7 @@ public class TemplatedEmailService {
         }
     }
 }
+```
 
 ## Email with attachment
 
@@ -175,7 +179,9 @@ public class UserController {
 
     @PostMapping("/register")
     public ResponseEntity<User> register(@Valid @RequestBody RegisterRequest req) {
+```java
         User user = userService.register(req);
+```
 
         emailService.sendEmail(new EmailRequest(
             "welcome@backendforge.com",

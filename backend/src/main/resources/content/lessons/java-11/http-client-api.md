@@ -16,6 +16,7 @@ Java 11 introduced `java.net.http.HttpClient` — a modern, fluent HTTP client b
 
 // OLD: HttpURLConnection — verbose, error-prone
 URL url = new URL("https://api.example.com/users");
+```java
 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 conn.setRequestMethod("GET");
 conn.setRequestProperty("Accept", "application/json");
@@ -26,14 +27,19 @@ reader.close();
 
 // NEW: HttpClient — clean, readable, fluent
 HttpClient client = HttpClient.newHttpClient();
+```
 HttpRequest request = HttpRequest.newBuilder()
     .uri(URI.create("https://api.example.com/users"))
     .header("Accept", "application/json")
     .GET()
+```java
     .build();
+```
 HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+```java
 int status = response.statusCode();
 String body = response.body();
+```
 
 ---
 
@@ -45,32 +51,44 @@ HttpRequest get = HttpRequest.newBuilder()
     .header("Accept", "application/json")
     .header("Authorization", "Bearer " + token)
     .GET()
+```java
     .build();
 
 // POST with JSON body
+```
 HttpRequest post = HttpRequest.newBuilder()
     .uri(URI.create("https://api.example.com/users"))
     .header("Content-Type", "application/json")
     .header("Accept", "application/json")
     .POST(HttpRequest.BodyPublishers.ofString("""
+```java
         {"name": "Alice", "email": "alice@example.com"}
+```
         """))
+```java
     .build();
 
 // PUT
+```
 HttpRequest put = HttpRequest.newBuilder()
     .uri(URI.create("https://api.example.com/users/123"))
     .header("Content-Type", "application/json")
     .PUT(HttpRequest.BodyPublishers.ofString("""
+```java
         {"name": "Alice Updated"}
+```
         """))
+```java
     .build();
 
 // DELETE
+```
 HttpRequest delete = HttpRequest.newBuilder()
     .uri(URI.create("https://api.example.com/users/123"))
     .DELETE()
+```java
     .build();
+```
 
 ---
 
@@ -83,16 +101,20 @@ public class Main {
 
         // SYNCHRONOUS — blocks the current thread
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+```java
         System.out.println(response.statusCode());
         System.out.println(response.body());
 
         // ASYNCHRONOUS — returns CompletableFuture, non-blocking
+```
         client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
             .thenApply(HttpResponse::body)
             .thenAccept(System.out::println)
+```java
             .join();  // blocks only at .join()
 
         // ASYNCHRONOUS with chaining
+```
         client.sendAsync(getUserRequest, HttpResponse.BodyHandlers.ofString())
             .thenApply(response -> parseUser(response.body()))
             .thenCompose(user -> client.sendAsync(
@@ -206,7 +228,9 @@ public class OrderServiceClient {
                 .header("Accept", "application/json")
                 .timeout(Duration.ofSeconds(3))
                 .GET()
+```java
                 .build();
+```
 
             HttpResponse<String> response = client.send(request,
                 HttpResponse.BodyHandlers.ofString());

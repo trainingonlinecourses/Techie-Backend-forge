@@ -33,7 +33,9 @@ t.start();
 
 ## Runnable vs Callable
 
+```java
 Runnable task = () -> System.out.println("no result");        // void
+```
 Callable<Integer> c = () -> compute();                        // returns a value, can throw
 
 `Callable` is the useful one — it returns results and throws exceptions, which `Future` then captures.
@@ -149,6 +151,7 @@ try (ExecutorService pool = Executors.newFixedThreadPool(4)) {
 
 ## Naming Threads
 
+```java
 ThreadFactory named = new ThreadFactory() {
     private final AtomicInteger counter = new AtomicInteger();
     public Thread newThread(Runnable r) {
@@ -158,11 +161,13 @@ ThreadFactory named = new ThreadFactory() {
     }
 };
 ExecutorService pool = Executors.newFixedThreadPool(4, named);
+```
 
 Named threads turn "which thread is stuck?" from a mystery into a log line. Guava's `ThreadFactoryBuilder` does this in one line if you use Guava.
 
 ## Executors in Spring
 
+```java
 @Configuration
 public class AsyncConfig {
 
@@ -178,6 +183,7 @@ public class AsyncConfig {
         return executor;
     }
 }
+```
 
 Used by `@Async("reportExecutor")` — the pool becomes a Spring bean with a name, a prefix, and a policy. (Full coverage in the scheduling module.)
 
@@ -192,6 +198,7 @@ Used by `@Async("reportExecutor")` — the pool becomes a Spring bean with a nam
 | Unnamed threads | Untraceable stacks |
 | Silent task exceptions | Lost failures (log them!) |
 
+```java
 // Exceptions in Runnable are swallowed — log explicitly
 pool.execute(() -> {
     try {
@@ -200,6 +207,7 @@ pool.execute(() -> {
         log.error("Task failed", e);   // without this: silently lost
     }
 });
+```
 
 ## Summary
 

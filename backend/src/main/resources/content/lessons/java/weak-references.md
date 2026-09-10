@@ -17,7 +17,9 @@ docs:
 
 A **strong reference** (`User u = new User()`) keeps the object alive — the GC will never collect it as long as the reference exists. The other reference types give the GC a hint: "I'd like this object, but I don't *need* it — collect it if you need the memory." This is the foundation of memory-sensitive caches and automatic resource cleanup.
 
+```java
 **The mental model:** think of strong references as "this is mine, don't touch it"; soft references as "I'd like to keep this, but you can take it if you're running low"; weak references as "I'm using this, but don't keep it alive on my account"; phantom references as "tell me when it's gone."
+```
 
 ## The four reference types
 
@@ -66,6 +68,7 @@ System.gc();
 - `alice = null` — removes the strong reference; now the object is only weakly reachable → eligible for GC
 - `System.gc()` — a hint (not a command); the JVM may or may not run GC in response
 
+```java
 **Real-world scenario — WeakHashMap as a cache:**
 import java.util.WeakHashMap;
 
@@ -80,14 +83,17 @@ session = null;
 // Next GC: the entry is removed
 
 **Why WeakHashMap for caches:** you don't need to manually evict entries — the GC does it for you. The trade-off: entries can disappear at any time (even immediately), so you need a fallback (database, default value).
+```
 
 ## SoftReference — memory-sensitive cache
 
+```java
 import java.lang.ref.SoftReference;
 import java.util.HashMap;
 import java.util.Map;
 
 // A memory-sensitive image cache
+```
 Map<String, SoftReference<Image>> imageCache = new HashMap<>();
 
 public Image getImage(String url) {
@@ -109,16 +115,21 @@ public Image getImage(String url) {
 
 ## PhantomReference — cleanup after collection
 
+```java
 import java.lang.ref.PhantomReference;
 import java.lang.ref.ReferenceQueue;
 
 // Track when objects are collected for cleanup
+```
 ReferenceQueue<Cleanable> queue = new ReferenceQueue<>();
 Map<PhantomReference<Cleanable>, CleanupTask> pending = new ConcurrentHashMap<>();
 
+```java
 Cleanable resource = new Cleanable();
 CleanupTask task = new CleanupTask(resource);
+```
 PhantomReference<Cleanable> phantom = new PhantomReference<>(resource, queue);
+```java
 pending.put(phantom, task);
 
 // In a background thread, poll the queue
@@ -131,6 +142,7 @@ Thread cleanupThread = Thread.ofVirtual().start(() -> {
 });
 
 **Line-by-line breakdown:**
+```
 - `new PhantomReference<>(resource, queue)` — wraps `resource` with a phantom reference; when `resource` is GC'd, the phantom reference is enqueued in `queue`
 - `queue.remove()` — blocks the cleanup thread until a phantom reference is enqueued (object was collected)
 - `pending.remove(ref)` — retrieves the cleanup task associated with the collected object

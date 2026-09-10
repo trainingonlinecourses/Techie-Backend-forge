@@ -51,6 +51,7 @@ The heap is the most important region. Every object you create with `new` lives 
   New objects → Eden → Survive → S0/S1 → Old Gen → GC'd
 ```
 
+```java
 **Young Generation:** New objects are allocated here. Most objects die young (local variables, temporary strings). The GC runs frequently here (minor GC) and is very fast.
 
 **Old Generation:** Objects that survive multiple minor GCs are promoted here. Major GC runs less frequently but takes longer.
@@ -60,11 +61,13 @@ String temp = "Hello";          // Created, used briefly, eligible for GC quickl
 
 // This object gets promoted to Old Gen (long-lived):
 private static final Config config = new Config();  // Lives for the entire app lifetime
+```
 
 ---
 
 ## How Java Objects Use Memory
 
+```java
 class Order {                    // header (12-16 bytes) + fields
     long id;                     //   8 bytes (primitive long)
     String customer;             //   4 bytes (reference, compressed oops)
@@ -72,17 +75,20 @@ class Order {                    // header (12-16 bytes) + fields
 }
 
 **Memory layout explained:**
+```
 - **Object header**: 12 bytes with compressed oops (default for heaps < 32 GB), 16 bytes without. Contains mark word (hashcode, GC age, lock info) + class pointer.
 - **References**: 4 bytes with `-XX:+UseCompressedOops` (default), 8 bytes without.
 - **Alignment**: Objects are padded to 8-byte boundaries. A 20-byte object actually uses 24 bytes.
 
 **The practical impact:** A `Long` object is 16 bytes vs 8 bytes for a primitive `long`. A `HashMap<Long, ...>` stores millions of wrapper objects — that's 2x the memory just for keys.
 
+```java
 // BAD: 16 bytes per key + wrapper overhead
 Map<Long, Order> orders = new HashMap<>();
 
 // BETTER for large datasets: use a primitive-specialized library
 // or consider if the wrapper overhead matters for your use case
+```
 
 ---
 

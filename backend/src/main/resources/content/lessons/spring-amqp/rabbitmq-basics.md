@@ -71,6 +71,7 @@ Exchange ──▶ Queue A
 
 ## Defining Topology in Spring
 
+```java
 @Configuration
 public class RabbitConfig {
 
@@ -101,6 +102,7 @@ public class RabbitConfig {
             .to(ordersExchange()).with("orders.cancelled");
     }
 }
+```
 
 `durable` queues survive broker restarts; `autoDelete(false)` keeps them until explicitly removed.
 
@@ -129,6 +131,7 @@ public class OrderPublisher {
 
 ## Consuming With @RabbitListener
 
+```java
 @Component
 public class OrderConsumer {
 
@@ -138,6 +141,7 @@ public class OrderConsumer {
         inventoryService.reserve(event.orderId());
     }
 }
+```
 
 The listener runs on the listener container's threads, automatically: deserializes the message, invokes the method, **acks on success** and **nacks on exception** (default: requeue).
 
@@ -157,12 +161,15 @@ spring:
 | `MANUAL` | Your code calls `channel.basicAck/nack` |
 | `NONE` | Broker assumes delivery succeeded (at-most-once) |
 
+```java
 AUTO is right for most cases; MANUAL when you need fine-grained control (e.g., ack after a multi-step process completes); NONE only for disposable/duplicate-tolerant data.
+```
 
 ## Configuring the Listener Container
 
 @Bean
 public RabbitListenerContainerFactory<SimpleMessageListenerContainer>
+```java
         rabbitListenerContainerFactory(ConnectionFactory connectionFactory) {
     SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
     factory.setConnectionFactory(connectionFactory);
@@ -173,17 +180,20 @@ public RabbitListenerContainerFactory<SimpleMessageListenerContainer>
     factory.setAcknowledgeMode(AcknowledgeMode.AUTO);
     return factory;
 }
+```
 
 **Concurrency**: `concurrentConsumers` × `prefetchCount` is your throughput dial. **`defaultRequeueRejected(false)`**: poison messages (that always throw) go to the DLQ instead of looping forever.
 
 ## Message Converters
 
+```java
 @Bean
 public Jackson2JsonMessageConverter jsonMessageConverter(ObjectMapper objectMapper) {
     Jackson2JsonMessageConverter converter = new Jackson2JsonMessageConverter(objectMapper);
     converter.setCreateMessageIds(true);
     return converter;
 }
+```
 
 Set it on both sides (producer + consumer factory) and POJOs round-trip as JSON with `__TypeId__` headers for polymorphic safety.
 

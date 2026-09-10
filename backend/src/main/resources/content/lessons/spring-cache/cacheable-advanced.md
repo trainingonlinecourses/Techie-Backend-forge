@@ -18,6 +18,7 @@ docs:
 
 `@CachePut` always executes the method, then stores the result. It never short-circuits:
 
+```java
 @Service
 public class CourseService {
 
@@ -26,6 +27,7 @@ public class CourseService {
         return courseRepository.save(course);
     }
 }
+```
 
 Every update writes through to the cache, so the next read of that key is fresh. But write-through has a cost: if the DB write succeeds and the cache write fails, you have stale data. If the method throws, nothing is cached — which is correct.
 
@@ -33,49 +35,61 @@ Every update writes through to the cache, so the next read of that key is fresh.
 
 `@CacheEvict` removes entries. Use it when the new value isn't easily derivable from the method result:
 
+```java
 @CacheEvict(value = "courses", key = "#courseId")
 public void deleteCourse(String courseId) {
     courseRepository.deleteById(courseId);
 }
+```
 
 ### All Entries
 
+```java
 @CacheEvict(value = "courses", allEntries = true)
 public void rebuildCatalog() { ... }
+```
 
 `allEntries = true` wipes the whole region. Blunt but essential for bulk operations.
 
 ### Before vs. After Invocation
 
+```java
 @CacheEvict(value = "courses", key = "#courseId", beforeInvocation = true)
 public void updateCourse(String courseId, CourseDto dto) { ... }
 
 @CacheEvict(value = "courses", key = "#courseId")   // default: AFTER
 public void updateCourse(String courseId, CourseDto dto) { ... }
+```
 
 - **After** (default): if the method throws, the cache is untouched — stale data survives, but the DB wasn't changed either, so cache and DB stay consistent.
 - **Before**: the cache is cleared even if the method throws. Safer for "always invalidate" scenarios but can clear entries unnecessarily.
 
 ### Conditional Eviction
 
+```java
 @CacheEvict(value = "courses", key = "#courseId", condition = "#dto.published == false")
 public void unpublish(String courseId, CourseDto dto) { ... }
+```
 
 ## Combining Cacheable + Evict: The Update Pattern
 
 The classic trap: a method that writes and returns the new value, annotated `@Cacheable`, which silently **serves the stale cached value instead of the fresh write**:
 
+```java
 // ❌ WRONG: @Cacheable skips the method, so the DB is never updated
 @Cacheable(value = "courses", key = "#course.id")
 public Course saveCourse(Course course) { ... }
+```
 
 Correct: `@CachePut` for the write path, `@CacheEvict` for deletes:
 
+```java
 @CachePut(value = "courses", key = "#course.code")
 public Course saveCourse(Course course) { ... }
 
 @CacheEvict(value = "courses", key = "#code")
 public void deleteCourse(String code) { ... }
+```
 
 ## Multi-Operation Caching
 
@@ -85,14 +99,18 @@ public void deleteCourse(String code) { ... }
     put = @CachePut(value = "courses", key = "#course.code"),
     evict = @CacheEvict(value = "course-list", allEntries = true)
 )
+```java
 public Course saveCourse(Course course) { ... }
+```
 
 Save the course in the detail cache **and** invalidate the list cache in one shot. Without this, the list cache would keep returning a stale catalog.
 
 ## Multi-Value Eviction
 
+```java
 @CacheEvict(cacheNames = {"courses", "course-summary"}, allEntries = true)
 public void rebuildCatalog() { ... }
+```
 
 ## The Consistency Problem
 
@@ -117,11 +135,13 @@ When the method is also `@Transactional`, the interceptor order matters. Spring 
 
 The subtle issue is the reverse: a `@CachePut` writes the cache *inside* the transaction's success path but *before* commit. If the commit later fails, the cache holds a value the DB never persisted:
 
+```java
 @CachePut(value = "courses", key = "#course.code")
 @Transactional
 public Course saveCourse(Course course) {
     return courseRepository.save(course);   // put runs, then commit may fail
 }
+```
 
 If commit fails, the cache has an entry the DB lacks — a phantom. Mitigate with a small TTL or by moving the cache op after commit via `TransactionSynchronizationManager`:
 

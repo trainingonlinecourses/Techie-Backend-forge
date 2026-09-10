@@ -51,6 +51,7 @@ Also common: `@JsonFormat`/`@JsonIgnore` per field, and `@JsonCreator`/`@JsonPro
 
 ## Per-type annotations vs global config
 
+```java
 Global config sets the defaults; per-field annotations override:
 
 public record OrderDto(
@@ -60,6 +61,7 @@ public record OrderDto(
 ) {}
 
 The org rule: **global config for system-wide policy** (null handling, money, unknown fields); **annotations for per-contract decisions** (names, ignored fields, formats). Annotations beat config when the same type appears in different shapes on different endpoints.
+```
 
 ## How we use it in an organization: the scenarios
 

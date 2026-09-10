@@ -15,6 +15,7 @@ docs:
 
 Spring's `ApplicationEventPublisher` gives you **in-process pub/sub**: one bean publishes, others listen, and neither knows the other exists. That's decoupling: `OrderService` doesn't import `AuditService`, `EmailService`, or `InventoryService`.
 
+```java
 // The event — an immutable record
 public record AccountCreatedEvent(UUID accountId) {}
 
@@ -41,11 +42,13 @@ public class AuditListener {
         audit.record("ACCOUNT_CREATED", e.accountId());
     }
 }
+```
 
 ## Synchronous by default
 
 `@EventListener` runs **synchronously in the publishing thread**. Exceptions in a listener propagate to the publisher (unless the listener handles them). That's fine for fast in-process work; for slow side effects, either keep them out of the request path or make them async:
 
+```java
 @Component
 public class NotificationListener {
     @Async                       // + @EnableAsync on a config class
@@ -54,11 +57,13 @@ public class NotificationListener {
         emailService.sendWelcome(e.accountId());   // runs on the async executor
     }
 }
+```
 
 ## @TransactionalEventListener — the important one
 
 Listeners that touch the database must wait until the transaction **commits**. `@TransactionalEventListener` does exactly that:
 
+```java
 @Component
 public class EmailListener {
 
@@ -69,6 +74,7 @@ public class EmailListener {
         emailService.sendWelcome(e.accountId());
     }
 }
+```
 
 Phases: `BEFORE_COMMIT`, `AFTER_COMMIT` (default for tx listeners), `AFTER_ROLLBACK`, `AFTER_COMPLETION`.
 

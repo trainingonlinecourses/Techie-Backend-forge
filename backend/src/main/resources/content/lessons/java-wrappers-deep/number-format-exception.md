@@ -12,9 +12,11 @@ docs:
 
 `NumberFormatException` is thrown when you try to parse a string that isn't a valid number. It's one of the most common runtime exceptions in Java.
 
+```java
 int num = Integer.parseInt("42");   // OK
 int bad = Integer.parseInt("abc");  // NumberFormatException!
 int also = Integer.parseInt("12.5"); // NumberFormatException — no decimals for int
+```
 
 ---
 
@@ -22,6 +24,7 @@ int also = Integer.parseInt("12.5"); // NumberFormatException — no decimals fo
 
 ### Try-Catch
 
+```java
 public class Main {
 
     public static void main(String[] args) {
@@ -32,20 +35,24 @@ public class Main {
         }
     }
 }
+```
 
 ### Optional-Based
 
 Optional<Integer> parsed = Optional.ofNullable(input)
     .filter(s -> !s.isBlank())
+```java
     .flatMap(s -> {
         try { return Optional.of(Integer.parseInt(s)); }
         catch (NumberFormatException e) { return Optional.empty(); }
     });
 
 int value = parsed.orElse(0);  // default to 0
+```
 
 ### Apache Commons / Guava
 
+```java
 // Apache Commons Lang
 int value = NumberUtils.toInt(input, -1);  // returns -1 if invalid
 
@@ -53,11 +60,13 @@ int value = NumberUtils.toInt(input, -1);  // returns -1 if invalid
 try {
     int value = Ints.tryParse(input);  // returns null if invalid
 } catch (Exception e) { ... }
+```
 
 ---
 
 ## Line-by-Line Walkthrough
 
+```java
 import java.util.*;
 
 public class NumberParsingDemo {
@@ -114,6 +123,7 @@ public class NumberParsingDemo {
         }
     }
 }
+```
 
 ---
 

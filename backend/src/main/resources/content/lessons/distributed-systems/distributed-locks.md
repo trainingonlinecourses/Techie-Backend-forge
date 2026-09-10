@@ -16,6 +16,7 @@ A distributed lock coordinates work across nodes — exactly one instance runs t
 
 ## The Naive Pattern (and Why It Fails)
 
+```java
 // ❌ set + expire in two steps — crash between them = lock without TTL = forever
 redis.set("job:lock", nodeId);
 redis.expire("job:lock", 30);
@@ -24,6 +25,7 @@ redis.expire("job:lock", 30);
 if (redis.get("job:lock").equals(nodeId)) {
     redis.del("job:lock");     // lock may have EXPIRED and been RE-ACQUIRED
 }
+```
 
 ## The Correct Pattern: SET NX EX
 
@@ -56,6 +58,7 @@ t=60   Node A finishes and releases... Node B's lock!
        → Both nodes ran the job — the lock FAILED
 ```
 
+```java
 // ❌ Long job + short TTL = lock lost mid-job
 redis.set("job:lock", nodeId, Duration.ofSeconds(30));   // job takes 60s!
 
@@ -63,9 +66,12 @@ redis.set("job:lock", nodeId, Duration.ofSeconds(30));   // job takes 60s!
 redis.set("job:lock", nodeId, Duration.ofMinutes(10));
 
 // ✅ Or RENEW the lease (heartbeat) — a watchdog thread extends the TTL
+```
 scheduler.scheduleAtFixedRate(() ->
     redis.set("job:lock", nodeId, Duration.ofMinutes(2), SetOption.SET_IF_PRESENT), 
+```java
     1, 1, TimeUnit.MINUTES);
+```
 
 The renewal/watchdog pattern is what ShedLock and etcd leases do — the lock dies with the holder, not with the job.
 
@@ -98,9 +104,11 @@ The fencing token turns "the lock might have expired" from a silent bug into a d
 
 ## ShedLock: The Battle-Tested Implementation
 
+```java
 @Scheduled(cron = "0 0 3 * * *")
 @SchedulerLock(name = "nightly-report", lockAtMostFor = "30m", lockAtLeastFor = "5m")
 public void runNightly() { ... }
+```
 
 - `lockAtMostFor` — the lease; must exceed the worst-case run
 - `lockAtLeastFor` — minimum hold; stops fast jobs from thrashing
@@ -116,7 +124,9 @@ public void runNightly() { ... }
 | Use for | Job dedup, rate limits | Critical coordination |
 | Consensus | None | Raft/ZAB |
 
+```java
 **Redlock** (Redis's multi-node lock) has a famous critique — it's not as safe as consensus-based locks. For *critical* coordination (leader election, split-brain-sensitive work), use etcd/ZooKeeper; for job dedup, Redis is fine.
+```
 
 ## The Decision Checklist
 
@@ -139,7 +149,9 @@ public void runNightly() { ... }
 | Stale holders | Fencing tokens — the resource rejects |
 | Production | ShedLock (JDBC/Redis) or etcd/ZooKeeper |
 
+```java
 Distributed locks are a lease, not a guarantee: TTLs make them crash-safe, renewals keep long jobs covered, and fencing tokens make stale holders harmless. For job scheduling, use ShedLock; for critical coordination, use a consensus system — and when you can, prefer idempotency, which makes the lock's failure mode irrelevant.
+```
 
 ## References
 

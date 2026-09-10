@@ -52,6 +52,7 @@ Spring Boot embeds a web server (Tomcat by default) directly inside your applica
 
 ### Scenario 2: Customizing Tomcat
 
+```java
 @Bean
 public TomcatServletWebServerFactory tomcatFactory() {
     return new TomcatServletWebServerFactory() {
@@ -68,6 +69,7 @@ public TomcatServletWebServerFactory tomcatFactory() {
 }
 
 @Bean
+```
 public WebServerFactoryCustomizer<TomcatServletWebServerFactory> tomcatCustomizer() {
     return factory -> {
         factory.addConnectorCustomizers(connector -> {
@@ -96,6 +98,7 @@ server:
 ```
 
 // Force HTTP → HTTPS redirect
+```java
 @Bean
 public ServletWebServerFactory servletContainer() {
     TomcatServletWebServerFactory tomcat = new TomcatServletWebServerFactory() {
@@ -121,6 +124,7 @@ private Connector httpRedirectConnector() {
     connector.setRedirectPort(8443);
     return connector;
 }
+```
 
 ### Scenario 4: Connection pool tuning
 
@@ -161,6 +165,7 @@ spring:
     timeout-per-shutdown-phase: 30s  # max wait for in-flight requests
 ```
 
+```java
 // Add a shutdown hook to log and clean up
 @Component
 public class ShutdownHook {
@@ -173,6 +178,7 @@ public class ShutdownHook {
         // but waits up to 30s for existing requests to finish
     }
 }
+```
 
 ## Common mistakes
 

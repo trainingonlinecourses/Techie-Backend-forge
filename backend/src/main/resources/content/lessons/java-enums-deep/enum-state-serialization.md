@@ -148,6 +148,7 @@ System.out.println(sm.getHistory());
 
 Enums are singletons — there's only ONE `PaymentState.PROCESSING` instance. But Java serialization creates new instances by default. If you serialize and deserialize an enum, you might get a **different** object:
 
+```java
 public class Main {
 
     public static void main(String[] args) {
@@ -164,6 +165,7 @@ public class Main {
         System.out.println(state == restored);  // true
     }
 }
+```
 
 ### Why It Works (and When It Doesn't)
 
@@ -249,12 +251,14 @@ public enum TicketState {
             return action == TicketAction.RESOLVE ? RESOLVED
                  : action == TicketAction.REASSIGN ? IN_PROGRESS
                  : action == TicketAction.CLOSE ? CLOSED
+```java
                  : this;
         }
     },
     RESOLVED {
         public TicketState transition(TicketAction action) {
             return action == TicketAction.REOPEN ? OPEN
+```
                  : action == TicketAction.CLOSE ? CLOSED
                  : this;
         }
@@ -266,6 +270,7 @@ public enum TicketState {
 
 ### Scenario 2: Game AI States
 
+```java
 public enum AIState {
     IDLE {
         public AIState update(GameWorld world) {
@@ -295,6 +300,7 @@ public enum AIState {
     
     public abstract AIState update(GameWorld world);
 }
+```
 
 ---
 

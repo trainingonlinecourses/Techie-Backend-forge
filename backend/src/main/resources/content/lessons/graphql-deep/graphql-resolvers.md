@@ -91,7 +91,9 @@ Field-level resolution means **errors are field-scoped** too. If `Course.lessons
 }
 ```
 
+```java
 The other courses still resolve; the error is attached to the failing field's path. Clients see partial data + precise error locations — a big difference from REST (where one bad field fails the whole response).
+```
 
 ## When You Need Resolvers (vs Defaults)
 
@@ -102,7 +104,9 @@ The other courses still resolve; the error is attached to the failing field's pa
 | Computed / derived | Yes |
 | Needs auth context (e.g., `me` field) | Yes — use `@AuthenticationPrincipal`-style access |
 
+```java
 The discipline: **keep the entity lean; resolve on demand.** Don't preload everything "just in case" — GraphQL's whole point is that untouched fields shouldn't be fetched.
+```
 
 ## Common Beginner Pitfalls
 

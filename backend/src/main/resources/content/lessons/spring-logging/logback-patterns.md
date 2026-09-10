@@ -89,6 +89,7 @@ logging:
 
 ### Scenario 1: Request tracing with MDC
 
+```java
 @Component
 public class MdcFilter implements Filter {
     @Override
@@ -103,6 +104,7 @@ public class MdcFilter implements Filter {
         }
     }
 }
+```
 
 Pattern: `%d{HH:mm:ss.SSS} %-5level [%thread] [%X{requestId}] %logger - %msg%n`
 

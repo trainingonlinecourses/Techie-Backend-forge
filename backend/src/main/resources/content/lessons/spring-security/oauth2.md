@@ -68,14 +68,18 @@ spring:
           # Spring auto-fetches the JWK Set from the issuer's metadata
 ```
 
+```java
 http.oauth2ResourceServer(rs -> rs.jwt(Customizer.withDefaults()));
+```
 
 Now your API validates tokens signed by the IdP — no shared secrets, no local user table needed for authn. Claims are available in controllers:
 
+```java
 @GetMapping("/me")
 public Jwt me(@AuthenticationPrincipal Jwt jwt) {
     return jwt;   // sub, email, roles claims from the IdP
 }
+```
 
 ## Client credentials for service accounts
 

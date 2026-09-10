@@ -56,6 +56,7 @@ Getting ordering wrong usually looks like: "the `OrderUpdated` event was process
 
 ## Idempotency in Spring Kafka
 
+```java
 @Component
 public class OrderEventConsumer {
 
@@ -72,6 +73,7 @@ public class OrderEventConsumer {
         }
     }
 }
+```
 
 The `record` + unique constraint is the backbone: it converts at-least-once into effectively-once for your business state.
 

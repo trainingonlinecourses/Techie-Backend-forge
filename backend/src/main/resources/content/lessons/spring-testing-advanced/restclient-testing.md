@@ -16,12 +16,14 @@ Your service calls other services. Those calls must be tested — but never agai
 
 ## @RestClientTest: The Slice for Clients
 
+```java
 @RestClientTest(PaymentGatewayClient.class)
 class PaymentGatewayClientTest {
 
     @Autowired PaymentGatewayClient client;
     @Autowired MockRestServiceServer server;
 }
+```
 
 `@RestClientTest` wires a `MockRestServiceServer` bound to your client's `RestTemplate`/`RestClient` — no real HTTP, no configuration.
 
@@ -54,7 +56,9 @@ server.expect(requestTo("/v1/charges"))
     .andExpect(header("Idempotency-Key", notNullValue()))
     .andExpect(content().contentType(MediaType.APPLICATION_JSON))
     .andExpect(jsonPath("$.amount").value(2500))
+```java
     .andExpect(jsonPath("$.currency").value("USD"));
+```
 
 If your client stops sending the auth header or the idempotency key, the test fails — that's a regression guard no real-API test can give you.
 
@@ -63,15 +67,19 @@ If your client stops sending the auth header or the idempotency key, the test fa
 @Test
 void handlesGatewayTimeout() {
     server.expect(requestTo("/v1/charges"))
+```java
         .andRespond(withStatus(HttpStatus.GATEWAY_TIMEOUT));
+```
 
     assertThrows(PaymentGatewayTimeoutException.class,
+```java
         () -> client.charge(2500, "tok_visa"));
 }
 
 @Test
 void retriesOn502() {
     server.expect(requestTo("/v1/charges")).andRespond(withStatus(HttpStatus.BAD_GATEWAY));
+```
     server.expect(requestTo("/v1/charges"))
         .andRespond(withSuccess("{\"id\":\"ch_2\"}", MediaType.APPLICATION_JSON));
 
@@ -103,6 +111,7 @@ class WebClientIntegrationTest {
         server.start();
         client = WebClient.builder()
             .baseUrl(server.url("/").toString())
+```java
             .build();
     }
 
@@ -113,10 +122,15 @@ class WebClientIntegrationTest {
 
     @Test
     void fetchesCourse() throws JsonProcessingException {
+```
         server.enqueue(new MockResponse()
+```java
             .setBody("{\"id\":1,\"title\":\"Spring\"}")
+```
             .setHeader("Content-Type", "application/json")
+```java
             .setResponseCode(200));
+```
 
         Mono<CourseDto> mono = client.get()
             .uri("/courses/1")
@@ -153,10 +167,12 @@ void circuitBreakerOpensAfterFailures() {
 @Test
 void timesOutWhenServerIsSlow() {
     server.expect(requestTo("/slow"))
+```java
         .andRespond(withSuccess("{}", MediaType.APPLICATION_JSON)
             .withBodyDelay(5, TimeUnit.SECONDS));   // delayed response
 
     // client with 2s timeout fails
+```
     assertThrows(ResourceAccessException.class,
         () -> slowClient.fetch());
 }
@@ -166,17 +182,23 @@ void timesOutWhenServerIsSlow() {
 @Test
 void maps404ToNotFoundDomainException() {
     server.expect(requestTo("/v1/courses/999"))
+```java
         .andRespond(withStatus(HttpStatus.NOT_FOUND));
+```
 
     assertThrows(CourseNotFoundException.class,
+```java
         () -> client.getCourse(999L));
 }
 
 @Test
 void mapsValidation422ToClientError() {
+```
     server.expect(requestTo("/v1/charges"))
         .andRespond(withStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+```java
             .body("{\"error\":\"card declined\"}"));
+```
 
     assertThrows(CardDeclinedException.class,
         () -> client.charge(2500, "tok_visa"));
@@ -184,9 +206,11 @@ void mapsValidation422ToClientError() {
 
 ## Verification: The Secret Weapon
 
+```java
 server.verify();                    // all expectations consumed, in order
 server.verify(1, requestTo("/x"));  // exactly one request to /x
 server.verify(0, requestTo("/y"));  // never called /y
+```
 
 `verify(0, ...)` is how you assert *absence* — "the client did NOT retry after success", "the client did NOT call the legacy endpoint".
 

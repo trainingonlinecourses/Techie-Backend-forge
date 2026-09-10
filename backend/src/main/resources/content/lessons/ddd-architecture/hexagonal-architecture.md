@@ -56,13 +56,17 @@ Domain ──▶ RepositoryPort (port) ◀── implemented by JPA adapter
 
 ### Inbound Port: The Use Case
 
+```java
 // Inbound port — what the application can DO
 public interface PlaceOrderUseCase {
     OrderId placeOrder(PlaceOrderCommand command);
 }
+```
 
 public record PlaceOrderCommand(Long customerId, List<OrderLineCommand> lines) {}
+```java
 public record OrderLineCommand(String productCode, int quantity) {}
+```
 
 ### Outbound Port: The Repository
 
@@ -85,6 +89,7 @@ public class Order {
     private OrderStatus status;
     private final List<OrderLine> lines = new ArrayList<>();
 
+```java
     public Order(OrderId id) {
         this.id = id;
         this.status = OrderStatus.DRAFT;
@@ -104,6 +109,7 @@ public class Order {
 
     public OrderId id() { return id; }
     public OrderStatus status() { return status; }
+```
     public List<OrderLine> lines() { return List.copyOf(lines); }
 }
 

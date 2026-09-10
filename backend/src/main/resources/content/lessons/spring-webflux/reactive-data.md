@@ -32,12 +32,14 @@ public interface CustomerRepository extends ReactiveCrudRepository<Customer, Lon
 
     Flux<Customer> findByLastName(String lastName);          // derived query → Flux
     Mono<Customer> findByEmail(String email);                // single → Mono
+```java
 }
 
 @Service
 public class CustomerService {
 
     private final CustomerRepository repo;
+```
 
     public Flux<Customer> all() { return repo.findAll(); }     // streaming, row by row
 

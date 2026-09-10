@@ -37,6 +37,7 @@ app:
 
 ## Line-by-Line Walkthrough
 
+```java
 @Data
 @ConfigurationProperties(prefix = "app.cache")
 public class CacheProperties {
@@ -53,6 +54,7 @@ public class CacheProperties {
         private int port = 6379;
     }
 }
+```
 
 ### Per-Profile YAML
 
@@ -104,6 +106,7 @@ app:
 
 ### Scenario 2: Conditional beans based on properties
 
+```java
 @Component
 @ConditionalOnProperty(name = "app.cache.type", havingValue = "redis")
 public class RedisCacheConfig {
@@ -112,6 +115,7 @@ public class RedisCacheConfig {
         return new RedisTemplate<>();
     }
 }
+```
 
 ---
 

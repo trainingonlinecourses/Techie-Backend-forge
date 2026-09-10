@@ -16,6 +16,7 @@ Sets and maps *are* their contracts: `equals`/`hashCode` decide membership, `com
 
 ## The Contract That Everything Depends On
 
+```java
 public class Course {
     private String slug;
 
@@ -31,6 +32,7 @@ public class Course {
         return Objects.hash(slug);
     }
 }
+```
 
 The three laws:
 1. `a.equals(b)` → `a.hashCode() == b.hashCode()` (equal objects, equal hashes)
@@ -62,8 +64,10 @@ Set<String> sorted = new TreeSet<>(List.of("b", "a", "c"));
 Set<Course> byLength = new TreeSet<>(
     Comparator.comparingInt(Course::minutes).thenComparing(Course::title));
 
+```java
 byLength.addAll(courses);
 // iterate: shortest first
+```
 
 ## The Map Family
 
@@ -77,6 +81,7 @@ byLength.addAll(courses);
 
 ### LinkedHashMap: The LRU Cache
 
+```java
 class LruCache<K, V> extends LinkedHashMap<K, V> {
 
     private final int maxSize;
@@ -91,14 +96,17 @@ class LruCache<K, V> extends LinkedHashMap<K, V> {
         return size() > maxSize;   // evict the least-recently-used on overflow
     }
 }
+```
 
 `accessOrder = true` reorders on `get` — the map becomes a real LRU cache in ~10 lines.
 
 ### EnumMap: The Forgotten Speed King
 
+```java
 enum Status { NEW, PROCESSING, PAID, CANCELLED }
 
 Map<Status, Integer> counts = new EnumMap<>(Status.class);
+```
 counts.merge(Status.PAID, 1, Integer::sum);
 
 // Backed by a plain array indexed by ordinal — O(1), tiny memory, no hashing
@@ -107,10 +115,12 @@ counts.merge(Status.PAID, 1, Integer::sum);
 
 ### IdentityHashMap
 
+```java
 // Reference-equality semantics: "same object", not "equal"
 IdentityHashMap<Object, String> registry = new IdentityHashMap<>();
 registry.put(c1, "instance-1");
 registry.put(new Course("same-slug"), "instance-2");   // different object, different key
+```
 
 Rarely needed — but essential for object-identity tracking (profiling, proxy caches) where `equals` is the wrong semantic.
 
@@ -130,19 +140,23 @@ Rarely needed — but essential for object-identity tracking (profiling, proxy c
 
 All non-concurrent collections throw `ConcurrentModificationException` on structural change during iteration. Remove safely:
 
+```java
 // ❌ CME
 for (String tag : tags) {
     if (tag.startsWith("x")) tags.remove(tag);
 }
 
 // ✅ iterator.remove()
+```
 Iterator<String> it = tags.iterator();
+```java
 while (it.hasNext()) {
     if (it.next().startsWith("x")) it.remove();
 }
 
 // ✅ removeIf (Java 8+)
 tags.removeIf(t -> t.startsWith("x"));
+```
 
 ## Choosing the Right Map
 

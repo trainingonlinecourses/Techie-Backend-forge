@@ -14,7 +14,9 @@ docs:
 
 ## The Concept: The Same URL, Different Intentions
 
+```java
 HTTP is a *request-response* protocol with a small set of **methods** (verbs) that say *what the client wants done* with the resource at the URL. The URL names *what*; the method names *the action*.
+```
 
 The genius of this design: the same URL (`/api/courses/42`) means something different per method:
 

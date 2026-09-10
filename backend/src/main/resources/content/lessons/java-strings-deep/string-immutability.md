@@ -20,8 +20,10 @@ An **immutable object** is the opposite: once it is created, its contents can **
 
 `String` in Java is immutable. When you write:
 
+```java
 String name = "Sateesh";
 name = name.toUpperCase();   // this does NOT change the original
+```
 
 you might think `name` changed from `"Sateesh"` to `"SATEESH"`. But what actually happens is:
 
@@ -108,10 +110,12 @@ public class ImmutabilityDemo {
 
 Sometimes you genuinely need to build or modify text incrementally — in a loop, for example. That's what `StringBuilder` is for (next lesson). The point of this lesson is: **the `String` class itself never mutates**. The APIs that look like mutation (`concat`, `replace`, `substring`, `toUpperCase`, `trim`, ...) all return new objects.
 
+```java
 // Looks like mutation, is actually 3 objects
 String s = "a";
 s = s + "b";   // new object "ab"
 s = s + "c";   // new object "abc"
+```
 
 Each `+` creates a new `String`. For one-off concatenations that's fine; inside a loop of thousands of iterations it wastes memory — which is exactly the problem `StringBuilder` solves.
 

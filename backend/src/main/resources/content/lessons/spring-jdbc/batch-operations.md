@@ -129,6 +129,7 @@ The writer + commit-interval pair is the production answer for million-row ETL: 
 
 ## Measuring the Win
 
+```java
 // Before: one-by-one
 long start = System.nanoTime();
 courses.forEach(c -> jdbcTemplate.update(INSERT_SQL, c.getTitle(), c.getLevel(), c.getMinutes()));
@@ -138,6 +139,7 @@ log.info("One-by-one: {} ms", TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - 
 start = System.nanoTime();
 jdbcTemplate.batchUpdate(INSERT_SQL, courses, 500, setter);
 log.info("Batched: {} ms", TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start));
+```
 
 Typical: 100k rows, one-by-one ≈ 40s → batched ≈ 1.5s (with `rewriteBatchedStatements`). Always measure — the numbers justify the pattern.
 

@@ -15,6 +15,7 @@ docs:
 
 A **cache** is a faster store in front of a slower one, holding copies of recently-read data. Spring's cache abstraction is annotation-driven: declare caching on a method, and the framework intercepts calls — check cache, miss → run method, store result. The store is swappable (ConcurrentHashMap, Redis, Caffeine, Hazelcast) via one `CacheManager` bean.
 
+```java
 @Service
 public class ProductService {
 
@@ -23,6 +24,7 @@ public class ProductService {
         return productRepo.findById(id).orElseThrow();   // runs only on cache miss
     }
 }
+```
 
 Second call with the same `id` → served from the cache; the method never runs.
 
@@ -36,11 +38,13 @@ Second call with the same `id` → served from the cache; the method never runs.
 | `@Caching` | compose several of the above |
 | `@CacheConfig` | class-level defaults (`cacheNames`, `cacheManager`) |
 
+```java
 @CacheEvict(cacheNames = "products", allEntries = true)   // invalidate on write
 public Product update(Product p) { ... }
 
 @CachePut(cacheNames = "products", key = "#p.id")          // refresh on miss-prone path
 public Product touch(Product p) { ... }
+```
 
 **Keys**: default = all method args (with the `SimpleKeyGenerator`); always set an explicit `key` (`#id`, `#p.id`) once methods take multiple args — or you cache the wrong granularity.
 
@@ -90,7 +94,9 @@ CacheManager cacheManager(RedisConnectionFactory cf) {
 
 ## Measuring, not guessing
 
+```java
 Caching without metrics is theater: track **hit ratio** per cache (Actuator exposes cache metrics with Micrometer), and re-measure after changes. A 99% hit ratio on a hot path is the win; a 20% ratio on a cold key space is memory spent for nothing.
+```
 
 ## Key takeaways
 

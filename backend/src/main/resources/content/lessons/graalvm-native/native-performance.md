@@ -174,13 +174,10 @@ public class OrderHandler implements RequestHandler<APIGatewayProxyRequestEvent,
 1. Kubernetes HPA (Horizontal Pod Autoscaler) scales based on CPU/memory. Native image: starts in 50ms → new pod serves traffic almost immediately. JVM: starts in 5 seconds → traffic backs up while waiting
 2. In k8s deployment: spec: containers: - name: academy. Image: academy-native:latest # GraalVM native image. Resources: limits: memory: "128Mi" # Only needs 128MB (vs 512MB for JVM). Cpu: "200m" # Low CPU (starts so fast, no burst needed)
 
-The same code, clean:
-
-```java
-```
 
 ### Scenario 3: CLI Tool
 
+```java
 @SpringBootApplication
 public class AcademyCli implements CommandLineRunner {
 
@@ -195,6 +192,7 @@ public class AcademyCli implements CommandLineRunner {
         System.out.println("All lessons validated successfully.");
     }
 }
+```
 
 ---
 

@@ -27,6 +27,7 @@ Prefer `ApplicationRunner` — parsing raw args is error-prone, and `Application
 
 ## How we use it in an organization: the scenarios
 
+```java
 **Scenario 1 — seed reference data on first boot.** A runner that populates lookup tables only when they're empty (idempotent, so redeploys don't duplicate):
 
 @Component
@@ -50,9 +51,11 @@ public class ReferenceDataSeeder implements ApplicationRunner {
         }
     }
 }
+```
 
 The `count() == 0` guard makes it safe across restarts and across the ephemeral-vs-persistent database moves teams do.
 
+```java
 **Scenario 2 — warm caches and connections at startup.** Eagerly load the hot reference data so the first user request doesn't pay a cold-cache penalty:
 
 @Component
@@ -66,9 +69,11 @@ public class CacheWarmer implements ApplicationRunner {
         log.info("Warmed product cache with {} entries", cache.size());
     }
 }
+```
 
 **Scenario 3 — fail-fast health check on boot.** A runner that verifies a critical external dependency and fails the app (via `System.exit(1)`) if it's unreachable — so a misconfigured deployment never serves traffic in a broken state:
 
+```java
 @Component
 public class ExternalDependencyCheck implements ApplicationRunner {
     @Override
@@ -93,14 +98,17 @@ public class BackfillRunner implements ApplicationRunner {
         }
     }
 }
+```
 
 ## Ordering multiple runners
 
 Multiple runners run in unspecified order unless you order them — implement `Ordered` or annotate `@Order`:
 
+```java
 @Component @Order(1) public class DependencyCheck implements ApplicationRunner { ... }
 @Component @Order(2) public class CacheWarmer implements ApplicationRunner { ... }
 @Component @Order(3) public class ReferenceDataSeeder implements ApplicationRunner { ... }
+```
 
 Lower order value runs first. Use `@Order` when the sequence matters (check dependencies before warming caches).
 

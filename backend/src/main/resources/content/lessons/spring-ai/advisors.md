@@ -35,7 +35,9 @@ chatClient.prompt()
         .user("What did I just ask about?")
         .advisors(a -> a.param(ChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY, conversationId))
         .call()
+```java
         .content();
+```
 
 For multi-user apps, scope memory per user: `conversationId = user.getId()` — never a global memory (users would see each other's context).
 
@@ -43,7 +45,9 @@ For multi-user apps, scope memory per user: `conversationId = user.getId()` — 
 
 .builder()
     .defaultAdvisors(new SimpleLoggerAdvisor())    // logs request + response
+```java
     .build();
+```
 
 `SimpleLoggerAdvisor` prints the prompt (system + user + messages) and the response — invaluable in dev; use structured logging + redaction in prod (prompts can contain PII).
 
@@ -54,6 +58,7 @@ For multi-user apps, scope memory per user: `conversationId = user.getId()` — 
 
 ## Safety: moderation & guardrails
 
+```java
 public class ModerationAdvisor implements Advisor {
     @Override
     public AdvisedRequest before(AdvisedRequest request) {
@@ -66,10 +71,13 @@ public class ModerationAdvisor implements Advisor {
         return response;
     }
 }
+```
 
 ChatClient safeClient = builder
         .defaultAdvisors(new ModerationAdvisor())
+```java
         .build();
+```
 
 Implementing `Advisor` gives you `before`/`after` hooks — the place for input filtering, output filtering, and injection guards.
 

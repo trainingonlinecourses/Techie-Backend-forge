@@ -15,6 +15,7 @@ docs:
 
 Before pattern matching, checking types in Java required verbose `if-else` chains with casts:
 
+```java
 // OLD way — ugly and error-prone
 static String describe(Object obj) {
     if (obj instanceof String) {
@@ -32,10 +33,12 @@ static String describe(Object obj) {
 }
 
 **The problems:**
+```
 1. You check the type, then cast — repeated boilerplate
 2. Easy to forget the cast after the `instanceof` check
 3. Long if-else chains are hard to read
 
+```java
 **Pattern matching for switch fixes this** (finalized in Java 21, JEP 441):
 
 // NEW way — clean and safe
@@ -47,6 +50,7 @@ static String describe(Object obj) {
         default          -> "Unknown: " + obj.getClass();
     };
 }
+```
 
 **One line per case. No casts. No intermediate variables.** The pattern variable `s`, `i`, `arr` is automatically bound if the type matches.
 
@@ -54,6 +58,7 @@ static String describe(Object obj) {
 
 Switch can now be used as an **expression** (not just a statement):
 
+```java
 public class Main {
 
     public static void main(String[] args) {
@@ -78,6 +83,7 @@ public class Main {
 }
 
 **Key differences from traditional switch:**
+```
 - Use `->` instead of `case:`
 - No `break` needed — arrow cases don't fall through
 - Returns a value — can assign to a variable
@@ -85,6 +91,7 @@ public class Main {
 
 ### Type Patterns — The Basics
 
+```java
 public class TypePatterns {
     static String format(Object obj) {
         return switch (obj) {
@@ -103,11 +110,13 @@ public class TypePatterns {
         System.out.println(format(null));      // null value
     }
 }
+```
 
 ### Guarded Patterns (When Clauses)
 
 Sometimes you need more than just a type check. Use `when` to add conditions:
 
+```java
 public class GuardedPatterns {
     static String classify(Number num) {
         return switch (num) {
@@ -128,11 +137,13 @@ public class GuardedPatterns {
         System.out.println(classify(100L));    // Long: 100
     }
 }
+```
 
 ### Pattern Matching with Sealed Classes
 
 Pattern matching becomes incredibly powerful with sealed classes:
 
+```java
 // Define a sealed class hierarchy
 public sealed interface Shape 
     permits Circle, Rectangle, Triangle {
@@ -158,11 +169,13 @@ public class ShapeCalculator {
 }
 
 **Why this matters:** The compiler enforces exhaustiveness. If you add a new shape to the sealed hierarchy and forget to handle it, you get a compile error.
+```
 
 ### Null Handling
 
 Pattern matching for switch has special null handling:
 
+```java
 public class NullHandling {
     static String process(String input) {
         return switch (input) {
@@ -173,11 +186,13 @@ public class NullHandling {
         // In pattern matching, null is handled explicitly
     }
 }
+```
 
 ### Nested Pattern Matching
 
 You can destructure records within patterns:
 
+```java
 public record Point(int x, int y) {}
 public record Line(Point start, Point end) {}
 
@@ -193,9 +208,11 @@ public class NestedPatterns {
         };
     }
 }
+```
 
 ### Organization Use Cases
 
+```java
 **1. API Request Routing**
 public class RequestRouter {
     public String route(Request request) {
@@ -236,6 +253,7 @@ public class AstEvaluator {
         };
     }
 }
+```
 
 ### Common Mistakes
 

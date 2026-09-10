@@ -15,6 +15,7 @@ Open `projects/payments-api/src/main/java/com/example/payments/` and follow alon
 
 ## DTOs: records at the boundary
 
+```java
 package com.example.payments.account;
 
 import jakarta.validation.constraints.NotBlank;
@@ -35,6 +36,7 @@ public record AccountView(Long id, String iban, String currency, long balanceCen
 }
 
 **Entities never cross the boundary** — services return views, controllers return views. The wire format is stable even when the entity changes.
+```
 
 ## The controller
 
@@ -75,6 +77,7 @@ public class AccountController {
 
 ## The transfer endpoint
 
+```java
 @RestController
 @RequestMapping("/api/transfers")
 public class TransferController {
@@ -94,16 +97,20 @@ public record CreateTransferRequest(
         @NotBlank String toIban,
         @NotNull @Min(1) Long amountCents,
         @NotBlank String idempotencyKey) {}
+```
 
 ## The uniform error contract
 
+```java
 package com.example.payments.common;
 
 import java.time.Instant;
 import java.util.List;
 
 public record ApiError(String timestamp, int status, String error, String message, String path,
+```
                        List<FieldError> fieldErrors) {
+```java
     public record FieldError(String field, String message) {}
 }
 
@@ -111,6 +118,7 @@ public record ApiError(String timestamp, int status, String error, String messag
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(AccountNotFound.class)
+```
     ResponseEntity<ApiError> notFound(AccountNotFound ex, HttpServletRequest req) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(ApiError.of(404, "Not Found", ex.getMessage(), req.getRequestURI()));

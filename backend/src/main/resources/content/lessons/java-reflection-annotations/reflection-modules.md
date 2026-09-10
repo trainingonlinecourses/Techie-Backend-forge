@@ -46,12 +46,14 @@ Here's a module declaration showing the vocabulary:
 // backend/src/main/java/module-info.java (conceptual)
 module academy.payments {
     // Public API — other modules can USE these packages.
+```java
     exports com.academy.payments.api;
     exports com.academy.payments.dto;
 
     // Deep reflection — frameworks may reflect into these packages.
     opens com.academy.payments.domain;
     opens com.academy.payments.config;
+```
 
     // Dependencies on other modules.
     requires spring.context;

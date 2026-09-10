@@ -70,8 +70,10 @@ when(repo.find(anyString(), eq(5))).thenReturn(p);
 **Custom matchers** with `argThat` — the "is this the right object?" check:
 
 verify(repo).save(argThat(order ->
+```java
         order.status().equals("PENDING") && order.total() > 0));
 // argThat takes a Predicate — your own matching logic inline.
+```
 
 **The rules to internalize:** matchers must be used consistently within a call (`eq` for raw values); `argThat` predicates should be *pure* (no side effects — they may run multiple times); and matching is by `equals` for `eq` — so records and properly-overridden classes work naturally.
 
@@ -135,6 +137,7 @@ public class Main {
 
 ## Verify Modes: The Full Accounting
 
+```java
 verify(mock).method();                    // exactly once (the default)
 verify(mock, times(3)).method();
 verify(mock, never()).method();
@@ -144,9 +147,11 @@ verify(mock, atMost(2)).method();
 verify(mock, only()).method();            // called exactly once, nothing else
 verifyNoMoreInteractions(mock);           // NOTHING else was called on it
 verifyNoInteractions(mock);               // it was never touched at all
+```
 
 **`verifyNoMoreInteractions` and `verifyNoInteractions`** are the strictness tools: they assert the *absence* of unexpected calls. `verifyNoInteractions(mock)` is the standard "this path must not touch the dependency" assertion — e.g., "a cached read must not hit the repository."
 
+```java
 **In-order verification** — asserting the sequence of calls:
 
 InOrder inOrder = inOrder(repo, auditLog);
@@ -157,6 +162,7 @@ service.charge("a1", 50);
 inOrder.verify(repo).findById("a1");
 inOrder.verify(repo).save(any(Account.class));
 inOrder.verify(auditLog).record(any(AuditEntry.class));
+```
 
 `inOrder` asserts *relative* ordering (not that no other calls happened) — the tool for "the code did the right thing in the right sequence" (a save before an audit entry, a lock before a release).
 
@@ -164,12 +170,14 @@ inOrder.verify(auditLog).record(any(AuditEntry.class));
 
 For asynchronous code (executor, CompletableFuture, virtual threads), the verification must *wait* for the call to happen:
 
+```java
 // timeout() — poll for the interaction, up to the given duration:
 verify(mock, timeout(2000)).process(anyString());
 // vs times() inside: verify(mock, timeout(2000).times(2)).process(any());
 
 // The distinction: times() fails immediately if the call hasn't happened
 // yet (race in async tests); timeout() waits up to the window for it.
+```
 
 **The async testing discipline:** prefer making the code's async boundary injectable (an `Executor`, a `CompletableFuture` you complete in the test) — then `timeout()` isn't needed. When the async is genuinely external, `timeout(ms)` with a generous window is the pragmatic tool — never a bare `Thread.sleep`, which is both slow and flaky.
 

@@ -16,10 +16,13 @@ docs:
 
 ## The Concept: Who Closes the Door?
 
+```java
 File handles, network sockets, database connections — Java calls these **resources**, and every one of them is a *limited, shared, kernel-backed thing*. Your operating system allows only so many open files per process; databases allow only so many connections. If your code opens a resource and never closes it, you **leak** it: the OS eventually refuses new opens, the database pool exhausts, and your application starts failing in baffling ways — "Too many open files," connection timeouts, hangs. The leak is invisible in tests (small programs rarely hit limits) and devastating in production (long-running servers hit limits constantly).
+```
 
 The classic, error-prone way to close resources is `finally`:
 
+```java
 public class Main {
 
     public static void main(String[] args) {
@@ -36,6 +39,7 @@ public class Main {
         }
     }
 }
+```
 
 **Why this is fragile:** three separate things can go wrong. First, `close()` throws a checked `IOException` that itself needs handling. Second, if `readLine()` throws and then `close()` also throws, the *second* exception silently replaces the first — you lose the original failure, and debugging becomes archaeology. Third, you must remember the null-check and the finally block *every single time* — and with nested resources (a file reader wrapping a stream wrapping a socket), the nesting explodes into pyramids of try/finally.
 
@@ -43,6 +47,7 @@ Java 7 gave us the tool that makes all of this vanish: **try-with-resources**.
 
 ## The Mechanism: Try-with-Resources
 
+```java
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -63,6 +68,7 @@ public class TryWithResourcesDemo {
 }
 
 **Walking through it, line by line:**
+```
 
 - `try (BufferedReader reader = new BufferedReader(new FileReader("data.txt")))` — the parentheses after `try` declare resources. The **only** requirement: the resource type must implement `AutoCloseable` (which `BufferedReader`, `FileReader`, `Connection`, `Statement`, `ResultSet`, `Socket`, and thousands of others do). That interface declares a single method, `close()`.
 
@@ -76,6 +82,7 @@ The subtle case: the try block throws an `IOException` (say, the disk hiccuped m
 
 In the old finally style, the close exception replaced the original — bad. In try-with-resources, Java does something clever: the *primary* exception (from the try body) propagates, and any exceptions thrown by `close()` are attached to it as **suppressed exceptions**.
 
+```java
 public class Main {
 
     public static void main(String[] args) {
@@ -89,11 +96,13 @@ public class Main {
         }
     }
 }
+```
 
 The `getSuppressed()` array is where you find close-time failures — they're preserved for debugging instead of stomping on the real error. This is why logs of try-with-resources code show the true root cause with "Suppressed:" lines beneath it.
 
 ## Multiple Resources in One try
 
+```java
 public class Main {
 
     public static void main(String[] args) {
@@ -109,6 +118,7 @@ public class Main {
         }
     }
 }
+```
 
 Both resources close automatically, **in reverse order** — `out` first, then `in`. That ordering matters: you want the destination flushed and closed before you release the source. A file copy with zero explicit close calls — this is the everyday power of the construct.
 
@@ -116,6 +126,7 @@ Both resources close automatically, **in reverse order** — `out` first, then `
 
 try-with-resources doesn't forbid a `finally` block; it just makes it unnecessary for *resource closing*. Use `finally` for cleanup that isn't a closable resource:
 
+```java
 try (Connection conn = dataSource.getConnection();
      PreparedStatement ps = conn.prepareStatement(sql)) {
     // ... work
@@ -125,6 +136,7 @@ try (Connection conn = dataSource.getConnection();
     // Non-AutoCloseable cleanup, e.g., release a lock or log timing
     metrics.record();
 }
+```
 
 The JDBC `Connection`, `Statement`, and `ResultSet` are all `AutoCloseable`, so the `try (...)` does the closing — the `finally` is purely for your own bookkeeping.
 
@@ -132,6 +144,7 @@ The JDBC `Connection`, `Statement`, and `ResultSet` are all `AutoCloseable`, so 
 
 Rarely, you'll meet a resource that is created *inside* the try body (not in the declaration) — try-with-resources can't auto-close it because the compiler needs the resource declared in the parentheses. The fix: declare it in the parentheses anyway:
 
+```java
 // WRONG: reader is created inside the body — no auto-close.
 try {
     BufferedReader reader = new BufferedReader(new FileReader("f.txt"));
@@ -142,6 +155,7 @@ try {
 try (BufferedReader reader = new BufferedReader(new FileReader("f.txt"))) {
     // ... work — reader is auto-closed
 } catch (IOException e) { }
+```
 
 If the resource genuinely can only exist after some logic, wrap that logic in a helper method that returns the resource, and call the helper inside the parentheses: `try (BufferedReader reader = openReader()) { ... }`.
 
@@ -149,6 +163,7 @@ If the resource genuinely can only exist after some logic, wrap that logic in a 
 
 Implementing `AutoCloseable` is a one-method interface — this is how you give *your* classes the same safety:
 
+```java
 public class ApiConnection implements AutoCloseable {
     private boolean open = true;
 
@@ -171,6 +186,7 @@ public class ApiConnection implements AutoCloseable {
         }   // close() called automatically here
     }
 }
+```
 
 Note the guard inside `close()` — it makes close idempotent (safe to call twice). That's a good habit: try-with-resources guarantees `close()` is called once, but defensive double-close protection costs nothing.
 

@@ -17,9 +17,11 @@ URL-based rules (`/api/orders/**` needs `ROLE_ADMIN`) authorize at the **edge** 
 
 Enable it once:
 
+```java
 @Configuration
 @EnableMethodSecurity   // Spring Security 6 — replaces @EnableGlobalMethodSecurity
 public class SecurityConfig { }
+```
 
 Then annotate service methods:
 
@@ -39,6 +41,7 @@ Then annotate service methods:
 
 ## How we use it in an organization: the scenarios
 
+```java
 **Scenario 1 — tenant isolation (the data-scoped rule that URL security can't do):**
 
 @Service
@@ -55,9 +58,11 @@ public class OrderService {
         }
     }
 }
+```
 
 URL rules only see `/api/orders/{id}` — they cannot know which tenant the order belongs to. The method rule checks the actual record. This is the canonical "why method security exists" scenario.
 
+```java
 **Scenario 2 — ownership via method arguments:**
 
 @PreAuthorize("#userId == authentication.principal.id")
@@ -68,18 +73,23 @@ public Profile getProfile(String userId) { ... }
 
 @PreAuthorize("hasAnyRole('ADMIN','AUDITOR') and @auditPolicy.allowsExport()")
 public byte[] exportLedger(LedgerFilter filter) { ... }
+```
 
 **Scenario 4 — `@PostAuthorize` for data-dependent responses.** The check runs *after* the method, on its return value — useful when the return object itself carries the permission:
 
+```java
 @PostAuthorize("returnObject.ownerId == authentication.principal.id or hasRole('ADMIN')")
 public Document getDocument(String id) { ... }
+```
 
 `@PostFilter` filters a returned collection (`@PostFilter("filterObject.ownerId == authentication.principal.id")`) — useful but beware it filters *after* the query, so it doesn't protect data volume or performance the way a WHERE clause does.
 
 ## @Secured and @RolesAllowed — the simpler alternatives
 
+```java
 @Secured("ROLE_ADMIN")            // role-only, no SpEL — fine for simple cases
 @RolesAllowed("ADMIN")            // JSR-250 standard; also role-only
+```
 
 Both are plain role checks — no arguments, no bean calls, no SpEL. `@Secured` is Spring's, `@RolesAllowed` is the Jakarta standard (useful for code shared across frameworks). Modern code prefers `@PreAuthorize` because it grows: a role check can become an ownership check without changing the annotation family.
 

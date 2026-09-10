@@ -47,6 +47,7 @@ public class Course {
 
     @OneToMany(mappedBy = "course", fetch = FetchType.LAZY)
     private List<Lesson> lessons = new ArrayList<>();
+```java
     // Hibernate manages loading, caching, cascades...
 }
 
@@ -54,6 +55,7 @@ public class Course {
 public class Course {
     @Id
     private Long id;
+```
     private List<Lesson> lessons = new ArrayList<>();
     // Loads the whole aggregate eagerly; no lazy, no cache
 }
@@ -63,10 +65,6 @@ public class Course {
 
 1. The N+1 story: JPA: courseRepository.findAll() then course.getLessons() per course -> N extra queries (unless you fetch-join) — the classic N+1. . JDBC: courseRepository.findAll() loads course + lessons in 2 queries total -> the aggregate IS the fetch unit — N+1 by construction impossible
 
-The same code, clean:
-
-```java
-```
 
 That contrast is the whole decision: JPA gives you power over *relationships* but you must master fetch strategies (see the N+1 lesson in the Data JPA module); JDBC gives you predictability — the aggregate is the unit, period.
 
@@ -102,7 +100,9 @@ If you're on JPA and everything is fine, **don't migrate for fashion**. Migratio
 - You can't reason about what SQL runs in production.
 - A new bounded module (reporting, analytics, a new aggregate) wants SQL control from day one.
 
+```java
 For *new* projects: start with Spring Data JDBC; escalate to JPA only when the domain's relationship complexity demands it.
+```
 
 ## Common Beginner Pitfalls
 

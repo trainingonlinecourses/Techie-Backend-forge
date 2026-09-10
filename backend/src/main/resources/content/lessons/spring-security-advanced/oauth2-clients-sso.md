@@ -55,6 +55,7 @@ The `client-secret` exchange happens **server-side** — that's why the client (
 
 Provider identity (Google `sub`, email) isn't your user model. Map on login via `OAuth2UserService`:
 
+```java
 @Service
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
@@ -66,10 +67,13 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         return new AppOAuth2User(user);          // wrap with YOUR authorities/roles
     }
 }
+```
 
 http.oauth2Login(oauth -> oauth
     .userInfoEndpoint(ui -> ui.userService(customService))
+```java
     .defaultSuccessUrl("/dashboard", true));
+```
 
 The pattern to get right: **provider identity (sub) must be unique per provider** — storing by email alone lets an attacker who controls the victim's email at another provider hijack the account. Store `provider` + `providerSub` as the link key.
 

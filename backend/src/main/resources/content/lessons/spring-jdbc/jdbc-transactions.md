@@ -39,12 +39,16 @@ public class CourseService {
     public void publishCourse(Long courseId, String adminUser) {
         jdbcTemplate.update("""
             UPDATE courses SET published = true WHERE id = ?
+```java
             """, courseId);
+```
 
         jdbcTemplate.update("""
             INSERT INTO audit_log (entity, entity_id, action, actor)
             VALUES ('course', ?, 'publish', ?)
+```java
             """, courseId, adminUser);
+```
 
         // any exception → BOTH updates roll back
     }
@@ -66,8 +70,10 @@ public class ImportService {
     }
 
     public ImportResult importAll(List<Course> courses) {
+```java
         // per-batch transactions: one failure doesn't roll back the whole import
         int succeeded = 0;
+```
         for (List<Course> batch : partition(courses, 100)) {
             try {
                 transactionTemplate.executeWithoutResult(status ->
@@ -85,15 +91,18 @@ public class ImportService {
 
 ## Configuring the TransactionTemplate
 
+```java
 TransactionTemplate template = new TransactionTemplate(txManager);
 template.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
 template.setIsolationLevel(TransactionDefinition.ISOLATION_READ_COMMITTED);
 template.setTimeout(30);   // seconds
+```
 
 Per-call settings — useful when the same service needs different isolation for different operations.
 
 ## REQUIRES_NEW: A Nested Transaction
 
+```java
 @Transactional
 public void processOrder(Long orderId) {
     jdbcTemplate.update("UPDATE orders SET status='PROCESSING' WHERE id=?", orderId);
@@ -107,6 +116,7 @@ public void processOrder(Long orderId) {
 public void recordAudit(Long orderId) {
     jdbcTemplate.update("INSERT INTO audit_log ...", orderId);
 }
+```
 
 `REQUIRES_NEW` suspends the outer transaction, runs the inner one on a **new connection**, commits it independently, then resumes the outer. The audit survives an outer rollback — the classic audit-trail pattern.
 
@@ -128,8 +138,10 @@ With JDBC, `readOnly` hints the driver (connection-level `setReadOnly`) — some
 | REPEATABLE_READ | Non-repeatable reads | Medium |
 | SERIALIZABLE | Phantom reads | High — locking |
 
+```java
 @Transactional(isolation = Isolation.SERIALIZABLE)
 public void reconcileBalances() { ... }
+```
 
 For a deep dive on the anomalies (dirty read, non-repeatable read, phantom), see the Postgres module lesson on isolation — the concepts are identical here.
 
@@ -155,6 +167,7 @@ NESTED is cheaper than REQUIRES_NEW (same connection, savepoint markers) and giv
 
 ## The Self-Invocation Trap (Again)
 
+```java
 @Service
 public class CourseService {
 
@@ -166,9 +179,11 @@ public class CourseService {
     @Transactional
     public void updateCourse(Long id) { ... }
 }
+```
 
 Same proxy problem as `@Async`/`@Cacheable`. Fix with self-injection or `TransactionTemplate`:
 
+```java
 @Service
 public class CourseService {
 
@@ -186,9 +201,11 @@ public class CourseService {
         tx.executeWithoutResult(status -> jdbcTemplate.update("...", id));
     }
 }
+```
 
 ## Testing Transactions
 
+```java
 @DataJpaTest   // rolls back each test automatically
 class TransactionTest {
 
@@ -201,6 +218,7 @@ class TransactionTest {
     }
     // rolled back after the test — no cleanup needed
 }
+```
 
 With `@JdbcTest` + `@Transactional`, each test runs in a rollback-only transaction: assertions see the writes, and nothing leaks to the next test.
 

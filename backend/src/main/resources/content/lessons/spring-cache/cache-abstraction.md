@@ -16,15 +16,18 @@ Spring's cache abstraction decouples your code from any concrete cache — you a
 
 ## Enabling Caching
 
+```java
 @Configuration
 @EnableCaching
 public class CacheConfig {
 }
+```
 
 `@EnableCaching` registers a `CacheInterceptor` that wraps annotated methods in a proxy. Like `@Transactional` and `@Async`, **self-invocation bypasses the cache** — call through the proxy.
 
 ## @Cacheable: The Core Annotation
 
+```java
 @Service
 public class CourseService {
 
@@ -34,6 +37,7 @@ public class CourseService {
             .orElseThrow(() -> new NotFoundException(courseId));
     }
 }
+```
 
 Behavior:
 1. Before executing, Spring computes the cache key from the arguments.
@@ -65,6 +69,7 @@ public Course getCourse(CourseDto dto) { ... }
 
 ## Conditional and Unless
 
+```java
 // Only cache when the condition holds
 @Cacheable(value = "courses", condition = "#courseId.startsWith('pub-')")
 
@@ -74,8 +79,11 @@ public Course getCourse(String courseId) { ... }
 
 // Combine: cache only non-null, only for public courses
 @Cacheable(value = "courses", condition = "#courseId.startsWith('pub-')",
+```
            unless = "#result == null")
+```java
 public Course getCourse(String courseId) { ... }
+```
 
 `condition` is evaluated **before** the method call (on the arguments); `unless` is evaluated **after** (on the result). Both are SpEL.
 
@@ -83,16 +91,20 @@ public Course getCourse(String courseId) { ... }
 
 A cache name is a **region** — a logical namespace with its own store, TTL, and eviction policy. Separate by data characteristics, not by class:
 
+```java
 @Cacheable("course-catalog")          // rarely changes, long TTL
 @Cacheable("course-pricing")          // changes daily, medium TTL
 @Cacheable("user-sessions")           // volatile, short TTL
 
 On Redis, each region maps to a Redis key namespace; on Caffeine each region is a separate cache with its own spec.
+```
 
 ## Multi-Value Caching
 
+```java
 @Cacheable(cacheNames = {"courses", "course-summary"})
 public Course getCourse(String courseId) { ... }
+```
 
 Spring writes to both caches. On a read, it checks them **in order** and returns the first hit. Use sparingly — it doubles write cost and complicates invalidation.
 
@@ -100,13 +112,16 @@ Spring writes to both caches. On a read, it checks them **in order** and returns
 
 With the default settings, ten concurrent requests for the same cold key all miss and all execute the expensive method — the **cache stampede**. `sync = true` makes Spring hold a per-key lock so only one thread executes the method while the others wait for its result:
 
+```java
 @Cacheable(value = "courses", sync = true)
 public Course getCourse(String courseId) { ... }
+```
 
 This is one of the highest-value flags in the annotation. Always set it on hot, expensive lookups.
 
 ## Self-Invocation Gotcha
 
+```java
 @Service
 public class CourseService {
 
@@ -119,9 +134,11 @@ public class CourseService {
     @Cacheable("courses")
     public Course getCourse(String id) { ... }
 }
+```
 
 Fix with `@Lazy` self-injection or split into two beans:
 
+```java
 @Service
 public class CourseService {
 
@@ -137,15 +154,18 @@ public class CourseService {
         return course;
     }
 }
+```
 
 ## Configuring a CacheManager
 
 ### Simple (ConcurrentHashMap — default)
 
+```java
 @Bean
 public CacheManager cacheManager() {
     return new ConcurrentMapCacheManager("courses", "users");
 }
+```
 
 ### Caffeine (in-memory with TTL + size limits)
 
@@ -170,6 +190,7 @@ Caffeine is the right default for single-instance apps: fast, bounded, and stats
 
 ## Testing Cached Methods
 
+```java
 @SpringBootTest
 class CourseServiceTest {
 
@@ -191,6 +212,7 @@ class CourseServiceTest {
         assertNotNull(again);
     }
 }
+```
 
 ## Summary
 

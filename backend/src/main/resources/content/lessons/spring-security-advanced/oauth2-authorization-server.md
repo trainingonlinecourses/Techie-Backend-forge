@@ -30,7 +30,9 @@ Clients are registered server-side (JDBC-backed `RegisteredClientRepository` in 
 RegisteredClientRepository clientRepository(JdbcTemplate jdbc) {
     RegisteredClient client = RegisteredClient.withId(UUID.randomUUID().toString())
         .clientId("spa-client")
+```java
         .clientSecret("{noop}")                       // public client (SPA) — no secret
+```
         .clientAuthenticationMethod(ClientAuthenticationMethod.NONE)
         .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
         .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)

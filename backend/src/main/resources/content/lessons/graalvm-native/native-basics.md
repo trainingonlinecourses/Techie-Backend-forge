@@ -18,9 +18,11 @@ docs:
 
 Java's classic model: your `.class` files run on the JVM, which **JIT-compiles** (Just-In-Time) the hot methods to machine code *while the program runs*. This gives great peak performance — but it costs startup: the JVM must load, interpret, profile, and compile before the application reaches full speed. A Spring Boot app typically takes 2–10 seconds to start and *seconds more* to warm up. **GraalVM Native Image** takes the opposite path: **AOT compilation (Ahead-Of-Time)** — it compiles your *entire application* (Java code, libraries, framework) into a **standalone native executable** *before* it ever runs. No JVM at startup: the binary starts in milliseconds.
 
+```java
 **The mental model:** JIT is a chef who cooks each dish to order, watching how you eat and optimizing as they go — great food, slow to start. AOT is a chef who *pre-cooks everything* by your menu — instant service, but the menu must be fully known in advance. The trade is exactly that: native image trades **runtime flexibility for compile-time knowledge** — it must know, at build time, everything the program will ever do.
 
 **The numbers that sell it:** a Spring Boot app starts in ~3 seconds on the JVM; the same app as a native image starts in ~50–100ms. Memory footprint drops significantly (no JIT, no class metadata, compact heap). For serverless (cold starts matter), containers (small images), and CLI tools, that difference is the difference between "usable" and "not."
+```
 
 ## How It Works: Closed-World Analysis
 
@@ -37,7 +39,9 @@ A standalone executable: your code + a minimal runtime
 (no JVM, no classloader, no JIT, no reflection metadata unless declared)
 ```
 
+```java
 **The consequences are the whole story of native image:** anything *reachable* at build time is compiled in; anything the analyzer *can't see* — classes loaded dynamically by name, reflectively invoked methods, resources discovered at runtime, JDBC drivers looked up by string — **doesn't exist in the binary**. That's why the two keywords of native development are **"reachability"** and **"configuration"**: you must tell the build about everything the closed-world analysis can't discover on its own.
+```
 
 ## The Cost of Instant Startup: What You Give Up
 

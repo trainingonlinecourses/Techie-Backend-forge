@@ -29,7 +29,9 @@ Single instance:                     Cluster:
 
 ## Redis replication — copying data
 
+```java
 **Replication** means one master and one or more slaves (replicas). The master handles writes; slaves handle reads and provide backup.
+```
 
 ```
 Master ←──writes──→ Client
@@ -73,10 +75,6 @@ Keys 10923-16383 → Master 3
 1. Redis uses hash slots to distribute keys. HASH_SLOT = CRC16(key) mod 16384
 2. Example: "user:1001" → hash slot 2938 → Master 1. "user:1002" → hash slot 7182 → Master 2. "user:1003" → hash slot 12456 → Master 3
 
-The same code, clean:
-
-```java
-```
 
 **Spring Boot configuration for Redis Cluster:**
 

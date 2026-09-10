@@ -191,6 +191,7 @@ public class DevDataLoader implements ApplicationRunner {
 
 ## Method 5: Spring Profiles for Environment-Specific Data
 
+```java
 @Component
 @Profile("dev")
 public class DevDataSeeder implements CommandLineRunner {
@@ -223,6 +224,7 @@ public class ProdDataSeeder implements CommandLineRunner {
         // Only seed essential roles and admin user
     }
 }
+```
 
 ```bash
 # Run with a specific profile

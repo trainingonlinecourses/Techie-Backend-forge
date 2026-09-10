@@ -48,6 +48,7 @@ While React/Angular/Vue handle rendering in the browser, **Thymeleaf** renders H
 
 ### Step 2: Entity (same as REST version)
 
+```java
 @Entity
 @Table(name = "tasks")
 public class Task {
@@ -69,6 +70,7 @@ public class Task {
     public enum Priority { LOW, MEDIUM, HIGH }
     public enum Status { TODO, IN_PROGRESS, DONE }
 }
+```
 
 ### Step 3: Repository
 

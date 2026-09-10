@@ -54,7 +54,9 @@ String html = """
             <p>Hello</p>
         </body>
     </html>
+```java
     """;
+```
 
 In this example, the source lines inside the text block are indented to align with the surrounding code. The compiler finds the minimum indentation among the lines (the lines with `<html>`, `<body>`, etc. have more indentation, but the line with `"""` and the lines with the HTML tags all contribute to the common whitespace calculation) and strips it. The resulting string starts at the first non-whitespace character of each line after stripping.
 
@@ -74,7 +76,9 @@ There is also a new escape sequence that is especially useful in text blocks: `\
 String spaces = """
     line one   \s
     line two   \s
+```java
     """;
+```
 
 ### When a Text Block Is Cleaner
 
@@ -97,9 +101,11 @@ String query = """
       AND o.total > ?
     ORDER BY o.total DESC
     LIMIT 10
+```java
     """;
 
 // A text block for JSON in a test assertion
+```
 String expected = """
     {
         "id": 1,
@@ -120,15 +126,21 @@ You still need to escape in a few cases:
 // Escaping still matters in a text block
 String path = """
     C:\\Users\\Alice\\Documents
+```java
     """;   // backslash must be escaped: \\ -> \
+```
 
 String withQuote = """
     He said, "hello"
+```java
     """;   // single quotes are fine inside a text block
+```
 
 String tricky = """
     a\"\"\"b
+```java
     """;   // three consecutive quotes — escape one to avoid ending the block
+```
 
 ### The Indentation Gotcha
 
@@ -286,7 +298,9 @@ String query = """
     WHERE u.status = :status
       AND o.created_at >= :since
     ORDER BY o.created_at DESC
+```java
     """;
+```
 
 Second, **JSON and JSON-like test data.** When you write a test that checks a JSON response, the expected JSON is much cleaner as a text block. You can format it with indentation and not worry about escaping every quote.
 
@@ -307,7 +321,9 @@ String greeting = """
     Hello, %s!
     Welcome to %s.
     Your account was created on %s.
+```java
     """.formatted("Alice", "BackendForge", "2025-01-15");
+```
 
 ## Common Mistakes
 

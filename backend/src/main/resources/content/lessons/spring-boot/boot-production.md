@@ -89,7 +89,9 @@ readinessProbe:
   periodSeconds: 5
 ```
 
+```java
 Liveness = "restart me"; readiness = "stop routing to me". Boot provides both groups out of the box.
+```
 
 > **Why it matters (organizational view)** — Production readiness is a *standard*, not an afterthought: every service ships with health probes, graceful shutdown, JSON logs, externalized secrets, and a slim container. When everything behaves the same way, the platform team can operate 50 services with the same runbook.
 

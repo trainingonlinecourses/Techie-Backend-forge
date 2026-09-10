@@ -80,7 +80,9 @@ message Course {
 Course course = Course.newBuilder()
     .addTags("java")
     .addAllTags(List.of("spring", "boot"))
+```java
     .build();
+```
 
 List<String> tags = course.getTagsList();   // immutable view
 
@@ -97,7 +99,9 @@ message Course {
 ```
 
 Course.Author author = Course.Author.newBuilder()
+```java
     .setName("Ada").setEmail("ada@example.com").build();
+```
 
 ## oneof: Exactly One Field
 
@@ -111,8 +115,10 @@ message Payment {
 }
 ```
 
+```java
 Payment p = Payment.newBuilder().setCardToken("tok_123").build();
 // Setting bankIban clears cardToken — only one is set
+```
 
 ## Maps
 
@@ -125,7 +131,9 @@ message Metadata {
 Metadata m = Metadata.newBuilder()
     .putLabels("env", "prod")
     .putLabels("region", "us-east")
+```java
     .build();
+```
 
 ## Defaults in proto3
 
@@ -139,7 +147,9 @@ Proto3 fields have **implicit defaults** — no `null`:
 | enum | first value (0) |
 | message | absent (use `hasField()` to check presence) |
 
+```java
 course.hasAuthor();    // presence check for messages
+```
 
 This is why the enum's first value must be a meaningful default (`STATUS_UNSPECIFIED = 0`), not a real state.
 
@@ -221,6 +231,7 @@ Course fromJson = JsonFormat.parser().parse(json, Course.class);
 
 ## Testing Protobuf
 
+```java
 @Test
 void roundTripsThroughBinary() throws Exception {
     Course original = courseBuilder().build();
@@ -237,6 +248,7 @@ void oneofSetsExactlyOneField() {
     assertFalse(p.hasCardToken());   // setting the second cleared the first
     assertTrue(p.hasBankIban());
 }
+```
 
 ## Summary
 

@@ -27,16 +27,21 @@ Three rules make a constructor what it is:
 
 ### 1. Default constructor (the invisible one)
 
+```java
 public class Product { }
+```
 
 If you write **no constructor at all**, the compiler silently inserts one that takes no arguments and does nothing beyond calling `super()`:
 
+```java
 public Product() {
     super();   // inserted by the compiler — call Object's constructor
 }
+```
 
 The moment you declare ANY constructor yourself, this freebie disappears:
 
+```java
 public class Product {
     public Product(String name) {  // now the ONLY constructor
         this.name = name;
@@ -45,11 +50,13 @@ public class Product {
 
 // new Product();            // ❌ compile error — no no-arg constructor exists anymore
 // new Product("Laptop");    // ✅ fine
+```
 
 > This is why some frameworks complain "no default constructor found" — libraries that create your objects reflectively need a way in.
 
 ### 2. No-arg constructor (explicit)
 
+```java
 public class Product {
     private String name = "unnamed";   // field initializer runs first
 
@@ -57,11 +64,13 @@ public class Product {
         // runs after field initializers; can add setup logic here
     }
 }
+```
 
 Useful when a sensible default object is meaningful (an empty cart, a blank form).
 
 ### 3. Parameterized constructor
 
+```java
 public class Product {
     private final String name;      // final: must be set exactly once, in every constructor path
     private final BigDecimal price;
@@ -74,6 +83,7 @@ public class Product {
         this.price = price;
     }
 }
+```
 
 Line by line:
 
@@ -91,7 +101,9 @@ Two keywords let one constructor delegate to another. Both must be **the very fi
 
 public class Order {
     private final List<String> items;
+```java
     private final boolean express;
+```
 
     public Order(List<String> items) {
         this(items, false);              // delegate to the two-arg constructor below
@@ -107,6 +119,7 @@ Why organizations do this: validation and copying logic lives in **one place** (
 
 ### `super(...)` — chain to the parent class
 
+```java
 class User {
     protected final String email;
 
@@ -121,6 +134,7 @@ class Admin extends User {
         // admin-specific setup goes after super(...)
     }
 }
+```
 
 Think of it as building a house: the foundation (`User`) has to be poured before walls (`Admin`) are added. If you don't write `super(...)` explicitly, the compiler inserts a bare `super()` — which fails to compile if the parent has no accessible no-arg constructor.
 
@@ -133,12 +147,14 @@ public class Customer {
     private final List<String> tags;
 
     public Customer(Long id, List<String> tags) {
+```java
         this.id = id;
         this.tags = new ArrayList<>(tags);     // defensive copy again
     }
 
     public Customer(Customer other) {          // copy constructor: takes an instance of its own class
         this.id = other.id;                    // primitives/references copied directly
+```
         this.tags = new ArrayList<>(other.tags); // nested mutable objects COPIED too → deep-ish copy
     }
 }
@@ -149,6 +165,7 @@ Now `new Customer(existingCustomer)` gives an independent duplicate — the stan
 
 Given inheritance + field initializers + blocks, the JVM runs things in exactly this order:
 
+```java
 class Base {
     static { System.out.println("1. Base static init"); }   // once per CLASS, when class loads
     { System.out.println("2. Base instance init"); }        // every instance creation
@@ -163,6 +180,7 @@ class Child extends Base {
 
 new Child();
 // Output order: 1, 4, 2, 3, 5, 6
+```
 
 Memorize the pattern: **statics first (parent→child), then per-instance: parent's initializers+constructor before child's**.
 

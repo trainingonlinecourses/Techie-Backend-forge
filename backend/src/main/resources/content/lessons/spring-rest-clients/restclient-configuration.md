@@ -107,6 +107,7 @@ Retry logic (covered in depth in the resilience module) composes with RestClient
 
 A minimal interceptor-based retry:
 
+```java
 ClientHttpRequestInterceptor retryInterceptor() {
     return (request, body, execution) -> {
         for (int attempt = 1; ; attempt++) {
@@ -121,6 +122,7 @@ ClientHttpRequestInterceptor retryInterceptor() {
 }
 
 **Important:** retry only **idempotent** requests (GET, PUT, DELETE — safe to repeat). Never blindly retry a POST that creates a resource without idempotency keys (see the idempotency lesson in REST best practices).
+```
 
 ## Headers You Should Always Consider
 

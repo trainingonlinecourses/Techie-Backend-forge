@@ -18,7 +18,9 @@ docs:
 
 A **dynamic proxy** is an object created *at runtime* that implements one or more interfaces you name, but with no hand-written class behind it. Instead, every method call on the proxy is routed to a single handler — `InvocationHandler.invoke(...)` — which can do *anything*: log the call, check permissions, measure time, forward to a real implementation, or change the behavior entirely.
 
+```java
 **The mental model:** imagine a celebrity's assistant who answers every phone call. You dial the celebrity's number (the interface), but the assistant picks up (the proxy). The assistant can screen calls, take messages, log everything, or patch you through to the celebrity (the real implementation). The caller never knows the difference — they're talking to the interface, not to a specific person. The proxy *is* the interface; it just delegates to your handler for every call.
+```
 
 **Why this matters:** this is the foundation of Spring AOP and `@Transactional`. When you annotate a Spring bean method with `@Transactional`, Spring doesn't change your class — it creates a *proxy* of your bean at runtime, and the proxy's handler starts a transaction before delegating to your real method, then commits or rolls back after. `@Async`, `@Cacheable`, security checks, and audit logging all work the same way: proxies intercept the call, add the cross-cutting behavior, and delegate.
 
@@ -101,6 +103,7 @@ public class ProxyDemo {
 
 The before/after structure above generalizes to every cross-cutting concern:
 
+```java
 InvocationHandler txHandler = (proxy, method, args) -> {
     if (method.isAnnotationPresent(Transactional.class)) {
         beginTransaction();
@@ -116,6 +119,7 @@ InvocationHandler txHandler = (proxy, method, args) -> {
     // Methods without the annotation pass straight through:
     return method.invoke(target, args);
 };
+```
 
 This is a miniature `@Transactional` — Spring's actual implementation does exactly this (plus more sophisticated proxy factories). The *same* pattern, with different before/after logic, produces: `@Async` (run on a thread pool), `@Cacheable` (check cache, then delegate, then populate cache), `@Secured` (check the current user's authorities before delegating), and audit logging (record who did what).
 

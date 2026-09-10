@@ -33,6 +33,7 @@ Spring Boot also exposes `ApplicationStartup` (flight-recorder-style bean init s
 
 **2. `@Lazy` the heavy, rarely-used beans.** A `KafkaAdmin`, a second `DataSource`, a reporting `WebClient` — defer them until first use:
 
+```java
 @Configuration
 public class HeavyBeans {
     @Bean
@@ -43,6 +44,7 @@ public class HeavyBeans {
     @Lazy
     public DataSource reportingDataSource() { ... }  // analytics pool — rarely touched
 }
+```
 
 Or globally: `spring.main.lazy-initialization=true` creates **everything** on first use. Fast, but it hides wiring errors until first touch and reorders startup side effects — acceptable for dev/CI, risky as a blanket prod setting. Use it as a diagnostic ("is my app fast when lazy?") more than a permanent switch.
 

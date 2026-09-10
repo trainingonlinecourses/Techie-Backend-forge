@@ -33,7 +33,9 @@ public User getUser(@PathVariable Long id) {
 ### The Solution: R2DBC Returns Immediately
 
 // R2DBC returns Mono<User> immediately — no thread is blocked
+```java
 @GetMapping("/users/{id}")
+```
 public Mono<User> getUser(@PathVariable Long id) {
     // ✅ Returns instantly, database query runs asynchronously
     // Thread is free to handle other requests while waiting
@@ -79,6 +81,7 @@ spring:
 
 ### Entity
 
+```java
 @Table("users")
 public class User {
     @Id
@@ -92,6 +95,7 @@ public class User {
 
     // Getters, setters, constructor
 }
+```
 
 ### Repository Interface
 

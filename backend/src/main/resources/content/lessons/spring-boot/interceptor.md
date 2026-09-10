@@ -73,6 +73,7 @@ public class RequestTimingInterceptor implements HandlerInterceptor {
 
 Check JWT tokens before controller execution:
 
+```java
 @Component
 public class AuthInterceptor implements HandlerInterceptor {
 
@@ -103,11 +104,13 @@ public class AuthInterceptor implements HandlerInterceptor {
         return true;
     }
 }
+```
 
 ### Scenario 3: Response header interceptor
 
 Add common headers to all API responses:
 
+```java
 @Component
 public class ResponseHeadersInterceptor implements HandlerInterceptor {
 
@@ -120,6 +123,7 @@ public class ResponseHeadersInterceptor implements HandlerInterceptor {
         response.setHeader("X-Content-Type-Options", "nosniff");
     }
 }
+```
 
 ## Registration and ordering
 
@@ -131,12 +135,16 @@ public class WebConfig implements WebMvcConfigurer {
         // Order determines execution sequence (lower = first)
         registry.addInterceptor(new ResponseHeadersInterceptor())
             .addPathPatterns("/api/**")
+```java
             .order(1);
+```
 
         registry.addInterceptor(authInterceptor)
             .addPathPatterns("/api/**")
             .excludePathPatterns("/api/auth/login", "/api/auth/register")
+```java
             .order(2);
+```
 
         registry.addInterceptor(requestTimingInterceptor)
             .addPathPatterns("/**")

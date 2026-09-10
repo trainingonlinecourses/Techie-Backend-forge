@@ -27,6 +27,7 @@ The drift means "passes in CI, fails in prod". Testcontainers eliminates the ent
 
 ## The Basic Setup
 
+```java
 @DataJpaTest
 @Testcontainers
 class CourseRepositoryTest {
@@ -38,11 +39,13 @@ class CourseRepositoryTest {
 
     @Autowired CourseRepository repository;
 }
+```
 
 `@ServiceConnection` (Spring Boot 3.1+) auto-wires the container's connection into the context — no `spring.datasource.url` properties needed.
 
 ## Multiple Dependencies
 
+```java
 @SpringBootTest
 @Testcontainers
 class FullStackIntegrationTest {
@@ -63,6 +66,7 @@ class FullStackIntegrationTest {
     @Autowired StringRedisTemplate redisTemplate;
     @Autowired KafkaTemplate<String, String> kafkaTemplate;
 }
+```
 
 One context, three real dependencies, everything wired. Tests exercise the exact stack production runs.
 

@@ -16,10 +16,12 @@ docs:
 
 Recall that `String` is immutable — every operation that "changes" a string creates a **new object**. Now think about building a sentence word by word in a loop:
 
+```java
 String result = "";
 for (int i = 0; i < 1000; i++) {
     result = result + "word" + i + " ";   // creates a NEW string every iteration
 }
+```
 
 With 1,000 iterations, this creates roughly **2,000–3,000 intermediate String objects**, each one copying all the previous content. That's O(n²) copying — for large loops it becomes brutally slow and churns the garbage collector.
 
@@ -115,13 +117,17 @@ There is an older sibling: **`StringBuffer`**. It is identical in API but its me
 
 The Java compiler automatically uses `StringBuilder` for simple `+` chains:
 
+```java
 String s = a + b + c;   // compiler: new StringBuilder().append(a).append(b).append(c).toString()
+```
 
 So a few `+` in one statement are fine — no need to hand-roll a builder. But in a **loop**, the compiler cannot hoist the builder out:
 
+```java
 for (...) {
     result = result + x;   // a NEW StringBuilder per iteration — still quadratic
 }
+```
 
 That's why the rule is: **in a loop, write the `StringBuilder` yourself, outside the loop.**
 

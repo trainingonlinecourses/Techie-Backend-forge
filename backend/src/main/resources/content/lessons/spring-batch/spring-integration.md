@@ -39,12 +39,14 @@ IntegrationFlow fileFlow() {
         .route(Order::kind, m -> m
             .channelMapping("standard", "orders.channel")
             .channelMapping("priority", "priority.channel"))
+```java
         .get();
 }
 
 @Bean
 IntegrationFlow handlerFlow() {
     return IntegrationFlow.from("orders.channel")
+```
         .handle("orderService", "handleOrder")               // service activator
         .get();
 }
@@ -53,6 +55,7 @@ IntegrationFlow handlerFlow() {
 
 A **gateway** hides messaging behind a plain interface — callers never see channels:
 
+```java
 public interface OrderSubmission {
     @Gateway(requestChannel = "orders.in", replyChannel = "orders.out")
     Confirmation submit(Order order);   // blocking request/reply
@@ -60,6 +63,7 @@ public interface OrderSubmission {
 
 // Usage — ordinary method call:
 Confirmation c = orderSubmission.submit(order);
+```
 
 With `@MessagingGateway` on the interface, Spring generates the implementation. Gateway + `QueueChannel` gives you async fire-and-forget; gateway + reply channel gives request/reply — all without exposing messaging in the business code.
 
@@ -87,6 +91,7 @@ Every flow can route failures to an error channel instead of failing silently:
 
 IntegrationFlow.from("orders.in")
     .handle("orderService", "handleOrder")
+```java
     .errorChannel("errors.in");         // or global: setDefaultErrorChannel
 
 @Bean
@@ -95,6 +100,7 @@ IntegrationFlow errorFlow() {
         .handle(m -> log.error("flow failed: {}", m.getPayload()))
         .get();
 }
+```
 
 The error message carries the original message in its headers (`ErrorMessage` wraps the failed `Message`) — so the DLQ discipline works here too: park, alert, replay.
 

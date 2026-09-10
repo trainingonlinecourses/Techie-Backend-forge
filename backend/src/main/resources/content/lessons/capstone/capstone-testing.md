@@ -40,11 +40,13 @@ class MoneyTest {
         Money b = Money.of("10", "USD");
         assertThatThrownBy(() -> a.add(b))
                 .isInstanceOf(IllegalArgumentException.class)
+```java
                 .hasMessageContaining("currency mismatch");
     }
 
     @Test
     void keeps_two_decimal_places() {
+```
         assertThat(Money.of("1.005", "EUR").amount())
                 .isEqualByComparingTo(new BigDecimal("1.01"));   // HALF_UP rounding
     }
@@ -97,15 +99,22 @@ class TransferApiIntegrationTest {
                         .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
+```java
                                 {"fromIban":"iban-1","toIban":"iban-2",
                                  "amountCents":500,"idempotencyKey":"k-1"}
+```
                                 """))
+```java
                 .andExpect(status().isCreated());
 
         // both balances changed
+```
         mockMvc.perform(get("/api/accounts/iban-1").header("Authorization", "Bearer " + token))
+```java
                 .andExpect(jsonPath("$.balanceCents").value(-500));
+```
         mockMvc.perform(get("/api/accounts/iban-2").header("Authorization", "Bearer " + token))
+```java
                 .andExpect(jsonPath("$.balanceCents").value(500));
     }
 
@@ -116,6 +125,7 @@ class TransferApiIntegrationTest {
 
     @Test
     void unauthenticated_request_gets_401() throws Exception {
+```
         mockMvc.perform(get("/api/accounts"))
                 .andExpect(status().isUnauthorized());
     }

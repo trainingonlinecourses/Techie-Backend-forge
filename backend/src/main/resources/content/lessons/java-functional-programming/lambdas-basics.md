@@ -109,10 +109,12 @@ public class LambdaDemo {
 
 ## When to Use a Lambda vs a Loop
 
+```java
 // Loop — fine when you need early exit, index, or mutation-heavy logic
 for (String n : names) { if (n.length() > 3) total += n.length(); }
 
 // Lambda/stream — expressive when you're transforming a collection
+```
 long total = names.stream().filter(n -> n.length() > 3).mapToLong(String::length).sum();
 
 Neither is "always better". Loops win for: early `break`, `continue`, index access, exceptions with precise control. Lambdas/streams win for: filtering/mapping/collecting pipelines, passing behavior as a parameter, and avoiding mutable loop state. In later lessons you'll combine them with the Stream API.

@@ -25,11 +25,13 @@ class OrderApiE2eTest {
     void createThenFetchOrder() {
         // POST — status and Location asserted on real HTTP
         ResponseEntity<OrderDto> created = rest.postForEntity(
+```java
             "/api/orders", new OrderRequest("card"), OrderDto.class);
         assertThat(created.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         assertThat(created.getHeaders().getLocation()).isNotNull();
 
         // GET the new resource — full round trip
+```
         ResponseEntity<OrderDto> fetched = rest.getForEntity(
             created.getHeaders().getLocation().getPath(), OrderDto.class);
         assertThat(fetched.getStatusCode()).isEqualTo(HttpStatus.OK);

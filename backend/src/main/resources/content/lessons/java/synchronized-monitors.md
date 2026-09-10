@@ -17,6 +17,7 @@ docs:
 
 There are two forms:
 
+```java
 // 1. Synchronized method — locks on 'this'
 public synchronized void increment() {
     count++;
@@ -31,6 +32,7 @@ public void transfer(Account from, Account to, BigDecimal amount) {
         }
     }
 }
+```
 
 **Reentrant:** a thread that already holds a monitor can re-enter it without deadlocking. This is why `synchronized` methods can call other `synchronized` methods on the same object.
 
@@ -73,6 +75,7 @@ public class OrderQueue {
 
 `synchronized` has a performance cost: the JVM must acquire and release the monitor, and contended locks force threads to queue. Modern JVMs optimize uncontended locks aggressively (biased locking, thin locks), but **contention is the killer**.
 
+```java
 // Contented: 10,000 threads all calling increment()
 public class Counter {
     private long count = 0;
@@ -105,11 +108,13 @@ public class Counter {
         count.incrementAndGet();  // CAS operation — no lock
     }
 }
+```
 
 ## How we use it in organizations
 
 ### Scenario 1: synchronized for simple thread-safe singleton
 
+```java
 public class DatabaseConnection {
     private static DatabaseConnection instance;
 
@@ -120,9 +125,11 @@ public class DatabaseConnection {
         return instance;
     }
 }
+```
 
 **Problem:** every thread pays the lock cost even after initialization. Better: double-checked locking with `volatile` or use an enum/holder class.
 
+```java
 // Better: holder idiom — lazy initialization without locks
 public class DatabaseConnection {
     private DatabaseConnection() {}
@@ -135,6 +142,7 @@ public class DatabaseConnection {
         return Holder.INSTANCE;  // class loading is thread-safe in Java
     }
 }
+```
 
 ### Scenario 2: wait/notify for a work queue
 
@@ -172,6 +180,7 @@ while ((order = queue.take()) != null) {
 
 ### Scenario 3: synchronized block for bank transfer (deadlock avoidance)
 
+```java
 public void transfer(Account from, Account to, BigDecimal amount) {
     // Always lock in a consistent order (by ID) to prevent deadlock
     Account first  = from.id().compareTo(to.id()) < 0 ? from : to;
@@ -184,6 +193,7 @@ public void transfer(Account from, Account to, BigDecimal amount) {
         }
     }
 }
+```
 
 If thread A locks `from` then tries `to`, and thread B locks `to` then tries `from`, you get a deadlock. Locking in consistent order prevents this.
 
@@ -191,6 +201,7 @@ If thread A locks `from` then tries `to`, and thread B locks `to` then tries `fr
 
 `java.util.concurrent.locks.ReentrantLock` provides the same mutual exclusion as `synchronized` but with additional features:
 
+```java
 private final ReentrantLock lock = new ReentrantLock();
 private final Condition notEmpty = lock.newCondition();
 
@@ -217,6 +228,7 @@ public T dequeue() throws InterruptedException {
 }
 
 **When to prefer ReentrantLock over synchronized:**
+```
 
 | Feature | `synchronized` | `ReentrantLock` |
 |---|---|---|

@@ -345,11 +345,13 @@ public class OrderController {
         // Paginated listing with optional status filter
         return orderService.findAll(status, PageRequest.of(page, size))
             .map(OrderMapper::toResponse);
+```java
     }
 
     @GetMapping("/{id}")
     public OrderResponse getOrder(@PathVariable Long id) {
         return orderService.findById(id)          // throws OrderNotFoundException if not found
+```
             .map(OrderMapper::toResponse)
             .orElseThrow(() -> new OrderNotFoundException(id));
     }
@@ -375,6 +377,7 @@ public class OrderController {
 
 ### Scenario 2: API versioning with content negotiation
 
+```java
 // Version 1: /api/v1/users
 @RestController
 @RequestMapping("/api/v1/users")
@@ -392,6 +395,7 @@ public class UserControllerV2 {
 }
 
 // Clients migrate from v1 to v2 at their own pace
+```
 
 ### Scenario 3: Request/Response logging with interceptor
 
@@ -407,6 +411,7 @@ public class RequestLoggingInterceptor implements HandlerInterceptor {
         log.info("→ {} {} from {}",
             request.getMethod(),
             request.getRequestURI(),
+```java
             request.getRemoteAddr());
         return true;
     }
@@ -415,6 +420,7 @@ public class RequestLoggingInterceptor implements HandlerInterceptor {
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response,
                                  Object handler, Exception ex) {
         long duration = System.currentTimeMillis() - (long) request.getAttribute("startTime");
+```
         log.info("← {} {} → {} ({}ms)",
             request.getMethod(),
             request.getRequestURI(),

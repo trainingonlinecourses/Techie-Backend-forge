@@ -67,6 +67,7 @@ class LessonControllerTest {
 
 `@MockBean` registers a Mockito mock as a Spring bean, replacing any bean of the same type in the context. It works in `@SpringBootTest`, `@WebMvcTest`, and `@DataJpaTest`:
 
+```java
 @SpringBootTest                     // the whole app
 class FullContextTest {
     @Autowired LessonService realService;    // hmm — this is the MOCK now
@@ -81,6 +82,7 @@ class FullContextTest {
 }
 
 **The costs to know (why @MockBean is not always the answer):**
+```
 
 1. **Context caching is invalidated.** Spring caches contexts between tests for speed; every `@MockBean` change *rebuilds the context* (a new cached entry). Many tests with different `@MockBean` sets = many context rebuilds = slow suites. The guidance: group tests that share the same mock set, and prefer slice tests (`@WebMvcTest`) over full `@SpringBootTest` with mocks.
 2. **It's a blunt instrument.** Mocking the *repository* in a full-context test means the service's real SQL never runs — a contract you may want covered at the integration level (that's what `@DataJpaTest` + Testcontainers is for).
@@ -94,11 +96,15 @@ MockMvc lets you assert on the full HTTP response:
 
 mockMvc.perform(post("/api/lessons")
         .contentType(MediaType.APPLICATION_JSON)
+```java
         .content("{\"title\":\"A\",\"minutes\":-5}"))     // invalid input
+```
     .andExpect(status().isBadRequest())                    // 1. status
     .andExpect(jsonPath("$.message").exists())             // 2. body shape
     .andExpect(header().string("Content-Type", containsString("application/json")))
+```java
     .andReturn();                                          // 3. full access
+```
 
 - **Status** — `isOk()`, `isBadRequest()`, `isNotFound()`, `isCreated()`.
 - **Body** — `jsonPath(...)` (the JSONPath expression language: `$.title`, `$[0].id`, wildcards) or `content().json(...)` (exact JSON match).

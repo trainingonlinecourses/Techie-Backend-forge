@@ -23,7 +23,9 @@ The schema (written in **SDL** — Schema Definition Language) declares:
 - **The Mutation type** — what clients may *change* (the write operations).
 - **Field relationships** — how types connect (`Course.lessons: [Lesson!]!`).
 
+```java
 Because the schema is explicit, the tooling is powerful: **introspection** lets any client (or tool like GraphiQL/Playground) discover the whole API; type checking happens at query time; and the client request/response shapes are self-validating.
+```
 
 ## SDL Essentials
 
@@ -77,7 +79,9 @@ type Lesson {
 }
 ```
 
+```java
 **The rule: non-null only for fields that are truly always there.** Making a field non-null commits the API: adding nullability *later* is a breaking change; removing it isn't. The classic mistake: marking everything non-null for optimism, then having to break clients when a field legitimately becomes optional. **Start nullable, tighten later.**
+```
 
 ## The Code Walkthrough — Schema First in Spring
 

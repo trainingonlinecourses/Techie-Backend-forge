@@ -16,12 +16,15 @@ docs:
 
 Here's a real object that needs a lot of configuration: an `EmailMessage` with a recipient, subject, body, attachments, priority, and whether to track read receipts. How do you construct it?
 
+```java
 **Option A — one constructor with all parameters:**
 
 new EmailMessage("a@b.com", "Hello", "Body...", null, null, Priority.HIGH, true, false);
+```
 
 Unreadable. Which `null` is the attachment? Which boolean is tracking? And if a field is optional, callers must pass `null`/`false` anyway. This is the **telescoping constructor** anti-pattern — constructors with ever-growing parameter lists (`(a)`, `(a,b)`, `(a,b,c)`, ...).
 
+```java
 **Option B — setters after construction:**
 
 EmailMessage m = new EmailMessage();
@@ -29,6 +32,7 @@ m.setRecipient("a@b.com");
 m.setSubject("Hello");
 // ... but now the object can be mutated after creation, and
 // a half-configured object can escape if you forget a required field.
+```
 
 **The Builder pattern** offers Option C: a separate *builder* object collects the settings through clear, named methods, and a final `build()` method creates the **immutable** result:
 
@@ -37,7 +41,9 @@ EmailMessage m = EmailMessage.builder()
         .subject("Hello")
         .priority(Priority.HIGH)
         .trackRead(true)
+```java
         .build();
+```
 
 Each method is named after the field (self-documenting), optional fields can be skipped, and the produced object can be immutable (final fields, no setters) — the builder is the *only* thing that assembles it.
 

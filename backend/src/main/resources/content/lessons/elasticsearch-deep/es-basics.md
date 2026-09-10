@@ -132,7 +132,9 @@ Elasticsearch is a Java service (a cluster of nodes), typically run via Docker, 
 
 ## Recap
 
+```java
 Elasticsearch is Lucene's inverted index wrapped in a distributed, JSON-API search engine: documents go into sharded indices; text is *analyzed* (tokenized, stemmed) into searchable terms; queries are dictionary lookups that return *ranked* results. It's fundamentally different from database lookup — fuzzy, language-aware, relevance-scored — which is why it powers search, log analysis (the ELK stack), and autocomplete everywhere. The three concepts to master first: the **inverted index** (why it's fast), **analysis** (why matching works the way it does — and why index/search analyzers must agree), and **shards + replicas** (why it scales and survives). From there, every query DSL feature is a variation on the same mechanism.
+```
 
 ## References
 

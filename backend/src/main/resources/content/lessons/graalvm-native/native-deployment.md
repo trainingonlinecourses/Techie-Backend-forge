@@ -18,7 +18,9 @@ docs:
 
 A native binary is a *different artifact* than a jar: no JVM to install, no classpath to manage, a tiny container image, millisecond cold starts. But deployment isn't just "smaller container" — it's a *different operational model*: the image is immutable (config is baked in), the build is slow (CI must be designed for it), and the runtime needs a different observability story (no JVM diagnostics). This lesson is the production playbook: containers, CI, and the operational patterns that make native deployment routine.
 
+```java
 **The mental model:** deploying a jar is shipping a recipe to a kitchen that has all the equipment (the JVM); deploying a native binary is shipping a *pre-cooked meal* — no kitchen needed, but you must decide the ingredients (config, resources) at cooking time. The container is the meal tray; the CI pipeline is the kitchen; and the operational question shifts from "which JVM?" to "what did the build bake in, and what does the environment still control?"
+```
 
 ## The Container Story
 
@@ -84,7 +86,9 @@ jobs:
       - run: ./deploy.sh   # render/kubectl/etc.
 ```
 
+```java
 **The three CI rules:** **cache everything** (the GraalVM toolchain, Maven repos, and native build outputs — a cached native build is seconds of delta instead of minutes of cold build); **run the native gate only when it earns its minutes** (deploys, release candidates — not every commit); and **use a build machine with headroom** (native compilation wants multiple cores and GBs of RAM).
+```
 
 ## The Immutable-Image Operational Model
 
@@ -125,7 +129,9 @@ logging.pattern.console={"timestamp":"%d","level":"%p","logger":"%c","message":"
 
 ## Recap
 
+```java
 Deploying native images is a new operational model: **small immutable containers** (buildpacks or distroless — no JVM, environment-only config), **CI architected for minute-scale builds** (cache the toolchain, gate natively only on deploy candidates, use beefy runners), **environment-as-configuration** (profiles and values at build time; DB URLs, secrets, and flags at runtime — never secrets in the build), and **app-level observability that carries over unchanged** (Actuator, Micrometer, JSON logs — only the JVM-internal diagnostics are gone). The shifts are deliberate, not surprising: the image is the immutable application, the environment is the configuration surface, and instant startup makes scaling and rollback feel different from the JVM world. Follow the checklist and native deployment becomes the *routine* — fast, small, and boring — rather than the special project.
+```
 
 ## References
 

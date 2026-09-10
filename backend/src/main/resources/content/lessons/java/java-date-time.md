@@ -275,20 +275,24 @@ String frenchDate = now.format(french);
 
 ## Timezone handling
 
+```java
 // ZonedDateTime: date/time WITH timezone
 ZonedDateTime tokyo = ZonedDateTime.now(ZoneId.of("Asia/Tokyo"));
 ZonedDateTime ny = ZonedDateTime.now(ZoneId.of("America/New_York"));
 ZonedDateTime london = ZonedDateTime.now(ZoneId.of("Europe/London"));
 
 // Convert between timezones
+```
 ZonedDateTime tokyoMeeting = ZonedDateTime.of(
     LocalDateTime.of(2024, 1, 15, 9, 0),
     ZoneId.of("Asia/Tokyo")
+```java
 );
 ZonedDateTime nyEquivalent = tokyoMeeting.withZoneSameInstant(ZoneId.of("America/New_York"));
 // "9:00 AM Tokyo" becomes "7:00 PM (previous day) New York"
 
 // List all available timezones
+```
 ZoneId.getAvailableZoneIds().stream()
     .filter(id -> id.startsWith("America/"))
     .sorted()

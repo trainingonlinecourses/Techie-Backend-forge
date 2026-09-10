@@ -385,14 +385,17 @@ public class TaskController {
 ## Real-World Scenarios
 
 ### Scenario 1: Admin dashboard with user management
+```java
 @Controller
 @RequestMapping("/admin/users")
 @PreAuthorize("hasRole('ADMIN')")    // Only admins can access
 public class AdminUserController {
     // Only admin sees user list, can ban/unban, reset passwords
 }
+```
 
 ### Scenario 2: E-commerce product catalog
+```java
 @Controller
 @RequestMapping("/products")
 public class ProductController {
@@ -406,6 +409,7 @@ public class ProductController {
         return "product-list";
     }
 }
+```
 
 ## Common Beginner Pitfalls
 

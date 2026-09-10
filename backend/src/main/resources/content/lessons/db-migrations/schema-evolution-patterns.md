@@ -42,7 +42,9 @@ Rename a column in three steps (add new → dual-write → drop old), never one 
 
 ## Backfills: the forgotten half
 
+```java
 DDL is easy; **data is the work**. A backfill of 50M rows has real rules:
+```
 
 1. **Chunk it** — `UPDATE ... WHERE id > :last AND ... LIMIT 1000` in a loop (or a batch job — the Spring Batch module), not one giant transaction.
 2. **Make it re-runnable (idempotent)** — guard with `WHERE new_col IS NULL`; re-running must be safe.

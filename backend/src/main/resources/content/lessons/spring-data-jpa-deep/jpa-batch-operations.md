@@ -38,10 +38,12 @@ Without the flag, `saveAll` is a **loop of single inserts** — the flag is what
 
 **The ID-generation caveat:** batching only works when the IDs are assigned *before* the insert — `GenerationType.IDENTITY` requires the INSERT to run immediately (to get the id), **defeating batching**. The fix: use `SEQUENCE`-based ids (`GenerationType.SEQUENCE` with `allocationSize` matching, or `UUID`):
 
+```java
 @Id
 @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "order_seq")
 @SequenceGenerator(name = "order_seq", sequenceName = "order_seq", allocationSize = 50)
 private Long id;
+```
 
 This is a classic hidden perf issue: the app "uses saveAll" but IDs are IDENTITY, so it's still one-by-one.
 
@@ -84,11 +86,13 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 - **It bypasses lifecycle callbacks** (`@PreUpdate`, auditing) — the DB rows change, the entities don't know.
 - It must run in a **transaction** (or `@Transactional` on the caller); returns the affected row count.
 
+```java
 @Transactional
 public void archiveOldOrders() {
     orderRepo.archiveOlderThan(Instant.now().minus(365, ChronoUnit.DAYS));
     entityManager.clear();    // detach stale managed entities — next reads see the DB truth
 }
+```
 
 ## How we use it in an organization: the scenarios
 

@@ -82,7 +82,9 @@ The PR description *is* the documentation of the change: what, why, how, and how
 | Scope | Does the PR do *one* thing? |
 | Performance | N+1? Unnecessary work in hot paths? |
 
+```java
 The reviewer's job isn't perfection — it's catching the issues the author can't see. **Small PRs get real reviews; giant PRs get rubber stamps.**
+```
 
 ## Merge Strategies — What "Merge" Means on GitHub
 
@@ -92,7 +94,9 @@ The reviewer's job isn't perfection — it's catching the issues the author can'
 | **Squash and merge** | All branch commits → one commit on main | Clean linear main (the common choice) |
 | **Rebase and merge** | Branch commits replayed onto main | Linear history, keeping individual commits |
 
+```java
 Most teams use **squash and merge**: the branch's messy internal commits collapse into one coherent commit on main (combining with the rewriting lesson: the PR shows the story; main stores the summary).
+```
 
 ## Git Flow — When Releases Are a Cadence
 
@@ -141,7 +145,9 @@ Protect `main` in the repo settings:
 - [ ] No direct pushes to main (admins included, or not — team decision).
 - [ ] Require conversation resolution (resolved comments).
 
+```java
 This academy's repo demonstrates the pattern: CI builds and tests on every push; the deployable main is the result of protected, reviewed merges.
+```
 
 ## Common Beginner Pitfalls
 

@@ -14,18 +14,22 @@ docs:
 
 Remember one rule first: **Strings are immutable.** Every "modifying" method returns a *new* string and throws the original away if you don't capture it:
 
+```java
 String name = "  amy  ";
 name.strip();                       // ❌ result discarded — name is STILL "  amy  "
 name = name.strip();                // ✅ reassign to keep the new object
+```
 
 ## Searching — `indexOf`, `contains`, `startsWith`
 
+```java
 String log = "2026-08-26 ERROR payment failed";
 
 int at = log.indexOf("ERROR");          // 11 — position of first occurrence, or -1 if absent
 boolean bad = log.contains("failed");   // true — simplest existence check
 boolean err = log.startsWith("2026-08");// true — useful for prefix routing/filtering
 int last = log.lastIndexOf("e");        // finds from the END backwards
+```
 
 | Call | Returns |
 |---|---|
@@ -37,12 +41,14 @@ The -1 convention matters: `if (log.indexOf("ERROR")) ` doesn't compile (int isn
 
 ## Cutting — `substring`, `split`
 
+```java
 String csv = "amy,engineer,bangalore";
 
 String[] parts = csv.split(",");        // ["amy", "engineer", "bangalore"]
 String role = parts[1];                 // "engineer"
 
 String domain = email.substring(email.indexOf('@') + 1);   // everything AFTER '@'
+```
 
 ### split's regex trap — the #1 string bug in Java
 
@@ -99,7 +105,9 @@ Line-by-line notes:
 "   ".isEmpty()     // false — has characters!
 "   ".isBlank()     // true  — only whitespace (Java 11+)
 
+```java
 "12345".matches("\\d{5}")    // true — matches validates the WHOLE string against regex
+```
 
 For user input validation, `isBlank()` is usually what you meant when you wrote `isEmpty()` — "did the user type nothing useful?"
 

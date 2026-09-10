@@ -108,6 +108,7 @@ class ResolverDemo {
 
 ## A Realistic Extension: Conditional Execution
 
+```java
 import org.junit.jupiter.api.extension.*;
 
 // An extension that skips tests when an environment flag says so:
@@ -124,6 +125,7 @@ public class DisabledOnMissingEnv implements ExecutionCondition {
         return ConditionEvaluationResult.enabled("TEST_ENV=" + env);
     }
 }
+```
 
 `ExecutionCondition` is the mechanism behind `@Disabled`, `@EnabledOnOs`, and `@EnabledIfEnvironmentVariable` — they're all built-in extensions implementing this interface. The takeaway: **if you can express it as a condition, an extension can apply it.**
 

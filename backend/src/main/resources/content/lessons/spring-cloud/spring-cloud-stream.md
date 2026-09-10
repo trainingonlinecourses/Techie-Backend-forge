@@ -66,7 +66,9 @@ Spring Cloud Stream uses **content-type negotiation** (like HTTP headers) plus `
 
 ## Error handling: retries and DLQs
 
+```java
 Failures are retried by default (3 attempts); after that the message is sent to an **error destination** (the DLQ pattern):
+```
 
 ```yaml
 spring.cloud.stream.bindings.onOrderCreated-in-0.consumer:
@@ -89,6 +91,7 @@ A separate `Consumer<Message<?>>` on the DLQ binding can log, alert, or park the
 - **Binding naming conventions** (`-in-0`/`-out-0`) are consistent and testable.
 - **Test binder** — `spring-cloud-stream-test-binder` replaces the broker in tests with an in-memory implementation, so integration tests don't need Kafka running:
 
+```java
 @SpringBootTest
 @AutoConfigureOutputBindings
 class OrderBindingsTest {
@@ -97,6 +100,7 @@ class OrderBindingsTest {
         // assert that shipOrders() emitted onto the output binding
     }
 }
+```
 
 ## Key takeaways
 

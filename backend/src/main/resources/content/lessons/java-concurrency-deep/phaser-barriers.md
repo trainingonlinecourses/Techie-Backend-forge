@@ -350,7 +350,9 @@ public class WaveProcessor {
     private final List<DataChunk> chunks;
 
     public WaveProcessor(List<DataChunk> chunks, int waveSize) {
+```java
         this.chunks = chunks;
+```
         this.barrier = new CyclicBarrier(waveSize, this::onWaveComplete);
     }
 

@@ -16,11 +16,13 @@ docs:
 
 Your checkout needs discounts. Rules so far:
 
+```java
 double price = base;
 if (member)            price *= 0.9;
 else if (holiday)      price *= 0.85;
 else if (newCustomer)  price *= 0.95;
 // ... and next month there's a coupon rule, a bulk rule, a VIP tier rule...
+```
 
 Every new rule means editing this method — which risks breaking existing rules, bloats the method, and makes the decision logic untestable in isolation. This is the classic **open/closed principle** violation: the code is *open* for modification (you keep editing it) instead of *open for extension* (you add new behavior without touching existing code).
 
@@ -30,7 +32,9 @@ Every new rule means editing this method — which risks breaking existing rules
 2. **Concrete strategies** — one class per algorithm (member discount, holiday discount, none).
 3. **A context** — holds a *current* strategy and delegates to it.
 
+```java
 The key move: **the algorithm becomes a pluggable object**. The checkout doesn't contain the rules; it holds a reference to whichever rule object it was given — and that reference can change at **runtime** (per order, per user, per request).
+```
 
 ## Composition over Inheritance
 
@@ -115,9 +119,11 @@ public class StrategyDemo {
 
 Because a strategy is "one method with a signature", a **lambda** implements it directly:
 
+```java
 checkout.setStrategy(p -> p * 0.80);              // anonymous rule
 // or from a config value:
 checkout.setStrategy(price -> price * (1 - coupon.rate()));
+```
 
 For simple rules, the interface can even be a functional interface and callers supply lambdas. For *complex* multi-method strategies, keep real classes.
 

@@ -16,6 +16,7 @@ Spring's `ApplicationEventPublisher` is in-memory and fire-and-forget: if the li
 
 ## Publishing with tracking
 
+```java
 // Any bean — the framework records the event BEFORE the transaction commits:
 @Service
 public class BillingService {
@@ -27,6 +28,7 @@ public class BillingService {
         // if this transaction rolls back, the recorded event rolls back with it
     }
 }
+```
 
 The `EventPublicationRegistry` table stores the event + its state (`IN_PROGRESS`, `COMPLETED`, `CANCELLED`, or failed) inside the same database transaction as the business data — **atomic: either the payment is recorded AND the event is recorded, or neither**.
 
@@ -63,6 +65,7 @@ The three modes are a decision, not a pick-one: same-transaction for *consistenc
 
 By default an event is marked `COMPLETED` when the listener returns; if it throws, the publication stays pending. **`@CompletionHandler`** is the Modulith answer to "the listener crashed":
 
+```java
 @Component
 public class OrderPaidCompletion {
 
@@ -74,6 +77,7 @@ public class OrderPaidCompletion {
         // park the event, alert, prepare a replay — never swallow silently
     }
 }
+```
 
 Combined with the **`EventPublicationRegistry`**, this gives you the full DLQ discipline in-process: events that failed are *queryable* (`registry.findIncompletePublications()`), replayable (`registry.markCompleted(...)` after a fix), and auditable — without Kafka.
 
@@ -81,8 +85,10 @@ Combined with the **`EventPublicationRegistry`**, this gives you the full DLQ di
 
 // Ops endpoint or scheduled job — find what's stuck:
 List<EventPublication> stuck = registry.findIncompletePublications();
+```java
 // after fixing the listener, complete them:
 stuck.forEach(p -> registry.markCompleted(p.getIdentifier(), Instant.now(), null));
+```
 
 A scheduled reconcile ("complete any publication that's been IN_PROGRESS for > 5 min with a still-pending listener") is the in-process version of the Kafka consumer's rebalance: **events can't vanish silently**.
 

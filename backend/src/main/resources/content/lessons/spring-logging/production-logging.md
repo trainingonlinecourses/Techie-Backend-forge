@@ -76,6 +76,7 @@ logging:
 
 ### Scenario 1: Dynamic log level changes
 
+```java
 // Actuator endpoint to change log levels at runtime
 // POST /actuator/loggers/com.example.MyService
 // {"configuredLevel": "DEBUG"}
@@ -84,6 +85,7 @@ logging:
 LoggerContext ctx = (LoggerContext) LoggerFactory.getILoggerFactory();
 Logger logger = ctx.getLogger("com.example.MyService");
 logger.setLevel(Level.DEBUG);
+```
 
 ### Scenario 2: Log shipping to ELK
 

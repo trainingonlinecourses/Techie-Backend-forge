@@ -115,9 +115,11 @@ public class CacheEvictionScheduler {
             return t;
         });
         scheduler.scheduleAtFixedRate(this::evictExpiredEntries, 1, 1, TimeUnit.MINUTES);
+```java
     }
 
     private void evictExpiredEntries() {
+```
         cache.entrySet().removeIf(entry ->
             System.currentTimeMillis() - entry.getValue().timestamp() > TTL_MS
         );
@@ -174,6 +176,7 @@ processor.interrupt();
 
 A `CountDownLatch` lets multiple threads wait for a common point — like a "ready, set, go" barrier:
 
+```java
 public class ServiceWarmup {
     private final CountDownLatch ready = new CountDownLatch(3);
 
@@ -191,6 +194,7 @@ public class ServiceWarmup {
         }
     }
 }
+```
 
 ### Scenario 5: Daemon thread naming for debugging
 

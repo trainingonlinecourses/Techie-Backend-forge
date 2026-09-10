@@ -21,6 +21,7 @@ Test-Driven Development is a **workflow** that makes design and refactoring safe
 3. REFACTOR — clean up, with the test as your safety net; repeat
 ```
 
+```java
 // 1. RED — the test fails because create() doesn't exist / returns null:
 @Test void createComputesTotal() {
     Order o = service.create(List.of(new Line(2, TEN)));
@@ -28,6 +29,7 @@ Test-Driven Development is a **workflow** that makes design and refactoring safe
 }
 
 // 2. GREEN — minimal implementation:
+```
 public Order create(List<Line> lines) {
     return new Order(lines.stream().mapToMoney(...).sum());
 }
@@ -50,6 +52,7 @@ It's not a religion: for exploratory/UI/infrastructure code, write tests when th
 
 Code that has no tests can't be safely refactored — which is why it stays untouchable. The unlock is **characterization tests**: tests that capture *current behavior* so refactoring preserves it, even if the behavior is imperfect.
 
+```java
 // 1. Write tests against the EXISTING behavior (they document the status quo):
 @Test
 void currentTaxRule_appliesFivePercentAboveThousand() {
@@ -59,6 +62,7 @@ void currentTaxRule_appliesFivePercentAboveThousand() {
 // 2. Refactor freely — the characterization tests prove behavior didn't change.
 // 3. Where the behavior is wrong, fix the TEST expectations FIRST (a deliberate decision),
 //    then the code — never simultaneously.
+```
 
 The move: **test everything you're about to touch before you touch it** (Seam-based: Michael Feathers' *Working Effectively with Legacy Code*). A seam is a place where behavior can be altered without editing — extracting a method, injecting a collaborator, wrapping a call. Find the seam, put a characterization test through it, then refactor.
 

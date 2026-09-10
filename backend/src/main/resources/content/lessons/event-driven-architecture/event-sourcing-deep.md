@@ -95,7 +95,9 @@ public class AccountRepository {
 }
 ```
 
+```java
 **The version discipline:** each event carries a sequence number; appends must be *optimistically locked* (the version you loaded must match at append time) — otherwise two concurrent commands interleave events and the replay is corrupted. This is the event-sourced version of the lost-update problem.
+```
 
 ## Snapshots: The Performance Escape Hatch
 
@@ -107,7 +109,9 @@ Account snapshot (balance=500, version=9000)   <- persisted periodically
         = current state (balance=510, version=9042)
 ```
 
+```java
 A scheduled job (or an append-time trigger) snapshots aggregates every N events; reads load the nearest snapshot and replay the small remainder. Snapshots are a *cache* of the replay — they can be rebuilt from events at any time, which is the beauty: the events remain the truth, snapshots are disposable accelerators.
+```
 
 ## Projections: The Read Side
 
@@ -147,15 +151,19 @@ public void on(MoneyDeposited e) {
 
 ## When to Choose Event Sourcing
 
+```java
 **Choose it when:** audit/compliance is a hard requirement (finance, healthcare, ledgers); temporal queries matter ("state as of X"); the domain is naturally eventful (banking, logistics, order lifecycles); you need the events for integration anyway.
 
 **Don't choose it when:** you need simple CRUD with immediate consistency (a user-profile service — the complexity buys nothing); the team is new to distributed patterns (learn the outbox + events first); the domain has no meaningful history (a config service).
 
 **The pragmatic path:** event sourcing for the *ledger-like cores* (accounts, orders, inventory) inside a mostly-CRUD system — not the whole application. The pattern is surgical, not systemic.
+```
 
 ## Recap
 
+```java
 Event sourcing stores the history, not the state: commands validate and produce events, the event store appends them immutably, and aggregates reconstruct their state by replay. Snapshots accelerate long replays; projections (read models) make the events queryable — leading naturally to CQRS with the event store as the write side. The gains are profound — complete audit, temporal queries, no lost-update races, events-as-integration — and the costs are real: eventual consistency, event-store infrastructure, schema evolution via upcasting, and genuine complexity. Choose it for the ledger-like cores where history *is* the product, and keep the rest of the system conventionally simple.
+```
 
 ## References
 

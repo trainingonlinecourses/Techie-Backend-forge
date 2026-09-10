@@ -23,8 +23,10 @@ Java has **eight primitives** (`int`, `long`, `double`, `boolean`, `char`, `byte
 
 Integer a = 42;          // autobox: int 42  → Integer.valueOf(42)
 int b = a;               // unbox:   Integer → a.intValue()
+```java
 Integer c = null;
 int d = c;               // NullPointerException at runtime — unboxing a null
+```
 
 The conversion is invisible in source but real at runtime. That invisibility is exactly why wrapper misuse is a top NPE source.
 
@@ -54,12 +56,14 @@ Integer avg = a.avgDurationSec();
 long safeAvg = avg == null ? 0 : avg;
 ```
 
+```java
 **The classic NPE in the wild:**
 
 // Long total = orderRepo.sumRevenue();  // NULL when no orders exist
 Long total = orderRepo.sumRevenue();
 // ...
 return total / orderCount;              // NPE if total is null — unboxing happens here!
+```
 
 JPA/Hibernate returns `Long` (nullable) for aggregate queries. Any arithmetic unboxes it. The org rule: `sum()`/`count()` results are treated as nullable, checked, and defaulted — never used directly in arithmetic.
 
@@ -67,10 +71,12 @@ JPA/Hibernate returns `Long` (nullable) for aggregate queries. Any arithmetic un
 
 `Integer.valueOf` caches `-128..127`, so:
 
+```java
 Integer a = 100, b = 100;   // same cached instance
 System.out.println(a == b); // true  — both are the SAME cached object
 Integer c = 200, d = 200;   // two separate objects (outside cache)
 System.out.println(c == d); // false — different instances!
+```
 
 Comparing wrappers with `==` compares **references**, and the result depends on the cache range — pure luck from the reader's perspective. The rules:
 
@@ -81,6 +87,7 @@ Comparing wrappers with `==` compares **references**, and the result depends on 
 
 Each autobox allocates an object. In a hot loop that's garbage pressure plus unboxing overhead:
 
+```java
 // WRONG — boxes and unboxes in every iteration
 long sum = 0;
 for (Long n : bigListOfLongs) {   // unboxes each read
@@ -90,6 +97,7 @@ for (Long n : bigListOfLongs) {   // unboxes each read
 // RIGHT — keep primitives in primitive containers
 long[] raw = ...;                 // long[] is contiguous primitives, zero boxing
 for (long n : raw) sum += n;
+```
 
 For numeric-heavy code (analytics, aggregations), prefer primitive arrays and `IntStream`/`LongStream` over `List<Integer>`/`List<Long>`. This matters most in batch jobs that process millions of rows.
 

@@ -192,6 +192,7 @@ public class Library {
 
 ### Scenario 2: Thread with anonymous class
 
+```java
 public class Main {
 
     public static void main(String[] args) {
@@ -206,6 +207,7 @@ public class Main {
         new Thread(() -> System.out.println("Running")).start();
     }
 }
+```
 
 ---
 

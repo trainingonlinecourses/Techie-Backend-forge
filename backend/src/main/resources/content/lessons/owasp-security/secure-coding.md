@@ -4,8 +4,10 @@ module: owasp-security
 order: 4
 minutes: 27
 topics: ["deserialization", "SSRF", "secure logging", "secrets management", "input validation", "secure defaults"]
+```java
 summary: Injection, XSS, and access control get the attention; the quieter vulnerabilities get the breaches. This lesson covers four productioncritical area...
 docs:
+```
   - title: "Deserialization Cheat Sheet (OWASP)"
     url: "https://cheatsheetseries.owasp.org/cheatsheets/Deserialization_Cheat_Sheet.html"
   - title: "Server-Side Request Forgery Prevention Cheat Sheet (OWASP)"
@@ -16,7 +18,9 @@ docs:
 
 ## The Concept: The Vulnerabilities Beyond the Top 10's Headlines
 
+```java
 Injection, XSS, and access control get the attention; the quieter vulnerabilities get the breaches. This lesson covers four production-critical areas that every serious codebase must handle deliberately: **deserialization** (untrusted data that becomes objects), **SSRF** (server-side fetches of attacker-chosen URLs), **secure logging** (what you log and what you never log), and **secrets management** (where credentials live). None is exotic — all four appear in everyday Spring applications.
+```
 
 ## Deserialization: Turning Untrusted Bytes Into Objects
 
@@ -28,10 +32,6 @@ Injection, XSS, and access control get the attention; the quieter vulnerabilitie
 1. VULNERABLE pattern — deserializing untrusted input with the JDK: ObjectInputStream in = new ObjectInputStream(untrustedStream); Object obj = in.readObject(); // could be an attack gadget!
 2. The mitigations, in order: 1. DON'T use Java serialization for untrusted input. Use safe formats: JSON (Jackson) / Protobuf / etc. — data, not executable objects. 2. If you MUST deserialize, validate the stream's classes against an. ALLOWLIST (not a denylist) before constructing: in.setObjectInputFilter(Filter.classNameMatches("com.academy.**"). .maxDepth(10).maxArrayLength(1000).build()); 3. Never accept serialized objects from clients — serialization is for. Your own trusted persistence, not for network boundaries.
 
-The same code, clean:
-
-```java
-```
 
 **The practical rules:** JSON APIs (the norm in Spring) don't hit the `readObject` danger — Jackson builds POJOs from typed, bounded data. The risk returns with: Java serialization over the wire, unsafe `yaml.load` of untrusted YAML (snakeyaml gadgets), and unsafe deserialization of RMI/JMX payloads. The single rule that covers them all: **never deserialize untrusted input with a format that can instantiate arbitrary classes.** Jackson's `DefaultTyping` (polymorphic typing) is the subtle one — enable it only with a strict allowlist.
 
@@ -68,10 +68,12 @@ public String fetch(@RequestParam String path) {
 
 ## Secure Logging: The Audit Trail That Must Not Leak
 
+```java
 Logging cuts both ways: **not enough** logging hides attacks (A09); **too much** logging leaks secrets. The discipline:
 
 
 **What this code does — step by step:**
+```
 
 1. NEVER log:
 2. `log.info("User logged in: {}", user.getPassword());` — password!
@@ -136,7 +138,9 @@ The meta-pattern behind every lesson in this module:
 
 ## Recap
 
+```java
 Beyond the headline vulnerabilities: **deserialization** must never reconstruct arbitrary classes from untrusted input (JSON/typed formats over Java serialization; allowlists over denylists); **SSRF** means no server-side fetch of user-chosen URLs (allowlist destinations, block private/metadata addresses); **secure logging** records who/when/from-where for incident response while never leaking credentials; and **secrets** live in deploy-time environment stores, never in repos or logs. The mindset uniting them — deny by default, least privilege, fail closed, validate at the boundary, defend in depth — is what makes a codebase *secure by design* rather than secure by patching. Run every feature through the audit checklist, and the quiet vulnerabilities stop being quiet surprises.
+```
 
 ## References
 

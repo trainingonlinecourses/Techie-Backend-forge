@@ -23,6 +23,7 @@ The cost: **every query and every constraint must be soft-delete-aware** — a d
 
 ## The classic implementation — @SQLDelete + @SQLRestriction
 
+```java
 @Entity
 @SQLDelete(sql = "UPDATE orders SET deleted_at = now(), deleted_by = current_user() WHERE id = ?")
 @SQLRestriction("deleted_at IS NULL")     // every SELECT adds this filter automatically
@@ -35,6 +36,7 @@ public class Order {
     @Column(name = "deleted_by")
     private String deletedBy;
 }
+```
 
 - **`@SQLDelete`** — overrides the DELETE statement: instead of removing the row, it sets the tombstone columns. (Hibernate 6.3+: `@SoftDelete` does this with less boilerplate.)
 - **`@SQLRestriction`** — appends `deleted_at IS NULL` to every query on this entity, so `findAll`, derived queries, and JPQL automatically exclude deleted rows. (Hibernate 6.3+: `@SoftDelete` also applies this automatically.)
@@ -43,6 +45,7 @@ With both, the *application* just calls `orderRepo.delete(order)` and everything
 
 ## Unique constraints — the soft-delete trap
 
+```java
 @Entity
 @SQLDelete(...)
 @SQLRestriction("deleted_at IS NULL")
@@ -50,6 +53,7 @@ public class Customer {
     @Column(nullable = false, unique = true)
     private String email;                  // ⚠️ unique across ALL rows — deleted ones too!
 }
+```
 
 Soft-deleting a customer with email `a@x.com` then creating a new one with the same email **violates the unique constraint** — the tombstoned row still holds the old email. The fix: make the unique constraint **partial** (Postgres):
 

@@ -97,6 +97,7 @@ openapi-generator generate \
 
 ### Step 3 — Implement against the generated interface
 
+```java
 // GENERATED: the interface IS the contract
 public interface CoursesApi {
     CoursePage listCourses(Integer page);
@@ -111,6 +112,7 @@ public class CourseController implements CoursesApi {
         return service.list(page == null ? 0 : page);
     }
 }
+```
 
 ### Walking Through Each Part
 

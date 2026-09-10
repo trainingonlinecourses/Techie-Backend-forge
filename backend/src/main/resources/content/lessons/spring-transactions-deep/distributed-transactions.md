@@ -16,6 +16,7 @@ A transaction spanning two databases, or a database plus a message broker, canno
 
 ## The Problem: Two Systems, One Operation
 
+```java
 // This CANNOT be one ACID transaction:
 @Transactional
 public void placeOrder(OrderDto dto) {
@@ -23,6 +24,7 @@ public void placeOrder(OrderDto dto) {
     paymentService.charge(dto.amount());     // HTTP call to payments service
     kafkaTemplate.send("orders", event);     // message broker
 }
+```
 
 Three systems, one logical operation. If the Kafka send fails after the DB commit, you have an order with no event — and no way to roll back the committed row.
 
@@ -175,6 +177,7 @@ public class OrderSaga {
 
 ## The Outbox vs. Direct Send
 
+```java
 // ❌ Direct send: event lost if the broker is down after commit
 @Transactional
 public void placeOrder(OrderDto dto) {
@@ -188,9 +191,11 @@ public void placeOrder(OrderDto dto) {
     orderRepository.save(toEntity(dto));
     outboxRepository.save(OutboxEvent.of(...));   // atomic with the order
 }
+```
 
 ## Testing the Outbox
 
+```java
 @SpringBootTest
 @Testcontainers
 class OutboxTest {
@@ -215,6 +220,7 @@ class OutboxTest {
         assertEquals(0, outboxRepository.countByPublishedAtIsNull());  // drained
     }
 }
+```
 
 ## Summary
 

@@ -165,6 +165,7 @@ buffer.compact();
 
 Read multiple fields in one operation using scatter (read into multiple buffers):
 
+```java
 ByteBuffer header = ByteBuffer.allocate(128);
 ByteBuffer body = ByteBuffer.allocate(1024);
 
@@ -174,13 +175,16 @@ long bytesRead = channel.read(buffers);  // scatter read — fills header first,
 
 header.flip();
 body.flip();
+```
 
 Write multiple buffers in one operation using gather:
 
+```java
 ByteBuffer header = ByteBuffer.wrap("HTTP/1.1 200 OK\r\n".getBytes());
 ByteBuffer body = ByteBuffer.wrap("Hello, world".getBytes());
 
 channel.write(new ByteBuffer[]{header, body});  // gather write
+```
 
 ## Selector key operations
 

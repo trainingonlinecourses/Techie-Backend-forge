@@ -13,7 +13,9 @@ docs:
 
 ## The concept: "keep me signed in" is a second credential
 
+```java
 **Remember-me** lets a returning user skip login: after a successful login, the server issues a **remember-me cookie**; on the next visit, the cookie authenticates the session without a password. It is *not* "the session never expires" — it's a **second, long-lived credential** stored in the browser, and it deserves the same care as the password itself.
+```
 
 The decision every team makes first: **is remember-me appropriate at all?** For banking, admin consoles, and anything with account-takeover impact, the answer is usually *no* — sessions expire and users re-authenticate. For consumer apps and low-risk tools, remember-me is standard UX. The org policy sets this per application, not per developer.
 
@@ -21,7 +23,9 @@ The decision every team makes first: **is remember-me appropriate at all?** For 
 
 http.rememberMe(rm -> rm
     .key("unique-and-secret-key")     // server secret — MUST be externalized, not hard-coded
+```java
     .tokenValiditySeconds(2_592_000)); // 30 days
+```
 
 The token is `username + expiry + MD5(username:expiry:password:key)`. **The flaw:** the token's hash includes the *password*, so changing the password invalidates all tokens — but more importantly, the token itself is the credential, and there's no server-side record to revoke. A stolen cookie is a stolen login for up to 30 days with no kill-switch. Fine for prototypes; not the production answer.
 
@@ -31,6 +35,7 @@ The persistent implementation stores each token **server-side** and tracks usage
 
 http.rememberMe(rm -> rm
     .tokenRepository(jdbcTokenRepository())   // a PersistentTokenRepository (JDBC-backed)
+```java
     .tokenValiditySeconds(2_592_000));
 
 @Bean
@@ -40,6 +45,7 @@ public PersistentTokenRepository jdbcTokenRepository(DataSource ds) {
     repo.setCreateTableOnStartup(true);       // creates persistent_logins on first boot
     return repo;
 }
+```
 
 Schema: `persistent_logins (username, series, token, last_used)`.
 
@@ -56,9 +62,11 @@ This gives server-side **revocation** (delete the row = logged out everywhere) a
 http.rememberMe(rm -> rm
     .rememberMeParameter("remember-me")     // the login form checkbox name
     .rememberMeCookieName("ACADEMY_REMEMBER_ME")
+```java
     .tokenValiditySeconds(2_592_000));
 
 // The cookie MUST be: Secure + HttpOnly + SameSite
+```
 
 Spring sets `HttpOnly` and `Secure` (on HTTPS) by default; add **SameSite** so the cookie isn't sent on cross-site requests (the CSRF-adjacent protection for cookies):
 
@@ -70,6 +78,7 @@ A remember-me cookie without `Secure` is transmitted over HTTP; without `HttpOnl
 
 ## How we use it in an organization: the scenarios
 
+```java
 **Scenario 1 — consumer app with persistent login.** The login page has "Keep me signed in"; persistent tokens in the DB; logout deletes both the session and the remember-me series row — "sign out everywhere" is real.
 
 **Scenario 2 — theft detection.** A token-replay detection that invalidates the series and alerts security: the dashboard shows "Your session was signed out from another device" — the standard user-facing cover for the detection firing.
@@ -77,6 +86,7 @@ A remember-me cookie without `Secure` is transmitted over HTTP; without `HttpOnl
 **Scenario 3 — remember-me for API-less web apps.** It's a browser-cookie feature — for a JWT API, the equivalent is the **refresh token** (long-lived, server-revocable, rotated) — see the refresh-tokens lesson. The *design lesson* carries over: long-lived credentials need rotation and revocation, whatever the transport.
 
 **Scenario 4 — force re-auth for sensitive actions.** Even with remember-me, "change password", "view full card number", and "transfer money" re-prompt for the password (step-up auth) — remember-me authenticates the *session*, not every sensitive action.
+```
 
 ## Pitfalls
 

@@ -34,6 +34,7 @@ Because migrations apply once and in order, the reference set is versioned and d
 
 The academy's own seeding is the pattern: a `CommandLineRunner` that creates the demo accounts **only if they don't exist**:
 
+```java
 @Component
 public class DemoDataSeeder implements ApplicationRunner {
     @Override
@@ -46,6 +47,7 @@ public class DemoDataSeeder implements ApplicationRunner {
         }
     }
 }
+```
 
 The idempotency is the whole game — **the seeder must survive redeploys without touching user data** (this academy learned that the hard way with module seeding: see the loader's reuse-existing-rows fix). Never `deleteAll` + re-seed in a startup runner — that's a data-loss bug wearing a seeding costume.
 
@@ -56,12 +58,14 @@ The idempotency is the whole game — **the seeder must survive redeploys withou
 spring.jpa.properties.hibernate.hbm2ddl.import_files: fixtures.sql   # Hibernate's dev fixture hook
 ```
 
+```java
 @Configuration
 @Profile("dev")                          // these beans do not exist outside dev
 public class DevFixtures {
     @Bean
     ApplicationRunner devData(UserRepository users, OrderRepository orders) { ... }
 }
+```
 
 The mechanisms vary (Hibernate import, Liquibase contexts, Spring `@Profile` beans) — the discipline is the same: **fixtures are compiled out of every non-dev environment**, so "it works on my machine with 10,000 orders" can't silently become prod's data set.
 

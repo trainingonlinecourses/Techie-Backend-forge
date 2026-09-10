@@ -18,6 +18,7 @@ The hardest part of testing Spring isn't writing assertions — it's **configuri
 
 Add beans only tests need, without polluting production config:
 
+```java
 @WebMvcTest(CourseController.class)
 class CourseControllerTest {
 
@@ -33,9 +34,11 @@ class CourseControllerTest {
     @Autowired MockMvc mockMvc;
     @MockBean CourseService courseService;
 }
+```
 
 **Inner `@TestConfiguration` classes are applied automatically** to the enclosing test. Standalone classes must be imported:
 
+```java
 @TestConfiguration
 public class TestClockConfig {
     @Bean
@@ -46,14 +49,17 @@ public class TestClockConfig {
 // usage:
 @Import(TestClockConfig.class)
 class ExpiringTokenTest { ... }
+```
 
 The fixed `Clock` bean is a classic: tests for expiry, TTL, and time-based logic become deterministic.
 
 ## @MockBean vs. @MockitoBean
 
+```java
 @MockBean CourseService courseService;      // Spring Boot 3.4+ replaces MockBean
 // or, modern:
 @MockitoBean CourseService courseService;
+```
 
 Both replace the real bean in the context with a Mockito mock. Consequences:
 
@@ -64,14 +70,17 @@ Both replace the real bean in the context with a Mockito mock. Consequences:
 **The context-caching trap**: each *different* combination of `@MockBean`s creates a new application context (expensive). Keep mock sets consistent across test classes:
 
 // Base class declares all mocks once → every subclass reuses the context
+```java
 @WebMvcTest
 abstract class WebMvcTestBase {
     @MockBean CourseService courseService;
     @MockBean LessonService lessonService;
 }
+```
 
 ## @SpyBean: Real Bean, Selective Stubbing
 
+```java
 @SpyBean PaymentGateway gateway;    // real implementation, spy on top
 
 @Test
@@ -85,12 +94,15 @@ void fallsBackWhenGatewayFails() {
 }
 
 Unstubbed methods run for real; stubbed ones are intercepted.
+```
 
 ## Profiles: Isolate Environments
 
+```java
 @SpringBootTest
 @ActiveProfiles("test")
 class IntegrationTest { ... }
+```
 
 ```yaml
 # application-test.yml
@@ -166,6 +178,7 @@ void filtersByLevel() {
 - **`@DirtiesContext`** — nukes the context after the test. Slow; use sparingly (static state, singleton caches).
 - **`@Sql`** — seed/cleanup SQL per test:
 
+```java
 @Test
 @Sql("/sql/seed-courses.sql")
 void listsSeededCourses() { ... }
@@ -173,6 +186,7 @@ void listsSeededCourses() { ... }
 @Test
 @Sql(statements = "DELETE FROM lessons", executionPhase = AFTER_TEST_METHOD)
 void cleansUp() { ... }
+```
 
 ## Preventing Flaky Tests
 

@@ -24,9 +24,11 @@ inventory-service ──GET /inventory-service/prod──▶ config-server
 
 ## 1. The config server
 
+```java
 @SpringBootApplication
 @EnableConfigServer
 public class ConfigServerApplication { ... }
+```
 
 ```xml
 <dependency>

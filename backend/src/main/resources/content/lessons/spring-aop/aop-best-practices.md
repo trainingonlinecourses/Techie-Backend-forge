@@ -28,6 +28,7 @@ The org rule of thumb:
 
 ## The production patterns teams keep
 
+```java
 **Pattern 1 — an audit aspect keyed by a custom annotation.** The annotation is the *contract*; the aspect is the *policy*:
 
 @Target(ElementType.METHOD) @Retention(RetentionPolicy.RUNTIME)
@@ -46,9 +47,11 @@ public class AuditAspect {
 // Usage — declarative, obvious, uniform:
 @Audited(action = "ORDER_CREATED")
 public Order placeOrder(OrderRequest r) { ... }
+```
 
 The annotation pattern is the sweet spot: **the *what* is declared on the method, the *how* lives in one aspect**, and adding auditing to a new method is a one-line annotation.
 
+```java
 **Pattern 2 — a retry aspect for transient failures.** Retrying only the *transient* exception types, with backoff and a cap — and importantly, sitting **outside** any transaction so each attempt gets a fresh unit of work:
 
 @Aspect @Component
@@ -66,11 +69,13 @@ public class RetryAspect {
         }
     }
 }
+```
 
 (Production teams often reach for Spring Retry or Resilience4j instead of hand-rolling — but a small custom aspect is legitimate when the policy is tiny and specific.)
 
 **Pattern 3 — a timing/metrics aspect on service boundaries.** Measure every `@Service` method or every controller handler uniformly, feeding a metrics registry:
 
+```java
 @Aspect @Component
 public class MetricsAspect {
     @Around("execution(* com.acme..*Service.*(..))")   // package-scoped pointcut
@@ -81,6 +86,7 @@ public class MetricsAspect {
                           .record(System.nanoTime() - start, NANOSECONDS); }
     }
 }
+```
 
 The `execution(...)` pointcut scoped to a package is the maintainable form — a new `*Service` in that package is *automatically* covered, which is exactly the uniformity AOP promises.
 

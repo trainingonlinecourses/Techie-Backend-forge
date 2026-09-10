@@ -79,15 +79,19 @@ springdoc.show-actuator=false                 # don't document actuator endpoint
 
 ## Documenting Auth on Individual Operations
 
+```java
 @Operation(security = { @SecurityRequirement(name = "bearerAuth") })
 @GetMapping("/me")
 public UserDto me() { ... }
+```
 
 Or apply globally (the bean above) and refine per-operation. Public endpoints (login) can *clear* the requirement:
 
+```java
 @Operation(security = {})
 @PostMapping("/auth/login")
 public TokenDto login(@RequestBody LoginRequest r) { ... }
+```
 
 ## Grouping — Public vs Internal Specs
 
@@ -98,12 +102,14 @@ public GroupedOpenApi publicApi() {
     return GroupedOpenApi.builder()
             .group("public")
             .pathsToMatch("/api/courses/**", "/api/auth/**")
+```java
             .build();
 }
 
 @Bean
 public GroupedOpenApi internalApi() {
     return GroupedOpenApi.builder()
+```
             .group("internal")
             .pathsToMatch("/admin/**", "/internal/**")
             .build();

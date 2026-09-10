@@ -24,6 +24,7 @@ Annotations cover 95% of JSON mapping. The rest needs **code**: a value whose wi
 
 Say the API must emit monetary amounts as *decimal strings* (`"99.50"` — not floating-point JSON), because floating-point JSON can lose precision:
 
+```java
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
@@ -31,6 +32,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 
 // The serializer: HOW a BigDecimal becomes JSON text.
+```
 public class MoneySerializer extends JsonSerializer<BigDecimal> {
 
     @Override
@@ -49,6 +51,7 @@ public class MoneySerializer extends JsonSerializer<BigDecimal> {
 
 ## Registering and Using It
 
+```java
 // Register per-field with @JsonSerialize:
 public class OrderDto {
     @JsonSerialize(using = MoneySerializer.class)
@@ -64,14 +67,17 @@ Jackson2ObjectMapperBuilderCustomizer moneyCustomizer() {
     return builder -> builder.serializers(new MoneySerializer())
                              .deserializers(new MoneyDeserializer());
 }
+```
 
 The choice: **per-field** (`@JsonSerialize(using=...)`) for one-off custom types; **global registration** for a type that always maps the same way (money always a string). Spring Boot's `Jackson2ObjectMapperBuilderCustomizer` is the clean hook — it adds your serializers without clobbering Boot's auto-configuration.
 
 ## The Matching Deserializer
 
+```java
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
+```
 
 public class MoneyDeserializer extends JsonDeserializer<BigDecimal> {
 
@@ -128,6 +134,7 @@ node.set("meta", mapper.createObjectNode().put("v", 1));
 
 When a field can hold *different* concrete types, Jackson needs to know which class to build. The annotation approach (`@JsonTypeInfo`) embeds a type discriminator:
 
+```java
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes({
     @JsonSubTypes.Type(value = CreditCardPayment.class, name = "card"),
@@ -143,6 +150,7 @@ public class BankPayment extends Payment { public String iban; }
 // Serializing a CreditCardPayment:
 // {"type":"card","amount":99.5,"last4":"4242"}
 // Deserializing reads "type" -> builds CreditCardPayment.
+```
 
 **The danger zone:** `@JsonTypeInfo` with `Id.CLASS` or default-typing lets JSON name *arbitrary classes* — the deserialization attack from the secure-coding lesson. **Use `Id.NAME` with an explicit `@JsonSubTypes` allowlist** (never `Id.CLASS` on untrusted input) — the allowlist is what keeps polymorphic deserialization safe.
 
@@ -150,6 +158,7 @@ public class BankPayment extends Payment { public String iban; }
 
 **`@JsonView`** serializes the *same* object differently per context — public fields vs admin fields:
 
+```java
 public class Views {
     public static class Public { }
     public static class Internal extends Public { }   // Internal = Public + more
@@ -172,6 +181,7 @@ public UserDto get(@PathVariable Long id) { ... }
 // A public endpoint uses the Public view — phone is omitted.
 
 **The trade-off vs DTOs:** views avoid duplicating classes for "same shape, different fields" — but they spread the contract across annotations. For more than two views, explicit DTOs are usually clearer. Views are the right tool when the object is genuinely one type with context-dependent exposure (public profile vs admin record).
+```
 
 ## Recap
 

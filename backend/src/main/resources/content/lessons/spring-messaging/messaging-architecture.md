@@ -16,7 +16,9 @@ docs:
 
 In direct calls (REST), the caller waits: request → response, both parties alive, tightly coupled in time and space. **Messaging** replaces the phone line with a **mailbox**: the sender drops a message and moves on; the receiver picks it up whenever it's ready. The two are decoupled in *time* (no waiting), *space* (no address — a broker routes it), and *technology* (different systems can speak different formats through a translator).
 
+```java
 Think of a restaurant kitchen: the waiter writes the order on a ticket and clips it to the pass. The chef cooks when ready. The waiter doesn't stand there while the food cooks (time decoupling); the chef doesn't know which waiter took the order (space decoupling); and if two waiters use different shorthand, the ticket is still understood because there's an agreed format (protocol).
+```
 
 ## The Two Messaging Models
 
@@ -38,7 +40,9 @@ Producer ──> Topic ──> Consumer A
 
 A message on a topic goes to **every** subscriber. Each consumer gets its own copy. Classic use: events — "user registered" goes to email-sender, analytics, and audit simultaneously.
 
+```java
 **The rule:** a *task* belongs in a queue (one worker should do it); a *fact/event* belongs on a topic (everyone interested should hear it).
+```
 
 ## The Broker — The Middleman
 
