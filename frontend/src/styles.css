@@ -1955,6 +1955,8 @@ typing i:nth-child(3) { animation-delay: 0.3s; }
 }
 :root[data-theme='light'] .audio-btn { color: #0b6bb8; border-color: #bcd8ef; background: #e8f2fb; }
 :root[data-theme='light'] .audio-btn:hover { background: #d9eaf8; }
+.audio-err { color: #ff9d66; font-size: 12.5px; align-self: center; }
+:root[data-theme='light'] .audio-err { color: #b3541e; }
 
 /* Search result topic chips */
 .rc-topics { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
