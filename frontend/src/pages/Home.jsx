@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext.jsx';
 import { useProgress } from '../hooks/useProgress.js';
 import { FALLBACK_CURRICULUM } from '../fallbackCurriculum.js';
 import { SkeletonCard } from '../components/Skeleton.jsx';
+import ProgressRing from '../components/ProgressRing.jsx';
 
 // Learning-path levels, in curriculum order — the Home page groups modules by these.
 const LEVELS = ['foundation', 'intermediate', 'advanced', 'expert'];
@@ -144,10 +145,19 @@ export default function Home() {
       {LEVELS.map((lv) => {
         const mods = (curriculum || []).filter((m) => m.module.level === lv);
         if (!curriculum || mods.length === 0) return null;
+        const lvTotal = mods.reduce((n, m) => n + (m.module.lessonCount ?? m.lessons.length), 0);
+        const lvDone = mods.reduce((n, m) => n + m.lessons.filter((l) => progress[l.id]).length, 0);
+        const ringColor = { foundation: '#6fce6f', intermediate: '#4cc2ff', advanced: '#bb9af7', expert: '#ff9e64' }[lv];
         return (
           <div key={lv} className="level-section">
             <h3 className="level-h">
               <span className={`level-pill ${lv}`}>{LEVEL_LABEL[lv]}</span>
+              <span className="level-ring">
+                <ProgressRing value={lvTotal > 0 ? lvDone / lvTotal : 0} size={44} stroke={5} color={ringColor}>
+                  <span className="level-ring-pct">{lvTotal > 0 ? Math.round((lvDone / lvTotal) * 100) : 0}%</span>
+                </ProgressRing>
+                <span className="level-ring-count">{lvDone}/{lvTotal} lessons</span>
+              </span>
             </h3>
             <div className="modgrid">
             {mods.map((m, i) => {

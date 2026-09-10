@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../api/client';
 import { useAuth } from '../context/AuthContext';
+import GamificationPanel from './GamificationPanel';
 
 export default function ProgressDashboard() {
   const { user } = useAuth();
@@ -51,7 +52,10 @@ export default function ProgressDashboard() {
   return (
     <div className="progress-dashboard">
       <h2>📊 Learning Dashboard</h2>
-      
+
+      {/* XP, streaks, badges, level rings */}
+      <GamificationPanel />
+
       {/* Main Stats */}
       <div className="stats-grid">
         <div className="stat-card">

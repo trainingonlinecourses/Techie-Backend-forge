@@ -59,6 +59,11 @@ export default function SearchPage() {
             </div>
             <h3>{r.title}</h3>
             <p dangerouslySetInnerHTML={{ __html: highlight(r.snippet, q) }} />
+            {Array.isArray(r.topics) && r.topics.length > 0 && (
+              <div className="rc-topics">
+                {r.topics.map((t) => <span key={t} className="chip">{t}</span>)}
+              </div>
+            )}
           </Link>
         ))}
         {!loading && q && results?.length === 0 && (

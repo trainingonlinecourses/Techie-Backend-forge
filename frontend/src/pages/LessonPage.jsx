@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext.jsx';
 import { useProgress } from '../hooks/useProgress.js';
 import Markdown from '../components/Markdown.jsx';
 import Quiz from '../components/Quiz.jsx';
+import AudioPlayer from '../components/AudioPlayer.jsx';
 import JavaIdeEditor from '../components/JavaIdeEditor.jsx';
 import KeyboardShortcuts from '../components/KeyboardShortcuts.jsx';
 import { SkeletonLesson } from '../components/Skeleton.jsx';
@@ -87,7 +88,14 @@ export default function LessonPage() {
 
   async function onToggle() {
     await toggle(l?.id, completed);
-    flash(completed ? 'Marked as unread' : '✓ Lesson marked complete');
+    if (completed) {
+      flash('Marked as unread');
+    } else {
+      // XP matches the backend rule: 10 per lesson, +5 bonus for expert level.
+      const level = curriculum?.find((m) => m.module.id === l.moduleId)?.module.level;
+      const xp = level === 'expert' ? 15 : 10;
+      flash(`✓ Lesson complete · +${xp} XP`);
+    }
   }
 
   async function markAndContinue() {
@@ -136,6 +144,7 @@ export default function LessonPage() {
         </div>
         <h1 className="ptitle">{l.title}</h1>
         <p className="lede">{l.summary}</p>
+        <AudioPlayer body={lesson.body} title={l.title} />
         <div className="head-actions">
           {user ? (
             <>
