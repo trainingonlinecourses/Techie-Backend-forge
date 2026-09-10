@@ -264,11 +264,65 @@ keep-alive cadence doesn't depend on GitHub's schedule queue:
 ### Database (H2 locally, Postgres in production)
 
 - **Local dev:** zero setup — the app uses an H2 file database (`backend/data/academy`).
-- **Production:** when `DATABASE_URL` is set (Render/Railway Postgres), the app builds its JDBC
+- **Production:** when `DATABASE_URL` is set (Supabase / Render / Railway Postgres), the app builds its JDBC
   DataSource from it automatically (`DatabaseConfig`), so user data survives redeploys.
 - Migrating: existing local H2 data does **not** carry over to Postgres — the fresh production
   database is created empty (demo accounts are re-seeded; any previously registered users must
   register again).
+
+### Using Supabase Postgres (recommended over Render's expiring free DB)
+
+Render's free Postgres **expires after 30 days**; Supabase's free tier does not (it only pauses
+after ~1 week of complete inactivity — restore from the dashboard). The app needs **no code
+changes** — it just reads `DATABASE_URL`.
+
+**1. Get the connection string.** Supabase dashboard → your project → **Connect** →
+**Connection pooling** (Transaction pooler). It looks like:
+
+```
+postgresql://postgres.<project-ref>:<PASSWORD>@aws-0-<region>.pooler.supabase.com:6543/postgres
+```
+
+- Port **6543** = PgBouncer transaction pooler (use this from Render; the app caps its client
+  pool at 5 connections when it sees a `pooler.supabase.com` host).
+- Port **5432** = direct connection (`db.<project-ref>.supabase.co`) — fine for local testing.
+- **URL-encode the password** if it contains `@ : / # ? %` — e.g. `p@ss` → `p%40ss`. A raw
+  special character breaks URL parsing and login fails with *password authentication failed*.
+
+**2. Set the exact env vars on Render** (Service → *Environment*):
+
+| Variable | Value |
+|---|---|
+| `DATABASE_URL` | `postgresql://postgres.<ref>:<URL-ENCODED-PASSWORD>@aws-0-<region>.pooler.supabase.com:6543/postgres` |
+| `APP_CORS_ORIGINS` | `https://techie-backend-forge.vercel.app` |
+| `APP_JWT_SECRET` | random string ≥ 32 chars (keep stable — changing it logs users out) |
+
+(`PORT` is injected by Render. `DATABASE_URL` may also be given with a `jdbc:postgresql://...`
+prefix or `?sslmode=require` — both are handled.)
+
+If you use the Blueprint (`render.yaml`) instead, delete its `DATABASE_URL`/database block and
+set the three variables above manually in the dashboard.
+
+**3. Verify.** Tables are created automatically on first boot (`ddl-auto: update`); the health
+check turns green once the pool connects:
+
+```bash
+curl https://<your-service>.onrender.com/actuator/health   # → {"status":"UP"}
+```
+
+**Test the pooled connection locally** (before touching Render) with the exact production
+datasource code:
+
+```bash
+cd backend
+mvn -q test-compile dependency:build-classpath -Dmdep.outputFile=target/cp.txt
+DATABASE_URL='postgresql://postgres.<ref>:<URL-ENCODED-PASSWORD>@aws-0-<region>.pooler.supabase.com:6543/postgres' \
+  java -cp "target/classes;target/test-classes;$(cat target/cp.txt)" \
+  com.backendforge.academy.config.SupabaseConnectionChecker
+```
+
+It prints the server version, database/user, and public-table count — exit code 0 means Render
+will connect too. (`DatabaseConfigTest` covers the URL parsing itself in CI.)
 
 ### 2. Point the Vercel frontend at the hosted API
 
@@ -298,7 +352,7 @@ uses the server-configured provider (free Hugging Face endpoint by default).
 | Variable | Default | Purpose |
 |---|---|---|
 | `PORT` | `8080` | Injected by Render/Railway; don't set manually. |
-| `DATABASE_URL` | *(unset → H2 file DB)* | `postgres://…` connection string from Render/Railway Postgres. When present, the app uses Postgres instead of H2. |
+| `DATABASE_URL` | *(unset → H2 file DB)* | `postgresql://…` connection string (Supabase pooler, Render/Railway Postgres). When present, the app uses Postgres instead of H2. |
 | `APP_CORS_ORIGINS` | `http://localhost:5173,http://127.0.0.1:5173` | Comma-separated origins allowed to call the API. Add your Vercel **preview** origin too if you test there. |
 | `APP_JWT_SECRET` | dev-only value | ≥ 32 chars. Keep it stable or existing JWTs stop validating. |
 | `OPENAI_API_KEY` | *(unset)* | Enables real OpenAI answers from the AI tutor. |
