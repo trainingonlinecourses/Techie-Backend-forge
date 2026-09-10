@@ -14,6 +14,7 @@
       "http-basics"
     ],
     "intermediate": [
+      "java-1-7",
       "java-8",
       "java-11",
       "java-17",
@@ -129,6 +130,15 @@
     "java-streams-advanced-consolidated"
   ],
   "newModules": [
+    {
+      "id": "java-1-7",
+      "title": "Java 1–7 — The Foundations Era",
+      "subtitle": "Where it all began: applets and the first JVM, the Collections Framework, Java 5's language revolution (generics, enums, autoboxing, varargs), and Java 7's fork/join, try-with-resources and the diamond operator — the story behind the syntax you use every day.",
+      "order": 12,
+      "color": "#d4a017",
+      "tech": ["Applets", "Collections", "Generics", "Enums", "Fork/Join", "Diamond"],
+      "docsUrl": "https://docs.oracle.com/javase/8/docs/technotes/guides/lang/enhancements.html"
+    },
     {
       "id": "java-22-24",
       "title": "Java 22–24 — The Releases Between LTS",
