@@ -20,11 +20,14 @@ public class ProgressController {
     private final ProgressService progress;
     private final LessonRepository lessons;
     private final ModuleRepository modules;
+    private final GamificationService gamification;
 
-    public ProgressController(ProgressService progress, LessonRepository lessons, ModuleRepository modules) {
+    public ProgressController(ProgressService progress, LessonRepository lessons,
+                              ModuleRepository modules, GamificationService gamification) {
         this.progress = progress;
         this.lessons = lessons;
         this.modules = modules;
+        this.gamification = gamification;
     }
 
     @GetMapping
@@ -44,6 +47,12 @@ public class ProgressController {
                                            @PathVariable String lessonId) {
         progress.unmark(principal.user().getId(), lessonId);
         return progress.progressMap(principal.user().getId());
+    }
+
+    /** XP, streaks, badges and per-level progress for the signed-in user. */
+    @GetMapping("/gamification")
+    public Gamification.Summary gamification(@AuthenticationPrincipal UserPrincipal principal) {
+        return gamification.summary(principal.user().getId());
     }
 
     /** Ordered list of completed lessons with their titles. */

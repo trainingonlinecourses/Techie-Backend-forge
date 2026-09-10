@@ -1,9 +1,11 @@
 # CI — runs on every push so broken code is caught before it can be deployed.
-# Two independent jobs run in parallel:
+# Three independent jobs run in parallel:
+#   content  — curriculum integrity (module order, lesson slugs, fences, references)
 #   backend  — Spring Boot unit/integration tests (mvn test, Java 21)
 #   frontend — Vite production build of the React app
-# Both must pass for the commit to be considered green; deployments
-# (Render/Railway for the API, Vercel for the frontend) should be gated on CI.
+# All must pass for the commit to be considered green; deployments
+# (Render for the API, Vercel for the frontend) are gated on CI via
+# required status checks on main.
 name: CI
 
 on:
@@ -18,7 +20,14 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
-jobs:
+  content:
+    name: Content integrity (curriculum)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify curriculum integrity
+        run: node scripts/verify-content.mjs
+
   backend:
     name: Backend tests (mvn test)
     runs-on: ubuntu-latest

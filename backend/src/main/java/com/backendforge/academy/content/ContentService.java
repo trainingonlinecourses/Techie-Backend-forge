@@ -86,24 +86,41 @@ public class ContentService {
         return lessons.findById(id);
     }
 
-    /** Lightweight keyword search with simple scoring across title / summary / body. */
+    /**
+     * Keyword search with topic-aware scoring: titles weigh most, then summaries,
+     * topic tags and phrase matches; body hits add depth but rank lower.
+     */
     public List<SearchResultDto> search(String query) {
         if (query == null || query.isBlank()) return List.of();
-        String[] tokens = query.toLowerCase(Locale.ROOT).split("[^a-z0-9+#.-]+");
+        String q = query.toLowerCase(Locale.ROOT);
+        String[] tokens = q.split("[^a-z0-9+#.-]+");
         Map<String, String> titles = moduleTitles();
         List<SearchResultDto> results = new ArrayList<>();
         for (Lesson l : lessons.findAll()) {
+            String title = l.getTitle().toLowerCase(Locale.ROOT);
+            String summary = l.getSummary().toLowerCase(Locale.ROOT);
+            String topics = String.join(" ", l.getTopics()).toLowerCase(Locale.ROOT);
+
             double score = 0;
+            boolean anyMatch = false;
             for (String token : tokens) {
                 if (token.isBlank()) continue;
-                if (l.getTitle().toLowerCase(Locale.ROOT).contains(token)) score += 5;
-                if (l.getSummary().toLowerCase(Locale.ROOT).contains(token)) score += 3;
+                anyMatch = true;
+                if (title.contains(token)) score += 6;
+                if (summary.contains(token)) score += 3;
+                if (topics.contains(token)) score += 2;
                 if (bodyContains(l, token)) score += 1;
             }
+            if (!anyMatch) return List.of();
+            // exact-phrase bonus — a query in quotes or a title that contains the phrase
+            if (title.contains(q)) score += 8;
+            if (summary.contains(q)) score += 3;
+
             if (score > 0) {
                 results.add(new SearchResultDto(l.getId(), l.getModuleId(),
                         titles.get(l.getModuleId()),
-                        l.getTitle(), snippet(l, query), score));
+                        l.getTitle(), snippet(l, query), score,
+                        l.getTopics().size() > 3 ? l.getTopics().subList(0, 3) : l.getTopics()));
             }
         }
         results.sort(Comparator.comparingDouble(SearchResultDto::score).reversed());

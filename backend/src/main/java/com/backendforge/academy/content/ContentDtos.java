@@ -52,7 +52,7 @@ public final class ContentDtos {
     }
 
     public record SearchResultDto(String lessonId, String moduleId, String moduleTitle, String title,
-                                  String snippet, double score) {}
+                                  String snippet, double score, List<String> topics) {}
 
     /** A module plus its ordered lessons (for the curriculum tree). */
     public record CurriculumModule(ModuleDto module, List<LessonSummaryDto> lessons) {}
