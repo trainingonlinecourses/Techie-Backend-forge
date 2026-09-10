@@ -198,11 +198,35 @@ claims, JSON 401/403 via `AuthenticationEntryPoint`/`AccessDeniedHandler`.
 ```
 ├── backend/                  Spring Boot API (the platform itself)
 │   └── src/main/resources/content/
-│       ├── modules.json      curriculum metadata (105 modules)
+│       ├── modules.json      curriculum metadata (116 modules, learning-path order)
 │       ├── docs-index.json   curated docs.spring.io index (325 links)
-│       └── lessons/<module>/ 712 markdown lessons (loaded + searched at runtime)
+│       └── lessons/<module>/ 781 markdown lessons (loaded + searched at runtime)
 ├── frontend/                 React SPA
+├── scripts/                  curriculum tooling (aligner, fallback generator)
 └── projects/payments-api/    Capstone: complete runnable payments API
+```
+
+### Curriculum structure
+
+Modules are strictly ordered 1→116 along a four-level learning path (the `level` field):
+
+1. **Foundation** (modules 1–11) — core Java, strings/arrays/OOP, Git, HTTP
+2. **Intermediate** (12–46) — Java 8 → 26 in release order, collections, streams, I/O, testing, Maven, design patterns, Spring Boot basics
+3. **Advanced** (47–77) — Spring internals, data access, JVM performance, concurrency deep dives
+4. **Expert** (78–116) — security, messaging, microservices, cloud, observability, capstone
+
+Release modules are labeled with a `version` chip (Java SE, Java 8, Java 11, Java 17, Java 22–24,
+Java 21, Java 25, Java 26) both on the home page and inside lessons.
+
+Every lesson ends with a **References** section routing to the best of five curated external
+tutorial sites (W3Schools, GeeksforGeeks, dev.java, Codecademy, Learn Java Online) plus the
+official Oracle/OpenJDK documentation.
+
+To adjust the path, edit `scripts/curriculum.config.json` and run:
+
+```bash
+node scripts/curriculum-align.mjs   # reorders modules, refreshes lesson references
+node scripts/gen-fallback.mjs       # regenerates the frontend offline fallback
 ```
 
 The old single-file `index.html` is kept in the repo root as an archive of the original design.
