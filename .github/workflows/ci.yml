@@ -1,0 +1,68 @@
+# CI — runs on every push so broken code is caught before it can be deployed.
+# Two independent jobs run in parallel:
+#   backend  — Spring Boot unit/integration tests (mvn test, Java 21)
+#   frontend — Vite production build of the React app
+# Both must pass for the commit to be considered green; deployments
+# (Render/Railway for the API, Vercel for the frontend) should be gated on CI.
+name: CI
+
+on:
+  push:
+  pull_request:
+    branches: [main]
+  workflow_dispatch: {}
+
+# Don't burn minutes re-testing outdated commits — cancel the older run of the
+# same branch/PR when a new one starts.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: Backend tests (mvn test)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Run tests
+        run: mvn -B --no-transfer-progress test
+
+  frontend:
+    name: Frontend build (vite build)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist
+          path: frontend/dist/
+          retention-days: 7
