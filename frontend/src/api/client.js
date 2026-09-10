@@ -40,3 +40,34 @@ api.interceptors.response.use(
 export function errorMessage(error, fallback = 'Something went wrong') {
   return error?.response?.data?.message || error?.message || fallback;
 }
+
+/**
+ * Tiny stale-while-revalidate cache for read-only content endpoints.
+ *
+ * Why: Render's free tier sleeps after 15 idle minutes, and the first visitor
+ * after a wake-up can wait 30-60s for the backend. With this cache, any page a
+ * user has already visited renders instantly from localStorage on return visits
+ * and navigation, then refreshes quietly once the backend answers.
+ *
+ * NOTE: stores public, non-sensitive content (curriculum, lessons, docs) only.
+ * Never cache auth or user-specific responses.
+ */
+export const cached = {
+  get(key) {
+    try {
+      const raw = localStorage.getItem(`bfc:${key}`);
+      if (!raw) return null;
+      const { t, v } = JSON.parse(raw);
+      return { at: t, data: v, ageMs: Date.now() - t };
+    } catch {
+      return null;
+    }
+  },
+  set(key, value) {
+    try {
+      localStorage.setItem(`bfc:${key}`, JSON.stringify({ t: Date.now(), v: value }));
+    } catch {
+      /* quota exceeded / private mode — caching is best-effort */
+    }
+  },
+};

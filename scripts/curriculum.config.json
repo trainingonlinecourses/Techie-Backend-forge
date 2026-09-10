@@ -1,0 +1,173 @@
+{
+  "levels": {
+    "foundation": [
+      "java",
+      "java-lang-fundamentals",
+      "java-strings-deep",
+      "java-arrays-deep",
+      "java-wrappers-deep",
+      "java-exceptions-deep",
+      "java-nested-classes",
+      "java-enums-deep",
+      "java-conversions-and-utilities",
+      "git-github-basics",
+      "http-basics"
+    ],
+    "intermediate": [
+      "java-8",
+      "java-11",
+      "java-17",
+      "java-22-24",
+      "java-21",
+      "java-25",
+      "java-26",
+      "java-generics-deep",
+      "java-collections-deep",
+      "java-modern-collections-deep",
+      "java-functional-programming",
+      "java-streams-deep",
+      "java-io-nio",
+      "java-io-zip-directory-operations",
+      "java-time-api",
+      "java-serialization-networking",
+      "java-networking",
+      "java-xml-processing",
+      "data-structures-algorithms",
+      "java-testing",
+      "junit5-deep",
+      "mockito-deep",
+      "maven-gradle",
+      "design-patterns",
+      "solid-clean-code",
+      "spring-core",
+      "spring-boot",
+      "spring-boot-fullstack",
+      "spring-configuration",
+      "spring-profiles-deep",
+      "spring-configproperties",
+      "spring-lombok",
+      "spring-boot-devtools",
+      "spring-logging"
+    ],
+    "advanced": [
+      "spring-boot-internals",
+      "spring-autoconfig",
+      "spring-starters",
+      "spring-data-jpa-deep",
+      "spring-data-jdbc",
+      "spring-jdbc",
+      "spring-data",
+      "redis-deep",
+      "mongodb-deep",
+      "elasticsearch-deep",
+      "spring-webmvc-advanced",
+      "spring-rest-clients",
+      "spring-file-upload",
+      "spring-actuator-deep",
+      "spring-cache",
+      "spring-scheduling-async",
+      "spring-aop",
+      "spring-transactions-deep",
+      "spring-testing-advanced",
+      "db-migrations",
+      "database-design",
+      "postgresql-deep",
+      "sql-advanced",
+      "jackson-json",
+      "jvm-performance",
+      "java-concurrency-deep",
+      "java-concurrency-lifecycle-deep",
+      "java-memory-model",
+      "java-reflection-annotations",
+      "java-annotation-processing",
+      "java-jpms",
+      "spring-shell",
+      "spring-session"
+    ],
+    "expert": [
+      "spring-security",
+      "spring-security-jwt-deep",
+      "spring-security-advanced",
+      "oauth2-oidc",
+      "owasp-security",
+      "spring-web-apis",
+      "openapi-rest-docs",
+      "rest-best-practices",
+      "spring-webflux",
+      "websockets-deep",
+      "graphql-deep",
+      "grpc-apis",
+      "spring-kafka",
+      "kafka-deep",
+      "spring-amqp",
+      "spring-messaging",
+      "spring-integration",
+      "spring-batch",
+      "event-driven-architecture",
+      "resilience-circuit-breaker",
+      "spring-cloud",
+      "microservices-patterns",
+      "distributed-systems",
+      "ddd-architecture",
+      "spring-modulith",
+      "spring-ai",
+      "java-modern-language-features-deep",
+      "java-advanced-language",
+      "graalvm-native",
+      "docker-deep",
+      "docker-compose-examples",
+      "cloud-native",
+      "kubernetes-deep",
+      "terraform-infra",
+      "cicd-devops",
+      "observability",
+      "projects",
+      "capstone"
+    ]
+  },
+  "retiredModules": [
+    "java-streams-advanced-consolidated"
+  ],
+  "newModules": [
+    {
+      "id": "java-22-24",
+      "title": "Java 22–24 — The Releases Between LTS",
+      "subtitle": "Unnamed variables, markdown doc comments, stream gatherers finalized, pinning-free synchronized virtual threads and AOT class loading — everything shipped in the releases between Java 21 and 25, explained for beginners.",
+      "order": 16,
+      "color": "#f39c12",
+      "tech": ["Unnamed Variables", "Markdown Docs", "Stream Gatherers", "Virtual Threads", "AOT"],
+      "docsUrl": "https://inside.java/"
+    }
+  ],
+  "references": {
+    "sites": {
+      "w3schools": {
+        "name": "W3Schools Java Tutorial",
+        "url": "https://www.w3schools.com/java/",
+        "keywords": ["hello", "syntax", "variable", "datatype", "data type", "operator", "cast", "wrapper", "autobox", "string method", "math", "boolean", "if", "else", "switch statement", "while", "for loop", "break", "continue", "array", "method", "parameter", "scope", "recursion", "oop", "class", "object", "attribute", "constructor", "modifier", "encapsulat", "inherit", "polymorphism", "override", "abstract", "interface", "enum", "date", "regex", "iterator", "try", "catch", "exception", "throw", "scanner", "inner class"]
+      },
+      "geeksforgeeks": {
+        "name": "GeeksforGeeks Java",
+        "url": "https://www.geeksforgeeks.org/java/java/",
+        "keywords": ["collection", "hashmap", "arraylist", "linkedlist", "hashset", "treemap", "queue", "deque", "priorityqueue", "comparator", "comparable", "generic", "wildcard", "stream", "lambda", "optional", "functional interface", "method reference", "record", "sealed", "pattern matching", "text block", "stringbuilder", "stringjoiner", "immutable", "singleton", "builder", "factory", "immutable class", "equals", "hashcode", "clone", "biginteger", "bigdecimal", "thread", "synchronized", "volatile", "executor", "callable", "future", "completablefuture", "fork", "atomic", "countdownlatch", "cyclicbarrier", "deadlock", "race condition", "static", "final", "this", "super", "instanceof", "reflection", "annotation", "proxy", "jvm", "bytecode", "garbage", "memory"]
+      },
+      "devjava": {
+        "name": "dev.java — the official OpenJDK documentation site",
+        "url": "https://dev.java/",
+        "keywords": ["virtual thread", "loom", "scoped value", "structured concurrency", "gatherer", "sequenced collection", "record pattern", "switch expression", "module", "jpms", "module-info", "var", "preview", "jep", "java 2", "java 1", "jdk", "release", "version", "nashorn", "deprecat", "removal", "migration", "lts"]
+      },
+      "codecademy": {
+        "name": "Codecademy Learn Java",
+        "url": "https://www.codecademy.com/learn/learn-java",
+        "keywords": ["beginner", "introduction", "getting started", "setup", "install", "ide", "compile", "run", "first program", "printf", "format", "input", "output", "debug", "practice", "exercise", "project", "quiz"]
+      },
+      "learnjavaonline": {
+        "name": "Learn Java Online (interactive exercises)",
+        "url": "https://www.learnjavaonline.org/",
+        "keywords": ["exercise", "interactive", "playground", "hello world", "comment", "literal", "type", "loop", "condition", "function", "inheritance", "interface practice", "generics exercise", "io", "file"]
+      }
+    },
+    "defaultSite": "geeksforgeeks",
+    "appendModuleDocsUrl": true
+  }
+}

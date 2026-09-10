@@ -127,6 +127,7 @@ export default function LessonPage() {
       <div className="pagehead">
         {l.capstone && <div className="capbadge">CAPSTONE PROJECT</div>}
         <div className="meta-chips">
+          {l.version && <span className="chip ver">{l.version}</span>}
           <span className="chip amber">LESSON {l.order}</span>
           <span className="chip blue">⏱ {l.minutes} min</span>
           {l.topics.slice(0, 5).map((t) => (

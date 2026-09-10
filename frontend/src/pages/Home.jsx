@@ -1,10 +1,19 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { api } from '../api/client';
+import { api, cached } from '../api/client';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useProgress } from '../hooks/useProgress.js';
 import { FALLBACK_CURRICULUM } from '../fallbackCurriculum.js';
 import { SkeletonCard } from '../components/Skeleton.jsx';
+
+// Learning-path levels, in curriculum order — the Home page groups modules by these.
+const LEVELS = ['foundation', 'intermediate', 'advanced', 'expert'];
+const LEVEL_LABEL = {
+  foundation: '🌱 Foundation — start here',
+  intermediate: '🚀 Intermediate — the modern language',
+  advanced: '⚡ Advanced — production backend skills',
+  expert: '🏗️ Expert — architecture & operations',
+};
 
 const TECH = [
   ['JAVA', 'JDK 21'], ['SPRING FRAMEWORK', 'IoC · DI · AOP'], ['SPRING BOOT', '3.4'],
@@ -20,10 +29,26 @@ export default function Home() {
   const [curriculum, setCurriculum] = useState(null);
 
   useEffect(() => {
-    api.get('/content/stats').then((res) => setStats(res.data)).catch(() => {});
+    // Stale-while-revalidate: show the cached curriculum instantly (instant nav,
+    // resilient to cold starts), then refresh quietly in the background.
+    const cachedStats = cached.get('stats');
+    if (cachedStats) setStats(cachedStats);
+    const cachedCurr = cached.get('curriculum');
+    if (cachedCurr) setCurriculum(Array.isArray(cachedCurr) ? cachedCurr : FALLBACK_CURRICULUM);
+
+    api.get('/content/stats')
+      .then((res) => { setStats(res.data); cached.set('stats', res.data); })
+      .catch(() => {});
     api.get('/content/curriculum')
-      .then((res) => setCurriculum(Array.isArray(res.data) ? res.data : FALLBACK_CURRICULUM))
-      .catch(() => setCurriculum(FALLBACK_CURRICULUM));
+      .then((res) => {
+        if (Array.isArray(res.data)) {
+          setCurriculum(res.data);
+          cached.set('curriculum', res.data);
+        } else if (!cachedCurr) {
+          setCurriculum(FALLBACK_CURRICULUM);
+        }
+      })
+      .catch(() => { if (!cachedCurr) setCurriculum(FALLBACK_CURRICULUM); });
   }, [user]);
 
   // The next incomplete lesson, in curriculum order — powers the "Continue learning" card.
@@ -107,43 +132,61 @@ export default function Home() {
 
       <h2 className="sec">The curriculum</h2>
       <p className="lede">
-        {curriculum?.length || '…'} modules, ordered the way an organization rolls out Java and Spring: foundation first,
-        then the framework, then production practice — finishing with a complete runnable project.
+        {curriculum?.length || '…'} modules, sorted the way Java itself grew — and the way you should learn it:
+        foundations first, then the modern language (Java 8 → 26), then the framework, then production practice —
+        finishing with a complete runnable project.
       </p>
-      <div className="modgrid">
-        {!curriculum ? (
-          Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)
-        ) : curriculum.map((m, i) => {
-          const total = m.module.lessonCount ?? m.lessons.length;
-          const done = m.lessons.filter((l) => progress[l.id]).length;
-          const pct = total > 0 ? Math.round(done / total * 100) : 0;
-          return (
-            <Link key={m.module.id} to={`/modules/${m.module.id}`} className="modcard" data-num={m.module.order} style={{ animationDelay: `${Math.min(i * 0.03, 0.3)}s` }}>
-              <div className="modcard-top">
-                <div className="g">MODULE {String(m.module.order).padStart(2, '0')}</div>
-                <div className="modcard-icon" style={{ background: m.module.color + '18', color: m.module.color }}>
-                  {m.module.order <= 10 ? '☕' : m.module.order <= 30 ? '🚀' : m.module.order <= 60 ? '⚡' : '🏗️'}
-                </div>
-              </div>
-              <h3>{m.module.title}</h3>
-              <p>{m.module.subtitle}</p>
-              <div className="techs">
-                {m.module.tech.slice(0, 4).map((t) => <span key={t}>{t}</span>)}
-                {m.module.tech.length > 4 && <span className="tech-more">+{m.module.tech.length - 4}</span>}
-              </div>
-              <div className="foot">
-                <span>{total} lessons · {Math.round(m.module.minutes / 60 * 10) / 10}h</span>
-                <span className={`state ${done === total && total > 0 ? 'done' : pct > 0 ? 'progress' : 'todo'}`}>
-                  {done === total && total > 0 ? '✓ complete' : pct > 0 ? `${pct}% done` : `${done}/${total}`}
-                </span>
-              </div>
-              <div className="mbar">
-                <div className="mbar-fill" style={{ width: `${pct}%`, background: m.module.color }} />
-              </div>
-            </Link>
-          );
-        })}
-      </div>
+      {!curriculum && (
+        <div className="modgrid">
+          {Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)}
+        </div>
+      )}
+      {LEVELS.map((lv) => {
+        const mods = (curriculum || []).filter((m) => m.module.level === lv);
+        if (!curriculum || mods.length === 0) return null;
+        return (
+          <div key={lv} className="level-section">
+            <h3 className="level-h">
+              <span className={`level-pill ${lv}`}>{LEVEL_LABEL[lv]}</span>
+            </h3>
+            <div className="modgrid">
+            {mods.map((m, i) => {
+              const total = m.module.lessonCount ?? m.lessons.length;
+              const done = m.lessons.filter((l) => progress[l.id]).length;
+              const pct = total > 0 ? Math.round(done / total * 100) : 0;
+              return (
+                <Link key={m.module.id} to={`/modules/${m.module.id}`} className="modcard" data-num={m.module.order} style={{ animationDelay: `${Math.min(i * 0.03, 0.3)}s` }}>
+                  <div className="modcard-top">
+                    <div className="g">MODULE {String(m.module.order).padStart(2, '0')}</div>
+                    <div className="modcard-head">
+                      {m.module.version && <span className="ver-chip">{m.module.version}</span>}
+                      <div className="modcard-icon" style={{ background: m.module.color + '18', color: m.module.color }}>
+                        {lv === 'foundation' ? '☕' : lv === 'intermediate' ? '🚀' : lv === 'advanced' ? '⚡' : '🏗️'}
+                      </div>
+                    </div>
+                  </div>
+                  <h3>{m.module.title}</h3>
+                  <p>{m.module.subtitle}</p>
+                  <div className="techs">
+                    {m.module.tech.slice(0, 4).map((t) => <span key={t}>{t}</span>)}
+                    {m.module.tech.length > 4 && <span className="tech-more">+{m.module.tech.length - 4}</span>}
+                  </div>
+                  <div className="foot">
+                    <span>{total} lessons · {Math.round(m.module.minutes / 60 * 10) / 10}h</span>
+                    <span className={`state ${done === total && total > 0 ? 'done' : pct > 0 ? 'progress' : 'todo'}`}>
+                      {done === total && total > 0 ? '✓ complete' : pct > 0 ? `${pct}% done` : `${done}/${total}`}
+                    </span>
+                  </div>
+                  <div className="mbar">
+                    <div className="mbar-fill" style={{ width: `${pct}%`, background: m.module.color }} />
+                  </div>
+                </Link>
+              );
+            })}
+            </div>
+          </div>
+        );
+      })}
 
       <h2 className="sec">How this platform works</h2>
       <div className="board">

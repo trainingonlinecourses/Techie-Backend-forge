@@ -56,6 +56,7 @@ export default function ModulePage() {
       </div>
       <div className="pagehead" style={{ borderColor: m.color }}>
         <div className="pnum">{String(m.order).padStart(2, '0')}</div>
+        <span className={`level-pill ${m.level || 'foundation'}`}>{(m.level || 'foundation').toUpperCase()}</span>
         <div className="meta-chips">
           <span className="chip" style={{ color: m.color, borderColor: m.color + '66' }}>{m.tech.join(' · ')}</span>
         </div>

@@ -1,4 +1,36 @@
 {
+  "headers": [
+    {
+      "source": "/api/content/curriculum",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=0, s-maxage=300, stale-while-revalidate=600" }
+      ]
+    },
+    {
+      "source": "/api/content/modules",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=0, s-maxage=300, stale-while-revalidate=600" }
+      ]
+    },
+    {
+      "source": "/api/content/modules/:id",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=0, s-maxage=300, stale-while-revalidate=600" }
+      ]
+    },
+    {
+      "source": "/api/content/lessons/:id",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=0, s-maxage=600, stale-while-revalidate=1800" }
+      ]
+    },
+    {
+      "source": "/api/content/docs",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=0, s-maxage=1800, stale-while-revalidate=3600" }
+      ]
+    }
+  ],
   "rewrites": [
     { "source": "/api/:path*", "destination": "https://backendforge-academy-api-bef2.onrender.com/api/:path*" },
     { "source": "/actuator/:path*", "destination": "https://backendforge-academy-api-bef2.onrender.com/actuator/:path*" },
