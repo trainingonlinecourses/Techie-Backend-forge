@@ -18,11 +18,22 @@ jobs:
     steps:
       - name: Hit health endpoint
         run: |
-          curl -fsS --retry 3 --retry-delay 5 --max-time 60 \
+          echo "Pinging Render backend at $(date -u)..."
+          # --fail-with-body: non-2xx fails the step but still prints the response,
+          # so the Actions log shows WHAT the health endpoint returned, not just the code.
+          curl -sS --fail-with-body --retry 3 --retry-delay 5 --max-time 60 \
             https://backendforge-academy-api-bef2.onrender.com/actuator/health \
             && echo "✓ health OK"
+
       - name: Warm the content cache
         run: |
           curl -fsS --retry 2 --retry-delay 3 --max-time 30 \
             https://backendforge-academy-api-bef2.onrender.com/api/content/stats \
             && echo "✓ content cache warm"
+
+      - name: Log result
+        if: always()
+        run: |
+          echo "Keep-alive ping completed at $(date -u)"
+          echo "Workflow: ${{ github.workflow }}"
+          echo "Run: ${{ github.run_number }}"
