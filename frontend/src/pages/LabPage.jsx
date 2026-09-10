@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { api, errorMessage } from '../api/client';
+import JavaIdeEditor from '../components/JavaIdeEditor.jsx';
 
 const LAB_TIMEOUT_MINUTES = 30;
 const POLL_INTERVAL_MS = 15000; // poll session status every 15s
@@ -106,31 +107,8 @@ export default function LabPage() {
       });
   }
 
-  async function runCode() {
-    if (!code.trim()) return;
-    setIsRunning(true);
-    setOutput('');
-    try {
-      // Use the existing Java simulator from the CodeEditor component.
-      const sim = await import('../components/JavaSimulator');
-      const result = sim.simulateJava(code);
-      const out = result.errors && result.errors.length > 0
-        ? 'Compilation errors:\n' + result.errors.join('\n')
-        : (result.output || '(no output — add System.out.println() to see results)');
-      setOutput(out);
-
-      // Persist output server-side if we have a session.
-      if (sessionIdRef.current) {
-        api.post('/labs/output', { output: out }, {
-          params: { sessionId: sessionIdRef.current }
-        }).catch(() => {});
-      }
-    } catch (e) {
-      setOutput('Error: ' + e.message);
-    } finally {
-      setIsRunning(false);
-    }
-  }
+  // Output handling now lives in JavaIdeEditor (which owns the Run button and
+  // calls back onRun(text) — the lab just persists the text server-side).
 
   async function extendSession() {
     if (!sessionIdRef.current) return;
@@ -227,36 +205,21 @@ export default function LabPage() {
           </aside>
 
           <main className="lab-workspace">
-            <div className="code-editor code-editor-full">
-              <div className="code-editor-header">
-                <div className="code-editor-tabs">
-                  <span className="tab active">Java</span>
-                </div>
-                <div className="code-editor-actions">
-                  <button className="btn-run" onClick={runCode} disabled={isRunning}>
-                    {isRunning ? '⏳ Running…' : '▶ Run'}
-                  </button>
-                </div>
-              </div>
-              <textarea
-                className="code-textarea code-textarea-full"
-                value={code}
-                onChange={(e) => setCode(e.target.value)}
-                spellCheck={false}
-                placeholder="// Edit the code below and click Run"
-                aria-label="Lab code editor"
-              />
-            </div>
-
-            {output && (
-              <div className="lab-output">
-                <div className="lab-output-header">
-                  <span>Console Output</span>
-                  <button className="btn-icon" onClick={() => setOutput('')}>×</button>
-                </div>
-                <pre className="output-content">{output}</pre>
-              </div>
-            )}
+            <JavaIdeEditor
+              initialCode={code}
+              onChange={setCode}
+              initialOutput={output}
+              onRun={(out) => {
+                setOutput(out);
+                // Persist output server-side so it survives a page reload
+                // within the 30-minute session window.
+                if (sessionIdRef.current) {
+                  api.post('/labs/output', { output: out }, {
+                    params: { sessionId: sessionIdRef.current }
+                  }).catch(() => {});
+                }
+              }}
+            />
 
             {!output && !isRunning && (
               <div className="lab-hint">

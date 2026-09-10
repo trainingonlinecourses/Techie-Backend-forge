@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext.jsx';
 import { useProgress } from '../hooks/useProgress.js';
 import Markdown from '../components/Markdown.jsx';
 import Quiz from '../components/Quiz.jsx';
-import CodeEditor from '../components/CodeEditor.jsx';
+import JavaIdeEditor from '../components/JavaIdeEditor.jsx';
 import KeyboardShortcuts from '../components/KeyboardShortcuts.jsx';
 import { SkeletonLesson } from '../components/Skeleton.jsx';
 
@@ -172,11 +172,9 @@ export default function LessonPage() {
               <h3>💻 Practice Code</h3>
               <span className="code-section-badge">Interactive</span>
             </div>
-            <p className="code-description">Try writing code to reinforce what you learned. Edit the example below and click Run:</p>
-            <CodeEditor 
+            <p className="code-description">Try writing code to reinforce what you learned. Edit the example below and click Run (or press Ctrl+Enter):</p>
+            <JavaIdeEditor
               initialCode={extractCodeExample(lesson.body)}
-              language="java"
-              onChange={(code) => console.log('Code updated:', code.length, 'chars')}
             />
           </div>
 

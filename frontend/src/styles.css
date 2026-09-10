@@ -1802,3 +1802,102 @@ typing i:nth-child(3) { animation-delay: 0.3s; }
 .chatbox::-webkit-scrollbar { width: 6px; }
 .chatbox::-webkit-scrollbar-thumb { background: var(--line2); border-radius: 3px; }
 .chatbox::-webkit-scrollbar-track { background: transparent; }
+
+/* ============================================================
+   JavaIdeEditor — CodeMirror 6 based browser IDE
+   ============================================================ */
+.java-ide {
+  border: 1px solid var(--line2);
+  border-radius: 12px;
+  overflow: hidden;
+  background: #282c34; /* oneDark editor background */
+  box-shadow: 0 4px 24px rgba(0, 0, 0, .35);
+}
+.java-ide-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 12px;
+  background: #21252b;
+  border-bottom: 1px solid #181a1f;
+}
+.java-ide-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--mono, monospace);
+  font-size: 12.5px;
+  color: #abb2bf;
+}
+.java-ide-dot { width: 10px; height: 10px; border-radius: 50%; background: #e5c07b; box-shadow: 0 0 6px #e5c07b88; }
+.java-ide-lang {
+  font-size: 10px;
+  padding: 2px 7px;
+  border-radius: 20px;
+  background: #2c313a;
+  color: #98c379;
+  border: 1px solid #3e4451;
+}
+.java-ide-actions { display: flex; gap: 6px; }
+.java-ide-btn, .java-ide-run {
+  font-size: 12px;
+  padding: 6px 12px;
+  border-radius: 7px;
+  border: 1px solid #3e4451;
+  background: #2c313a;
+  color: #abb2bf;
+  cursor: pointer;
+  transition: background .15s, color .15s, border-color .15s;
+}
+.java-ide-btn:hover { background: #3a3f4b; color: #e6e6e6; }
+.java-ide-run {
+  background: var(--amber, #f5a623);
+  border-color: var(--amber, #f5a623);
+  color: #1b1b1b;
+  font-weight: 700;
+}
+.java-ide-run:hover { filter: brightness(1.08); }
+.java-ide-run:disabled { opacity: .6; cursor: wait; }
+
+.java-ide-editor { font-size: 13.5px; }
+.java-ide-editor .cm-editor { background: transparent; }
+.java-ide-editor .cm-editor.cm-focused { outline: none; }
+.java-ide-editor .cm-scroller { font-family: var(--mono, 'JetBrains Mono', Consolas, monospace); line-height: 1.55; }
+.java-ide-editor .cm-gutters { background: #21252b; border-right: 1px solid #181a1f; }
+.java-ide-editor .cm-activeLineGutter, .java-ide-editor .cm-activeLine { background: #2c313a55; }
+
+.java-ide-output { border-top: 1px solid #181a1f; background: #1e2127; }
+.java-ide-output-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 12px;
+  font-size: 11px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: #7f8798;
+  border-bottom: 1px solid #262a31;
+}
+.java-ide-output pre {
+  margin: 0;
+  padding: 12px 14px;
+  font-family: var(--mono, 'JetBrains Mono', Consolas, monospace);
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: #98c379;
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 320px;
+  overflow-y: auto;
+}
+.java-ide-output.error pre { color: #e06c75; }
+.java-ide-x {
+  background: none; border: none; color: #7f8798;
+  font-size: 15px; cursor: pointer; line-height: 1; padding: 2px 6px;
+}
+.java-ide-x:hover { color: #e06c75; }
+
+/* CodeMirror inside the lesson practice section */
+.lesson-code-section .java-ide { margin-top: 10px; }
+

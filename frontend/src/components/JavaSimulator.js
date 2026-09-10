@@ -67,27 +67,114 @@ export function simulateJava(code) {
   return flushResult(runBlock(src, errors));
 }
 
+// ==================== CONTROL FLOW (break / continue) ====================
+// break/continue inside a loop body is executed by a nested runBlock call, so we
+// signal with dedicated JS exceptions that loop executors catch. A context stack
+// distinguishes "break inside a switch" (no fall-through here → no-op) from
+// "break inside a loop" (exit the loop).
+class BreakSignal extends Error { constructor() { super('break'); this.__javaControl = true; } }
+class ContinueSignal extends Error { constructor() { super('continue'); this.__javaControl = true; } }
+const cfStack = [];
+
+function handleBreak() {
+  // Innermost 'switch' frame absorbs the break (no fall-through in this simulator);
+  // otherwise break targets the innermost loop.
+  for (let i = cfStack.length - 1; i >= 0; i--) {
+    if (cfStack[i] === 'switch') return;
+    if (cfStack[i] === 'loop') throw new BreakSignal();
+  }
+}
+
+function handleContinue() {
+  // continue is transparent to switch frames — it always targets the innermost loop.
+  for (let i = cfStack.length - 1; i >= 0; i--) {
+    if (cfStack[i] === 'loop') throw new ContinueSignal();
+  }
+}
+
+/**
+ * javaFormat — Java's String.format/printf formatter (common conversions):
+ * %s %d %f %.Nf %b %c %x %X %% %n, with optional width and left-align flag (%-8s).
+ */
+function javaFormat(fmt, args) {
+  let idx = 0;
+  return String(fmt).replace(/%(-)?(\d+)?(?:\.(\d+))?([nsdfbcxX%])/g,
+    (m, left, width, prec, conv) => {
+      if (conv === '%') return '%';
+      if (conv === 'n') return '\n';
+      const val = args[idx++];
+      let s;
+      switch (conv) {
+        case 'd': s = String(Math.round(Number(val))); break;
+        case 'f': s = Number(val).toFixed(prec !== undefined ? parseInt(prec) : 6); break;
+        case 's': s = formatJavaValue(val); break;
+        case 'b': s = String(isTruthy(val)); break;
+        case 'c': s = String(val); break;
+        case 'x': s = typeof val === 'number' ? Math.round(val).toString(16) : String(val); break;
+        case 'X': s = typeof val === 'number' ? Math.round(val).toString(16).toUpperCase() : String(val); break;
+        default: s = String(val);
+      }
+      if (prec !== undefined && conv === 's') s = s.slice(0, parseInt(prec));
+      if (width !== undefined) {
+        const w = parseInt(width);
+        s = left ? s.padEnd(w, ' ') : s.padStart(w, ' ');
+      }
+      return s;
+    });
+}
+
 /**
  * Run a block of code. Each call gets its own vars/arrays scope.
  */
 function runBlock(code, errors, parentVars, parentArrays) {
+  return runStmts(splitStatements(code), errors, parentVars, parentArrays);
+}
+
+/**
+ * Run an already-split statement list. Loop/if/try executors pass their collected
+ * statement arrays here DIRECTLY — joining them back into a string and re-splitting
+ * corrupts block structure ('{' + 'break;' + '}' would collapse into one garbage
+ * statement), which broke break/continue inside if-bodies inside loops.
+ */
+function runStmts(stmts, errors, parentVars, parentArrays) {
   const output = [];
   output._pending = '';
   const vars = parentVars ? Object.create(parentVars) : {};
   const arrays = parentArrays ? Object.create(parentArrays) : {};
 
-  const stmts = splitStatements(code);
   let i = 0;
 
   while (i < stmts.length) {
     const stmt = stmts[i].trim().replace(/\)\s+\./g, ').').replace(/\s*\n\s*/g, ' ');
     if (!stmt || stmt === '{' || stmt === '}') { i++; continue; }
 
+    // --- break / continue (inside loops) ---
+    if (/^break\s*;?$/.test(stmt)) { handleBreak(); i++; continue; }
+    if (/^continue\s*;?$/.test(stmt)) { handleContinue(); i++; continue; }
+
       // --- switch expression or statement (Java 14+) ---
-    // Match switch expression anywhere in the statement (after splitStatements collapses newlines)
+    // Match switch expression anywhere in the statement (after splitStatements collapses newlines).
+    // splitStatements keeps 'switch (cond)' and the body '{' as SEPARATE statements (the
+    // class/enum-like header split) — if the next statement is that '{', executeSwitch must
+    // see the whole thing, so re-attach the brace (and following body statements) first.
     const switchExprMatch = /switch\s*\(([^)]+)\)/.exec(stmt);
     if (switchExprMatch) {
-    
+      if (i + 1 < stmts.length && stmts[i + 1].trim() === '{') {
+        const bodyParts = [stmts[i + 1].trim()];
+        let j = i + 2;
+        let depth = 1;
+        while (j < stmts.length && depth > 0) {
+          const s = stmts[j].trim();
+          if (s === '{') depth++;
+          else if (s === '}') depth--;
+          if (depth > 0) bodyParts.push(s);
+          j++;
+        }
+        const rebuilt = stmts[i].trim() + ' ' + bodyParts.join(' ');
+        stmts[i] = rebuilt;
+        stmts.splice(i + 1, j - i - 1);
+        continue; // re-process the merged switch statement
+      }
       const swExpr = switchExprMatch[1];
       i = executeSwitch(i, stmts, swExpr, vars, arrays, output, errors);
       // Capture switch result for variable declarations
@@ -398,10 +485,10 @@ function runBlock(code, errors, parentVars, parentArrays) {
         i++;
       }
 
-      // Execute loop — rebuild body as string and re-parse each iteration
-      const bodyCode = body.join('; ');
+      // Execute loop — re-run the collected statements each iteration
       const maxIter = 10000;
       let iter = 0;
+      cfStack.push('loop');
       while (iter < maxIter) {
         let condMet = false;
         switch (op) {
@@ -416,20 +503,29 @@ function runBlock(code, errors, parentVars, parentArrays) {
         if (!condMet) break;
 
         vars[varName] = { type: 'int', value: current };
-        // Re-parse body each iteration so nested loops work
-        const innerResult = runBlock(bodyCode, errors, vars, arrays);
-        // Merge: prepend our pending to first output line, then push rest
-        if (innerResult.output.length > 0) {
-          output.push(output._pending + innerResult.output[0]);
-          output._pending = '';
-          output.push(...innerResult.output.slice(1));
+        // Re-run body each iteration so nested loops work
+        try {
+          const innerResult = runStmts(body, errors, vars, arrays);
+          // Merge: prepend our pending to first output line, then push rest
+          if (innerResult.output.length > 0) {
+            output.push(output._pending + innerResult.output[0]);
+            output._pending = '';
+            output.push(...innerResult.output.slice(1));
+          }
+          // Carry pending across iterations
+          if (innerResult._pending) output._pending += innerResult._pending;
+        } catch (e) {
+          if (e instanceof BreakSignal) break;
+          if (e instanceof ContinueSignal) { current += step; iter++; continue; }
+          throw e;
         }
-        // Carry pending across iterations
-        if (innerResult._pending) output._pending += innerResult._pending;
 
         current += step;
         iter++;
+        cfStack.pop();
+        cfStack.push('loop');
       }
+      cfStack.pop();
       continue;
     }
 
@@ -482,7 +578,8 @@ function runBlock(code, errors, parentVars, parentArrays) {
         i++;
       }
 
-      const bodyCode = body.join('; ');
+      const maxIter = values.length;
+      cfStack.push('loop');
       for (const val of values) {
         if (isMapIteration) {
           const isEntryIteration = stmt.includes('Map.Entry');
@@ -494,15 +591,99 @@ function runBlock(code, errors, parentVars, parentArrays) {
         } else {
           vars[varName] = { type: 'var', value: val };
         }
-        const innerResult = runBlock(bodyCode, errors, vars, arrays);
-        // Merge: prepend our pending to first output line, then push rest
-        if (innerResult.output.length > 0) {
-          output.push(output._pending + innerResult.output[0]);
-          output._pending = '';
-          output.push(...innerResult.output.slice(1));
+        try {
+          const innerResult = runStmts(body, errors, vars, arrays);
+          // Merge: prepend our pending to first output line, then push rest
+          if (innerResult.output.length > 0) {
+            output.push(output._pending + innerResult.output[0]);
+            output._pending = '';
+            output.push(...innerResult.output.slice(1));
+          }
+          // Carry pending across iterations
+          if (innerResult._pending) output._pending += innerResult._pending;
+        } catch (e) {
+          if (e instanceof BreakSignal) break;
+          if (e instanceof ContinueSignal) continue;
+          throw e;
         }
-        // Carry pending across iterations
-        if (innerResult._pending) output._pending += innerResult._pending;
+      }
+      cfStack.pop();
+      continue;
+    }
+
+    // --- while loop ---
+    const whileMatch = /^while\s*\((.+)\)\s*\{?$/.exec(stmt);
+    if (whileMatch) {
+      i++;
+      if (i < stmts.length && stmts[i].trim() === '{') i++;
+      const { body, nextIndex } = collectBody(stmts, i);
+      i = nextIndex;
+
+      const maxIter = 10000;
+      let iter = 0;
+      cfStack.push('loop');
+      try {
+        while (iter < maxIter) {
+          const cond = evaluateExpr(whileMatch[1], vars, arrays);
+          if (!isTruthy(cond)) break;
+          try {
+            const innerResult = runStmts(body, errors, vars, arrays);
+            if (innerResult.output.length > 0) {
+              output.push(output._pending + innerResult.output[0]);
+              output._pending = '';
+              output.push(...innerResult.output.slice(1));
+            }
+            if (innerResult._pending) output._pending += innerResult._pending;
+          } catch (e) {
+            if (e instanceof BreakSignal) break;
+            if (e instanceof ContinueSignal) { iter++; continue; }
+            throw e;
+          }
+          iter++;
+        }
+      } finally {
+        cfStack.pop();
+      }
+      continue;
+    }
+
+    // --- do { ... } while (cond); ---
+    if (/^do\s*\{?$/.test(stmt)) {
+      i++;
+      if (i < stmts.length && stmts[i].trim() === '{') i++;
+      const { body, nextIndex } = collectBody(stmts, i);
+      i = nextIndex;
+      // The trailing 'while (cond);' is the next statement after the body.
+      let condExpr = 'false';
+      if (i < stmts.length) {
+        const wm = /^while\s*\((.+)\)\s*;?$/.exec(stmts[i].trim());
+        if (wm) { condExpr = wm[1]; i++; }
+      }
+
+      const maxIter = 10000;
+      let iter = 0;
+      cfStack.push('loop');
+      try {
+        while (iter < maxIter) {
+          try {
+            const innerResult = runStmts(body, errors, vars, arrays);
+            if (innerResult.output.length > 0) {
+              output.push(output._pending + innerResult.output[0]);
+              output._pending = '';
+              output.push(...innerResult.output.slice(1));
+            }
+            if (innerResult._pending) output._pending += innerResult._pending;
+          } catch (e) {
+            if (e instanceof BreakSignal) break;
+            if (e instanceof ContinueSignal) { /* fall through to cond check */ }
+            else throw e;
+          }
+          iter++;
+          const cond = evaluateExpr(condExpr, vars, arrays);
+          if (!isTruthy(cond)) break;
+        }
+      } finally {
+        cfStack.pop();
       }
       continue;
     }
@@ -627,8 +808,7 @@ function executeIfElse(i, stmts, condExpr, vars, arrays, output, errors) {
   }
 
   function runBody(bodyStmts) {
-    const code = bodyStmts.join('; ');
-    const result = runBlock(code, errors, vars, arrays);
+    const result = runStmts(bodyStmts, errors, vars, arrays);
     if (output._pending.length > 0 && result.output.length > 0) {
       output._pending += result.output[0];
       output.push(...result.output.slice(1));
@@ -694,8 +874,7 @@ function executeTryCatch(i, stmts, vars, arrays, output, errors) {
   }
 
   function runCode(bodyStmts) {
-    const code = bodyStmts.join('; ');
-    const result = runBlock(code, errors, vars, arrays);
+    const result = runStmts(bodyStmts, errors, vars, arrays);
     output.push(...result.output);
     return result.errors;
   }
@@ -704,7 +883,7 @@ function executeTryCatch(i, stmts, vars, arrays, output, errors) {
   let throwMsg = '';
   try {
     const tryErrors = [];
-    const tryResult = runBlock(tryBody.join('; '), tryErrors, vars, arrays);
+    const tryResult = runStmts(tryBody, tryErrors, vars, arrays);
     output.push(...tryResult.output);
     if (tryResult.errors.length > 0) {
       thrownException = tryResult.errors[tryResult.errors.length - 1];
@@ -736,7 +915,7 @@ function executeTryCatch(i, stmts, vars, arrays, output, errors) {
           value: { _type: 'Exception', _class: excType, _message: excMsg, toString: function() { return this._class + ': ' + this._message; } }
         };
         const catchErrors = [];
-        const catchResult = runBlock(body.join('; '), catchErrors, vars, arrays);
+        const catchResult = runStmts(body, catchErrors, vars, arrays);
         output.push(...catchResult.output);
         errors.push(...catchErrors);
         caught = true;
@@ -750,7 +929,7 @@ function executeTryCatch(i, stmts, vars, arrays, output, errors) {
 
   if (finallyBody) {
     const finallyErrors = [];
-    const finallyResult = runBlock(finallyBody.join('; '), finallyErrors, vars, arrays);
+    const finallyResult = runStmts(finallyBody, finallyErrors, vars, arrays);
     output.push(...finallyResult.output);
   }
 
@@ -798,6 +977,53 @@ function executeStatement(stmt, vars, arrays, output, errors) {
   // System.out.println() — no args
   if (/^System\.out\.print(?:ln)?\(\);?$/.test(stmt)) {
     output.push('');
+    return;
+  }
+
+  // System.out.printf(fmt, args...) / String.format(fmt, args...)
+  const printfMatch = /^(?:System\.out\.)?printf\((.+)\);?$/.exec(stmt);
+  const formatCallMatch = !printfMatch && /^String\.format\((.+)\);?$/.exec(stmt);
+  if (printfMatch || formatCallMatch) {
+    const argsSrc = (printfMatch || formatCallMatch)[1];
+    const parts = smartSplit(argsSrc);
+    if (parts.length > 0) {
+      const fmt = evaluateExpr(parts[0].trim(), vars, arrays);
+      const args = parts.slice(1).map(a => evaluateExpr(a.trim(), vars, arrays));
+      const text = javaFormat(fmt, args);
+      if (printfMatch) {
+        // printf does NOT append a newline — append to pending output.
+        output._pending += text;
+      } else {
+        return text; // String.format is an expression (value unused here)
+      }
+    }
+    return;
+  }
+
+  // Increment / decrement statements: i++; i--;  (the for-header step is handled
+  // by the loop executors, but while/do-while bodies execute i++ as a statement)
+  const incDecMatch = /^(\w+)\s*(\+\+|--)\s*;?$/.exec(stmt);
+  if (incDecMatch) {
+    const [, name, op] = incDecMatch;
+    const v = vars[name];
+    if (v && typeof v.value === 'number') v.value = op === '++' ? v.value + 1 : v.value - 1;
+    return;
+  }
+
+  // Compound assignment: x += n; x -= n; x *= n; x /= n; x %= n; (also s += "text")
+  const compoundMatch = /^(\w+)\s*(\+=|-=|\*=|\/=|%=)\s*(.+);?$/.exec(stmt);
+  if (compoundMatch) {
+    const [, name, op, expr] = compoundMatch;
+    const v = vars[name];
+    if (v) {
+      const rhs = evaluateExpr(expr.replace(/;$/, ''), vars, arrays);
+      const cur = v.value;
+      if (op === '+=') v.value = (typeof cur === 'string' || typeof rhs === 'string') ? String(cur ?? 'null') + String(rhs ?? 'null') : cur + rhs;
+      else if (op === '-=') v.value = cur - rhs;
+      else if (op === '*=') v.value = cur * rhs;
+      else if (op === '/=') v.value = cur / rhs;
+      else if (op === '%=') v.value = cur % rhs;
+    }
     return;
   }
 
@@ -2390,6 +2616,33 @@ function executeSwitch(i, stmts, switchExpr, vars, arrays, output, errors) {
       currentBody.push(yieldMatch[1]);
       currentYieldExpr = yieldMatch[1];
     } else {
+      // A section like 'case 2: System.out.println("Tue")' (header AND body in one
+      // string — splitStatements keeps case-body statements glued to the header when
+      // they share a line) — register the header, keep only the body statements.
+      if (/^(case|default)\b/.test(bs) && !multiCaseArrowMatch && !multiCaseColonMatch
+          && !typePatternArrowMatch && !typePatternColonMatch
+          && !defaultArrowMatch && !defaultMatch) {
+        const inlineHeader = /^case\s+([^:]+)\s*:\s*([\s\S]+)$/.exec(bs);
+        const inlineDefault = /^default\s*:\s*([\s\S]+)$/.exec(bs);
+        if (inlineHeader) {
+          if (currentCase !== null && currentBody.length > 0) {
+            cases.push({ value: currentCase, body: currentBody, typePattern: null, yieldExpr: currentYieldExpr });
+          }
+          currentCase = inlineHeader[1].trim();
+          currentBody = [inlineHeader[2].trim()];
+          currentYieldExpr = null;
+          continue;
+        }
+        if (inlineDefault) {
+          if (currentCase !== null && currentBody.length > 0) {
+            cases.push({ value: currentCase, body: currentBody, typePattern: null, yieldExpr: currentYieldExpr });
+          }
+          currentCase = null;
+          currentBody = [inlineDefault[1].trim()];
+          currentYieldExpr = null;
+          continue;
+        }
+      }
       currentBody.push(bs);
     }
   }
@@ -2445,8 +2698,7 @@ function executeSwitch(i, stmts, switchExpr, vars, arrays, output, errors) {
           if (r.output.length > 0) output.push(...r.output);
           if (r._pending) output.push(r._pending);
         } else {
-          const bodyToRun = c.body.join('; ');
-          const result = runBlock(bodyToRun, errors, vars, arrays);
+          const result = runStmts(c.body, errors, vars, arrays);
           if (result.output.length > 0) output.push(...result.output);
           if (result._pending) output.push(result._pending);
           if (c.body.length === 1) {
@@ -2472,8 +2724,9 @@ function executeSwitch(i, stmts, switchExpr, vars, arrays, output, errors) {
           if (r.output.length > 0) output.push(...r.output);
           if (r._pending) output.push(r._pending);
         } else {
-          const bodyToRun = c.body.join('; ');
-          const result = runBlock(bodyToRun, errors, vars, arrays);
+          cfStack.push('switch');
+          const result = runStmts(c.body, errors, vars, arrays);
+          cfStack.pop();
           if (result.output.length > 0) output.push(...result.output);
           if (result._pending) output.push(result._pending);
           if (c.body.length === 1) {
@@ -2484,6 +2737,19 @@ function executeSwitch(i, stmts, switchExpr, vars, arrays, output, errors) {
         break;
       }
     }
+  }
+
+  // Nothing matched — run the default case (classic switch statements).
+  if (!matched && defaultBody) {
+    cfStack.push('switch');
+    const result = runStmts(defaultBody.body, errors, vars, arrays);
+    cfStack.pop();
+    if (result.output.length > 0) output.push(...result.output);
+    if (result._pending) output.push(result._pending);
+    if (defaultBody.body.length === 1) {
+      lastMatchResult = evaluateExpr(defaultBody.body[0], vars, arrays);
+    }
+    matched = true; // a default arm is a valid outcome for switch *expressions* too
   }
 
   vars['__switchResult__'] = matched ? (lastMatchResult !== undefined ? lastMatchResult : '') : (defaultBody ? '' : undefined);
