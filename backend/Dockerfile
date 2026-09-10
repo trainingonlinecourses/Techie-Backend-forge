@@ -19,4 +19,10 @@ WORKDIR /app
 ENV PORT=8080
 COPY --from=build /build/target/academy-api-*.jar app.jar
 EXPOSE 8080
-ENTRYPOINT ["java", "-XX:+UseContainerSupport", "-jar", "app.jar"]
+# Render free tier gives the container 512 MB. The JDK's container-aware default
+# heap is 25% of that (128 MB) — too small for Hibernate + 900 content rows, which
+# shows up as GC thrash/OOM crash-loops that look like "service never starts".
+# 75% heap + SerialGC (right choice for small heaps) keeps startup fast and stable.
+# (Container support is on by default, which is what makes MaxRAMPercentage work.)
+ENTRYPOINT ["java", "-XX:MaxRAMPercentage=75.0", "-XX:+UseSerialGC", \
+  "-XX:+ExitOnOutOfMemoryError", "-jar", "app.jar"]

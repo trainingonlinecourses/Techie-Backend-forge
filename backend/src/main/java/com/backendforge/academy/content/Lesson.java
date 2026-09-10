@@ -31,6 +31,15 @@ public class Lesson {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String body;
 
+    /**
+     * SHA-256 (hex) of the raw source markdown this row was seeded from. Lets the
+     * {@link ContentLoader} fast-path skip unchanged lessons on restart instead of
+     * rewriting every row. Nullable in the schema for backward compatibility with
+     * rows seeded before this column existed.
+     */
+    @Column(name = "content_hash", length = 64)
+    private String contentHash;
+
     @ElementCollection(fetch = FetchType.EAGER)   // tiny metadata lists — safe to load eagerly
     @org.hibernate.annotations.BatchSize(size = 50) // one query per 50 lessons, not one per lesson
     private List<String> topics = new ArrayList<>();
@@ -60,4 +69,6 @@ public class Lesson {
     public List<String> getDocs() { return docs; }
     public boolean isCapstone() { return capstone; }
     public void setCapstone(boolean capstone) { this.capstone = capstone; }
+    public String getContentHash() { return contentHash; }
+    public void setContentHash(String contentHash) { this.contentHash = contentHash; }
 }

@@ -21,6 +21,13 @@ spring:
     properties:
       hibernate:
         format_sql: true
+        # Batch INSERTs/UPDATEs: the content seeder writes ~900 rows on a content
+        # change; batching turns ~900 round trips into ~20. order_inserts groups
+        # same-entity statements so batches actually form.
+        jdbc:
+          batch_size: 50
+        order_inserts: true
+        order_updates: true
   h2:
     console:
       enabled: false

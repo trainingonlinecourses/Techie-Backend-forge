@@ -31,6 +31,10 @@ public class Module {
     @ElementCollection(fetch = FetchType.EAGER)   // tiny metadata list — safe to load eagerly
     private List<String> tech = new ArrayList<>();
 
+    /** SHA-256 (hex) of the module's source JSON entry — seed fast-path (see ContentLoader). */
+    @Column(name = "content_hash", length = 64)
+    private String contentHash;
+
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
     public String getTitle() { return title; }
@@ -44,4 +48,6 @@ public class Module {
     public String getDocsUrl() { return docsUrl; }
     public void setDocsUrl(String docsUrl) { this.docsUrl = docsUrl; }
     public List<String> getTech() { return tech; }
+    public String getContentHash() { return contentHash; }
+    public void setContentHash(String contentHash) { this.contentHash = contentHash; }
 }

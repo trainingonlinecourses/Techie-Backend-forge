@@ -1,5 +1,6 @@
 package com.backendforge.academy.content;
 
+import com.backendforge.academy.content.ContentDtos.*;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -22,9 +24,24 @@ import java.util.regex.Pattern;
  * <ul>
  *   <li>{@code modules.json} — module metadata</li>
  *   <li>{@code lessons/<module>/<slug>.md} — lessons with YAML-ish front matter</li>
- *   <li>{@code docs-index.json} — curated links into the official docs</li>
+ *   <li>{@code docs-index.json} — curated links into the official docs (via DocsIndexService)</li>
  * </ul>
- * Idempotent: re-runs update existing rows instead of duplicating them.
+ *
+ * <p><b>Why this loader is fast:</b> the first version did one {@code findById} SELECT plus
+ * one {@code save} per lesson/module — ~1,800 sequential round trips to a remote Postgres
+ * (Supabase/Render pooler) on every boot, which pushed startup into minutes on the free tier.
+ * This version:
+ * <ol>
+ *   <li>Parses all classpath content up front (cheap, local jar reads).</li>
+ *   <li>Compares per-row SHA-256 content hashes with two lightweight SELECTs. If nothing
+ *       changed — the common case — it touches nothing else and returns immediately.</li>
+ *   <li>When content did change, it wipes the two content tables and re-inserts every row
+ *       as a batch (with {@code hibernate.jdbc.batch_size}, that is a handful of INSERT
+ *       statements, not thousands of round trips).</li>
+ * </ol>
+ * Idempotent and safe to re-run; user data (progress, chats, users) lives in other tables
+ * and is never touched. Lesson/module ids are stable across reseeds, so progress entries
+ * that reference lesson ids keep working.
  */
 @Component
 public class ContentLoader implements CommandLineRunner {
@@ -50,39 +67,56 @@ public class ContentLoader implements CommandLineRunner {
     @Override
     @Transactional
     public void run(String... args) throws Exception {
-        loadModules();
-        loadLessons();
+        long t0 = System.nanoTime();
+
+        List<Map<String, Object>> rawModules = readModulesJson();
+        List<SeedLesson> seedLessons = readLessonFiles();
+
+        if (databaseMatches(rawModules, seedLessons)) {
+            docsIndex.load();
+            log.info("Content ready (unchanged, skipped reseed): {} modules, {} lessons, {} doc links in {} ms",
+                    rawModules.size(), seedLessons.size(), docsIndex.count(),
+                    (System.nanoTime() - t0) / 1_000_000);
+            return;
+        }
+
+        log.info("Content changed (or first boot) — reseeding {} modules and {} lessons",
+                rawModules.size(), seedLessons.size());
+        lessons.deleteAllInBatch();
+        modules.deleteAllInBatch();
+        for (Map<String, Object> m : rawModules) {
+            modules.save(toModule(m));
+        }
+        for (SeedLesson sl : seedLessons) {
+            lessons.save(toLesson(sl));
+        }
+
         docsIndex.load();
-        log.info("Content ready: {} modules, {} lessons, {} doc links",
-                modules.count(), lessons.count(), docsIndex.count());
+        log.info("Content ready (reseeded): {} modules, {} lessons, {} doc links in {} ms",
+                rawModules.size(), seedLessons.size(), docsIndex.count(),
+                (System.nanoTime() - t0) / 1_000_000);
     }
 
-    private void loadModules() throws IOException {
+    // ---- seed data reading (classpath only, no DB) ---------------------------
+
+    private List<Map<String, Object>> readModulesJson() throws IOException {
         try (InputStream in = getClass().getResourceAsStream("/content/modules.json")) {
             if (in == null) throw new IllegalStateException("content/modules.json missing on classpath");
-            List<Map<String, Object>> raw = mapper.readValue(in, new TypeReference<>() {});
-            for (Map<String, Object> m : raw) {
-                // Reuse existing rows (like loadLessons) — on Postgres a plain
-                // save() with a set id always INSERTs, so a redeploy against a
-                // populated database would die with a duplicate-key error.
-                String id = (String) m.get("id");
-                Module module = modules.findById(id).orElseGet(Module::new);
-                module.setId(id);
-                module.setTitle((String) m.get("title"));
-                module.setSubtitle((String) m.get("subtitle"));
-                module.setOrderIndex((Integer) m.get("order"));
-                module.setColor((String) m.get("color"));
-                module.setDocsUrl((String) m.get("docsUrl"));
-                module.getTech().clear();
-                module.getTech().addAll(castStringList(m.get("tech")));
-                modules.save(module);
-            }
+            return mapper.readValue(in, new TypeReference<>() {});
         }
     }
 
-    private void loadLessons() throws IOException {
+    private record SeedLesson(String moduleId, String slug, String rawText,
+                              Map<String, String> meta, String body, String hash) {}
+
+    private List<SeedLesson> readLessonFiles() throws IOException {
         Resource[] resources = new PathMatchingResourcePatternResolver()
                 .getResources("classpath:content/lessons/*/*.md");
+        List<SeedLesson> result = new ArrayList<>(resources.length);
+        // Lesson ids are the file slug (globally unique in the DB). A slug repeated
+        // across two module folders collapses to one row (last file wins — the same
+        // semantics save() gives us), so dedupe here to keep counts comparable.
+        Map<String, SeedLesson> bySlug = new LinkedHashMap<>();
         for (Resource resource : resources) {
             String url = resource.getURL().toString(); // .../content/lessons/<module>/<slug>.md
             int idx = url.indexOf("/content/lessons/");
@@ -90,27 +124,101 @@ public class ContentLoader implements CommandLineRunner {
             String[] parts = rel.split("/");
             String moduleId = parts[parts.length - 2];
             String slug = parts[parts.length - 1].replaceAll("\\.md$", "");
-            String text = resource.getContentAsString(StandardCharsets.UTF_8);
+            String text = resource.getContentAsString(StandardCharsets.UTF_8)
+                    .replace("\r\n", "\n"); // normalize CRLF (Windows checkouts) so front matter parses and hashes are platform-stable
 
             ParsedLesson parsed = parse(text);
-            Lesson lesson = lessons.findById(slug).orElseGet(Lesson::new);
-            lesson.setId(slug);
-            lesson.setModuleId(moduleId);
-            lesson.setTitle(parsed.meta.getOrDefault("title", slug));
-            lesson.setSummary(parsed.meta.getOrDefault("summary", ""));
-            lesson.setOrderIndex(parseInt(parsed.meta.get("order"), 99));
-            lesson.setMinutes(parseInt(parsed.meta.get("minutes"), 10));
-            lesson.setCapstone(Boolean.parseBoolean(parsed.meta.getOrDefault("capstone", "false")));
-            lesson.getTopics().clear();
-            lesson.getTopics().addAll(parseList(parsed.meta.get("topics")));
-            lesson.getDocs().clear();
-            lesson.getDocs().addAll(parseList(parsed.meta.get("docs")));
-            lesson.setBody(parsed.body);
-            lessons.save(lesson);
+            bySlug.put(slug, new SeedLesson(moduleId, slug, text, parsed.meta(), parsed.body(),
+                    sha256(text)));
+        }
+        result.addAll(bySlug.values());
+        return result;
+    }
+
+    // ---- change detection ----------------------------------------------------
+
+    /**
+     * True when the database already holds exactly this content (same ids, same hashes).
+     * Two hash-aggregating SELECTs total — no per-row lookups.
+     */
+    private boolean databaseMatches(List<Map<String, Object>> rawModules,
+                                    List<SeedLesson> seedLessons) {
+        if (lessons.count() != seedLessons.size() || modules.count() != rawModules.size()) {
+            return false;
+        }
+        Map<String, String> dbLessonHashes = new HashMap<>();
+        for (Object[] row : lessons.findAllIdAndHash()) {
+            dbLessonHashes.put((String) row[0], (String) row[1]);
+        }
+        for (SeedLesson sl : seedLessons) {
+            if (!sl.hash().equals(dbLessonHashes.get(sl.slug()))) return false;
+        }
+        Map<String, String> dbModuleHashes = new HashMap<>();
+        for (Object[] row : modules.findAllIdAndHash()) {
+            dbModuleHashes.put((String) row[0], (String) row[1]);
+        }
+        for (Map<String, Object> m : rawModules) {
+            String id = (String) m.get("id");
+            if (!moduleHash(m).equals(dbModuleHashes.get(id))) return false;
+        }
+        return true;
+    }
+
+    // ---- entity mapping -------------------------------------------------------
+
+    private Module toModule(Map<String, Object> m) {
+        Module module = new Module();
+        module.setId((String) m.get("id"));
+        module.setTitle((String) m.get("title"));
+        module.setSubtitle((String) m.get("subtitle"));
+        module.setOrderIndex((Integer) m.get("order"));
+        module.setColor((String) m.get("color"));
+        module.setDocsUrl((String) m.get("docsUrl"));
+        module.getTech().addAll(castStringList(m.get("tech")));
+        module.setContentHash(moduleHash(m));
+        return module;
+    }
+
+    private Lesson toLesson(SeedLesson sl) {
+        Lesson lesson = new Lesson();
+        lesson.setId(sl.slug());
+        lesson.setModuleId(sl.moduleId());
+        lesson.setTitle(sl.meta().getOrDefault("title", sl.slug()));
+        lesson.setSummary(sl.meta().getOrDefault("summary", ""));
+        lesson.setOrderIndex(parseInt(sl.meta().get("order"), 99));
+        lesson.setMinutes(parseInt(sl.meta().get("minutes"), 10));
+        lesson.setCapstone(Boolean.parseBoolean(sl.meta().getOrDefault("capstone", "false")));
+        lesson.getTopics().addAll(parseList(sl.meta().get("topics")));
+        lesson.getDocs().addAll(parseList(sl.meta().get("docs")));
+        lesson.setBody(sl.body());
+        lesson.setContentHash(sl.hash());
+        return lesson;
+    }
+
+    /** Modules are small — hash their JSON fragment (order-independent enough for change detection). */
+    private String moduleHash(Map<String, Object> m) {
+        try {
+            return sha256(mapper.writeValueAsString(m));
+        } catch (Exception e) {
+            // Should never happen for a parsed tree; fall back to a full reseed signal.
+            return UUID.randomUUID().toString();
         }
     }
 
-    // ---- helpers -----------------------------------------------------------
+    // ---- hashing / parsing helpers -------------------------------------------
+
+    private static String sha256(String text) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(text.getBytes(StandardCharsets.UTF_8));
+            StringBuilder hex = new StringBuilder(64);
+            for (byte b : hash) hex.append(Character.forDigit((b >> 4) & 0xF, 16))
+                    .append(Character.forDigit(b & 0xF, 16));
+            return hex.toString();
+        } catch (Exception e) {
+            throw new IllegalStateException("SHA-256 unavailable", e);
+        }
+    }
 
     private record ParsedLesson(Map<String, String> meta, String body) {}
 
