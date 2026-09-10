@@ -20,6 +20,7 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
+jobs:
   content:
     name: Content integrity (curriculum)
     runs-on: ubuntu-latest
