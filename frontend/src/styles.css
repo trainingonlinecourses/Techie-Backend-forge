@@ -2271,10 +2271,15 @@ typing i:nth-child(3) { animation-delay: 0.3s; }
 
 /* ---- Hero card: slim band-progress bar under the meta line ---- */
 .cc-progress {
-  height: 5px; border-radius: 999px; background: rgba(245,166,35,.15);
+  position: relative; height: 5px; border-radius: 999px; background: rgba(245,166,35,.15);
   overflow: hidden; margin-top: 9px; max-width: 460px;
 }
 .cc-progress-fill { height: 100%; border-radius: 999px; transition: width .5s ease; }
+/* quarter-way milestone ticks — under the fill, so they read as background notches */
+.cc-progress-tick {
+  position: absolute; top: 0; bottom: 0; width: 2px;
+  background: rgba(245,166,35,.28); pointer-events: none;
+}
 
 /* ---- Hero card: guided CTA + "Pick a band" side by side ---- */
 .cc-actions { display: flex; flex-direction: column; gap: 8px; align-items: stretch; flex-shrink: 0; }

@@ -205,6 +205,9 @@ export default function Home() {
                   </span>
                   <div className="cc-progress" role="progressbar" aria-valuenow={bandPct} aria-valuemin={0} aria-valuemax={100}
                        aria-label={`${bandDone} of ${bandTotal} ${recInfo.band} lessons completed`}>
+                    {[25, 50, 75, 100].map((pct) => (
+                      <span key={pct} className="cc-progress-tick" style={{ left: `calc(${pct}% - 1px)` }} aria-hidden="true" />
+                    ))}
                     <div className="cc-progress-fill" style={{ width: `${bandPct}%`, background: bandColor }} />
                   </div>
                 </div>
