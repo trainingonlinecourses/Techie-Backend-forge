@@ -6,9 +6,9 @@ import { useProgress } from '../hooks/useProgress.js';
 import { FALLBACK_CURRICULUM } from '../fallbackCurriculum.js';
 import { SkeletonCard } from '../components/Skeleton.jsx';
 import ProgressRing from '../components/ProgressRing.jsx';
+import { LEVELS, recommendBand, nextModuleInBand } from '../lib/bands.js';
 
-// Learning-path levels, in curriculum order — the Home page groups modules by these.
-const LEVELS = ['foundation', 'intermediate', 'advanced', 'expert'];
+// Learning-path levels, in curriculum order — see lib/bands.js for the shared logic.
 const LEVEL_LABEL = {
   foundation: '🌱 Foundation — start here',
   intermediate: '🚀 Intermediate — the modern language',
@@ -73,6 +73,19 @@ export default function Home() {
       try { localStorage.setItem(BAND_KEY, urlBand); } catch { /* ignore */ }
     }
   }, [urlBand, storedBand]);
+
+  // First visit (no stored choice, no ?band=): land the learner in the first band
+  // with unfinished work, and highlight the exact module to start next.
+  const recommended = useMemo(
+    () => recommendBand(curriculum, progress),
+    [curriculum, progress]
+  );
+  const isFirstVisit = !urlBand && !storedBand;
+  const activeBand = band === 'all' && isFirstVisit && recommended ? recommended : band;
+  const nextUp = useMemo(
+    () => (activeBand === 'all' ? null : nextModuleInBand(curriculum, activeBand, progress)),
+    [curriculum, activeBand, progress]
+  );
 
   // The next incomplete lesson, in curriculum order — powers the "Continue learning" card.
   const nextLesson = useMemo(() => {
@@ -183,8 +196,8 @@ export default function Home() {
         <div className="band-tabs" role="tablist" aria-label="Filter curriculum by level">
           <button
             role="tab"
-            aria-selected={band === 'all'}
-            className={`band-tab ${band === 'all' ? 'active' : ''}`}
+            aria-selected={activeBand === 'all'}
+            className={`band-tab ${activeBand === 'all' ? 'active' : ''}`}
             onClick={() => pickBand('all')}
           >
             All bands
@@ -194,11 +207,12 @@ export default function Home() {
             <button
               key={lv}
               role="tab"
-              aria-selected={band === lv}
-              className={`band-tab ${lv} ${band === lv ? 'active' : ''}`}
+              aria-selected={activeBand === lv}
+              className={`band-tab ${lv} ${activeBand === lv ? 'active' : ''}`}
               onClick={() => pickBand(lv)}
             >
               {LEVEL_SHORT[lv]}
+              {recommended === lv && <span className="band-tab-rec" title="Your next band to progress in" />}
               <span className="band-tab-count">{levelStats[lv].done}/{levelStats[lv].total}</span>
             </button>
           ))}
@@ -209,7 +223,7 @@ export default function Home() {
           {Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)}
         </div>
       )}
-      {LEVELS.filter((lv) => band === 'all' || band === lv).map((lv) => {
+      {LEVELS.filter((lv) => activeBand === 'all' || activeBand === lv).map((lv) => {
         const mods = (curriculum || []).filter((m) => m.module.level === lv);
         if (!curriculum || mods.length === 0) return null;
         const lvTotal = mods.reduce((n, m) => n + (m.module.lessonCount ?? m.lessons.length), 0);
@@ -231,8 +245,10 @@ export default function Home() {
               const total = m.module.lessonCount ?? m.lessons.length;
               const done = m.lessons.filter((l) => progress[l.id]).length;
               const pct = total > 0 ? Math.round(done / total * 100) : 0;
+              const isNextUp = nextUp?.module.id === m.module.id;
               return (
-                <Link key={m.module.id} to={`/modules/${m.module.id}`} className="modcard" data-num={m.module.order} style={{ animationDelay: `${Math.min(i * 0.03, 0.3)}s` }}>
+                <Link key={m.module.id} to={`/modules/${m.module.id}`} className={`modcard ${isNextUp ? 'next-up' : ''}`} data-num={m.module.order} style={{ animationDelay: `${Math.min(i * 0.03, 0.3)}s` }}>
+                  {isNextUp && <span className="next-up-chip">▶ Start here</span>}
                   <div className="modcard-top">
                     <div className="g">MODULE {String(m.module.order).padStart(2, '0')}</div>
                     <div className="modcard-head">
