@@ -190,7 +190,8 @@ export default function Home() {
       <p className="lede">
         {curriculum?.length || '…'} modules, sorted the way Java itself grew — and the way you should learn it:
         foundations first, then the modern language (Java 8 → 26), then the framework, then production practice —
-        finishing with a complete runnable project.
+        finishing with a complete runnable project.{' '}
+        <Link to="/timeline" className="tl-inline-link">Prefer the release story? Walk the 1.0 → 26 timeline →</Link>
       </p>
       {curriculum && curriculum.length > 0 && (
         <div className="band-tabs" role="tablist" aria-label="Filter curriculum by level">

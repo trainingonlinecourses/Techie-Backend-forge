@@ -101,6 +101,7 @@ export default function Navbar({ onMenu, drawerOpen }) {
       )}
 
       <nav className="navlinks">
+        <Link to="/timeline">Timeline</Link>
         <Link to="/docs">Docs</Link>
         <Link to="/chat" className="chatlink">
           <span className="pulse" /> AI Tutor

@@ -18,6 +18,7 @@ import NotFound from './pages/NotFound.jsx';
 import QuizPage from './pages/QuizPage.jsx';
 import CertificatePage from './pages/CertificatePage.jsx';
 import ProgressPage from './pages/ProgressPage.jsx';
+import TimelinePage from './pages/TimelinePage.jsx';
 import AdminReorderPage from './pages/AdminReorderPage.jsx';
 import MobileBottomNav from './components/MobileBottomNav.jsx';
 import './components/mobile.css';
@@ -96,6 +97,7 @@ export default function App() {
             <Route path="/modules/:moduleId" element={<ModulePage />} />
             <Route path="/lessons/:lessonId" element={<LessonPage />} />
             <Route path="/search" element={<SearchPage />} />
+            <Route path="/timeline" element={<TimelinePage />} />
             <Route path="/docs" element={<DocsPage />} />
             <Route
               path="/chat"
