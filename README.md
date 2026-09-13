@@ -396,3 +396,4 @@ uses the server-configured provider (free Hugging Face endpoint by default).
   health check at `/actuator/health`.
 - **Local:** backend on `:8080`, frontend dev server on `:5173` (proxies `/api`).
 
+
