@@ -1,5 +1,7 @@
 package com.backendforge.academy.progress;
 
+import com.backendforge.academy.analytics.AnalyticsEvent;
+import com.backendforge.academy.analytics.AnalyticsService;
 import com.backendforge.academy.common.NotFoundException;
 import com.backendforge.academy.content.LessonRepository;
 import com.backendforge.academy.user.User;
@@ -17,11 +19,14 @@ public class ProgressService {
     private final ProgressRepository progress;
     private final LessonRepository lessons;
     private final UserRepository users;
+    private final AnalyticsService analytics;
 
-    public ProgressService(ProgressRepository progress, LessonRepository lessons, UserRepository users) {
+    public ProgressService(ProgressRepository progress, LessonRepository lessons, UserRepository users,
+                           AnalyticsService analytics) {
         this.progress = progress;
         this.lessons = lessons;
         this.users = users;
+        this.analytics = analytics;
     }
 
     public Map<String, Boolean> progressMap(Long userId) {
@@ -51,6 +56,9 @@ public class ProgressService {
             entry.setLessonId(lessonId);
             entry.setUser(user);
             progress.save(entry);
+            // Outcome metric for the recommendation A/B experiment (server-recorded,
+            // new completions only — un-re-marking and re-marking doesn't double count).
+            analytics.record(user, AnalyticsEvent.Surface.LESSON_COMPLETED, lessonId, null);
         }
     }
 

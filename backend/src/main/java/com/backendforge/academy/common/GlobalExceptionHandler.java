@@ -44,6 +44,13 @@ public class GlobalExceptionHandler {
                 .body(ApiError.of(400, "Bad Request", "Validation failed", req.getRequestURI(), errors));
     }
 
+    /** Controllers throwing ResponseStatusException get their intended status, not the generic 500. */
+    @ExceptionHandler(org.springframework.web.server.ResponseStatusException.class)
+    ResponseEntity<ApiError> statusException(org.springframework.web.server.ResponseStatusException ex, HttpServletRequest req) {
+        return ResponseEntity.status(ex.getStatusCode())
+                .body(ApiError.of(ex.getStatusCode().value(), ex.getStatusCode().toString(), ex.getReason(), req.getRequestURI()));
+    }
+
     /** Rate-limited login — return 429 before the generic 401 handler. */
     @ExceptionHandler(org.springframework.security.authentication.DisabledException.class)
     ResponseEntity<ApiError> rateLimited(org.springframework.security.authentication.DisabledException ex, HttpServletRequest req) {

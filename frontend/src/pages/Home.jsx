@@ -7,6 +7,7 @@ import { FALLBACK_CURRICULUM } from '../fallbackCurriculum.js';
 import { SkeletonCard } from '../components/Skeleton.jsx';
 import ProgressRing from '../components/ProgressRing.jsx';
 import { LEVELS, recommendBand, nextModuleInBand, explainRecommendation } from '../lib/bands.js';
+import { trackChipClick, trackRibbonJump, markRecommendedVisit } from '../lib/analytics.js';
 
 // Learning-path levels, in curriculum order — see lib/bands.js for the shared logic.
 const LEVEL_LABEL = {
@@ -124,6 +125,18 @@ export default function Home() {
     return map;
   }, [curriculum, progress]);
 
+  function openFromChip() {
+    if (!nextUp || !user) return;
+    trackChipClick(nextUp.lesson.id, activeBand);
+    markRecommendedVisit(nextUp.lesson.id);
+  }
+
+  function jumpFromRibbon() {
+    if (!user || !nextUp) return;
+    trackRibbonJump(recInfo.band);
+    markRecommendedVisit(nextUp.lesson.id);
+  }
+
   function pickBand(lv) {
     const next = new URLSearchParams(searchParams);
     if (lv === 'all') next.delete('band');
@@ -211,7 +224,7 @@ export default function Home() {
           <span className="rec-ribbon-badge">Recommended for you</span>
           <span className="rec-ribbon-reason">{recInfo.reason}</span>
           {activeBand !== recInfo.band && (
-            <button className="rec-ribbon-go" onClick={() => pickBand(recInfo.band)}>
+            <button className="rec-ribbon-go" onClick={() => { jumpFromRibbon(); pickBand(recInfo.band); }}>
               Show the {LEVEL_SHORT[recInfo.band].replace(/^[^ ]+ /, '')} band →
             </button>
           )}
@@ -247,6 +260,7 @@ export default function Home() {
             <Link
               to={`/lessons/${nextUp.lesson.id}`}
               className="continue-chip"
+              onClick={openFromChip}
               title={`Next up in ${activeBand === 'all' ? 'the curriculum' : LEVEL_LABEL[activeBand]}: ${nextUp.lesson.title} (${nextUp.module.title})`}
             >
               <span className="continue-chip-label">{scopeStarted ? '▶ Continue where you left off' : '▶ Start here'}</span>

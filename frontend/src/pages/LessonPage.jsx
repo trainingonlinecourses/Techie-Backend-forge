@@ -9,6 +9,7 @@ import AudioPlayer from '../components/AudioPlayer.jsx';
 import JavaIdeEditor from '../components/JavaIdeEditor.jsx';
 import KeyboardShortcuts from '../components/KeyboardShortcuts.jsx';
 import { SkeletonLesson } from '../components/Skeleton.jsx';
+import { trackManualNavigation, isRecommendedVisit } from '../lib/analytics.js';
 
 export default function LessonPage() {
   const { lessonId } = useParams();
@@ -38,6 +39,15 @@ export default function LessonPage() {
     api.get('/content/curriculum').then((res) => setCurriculum(res.data)).catch(() => {});
     window.scrollTo(0, 0);
   }, [lessonId]);
+
+  // A/B analytics: a lesson visit that didn't come through a recommendation
+  // surface is the control observation. The flag is lesson-scoped and checked
+  // non-destructively — StrictMode double-runs this effect in dev.
+  useEffect(() => {
+    if (!user || !lessonId) return;
+    if (isRecommendedVisit(lessonId)) return; // chip/ribbon click already logged this visit
+    trackManualNavigation(lessonId);
+  }, [lessonId, user?.id]);
 
   // Reading progress bar + scroll-spy TOC + back-to-top visibility.
   useEffect(() => {
