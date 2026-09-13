@@ -395,3 +395,4 @@ uses the server-configured provider (free Hugging Face endpoint by default).
 - **Backend (Render, after step 1):** https://backendforge-academy-api-bef2.onrender.com —
   health check at `/actuator/health`.
 - **Local:** backend on `:8080`, frontend dev server on `:5173` (proxies `/api`).
+
