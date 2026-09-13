@@ -14,6 +14,9 @@ import java.nio.charset.StandardCharsets;
 @Configuration
 public class DatabaseConfig {
 
+    private static final org.slf4j.Logger log =
+            org.slf4j.LoggerFactory.getLogger(DatabaseConfig.class);
+
     /**
      * Builds the Hikari pool from DATABASE_URL. Supported formats (all work with
      * Supabase, Render Postgres, Railway, Neon, ...):
@@ -31,9 +34,14 @@ public class DatabaseConfig {
      * through to the PostgreSQL JDBC driver untouched.
      */
     @Bean
-    @ConditionalOnProperty(name = "DATABASE_URL", havingValue = "true", matchIfMissing = false)
+    @ConditionalOnProperty(name = "DATABASE_URL", matchIfMissing = false)
     DataSource dataSource(Environment env) throws URISyntaxException {
-        String raw = env.getProperty("DATABASE_URL").trim();
+        String raw = env.getProperty("DATABASE_URL") == null ? "" : env.getProperty("DATABASE_URL").trim();
+        if (raw.isBlank()) {
+            throw new IllegalStateException(
+                    "DATABASE_URL is set but blank — remove the variable or provide a "
+                    + "postgres connection string.");
+        }
 
         // Tolerate a pre-built JDBC URL: strip "jdbc:" so the rest parses like a normal URL.
         String toParse = raw.startsWith("jdbc:") ? raw.substring("jdbc:".length()) : raw;
@@ -56,6 +64,12 @@ public class DatabaseConfig {
         String[] creds = uri.getUserInfo() == null ? new String[0] : uri.getUserInfo().split(":", 2);
         if (creds.length > 0) ds.setUsername(urlDecode(creds[0]));
         if (creds.length > 1) ds.setPassword(urlDecode(creds[1]));
+
+        // Loud, greppable startup line: a silent-H2-in-production failure mode
+        // cost real user registrations once — never let the active database be a guess.
+        log.info("DATABASE_URL detected → PostgreSQL pool: {}:{}/{} (user: {})",
+                uri.getHost(), port, path.replaceFirst("^/", ""),
+                creds.length > 0 ? creds[0] : "?");
 
         // Supabase's pooler (host like aws-0-<region>.pooler.supabase.com, port 6543)
         // fronts PgBouncer in transaction mode: each connection returns to the pool
@@ -90,9 +104,13 @@ public class DatabaseConfig {
      */
     public void assertExternalDatabase(Environment env, java.util.function.Function<Environment, Boolean> isLocal) {
         if (isLocal.apply(env)) {
+            if (env.getProperty("DATABASE_URL") == null) {
+                log.info("No DATABASE_URL — using the local H2 file database (local/test only; "
+                        + "data lives in ./data and is NOT durable on hosting platforms).");
+            }
             return;
         }
-        if (env.getProperty("DATABASE_URL") == null) {
+        if (env.getProperty("DATABASE_URL") == null || env.getProperty("DATABASE_URL").isBlank()) {
             throw new IllegalStateException(
                     "No DATABASE_URL configured for this non-local environment. The application " +
                     "refuses to start against the default H2 file database because user data " +

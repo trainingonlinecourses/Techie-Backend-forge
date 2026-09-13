@@ -100,6 +100,31 @@ class DatabaseConfigTest {
                 .hasMessageContaining("mysql");
     }
 
+    @Test
+    @DisplayName("Blank DATABASE_URL is rejected, not silently ignored")
+    void rejectsBlankUrl() {
+        assertThatThrownBy(() -> config.dataSource(env("   ")))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("blank");
+    }
+
+    @Test
+    @DisplayName("REGRESSION: DATABASE_URL must activate the datasource by PRESENCE — never by value")
+    void datasourceConditionMatchesPresenceNotValue() {
+        // The original bug: @ConditionalOnProperty(havingValue = "true") made the bean
+        // match only when the env var literally equalled "true", so a real Postgres URL
+        // silently fell through to the ephemeral default H2 — registrations were lost on
+        // every restart. The condition must match whenever the property is present.
+        new org.springframework.boot.test.context.runner.ApplicationContextRunner()
+                .withUserConfiguration(DatabaseConfig.class)
+                .withPropertyValues("DATABASE_URL=postgresql://u:p@localhost:5432/db")
+                .run(context -> assertThat(context).hasBean("dataSource"));
+
+        new org.springframework.boot.test.context.runner.ApplicationContextRunner()
+                .withUserConfiguration(DatabaseConfig.class)
+                .run(context -> assertThat(context).doesNotHaveBean("dataSource"));
+    }
+
     private MockEnvironment env(String databaseUrl) {
         MockEnvironment env = new MockEnvironment();
         env.setProperty("DATABASE_URL", databaseUrl);
