@@ -257,6 +257,13 @@ export default function Home() {
                     onClick={() => {
                       setTabsGlow(true);
                       document.getElementById('band-tabs-anchor')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                      // Screen-reader focus lands on the ACTIVE tab — a real
+                      // role="tab" button, announced with its selected state and
+                      // position. preventScroll stops focus from yanking the
+                      // viewport and cancelling the smooth scroll above.
+                      document
+                        .querySelector('#band-tabs-anchor [role="tab"][aria-selected="true"]')
+                        ?.focus({ preventScroll: true });
                     }}
                   >
                     Pick a band{recInfo?.band ? ` — we suggest ${LEVEL_SHORT[recInfo.band].replace(/^[^ ]+ /, '')}` : ''}
