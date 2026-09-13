@@ -7,7 +7,7 @@ import { FALLBACK_CURRICULUM } from '../fallbackCurriculum.js';
 import { SkeletonCard } from '../components/Skeleton.jsx';
 import ProgressRing from '../components/ProgressRing.jsx';
 import { LEVELS, recommendBand, nextModuleInBand, explainRecommendation } from '../lib/bands.js';
-import { trackChipClick, trackRibbonJump, markRecommendedVisit } from '../lib/analytics.js';
+import { trackChipClick, trackRibbonJump, markRecommendedVisit, trackImpression } from '../lib/analytics.js';
 
 // Learning-path levels, in curriculum order — see lib/bands.js for the shared logic.
 const LEVEL_LABEL = {
@@ -92,6 +92,11 @@ export default function Home() {
     () => explainRecommendation(curriculum, progress),
     [curriculum, progress]
   );
+  // A/B: an actually-shown ribbon is an impression (deduped per session+band in the tracker).
+  const shownBand = curriculum && curriculum.length > 0 ? recInfo?.band : null;
+  useEffect(() => {
+    if (user && shownBand) trackImpression(shownBand);
+  }, [user?.id, shownBand]);
   // Has the learner started anything in the active scope? Decides Start vs Continue wording.
   const scopeStarted = useMemo(() => {
     if (!curriculum) return false;

@@ -19,6 +19,8 @@ import java.time.Instant;
 public class AnalyticsEvent {
 
     public enum Surface {
+        /** The recommendation ribbon (with its reason) was actually shown to this learner. */
+        IMPRESSION,
         /** Click on the "Continue where you left off" / "Start here" chip by the band tabs. */
         CONTINUE_CHIP,
         /** Click on the "Show the X band →" action in the recommendation ribbon. */
