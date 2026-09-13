@@ -121,6 +121,38 @@ export function nextModuleInBand(curriculum, level, progress) {
 
 const PULSE_KEY = 'bf:heroBandCounts';
 
+// Band color + emoji — the single source shared by the hero card, the tab row
+// and the navbar pill, so every surface tinting a band uses identical colors.
+export const BAND_COLORS = {
+  foundation: '#6fce6f',
+  intermediate: '#4cc2ff',
+  advanced: '#bb9af7',
+  expert: '#ff9e64',
+};
+
+export const BAND_LABEL = {
+  foundation: '🌱 Foundation',
+  intermediate: '🚀 Intermediate',
+  advanced: '⚡ Advanced',
+  expert: '🏗️ Expert',
+};
+
+/**
+ * Done/total lesson counts per band — the numbers behind the tab badges,
+ * the hero card and the navbar band bar. `lessonCount` (server metadata)
+ * is preferred over counting the lessons array, matching Home's totals.
+ */
+export function bandCounts(curriculum, progress) {
+  const map = {};
+  for (const lv of LEVELS) {
+    const mods = (curriculum || []).filter((m) => m.module.level === lv);
+    const total = mods.reduce((n, m) => n + (m.module.lessonCount ?? m.lessons.length), 0);
+    const done = mods.reduce((n, m) => n + m.lessons.filter((l) => progress?.[l.id]).length, 0);
+    map[lv] = { total, done };
+  }
+  return map;
+}
+
 function defaultPulseStorage() {
   return typeof sessionStorage !== 'undefined' ? sessionStorage : null;
 }

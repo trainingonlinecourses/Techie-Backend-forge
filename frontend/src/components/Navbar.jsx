@@ -1,13 +1,20 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { api } from '../api/client';
+import { api, cached } from '../api/client';
 import { useAuth } from '../context/AuthContext.jsx';
+import { useProgress } from '../hooks/useProgress.js';
+import { recommendBand, bandCounts, BAND_COLORS, BAND_LABEL } from '../lib/bands.js';
+import { FALLBACK_CURRICULUM } from '../fallbackCurriculum.js';
 
 export default function Navbar({ onMenu, drawerOpen }) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [query, setQuery] = useState('');
   const [stats, setStats] = useState(null);
+  // The compact band bar mirrors the home page's recommendation: which band
+  // should the learner be in, and how far through it they are.
+  const { progress, ready: progressReady } = useProgress();
+  const [curriculum, setCurriculum] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [theme, setTheme] = useState(() => localStorage.getItem('bf-theme') || 'dark');
   const menuRef = useRef(null);
@@ -22,6 +29,19 @@ export default function Navbar({ onMenu, drawerOpen }) {
       .get('/content/stats')
       .then((res) => setStats(res.data))
       .catch(() => {});
+    const cachedCurr = cached.get('curriculum');
+    if (cachedCurr && Array.isArray(cachedCurr)) setCurriculum(cachedCurr);
+    api
+      .get('/content/curriculum')
+      .then((res) => {
+        if (Array.isArray(res.data)) {
+          setCurriculum(res.data);
+          cached.set('curriculum', res.data);
+        } else if (!cachedCurr) {
+          setCurriculum(FALLBACK_CURRICULUM);
+        }
+      })
+      .catch(() => { if (!cachedCurr) setCurriculum(FALLBACK_CURRICULUM); });
   }, [user]);
 
   useEffect(() => {
@@ -50,6 +70,14 @@ export default function Navbar({ onMenu, drawerOpen }) {
 
   const pct = stats && stats.totalLessons > 0 ? Math.round((stats.completedLessons / stats.totalLessons) * 100) : 0;
   const ring = 75.4 - (75.4 * pct) / 100;
+
+  // Recommended band + its counts, shared with the hero card via lib/bands.js.
+  const recBand = useMemo(() => recommendBand(curriculum, progress), [curriculum, progress]);
+  const levelStats = useMemo(() => bandCounts(curriculum, progress), [curriculum, progress]);
+  const bandBar = user && progressReady && recBand && levelStats[recBand]
+    ? { band: recBand, ...levelStats[recBand] }
+    : null;
+  const bandPct = bandBar && bandBar.total > 0 ? Math.round((bandBar.done / bandBar.total) * 100) : 0;
 
   return (
     <header>
@@ -89,7 +117,11 @@ export default function Navbar({ onMenu, drawerOpen }) {
       </form>
 
       {stats && (
-        <Link to="/" className="progresspill" title={`${stats.completedLessons}/${stats.totalLessons} lessons completed`}>
+        <Link
+          to="/"
+          className="progresspill"
+          title={`${stats.completedLessons}/${stats.totalLessons} lessons completed${bandBar ? ` · ${BAND_LABEL[bandBar.band]} ${bandBar.done}/${bandBar.total} (${bandPct}%)` : ''}`}
+        >
           <svg className="ring" viewBox="0 0 30 30">
             <circle className="bgc" cx="15" cy="15" r="12" />
             <circle className="fgc" cx="15" cy="15" r="12" style={{ strokeDashoffset: ring }} />
@@ -97,6 +129,22 @@ export default function Navbar({ onMenu, drawerOpen }) {
           <span className="txt">
             <b>{stats.completedLessons}</b>/{stats.totalLessons} done
           </span>
+          {bandBar && (
+            <span
+              className="bandbar"
+              role="progressbar"
+              aria-valuenow={bandPct}
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-label={`${BAND_LABEL[bandBar.band]}: ${bandBar.done} of ${bandBar.total} lessons completed`}
+              title={`${BAND_LABEL[bandBar.band]} — ${bandBar.done}/${bandBar.total} (${bandPct}%)`}
+            >
+              <span
+                className="bandbar-fill"
+                style={{ width: `${bandPct}%`, background: BAND_COLORS[bandBar.band] }}
+              />
+            </span>
+          )}
         </Link>
       )}
 

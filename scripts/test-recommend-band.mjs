@@ -15,7 +15,7 @@ const src = readFileSync(
 const mod = await import(
   'data:text/javascript;base64,' + Buffer.from(src, 'utf8').toString('base64')
 );
-const { recommendBand, nextModuleInBand, explainRecommendation, estimateMinutesLeft, formatMinutes, loadPulseState, savePulseState, consumeBandGain, LEVELS } = mod;
+const { recommendBand, nextModuleInBand, explainRecommendation, estimateMinutesLeft, formatMinutes, loadPulseState, savePulseState, consumeBandGain, bandCounts, BAND_COLORS, BAND_LABEL, LEVELS } = mod;
 
 let failures = 0;
 function check(name, actual, expected) {
@@ -144,6 +144,29 @@ console.log('hero pulse helpers (loadPulseState / savePulseState / consumeBandGa
 
   check('null current → no pulse, empty counts',
     consumeBandGain(null, { foundation: 3 }), { pulseBand: null, counts: {} });
+}
+
+console.log('bandCounts / shared band metadata:');
+{
+  check('per-band done/total counts', bandCounts(mods, { a1: 1 }), {
+    foundation: { total: 3, done: 1 },
+    intermediate: { total: 0, done: 0 },
+    advanced: { total: 0, done: 0 },
+    expert: { total: 1, done: 0 },
+  });
+  check('null curriculum → zeros, no crash', bandCounts(null, { a1: 1 }), {
+    foundation: { total: 0, done: 0 },
+    intermediate: { total: 0, done: 0 },
+    advanced: { total: 0, done: 0 },
+    expert: { total: 0, done: 0 },
+  });
+  // lessonCount metadata wins over the (possibly trimmed) lessons array
+  const trimmed = [{ module: { id: 'a', level: 'foundation', order: 1, lessonCount: 10 }, lessons: [{ id: 'a1' }] }];
+  check('lessonCount metadata preferred', bandCounts(trimmed, {}).foundation.total, 10);
+
+  check('all four bands have colors', Object.keys(BAND_COLORS).sort(), [...LEVELS].sort());
+  check('colors are hex strings', Object.values(BAND_COLORS).every((c) => /^#[0-9a-f]{6}$/i.test(c)), true);
+  check('labels exist for all bands', Object.keys(BAND_LABEL).sort(), [...LEVELS].sort());
 }
 
 console.log('misc:');

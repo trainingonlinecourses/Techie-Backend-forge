@@ -6,7 +6,7 @@ import { useProgress } from '../hooks/useProgress.js';
 import { FALLBACK_CURRICULUM } from '../fallbackCurriculum.js';
 import { SkeletonCard } from '../components/Skeleton.jsx';
 import ProgressRing from '../components/ProgressRing.jsx';
-import { LEVELS, recommendBand, nextModuleInBand, explainRecommendation, estimateMinutesLeft, formatMinutes, loadPulseState, savePulseState, consumeBandGain } from '../lib/bands.js';
+import { LEVELS, recommendBand, nextModuleInBand, explainRecommendation, estimateMinutesLeft, formatMinutes, loadPulseState, savePulseState, consumeBandGain, bandCounts, BAND_COLORS } from '../lib/bands.js';
 import { trackChipClick, trackRibbonJump, markRecommendedVisit, trackImpression } from '../lib/analytics.js';
 
 // Learning-path levels, in curriculum order — see lib/bands.js for the shared logic.
@@ -108,17 +108,8 @@ export default function Home() {
 
   const totalLessons = curriculum?.reduce((n, m) => n + (m.module.lessonCount ?? m.lessons.length), 0) ?? 0;
 
-  // Per-band progress, shown on the filter tabs.
-  const levelStats = useMemo(() => {
-    const map = {};
-    for (const lv of LEVELS) {
-      const mods = (curriculum || []).filter((m) => m.module.level === lv);
-      const total = mods.reduce((n, m) => n + (m.module.lessonCount ?? m.lessons.length), 0);
-      const done = mods.reduce((n, m) => n + m.lessons.filter((l) => progress[l.id]).length, 0);
-      map[lv] = { total, done };
-    }
-    return map;
-  }, [curriculum, progress]);
+  // Per-band progress, shown on the filter tabs, the hero card and the navbar pill.
+  const levelStats = useMemo(() => bandCounts(curriculum, progress), [curriculum, progress]);
 
   // The hero card follows the RECOMMENDED band (not the tab being browsed) and
   // deep-links to its Start-here lesson; null when the curriculum is complete.
@@ -231,7 +222,7 @@ export default function Home() {
             const bandDone = levelStats[recInfo.band]?.done ?? 0;
             const bandTotal = levelStats[recInfo.band]?.total ?? 0;
             const bandPct = bandTotal > 0 ? Math.round((bandDone / bandTotal) * 100) : 0;
-            const bandColor = { foundation: '#6fce6f', intermediate: '#4cc2ff', advanced: '#bb9af7', expert: '#ff9e64' }[recInfo.band];
+            const bandColor = BAND_COLORS[recInfo.band];
             return (
               <div className="continuecard">
                 <div className="cc-info">
