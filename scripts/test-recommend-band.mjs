@@ -15,7 +15,7 @@ const src = readFileSync(
 const mod = await import(
   'data:text/javascript;base64,' + Buffer.from(src, 'utf8').toString('base64')
 );
-const { recommendBand, nextModuleInBand, explainRecommendation, LEVELS } = mod;
+const { recommendBand, nextModuleInBand, explainRecommendation, estimateMinutesLeft, formatMinutes, LEVELS } = mod;
 
 let failures = 0;
 function check(name, actual, expected) {
@@ -80,6 +80,30 @@ console.log('explainRecommendation:');
 
   const plural = explainRecommendation(mods, { a1: 1, a2: 1 });
   check('plural handled', /2 lessons into foundation/.test(plural.reason), true);
+}
+
+console.log('estimateMinutesLeft / formatMinutes:')
+{
+  // fixture lessons get minutes: a1=30, a2=45, b1=20 → foundation total 95, 30 done after a1
+  const timed = [
+    { module: { id: 'a', level: 'foundation', order: 1 }, lessons: [{ id: 'a1', minutes: 30 }, { id: 'a2', minutes: 45 }] },
+    { module: { id: 'b', level: 'foundation', order: 2 }, lessons: [{ id: 'b1', minutes: 20 }] },
+    { module: { id: 'c', level: 'expert', order: 3 }, lessons: [{ id: 'c1', minutes: 90 }] },
+  ];
+  check('all incomplete → 95', estimateMinutesLeft(timed, 'foundation', {}), 95);
+  check('one done → 65', estimateMinutesLeft(timed, 'foundation', { a1: 1 }), 65);
+  check('band-scoped (expert → 90)', estimateMinutesLeft(timed, 'expert', {}), 90);
+  check('all → 185', estimateMinutesLeft(timed, 'all', {}), 185);
+  check('band complete → 0', estimateMinutesLeft(timed, 'foundation', { a1: 1, a2: 1, b1: 1 }), 0);
+  check('null curriculum → 0', estimateMinutesLeft(null, 'foundation', {}), 0);
+  check('missing minutes field counts as 0', estimateMinutesLeft(
+    [{ module: { id: 'x', level: 'foundation', order: 1 }, lessons: [{ id: 'x1' }] }], 'foundation', {}), 0);
+
+  check('format 0 → 0m', formatMinutes(0), '0m');
+  check('format 45 → 45m', formatMinutes(45), '45m');
+  check('format 95 → 1h 35m', formatMinutes(95), '1h 35m');
+  check('format 60 → 1h 0m', formatMinutes(60), '1h 0m');
+  check('format negative clamps to 0m', formatMinutes(-5), '0m');
 }
 
 console.log('misc:');

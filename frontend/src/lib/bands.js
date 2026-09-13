@@ -72,6 +72,31 @@ export function explainRecommendation(curriculum, progress) {
 }
 
 /**
+ * Minutes of lesson time remaining in `level` (or the whole curriculum for
+ * 'all'/unknown): every incomplete lesson's `minutes`, summed. Powers the
+ * hero card's "≈ Xh Ym left" estimate.
+ */
+export function estimateMinutesLeft(curriculum, level, progress) {
+  const mods = LEVELS.includes(level)
+    ? (curriculum || []).filter((m) => m.module.level === level)
+    : curriculum || [];
+  let minutes = 0;
+  for (const m of mods) {
+    for (const l of m.lessons) {
+      if (!progress?.[l.id]) minutes += l.minutes || 0;
+    }
+  }
+  return minutes;
+}
+
+/** "4h 35m" (hours shown once ≥ 60), "45m" below that, "0m" when done. */
+export function formatMinutes(mins) {
+  const m = Math.max(0, Math.round(mins || 0));
+  if (m < 60) return `${m}m`;
+  return `${Math.floor(m / 60)}h ${m % 60}m`;
+}
+
+/**
  * The module (and its first incomplete lesson) where the learner should resume
  * inside `level` — or across the whole curriculum when level is 'all'/unknown.
  * Returns null when everything in scope is complete.

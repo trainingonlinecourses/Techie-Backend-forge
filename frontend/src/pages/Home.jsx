@@ -6,7 +6,7 @@ import { useProgress } from '../hooks/useProgress.js';
 import { FALLBACK_CURRICULUM } from '../fallbackCurriculum.js';
 import { SkeletonCard } from '../components/Skeleton.jsx';
 import ProgressRing from '../components/ProgressRing.jsx';
-import { LEVELS, recommendBand, nextModuleInBand, explainRecommendation } from '../lib/bands.js';
+import { LEVELS, recommendBand, nextModuleInBand, explainRecommendation, estimateMinutesLeft, formatMinutes } from '../lib/bands.js';
 import { trackChipClick, trackRibbonJump, markRecommendedVisit, trackImpression } from '../lib/analytics.js';
 
 // Learning-path levels, in curriculum order — see lib/bands.js for the shared logic.
@@ -127,6 +127,10 @@ export default function Home() {
     [curriculum, recInfo, progress]
   );
   const heroStarted = recInfo?.band ? levelStats[recInfo.band]?.done > 0 : false;
+  const heroMinutesLeft = useMemo(
+    () => (recInfo?.band ? estimateMinutesLeft(curriculum, recInfo.band, progress) : 0),
+    [curriculum, recInfo, progress]
+  );
 
   function openFromChip() {
     if (!nextUp || !user) return;
@@ -192,6 +196,7 @@ export default function Home() {
                 <span className="cc-mod">
                   MODULE {String(heroNext.module.order).padStart(2, '0')} · {heroNext.module.title}
                   {' · '}{levelStats[recInfo.band]?.done}/{levelStats[recInfo.band]?.total} in this band
+                  {' · '}≈{formatMinutes(heroMinutesLeft)} left
                 </span>
               </div>
               <Link to={`/lessons/${heroNext.lesson.id}`} className="btn primary">{heroStarted ? 'Continue →' : 'Start here →'}</Link>
