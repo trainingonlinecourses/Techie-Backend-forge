@@ -101,16 +101,6 @@ export default function Home() {
     return mods.some((m) => m.lessons.some((l) => progress[l.id]));
   }, [curriculum, activeBand, progress]);
 
-  // The next incomplete lesson, in curriculum order — powers the "Continue learning" card.
-  const nextLesson = useMemo(() => {
-    if (!Array.isArray(curriculum)) return null;
-    for (const m of curriculum) {
-      const next = m.lessons.find((l) => !progress[l.id]);
-      if (next) return { module: m.module, lesson: next };
-    }
-    return null;
-  }, [curriculum, progress]);
-
   const totalLessons = curriculum?.reduce((n, m) => n + (m.module.lessonCount ?? m.lessons.length), 0) ?? 0;
 
   // Per-band progress, shown on the filter tabs.
@@ -124,6 +114,14 @@ export default function Home() {
     }
     return map;
   }, [curriculum, progress]);
+
+  // The hero card follows the RECOMMENDED band (not the tab being browsed) and
+  // deep-links to its Start-here lesson; null when the curriculum is complete.
+  const heroNext = useMemo(
+    () => (recInfo?.band ? nextModuleInBand(curriculum, recInfo.band, progress) : null),
+    [curriculum, recInfo, progress]
+  );
+  const heroStarted = recInfo?.band ? levelStats[recInfo.band]?.done > 0 : false;
 
   function openFromChip() {
     if (!nextUp || !user) return;
@@ -179,19 +177,22 @@ export default function Home() {
             ))}
           </div>
 
-          {user && nextLesson && (
+          {user && heroNext && recInfo?.band && (
             <div className="continuecard">
               <div className="cc-info">
-                <span className="cc-label">CONTINUE LEARNING</span>
-                <Link to={`/lessons/${nextLesson.lesson.id}`} className="cc-title">{nextLesson.lesson.title}</Link>
+                <span className="cc-label">
+                  {heroStarted ? 'CONTINUE LEARNING' : 'START LEARNING'} · {LEVEL_SHORT[recInfo.band].toUpperCase()}
+                </span>
+                <Link to={`/lessons/${heroNext.lesson.id}`} className="cc-title">{heroNext.lesson.title}</Link>
                 <span className="cc-mod">
-                  MODULE {String(nextLesson.module.order).padStart(2, '0')} · {nextLesson.module.title}
+                  MODULE {String(heroNext.module.order).padStart(2, '0')} · {heroNext.module.title}
+                  {' · '}{levelStats[recInfo.band]?.done}/{levelStats[recInfo.band]?.total} in this band
                 </span>
               </div>
-              <Link to={`/lessons/${nextLesson.lesson.id}`} className="btn primary">Continue →</Link>
+              <Link to={`/lessons/${heroNext.lesson.id}`} className="btn primary">{heroStarted ? 'Continue →' : 'Start here →'}</Link>
             </div>
           )}
-          {user && !nextLesson && totalLessons > 0 && (
+          {user && !heroNext && totalLessons > 0 && (
             <div className="continuecard done">
               <div className="cc-info">
                 <span className="cc-label">🏁 ALL DONE</span>
