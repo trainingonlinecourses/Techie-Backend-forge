@@ -186,22 +186,32 @@ export default function Home() {
             ))}
           </div>
 
-          {user && heroNext && recInfo?.band && (
-            <div className="continuecard">
-              <div className="cc-info">
-                <span className="cc-label">
-                  {heroStarted ? 'CONTINUE LEARNING' : 'START LEARNING'} · {LEVEL_SHORT[recInfo.band].toUpperCase()}
-                </span>
-                <Link to={`/lessons/${heroNext.lesson.id}`} className="cc-title">{heroNext.lesson.title}</Link>
-                <span className="cc-mod">
-                  MODULE {String(heroNext.module.order).padStart(2, '0')} · {heroNext.module.title}
-                  {' · '}{levelStats[recInfo.band]?.done}/{levelStats[recInfo.band]?.total} in this band
-                  {' · '}≈{formatMinutes(heroMinutesLeft)} left
-                </span>
+          {user && heroNext && recInfo?.band && (() => {
+            const bandDone = levelStats[recInfo.band]?.done ?? 0;
+            const bandTotal = levelStats[recInfo.band]?.total ?? 0;
+            const bandPct = bandTotal > 0 ? Math.round((bandDone / bandTotal) * 100) : 0;
+            const bandColor = { foundation: '#6fce6f', intermediate: '#4cc2ff', advanced: '#bb9af7', expert: '#ff9e64' }[recInfo.band];
+            return (
+              <div className="continuecard">
+                <div className="cc-info">
+                  <span className="cc-label">
+                    {heroStarted ? 'CONTINUE LEARNING' : 'START LEARNING'} · {LEVEL_SHORT[recInfo.band].toUpperCase()}
+                  </span>
+                  <Link to={`/lessons/${heroNext.lesson.id}`} className="cc-title">{heroNext.lesson.title}</Link>
+                  <span className="cc-mod">
+                    MODULE {String(heroNext.module.order).padStart(2, '0')} · {heroNext.module.title}
+                    {' · '}{bandDone}/{bandTotal} in this band
+                    {' · '}≈{formatMinutes(heroMinutesLeft)} left
+                  </span>
+                  <div className="cc-progress" role="progressbar" aria-valuenow={bandPct} aria-valuemin={0} aria-valuemax={100}
+                       aria-label={`${bandDone} of ${bandTotal} ${recInfo.band} lessons completed`}>
+                    <div className="cc-progress-fill" style={{ width: `${bandPct}%`, background: bandColor }} />
+                  </div>
+                </div>
+                <Link to={`/lessons/${heroNext.lesson.id}`} className="btn primary">{heroStarted ? 'Continue →' : 'Start here →'}</Link>
               </div>
-              <Link to={`/lessons/${heroNext.lesson.id}`} className="btn primary">{heroStarted ? 'Continue →' : 'Start here →'}</Link>
-            </div>
-          )}
+            );
+          })()}
           {user && !heroNext && totalLessons > 0 && (
             <div className="continuecard done">
               <div className="cc-info">

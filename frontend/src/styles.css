@@ -2268,3 +2268,10 @@ typing i:nth-child(3) { animation-delay: 0.3s; }
   transition: background .15s, transform .15s;
 }
 .rec-ribbon-go:hover { background: rgba(111,206,111,.12); transform: translateY(-1px); }
+
+/* ---- Hero card: slim band-progress bar under the meta line ---- */
+.cc-progress {
+  height: 5px; border-radius: 999px; background: rgba(245,166,35,.15);
+  overflow: hidden; margin-top: 9px; max-width: 460px;
+}
+.cc-progress-fill { height: 100%; border-radius: 999px; transition: width .5s ease; }
