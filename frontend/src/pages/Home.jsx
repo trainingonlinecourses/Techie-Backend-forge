@@ -6,7 +6,7 @@ import { useProgress } from '../hooks/useProgress.js';
 import { FALLBACK_CURRICULUM } from '../fallbackCurriculum.js';
 import { SkeletonCard } from '../components/Skeleton.jsx';
 import ProgressRing from '../components/ProgressRing.jsx';
-import { LEVELS, recommendBand, nextModuleInBand } from '../lib/bands.js';
+import { LEVELS, recommendBand, nextModuleInBand, explainRecommendation } from '../lib/bands.js';
 
 // Learning-path levels, in curriculum order — see lib/bands.js for the shared logic.
 const LEVEL_LABEL = {
@@ -85,6 +85,11 @@ export default function Home() {
   const nextUp = useMemo(
     () => nextModuleInBand(curriculum, activeBand, progress),
     [curriculum, activeBand, progress]
+  );
+  // The "why" behind the recommendation — rendered as a ribbon above the tabs.
+  const recInfo = useMemo(
+    () => explainRecommendation(curriculum, progress),
+    [curriculum, progress]
   );
   // Has the learner started anything in the active scope? Decides Start vs Continue wording.
   const scopeStarted = useMemo(() => {
@@ -201,6 +206,17 @@ export default function Home() {
         finishing with a complete runnable project.{' '}
         <Link to="/timeline" className="tl-inline-link">Prefer the release story? Walk the 1.0 → 26 timeline →</Link>
       </p>
+      {curriculum && curriculum.length > 0 && recInfo.band && (
+        <div className={`rec-ribbon ${recInfo.kind}`}>
+          <span className="rec-ribbon-badge">Recommended for you</span>
+          <span className="rec-ribbon-reason">{recInfo.reason}</span>
+          {activeBand !== recInfo.band && (
+            <button className="rec-ribbon-go" onClick={() => pickBand(recInfo.band)}>
+              Show the {LEVEL_SHORT[recInfo.band].replace(/^[^ ]+ /, '')} band →
+            </button>
+          )}
+        </div>
+      )}
       {curriculum && curriculum.length > 0 && (
         <div className="band-tabs-row">
           <div className="band-tabs" role="tablist" aria-label="Filter curriculum by level">

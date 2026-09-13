@@ -15,7 +15,7 @@ const src = readFileSync(
 const mod = await import(
   'data:text/javascript;base64,' + Buffer.from(src, 'utf8').toString('base64')
 );
-const { recommendBand, nextModuleInBand, LEVELS } = mod;
+const { recommendBand, nextModuleInBand, explainRecommendation, LEVELS } = mod;
 
 let failures = 0;
 function check(name, actual, expected) {
@@ -54,6 +54,33 @@ check('unknown level → treated as all',
   nextModuleInBand(mods, 'zzz', { a1: 1 }),
   { module: mods[0].module, lesson: { id: 'a2' } });
 check('empty curriculum → null', nextModuleInBand([], 'foundation', {}), null);
+
+console.log('explainRecommendation:');
+{
+  const fresh = explainRecommendation(mods, {});
+  check('fresh-start kind', fresh.kind, 'fresh-start');
+  check('fresh-start band', fresh.band, 'foundation');
+  check('fresh-start reason mentions no completions', /haven't completed/i.test(fresh.reason), true);
+
+  const mid = explainRecommendation(mods, { a1: 1 });
+  check('in-progress kind', mid.kind, 'in-progress');
+  check('in-progress counts 1/3 lessons', `${mid.completed}/${mid.total}`, '1/3');
+  check('in-progress reason shows counts', /1 lesson into foundation \(3 total\)/.test(mid.reason), true);
+
+  const graduatedBands = explainRecommendation(mods, { a1: 1, a2: 1, b1: 1 });
+  check('graduated-foundation mentions finished band', /finished every lesson in foundation/.test(graduatedBands.reason), true);
+  check('graduated-foundation recommends expert', graduatedBands.band, 'expert');
+
+  const allDone = explainRecommendation(mods, { a1: 1, a2: 1, b1: 1, c1: 1 });
+  check('graduated kind', allDone.kind, 'graduated');
+  check('graduated reason counts all 4', /all 4 lessons/.test(allDone.reason), true);
+
+  const loading = explainRecommendation(null, {});
+  check('no curriculum → fresh-start foundation', loading.band, 'foundation');
+
+  const plural = explainRecommendation(mods, { a1: 1, a2: 1 });
+  check('plural handled', /2 lessons into foundation/.test(plural.reason), true);
+}
 
 console.log('misc:');
 check('LEVELS order', LEVELS, ['foundation', 'intermediate', 'advanced', 'expert']);

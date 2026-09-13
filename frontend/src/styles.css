@@ -2244,3 +2244,27 @@ typing i:nth-child(3) { animation-delay: 0.3s; }
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 @media (max-width: 900px) { .continue-chip { max-width: 100%; } .continue-chip-lesson { max-width: 46vw; } }
+
+/* ---- "Recommended for you" ribbon above the band tabs ---- */
+.rec-ribbon {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  padding: 10px 16px; margin-bottom: 12px; border-radius: 12px;
+  border: 1px solid rgba(111,206,111,.35); background: rgba(111,206,111,.06);
+}
+.rec-ribbon.in-progress { border-color: rgba(76,194,255,.35); background: rgba(76,194,255,.05); }
+.rec-ribbon.graduated { border-color: rgba(245,166,35,.4); background: rgba(245,166,35,.06); }
+.rec-ribbon-badge {
+  font-size: 10.5px; font-weight: 800; letter-spacing: .07em; text-transform: uppercase;
+  color: #6fce6f; background: rgba(111,206,111,.12); border: 1px solid rgba(111,206,111,.45);
+  padding: 3px 10px; border-radius: 999px; white-space: nowrap;
+}
+.rec-ribbon.in-progress .rec-ribbon-badge { color: #4cc2ff; background: rgba(76,194,255,.1); border-color: rgba(76,194,255,.45); }
+.rec-ribbon.graduated .rec-ribbon-badge { color: var(--amber, #f5a623); background: rgba(245,166,35,.1); border-color: rgba(245,166,35,.45); }
+.rec-ribbon-reason { flex: 1; min-width: 220px; font-size: 13.5px; color: var(--fg, #e6edf3); }
+.rec-ribbon-go {
+  background: none; border: 1px solid rgba(111,206,111,.5); color: #6fce6f;
+  font: inherit; font-size: 12.5px; font-weight: 600; padding: 5px 12px;
+  border-radius: 999px; cursor: pointer; white-space: nowrap;
+  transition: background .15s, transform .15s;
+}
+.rec-ribbon-go:hover { background: rgba(111,206,111,.12); transform: translateY(-1px); }
