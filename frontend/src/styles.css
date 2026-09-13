@@ -2316,4 +2316,4 @@ typing i:nth-child(3) { animation-delay: 0.3s; }
 @media (prefers-reduced-motion: reduce) {
   .band-tabs-row.tabs-glow { animation: none; }
 }
-@media (max-width: 720px) { .cc-actions { flex-direction: row; } .cc-actions .btn { flex: 1; } }
+@media (max-width: 720px) { .cc-actions { flex-direction: row; flex-wrap: wrap; } .cc-actions .btn { flex: 1; } } /* wrap: the longer "we suggest …" label gets room on narrow screens */

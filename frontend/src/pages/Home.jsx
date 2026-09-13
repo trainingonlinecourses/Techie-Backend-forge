@@ -259,7 +259,7 @@ export default function Home() {
                       document.getElementById('band-tabs-anchor')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                     }}
                   >
-                    Pick a band
+                    Pick a band{recInfo?.band ? ` — we suggest ${LEVEL_SHORT[recInfo.band].replace(/^[^ ]+ /, '')}` : ''}
                   </button>
                 </div>
               </div>
