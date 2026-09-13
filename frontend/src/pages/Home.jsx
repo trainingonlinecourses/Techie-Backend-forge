@@ -22,6 +22,10 @@ const LEVEL_SHORT = {
   expert: '🏗️ Expert',
 };
 
+// Last-picked band persists across visits; an explicit ?band= in the URL overrides it (shareable links).
+const BAND_KEY = 'bf:lastBand';
+const ALL_BANDS = ['all', ...LEVELS];
+
 const TECH = [
   ['JAVA', 'JDK 21'], ['SPRING FRAMEWORK', 'IoC · DI · AOP'], ['SPRING BOOT', '3.4'],
   ['SPRING SECURITY', 'JWT · OAuth2'], ['SPRING AI', 'RAG · ChatClient'], ['JPA', 'Hibernate'],
@@ -35,7 +39,10 @@ export default function Home() {
   const [stats, setStats] = useState(null);
   const [curriculum, setCurriculum] = useState(null);
   const [searchParams, setSearchParams] = useSearchParams();
-  const band = searchParams.get('band') || 'all';
+  // Priority: ?band= in the URL → last picked (persisted) → all bands.
+  const urlBand = searchParams.get('band');
+  const storedBand = localStorage.getItem(BAND_KEY);
+  const band = ALL_BANDS.includes(urlBand) ? urlBand : ALL_BANDS.includes(storedBand) ? storedBand : 'all';
 
   useEffect(() => {
     // Stale-while-revalidate: show the cached curriculum instantly (instant nav,
@@ -59,6 +66,13 @@ export default function Home() {
       })
       .catch(() => { if (!cachedCurr) setCurriculum(FALLBACK_CURRICULUM); });
   }, [user]);
+
+  // A valid ?band= deep link is also "the learner's last selection" — remember it for plain visits.
+  useEffect(() => {
+    if (urlBand && ALL_BANDS.includes(urlBand) && urlBand !== storedBand) {
+      try { localStorage.setItem(BAND_KEY, urlBand); } catch { /* ignore */ }
+    }
+  }, [urlBand, storedBand]);
 
   // The next incomplete lesson, in curriculum order — powers the "Continue learning" card.
   const nextLesson = useMemo(() => {
@@ -88,6 +102,7 @@ export default function Home() {
     const next = new URLSearchParams(searchParams);
     if (lv === 'all') next.delete('band');
     else next.set('band', lv);
+    try { localStorage.setItem(BAND_KEY, lv); } catch { /* storage unavailable — the choice just won't persist */ }
     setSearchParams(next, { replace: true });
   }
 
@@ -164,7 +179,7 @@ export default function Home() {
         foundations first, then the modern language (Java 8 → 26), then the framework, then production practice —
         finishing with a complete runnable project.
       </p>
-      {curriculum && (
+      {curriculum && curriculum.length > 0 && (
         <div className="band-tabs" role="tablist" aria-label="Filter curriculum by level">
           <button
             role="tab"
