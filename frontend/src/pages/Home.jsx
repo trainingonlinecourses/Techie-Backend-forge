@@ -83,9 +83,17 @@ export default function Home() {
   const isFirstVisit = !urlBand && !storedBand;
   const activeBand = band === 'all' && isFirstVisit && recommended ? recommended : band;
   const nextUp = useMemo(
-    () => (activeBand === 'all' ? null : nextModuleInBand(curriculum, activeBand, progress)),
+    () => nextModuleInBand(curriculum, activeBand, progress),
     [curriculum, activeBand, progress]
   );
+  // Has the learner started anything in the active scope? Decides Start vs Continue wording.
+  const scopeStarted = useMemo(() => {
+    if (!curriculum) return false;
+    const mods = activeBand === 'all'
+      ? curriculum
+      : curriculum.filter((m) => m.module.level === activeBand);
+    return mods.some((m) => m.lessons.some((l) => progress[l.id]));
+  }, [curriculum, activeBand, progress]);
 
   // The next incomplete lesson, in curriculum order — powers the "Continue learning" card.
   const nextLesson = useMemo(() => {
@@ -194,29 +202,41 @@ export default function Home() {
         <Link to="/timeline" className="tl-inline-link">Prefer the release story? Walk the 1.0 → 26 timeline →</Link>
       </p>
       {curriculum && curriculum.length > 0 && (
-        <div className="band-tabs" role="tablist" aria-label="Filter curriculum by level">
-          <button
-            role="tab"
-            aria-selected={activeBand === 'all'}
-            className={`band-tab ${activeBand === 'all' ? 'active' : ''}`}
-            onClick={() => pickBand('all')}
-          >
-            All bands
-            <span className="band-tab-count">{totalLessons}</span>
-          </button>
-          {LEVELS.map((lv) => (
+        <div className="band-tabs-row">
+          <div className="band-tabs" role="tablist" aria-label="Filter curriculum by level">
             <button
-              key={lv}
               role="tab"
-              aria-selected={activeBand === lv}
-              className={`band-tab ${lv} ${activeBand === lv ? 'active' : ''}`}
-              onClick={() => pickBand(lv)}
+              aria-selected={activeBand === 'all'}
+              className={`band-tab ${activeBand === 'all' ? 'active' : ''}`}
+              onClick={() => pickBand('all')}
             >
-              {LEVEL_SHORT[lv]}
-              {recommended === lv && <span className="band-tab-rec" title="Your next band to progress in — based on your completed lessons">Start here</span>}
-              <span className="band-tab-count">{levelStats[lv].done}/{levelStats[lv].total}</span>
+              All bands
+              <span className="band-tab-count">{totalLessons}</span>
             </button>
-          ))}
+            {LEVELS.map((lv) => (
+              <button
+                key={lv}
+                role="tab"
+                aria-selected={activeBand === lv}
+                className={`band-tab ${lv} ${activeBand === lv ? 'active' : ''}`}
+                onClick={() => pickBand(lv)}
+              >
+                {LEVEL_SHORT[lv]}
+                {recommended === lv && <span className="band-tab-rec" title="Your next band to progress in — based on your completed lessons">Start here</span>}
+                <span className="band-tab-count">{levelStats[lv].done}/{levelStats[lv].total}</span>
+              </button>
+            ))}
+          </div>
+          {nextUp && (
+            <Link
+              to={`/lessons/${nextUp.lesson.id}`}
+              className="continue-chip"
+              title={`Next up in ${activeBand === 'all' ? 'the curriculum' : LEVEL_LABEL[activeBand]}: ${nextUp.lesson.title} (${nextUp.module.title})`}
+            >
+              <span className="continue-chip-label">{scopeStarted ? '▶ Continue where you left off' : '▶ Start here'}</span>
+              <span className="continue-chip-lesson">{nextUp.lesson.title}</span>
+            </Link>
+          )}
         </div>
       )}
       {!curriculum && (
