@@ -3,19 +3,32 @@ import { api } from '../api/client';
 import { useAuth } from '../context/AuthContext.jsx';
 
 export function useProgress() {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [progress, setProgress] = useState({});
+  // True once the progress state is final for the current user: immediately for
+  // guests (nothing to load), after the fetch resolves/fails for signed-in
+  // users. Auth hydration (a stored token being validated) also holds this off —
+  // otherwise consumers would see a transient empty progress for a signed-in
+  // user and mistake it for "nothing completed yet".
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    if (!user) {
-      setProgress({});
+    if (authLoading) {
+      setReady(false);
       return;
     }
+    if (!user) {
+      setProgress({});
+      setReady(true);
+      return;
+    }
+    setReady(false); // switching accounts — the previous state no longer applies
     api
       .get('/progress')
       .then((res) => setProgress(res.data || {}))
-      .catch(() => setProgress({}));
-  }, [user?.id]);
+      .catch(() => setProgress({}))
+      .finally(() => setReady(true));
+  }, [user?.id, authLoading]);
 
   const toggle = useCallback(
     async (lessonId, completed) => {
@@ -32,5 +45,5 @@ export function useProgress() {
     [user]
   );
 
-  return { progress, toggle, completedCount: Object.keys(progress).length };
+  return { progress, toggle, ready, completedCount: Object.keys(progress).length };
 }

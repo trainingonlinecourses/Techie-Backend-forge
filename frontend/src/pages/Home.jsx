@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { api, cached } from '../api/client';
 import { useAuth } from '../context/AuthContext.jsx';
@@ -6,7 +6,7 @@ import { useProgress } from '../hooks/useProgress.js';
 import { FALLBACK_CURRICULUM } from '../fallbackCurriculum.js';
 import { SkeletonCard } from '../components/Skeleton.jsx';
 import ProgressRing from '../components/ProgressRing.jsx';
-import { LEVELS, recommendBand, nextModuleInBand, explainRecommendation, estimateMinutesLeft, formatMinutes } from '../lib/bands.js';
+import { LEVELS, recommendBand, nextModuleInBand, explainRecommendation, estimateMinutesLeft, formatMinutes, loadPulseState, savePulseState, consumeBandGain } from '../lib/bands.js';
 import { trackChipClick, trackRibbonJump, markRecommendedVisit, trackImpression } from '../lib/analytics.js';
 
 // Learning-path levels, in curriculum order — see lib/bands.js for the shared logic.
@@ -36,7 +36,7 @@ const TECH = [
 
 export default function Home() {
   const { user } = useAuth();
-  const { progress } = useProgress();
+  const { progress, ready: progressReady } = useProgress();
   const [stats, setStats] = useState(null);
   const [curriculum, setCurriculum] = useState(null);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -132,6 +132,47 @@ export default function Home() {
     [curriculum, recInfo, progress]
   );
 
+  // Reward pulse on the hero bar: fire once when the recommended band's
+  // done-count grows vs the last count observed this session — usually the
+  // moment the learner returns home after completing a lesson. Counts are
+  // observed only after the progress fetch settles (progressReady), otherwise
+  // the async 0→N load would read as a gain on every visit. Session-persisted
+  // per band per user so a full page load doesn't suppress or fake a reward.
+  const recBand = recInfo?.band ?? null;
+  const levelCounts = useMemo(
+    () => Object.fromEntries(LEVELS.map((lv) => [lv, levelStats[lv]?.done ?? 0])),
+    [levelStats]
+  );
+  const lastBandRef = useRef(null);
+  const lastCountsRef = useRef({});
+  const prevUserRef = useRef(null);
+  const consumedCountsRef = useRef(null);
+  const [pulseBand, setPulseBand] = useState(null);
+  useEffect(() => {
+    if (!progressReady || !curriculum) return;
+    if (consumedCountsRef.current === levelCounts) return; // StrictMode re-run of the same state
+    consumedCountsRef.current = levelCounts;
+    if (prevUserRef.current !== (user?.id ?? null)) {
+      // Account switched — in-memory observations belong to the previous user.
+      prevUserRef.current = user?.id ?? null;
+      lastCountsRef.current = {};
+      lastBandRef.current = null;
+    }
+    // In-memory (this session) observations are newer than the persisted ones.
+    const lastSeen = { ...loadPulseState(user?.id), ...lastCountsRef.current };
+    if (lastBandRef.current !== null && lastBandRef.current !== recBand
+        && Number.isFinite(levelCounts[recBand])) {
+      // The recommendation genuinely moved mid-session (band graduated) — the new
+      // band starts from its current count, so switching to it is not a reward.
+      lastSeen[recBand] = levelCounts[recBand];
+    }
+    lastBandRef.current = recBand;
+    const { pulseBand: gained, counts } = consumeBandGain(levelCounts, lastSeen);
+    lastCountsRef.current = counts;
+    savePulseState(user?.id, counts);
+    setPulseBand(gained);
+  }, [progressReady, curriculum, recBand, levelCounts, user?.id]);
+
   function openFromChip() {
     if (!nextUp || !user) return;
     trackChipClick(nextUp.lesson.id, activeBand);
@@ -203,8 +244,12 @@ export default function Home() {
                     {' · '}{bandDone}/{bandTotal} in this band
                     {' · '}≈{formatMinutes(heroMinutesLeft)} left
                   </span>
-                  <div className="cc-progress" role="progressbar" aria-valuenow={bandPct} aria-valuemin={0} aria-valuemax={100}
-                       aria-label={`${bandDone} of ${bandTotal} ${recInfo.band} lessons completed`}>
+                  <div
+                    className={`cc-progress${pulseBand && pulseBand === recInfo.band ? ' cc-pulse' : ''}`}
+                    onAnimationEnd={(e) => { if (e.target === e.currentTarget) setPulseBand(null); }}
+                    role="progressbar" aria-valuenow={bandPct} aria-valuemin={0} aria-valuemax={100}
+                    aria-label={`${bandDone} of ${bandTotal} ${recInfo.band} lessons completed`}
+                  >
                     {[25, 50, 75, 100].map((pct) => (
                       <span key={pct} className="cc-progress-tick" style={{ left: `calc(${pct}% - 1px)` }} aria-hidden="true" />
                     ))}

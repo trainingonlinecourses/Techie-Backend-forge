@@ -112,3 +112,54 @@ export function nextModuleInBand(curriculum, level, progress) {
   }
   return null;
 }
+
+// ---------------------------------------------------------------------------
+// Hero-bar reward pulse — fires once when the recommended band's done-count
+// increases vs the last count observed this browser session (typically right
+// after the learner returns home from completing a lesson). Pure helpers;
+// Home.jsx owns the React state and the storage round-trip.
+
+const PULSE_KEY = 'bf:heroBandCounts';
+
+function defaultPulseStorage() {
+  return typeof sessionStorage !== 'undefined' ? sessionStorage : null;
+}
+
+/**
+ * Last-seen done-count per band for this session — scoped to the user id, so
+ * switching accounts in the same tab never carries counts across. Returns {}
+ * when nothing valid is stored (first observation, other user, private mode).
+ */
+export function loadPulseState(userId, storage = defaultPulseStorage()) {
+  try {
+    const parsed = JSON.parse(storage?.getItem(PULSE_KEY) || 'null');
+    if (parsed && parsed.userId === userId && parsed.counts && typeof parsed.counts === 'object') {
+      return parsed.counts;
+    }
+  } catch { /* disabled storage / corrupt JSON — treat as first observation */ }
+  return {};
+}
+
+/** Persists the last-seen done-count per band for this session. Best-effort. */
+export function savePulseState(userId, counts, storage = defaultPulseStorage()) {
+  try { storage?.setItem(PULSE_KEY, JSON.stringify({ userId, counts: counts || {} })); } catch { /* ignore */ }
+}
+
+/**
+ * Compares current done-counts against the last-seen state.
+ * Returns { pulseBand, counts }: pulseBand is the band whose count grew the
+ * most (null when nothing grew — including on the first observation of a
+ * band, where there is no previous count to compare against); counts is the
+ * new last-seen state to persist.
+ */
+export function consumeBandGain(currentCounts, lastSeen) {
+  const counts = {};
+  let pulseBand = null;
+  let bestGain = 0;
+  for (const [band, done] of Object.entries(currentCounts || {})) {
+    const prev = Number.isFinite(lastSeen?.[band]) ? lastSeen[band] : done;
+    counts[band] = done;
+    if (done - prev > bestGain) { bestGain = done - prev; pulseBand = band; }
+  }
+  return { pulseBand, counts };
+}

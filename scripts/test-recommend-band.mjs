@@ -15,7 +15,7 @@ const src = readFileSync(
 const mod = await import(
   'data:text/javascript;base64,' + Buffer.from(src, 'utf8').toString('base64')
 );
-const { recommendBand, nextModuleInBand, explainRecommendation, estimateMinutesLeft, formatMinutes, LEVELS } = mod;
+const { recommendBand, nextModuleInBand, explainRecommendation, estimateMinutesLeft, formatMinutes, loadPulseState, savePulseState, consumeBandGain, LEVELS } = mod;
 
 let failures = 0;
 function check(name, actual, expected) {
@@ -104,6 +104,46 @@ console.log('estimateMinutesLeft / formatMinutes:')
   check('format 95 → 1h 35m', formatMinutes(95), '1h 35m');
   check('format 60 → 1h 0m', formatMinutes(60), '1h 0m');
   check('format negative clamps to 0m', formatMinutes(-5), '0m');
+}
+
+console.log('hero pulse helpers (loadPulseState / savePulseState / consumeBandGain):');
+{
+  // Node has no sessionStorage — the helpers accept any {getItem,setItem} store.
+  function fakeStorage() {
+    const m = new Map();
+    return { getItem: (k) => (m.has(k) ? m.get(k) : null), setItem: (k, v) => m.set(k, v) };
+  }
+  const store = fakeStorage();
+
+  check('load with empty storage → {}', loadPulseState(7, store), {});
+
+  savePulseState(7, { foundation: 3, expert: 1 }, store);
+  check('save + load round-trip', loadPulseState(7, store), { foundation: 3, expert: 1 });
+  check('other user → {} (counts are per-user)', loadPulseState(8, store), {});
+
+  store.setItem('bf:heroBandCounts', '{not json');
+  check('corrupt JSON → {}', loadPulseState(7, store), {});
+
+  const grew = consumeBandGain({ foundation: 4, expert: 1 }, { foundation: 3, expert: 1 });
+  check('gain → pulse on the grown band', grew.pulseBand, 'foundation');
+  check('gain → counts updated', grew.counts, { foundation: 4, expert: 1 });
+
+  check('no change → no pulse', consumeBandGain({ foundation: 3 }, { foundation: 3 }).pulseBand, null);
+  const dropped = consumeBandGain({ foundation: 2 }, { foundation: 3 });
+  check('decrease → no pulse (un-completing is not a reward)', dropped.pulseBand, null);
+  check('decrease → counts follow down', dropped.counts, { foundation: 2 });
+
+  check('first observation of a band → no pulse',
+    consumeBandGain({ foundation: 5 }, {}).pulseBand, null);
+
+  const two = consumeBandGain({ foundation: 3, expert: 5 }, { foundation: 1, expert: 2 });
+  check('two gains → the larger one wins (+3 expert vs +2 foundation)', two.pulseBand, 'expert');
+
+  check('non-numeric last-seen → treated as first observation',
+    consumeBandGain({ foundation: 2 }, { foundation: 'x' }).pulseBand, null);
+
+  check('null current → no pulse, empty counts',
+    consumeBandGain(null, { foundation: 3 }), { pulseBand: null, counts: {} });
 }
 
 console.log('misc:');
