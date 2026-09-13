@@ -139,6 +139,9 @@ export default function Home() {
   const prevUserRef = useRef(null);
   const consumedCountsRef = useRef(null);
   const [pulseBand, setPulseBand] = useState(null);
+  // One-shot glow on the tab row after "Pick a band" scrolls to it — the scroll
+  // moves the page; the glow moves the eyes.
+  const [tabsGlow, setTabsGlow] = useState(false);
   useEffect(() => {
     if (!progressReady || !curriculum) return;
     if (consumedCountsRef.current === levelCounts) return; // StrictMode re-run of the same state
@@ -251,7 +254,10 @@ export default function Home() {
                   <Link to={`/lessons/${heroNext.lesson.id}`} className="btn primary">{heroStarted ? 'Continue →' : 'Start here →'}</Link>
                   <button
                     className="btn ghost"
-                    onClick={() => document.getElementById('band-tabs-anchor')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+                    onClick={() => {
+                      setTabsGlow(true);
+                      document.getElementById('band-tabs-anchor')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }}
                   >
                     Pick a band
                   </button>
@@ -299,7 +305,11 @@ export default function Home() {
         </div>
       )}
       {curriculum && curriculum.length > 0 && (
-        <div className="band-tabs-row" id="band-tabs-anchor">
+        <div
+          className={`band-tabs-row${tabsGlow ? ' tabs-glow' : ''}`}
+          id="band-tabs-anchor"
+          onAnimationEnd={(e) => { if (e.target === e.currentTarget) setTabsGlow(false); }}
+        >
           <div className="band-tabs" role="tablist" aria-label="Filter curriculum by level">
             <button
               role="tab"
