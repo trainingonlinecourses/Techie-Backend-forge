@@ -6,6 +6,7 @@
       "java-strings-deep",
       "java-arrays-deep",
       "java-wrappers-deep",
+      "java-control-flow-deep",
       "java-exceptions-deep",
       "java-nested-classes",
       "java-enums-deep",
@@ -130,8 +131,22 @@
     "java-streams-advanced-consolidated"
   ],
   "newModules": [
-    {
-      "id": "java-1-7",
+  {
+   "id": "java-control-flow-deep",
+   "title": "Control Flow in Depth — Recursion, Trees, and Thinking in Calls",
+   "subtitle": "Recursion from absolute zero — base cases, the call stack, converting to loops, and processing tree-shaped data like file systems and JSON — the skill the reference sites all teach and interviews love to probe.",
+   "color": "#e0a832",
+   "tech": [
+    "Recursion",
+    "Call Stack",
+    "Trees",
+    "DFS/BFS",
+    "Loops"
+   ],
+   "docsUrl": "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/for.html"
+  },
+  {
+    "id": "java-1-7",
       "title": "Java 1–7 — The Foundations Era",
       "subtitle": "Where it all began: applets and the first JVM, the Collections Framework, Java 5's language revolution (generics, enums, autoboxing, varargs), and Java 7's fork/join, try-with-resources and the diamond operator — the story behind the syntax you use every day.",
       "order": 12,

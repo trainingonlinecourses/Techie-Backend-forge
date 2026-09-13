@@ -141,9 +141,13 @@ for (const m of ordered) {
     let text = fs.readFileSync(p, 'utf8');
     text = text.replace(/\r\n/g, '\n'); // CRLF checkouts — keep sections stable
 
-    // Idempotent: strip any previous auto-generated References section, rebuild.
-    const had = refsRe.test(text);
-    if (had) text = text.replace(refsSectionRe, '\n');
+    // Respect curated references: a hand-written References section is the
+    // author's judgment about the best resources for THIS lesson — never strip
+    // or replace it. Auto-enrichment only fills lessons that have none.
+    if (refsRe.test(text)) {
+      alreadyOk++;
+      continue;
+    }
 
     // Topic context: lesson title + summary + module metadata.
     const fm = /^---\n([\s\S]*?)\n---/.exec(text);
@@ -169,7 +173,7 @@ for (const m of ordered) {
     const out = text.replace(/\s*$/, '') + '\n' + lines.join('\n') + '\n';
 
     if (!dryRun) writeWithRetry(p, out);
-    had ? alreadyOk++ : enriched++;
+    enriched++;
   }
 }
 
