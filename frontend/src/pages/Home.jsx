@@ -213,7 +213,7 @@ export default function Home() {
               onClick={() => pickBand(lv)}
             >
               {LEVEL_SHORT[lv]}
-              {recommended === lv && <span className="band-tab-rec" title="Your next band to progress in" />}
+              {recommended === lv && <span className="band-tab-rec" title="Your next band to progress in — based on your completed lessons">Start here</span>}
               <span className="band-tab-count">{levelStats[lv].done}/{levelStats[lv].total}</span>
             </button>
           ))}
