@@ -2034,6 +2034,47 @@ typing i:nth-child(3) { animation-delay: 0.3s; }
    Learning-path levels & Java release version chips
    ========================================================================== */
 .level-h { margin: 26px 0 4px; }
+
+/* Level filter tabs (Foundation / Intermediate / Advanced / Expert) */
+.band-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 14px 0 6px;
+}
+.band-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border: 1px solid var(--line2, #2b3a4f);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--mut, #8b98a9);
+  font: inherit;
+  font-size: 13.5px;
+  cursor: pointer;
+  transition: color .15s, border-color .15s, background .15s;
+}
+.band-tab:hover { color: var(--fg, #e6edf3); border-color: rgba(76,194,255,.5); }
+.band-tab.active { color: var(--fg, #e6edf3); border-color: rgba(76,194,255,.7); background: rgba(76,194,255,.1); }
+.band-tab-count {
+  font-size: 11.5px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--line2, #2b3a4f);
+  color: var(--mut, #8b98a9);
+}
+.band-tab.active .band-tab-count { color: var(--blue, #4cc2ff); border-color: rgba(76,194,255,.5); }
+.band-tab.foundation.active     { border-color: rgba(111,206,111,.6); background: rgba(111,206,111,.08); }
+.band-tab.foundation.active .band-tab-count     { color: #6fce6f; border-color: rgba(111,206,111,.45); }
+.band-tab.intermediate.active { border-color: rgba(76,194,255,.6);  background: rgba(76,194,255,.08); }
+.band-tab.intermediate.active .band-tab-count { color: #4cc2ff; border-color: rgba(76,194,255,.45); }
+.band-tab.advanced.active     { border-color: rgba(187,154,247,.6); background: rgba(187,154,247,.08); }
+.band-tab.advanced.active .band-tab-count     { color: #bb9af7; border-color: rgba(187,154,247,.45); }
+.band-tab.expert.active       { border-color: rgba(255,158,100,.6); background: rgba(255,158,100,.08); }
+.band-tab.expert.active .band-tab-count       { color: #ff9e64; border-color: rgba(255,158,100,.45); }
+
 .level-pill {
   display: inline-block;
   font-size: 12.5px;

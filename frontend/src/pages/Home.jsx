@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { api, cached } from '../api/client';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useProgress } from '../hooks/useProgress.js';
@@ -15,6 +15,12 @@ const LEVEL_LABEL = {
   advanced: '⚡ Advanced — production backend skills',
   expert: '🏗️ Expert — architecture & operations',
 };
+const LEVEL_SHORT = {
+  foundation: '🌱 Foundation',
+  intermediate: '🚀 Intermediate',
+  advanced: '⚡ Advanced',
+  expert: '🏗️ Expert',
+};
 
 const TECH = [
   ['JAVA', 'JDK 21'], ['SPRING FRAMEWORK', 'IoC · DI · AOP'], ['SPRING BOOT', '3.4'],
@@ -28,6 +34,8 @@ export default function Home() {
   const { progress } = useProgress();
   const [stats, setStats] = useState(null);
   const [curriculum, setCurriculum] = useState(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const band = searchParams.get('band') || 'all';
 
   useEffect(() => {
     // Stale-while-revalidate: show the cached curriculum instantly (instant nav,
@@ -63,6 +71,25 @@ export default function Home() {
   }, [curriculum, progress]);
 
   const totalLessons = curriculum?.reduce((n, m) => n + (m.module.lessonCount ?? m.lessons.length), 0) ?? 0;
+
+  // Per-band progress, shown on the filter tabs.
+  const levelStats = useMemo(() => {
+    const map = {};
+    for (const lv of LEVELS) {
+      const mods = (curriculum || []).filter((m) => m.module.level === lv);
+      const total = mods.reduce((n, m) => n + (m.module.lessonCount ?? m.lessons.length), 0);
+      const done = mods.reduce((n, m) => n + m.lessons.filter((l) => progress[l.id]).length, 0);
+      map[lv] = { total, done };
+    }
+    return map;
+  }, [curriculum, progress]);
+
+  function pickBand(lv) {
+    const next = new URLSearchParams(searchParams);
+    if (lv === 'all') next.delete('band');
+    else next.set('band', lv);
+    setSearchParams(next, { replace: true });
+  }
 
   return (
     <div className="home">
@@ -137,12 +164,37 @@ export default function Home() {
         foundations first, then the modern language (Java 8 → 26), then the framework, then production practice —
         finishing with a complete runnable project.
       </p>
+      {curriculum && (
+        <div className="band-tabs" role="tablist" aria-label="Filter curriculum by level">
+          <button
+            role="tab"
+            aria-selected={band === 'all'}
+            className={`band-tab ${band === 'all' ? 'active' : ''}`}
+            onClick={() => pickBand('all')}
+          >
+            All bands
+            <span className="band-tab-count">{totalLessons}</span>
+          </button>
+          {LEVELS.map((lv) => (
+            <button
+              key={lv}
+              role="tab"
+              aria-selected={band === lv}
+              className={`band-tab ${lv} ${band === lv ? 'active' : ''}`}
+              onClick={() => pickBand(lv)}
+            >
+              {LEVEL_SHORT[lv]}
+              <span className="band-tab-count">{levelStats[lv].done}/{levelStats[lv].total}</span>
+            </button>
+          ))}
+        </div>
+      )}
       {!curriculum && (
         <div className="modgrid">
           {Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)}
         </div>
       )}
-      {LEVELS.map((lv) => {
+      {LEVELS.filter((lv) => band === 'all' || band === lv).map((lv) => {
         const mods = (curriculum || []).filter((m) => m.module.level === lv);
         if (!curriculum || mods.length === 0) return null;
         const lvTotal = mods.reduce((n, m) => n + (m.module.lessonCount ?? m.lessons.length), 0);
