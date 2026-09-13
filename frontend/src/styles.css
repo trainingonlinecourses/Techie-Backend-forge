@@ -2275,3 +2275,9 @@ typing i:nth-child(3) { animation-delay: 0.3s; }
   overflow: hidden; margin-top: 9px; max-width: 460px;
 }
 .cc-progress-fill { height: 100%; border-radius: 999px; transition: width .5s ease; }
+
+/* ---- Hero card: guided CTA + "Pick a band" side by side ---- */
+.cc-actions { display: flex; flex-direction: column; gap: 8px; align-items: stretch; flex-shrink: 0; }
+.cc-actions .btn { white-space: nowrap; }
+#band-tabs-anchor { scroll-margin-top: 84px; } /* clear the sticky navbar on anchor scroll */
+@media (max-width: 720px) { .cc-actions { flex-direction: row; } .cc-actions .btn { flex: 1; } }

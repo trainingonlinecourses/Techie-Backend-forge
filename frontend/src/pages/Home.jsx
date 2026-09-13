@@ -208,7 +208,15 @@ export default function Home() {
                     <div className="cc-progress-fill" style={{ width: `${bandPct}%`, background: bandColor }} />
                   </div>
                 </div>
-                <Link to={`/lessons/${heroNext.lesson.id}`} className="btn primary">{heroStarted ? 'Continue →' : 'Start here →'}</Link>
+                <div className="cc-actions">
+                  <Link to={`/lessons/${heroNext.lesson.id}`} className="btn primary">{heroStarted ? 'Continue →' : 'Start here →'}</Link>
+                  <button
+                    className="btn ghost"
+                    onClick={() => document.getElementById('band-tabs-anchor')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+                  >
+                    Pick a band
+                  </button>
+                </div>
               </div>
             );
           })()}
@@ -252,7 +260,7 @@ export default function Home() {
         </div>
       )}
       {curriculum && curriculum.length > 0 && (
-        <div className="band-tabs-row">
+        <div className="band-tabs-row" id="band-tabs-anchor">
           <div className="band-tabs" role="tablist" aria-label="Filter curriculum by level">
             <button
               role="tab"
