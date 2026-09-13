@@ -10,6 +10,14 @@
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
 </head>
 <body>
+  <script>
+    // Apply the saved theme before first paint — React would set it only after
+    // mounting, leaving a dark flash for light-theme visitors on every load.
+    try {
+      var t = localStorage.getItem('bf-theme');
+      if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+    } catch (e) { /* storage unavailable — default theme applies */ }
+  </script>
   <div id="root"></div>
   <script type="module" src="/src/main.jsx"></script>
 </body>

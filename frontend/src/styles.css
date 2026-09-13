@@ -2207,3 +2207,20 @@ typing i:nth-child(3) { animation-delay: 0.3s; }
   .tl-item { width: 190px; }
   .tl-head h1 { font-size: 24px; }
 }
+
+/* ---- Sidebar: module rows with collapse chevron + expand/collapse-all ---- */
+.sidebar-curriculum-head { display: flex; align-items: center; justify-content: space-between; }
+.sidebar-toggle-all {
+  background: none; border: none; color: var(--dim, #8b98a9); font: inherit; font-size: 11px;
+  cursor: pointer; padding: 2px 6px; border-radius: 6px;
+}
+.sidebar-toggle-all:hover { color: var(--txt, #e6edf3); background: var(--surface, #131720); }
+.modrow { display: flex; align-items: center; gap: 2px; }
+.modrow .modlink { flex: 1; min-width: 0; }
+.modchev {
+  background: none; border: none; color: var(--dim, #8b98a9); cursor: pointer;
+  font-size: 11px; padding: 4px 7px; border-radius: 6px; flex: 0 0 auto;
+  transition: transform .2s ease, color .15s, background .15s;
+}
+.modchev:hover { color: var(--txt, #e6edf3); background: var(--surface, #131720); }
+.modchev.open { transform: rotate(90deg); }
