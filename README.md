@@ -256,6 +256,11 @@ and `railway.toml` so the backend is one-click deployable on the free tier.
    curl https://backendforge-academy-api-bef2.onrender.com/actuator/health   # → {"status":"UP"}
    ```
 
+   The startup log must contain `DATABASE_URL detected → PostgreSQL pool: …` — that
+   line is proof the service is writing to Supabase and data survives deploys and
+   restarts. If it is missing, the app is silently running on the ephemeral default
+   H2 and every registration will be lost on the next restart.
+
 Free-tier notes: the web instance sleeps after ~15 min idle (the first request takes ~1 min to
 wake), and Render's free Postgres **expires after 30 days** — upgrade it to the Starter plan for a
 permanent database. Demo accounts (`admin`/`admin123`, `learner`/`learner123`) are seeded at
