@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { api, errorMessage } from '../api/client';
 import JavaIdeEditor from '../components/JavaIdeEditor.jsx';
+import JShellTerminal from '../components/JShellTerminal.jsx';
 
 const LAB_TIMEOUT_MINUTES = 30;
 const POLL_INTERVAL_MS = 15000; // poll session status every 15s
@@ -17,6 +18,8 @@ export default function LabPage() {
   const [expired, setExpired] = useState(false);
   const [error, setError] = useState(null);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  // 'ide' runs whole classes; 'jshell' is the snippet REPL with persistent vars.
+  const [mode, setMode] = useState('ide');
   const pollRef = useRef(null);
   const sessionIdRef = useRef(null);
 
@@ -205,27 +208,52 @@ export default function LabPage() {
           </aside>
 
           <main className="lab-workspace">
-            <JavaIdeEditor
-              initialCode={code}
-              onChange={setCode}
-              initialOutput={output}
-              onRun={(out) => {
-                setOutput(out);
-                // Persist output server-side so it survives a page reload
-                // within the 30-minute session window.
-                if (sessionIdRef.current) {
-                  api.post('/labs/output', { output: out }, {
-                    params: { sessionId: sessionIdRef.current }
-                  }).catch(() => {});
-                }
-              }}
-            />
+            <div className="lab-mode-tabs" role="tablist" aria-label="Lab mode">
+              <button
+                role="tab"
+                aria-selected={mode === 'ide'}
+                className={`lab-mode-tab ${mode === 'ide' ? 'active' : ''}`}
+                onClick={() => setMode('ide')}
+              >
+                ⌨ IDE — full class
+              </button>
+              <button
+                role="tab"
+                aria-selected={mode === 'jshell'}
+                className={`lab-mode-tab ${mode === 'jshell' ? 'active' : ''}`}
+                onClick={() => setMode('jshell')}
+              >
+                ⚡ JShell — snippets
+              </button>
+            </div>
 
-            {!output && !isRunning && (
-              <div className="lab-hint">
-                💡 Edit the code and click <strong>Run</strong> (or press Ctrl+Enter).
-                Your output is saved to this session for 30 minutes.
-              </div>
+            {mode === 'ide' ? (
+              <>
+                <JavaIdeEditor
+                  initialCode={code}
+                  onChange={setCode}
+                  initialOutput={output}
+                  onRun={(out) => {
+                    setOutput(out);
+                    // Persist output server-side so it survives a page reload
+                    // within the 30-minute session window.
+                    if (sessionIdRef.current) {
+                      api.post('/labs/output', { output: out }, {
+                        params: { sessionId: sessionIdRef.current }
+                      }).catch(() => {});
+                    }
+                  }}
+                />
+
+                {!output && !isRunning && (
+                  <div className="lab-hint">
+                    💡 Edit the code and click <strong>Run</strong> (or press Ctrl+Enter).
+                    Your output is saved to this session for 30 minutes.
+                  </div>
+                )}
+              </>
+            ) : (
+              <JShellTerminal />
             )}
           </main>
         </div>
