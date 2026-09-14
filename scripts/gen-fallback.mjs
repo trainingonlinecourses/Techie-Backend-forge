@@ -1,8 +1,12 @@
 #!/usr/bin/env node
 /**
  * Regenerates frontend/src/fallbackCurriculum.js from the canonical
- * backend/src/main/resources/content/modules.json, preserving the
- * lessonCount/minutes of modules already present in the old file.
+ * backend/src/main/resources/content.
+ *
+ * Module metadata comes from modules.json; lessonCount and minutes are
+ * computed from the lesson files themselves (front-matter `minutes:`), so the
+ * fallback can never drift from the real curriculum the way a carried-over
+ * count did (it once summed 563 lessons while the curriculum held 792).
  *
  * Usage: node scripts/gen-fallback.mjs
  */
@@ -13,13 +17,21 @@ import { fileURLToPath } from 'node:url';
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const mods = JSON.parse(fs.readFileSync(
   path.join(root, 'backend/src/main/resources/content/modules.json'), 'utf8'));
+const lessonsBase = path.join(root, 'backend/src/main/resources/content/lessons');
 const fallbackPath = path.join(root, 'frontend/src/fallbackCurriculum.js');
-const oldSrc = fs.readFileSync(fallbackPath, 'utf8');
 
-// Carry over lessonCount/minutes from the existing fallback where ids match.
-const old = new Map();
-for (const m of oldSrc.matchAll(/id: '([a-z0-9-]+)'[\s\S]*?lessonCount: (\d+), minutes: (\d+)/g)) {
-  old.set(m[1], { lc: +m[2], min: +m[3] });
+/** Count lessons and sum front-matter minutes for one module directory. */
+function moduleStats(moduleId) {
+  const dir = path.join(lessonsBase, moduleId);
+  if (!fs.existsSync(dir)) return { lc: 0, min: 0 };
+  let lc = 0;
+  let min = 0;
+  for (const f of fs.readdirSync(dir).filter((x) => x.endsWith('.md'))) {
+    lc++;
+    const m = /^minutes:\s*(\d+)\s*$/m.exec(fs.readFileSync(path.join(dir, f), 'utf8'));
+    min += m ? +m[1] : 10; // same default the backend loader uses
+  }
+  return { lc, min };
 }
 
 const esc = (s) => String(s).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
@@ -30,13 +42,13 @@ const versionOf = (id) => {
 };
 
 const entries = mods.map((m) => {
-  const o = old.get(m.id) || { lc: 0, min: 0 };
+  const { lc, min } = moduleStats(m.id);
   const tech = (m.tech || []).map((t) => `'${esc(t)}'`).join(', ');
   const ver = versionOf(m.id);
   return `  { module: { id: '${esc(m.id)}', title: '${esc(m.title)}', subtitle: '${esc(m.subtitle)}', `
     + `order: ${m.order}, level: '${esc(m.level)}', version: ${ver ? `'${esc(ver)}'` : 'null'}, `
     + `color: '${esc(m.color)}', tech: [${tech}], docsUrl: '${esc(m.docsUrl)}', `
-    + `lessonCount: ${o.lc}, minutes: ${o.min} }, lessons: [] },`;
+    + `lessonCount: ${lc}, minutes: ${min} }, lessons: [] },`;
 });
 
 const out = `// Shown when the API is unreachable (e.g. a static-only deployment) so the
@@ -49,4 +61,6 @@ ${entries.join('\n')}
 `;
 
 fs.writeFileSync(fallbackPath, out);
-console.log(`written ${entries.length} entries`);
+const totalLessons = entries.reduce((a, e) => a + (+(e.match(/lessonCount: (\d+)/) || [0, 0])[1]), 0);
+const totalMinutes = entries.reduce((a, e) => a + (+(e.match(/minutes: (\d+) },/) || [0, 0])[1]), 0);
+console.log(`written ${entries.length} entries — ${totalLessons} lessons, ${totalMinutes} minutes`);
