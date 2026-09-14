@@ -1,7 +1,7 @@
 ---
 title: Bean Post-Processors — The Hooks That Make Spring Spring
 summary: BeanPostProcessor vs BeanFactoryPostProcessor, the lifecycle hooks, and the production use-cases — property redaction, proxying, and customization.
-order: 2
+order: 11
 minutes: 22
 topics: [beanpostprocessor, beanfactorypostprocessor, postprocess, lifecycle-hooks, proxies, customization]
 docs:

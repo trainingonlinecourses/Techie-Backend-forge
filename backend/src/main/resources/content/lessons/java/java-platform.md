@@ -1,7 +1,7 @@
 ---
 title: The Java Platform — JVM, JRE, JDK, Bytecode, and Garbage Collection
 summary: What the JVM actually does, how source code becomes bytecode, how the JIT compiler makes Java fast, how garbage collection works, class loading, and why understanding the platform matters for production debugging with line-by-line walkthroughs.
-order: 43
+order: 1
 minutes: 25
 topics: [jvm, jre, jdk, bytecode, jit, garbage-collection, class-loading, java-platform]
 docs:

@@ -1,7 +1,7 @@
 ---
 title: The Environment Abstraction — Properties, Profiles and Resolution Order
 summary: Environment, PropertySources, resolution order, and how property precedence protects prod from dev defaults in real deployments.
-order: 12
+order: 14
 minutes: 20
 topics: [environment, propertysources, resolution-order, property-resolution, profiles, property-override]
 docs:

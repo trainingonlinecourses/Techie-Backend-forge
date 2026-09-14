@@ -1,7 +1,7 @@
 ---
 title: @ConfigurationProperties — Type-Safe Configuration
 summary: What @ConfigurationProperties is, binding rules, nested properties, validation, defaults, and how organizations manage configuration safely.
-order: 2
+order: 1
 minutes: 20
 topics: [@configurationproperties, type-safe-config, validation, defaults, spring-boot]
 docs:

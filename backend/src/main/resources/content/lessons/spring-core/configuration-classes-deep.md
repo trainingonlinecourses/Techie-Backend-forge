@@ -1,7 +1,7 @@
 ---
 title: @Configuration Classes in Depth — proxyBeanMethods and @Bean Semantics
 summary: How @Configuration is proxied, why bean-to-bean calls return singletons, proxyBeanMethods=false, and the @Bean lifecycle wiring teams rely on.
-order: 8
+order: 7
 minutes: 18
 topics: [configuration, proxybeanmethods, bean-methods, full-lite-mode, bean-wiring, lifecycle]
 docs:

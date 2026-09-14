@@ -1,7 +1,7 @@
 ---
 title: Class Loading & the JVM — Complete Beginner's Guide
 summary: How the JVM loads classes, the three class loaders, delegation model, and why classloader leaks crash redeployments.
-order: 11
+order: 2
 minutes: 18
 topics: [classloading, classloader, delegation, parent-first, classpath, metaspace]
 docs:

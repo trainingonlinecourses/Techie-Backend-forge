@@ -1,7 +1,7 @@
 ---
 title: Validating Configuration Properties — Fail Fast on Bad Config
 summary: How to validate @ConfigurationProperties with @Validated, using Jakarta Validation annotations, nested properties, and custom validators.
-order: 5
+order: 4
 minutes: 15
 topics: [@Validated, jakarta-validation, nested-properties, custom-validator, fail-fast]
 docs:

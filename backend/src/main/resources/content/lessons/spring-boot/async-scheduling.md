@@ -1,7 +1,7 @@
 ---
 title: @Async, @Scheduled & Background Work
 summary: Running work off the request thread, scheduled jobs, and the pitfalls (proxy, executor tuning, missed runs).
-order: 5
+order: 35
 minutes: 14
 topics: [async, scheduled, task-executor, background-jobs]
 docs:

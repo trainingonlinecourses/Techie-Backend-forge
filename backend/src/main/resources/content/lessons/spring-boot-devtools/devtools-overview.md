@@ -1,7 +1,7 @@
 ---
 title: Spring Boot DevTools — Development Productivity
 summary: How Spring Boot DevTools accelerates development with automatic restarts, LiveReload, property defaults, and remote debugging — and why it's automatically disabled in production.
-order: 2
+order: 1
 minutes: 20
 topics: ["devtools", "automatic restart", "livereload", "property defaults", "remote debug"]
 docs:

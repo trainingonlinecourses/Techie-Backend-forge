@@ -1,7 +1,7 @@
 ---
 title: OOP & Encapsulation — Classes, Interfaces, Records, Polymorphism
 summary: The four pillars of OOP explained for beginners: encapsulation with private fields, inheritance with the fragile base class problem, polymorphism as the foundation of Spring DI, abstraction through interfaces and records, and composition over inheritance.
-order: 41
+order: 15
 minutes: 35
 topics: [oop, encapsulation, polymorphism, records, interfaces, inheritance, composition, abstraction]
 docs:

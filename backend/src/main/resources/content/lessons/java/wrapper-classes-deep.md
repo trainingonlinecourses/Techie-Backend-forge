@@ -1,7 +1,7 @@
 ---
 title: Wrapper Classes — Autoboxing, Caching & the Integer Trap
 summary: Primitive-to-object conversion, the Integer cache trap, NullPointerException on unboxing, and why equals() beats == for wrapper comparison.
-order: 86
+order: 30
 minutes: 18
 topics: [wrapper-classes, autoboxing, unboxing, integer-cache, equals-vs-operator, null-safety]
 docs:

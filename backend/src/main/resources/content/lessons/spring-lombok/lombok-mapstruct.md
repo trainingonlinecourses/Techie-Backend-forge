@@ -1,7 +1,7 @@
 ---
 title: Lombok & MapStruct — Eliminate Boilerplate Code
 summary: What Lombok and MapStruct are, @Data, @Builder, @Value, @Slf4j, MapStruct mappers, and how organizations use them to write clean, maintainable code.
-order: 4
+order: 3
 minutes: 30
 topics: [lombok, mapstruct, @Data, @Builder, @Value, @Slf4j, mappers, boilerplate]
 docs:

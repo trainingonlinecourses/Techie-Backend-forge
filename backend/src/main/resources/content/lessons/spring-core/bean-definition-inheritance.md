@@ -1,7 +1,7 @@
 ---
 title: Bean Definitions & FactoryBean — How Beans Are Actually Built
 summary: BeanDefinition as the recipe, FactoryBean for complex construction, and the container internals that explain lazy init, aliases and primary beans.
-order: 1
+order: 9
 minutes: 20
 topics: [beandefinition, factorybean, lazy-init, aliases, primary, bean-lifecycle, container-internals]
 docs:

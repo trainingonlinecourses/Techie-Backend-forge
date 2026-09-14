@@ -1,7 +1,7 @@
 ---
 title: Lombok with Testing — Mockito, Jackson, and JPA
 summary: How Lombok annotations interact with testing frameworks, common pitfalls with @MockBean, JSON serialization, and JPA entity mapping.
-order: 5
+order: 4
 minutes: 15
 topics: [lombok-testing, jackson, jpa, mockito, deserialization, entity-mapping]
 docs:

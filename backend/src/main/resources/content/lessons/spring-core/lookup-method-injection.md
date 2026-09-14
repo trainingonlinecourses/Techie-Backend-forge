@@ -1,7 +1,7 @@
 ---
 title: Method Injection & ObjectProvider — Prototype Beans Inside Singletons
 summary: The prototype-in-singleton trap, @Lookup, ObjectProvider and Supplier injection, and the scenarios that genuinely need per-call beans.
-order: 15
+order: 5
 minutes: 20
 topics: [lookup, objectprovider, prototype-scope, method-injection, provider, scoped-proxy]
 docs:

@@ -1,7 +1,7 @@
 ---
 title: Java Exception Handling — try/catch, throw/throws, and Recovery Strategies
 summary: The exception hierarchy explained for beginners: checked vs unchecked, try-with-resources, custom exceptions, multi-catch, and how organizations use exception handling for retry logic, circuit breakers, and audit trails.
-order: 33
+order: 41
 minutes: 30
 topics: [exceptions, try-catch, checked-unchecked, custom-exceptions, try-with-resources, exception-hierarchy, throw-throws, multi-catch]
 docs:

@@ -1,7 +1,7 @@
 ---
 title: Component Scanning & @Import — Complete Beginner's Guide
 summary: How Spring finds your beans, why package structure matters, @Import for third-party libraries, and the debugging tricks that save hours.
-order: 6
+order: 8
 minutes: 22
 topics: [componentscan, import, stereotypes, filters, bean-discovery, package-structure]
 docs:

@@ -1,7 +1,7 @@
 ---
 title: Scanner & User Input — Reading Data the Safe Way
 summary: How Scanner tokenizes input, the notorious nextInt-vs-nextLine newline trap, validation loops, and why server-side Java reads configuration instead of keyboards.
-order: 68
+order: 7
 minutes: 16
 topics: [scanner, user-input, nextline-trap, console, input-validation]
 docs:

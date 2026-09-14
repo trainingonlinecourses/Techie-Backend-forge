@@ -1,7 +1,7 @@
 ---
 title: "Exception Handling — Clean Error Responses That Clients Actually Understand"
 summary: "@ControllerAdvice, custom exceptions, RFC 7807 Problem Details, global exception handlers, and how organizations return consistent error responses."
-order: 28
+order: 16
 minutes: 20
 topics: [exception-handling, controller-advice, custom-exceptions, error-response, rfc-7807, handler-exception]
 docs:

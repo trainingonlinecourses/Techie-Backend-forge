@@ -1,7 +1,7 @@
 ---
 title: "Bean Validation — Reject Bad Data Before It Touches Your Code"
 summary: "What Bean Validation is, how @Valid works, custom constraints, group validation, and how organizations use it to enforce data quality at the API boundary."
-order: 54
+order: 14
 minutes: 20
 topics: [bean-validation, hibernate-validator, @valid, custom-constraints, validation-groups, jakarta-validation]
 docs:

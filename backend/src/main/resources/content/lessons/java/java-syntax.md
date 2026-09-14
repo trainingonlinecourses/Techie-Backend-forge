@@ -1,7 +1,7 @@
 ---
 title: Java Language Fundamentals — Types, Operators, Control Flow, and Strings
 summary: Everything a beginner needs to know about Java basics: primitives vs objects, type system, operators with precedence rules, every control flow statement explained, and String handling with line-by-line code walkthroughs.
-order: 48
+order: 3
 minutes: 35
 topics: [types, primitives, control-flow, strings, operators, autoboxing, switch, loops]
 docs:

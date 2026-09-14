@@ -1,7 +1,7 @@
 ---
 title: MDC Logging — Context Across Threads
 summary: How the MDC (Mapped Diagnostic Context) works, adding request-scoped data to logs, thread propagation, and production logging patterns.
-order: 4
+order: 3
 minutes: 15
 topics: [mdc, diagnostic-context, request-scoped, thread-local, logging-context]
 docs:

@@ -1,7 +1,7 @@
 ---
 title: @Value Injection — Property Placeholders and SpEL in Fields
 summary: ${...} vs #{...}, defaults, constructor injection of values, and the scenarios where @Value is right and where @ConfigurationProperties is better.
-order: 24
+order: 4
 minutes: 18
 topics: [value, placeholder, spel, property-injection, defaults, constructor-injection]
 docs:

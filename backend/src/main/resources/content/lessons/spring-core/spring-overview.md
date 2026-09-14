@@ -1,7 +1,7 @@
 ---
 title: The Spring Ecosystem — A Complete Beginner's Guide
 summary: Why Spring exists, the problems it solves, every project in the platform explained in depth, and how organizations standardize on it.
-order: 22
+order: 1
 minutes: 20
 topics: [spring, ecosystem, roadmap, dependency-injection, inversion-of-control]
 docs:

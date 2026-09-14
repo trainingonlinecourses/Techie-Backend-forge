@@ -1,7 +1,7 @@
 ---
 title: Profiles — Environment-Specific Behavior
 module: spring-configuration
-order: 3
+order: 4
 minutes: 24
 topics: ["@Profile", "profiles", "environment-specific config", "active profiles", "conditional beans"]
 ```java

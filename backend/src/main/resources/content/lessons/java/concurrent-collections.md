@@ -1,7 +1,7 @@
 ---
 title: Concurrent Collections — Thread-Safe Data Structures Beyond Synchronized
 summary: ConcurrentHashMap, CopyOnWriteArrayList, BlockingQueue, and the concurrent map atomic operations that replace manual synchronization in production code.
-order: 15
+order: 69
 minutes: 22
 topics: [concurrent-hashmap, copy-on-write, blocking-queue, concurrent-map, atomic-operations, thread-safe-collections]
 docs:

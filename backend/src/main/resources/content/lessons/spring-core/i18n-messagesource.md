@@ -1,7 +1,7 @@
 ---
 title: Internationalization (i18n) with MessageSource
 summary: Locale-aware messages with MessageSource, message.properties files, parameterized and pluralized text, and locale resolution in Spring MVC.
-order: 13
+order: 24
 minutes: 12
 topics: [i18n, messagesource, locale, resource bundles, localeresolver]
 docs:

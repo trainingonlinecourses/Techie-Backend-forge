@@ -1,7 +1,7 @@
 ---
 title: "DTO Pattern — Never Expose Your Entities to the Outside World"
 summary: "What DTOs are, why you need them, how to map entities to DTOs and back, and how organizations use them to decouple internal models from API contracts."
-order: 24
+order: 11
 minutes: 22
 topics: [dto, data-transfer-object, entity-mapping, record-dto, mapstruct, api-contract]
 docs:

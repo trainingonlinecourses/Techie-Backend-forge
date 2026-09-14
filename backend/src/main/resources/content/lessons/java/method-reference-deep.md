@@ -1,7 +1,7 @@
 ---
 title: Method References — Lambdas That Just Point at Existing Code
 summary: The four kinds of method references (static, bound, unbound, constructor), how the compiler translates them, and where organizations use them to make stream pipelines read like sentences.
-order: 55
+order: 44
 minutes: 18
 topics: [method-reference, lambda, streams, constructor-reference, functional-programming]
 docs:

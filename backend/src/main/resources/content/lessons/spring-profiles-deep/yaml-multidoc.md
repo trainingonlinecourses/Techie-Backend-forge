@@ -1,7 +1,7 @@
 ---
 title: YAML Multi-Document and Profile Configuration
 summary: How Spring profiles work with YAML multi-document sections, property precedence, profile-specific properties, and externalized configuration strategies.
-order: 6
+order: 4
 minutes: 15
 topics: [yaml, multi-document, profile-properties, property-source, configuration]
 docs:

@@ -1,7 +1,7 @@
 ---
 title: AOP & Proxies
 summary: Aspects, pointcuts, advice types, how Spring AOP works — and the self-invocation trap that bites everyone.
-order: 20
+order: 19
 minutes: 18
 topics: [aop, aspects, pointcuts, proxies, self-invocation]
 docs:

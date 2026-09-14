@@ -1,7 +1,7 @@
 ---
 title: OAuth2 Overview — Roles, Grants, and the Protocol
 module: oauth2-oidc
-order: 3
+order: 1
 minutes: 27
 topics: ["OAuth2", "authorization server", "resource server", "scopes", "grants", "tokens"]
 summary: The worst way to let an app access your data on another service is to hand over your password — the app then has total, permanent, unrevocable acce...

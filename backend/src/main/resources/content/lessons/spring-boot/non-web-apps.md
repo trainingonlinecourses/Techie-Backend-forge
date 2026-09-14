@@ -1,7 +1,7 @@
 ---
 title: Non-Web Spring Boot Applications — CLI, Batch, and Background Services
 summary: Building Spring Boot apps that don't serve HTTP — command-line runners, application runners, scheduled services, and when to use a web server vs a standalone process.
-order: 38
+order: 56
 minutes: 18
 topics: [non-web, commandline-runner, application-runner, spring-boot-cli, background-service, headless]
 docs:

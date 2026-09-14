@@ -1,7 +1,7 @@
 ---
 title: Pass-by-Value vs Pass-by-Reference — The Definitive Guide
 summary: Why Java is always pass-by-value, the difference between copying primitives vs object references, and the common trap of trying to reassign parameters.
-order: 63
+order: 9
 minutes: 16
 topics: [pass-by-value, pass-by-reference, object-references, method-parameters, memory-model]
 docs:

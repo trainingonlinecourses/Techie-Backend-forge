@@ -1,7 +1,7 @@
 ---
 title: Method Validation — @Validated on Services and Param Constraints
 summary: Jakarta Bean Validation on method parameters and return values, @Validated, groups, and the scenarios where service-layer validation beats field-only checks.
-order: 16
+order: 22
 minutes: 17
 topics: [method-validation, validated, constraint, param-validation, return-value-validation, validation-groups, jakarta-validation]
 docs:

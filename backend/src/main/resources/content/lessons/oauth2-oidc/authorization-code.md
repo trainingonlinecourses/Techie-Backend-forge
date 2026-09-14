@@ -1,7 +1,7 @@
 ---
 title: The Authorization Code Flow — With PKCE
 module: oauth2-oidc
-order: 1
+order: 2
 minutes: 27
 topics: ["authorization code", "PKCE", "redirect URIs", "code exchange", "state", "SPA"]
 summary: The authorization code flow is the workhorse of OAuth2 — the flow behind every "Sign in with Google / GitHub / Apple" button. Its genius is a twost...

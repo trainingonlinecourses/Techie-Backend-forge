@@ -1,7 +1,7 @@
 ---
 title: Java Date & Time API — LocalDate, LocalDateTime, Instant, and DateTimeFormatter
 summary: Why the old Date/Calendar API was replaced, the modern java.time package explained for beginners: LocalDate for dates, LocalDateTime for timestamps, Instant for epoch time, Duration/Period for calculations, DateTimeFormatter for parsing, and timezone handling with line-by-line walkthroughs.
-order: 32
+order: 47
 minutes: 28
 topics: [localdate, localdatetime, instant, duration, period, datetimeformatter, timezone, epoch, java-time]
 docs:

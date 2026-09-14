@@ -1,7 +1,7 @@
 ---
 title: Bean Scopes & Lifecycle
 summary: The full lifecycle of a bean — instantiation to destruction — plus the stereotypes and @Bean patterns.
-order: 3
+order: 10
 minutes: 16
 topics: [lifecycle, stereotypes, postconstruct, beandefinition]
 docs:

@@ -1,7 +1,7 @@
 ---
 title: JWT Structure — What's Actually in a Token
 module: spring-security-jwt-deep
-order: 3
+order: 1
 minutes: 26
 topics: ["JWT", "JWS", "header", "payload", "signature", "base64url"]
 summary: A JWT (JSON Web Token) is a compact, URLsafe string that carries claims (statements about a subject — "user 42 is an admin", "this token expires at...

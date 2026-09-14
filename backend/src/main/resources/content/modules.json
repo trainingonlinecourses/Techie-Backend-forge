@@ -248,10 +248,25 @@
     "level": "intermediate"
   },
   {
+    "id": "java-21",
+    "title": "Java 21 LTS Features",
+    "subtitle": "Virtual threads, sequenced collections, pattern matching switch, record patterns.",
+    "order": 17,
+    "color": "#9b59b6",
+    "tech": [
+      "Virtual Threads",
+      "Sequenced Collections",
+      "Pattern Matching Switch",
+      "Record Patterns"
+    ],
+    "docsUrl": "https://docs.oracle.com/en/java/javase/21/docs/api/",
+    "level": "intermediate"
+  },
+  {
     "id": "java-22-24",
     "title": "Java 22–24 — The Releases Between LTS",
     "subtitle": "Unnamed variables, markdown doc comments, stream gatherers finalized, pinning-free synchronized virtual threads and AOT class loading — everything shipped in the releases between Java 21 and 25, explained for beginners.",
-    "order": 17,
+    "order": 18,
     "color": "#f39c12",
     "tech": [
       "Unnamed Variables",
@@ -261,21 +276,6 @@
       "AOT"
     ],
     "docsUrl": "https://inside.java/",
-    "level": "intermediate"
-  },
-  {
-    "id": "java-21",
-    "title": "Java 21 LTS Features",
-    "subtitle": "Virtual threads, sequenced collections, pattern matching switch, record patterns.",
-    "order": 18,
-    "color": "#9b59b6",
-    "tech": [
-      "Virtual Threads",
-      "Sequenced Collections",
-      "Pattern Matching Switch",
-      "Record Patterns"
-    ],
-    "docsUrl": "https://docs.oracle.com/en/java/javase/21/docs/api/",
     "level": "intermediate"
   },
   {

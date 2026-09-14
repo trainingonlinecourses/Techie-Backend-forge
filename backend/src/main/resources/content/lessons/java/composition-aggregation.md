@@ -1,7 +1,7 @@
 ---
 title: Composition vs Aggregation vs Association
 summary: The three levels of object relationships — when to use has-a vs owns-a, lifecycle management, and real-world organizational design patterns.
-order: 14
+order: 19
 minutes: 15
 topics: [composition, aggregation, association, has-a, object-relationships, solid-principles]
 docs:

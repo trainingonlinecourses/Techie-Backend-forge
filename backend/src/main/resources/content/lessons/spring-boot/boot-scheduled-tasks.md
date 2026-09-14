@@ -1,7 +1,7 @@
 ---
 title: Scheduled Tasks — @Scheduled, @Async, and Task Schedulers
 summary: Cron expressions, fixed-rate vs fixed-delay, task scheduler configuration, distributed scheduling with ShedLock, thread pool sizing, and how organizations run background jobs without duplication.
-order: 12
+order: 37
 minutes: 20
 topics: [scheduled, cron, fixed-rate, fixed-delay, task-scheduler, shedlock, async, thread-pool, distributed-lock]
 docs:

@@ -1,7 +1,7 @@
 ---
 title: SpEL Advanced — Expressions in Security, Caching and Configuration
 summary: The SpEL evaluation model, where SpEL appears in production (security, caching, @Value, routing), and the security/performance rules for untrusted expressions.
-order: 18
+order: 17
 minutes: 18
 topics: [spel, expression, evaluation, spel-context, security-expressions, cache-keys, template-expressions]
 docs:

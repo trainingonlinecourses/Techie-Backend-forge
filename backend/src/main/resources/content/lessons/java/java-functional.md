@@ -1,7 +1,7 @@
 ---
 title: Java Functional Programming — Lambda Expressions, Method References, and Functional Interfaces
 summary: What functional programming means in Java, writing lambda expressions step by step, built-in functional interfaces (Predicate, Function, Consumer, Supplier), method references, composition of functions, and how Spring uses functional patterns with line-by-line walkthroughs.
-order: 34
+order: 43
 minutes: 30
 topics: [lambda, functional-interface, predicate, function, consumer, supplier, method-reference, composition]
 docs:

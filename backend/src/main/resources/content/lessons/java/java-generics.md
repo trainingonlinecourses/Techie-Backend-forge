@@ -1,7 +1,7 @@
 ---
 title: Java Generics — Type Parameters, Bounded Types, Wildcards, and PECS Rule
 summary: What generics are and why they exist, writing generic classes and methods, bounded type parameters, the PECS rule (Producer Extends, Consumer Super), type erasure, and common wildcard patterns with line-by-line code walkthroughs.
-order: 35
+order: 39
 minutes: 30
 topics: [generics, type-parameters, bounded-types, wildcards, pecs, type-erasure, generic-methods]
 docs:

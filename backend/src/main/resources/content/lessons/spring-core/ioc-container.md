@@ -1,7 +1,7 @@
 ---
 title: Inversion of Control & the ApplicationContext — Complete Beginner's Guide
 summary: What IoC really means, how the container builds and wires beans step by step, why singleton statelessness matters, and the prototype injection trap.
-order: 14
+order: 2
 minutes: 22
 topics: [ioc, applicationcontext, beans, scopes, bean-lifecycle, singleton, prototype]
 docs:

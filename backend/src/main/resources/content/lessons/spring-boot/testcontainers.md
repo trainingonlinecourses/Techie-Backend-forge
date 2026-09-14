@@ -1,7 +1,7 @@
 ---
 title: Integration Testing with Testcontainers
 summary: Real Postgres, Kafka, Redis and more in tests — spinning up disposable containers, wiring them to Spring contexts, and the JUnit 5 lifecycle.
-order: 50
+order: 44
 minutes: 16
 topics: [testcontainers, integration testing, docker, test lifecycle, @ServiceConnection]
 docs:

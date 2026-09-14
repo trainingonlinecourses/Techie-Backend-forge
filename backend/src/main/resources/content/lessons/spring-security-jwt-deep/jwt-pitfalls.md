@@ -1,7 +1,7 @@
 ---
 title: JWT Security — The Attacks and the Fixes
 module: spring-security-jwt-deep
-order: 2
+order: 4
 minutes: 27
 topics: ["alg confusion", "secret management", "token theft", "XSS", "CSRF", "hardening"]
 summary: A JWT's trust model rests on one assumption: only the server can produce a valid signature. Every JWT vulnerability is ultimately a way to violate ...

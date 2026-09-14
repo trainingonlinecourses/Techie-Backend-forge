@@ -1,7 +1,7 @@
 ---
 title: Java Records — Immutable Data Carriers
 summary: Replace verbose POJOs with one-line records, compact constructors for validation, generic records, and using records for DTOs and domain events.
-order: 44
+order: 27
 minutes: 20
 topics: [java-records, immutable, dto, data-carrier, compact-constructor, pattern-matching]
 docs:

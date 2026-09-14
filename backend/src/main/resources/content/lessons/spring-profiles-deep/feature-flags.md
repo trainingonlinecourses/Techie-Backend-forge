@@ -1,7 +1,7 @@
 ---
 title: Feature Flags with Spring Profiles
 summary: Using profiles as feature flags, conditional beans, @ConditionalOnProperty, and gradual rollout strategies.
-order: 1
+order: 5
 minutes: 15
 topics: [feature-flags, conditional-beans, conditional-on-property, gradual-rollout, a-b-testing]
 docs:

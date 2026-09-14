@@ -1,7 +1,7 @@
 ---
 title: Spring Boot Project Structure — The Complete Guide
 summary: How a Spring Boot project is organized — src/main/java, src/main/resources, src/test, the role of pom.xml/build.gradle, and how to structure a real enterprise application. Beginner-friendly with line-by-line explanations.
-order: 10
+order: 2
 minutes: 20
 topics: [project structure, pom.xml, build.gradle, src layout, application.properties, profiles, enterprise structure]
 docs:

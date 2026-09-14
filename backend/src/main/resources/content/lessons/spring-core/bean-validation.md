@@ -1,7 +1,7 @@
 ---
 title: Bean Validation with Jakarta Validation
 summary: Declarative validation with @Valid, @NotNull and friends — jakarta.validation annotations, custom constraints, groups and error handling in REST APIs.
-order: 4
+order: 21
 minutes: 15
 topics: [bean validation, jakarta validation, constraints, validation groups, error handling]
 docs:

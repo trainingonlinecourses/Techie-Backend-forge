@@ -1,7 +1,7 @@
 ---
 title: Property Sources — Where Configuration Comes From
 module: spring-configuration
-order: 4
+order: 2
 minutes: 23
 topics: ["@PropertySource", "Environment", "property sources", "custom sources", "placeholder resolution"]
 summary: The Environment is Spring's unified view of configuration: a list of property sources (each a Maplike of key → value), consulted in order. Every ${...

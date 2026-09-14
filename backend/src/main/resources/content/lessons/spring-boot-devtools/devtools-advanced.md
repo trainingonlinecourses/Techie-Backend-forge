@@ -1,7 +1,7 @@
 ---
 title: DevTools Advanced — Customizing Restart, LiveReload, and Remote Debug
 summary: Advanced DevTools configuration: custom restart triggers, conditional restart exclusions, remote application debugging, resource-only restart for frontend dev, and performance tuning.
-order: 1
+order: 5
 minutes: 22
 topics: ["trigger file", "restart exclusion", "remote debug", "resource restart", "performance tuning"]
 docs:

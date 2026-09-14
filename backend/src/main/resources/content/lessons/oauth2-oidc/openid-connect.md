@@ -1,7 +1,7 @@
 ---
 title: OpenID Connect — OAuth2 Plus Identity
 module: oauth2-oidc
-order: 5
+order: 3
 minutes: 26
 topics: ["OpenID Connect", "ID token", "discovery", "userinfo", "claims", "authentication"]
 summary: OAuth2 answers "what can this app do for the user?" — but it famously does not answer "who is the user?" A resource server can verify a token's val...

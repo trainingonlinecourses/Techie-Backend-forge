@@ -1,7 +1,7 @@
 ---
 title: Java Concurrency — Threads, Synchronization, ExecutorService, and CompletableFuture
 summary: Thread basics for beginners, creating and starting threads, synchronized and volatile, ExecutorService thread pools, Future and CompletableFuture for async composition, Callable vs Runnable, and common concurrency patterns with line-by-line walkthroughs.
-order: 31
+order: 64
 minutes: 35
 topics: [threads, synchronized, volatile, executor-service, future, completable-future, callable, thread-pool, concurrency]
 docs:

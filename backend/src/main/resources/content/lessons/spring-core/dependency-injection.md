@@ -1,7 +1,7 @@
 ---
 title: Dependency Injection in Depth
 summary: Constructor injection, @Autowired, @Qualifier, @Primary, circular dependencies and why the container picks what it picks.
-order: 11
+order: 3
 minutes: 20
 topics: [di, autowired, qualifier, primary, circular-deps]
 docs:

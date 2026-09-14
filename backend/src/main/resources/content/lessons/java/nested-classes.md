@@ -1,7 +1,7 @@
 ---
 title: Nested & Inner Classes — Static, Inner, Local and Anonymous
 summary: The four kinds of nested classes, when each is used in production, the implicit-outer-reference gotcha, and lambda-vs-anonymous-class trade-offs.
-order: 56
+order: 23
 minutes: 20
 topics: [nested-classes, inner-class, static-nested, anonymous-class, local-class, outer-reference, lambdas]
 docs:

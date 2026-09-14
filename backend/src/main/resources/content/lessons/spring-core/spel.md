@@ -1,7 +1,7 @@
 ---
 title: Spring Expression Language (SpEL) — Dynamic Values at Runtime
 summary: SpEL basics — property placeholders, bean references, conditional expressions, collection filtering, and how organizations use SpEL for dynamic configuration and security rules. Beginner-friendly with line-by-line code.
-order: 19
+order: 16
 minutes: 20
 topics: [SpEL, Spring Expression Language, property placeholders, bean references, conditional, collection filtering, dynamic config]
 docs:

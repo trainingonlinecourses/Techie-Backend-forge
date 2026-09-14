@@ -1,7 +1,7 @@
 ---
 title: Profile-Specific Configuration Properties
 summary: How @ConfigurationProperties interacts with profiles, profile-specific YAML documents, and environment-specific property binding.
-order: 4
+order: 5
 minutes: 15
 topics: [profile-config, yaml-multidoc, environment, conditional-binding, profile-properties]
 docs:

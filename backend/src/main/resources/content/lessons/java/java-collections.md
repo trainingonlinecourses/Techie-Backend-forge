@@ -1,7 +1,7 @@
 ---
 title: Java Collections Framework — List, Set, Map, Queue Explained for Beginners
 summary: The complete collections hierarchy with beginner-friendly explanations: ArrayList vs LinkedList, HashSet vs TreeSet, HashMap vs TreeMap, when to use Queue and Deque, immutable collections, and thread-safe alternatives with line-by-line code walkthroughs.
-order: 30
+order: 35
 minutes: 35
 topics: [collections, arraylist, linkedlist, hashset, treeset, hashmap, treemap, queue, deque, immutable-collections, collections-utils]
 docs:

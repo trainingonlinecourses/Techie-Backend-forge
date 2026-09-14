@@ -1,7 +1,7 @@
 ---
 title: Issuing JWTs — From Login to Token
 module: spring-security-jwt-deep
-order: 1
+order: 2
 minutes: 25
 topics: ["token issuance", "jjwt", "claims", "expiry", "login flow"]
 summary: The issuance side of JWT auth is the login flow: the user presents credentials, the server verifies them, and — if valid — mints a token the user c...

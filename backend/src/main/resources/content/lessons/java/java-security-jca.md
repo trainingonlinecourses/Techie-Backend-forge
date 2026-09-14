@@ -1,7 +1,7 @@
 ---
 title: Java Cryptography Architecture — Complete Beginner's Guide
 summary: How Java's security API works, message digests, digital signatures, key management, and the crypto operations every backend dev should know.
-order: 46
+order: 61
 minutes: 18
 topics: [jca, cryptography, message digest, digital signature, keypair, keystore]
 docs:

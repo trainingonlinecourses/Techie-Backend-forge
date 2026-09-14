@@ -1,7 +1,7 @@
 ---
 title: Resources & ResourceLoader
 summary: Abstracting files, classpath entries and URLs behind Spring's Resource interface — ResourceLoader injection, patterns, and reading resources in Boot apps.
-order: 17
+order: 15
 minutes: 12
 topics: [resource, resourceloader, classpath, files, resource patterns]
 docs:

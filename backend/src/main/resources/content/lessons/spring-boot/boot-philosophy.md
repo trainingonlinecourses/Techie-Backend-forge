@@ -1,7 +1,7 @@
 ---
 title: What is Spring Boot — Why It Exists, How It Differs from Spring, and Auto-Configuration
 summary: Plain Spring's configuration pain, what Spring Boot solves (embedded servers, auto-configuration, starters, opinionated defaults), how @SpringBootApplication works under the hood, and why every production Java team uses it with line-by-line walkthroughs.
-order: 8
+order: 1
 minutes: 25
 topics: [spring-boot, auto-configuration, starter-parent, embedded-server, convention-over-configuration, spring-vs-spring-boot]
 docs:

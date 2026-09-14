@@ -1,7 +1,7 @@
 ---
 title: XSS and CSRF — The Browser Attacks
 module: owasp-security
-order: 5
+order: 4
 minutes: 27
 topics: ["XSS", "CSRF", "content security policy", "same-origin policy", "CORS", "browser security"]
 summary: Two of the most misunderstood web attacks share a theme: they abuse the browser's trust. XSS (CrossSite Scripting) makes your application execute t...

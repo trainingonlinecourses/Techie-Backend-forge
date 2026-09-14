@@ -1,7 +1,7 @@
 ---
 title: Regular Expressions — Pattern & Matcher in Practice
 summary: The regex engine, Pattern/Matcher lifecycle, groups and backreferences, and the validation, parsing, and scrubbing scenarios teams use them for.
-order: 67
+order: 53
 minutes: 22
 topics: [regex, pattern, matcher, groups, lookahead, validation, parsing, replacement]
 docs:

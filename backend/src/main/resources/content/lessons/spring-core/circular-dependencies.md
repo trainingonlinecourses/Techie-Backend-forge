@@ -1,7 +1,7 @@
 ---
 title: Circular Dependencies — Why They Happen and How to Break Them
 summary: The bean cycle failure, constructor vs field injection behavior, and the refactors (extract, ObjectProvider, @Lazy) that eliminate cycles cleanly.
-order: 5
+order: 13
 minutes: 18
 topics: [circular-dependency, cycle, objectprovider, lazy, refactor, constructor-injection]
 docs:

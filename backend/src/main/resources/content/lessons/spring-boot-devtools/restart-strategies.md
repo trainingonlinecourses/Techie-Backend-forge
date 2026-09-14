@@ -1,7 +1,7 @@
 ---
 title: Restart Strategies — Configuring Fast Development
 summary: How DevTools restart works, custom restart triggers, restart exclusions, baseline performance, and when to use restart vs LiveReload.
-order: 5
+order: 2
 minutes: 15
 topics: [restart, triggers, exclusions, classpath, performance, fast-restart]
 docs:

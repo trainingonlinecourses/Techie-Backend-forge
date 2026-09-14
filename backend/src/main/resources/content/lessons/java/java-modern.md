@@ -1,7 +1,7 @@
 ---
 title: Modern Java (17+) — Sealed Classes, Pattern Matching, Text Blocks, and Records
 summary: The most impactful modern Java features explained for beginners: sealed classes for type safety, pattern matching instanceof and switch, text blocks for multi-line strings, records for data carriers, switch expressions, and how organizations adopt these features incrementally with line-by-line walkthroughs.
-order: 37
+order: 83
 minutes: 30
 topics: [sealed-classes, pattern-matching, text-blocks, records, switch-expressions, modern-java, java17, java21]
 docs:

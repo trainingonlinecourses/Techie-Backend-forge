@@ -1,7 +1,7 @@
 ---
 title: Conditional Beans — @Conditional, @Profile and Feature Flags
 summary: @Profile vs @Conditional, Spring Boot's @ConditionalOn* family, custom conditions, and the environment-driven bean selection patterns orgs use.
-order: 7
+order: 12
 minutes: 22
 topics: [conditional, profile, conditionalonproperty, conditionalonclass, feature-flag, bean-selection]
 docs:

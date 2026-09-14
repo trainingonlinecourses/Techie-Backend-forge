@@ -1,7 +1,7 @@
 ---
 title: Authentication and Authorization — Broken Access Control and Auth Failures
 module: owasp-security
-order: 1
+order: 2
 minutes: 26
 topics: ["broken access control", "IDOR", "authentication failures", "session management", "authorization", "Spring Security"]
 summary: Two separate jobs, one acronym away from each other, and both in the Top 10: authentication — proving who you are (A07, Identification and Authenti...

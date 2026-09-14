@@ -1,7 +1,7 @@
 ---
 title: Spring Configuration — @Configuration, @Bean, and Properties
 summary: How Spring's configuration system works — @Configuration classes, @Bean methods, @Value injection, profile-specific config, and the patterns that keep enterprise applications maintainable. Beginner-friendly with line-by-line code.
-order: 9
+order: 6
 minutes: 20
 topics: [@Configuration, @Bean, @Value, @PropertySource, profiles, configuration properties, typed config, relaxed binding]
 docs:

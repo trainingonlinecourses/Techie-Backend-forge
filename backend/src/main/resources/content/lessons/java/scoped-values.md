@@ -1,7 +1,7 @@
 ---
 title: ScopedValues — Context Variables for Virtual Threads
 summary: ThreadLocal replacement for structured contexts, automatic cleanup, request tracing, multi-tenant routing, and virtual thread safety.
-order: 69
+order: 74
 minutes: 18
 topics: [scoped-values, threadlocal, virtual-threads, context-propagation, structured-concurrency]
 docs:

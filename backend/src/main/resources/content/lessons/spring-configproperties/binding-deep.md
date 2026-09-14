@@ -1,7 +1,7 @@
 ---
 title: @ConfigurationProperties Deep Dive — Type-Safe Configuration Binding
 summary: Advanced @ConfigurationProperties patterns: nested properties, constructor binding, @DefaultValue, validation, prefix aliases, relaxed binding rules, and configuration profiles.
-order: 1
+order: 2
 minutes: 28
 topics: ["constructor binding", "nested properties", "validation", "relaxed binding", "defaultValue", "profile-specific config"]
 docs:

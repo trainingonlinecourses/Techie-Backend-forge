@@ -1,7 +1,7 @@
 ---
 title: JWT as Access Tokens — Structure, Signing, and Validation
 module: oauth2-oidc
-order: 2
+order: 4
 minutes: 27
 topics: ["JWT", "access tokens", "signature", "HS256", "RS256", "JWKS", "audience"]
 summary: OAuth2 access tokens come in two flavors: opaque (random strings the resource server must look up at the auth server) and JWT (selfcontained JSON t...

@@ -1,7 +1,7 @@
 ---
 title: YAML Configuration — Structured and Readable
 module: spring-configuration
-order: 5
+order: 3
 minutes: 22
 topics: ["YAML", "application.yml", "structured config", "lists and maps", "multi-document"]
 summary: application.properties is a flat list of key=value lines. As config grows, that gets repetitive and hard to group:

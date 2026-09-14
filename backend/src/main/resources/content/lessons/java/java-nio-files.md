@@ -1,7 +1,7 @@
 ---
 title: NIO.2: Files, Paths & Non-blocking I/O
 summary: The modern file and I/O API — Path, Files, streams of lines, memory-mapped and asynchronous channels, and when NIO beats classic java.io.
-order: 40
+order: 56
 minutes: 17
 topics: [nio, path, files, channels, async-io, memory-mapped]
 docs:

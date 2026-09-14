@@ -1,7 +1,7 @@
 ---
 title: "Profile-Specific Configuration — One Codebase, Many Environments"
 summary: "How Spring profiles work, activating profiles, profile-specific properties, YAML multi-document format, and how organizations manage dev/test/prod configurations."
-order: 5
+order: 6
 minutes: 18
 topics: [profiles, profile-specific-config, yaml-profiles, active-profile, conditional-beans, environment]
 docs:

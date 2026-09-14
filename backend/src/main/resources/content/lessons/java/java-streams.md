@@ -1,7 +1,7 @@
 ---
 title: Java Streams API — Functional Data Processing for Beginners
 summary: What streams are and why they exist, creating streams, intermediate operations (filter, map, flatMap, sorted, distinct), terminal operations (collect, reduce, forEach, count), custom collectors, parallel streams, and when to use streams vs loops with line-by-line walkthroughs.
-order: 47
+order: 45
 minutes: 35
 topics: [streams, filter, map, flatmap, reduce, collect, parallel-streams, stream-creation, custom-collector]
 docs:

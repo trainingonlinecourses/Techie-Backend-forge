@@ -1,7 +1,7 @@
 ---
 title: Spring Boot Interceptors — HandlerInterceptor Deep Dive
 summary: Pre and post request processing with HandlerInterceptor, HandlerInterceptorAdapter, registration patterns, order of execution vs filters, and real-world interceptor use cases.
-order: 32
+order: 33
 minutes: 20
 topics: [handler-interceptor, prehandle, posthandle, aftercompletion, interceptor-registration, request-timing, cross-cutting]
 docs:

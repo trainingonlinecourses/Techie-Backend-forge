@@ -1,7 +1,7 @@
 ---
 title: OWASP Top 10 — Complete Beginner's Guide
 summary: The 10 most critical web security risks, explained with real examples, how Spring Boot prevents them, and the code that fixes each one.
-order: 3
+order: 1
 minutes: 22
 topics: [owasp, injection, xss, csrf, broken authentication, security misconfiguration]
 docs:

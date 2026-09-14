@@ -1,7 +1,7 @@
 ---
 title: Interface Defaults and Static Methods — Contracts That Implement Code
 summary: How default methods solve the diamond problem in interface hierarchies, why static methods on interfaces exist, and the patterns that replace abstract base classes.
-order: 27
+order: 22
 minutes: 18
 topics: [interfaces, default methods, static methods, diamond problem, abstract class vs interface, compatibility]
 docs:

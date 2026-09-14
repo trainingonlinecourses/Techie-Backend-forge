@@ -1,7 +1,7 @@
 ---
 title: Spring Boot Logging — From SLF4J to Production
 summary: What logging frameworks Spring Boot uses, configuring Logback, log levels, file rotation, structured logging, and how organizations manage logs at scale.
-order: 2
+order: 1
 minutes: 22
 topics: [logging, slf4j, logback, log-levels, structured-logging, spring-boot]
 docs:

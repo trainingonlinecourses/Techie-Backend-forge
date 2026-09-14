@@ -1,7 +1,7 @@
 ---
 title: Injection Prevention — SQL, NoSQL, and Command Injection
 module: owasp-security
-order: 2
+order: 3
 minutes: 27
 topics: ["SQL injection", "parameterized queries", "prepared statements", "NoSQL injection", "command injection", "OWASP"]
 summary: // The attackercontrolled input arrives from a request:

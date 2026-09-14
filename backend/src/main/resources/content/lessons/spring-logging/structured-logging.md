@@ -1,7 +1,7 @@
 ---
 title: Structured Logging — Machine-Readable Logs
 summary: JSON log format, log aggregation with ELK/Datadog, key-value logging, and why structured logs are essential for production observability.
-order: 6
+order: 4
 minutes: 15
 topics: [structured-logging, json, elk, datadog, log-aggregation, key-value]
 docs:

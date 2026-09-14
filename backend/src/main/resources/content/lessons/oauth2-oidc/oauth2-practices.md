@@ -1,7 +1,7 @@
 ---
 title: OAuth2 Production Practices — Refresh Tokens, Rotation, and Security
 module: oauth2-oidc
-order: 4
+order: 5
 minutes: 26
 topics: ["refresh tokens", "token rotation", "client credentials", "security best practices", "Spring resource server"]
 summary: The previous lessons covered getting tokens. Production is about managing them: what happens when the access token expires (refresh tokens), how to...

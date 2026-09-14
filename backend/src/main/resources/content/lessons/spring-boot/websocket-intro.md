@@ -1,7 +1,7 @@
 ---
 title: "WebSockets — Real-Time Communication Without Polling"
 summary: "What WebSockets are, how they differ from HTTP, STOMP protocol, and how organizations use them for chat, notifications, and live dashboards."
-order: 56
+order: 24
 minutes: 20
 topics: [websocket, stomp, real-time, push-notifications, spring-websocket, sockjs]
 docs:

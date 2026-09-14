@@ -1,7 +1,7 @@
 ---
 title: Spring Boot Admin — Monitoring and Managing Your Application
 summary: Spring Boot Admin Server setup, client registration, Actuator endpoints exposure, logging level management, notification channels, and how organizations monitor application health without expensive APM tools.
-order: 2
+order: 51
 minutes: 18
 topics: [spring-boot-admin, actuator, monitoring, health-check, log-level, notification, micrometer, metrics]
 docs:

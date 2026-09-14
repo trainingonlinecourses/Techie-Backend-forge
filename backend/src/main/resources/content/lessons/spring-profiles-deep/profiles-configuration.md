@@ -1,7 +1,7 @@
 ---
 title: Spring Profiles — Environment-Specific Configuration
 summary: What profiles are, activating profiles, profile-specific properties, @Profile annotation, YAML multi-document, and how organizations manage dev/test/prod configurations.
-order: 4
+order: 1
 minutes: 25
 topics: [profiles, configuration, environment, yaml, @profile, application-properties]
 docs:

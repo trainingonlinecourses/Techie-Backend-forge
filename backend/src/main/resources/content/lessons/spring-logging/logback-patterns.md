@@ -1,7 +1,7 @@
 ---
 title: Logback Patterns — Structuring Your Logs
 summary: Logback pattern syntax, common conversion words, custom patterns, colorized output, and production-ready log formats.
-order: 1
+order: 2
 minutes: 15
 topics: [logback, pattern, conversion, layout, color, timestamp]
 docs:

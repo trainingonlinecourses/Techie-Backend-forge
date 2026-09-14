@@ -1,7 +1,7 @@
 ---
 title: Validating JWTs — The Stateless Checkpoint
 module: spring-security-jwt-deep
-order: 4
+order: 3
 minutes: 25
 topics: ["JWT validation", "jjwt parser", "signature verification", "expiry check", "stateless auth"]
 summary: The validation side is the other half of the handshake. On every authenticated request, the server must answer: "is this token genuine, untampered,...

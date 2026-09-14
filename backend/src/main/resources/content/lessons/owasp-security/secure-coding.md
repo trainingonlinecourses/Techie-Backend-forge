@@ -1,7 +1,7 @@
 ---
 title: Secure Coding — Deserialization, SSRF, Logging, and Secrets
 module: owasp-security
-order: 4
+order: 5
 minutes: 27
 topics: ["deserialization", "SSRF", "secure logging", "secrets management", "input validation", "secure defaults"]
 ```java
