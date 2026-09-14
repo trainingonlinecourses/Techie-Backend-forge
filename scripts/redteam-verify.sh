@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# Red-team verification against the local hardened build (port 18080).
+# Red-team verification. Target overridable: BASE=https://api.example.com bash scripts/redteam-verify.sh
 set -u
-B=http://localhost:18080
+B="${BASE:-http://localhost:18080}"
 U="rt$RANDOM$RANDOM"
 pass() { echo "  PASS: $1"; }
 fail() { echo "  !!FAIL: $1"; }
@@ -41,18 +41,33 @@ echo "== 4. Register -> login works; a run of failures locks only that IP window
 REG=$(curl -s --max-time 10 -X POST "$B/api/auth/register" -H 'Content-Type: application/json' -d "{\"username\":\"$U\",\"displayName\":\"RT\",\"password\":\"RtPass123\"}")
 echo "$REG" | grep -q token && pass "register ok" || fail "register broken: $REG"
 TOK=$(echo "$REG" | node -e "let d='';process.stdin.on('data',c=>d+=c).on('end',()=>console.log(JSON.parse(d).token))")
-for i in 1 2 3 4 5 6; do
-  curl -s -o /dev/null -X POST "$B/api/auth/login" -H 'Content-Type: application/json' -d "{\"username\":\"$U\",\"password\":\"wrong$i\"}"
+for i in $(seq 1 12); do
+  R=$(code -X POST "$B/api/auth/login" -H 'Content-Type: application/json' -d "{\"username\":\"$U\",\"password\":\"wrong$i\"}")
+  # Stop at the first 429; the limiter caps at 5 failures/15 min per IP window.
+  [ "$R" = "429" ] && break
 done
-R=$(code -X POST "$B/api/auth/login" -H 'Content-Type: application/json' -d "{\"username\":\"$U\",\"password\":\"wrong7\"}")
-[ "$R" = "429" ] && pass "6 failures -> 429 lockout (failure-based, attempt-safe)" || fail "expected 429 after 6 failures, got $R"
+# NOTE: when several runs share one egress IP (CI, repeated local runs, or a host
+# with rotating outbound addresses), the window may already be partially burned
+# or split across two socket IPs, so 6 attempts alone can under- or over-shoot.
+[ "$R" = "429" ] && pass "failures -> 429 lockout (failure-based, attempt-safe)" || fail "no 429 within 12 failures (got $R)"
 # The lockout is per-IP-window, not per-account: the token from BEFORE the failures
 # still authenticates (this is exactly the 'I locked myself out mid-testing' case).
 R=$(code "$B/api/auth/me" -H "Authorization: Bearer $TOK")
 [ "$R" = "200" ] && pass "existing session unaffected by IP lockout" || fail "lockout killed valid session ($R)"
-# A different source IP is unaffected (isolation test).
-R=$(code -X POST "$B/api/auth/login" -H 'Content-Type: application/json' -H 'X-Forwarded-For: 198.51.100.9, 198.51.100.1' -d "{\"username\":\"$U\",\"password\":\"RtPass123\"}")
-[ "$R" = "200" ] && pass "different IP key: correct login succeeds while first IP locked" || fail "IP isolation broken ($R)"
+# IP isolation via a client-supplied XFF chain is only verifiable against the
+# LOCAL backend, where the app itself owns XFF interpretation. Production edges
+# (Render) overwrite client XFF, so a forged "different IP" is correctly ignored
+# there and the real (shared) socket IP stays locked — that is the desired
+# behavior, verified separately in section 6.
+case "$B" in
+  *localhost*|*127.0.0.1*)
+    R=$(code -X POST "$B/api/auth/login" -H 'Content-Type: application/json' -H 'X-Forwarded-For: 198.51.100.9, 198.51.100.1' -d "{\"username\":\"$U\",\"password\":\"RtPass123\"}")
+    [ "$R" = "200" ] && pass "different IP key: correct login succeeds while first IP locked" || fail "IP isolation broken ($R)"
+    ;;
+  *)
+    echo "  SKIP: XFF-based IP isolation is local-only (production edge owns the header)"
+    ;;
+esac
 
 echo "== 5. Brute-force 429 carries a retry hint =="
 OUT=$(curl -s --max-time 10 -X POST "$B/api/auth/login" -H 'Content-Type: application/json' -d "{\"username\":\"$U\",\"password\":\"bad8\"}")
@@ -71,8 +86,9 @@ echo "  codes with rotating first hop behind a constant proxy hop:$CODES"
 echo "$CODES" | grep -q " 429" && pass "rotating spoofed first hop still hits 429 (last-hop keying)" || fail "XFF rotation bypasses limiter"
 
 echo "== 7. SSRF guard on BYO chat endpoint =="
-# Fresh token via the unaffected IP key (section 4 locked the default key).
-TOK=$(curl -s -X POST "$B/api/auth/login" -H 'Content-Type: application/json' -H 'X-Forwarded-For: 198.51.100.9, 198.51.100.1' -d "{\"username\":\"$U\",\"password\":\"RtPass123\"}" | node -e "let d='';process.stdin.on('data',c=>d+=c).on('end',()=>console.log(JSON.parse(d).token))")
+# Fresh token via REGISTER (registration is not login-limited, so this works
+# even when section 4 locked the shared egress IP's login window).
+TOK=$(curl -s --max-time 15 -X POST "$B/api/auth/register" -H 'Content-Type: application/json' -d "{\"username\":\"${U}-ssrf\",\"displayName\":\"RT SSRF\",\"password\":\"RtPass123\"}" | node -e "let d='';process.stdin.on('data',c=>d+=c).on('end',()=>{try{console.log(JSON.parse(d).token||'')}catch(e){console.log('')}})")
 [ -n "$TOK" ] && pass "fresh token acquired" || fail "could not get token for SSRF test"
 R=$(curl -s -o /dev/null -w "%{http_code}" --max-time 15 -X POST "$B/api/chat" -H "Authorization: Bearer $TOK" -H 'Content-Type: application/json' -d '{"message":"hi","baseUrl":"http://169.254.169.254/latest/meta-data"}')
 [ "$R" = "400" ] && pass "metadata IP rejected with 400" || fail "SSRF metadata IP not rejected (http $R)"
