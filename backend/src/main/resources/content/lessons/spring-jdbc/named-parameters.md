@@ -28,6 +28,11 @@ public class CourseRepository {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `CourseRepository`.
+
 Spring Boot auto-configures it from the `DataSource`. It wraps a `JdbcTemplate` under the hood — same features, named syntax.
 
 ## Named Queries
@@ -165,6 +170,11 @@ class CourseRepositoryTest {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `CourseRepositoryTest`.
 
 ## Summary
 

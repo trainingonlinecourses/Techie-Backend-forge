@@ -82,6 +82,11 @@ public void onOrderPlaced(OrderPlaced event) {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses conditionals.
+
 ## Why the Outbox Beats the Alternatives
 
 | Approach | Problem |

@@ -42,6 +42,11 @@ public class OrderController {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderController` with methods `handleOrderNotFound()`.
+
 Spring picks the **most specific** handler: a controller-local `@ExceptionHandler` beats a global advice handler for the same exception type.
 
 ## Multiple Handlers, One Method
@@ -67,6 +72,12 @@ public class OrderNotFoundException extends RuntimeException {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderNotFoundException`.
+- Uses inheritance.
 
 No advice needed for the common case. But once you want a consistent body (Problem Details, trace ids), the advice wins.
 
@@ -119,6 +130,13 @@ public class AsyncConfig implements AsyncConfigurer {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `AsyncConfig` with methods `getAsyncUncaughtExceptionHandler()`.
+- Uses lambda expressions.
+- Uses interface implementation.
+
 ## The Error Page and /error
 
 Spring Boot's `BasicErrorController` serves `/error` — the final safety net for unmapped errors (including container-level 404s and 500s). Customize it:
@@ -134,6 +152,13 @@ public class CustomErrorController implements ErrorController {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("status", status != null ? status : 500);
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses the `Map` collection.
+- Uses generics.
+
         body.put("error", HttpStatus.resolve(status) != null
             ? HttpStatus.resolve(status).getReasonPhrase() : "Error");
         body.put("timestamp", Instant.now().toString());
@@ -174,6 +199,11 @@ public class GlobalExceptionHandler {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `GlobalExceptionHandler` with methods `handleUnexpected()`.
 
 Order matters at *runtime*: Spring picks the closest match in the hierarchy, so the catch-all only fires for truly unknown exceptions.
 

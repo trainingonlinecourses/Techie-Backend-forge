@@ -54,6 +54,11 @@ static void changeNumber(int n) {
 **What happens step by step:**
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- When run, it prints: “Before method: ”, “After method: ” …
+
 ```
 Step 1: main() creates num = 10
         num → [10]
@@ -129,6 +134,11 @@ static void reassignReference(StringBuilder s) {
 **What happened:**
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- When run, it prints: “Before: ”, “After: ” …
+
 ```
 Step 1: sb points to "Hello" object
         sb ──→ [StringBuilder: "Hello"]
@@ -180,6 +190,12 @@ static void modifyUser(User u) {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `User` with methods `main()`, `modifyUser()`.
+- When run, it prints: “Before: ”, “After: ”
+
 ### Scenario 2: Reassigning the Reference (Doesn't Affect Original)
 
 ```java
@@ -198,6 +214,11 @@ static void replaceUser(User u) {
     System.out.println("Inside: " + u.name);      // Bob
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- When run, it prints: “Before: ”, “After: ” …
 
 ### Scenario 3: Collections
 
@@ -281,6 +302,11 @@ public class UserService {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `UserService` with methods `switchUser()`.
+
 ### Scenario 2: Batch Updates (Works Because of Reference Copy)
 
 
@@ -308,6 +334,14 @@ List<OrderItem> myItems = getItems();
 service.applyDiscount(myItems, 0.10);
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderService` with methods `applyDiscount()`.
+- Uses the `List` collection.
+- Uses loops.
+- Uses generics.
+
 ### Scenario 3: Null Checks After Method Calls
 
 
@@ -334,6 +368,12 @@ public static void clearList(List<String> list) {
 List<String> names = new ArrayList<>(List.of("Alice", "Bob"));
 clearList(names);
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses the `List` collection.
+- Uses generics.
 
 ---
 

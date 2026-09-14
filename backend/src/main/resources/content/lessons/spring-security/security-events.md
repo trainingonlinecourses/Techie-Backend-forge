@@ -58,6 +58,11 @@ public class SecurityAuditListener {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `SecurityAuditListener` with methods `onSuccess()`, `onFailure()`, `onLocked()`.
+
 ## How we use it in an organization: the scenarios
 
 **Scenario 1 — the failed-login ledger.** Every failed login appended to an audit store (DB table, log stream). This is the raw material for: **lockout policy** (after N failures, disable — implemented in the `UserDetails`/lockout service), **brute-force detection** (same IP, many users; same user, many IPs), and **incident investigation** ("was the attacker trying this account?").

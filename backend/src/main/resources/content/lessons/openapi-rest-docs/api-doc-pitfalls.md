@@ -99,6 +99,14 @@ public record ApiError(
         content = @Content(schema = @Schema(implementation = ApiError.class)))
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `ApiError`.
+- Uses a `record`.
+- Uses the `Map` collection.
+- Uses generics.
+
 **Rule:** every documented success code should be matched by documented error codes — 400 (validation), 401 (unauthenticated), 403 (forbidden), 404 (not found), 409 (conflict), 429 (rate limited), 5xx (server).
 
 ## Deprecation — The Honest Exit

@@ -141,6 +141,12 @@ public void processAllOrders() {
         process(order);                               // L1 cache grows with each entity
     }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses loops.
+
     // If this processes 1M orders, L1 cache holds 1M entities → OOM
 }
 

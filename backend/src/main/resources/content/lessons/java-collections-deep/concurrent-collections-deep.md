@@ -22,6 +22,12 @@ Map<String, Integer> map = new HashMap<>();
 // Race condition: one write may be lost, or internal structure corrupts
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses the `Map` collection.
+- Uses generics.
+
 Even worse, `HashMap` uses a linked list internally. Concurrent modifications can create an infinite loop (the classic "CPU spike" bug).
 
 ### ConcurrentHashMap — The Workhorse
@@ -156,6 +162,14 @@ public class ProducerConsumerDemo {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `ProducerConsumerDemo` with methods `main()`.
+- Uses manual threading.
+- Uses exception handling with try/catch.
+- Uses lambda expressions.
+
 ### BlockingQueue Implementations
 
 | Implementation | Behavior When Full | Behavior When Empty |
@@ -195,6 +209,13 @@ public class ImmutableDemo {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `ImmutableDemo` with methods `main()`.
+- Uses the `List` collection.
+- Uses generics.
 
 ### Organization Use Cases
 

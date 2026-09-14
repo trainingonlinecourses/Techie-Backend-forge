@@ -18,6 +18,12 @@ Most developers know records as simple data holders:
 public record Point(int x, int y) {}
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Point`.
+- Uses a `record`.
+
 But records have powerful features that make them essential for real-world Java:
 
 ### Compact Constructors for Validation
@@ -39,6 +45,13 @@ public record Range(int min, int max) {
     // Range invalid = new Range(10, 5);   // Throws exception
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Range`.
+- Uses a `record`.
+- Uses conditionals.
 
 ### Records with Custom Methods
 
@@ -76,6 +89,14 @@ public record Money(BigDecimal amount, Currency currency) {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Money` with 4 methods.
+- Uses a `record`.
+- Uses `BigDecimal` for exact decimal math.
+- Uses conditionals.
+
 ### Records as Map Keys
 
 ```java
@@ -91,6 +112,14 @@ grid.put(new Coordinate(1, 2), "Target");
 // Lookups work correctly because records have proper equals/hashCode
 String value = grid.get(new Coordinate(1, 2)); // "Target"
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Coordinate`.
+- Uses a `record`.
+- Uses the `Map` collection.
+- Uses generics.
 
 ### Records with Builder Pattern
 
@@ -144,6 +173,14 @@ static double area(Shape shape) {
     };
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Shape` and `Circle` and 2 more type(s) with methods `area()`.
+- Uses lambda expressions.
+- Uses a `record`.
+- Uses an interface.
 
 ### Records vs Classes Decision Guide
 

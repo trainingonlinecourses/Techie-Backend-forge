@@ -49,6 +49,11 @@ http.csrf(Customizer.withDefaults());          // default ON for cookie-based ap
 //       — public webhooks are exempt because they're unauthenticated
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+
 ## How we use it in an organization: the scenarios
 
 **Scenario 1 — SPA frontend at a different origin calling the API.** Vite dev server on `localhost:5173`, API on `localhost:8080` — that's two origins, so CORS is needed in dev. Production often proxies through the same origin (Vercel rewrites `/api/*` to the backend), but a separate API origin needs explicit CORS:
@@ -84,6 +89,11 @@ public class CorsConfig {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `CorsConfig` with methods `corsConfigurationSource()`.
 
 Production rules: **explicit allow-list** (never `*` for credentialed requests), scoped to `/api/**`, and `OPTIONS` must pass through unauthenticated (Spring's `cors()` integration handles preflight before auth).
 

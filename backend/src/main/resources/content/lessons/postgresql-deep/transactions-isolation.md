@@ -87,6 +87,12 @@ for (int attempt = 0; attempt < 3; attempt++) {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses exception handling with try/catch.
+- Uses loops.
+
 ## Row-Level Locking: SELECT FOR UPDATE
 
 MVCC handles *reads*; **writes to the same row still conflict**. `FOR UPDATE` locks rows so no concurrent tx can modify them until you commit:

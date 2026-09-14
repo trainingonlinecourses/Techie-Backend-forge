@@ -86,6 +86,13 @@ public class CustomErrorHandler implements ResponseErrorHandler {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `CustomErrorHandler` with methods `hasError()`, `handleError()`.
+- Uses interface implementation.
+- Uses conditionals.
+
 ## WebClient — the modern choice
 
 @Configuration
@@ -123,6 +130,12 @@ public class InventoryClientWebClient {
         return webClient.get()
             .uri("/inventory/{id}", productId)
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `InventoryClientWebClient` with methods `checkStock()`.
+
             .retrieve()
             .bodyToMono(Inventory.class)
             .block();  // blocks until response arrives

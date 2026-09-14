@@ -61,6 +61,12 @@ public class FormatService {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `FormatService` with methods `toCsv()`, `fromCsv()`.
+- Uses `BigDecimal` for exact decimal math.
+
 **The transformer contract:** in-payload → method → out-payload. Every format conversion in an integration — XML→JSON, CSV→objects, DTO→wire format — is a transformer. The bean-method form keeps the logic testable in isolation: a `FormatService.toCsv` is a plain method you can unit-test without any messaging.
 
 ## Routers: Sending to the Right Place
@@ -114,6 +120,12 @@ IntegrationFlow enrichedFlow() {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+- Uses generics.
+
 **The enricher pattern:** the message carries an id; the enricher *looks up* the related data (a DB call, an API call — modeled as its own request-reply flow on the `requestChannel`) and merges it into the message as new properties or as the new payload. It's the "join" of the messaging world — enriching a message with data that lives elsewhere, without the pipeline knowing how to fetch it.
 
 ## Splitters and Aggregators: One↔Many
@@ -159,6 +171,14 @@ IntegrationFlow aggregateFlow() {
             .get();
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderSplitter` with methods `split()`.
+- Uses the Streams API to process data declaratively.
+- Uses lambda expressions.
+- Uses the `List` collection.
 
 **The splitter-aggregator pair is the parallel-processing workhorse:** split a batch into per-item messages (each processed independently, possibly on different threads), then aggregate the results back by **correlation strategy** (how to group — the batch id) and **release strategy** (when to emit — count reached, or time window expired). This is scatter-gather — the EIP pattern behind "process 10,000 items, collect the results" — and it's where an integration either performs or silently drops results, so the release strategy (especially timeouts) deserves real design attention.
 

@@ -48,6 +48,12 @@ MapOutputConverter converter = new MapOutputConverter();
 Map<String, Object> summary = converter.convert(response);
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses the `Map` collection.
+- Uses generics.
+
 ## Function calling: the model calls YOUR code
 
 The model can invoke registered Java methods as **tools**. This is how assistants take real actions: look up an order, compute a price, write to a log.
@@ -72,6 +78,12 @@ public class AiConfig {
     ChatClient chatClient(ChatClient.Builder builder, OrderTools tools) {
         return builder
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `AiConfig`.
+
                 .defaultSystem("You are an order assistant. Use the orderStatus tool to answer questions about orders.")
                 .defaultTools(ToolCallbacks.from(tools))          // register the tool
                 .build();

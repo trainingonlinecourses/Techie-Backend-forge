@@ -47,6 +47,12 @@ public class WebConfig implements WebMvcConfigurer {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `WebConfig` with methods `configureViewResolvers()`.
+- Uses interface implementation.
+
 Precedence is configuration order: put the primary engine first.
 
 ## Thymeleaf: The Modern Default
@@ -106,6 +112,11 @@ public class BaseController {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `BaseController` with methods `appName()`, `currentUser()`.
+
 These appear in every template as `${appName}`, `${currentUser}`.
 
 ## Redirect vs. Forward
@@ -127,6 +138,11 @@ public String create(@Valid @ModelAttribute CourseForm form, BindingResult resul
     return "redirect:/courses/" + course.getId();   // PRG
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses conditionals.
 
 ### Redirect Attributes
 

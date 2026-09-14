@@ -44,6 +44,12 @@ class OrderServiceTest {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderServiceTest`.
+- Uses `BigDecimal` for exact decimal math.
+
 The lifecycle in order: `@BeforeAll` (once, static) → `@BeforeEach` → `@Test` → `@AfterEach` → `@AfterAll` (once, static). **Each test runs on a fresh instance** — that's what makes tests independent and parallel-safe.
 
 ## Assertions: the failure messages matter
@@ -70,6 +76,13 @@ assertTrue(orders.stream().allMatch(o -> o.status() == PENDING),
     "all created orders should start PENDING, got: " + orders);
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses the Streams API to process data declaratively.
+- Uses lambda expressions.
+- Uses the java.time date-time API.
+
 **A failing assertion without a message is a debugging session waiting to happen.** For richer assertions (lists, maps, exception details) the project uses AssertJ — the next lesson.
 
 ## Display names, disabling, tagging
@@ -89,6 +102,11 @@ class OrderServiceTest {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderServiceTest`.
+
 `@Disabled` with a reason, not a silence — the reason is what lets a future dev know whether to fix or delete.
 
 ## Nested tests and the ClassNameTest convention
@@ -105,6 +123,11 @@ class MoneyTests {
     @Test void formatsWithTwoDecimals() { ... }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `ValidationTests` and `MoneyTests`.
 
 `@Nested` groups give you readable test reports (like sections in a spec). Convention: test class `OrderServiceTest` next to `OrderService`, same package — Maven's Surefire picks up `*Test`, `Test*`, `*Tests`, `*TestCase` by default.
 

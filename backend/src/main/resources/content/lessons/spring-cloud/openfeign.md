@@ -29,6 +29,12 @@ public interface PaymentClient {
 Payment p = paymentClient.get(order.paymentId());
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `PaymentClient`.
+- Uses an interface.
+
 ## The pieces
 
 - **`@FeignClient(name = "payments")`** — `name` is the service id: with Eureka (the service-discovery lesson), Feign resolves it via the discovery client; without discovery, `url = "https://payments.internal"` points at a fixed host.
@@ -59,6 +65,13 @@ public class PaymentClientFallback implements PaymentClient {   // must implemen
     public Payment create(CreatePaymentRequest req) { throw new PaymentsUnavailableException(); }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `PaymentClient` and `PaymentClientFallback` with methods `get()`, `create()`.
+- Uses an interface.
+- Uses interface implementation.
 
 ```yaml
 feign.circuitbreaker.enabled: true
@@ -94,6 +107,11 @@ RequestInterceptor authHeader() {            // attach the token to every Feign 
     return template -> template.header("Authorization", "Bearer " + currentToken());
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
 
 ## Testing Feign clients
 

@@ -137,6 +137,11 @@ public void handleOrder(OrderCreated event) {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses conditionals.
+
 ## Spring Boot integration — line by line
 
 
@@ -205,6 +210,12 @@ record ProcessPayment(UUID orderId) {}   // This tells someone what to do
 
 **Why:** An event represents something that ALREADY happened. "OrderCreated" means the order WAS created. You can't un-create it. A command like "CreateOrder" implies it might not happen — that's a different pattern.
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderCreated` and `PaymentCaptured` and 3 more type(s).
+- Uses a `record`.
 
 ## Real-world scenario — e-commerce order flow
 

@@ -110,6 +110,14 @@ public Course course(@Argument Long id) {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `CourseNotFoundException` and `GraphQlExceptionHandler` with methods `handleException()`, `course()`.
+- Uses lambda expressions.
+- Uses inheritance.
+- Uses interface implementation.
+
 ### Walking Through Each Part
 
 **Domain exceptions** — the resolvers throw *meaningful* exceptions (`CourseNotFoundException`), never raw SQL or `NullPointerException`. The error vocabulary lives in the exception types.
@@ -162,6 +170,15 @@ class InvalidInputException extends RuntimeException {
 
 // In the handler:
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `InvalidInputException`.
+- Uses inheritance.
+- Uses the `Map` collection.
+- Uses generics.
+
 error = GraphqlErrorBuilder.newError()
         .message("Validation failed")
         .path(params.getPath())

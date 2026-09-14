@@ -24,6 +24,12 @@ assertThat(order.getLines()).hasSize(2).allMatch(l -> l.qty() > 0);
 assertThat(order.getCustomer().email()).endsWith("@example.com");
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+- Uses `BigDecimal` for exact decimal math.
+
 The killer feature for money: **`isEqualByComparingTo`** for `BigDecimal` — plain `assertEquals` on `new BigDecimal("19.9")` vs `new BigDecimal("19.90")` fails on scale, while AssertJ compares *value*.
 
 ## Collections: the common 90%
@@ -79,6 +85,11 @@ softly.assertThat(order.status()).isEqualTo(PENDING);
 softly.assertAll();   // throws with ALL collected failures at once
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses `BigDecimal` for exact decimal math.
+
 When one failed assert makes you rerun the test five times to find the rest, soft assertions fix it. Use them for **multi-field response validation** (a DTO's fields, a CSV row, a JSON payload) — the places where "fail fast" is just "fail repeatedly".
 
 ## Extracting nested data: the DTO test
@@ -91,6 +102,12 @@ assertThat(response.getBody())
 
 // Deep into the graph:
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses `BigDecimal` for exact decimal math.
+
 assertThat(orders)
     .flatExtracting(Order::getLines)          // one list of all lines across orders
     .extracting(Line::productId)

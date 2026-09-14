@@ -65,6 +65,11 @@ try {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses exception handling with try/catch.
+
 ### 2. Pessimistic Read Lock
 
 ```java
@@ -77,6 +82,11 @@ try {
     lock.unlockRead(stamp);
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses exception handling with try/catch.
 
 ### 3. Optimistic Read (The Superpower!)
 
@@ -114,6 +124,14 @@ public class Main {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- Uses exception handling with try/catch.
+- Uses conditionals.
+- When run, it prints: “Balance: ”
 
 **Why is this amazing?** The optimistic read path has **zero locking overhead** — it's as fast as an unprotected read. Only when a write conflict is detected does it fall back to a real lock.
 
@@ -177,6 +195,13 @@ public class Point {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Point` with methods `move()`, `distanceFromOrigin()`, `distanceFromOriginOptimistic()`.
+- Uses exception handling with try/catch.
+- Uses conditionals.
+
 ---
 
 ## Convert Between Lock Modes
@@ -209,6 +234,12 @@ try {
     lock.unlock(stamp);
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses exception handling with try/catch.
+- Uses conditionals.
 
 ---
 
@@ -274,6 +305,14 @@ public class ConfigurationCache {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `ConfigurationCache` with methods `get()`, `update()`, `updateAll()`.
+- Uses exception handling with try/catch.
+- Uses the `Map` collection.
+- Uses conditionals.
+
 ### Scenario 2: Financial Account Balance
 
 ```java
@@ -315,6 +354,14 @@ public class BankAccount {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `BankAccount` with methods `getBalance()`, `withdraw()`.
+- Uses exception handling with try/catch.
+- Uses `BigDecimal` for exact decimal math.
+- Uses conditionals.
 
 ---
 

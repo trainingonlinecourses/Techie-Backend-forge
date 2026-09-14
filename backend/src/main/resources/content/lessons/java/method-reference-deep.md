@@ -16,6 +16,13 @@ A **method reference** is a shortcut: when a lambda does nothing but call one ex
 // These two lines do EXACTLY the same thing:
 Function<String, Integer> lenLambda = s -> s.length();   // lambda: take s, return s.length()
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+- Uses generics.
+
 Function<String, Integer> lenRef    = String::length;    // reference: "the length method of String"
 
 Read `::` as "refer to". No parentheses, no arguments listed — the compiler already knows what arguments to pass because the **target functional interface** defines them. `Function<String,Integer>` promises "give me a String, I'll give you an Integer", and `String::length` fits that shape perfectly.
@@ -30,6 +37,11 @@ Function<String, Integer> parser = Integer::parseInt;
 ```java
 // same as: s -> Integer.parseInt(s)
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
 
 List<String> raw = List.of("42", "17", "99");
 List<Integer> nums = raw.stream()
@@ -53,6 +65,11 @@ Function<String, String> tagger = prefix::concat;
 tagger.apply("1001");   // "ORDER-1001"
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+
 "Bound" = bound to one particular receiver (`prefix`) fixed in advance.
 
 ### Kind 3 — Unbound (instance method of the parameter): `ClassName::instanceMethod`
@@ -63,10 +80,20 @@ BiFunction<String, String, Boolean> contains = String::contains;
 // first parameter becomes the RECEIVER, the rest become arguments
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+
 Comparator<String> byLength = Comparator.comparing(String::length);
 ```java
 // same as comparing(s -> s.length())
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
 
 This is the workhorse inside streams:
 
@@ -99,6 +126,14 @@ List<User> users = emails.stream()
         .map(User::new)
         .toList();
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses the Streams API to process data declaratively.
+- Uses method references.
+- Uses the `List` collection.
+- Uses generics.
 
 The compiler performs overload resolution against the functional interface's shape — `User::new` with a `Function<String,User>` target finds a one-String constructor automatically.
 

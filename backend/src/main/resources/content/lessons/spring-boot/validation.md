@@ -91,6 +91,12 @@ public class CreateUserRequest {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `CreateUserRequest`.
+- Uses `BigDecimal` for exact decimal math.
+
 ### Common Annotations Reference
 
 | Annotation | Purpose | Example |
@@ -142,6 +148,14 @@ public class ContactRequest {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `PhoneNumber` and `PhoneNumberValidator` and 1 more type(s) with methods `isValid()`.
+- Uses an interface.
+- Uses inheritance.
+- Uses interface implementation.
+
 ### Nested Validation
 
 Validate objects inside objects:
@@ -180,6 +194,14 @@ public class OrderItem {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderRequest` and `Customer` and 1 more type(s).
+- Uses the `List` collection.
+- Uses `BigDecimal` for exact decimal math.
+- Uses generics.
+
 ### Global Exception Handler
 
 Handle validation errors gracefully:
@@ -203,6 +225,14 @@ public class ValidationExceptionHandler {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `ValidationExceptionHandler` with methods `handleValidation()`.
+- Uses lambda expressions.
+- Uses the `Map` collection.
+- Uses generics.
 
 ### Validation Groups
 
@@ -246,6 +276,12 @@ public User update(@PathVariable Long id,
     return userService.update(id, request);
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Create` and `Update` and 1 more type(s) with methods `create()`, `update()`.
+- Uses an interface.
 
 ### Common Mistakes
 
@@ -291,6 +327,12 @@ public record CreateUserRequest(
     String phone
 ) {}
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `CreateUserRequest`.
+- Uses a `record`.
 
 ### Key Takeaways
 

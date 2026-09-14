@@ -34,6 +34,12 @@ public void transfer(Account from, Account to, BigDecimal amount) {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses synchronization with `synchronized`.
+- Uses `BigDecimal` for exact decimal math.
+
 **Reentrant:** a thread that already holds a monitor can re-enter it without deadlocking. This is why `synchronized` methods can call other `synchronized` methods on the same object.
 
 ## The monitor protocol: wait/notify
@@ -110,6 +116,12 @@ public class Counter {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Counter` with methods `increment()`.
+- Uses synchronization with `synchronized`.
+
 ## How we use it in organizations
 
 ### Scenario 1: synchronized for simple thread-safe singleton
@@ -127,6 +139,13 @@ public class DatabaseConnection {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `DatabaseConnection` with methods `getInstance()`.
+- Uses synchronization with `synchronized`.
+- Uses conditionals.
+
 **Problem:** every thread pays the lock cost even after initialization. Better: double-checked locking with `volatile` or use an enum/holder class.
 
 ```java
@@ -143,6 +162,11 @@ public class DatabaseConnection {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `DatabaseConnection` and `Holder` with methods `getInstance()`.
 
 ### Scenario 2: wait/notify for a work queue
 
@@ -195,6 +219,12 @@ public void transfer(Account from, Account to, BigDecimal amount) {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses synchronization with `synchronized`.
+- Uses `BigDecimal` for exact decimal math.
+
 If thread A locks `from` then tries `to`, and thread B locks `to` then tries `from`, you get a deadlock. Locking in consistent order prevents this.
 
 ## ReentrantLock: the modern alternative
@@ -229,6 +259,13 @@ public T dequeue() throws InterruptedException {
 
 **When to prefer ReentrantLock over synchronized:**
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses synchronization with `synchronized`.
+- Uses exception handling with try/catch.
+- Uses loops.
 
 | Feature | `synchronized` | `ReentrantLock` |
 |---|---|---|

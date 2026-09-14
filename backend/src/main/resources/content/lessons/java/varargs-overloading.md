@@ -99,6 +99,13 @@ class B extends A { @Override void f(A a) {} }   // overrides the f(A) overload
 
 A x = new B();
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `A` and `B`.
+- Uses inheritance.
+
 x.f(new B());   // resolves f(B) at compile time (x is declared A) → A.f(B), NOT overridden
 
 This is the classic source of "I overrode it but the wrong method ran" bugs: overload resolution uses the *static* type. If dispatch-by-actual-type matters, the methods must have the *same* signature (true overriding).

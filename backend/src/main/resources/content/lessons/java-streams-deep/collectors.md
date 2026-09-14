@@ -21,6 +21,12 @@ public interface Collector<T, A, R> {
 ```java
     BiConsumer<A, T> accumulator();      // add one element
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses generics.
+
     BinaryOperator<A> combiner();        // merge two accumulators (parallel)
     Function<A, R> finisher();           // finish: accumulator → result
     Set<Characteristics> characteristics();
@@ -38,6 +44,11 @@ String joined = courses.stream().map(Course::title)
 ```java
     .collect(Collectors.joining(", ", "[", "]"));   // prefix, delimiter, suffix
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses the Streams API to process data declaratively.
 
 ### toMap With Duplicate Keys
 
@@ -103,6 +114,14 @@ Map<String, Optional<Course>> longestByLevel = courses.stream()
         Collectors.maxBy(Comparator.comparingInt(Course::minutes))));
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses the Streams API to process data declaratively.
+- Uses `Optional` for null-safe values.
+- Uses method references.
+- Uses the `Map` collection.
+
 **Downstream collectors compose** — `groupingBy(classifier, downstream)` nests arbitrarily deep:
 
 // Level → (published → count)
@@ -141,6 +160,12 @@ Map<String, IntSummaryStatistics> byLevel = courses.stream()
 // Java 12+: compute two things in a single traversal
 record Range(int min, int max) {}
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Range`.
+- Uses a `record`.
 
 Range range = courses.stream().collect(Collectors.teeing(
     Collectors.minBy(Comparator.comparingInt(Course::minutes)),
@@ -181,6 +206,14 @@ public static Collector<Course, ?, List<Course>> topN(int n) {
 
 List<Course> top3 = courses.stream().collect(topN(3));
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses the Streams API to process data declaratively.
+- Uses lambda expressions.
+- Uses method references.
+- Uses the `List` collection.
 
 ## Choosing the Right Collector
 

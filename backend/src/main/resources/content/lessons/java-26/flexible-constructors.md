@@ -21,6 +21,11 @@ class PositiveNumber {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `PositiveNumber`.
+
 Java 26 relaxes this restriction. You can now do calculations, validations, and even field assignments before calling `super()`.
 
 ## The Code
@@ -69,6 +74,12 @@ class UserProfile extends BaseUser {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Rectangle` and `SafeRectangle` and 2 more type(s).
+- Uses inheritance.
 
 ## Key Takeaways
 

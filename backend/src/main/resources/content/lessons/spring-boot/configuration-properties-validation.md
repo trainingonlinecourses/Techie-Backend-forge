@@ -56,6 +56,12 @@ public class PaymentProperties {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `PaymentProperties` and `Retry`.
+- Uses exception handling with try/catch.
+
 With `@Validated` + `jakarta.validation` constraints, startup fails if `provider` is blank or `timeout-seconds` is out of range — with a clear message naming the property, instead of a mid-request `NullPointerException`.
 
 ## Binding rules: the parts that surprise people
@@ -99,6 +105,12 @@ APP_INTEGRATIONS_BASE_URL=https://payments.internal
 @Constraint(validatedBy = TimeoutConsistencyValidator.class)
 public @interface ConsistentTimeouts { String message() default "backoff must be < timeout"; }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `ConsistentTimeouts`.
+- Uses an interface.
 
 **Scenario 4 — test overrides.** `@SpringBootTest(properties = "app.payments.provider=stub")` supplies test values; with validation, a wrong test value fails the test context instead of silently testing the wrong thing.
 

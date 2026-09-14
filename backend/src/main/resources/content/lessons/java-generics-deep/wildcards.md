@@ -72,6 +72,14 @@ public class WildcardsDemo {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `WildcardsDemo` with methods `sum()`, `main()`.
+- Uses inheritance.
+- Uses the `List` collection.
+- Uses loops.
+
 **Walking through it:** the parameter type `List<? extends Number>` promises the compiler: "this list's elements are at least Numbers." From that promise, reading is safe — every element you pull out can be treated as a `Number`, and you can call `doubleValue()`. Since `Integer`, `Double`, and friends all extend `Number`, any of their lists match. This is called **covariance**: the type relationship flows in the same direction as the subtype relationship.
 
 **But what about writing?** Inside `sum`, try `numbers.add(3.14)` — compile error. Here's the subtle reason: the list could actually be a `List<Integer>`. Adding a `Double` into a list of `Integer`s would corrupt it. The compiler doesn't know the *real* element type — it only knows the bound — so it must forbid all additions except `null`. This is the safety trade-off of `? extends`: you can read freely, but you cannot write.
@@ -117,6 +125,13 @@ public class SuperDemo {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `SuperDemo` with methods `fill()`, `main()`.
+- Uses the `List` collection.
+- Uses generics.
 
 **Walking through it:** `? super Integer` promises the compiler: "this list's element type is `Integer` or something more general." A more general type can always accept an `Integer` — that's the essence of inheritance. So writing `Integer`s is guaranteed safe. This is called **contravariance**: the acceptable types flow in the opposite direction of the subtype relationship.
 

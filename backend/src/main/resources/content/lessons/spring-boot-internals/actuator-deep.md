@@ -101,6 +101,12 @@ public class VersionInfoContributor implements InfoContributor {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `VersionInfoContributor` with methods `contribute()`.
+- Uses interface implementation.
+
 ### Walking Through Each Part
 
 **Exposure** — actuator endpoints are **not exposed over HTTP by default** (only `health` is). You opt in via `management.endpoints.web.exposure.include`. In production, expose only what you need and put the actuator behind auth or the internal network — `/actuator/env` leaks environment variables (secrets!).

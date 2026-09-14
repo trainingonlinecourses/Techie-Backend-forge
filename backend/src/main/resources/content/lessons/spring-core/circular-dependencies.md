@@ -76,6 +76,11 @@ public class A {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `A`.
+
 `@Lazy` on the parameter injects a proxy that resolves the real bean on first use. It works, but it's the **last resort** — it hides the design smell and adds a proxy layer.
 
 ## Field injection — the tempting wrong answer

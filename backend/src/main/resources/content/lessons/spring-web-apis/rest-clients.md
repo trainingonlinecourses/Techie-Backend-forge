@@ -59,6 +59,12 @@ client = builder.requestFactory(new JdkClientHttpRequestFactory(
 
 // Or the "exchange" variant for full control (also lets you read the error body):
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+
 .exchange((req, res) -> res.getStatusCode().is2xxSuccessful()
     ? res.bodyTo(Payment.class)
 ```java

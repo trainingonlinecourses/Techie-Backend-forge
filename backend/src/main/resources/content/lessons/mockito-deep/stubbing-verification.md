@@ -103,6 +103,11 @@ Order saved = service.placeOrder("c1", 25.0);
 assertEquals("generated-", saved.id().substring(0, 10));
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+
 **The `InvocationOnMock` gives you everything:** `getArgument(0)` (the args), `getMethod()` (which method), `getMock()` (the mock), and `callRealMethod()` (delegate to the real one). The classic uses: ID/sequence generation, time-based values, simulating a queue that acknowledges, and **callback invocation** — `doAnswer` to invoke the callback argument the way a real async API would.
 
 ## The do* Family — When when() Can't Work
@@ -133,6 +138,13 @@ public class Main {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- Uses lambda expressions.
+- When run, it prints: “deleted ”
+
 **The rule:** `when(mock.method()).thenReturn(...)` first *calls* `method()` to record the stub — fine for mocks (no-op), dangerous for spies (real side effects) and impossible for voids. `doReturn/doThrow/doAnswer/doNothing` skip the call entirely — the safe family for voids and spies.
 
 ## Verify Modes: The Full Accounting
@@ -148,6 +160,11 @@ verify(mock, only()).method();            // called exactly once, nothing else
 verifyNoMoreInteractions(mock);           // NOTHING else was called on it
 verifyNoInteractions(mock);               // it was never touched at all
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses conditionals.
 
 **`verifyNoMoreInteractions` and `verifyNoInteractions`** are the strictness tools: they assert the *absence* of unexpected calls. `verifyNoInteractions(mock)` is the standard "this path must not touch the dependency" assertion — e.g., "a cached read must not hit the repository."
 

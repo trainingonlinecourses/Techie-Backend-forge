@@ -55,6 +55,12 @@ public class Hello {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Hello` with methods `main()`.
+- When run, it prints: “Hello, World!”
+
 The bytecode in `Hello.class` is platform-neutral. A Windows JVM reads the same bytecode and produces Windows machine code; a Linux JVM on ARM reads the same bytecode and produces ARM machine code. The JVM is the translator.
 
 ### The JVM Architecture — What's Inside
@@ -98,6 +104,11 @@ static void recurse(int n) {
 // recurse(1_000_000)  — eventually StackOverflowError
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses conditionals.
+
 Local variables live only as long as their frame is on the stack. When `recurse` returns, its local variable `n` is gone. This is why local variables are not shared between threads — each thread has its own stack.
 
 #### The Program Counter (PC) Register
@@ -134,6 +145,11 @@ The same code, clean:
 System.out.println("hello");
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- When run, it prints: “hello”
+
 The constant pool entries `#2`, `#3`, `#4` are resolved by the JVM at runtime. This is why reflection and dynamic proxies work — the JVM already has the machinery to look up methods by name and descriptor.
 
 ### The ClassLoader Subsystem — how classes get into the JVM
@@ -168,6 +184,11 @@ public class Main {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+
 #### Custom ClassLoaders
 
 You can write your own classloader by extending `ClassLoader` and overriding `findClass` (or `loadClass` if you want to change the delegation model). Custom classloaders are the foundation of:
@@ -198,6 +219,14 @@ var loader = new ByteArrayClassLoader();
 loader.store("com.example.Foo", compileSomehow());
 Class<?> foo = loader.loadClass("com.example.Foo");
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `ByteArrayClassLoader`.
+- Uses inheritance.
+- Uses the `Map` collection.
+- Uses local type inference with `var`.
 
 But be careful: a class is identified by its **fully qualified name AND the classloader that loaded it**. `com.example.Foo` loaded by classloader A is a different type than `com.example.Foo` loaded by classloader B. You cannot cast between them — you get ` ClassCastException` even though the names match. This is the root of many "classloader hell" bugs in application servers.
 
@@ -242,6 +271,11 @@ static long sum(long n) {
 
 The end user does not control the JIT directly, but understanding it helps explain performance behavior: don't micro-optimize Java code based on a single short run; write clean code and let the JIT do its job; use JMH for real benchmarks.
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses loops.
 
 ### "Write Once, Run Anywhere" — What It Actually Means
 

@@ -76,6 +76,11 @@ public class CourseReferenceResolver {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `CourseReferenceResolver` with methods `course()`.
+
 ### Walking Through Each Part
 
 **The subgraph schema** — declares `Course` with `@key(fields: "id")`: *"this service identifies courses by id."* The `@key` is the contract other subgraphs use to extend the type.

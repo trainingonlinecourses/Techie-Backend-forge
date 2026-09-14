@@ -41,6 +41,11 @@ public class CustomerService {
     private final CustomerRepository repo;
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `CustomerService`.
+
     public Flux<Customer> all() { return repo.findAll(); }     // streaming, row by row
 
     public Mono<Customer> byId(Long id) {

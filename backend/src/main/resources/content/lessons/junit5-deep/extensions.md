@@ -104,6 +104,14 @@ class ResolverDemo {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `RandomUser` and `RandomUserResolver` and 2 more type(s) with methods `supportsParameter()`, `resolveParameter()`.
+- Uses a `record`.
+- Uses an interface.
+- Uses interface implementation.
+
 **The contract has exactly two methods:** `supportsParameter` (JUnit asks "can you provide this parameter?" — answer by checking the type/annotation) and `resolveParameter` (JUnit asks "give me the value"). JUnit calls `supportsParameter` for *every* unresolved parameter, in *extension registration order*, until one claims it. This is precisely how **`MockitoExtension`** works — it sees `@Mock UserRepository repo` in the test method's parameters, creates the mock, and injects it. And it's how **`SpringExtension`** (`@SpringBootTest`) injects beans: a resolver that pulls from the application context.
 
 ## A Realistic Extension: Conditional Execution
@@ -126,6 +134,13 @@ public class DisabledOnMissingEnv implements ExecutionCondition {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `DisabledOnMissingEnv` with methods `evaluateExecutionCondition()`.
+- Uses interface implementation.
+- Uses conditionals.
 
 `ExecutionCondition` is the mechanism behind `@Disabled`, `@EnabledOnOs`, and `@EnabledIfEnvironmentVariable` — they're all built-in extensions implementing this interface. The takeaway: **if you can express it as a condition, an extension can apply it.**
 
@@ -150,6 +165,12 @@ class TestA { }
 @Retention(RetentionPolicy.RUNTIME)
 @interface FastTestSuite { }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `TestA` and `FastTestSuite`.
+- Uses an interface.
 
 The **composed annotation** pattern is the professional packaging: a team's `@WebTest` or `@DatabaseTest` annotation bundles the extension set, tags, and conventions into one meaningful name — the same design philosophy as Spring's stereotype annotations.
 

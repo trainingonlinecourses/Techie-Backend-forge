@@ -23,6 +23,12 @@ Runnable r = new Runnable() {
 };
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Runnable` with methods `run()`.
+- When run, it prints: “Hello”
+
 Java 8 introduced **lambda expressions** — a concise way to write inline implementations of functional interfaces. The same code becomes:
 
 ```java
@@ -113,6 +119,12 @@ public class Main {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- Uses lambda expressions.
+
 ---
 
 ## Line-by-Line Code Walkthrough
@@ -171,6 +183,14 @@ public class LambdaDemo {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `LambdaDemo` with methods `main()`.
+- Uses the Streams API to process data declaratively.
+- Uses lambda expressions.
+- Uses the `List` collection.
+
 ---
 
 ## Real-World Organizational Scenarios
@@ -185,6 +205,15 @@ record OrderEvent(String orderId, String type, Map<String, Object> data) {}
 
 // Register handlers using lambdas
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderEvent`.
+- Uses a `record`.
+- Uses the `Map` collection.
+- Uses generics.
+
 Map<String, Consumer<OrderEvent>> handlers = Map.of(
     "CREATED",   event -> orderService.sendConfirmation(event.orderId()),
     "CANCELLED", event -> inventoryService.restoreStock(event.data()),
@@ -202,6 +231,11 @@ if (handler != null) {
 
 **Why lambdas here:** Each handler is a small, focused piece of behavior. Without lambdas, you'd need a separate class for each handler — four classes instead of four lambdas.
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses conditionals.
 
 ### Scenario 2: API gateway request transformation
 
@@ -261,6 +295,14 @@ public <T> T retryWithBackoff(Supplier<T> operation, int maxAttempts) {
 User user = retryWithBackoff(() -> httpClient.get("/api/users/123", User.class), 3);
 Order order = retryWithBackoff(() -> orderService.findById(orderId), 3);
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses exception handling with try/catch.
+- Uses lambda expressions.
+- Uses loops.
+- Uses conditionals.
 
 **Why lambdas here:** The retry logic is completely decoupled from what it's retrying. You can retry HTTP calls, database queries, file reads — anything.
 

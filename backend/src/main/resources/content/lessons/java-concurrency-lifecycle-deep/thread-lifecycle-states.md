@@ -202,6 +202,13 @@ class Worker extends Thread {
 new Worker("job-1").start();
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Worker` with methods `run()`.
+- Uses manual threading.
+- Uses inheritance.
+
 **2. Implement `Runnable` and pass it to `Thread`** — the classic approach. Separates the task (what to do) from the thread (how to run it). Preferred over subclassing Thread.
 
 ```java

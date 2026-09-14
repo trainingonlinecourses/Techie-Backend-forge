@@ -89,6 +89,12 @@ public class Factorial {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Factorial` with methods `main()`, `factorial()`.
+- Uses conditionals.
+
 The key line is `return n * factorial(n - 1)`. Notice the method can't finish its multiplication until the smaller call returns. Expanding it by hand:
 
 ```text
@@ -115,6 +121,11 @@ static int digitSum(int n) {
     return (n % 10) + digitSum(n / 10); // last digit + sum of the rest
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses conditionals.
 
 `digitSum(1729)` = `9 + digitSum(172)` = `9 + 2 + digitSum(17)` = `9 + 2 + 7 + digitSum(1)` = `19`. The shrinking move here is `n / 10` — any operation that reliably heads toward the base case works.
 

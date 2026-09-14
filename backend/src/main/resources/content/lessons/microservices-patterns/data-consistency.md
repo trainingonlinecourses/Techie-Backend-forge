@@ -225,6 +225,11 @@ public User findByEmail(String email) {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+
 ### Scenario 3: Distributed Lock for Critical Operations
 
 ```java

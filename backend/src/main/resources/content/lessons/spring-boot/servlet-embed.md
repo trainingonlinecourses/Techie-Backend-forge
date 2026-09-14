@@ -180,6 +180,11 @@ public class ShutdownHook {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `ShutdownHook` with methods `onShutdown()`.
+
 ## Common mistakes
 
 | Mistake | Consequence |

@@ -67,6 +67,12 @@ public class AppInfo {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `AppInfo` with methods `describe()`.
+- When run, it prints: “App: ”
+
 ### Walking Through Each Part
 
 **`application.properties`** — the base: dev-friendly defaults (localhost DB, port 8080). Anything not overridden by a higher source uses these.

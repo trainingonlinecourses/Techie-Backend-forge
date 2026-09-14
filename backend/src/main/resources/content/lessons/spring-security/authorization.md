@@ -52,6 +52,11 @@ public class PaymentService {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `SecurityConfig` and `PaymentService` with methods `reconcile()`, `findAccount()`, `manage()`.
+
 ## Authorities vs roles
 
 Authorities are the raw strings in the token/principal. Spring Security convention: role authorities are prefixed `ROLE_`. Permissions can be arbitrary strings (`account:read`).

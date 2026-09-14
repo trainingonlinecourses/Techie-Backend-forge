@@ -134,6 +134,13 @@ public class BinarySearch {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `BinarySearch` with methods `search()`, `isSorted()`.
+- Uses loops.
+- Uses conditionals.
+
 ### Scenario 3: debugging with logging and diagnostics
 
 When assertions are off in production, structured logging replaces them:
@@ -164,6 +171,12 @@ public class OrderService {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderService` with methods `processOrder()`.
+- Uses conditionals.
 
 ## JVM debugging tools
 

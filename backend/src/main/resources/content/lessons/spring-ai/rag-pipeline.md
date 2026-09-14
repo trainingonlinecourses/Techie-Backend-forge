@@ -54,6 +54,12 @@ public class RagService {
         // 3. GENERATE: answer grounded in the context
         return chatClient.prompt()
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses the Streams API to process data declaratively.
+
                 .system("""
                         You are a documentation assistant. Answer ONLY from the provided
                         context. If the context doesn't contain the answer, say so.
@@ -62,6 +68,12 @@ public class RagService {
 ```java
                 .user(u -> u.text("Context:\n{context}\n\nQuestion: {question}")
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+
                         .param("context", context)
                         .param("question", question))
                 .call()

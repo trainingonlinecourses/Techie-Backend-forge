@@ -30,6 +30,11 @@ public void transferMoney(String fromAccount, String toAccount, BigDecimal amoun
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses `BigDecimal` for exact decimal math.
+
 Without `@Transactional`, each `save()` is its own transaction. If `save(receiver)` fails, the debit is already committed — money vanished.
 
 ## Transaction propagation
@@ -61,6 +66,11 @@ public class OrderService {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderService` with methods `processOrder()`.
 
 ## Isolation levels
 
@@ -157,6 +167,12 @@ public class OrderService {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderService` with methods `processOrder()`, `createOrder()`.
+- Uses lambda expressions.
+
 ## Read-only transactions
 
 @Transactional(readOnly = true)
@@ -199,6 +215,12 @@ public class PaymentService {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `PaymentService` with methods `processPayment()`.
+- Uses exception handling with try/catch.
+
 ### Scenario 2: REQUIRES_NEW for audit logging
 
 ```java
@@ -213,6 +235,11 @@ public class AuditService {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `AuditService` with methods `logAction()`.
 
 ### Scenario 3: optimistic locking with @Version
 
@@ -237,6 +264,12 @@ public class AccountService {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Account` and `AccountService` with methods `debit()`.
+- Uses `BigDecimal` for exact decimal math.
 
 ## Common mistakes
 

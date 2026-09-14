@@ -106,6 +106,13 @@ public class MdcFilter implements Filter {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `MdcFilter` with methods `doFilter()`.
+- Uses exception handling with try/catch.
+- Uses interface implementation.
+
 Pattern: `%d{HH:mm:ss.SSS} %-5level [%thread] [%X{requestId}] %logger - %msg%n`
 
 ---

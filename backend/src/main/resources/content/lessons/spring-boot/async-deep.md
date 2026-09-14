@@ -55,6 +55,11 @@ public class UserService {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `UserService` with methods `register()`.
+
 ## Configuring the thread pool
 
 ```java
@@ -83,6 +88,14 @@ public class AsyncConfig implements AsyncConfigurer {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `AsyncConfig` with methods `getAsyncExecutor()`, `getAsyncUncaughtExceptionHandler()`.
+- Uses manual threading.
+- Uses lambda expressions.
+- Uses interface implementation.
 
 ## Exception handling in @Async
 
@@ -129,6 +142,12 @@ public class CleanupService {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `CleanupService` with methods `cleanupOldSessions()`.
+- Uses the java.time date-time API.
+
 ## org scenarios
 
 ```java
@@ -152,6 +171,12 @@ public void audit(User user, String action, Map<String, Object> details) {
 **Parallel task execution:** combine multiple @Async calls:
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses the `Map` collection.
+- Uses generics.
+
 CompletableFuture<User> userFuture = userService.getUserAsync(userId);
 CompletableFuture<List<Order>> ordersFuture = orderService.getOrdersAsync(userId);
 CompletableFuture<Stats> statsFuture = analyticsService.getStatsAsync(userId);
@@ -160,6 +185,11 @@ CompletableFuture<Stats> statsFuture = analyticsService.getStatsAsync(userId);
 // All three run in parallel — combine when ready
 CompletableFuture.allOf(userFuture, ordersFuture, statsFuture).join();
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses asynchronous composition with `CompletableFuture`.
 
 UserProfile profile = new UserProfile(
     userFuture.join(), ordersFuture.join(), statsFuture.join()

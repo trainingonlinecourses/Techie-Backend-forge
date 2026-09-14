@@ -52,6 +52,12 @@ public class CourseSpecifications {
 ```java
         return (root, query, cb) ->
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+
             text == null ? null
                 : cb.like(cb.lower(root.get("title")), "%" + text.toLowerCase() + "%");
     }
@@ -94,6 +100,12 @@ if (publishedOnly)        spec = spec.and(isPublished());
 
 // OR composition
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses conditionals.
+
 Specification<Course> beginnerOrAdvanced =
 ```java
     hasLevel("BEGINNER").or(hasLevel("ADVANCED"));

@@ -98,6 +98,13 @@ public class FormatDemo {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `FormatDemo` with methods `main()`.
+- Uses formatted output.
+- When run, it prints: “| %-10s | %6.2f |%n”, “%2$s is cheaper than %1$s%n” …
+
 ### Walking Through Each Part
 
 **Part 1 — `String.format`:** The template is scanned left to right; each specifier consumes the next argument. `%d` → `items` (3), `%s` → `product` ("Widget"), `%,.2f` → `total` — the `,` flag adds thousands separators and `.2` rounds to 2 decimals (`1,234.57`), and `%.0f` → `discount` with zero decimals (`15`). The `%%` prints a literal percent sign — because a single `%` would start a specifier.
@@ -137,6 +144,14 @@ public class Main {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- Uses formatted output.
+- Uses the java.time date-time API.
+- When run, it prints: “%tF %<tT%n”
 
 `%tF` = ISO date, `%<tT` = time; the `<` flag means "reuse the previous argument", so we don't pass `now` twice.
 

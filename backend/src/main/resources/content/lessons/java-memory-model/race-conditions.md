@@ -20,6 +20,11 @@ if (map.containsKey(key)) {     // Thread 1 checks: true
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses conditionals.
+
 ---
 
 ## Common Race Condition Patterns
@@ -39,6 +44,12 @@ synchronized (account) {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses synchronization with `synchronized`.
+- Uses conditionals.
 
 ### Read-Modify-Write
 
@@ -61,6 +72,12 @@ if (instance == null) {
 
 // ✅ Fixed: synchronized or volatile + double-checked locking
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses synchronization with `synchronized`.
+- Uses conditionals.
 
 ---
 
@@ -150,6 +167,14 @@ public class RaceConditionDemo {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `RaceConditionDemo` with 6 methods.
+- Uses synchronization with `synchronized`.
+- Uses lambda expressions.
+- Uses method references.
+
 ---
 
 ## Real-World Scenarios
@@ -190,6 +215,12 @@ public boolean decrementIfPositive(String productId) {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses loops.
+- Uses conditionals.
+
 ### Scenario 2: Double-checked locking
 
 ```java
@@ -209,6 +240,13 @@ public class Config {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Config` with methods `getInstance()`.
+- Uses synchronization with `synchronized`.
+- Uses conditionals.
 
 ---
 

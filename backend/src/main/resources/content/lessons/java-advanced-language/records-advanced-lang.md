@@ -46,6 +46,13 @@ public record Course(Long id, String title, String level, int minutes) {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Course`.
+- Uses a `record`.
+- Uses conditionals.
+
 The compact constructor runs before field assignment — the canonical place for validation and normalization.
 
 ## Custom Accessors
@@ -66,6 +73,12 @@ public record Course(Long id, String title, String level, int minutes) {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Course` with methods `isLong()`, `withTitle()`, `title()`.
+- Uses a `record`.
+
 Records are immutable by design — updates create new instances.
 
 ## Sealed Classes: Closed Hierarchies
@@ -79,6 +92,14 @@ public record CardPayment(String token, String last4) implements Payment {}
 public record BankTransfer(String iban) implements Payment {}
 public record WalletPayment(String provider, String walletId) implements Payment {}
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Payment` and `CardPayment` and 2 more type(s).
+- Uses a `record`.
+- Uses an interface.
+- Uses interface implementation.
 
 The three permitted subtypes are exhaustive — the compiler knows every possible `Payment`. Add a fourth subtype? You must update the `permits` list and every switch.
 
@@ -112,6 +133,12 @@ public String describe(Payment payment) {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+- Uses switch branching.
+
 `when` clauses add predicates; order matters — the first matching guard wins.
 
 ## Pattern Matching for instanceof
@@ -136,6 +163,12 @@ public class Main {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- Uses conditionals.
+
 With flow scoping — `s` is usable *only where it's safe*:
 
 ```java
@@ -144,6 +177,11 @@ if (obj instanceof String s && s.length() > 5) {
 }
 // s NOT in scope here (condition could have failed)
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses conditionals.
 
 ## Record Patterns: Nested Destructuring
 
@@ -155,6 +193,13 @@ public boolean isHorizontal(Line line) {
     return line instanceof Line(Point(var x1, _), Point(var x2, _)) && x1 == x2;
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Point` and `Line` with methods `isHorizontal()`.
+- Uses a `record`.
+- Uses local type inference with `var`.
 
 Nested patterns destructure in one expression. `_` (unnamed variable, Java 22) skips components you don't need.
 
@@ -170,6 +215,12 @@ public int timeEstimate(Payment payment) {
     return base;
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+- Uses switch branching.
 
 Arrow-switch returns values; the whole expression assigns. No `break`, no mutable accumulator.
 
@@ -196,6 +247,14 @@ public class OrderStateMachine {
 Every event is immutable data; the state machine is an exhaustive switch; the compiler guarantees no unhandled event type. This trio is the modern Java idiom for domain modeling.
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderEvent` and `OrderPlaced` and 3 more type(s) with methods `apply()`.
+- Uses lambda expressions.
+- Uses a `record`.
+- Uses an interface.
+
 ## JSON Interop
 
 Records work with Jackson out of the box (Spring Boot 3):
@@ -209,6 +268,12 @@ CourseDto dto = objectMapper.readValue(json, CourseDto.class);
 // serialization
 String json = objectMapper.writeValueAsString(dto);
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `CourseDto`.
+- Uses a `record`.
 
 No annotations needed for the common case — records' canonical constructor matches JSON properties.
 
@@ -225,6 +290,11 @@ No annotations needed for the common case — records' canonical constructor mat
 ```java
 Records make data immutable and terse; sealed classes make hierarchies exhaustive; pattern matching makes handling them elegant and compiler-checked. This trio is the foundation of modern Java domain modeling — and it composes perfectly with the next lesson's switch expressions and richer language features.
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses switch branching.
 
 ## References
 

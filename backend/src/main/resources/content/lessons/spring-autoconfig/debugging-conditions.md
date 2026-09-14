@@ -120,6 +120,11 @@ public class DebuggingDemo {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `DebuggingDemo` with methods `main()`.
+
 ---
 
 ## Real-World Scenarios
@@ -190,6 +195,11 @@ public class CustomAutoConfiguration {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `CustomAutoConfiguration` with methods `customService()`.
 
 ---
 

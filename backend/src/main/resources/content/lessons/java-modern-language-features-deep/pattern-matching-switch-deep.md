@@ -120,6 +120,11 @@ if (obj instanceof String s) {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses conditionals.
+
 The guarded switch is more direct and less prone to nesting errors.
 
 ### Exhaustiveness — The Compiler Checks That Every Value Is Covered
@@ -180,6 +185,13 @@ String describe(Object obj) {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+- Uses switch branching.
+- Uses conditionals.
+
 ### Null Handling in Pattern Matching Switch
 
 A `null` selector does not match a type pattern. A `case String s` does **not** match `null`, even though `null` is technically not an instance of `String`. If the selector is `null` and there is no `case null`, the switch throws a `NullPointerException`.
@@ -197,6 +209,13 @@ String describe(Object obj) {
     };
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+- Uses switch branching.
+- Uses conditionals.
 
 Without the `case null`, passing `null` into this switch would throw. With it, `null` is handled gracefully. This is especially useful when the selector might be `null` in normal use — for example, a method that accepts an `Object` and might be called with `null`.
 
@@ -219,6 +238,14 @@ String summary(Object obj) {
     };
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Status`.
+- Uses lambda expressions.
+- Uses an `enum`.
+- Uses switch branching.
 
 Here the switch handles `null`, three `Status` constants, a `String` pattern, an `Integer` pattern, and a `default`. The compiler ensures the cases are well-formed.
 
@@ -261,6 +288,13 @@ String deep(Object obj) {
     };
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+- Uses switch branching.
+- Uses conditionals.
 
 Here the pattern `Circle(Point(int cx, int cy), double r)` matches a `Circle`, matches its `center` with a nested `Point` pattern, and binds the point's `x` and `y` to `cx` and `cy`, and the circle's `radius` to `r`. This is a deep structural match — the shape of the data is matched directly.
 

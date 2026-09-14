@@ -16,11 +16,22 @@ Here is a fact that surprises most beginners: **every single class you ever writ
 public class Customer { }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Customer`.
+
 Behind the scenes the compiler treats this as:
 
 ```java
 public class Customer extends Object { }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Customer`.
+- Uses inheritance.
 
 Why does this matter? Because it means **every object in your application already has 11 methods** the moment it is created: `toString()`, `equals()`, `hashCode()`, `getClass()`, `clone()`, `finalize()`, `wait()` (3 overloads), and `notify()`/`notifyAll()`. You never wrote them — they came free from `Object`.
 
@@ -81,6 +92,11 @@ public class Customer {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Customer` with methods `toString()`.
 
 Now logging `c` prints `Customer{id=42, email='amy@corp.com'}` — immediately useful at 3 AM during an incident.
 

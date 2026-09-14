@@ -67,6 +67,13 @@ public class SearchingDemo {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `SearchingDemo` with methods `binarySearch()`, `main()`.
+- Uses loops.
+- Uses conditionals.
+
 **Walking through it:** the loop maintains a search window `[lo, hi]`. Each iteration compares the middle element and discards the half that can't contain the target. With 1 billion elements, ~30 iterations suffice — the halving is what log₂n means. Note `mid = lo + (hi - lo) / 2` — the naive `(lo+hi)/2` can overflow for huge arrays. And the crucial precondition: **the array must be sorted** — binary search on unsorted data silently returns wrong answers, one of the classic "why is my code wrong" bugs.
 
 ## The Two Great Sorts: Merge and Quick
@@ -118,6 +125,13 @@ public class MergeSort {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `MergeSort` with methods `mergeSort()`, `merge()`, `main()`.
+- Uses loops.
+- Uses conditionals.
 
 **Walking through the idea:** merge sort splits the array in half, recursively sorts each half, then *merges* the two sorted halves — the merge is the magic: with both halves sorted, the smallest overall element must be one of the two heads, so a single left-to-right pass combines them in O(n). Recursion depth is log n, and at each level we do O(n) merging work → **O(n log n) guaranteed**, always — no bad cases. The cost: the O(n) scratch array (space complexity).
 
@@ -171,6 +185,13 @@ public class QuickSort {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `QuickSort` with 4 methods.
+- Uses loops.
+- Uses conditionals.
+
 **Walking through the idea:** quicksort picks a **pivot** and *partitions* — rearranges the array so everything smaller than the pivot sits before it and everything larger after it. The pivot is now in its *final* position, forever. Recursing on each side sorts the rest. On average, each partition divides the array roughly in half → O(n log n), and — critically — it sorts **in place** with O(log n) stack space, no scratch array. The catch: a bad pivot choice (e.g., always picking the last element on an already-sorted array) produces lopsided partitions → O(n²). Java's real implementation avoids this with careful pivot selection ("dual-pivot" picks three candidates).
 
 ## Sorting Your Own Objects
@@ -206,6 +227,14 @@ public class SortObjectsDemo {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `SortObjectsDemo` and `Student` with methods `main()`.
+- Uses method references.
+- Uses a `record`.
+- Uses the `List` collection.
 
 **The two mechanisms:** `Comparable` (the class defines its *natural* order via `compareTo` — used by `TreeMap`, `TreeSet`, `Collections.sort` without a comparator) and `Comparator` (a *separate* ordering strategy, passed per-call — the flexible choice, and the modern idiom with `Comparator.comparing` and method references). A `record` can implement `Comparable` like any class. The consistency rule: `compareTo`/`compare` returning 0 must agree with `equals` — otherwise sorted collections (which use comparisons) and hash collections (which use equals) disagree about duplicates.
 

@@ -66,6 +66,13 @@ public interface OrderSummary {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderSummary`.
+- Uses an interface.
+- Uses `BigDecimal` for exact decimal math.
+
 List<OrderSummary> findSummariesByStatus(OrderStatus status);
 
 // Class projection — a DTO with a matching constructor:

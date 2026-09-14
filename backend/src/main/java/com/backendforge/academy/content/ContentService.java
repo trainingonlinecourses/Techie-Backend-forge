@@ -79,8 +79,79 @@ public class ContentService {
                 .orElseThrow(() -> new NotFoundException("Lesson not found: " + id));
         String moduleTitle = modules.findById(l.getModuleId())
                 .map(Module::getTitle).orElse(null);
-        return LessonDto.from(l, moduleTitle);
+        return LessonDto.from(l, moduleTitle, derivePrereqs(l));
     }
+
+    /**
+     * Prerequisites of a lesson as frontend-presentable summaries:
+     * first any explicit {@code requires:} tags, then (capped) the lessons the
+     * curriculum places directly before this one — the natural reading path.
+     * Skips the lesson itself, unknown ids, and same-position siblings; used by
+     * LessonPage to warn learners who jump far ahead of what they've completed.
+     */
+    public List<LessonSummaryDto> derivePrereqs(Lesson lesson) {
+        Map<String, String> titles = moduleTitles();
+        List<LessonSummaryDto> out = new ArrayList<>();
+        Set<String> tagged = new HashSet<>();
+
+        // 1. Explicit tags from the lesson author — always authoritative.
+        for (String slug : lesson.getPrereqs().stream().distinct().toList()) {
+            lessons.findById(slug)
+                    .map(l -> LessonSummaryDto.from(l, titles.get(l.getModuleId())))
+                    .ifPresent(dto -> {
+                        out.add(dto);
+                        tagged.add(dto.id());
+                    });
+        }
+
+        // 2. Up to three lessons directly before this one, in-order within the
+        //    module and (when the module is exhausted) from the preceding module —
+        //    i.e. the path a learner following the curriculum would have taken.
+        //    Lessons already named explicitly are not repeated.
+        int capacity = PREREQ_CONTEXT_LIMIT - out.size();
+        if (capacity > 0) {
+            pathBefore(lesson, capacity).stream()
+                    .filter(p -> !tagged.contains(p.id()))
+                    .limit(capacity)
+                    .forEach(out::add);
+        }
+        return out;
+    }
+
+    /**
+     * The ordered lessons a learner would have read immediately before this one,
+     * spanning module borders. Uses the lightweight summary projection (no bodies)
+     * and matches the current lesson by id — the passed entity comes from a
+     * different persistence context than the listing, so identity would fail.
+     */
+    private List<LessonSummaryDto> pathBefore(Lesson lesson, int limit) {
+        List<Module> mods = modules.findAllByOrderByOrderIndexAsc();
+        Map<String, String> titles = mods.stream()
+                .collect(Collectors.toMap(Module::getId, Module::getTitle));
+        Map<String, List<LessonSummaryData>> byModule = lessons.findAllSummaries().stream()
+                .collect(Collectors.groupingBy(LessonSummaryData::moduleId));
+
+        List<LessonSummaryData> flat = new ArrayList<>();
+        for (Module m : mods) {
+            byModule.getOrDefault(m.getId(), List.of()).stream()
+                    .sorted(Comparator.comparingInt(LessonSummaryData::order))
+                    .forEach(flat::add);
+        }
+        int idx = -1;
+        for (int i = 0; i < flat.size(); i++) {
+            if (flat.get(i).id().equals(lesson.getId())) { idx = i; break; }
+        }
+        if (idx <= 0) return List.of();
+        List<LessonSummaryDto> out = new ArrayList<>(Math.min(limit, idx));
+        for (int i = Math.max(0, idx - limit); i < idx; i++) {
+            LessonSummaryData d = flat.get(i);
+            out.add(LessonSummaryDto.from(d, titles.get(d.moduleId())));
+        }
+        return out;
+    }
+
+    /** Context lessons served alongside a lesson's prerequisites. */
+    private static final int PREREQ_CONTEXT_LIMIT = 3;
 
     public Optional<Lesson> lessonEntity(String id) {
         return lessons.findById(id);

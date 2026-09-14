@@ -145,6 +145,11 @@ IntegrationFlow scatterGather() {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+
 The **splitter-aggregator** pair is the workhorse of parallel processing within an integration — split a batch, process items, recombine by correlation. The aggregator's release strategy decides "how many / how long until we emit the combined message" — the heartbeat/count-based patterns are the standard.
 
 ## Testing: The Integration That's Actually Testable

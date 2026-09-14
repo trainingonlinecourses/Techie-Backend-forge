@@ -50,6 +50,11 @@ public class User {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `User` with 9 methods.
+
 ### What is MapStruct?
 
 MapStruct is a code generator that creates **type-safe mapping code** between Java objects. Instead of manually copying fields from one object to another, MapStruct generates the mapping code at compile time.
@@ -70,6 +75,12 @@ public interface UserMapper {
     UserDTO toDTO(User user);
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `UserMapper` with methods `toDTO()`.
+- Uses an interface.
 
 ---
 
@@ -103,6 +114,12 @@ public class Employee {
     private LocalDate hireDate;
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Employee`.
+- Uses the java.time date-time API.
 
 ### @Builder — Fluent Object Creation
 
@@ -162,6 +179,13 @@ Money price = new Money(new BigDecimal("29.99"), Currency.USD);
 // price.setAmount(...) — COMPILE ERROR: no setter!
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Money` with methods `add()`.
+- Uses `BigDecimal` for exact decimal math.
+- Uses conditionals.
+
 ### @Slf4j — Automatic Logger
 
 ```java
@@ -188,6 +212,11 @@ public class UserService {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `UserService` with methods `createUser()`, `deleteUser()`.
+
 ### @ToString — Debug-Friendly Output
 
 ```java
@@ -205,6 +234,11 @@ public class Customer {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Customer`.
+
 ### @EqualsAndHashCode — Proper Object Comparison
 
 ```java
@@ -219,6 +253,12 @@ public class PremiumCustomer extends Customer {
 // Two PremiumCustomer objects are equal if ALL fields match
 // (including inherited fields from Customer)
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `PremiumCustomer`.
+- Uses inheritance.
 
 ---
 
@@ -319,6 +359,14 @@ public class Pair<A, B> {
 Pair<String, Integer> pair = Pair.of("age", 25);
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `User` and `PremiumUser` and 1 more type(s) with methods `isAdmin()`.
+- Uses inheritance.
+- Uses the `Set` collection.
+- Uses the java.time date-time API.
+
 ---
 
 ## MapStruct Deep Dive
@@ -362,6 +410,12 @@ public interface UserMapper {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `UserMapper`.
+- Uses an interface.
+
 ### Complex Mappings
 
 
@@ -401,6 +455,14 @@ public interface OrderMapper {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderMapper`.
+- Uses an interface.
+- Uses the `List` collection.
+- Uses generics.
+
 ### Reverse Mapping
 
 ```java
@@ -418,6 +480,12 @@ public interface ProductMapper {
     Product toEntity(ProductDTO dto);
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `ProductMapper`.
+- Uses an interface.
 
 ---
 
@@ -555,6 +623,14 @@ public class UserController {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `User` and `UserDTO` and 3 more type(s) with 4 methods.
+- Uses an interface.
+- Uses the `List` collection.
+- Uses the java.time date-time API.
+
 ### Scenario 2: Lombok with Spring Data JPA
 
 @Data
@@ -593,6 +669,13 @@ public class Product {
     
     @Builder.Default  // Default to empty list
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Product`.
+- Uses `BigDecimal` for exact decimal math.
+
     private List<Tag> tags = new ArrayList<>();
     
 ```java
@@ -713,6 +796,12 @@ public class AppConfig {
     private final String appName;
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Order` and `Money` and 3 more type(s).
+- Uses `BigDecimal` for exact decimal math.
 
 ## References
 

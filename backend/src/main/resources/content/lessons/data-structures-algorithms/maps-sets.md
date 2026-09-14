@@ -63,6 +63,14 @@ public class MapDemo {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `MapDemo` with methods `main()`.
+- Uses lambda expressions.
+- Uses the `Map` collection.
+- Uses loops.
+
 **Walking through it:** `put` computes `"Ada".hashCode()` (a specific int), maps it to a bucket index, and stores the entry. `get` does the same computation and checks only that one bucket. This is O(1) — independent of how many keys exist. `getOrDefault` and `containsKey` are the null-safe idioms. And note the iteration order warning: `HashMap` makes *no* ordering promises. If you need insertion order, use `LinkedHashMap`; if you need sorted order, use `TreeMap`.
 
 ## Collisions: When Two Keys Share a Bucket
@@ -119,6 +127,13 @@ public class ContractDemo {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `ContractDemo` and `BadKey` and 1 more type(s) with methods `equals()`, `hashCode()`, `main()`.
+- Uses the `Map` collection.
+- Uses generics.
+
 **The contract:** if `a.equals(b)` then `a.hashCode() == b.hashCode()` (equal objects must hash equally). The reverse need not hold (unequal objects may collide — that's fine, just slower). The `BadKey` breaks it functionally: with a constant hash, `get` computes the same bucket, but then must compare with `equals` — and since `equals` works, why does `get` return null? Because the *stored* key and the *lookup* key are different objects in the same bucket and... wait, equals says they're equal. Let's trace: with a constant hashCode, both go to bucket 1, equals matches — it should work. The real breakage: **mutability**. If a key's `hashCode` changes *after* it's stored (because the key object is mutable and its fields change), the map looks in the wrong bucket forever. The classic bug: storing a mutable object as a key, mutating it, then failing to find it. The rule: **use immutable keys** (String, Integer, records) — and if you must use mutable keys, never mutate them while they're in the map.
 
 ## TreeMap and TreeSet: Sorted Order, O(log n)
@@ -151,6 +166,13 @@ public class Main {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- Uses the `Map` collection.
+- Uses generics.
 
 Range queries (`ceilingKey`, `subMap`) are the reason `TreeMap` exists. The trade-off: O(log n) instead of O(1) for basic ops — a small constant-factor cost for huge ordering power.
 

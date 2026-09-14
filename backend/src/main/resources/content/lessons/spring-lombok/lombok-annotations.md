@@ -36,6 +36,11 @@ public class User {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `User` with 7 methods.
+
 ---
 
 ## Core Annotations
@@ -53,6 +58,11 @@ public class User {
 // Generates: getName(), setName(), getAge(), setAge()
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `User`.
+
 ### @Data (combines everything)
 
 ```java
@@ -65,6 +75,11 @@ public class User {
 // Generates: getters, setters, toString, equals, hashCode, requiredArgsConstructor
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `User`.
+
 ### @Value (immutable)
 
 ```java
@@ -76,6 +91,11 @@ public class Money {
 
 // Generates: getters only, final fields, all-args constructor, toString, equals, hashCode
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Money`.
 
 ### @Builder
 
@@ -90,6 +110,11 @@ public class User {
 // Usage: User.builder().name("Alice").age(30).email("alice@example.com").build()
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `User`.
+
 ### @Slf4j
 
 ```java
@@ -102,6 +127,11 @@ public class MyService {
 
 // Generates: private static final Logger log = LoggerFactory.getLogger(MyService.class);
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `MyService` with methods `doSomething()`.
 
 ---
 
@@ -159,6 +189,12 @@ public class LombokDemo {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `User` and `Role` and 1 more type(s) with methods `main()`.
+- Uses an `enum`.
+
 ---
 
 ## Real-World Scenarios
@@ -176,6 +212,11 @@ public class CreateOrderRequest {
     private String notes;  // optional
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `CreateOrderRequest`.
 
 ### Scenario 2: Entity with selective mutation
 
@@ -201,6 +242,11 @@ public class Order {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Order`.
 
 ---
 

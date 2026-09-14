@@ -338,6 +338,13 @@ class Song {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Library` and `Playlist` and 2 more type(s) with 4 methods.
+- Uses the `List` collection.
+- Uses generics.
+
 ---
 
 ## In an Organization
@@ -447,6 +454,12 @@ public class Main {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- When run, it prints: “Total: $”
 
 ### Scenario 2: Social Media (Composition)
 

@@ -57,15 +57,16 @@ public class OrderController {
 ## Affordances vs. hard-coded clients
 
 
-**What this code does — step by step:**
-
-1. "Hypermedia as the engine of application state" (HATEOAS, Fielding): the client asks "what may I do?" and the server answers with links.
-2. The honest middle ground — most teams: 1. Links for navigation (self, related aggregates) — followed by the client. 2. Links for *actions* as a contract signal — the client still knows the workflow,. But the server controls when it's available (conditional affordances).
 
 
 ```java
 Pure HATEOAS (clients that know *nothing* about the API shape) is elegant and rarely achieved in practice; the pragmatic value is **navigation links that can't rot** + **state-conditional actions**.
 ```
+
+<!-- why -->
+**What this code does — step by step:**
+1. "Hypermedia as the engine of application state" (HATEOAS, Fielding): the client asks "what may I do?" and the server answers with links.
+2. The honest middle ground — most teams: 1. Links for navigation (self, related aggregates) — followed by the client. 2. Links for *actions* as a contract signal — the client still knows the workflow,. But the server controls when it's available (conditional affordances).
 
 ## Pagination with CollectionModel
 

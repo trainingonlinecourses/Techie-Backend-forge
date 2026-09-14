@@ -70,6 +70,13 @@ public class ProductService {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `ProductService` with methods `getAllProducts()`, `deleteProduct()`, `updateProduct()`.
+- Uses the `List` collection.
+- Uses generics.
+
 ### Cache Annotations Reference
 
 | Annotation | What It Does |
@@ -125,6 +132,13 @@ public class ProductService {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `ProductService` with 5 methods.
+- Uses the `List` collection.
+- Uses generics.
+
 ### Cache Eviction Strategies
 
 
@@ -157,6 +171,11 @@ public class ProductService {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `ProductService` with methods `deleteProduct()`, `refreshAllProducts()`, `massiveUpdate()`.
 
 ### Multi-Tier Caching
 
@@ -294,6 +313,11 @@ public class ProductService {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `ProductService` with methods `getProductById()`, `deleteProduct()`, `updateProduct()`.
 
 ### Key Takeaways
 

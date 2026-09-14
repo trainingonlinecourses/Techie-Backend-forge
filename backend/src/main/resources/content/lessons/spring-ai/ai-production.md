@@ -46,6 +46,12 @@ public class ResilientAssistant {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `ResilientAssistant` with methods `answer()`.
+- Uses exception handling with try/catch.
+
 Add: timeouts (`ChatOptions` `requestTimeout`), retries with backoff (Spring Retry), and a circuit breaker (Resilience4j) for sustained outages.
 
 ## Guardrails for real users
@@ -75,6 +81,11 @@ public SseEmitter stream(@RequestParam String question) {
 ```java
 **MCP** (Model Context Protocol) standardizes how AI tools talk to systems — servers expose tools/resources; clients (Claude, IDEs, your app) consume them. Spring AI has first-class MCP support:
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `MCP`.
 
 ```xml
 <dependency>

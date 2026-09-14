@@ -81,10 +81,21 @@ String sql = "SELECT * FROM products ORDER BY " + sortColumn;
 
 // SAFE — NEVER bind identifiers; whitelist them instead:
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+
 List<String> ALLOWED = List.of("price", "name", "created_at");
 ```java
 if (!ALLOWED.contains(sortColumn)) sortColumn = "price";   // deny by default
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses conditionals.
 
 **The rule:** identifiers come from a *whitelist you control*, never from user input directly. The same applies to dynamic table names, dynamic `GROUP BY` columns, and dynamic SQL fragments — each is a grammar slot that parameterization can't protect.
 

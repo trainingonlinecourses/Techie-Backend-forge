@@ -56,6 +56,12 @@ public class LessonController {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `LessonController` with methods `getProgress()`.
+- Uses conditionals.
+
 **The pattern of the bug:** the id comes from the URL (client-controlled), the query trusts it, and authorization never happens. **The rule:** *every* object-level access must verify ownership (or an explicit grant) — never trust that an id in the URL implies permission. The same bug shows up in file downloads (`/files/{name}`), order views, message threads, and admin actions keyed by ids.
 
 ## The Authorization Toolkit in Spring
@@ -85,6 +91,11 @@ public void deleteUser(Long id) { ... }
 @PreAuthorize("hasRole('ADMIN') or #progress.ownerId == authentication.name")
 public ProgressDto getProgress(@P("progress") Progress progress) { ... }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
 
 **The three habits that prevent the class:** **deny-by-default** (`anyRequest().denyAll()` — an unlisted endpoint is *denied*, not open), **authorization at the resource** (method-level checks where the object is known, not just at the URL), and **ownership checks for every object reference** (the IDOR fix). The layered shape: URL rules for coarse routes, `@PreAuthorize` for fine-grained service rules, and ownership logic for per-object access.
 

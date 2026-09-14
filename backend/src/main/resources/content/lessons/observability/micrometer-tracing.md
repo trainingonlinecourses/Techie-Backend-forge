@@ -115,6 +115,12 @@ public class ObservationConfig {
 
 @Observed(name = "recommendations.fetch")
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `ObservationConfig` with methods `observedAspect()`.
+
 public List<Recommendation> fetch(String userId) { ... }
 
 `@Observed` is the modern approach — it produces **both** metrics and traces from one annotation, because an Observation is metrics + tracing + logging together.
@@ -202,6 +208,11 @@ class TracingTest {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `TracingTest`.
 
 Better: assert spans reached a test Zipkin receiver, or use `TestObservationRegistry` for `@Observed` methods.
 

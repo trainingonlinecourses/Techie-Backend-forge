@@ -70,6 +70,11 @@ public class RegionRouter {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `RegionRouter` with methods `region()`.
+
 `@Value` covers most needs; `Environment` is for dynamic lookups, defaults, and reading typed values (`getProperty("x", Integer.class)`).
 
 ```java
@@ -79,6 +84,11 @@ if (env.acceptsProfiles(Profiles.of("prod"))) {
     metricsRegistry.enable();   // only register prod-only collectors
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses conditionals.
 
 **Scenario 4 — test overrides.** `@SpringBootTest(properties = "app.db.url=jdbc:h2:mem:t")` adds a test property source *above* everything — tests override prod values cleanly without editing config files.
 

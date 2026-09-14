@@ -322,6 +322,11 @@ static void good(String username) {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+
 This is the safety mechanism of scoped values. They are not global variables. They are bound for a specific scope, and reading them outside that scope is an error.
 
 ### A Common Mistake: Thinking Scoped Values Are a Drop-In Replacement for ThreadLocal in All Cases

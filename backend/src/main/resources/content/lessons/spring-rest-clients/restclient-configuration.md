@@ -80,6 +80,14 @@ public class RestClientConfig {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `RestClientConfig` with methods `catalogClient()`, `loggingInterceptor()`.
+- Uses lambda expressions.
+- Uses method references.
+- Uses the java.time date-time API.
+
 ### Walking Through Each Part
 
 **Part 1 — timeouts.** `ClientHttpRequestFactorySettings` configures the underlying HTTP client (the JDK client, Apache, or Jetty — Boot's default is the JDK `HttpClient`). `withConnectTimeout` bounds how long establishing the connection may take; `withReadTimeout` bounds how long a response may take once connected. **Without these, a dead server hangs your request indefinitely.** Choose values per service: a fast internal API → 2–5s; a slow third party → 10–30s.
@@ -123,6 +131,14 @@ ClientHttpRequestInterceptor retryInterceptor() {
 
 **Important:** retry only **idempotent** requests (GET, PUT, DELETE — safe to repeat). Never blindly retry a POST that creates a resource without idempotency keys (see the idempotency lesson in REST best practices).
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses exception handling with try/catch.
+- Uses lambda expressions.
+- Uses loops.
+- Uses conditionals.
 
 ## Headers You Should Always Consider
 

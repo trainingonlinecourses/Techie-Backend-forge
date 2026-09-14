@@ -92,6 +92,14 @@ public class MethodRefDemo {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `MethodRefDemo` with methods `main()`.
+- Uses the Streams API to process data declaratively.
+- Uses lambda expressions.
+- Uses method references.
+
 ---
 
 ## Real-World Scenarios
@@ -147,6 +155,13 @@ public class Main {
 
         // Lambda — method reference would be obscure
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+- When run, it prints: “User: ”
+
         list.stream().filter(name -> name.length() > 5 && name.startsWith("A"))
     }
 }

@@ -130,6 +130,12 @@ p.sync();   // all 1000 sent together
 **MULTI/EXEC** gives *transactions*: commands buffer, then execute atomically — no other client's commands interleave. Redis single-threaded execution model means each command is already atomic; MULTI extends that to a *sequence*. (Lua scripts give even richer atomicity — the basis of the Redis rate-limiter patterns.)
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses inheritance.
+- Uses loops.
+
 ## Recap
 
 Redis is an in-memory data-structure server: typed values under string keys, manipulated by atomic commands with sub-millisecond latency. Strings (with `incr` and TTL) power counters and caches; lists build queues; sets do membership and set algebra; hashes model objects; sorted sets run leaderboards and rankings. The colon-namespace is your schema, TTLs keep caches fresh, and pipelining/transactions get throughput. Master these five structures and you can build caching, sessions, rate limiting, and queues — the pillars of every production Spring Boot app — without a single custom data structure of your own.

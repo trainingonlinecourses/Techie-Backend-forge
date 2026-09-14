@@ -31,6 +31,13 @@ public class LocalFileStorage implements FileStorage { ... }
 public class S3FileStorage implements FileStorage { ... }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `FileStorage` and `LocalFileStorage` and 1 more type(s).
+- Uses an interface.
+- Uses interface implementation.
+
 ---
 
 ## Line-by-Line Walkthrough
@@ -140,6 +147,11 @@ public class Attachment {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Attachment`.
+
 ### Scenario 2: Multi-tenant storage
 
 ```java
@@ -152,6 +164,14 @@ public class TenantFileStorage implements FileStorage {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `TenantFileStorage` with methods `forTenant()`.
+- Uses interface implementation.
+- Uses the `Map` collection.
+- Uses generics.
 
 ---
 

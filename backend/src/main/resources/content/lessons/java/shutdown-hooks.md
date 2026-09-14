@@ -58,6 +58,14 @@ public class Application {
 **Order is NOT guaranteed.** Hooks run concurrently in separate threads. If broker depends on the database being available during shutdown, you need explicit ordering within the hooks.
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Application` with methods `main()`.
+- Uses manual threading.
+- Uses lambda expressions.
+- When run, it prints: “Shutting down message broker...”, “Closing database pool...”
+
 ## Ordering shutdown hooks
 
 public class ShutdownManager {
@@ -110,6 +118,13 @@ public static void main(String[] args) {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses manual threading.
+- Uses lambda expressions.
+- When run, it prints: “Hook running”, “Before exit” …
+
 `System.exit(0)` triggers orderly shutdown (hooks run). `System.halt(0)` forces immediate termination (hooks are skipped).
 
 ## How we use it in organizations
@@ -161,6 +176,12 @@ public class ServiceRegistryHook {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `ServiceRegistryHook` with methods `deregister()`.
+- When run, it prints: “Deregistered from service discovery”
+
 ### Scenario 3: flushing audit logs
 
 ```java
@@ -177,6 +198,12 @@ public class AuditFlushHook {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `AuditFlushHook` with methods `flush()`.
+- When run, it prints: “Flushing ”, “Audit logs flushed”
 
 ## Spring @PreDestroy vs shutdown hooks
 
@@ -200,6 +227,11 @@ public class MyService {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `MyService` with methods `cleanup()`.
 
 ## Common mistakes
 

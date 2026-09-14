@@ -44,6 +44,14 @@ public void book() {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `BookingService` with methods `book()`.
+- Uses synchronization with `synchronized`.
+- Uses loops.
+- Uses conditionals.
+
 ## 2. Deadlock
 
 **Definition**: two or more threads each hold a lock the other needs — all wait forever.
@@ -53,10 +61,20 @@ public void book() {
 synchronized (accountA) { synchronized (accountB) { ... } }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses synchronization with `synchronized`.
+
 // Thread B: transfer(b→a)
 ```java
 synchronized (accountB) { synchronized (accountA) { ... } }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses synchronization with `synchronized`.
 
 **Recognition**: threads stuck forever (jstack shows both `WAITING` on each other's monitors), thread dump shows the cycle:
 
@@ -96,6 +114,11 @@ while (!lock.tryLock()) {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses loops.
+
 ## 4. Starvation
 
 ```java
@@ -107,6 +130,11 @@ ReentrantLock lock = new ReentrantLock(true);   // fair — FCFS, prevents starv
 
 **Recognition**: one thread never progresses while others complete; thread dump shows it RUNNABLE but the same others always hold the lock.
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses synchronization with `synchronized`.
 
 **Fix**: fair locks (`new ReentrantLock(true)`), or redesign to reduce contention (striped locks, atomics).
 
@@ -125,6 +153,11 @@ private volatile boolean done = false;
 
 **Recognition**: infinite loops, stale values that "should" have updated, works after adding a print (which incidentally syncs).
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses loops.
 
 ## Detection Toolkit
 

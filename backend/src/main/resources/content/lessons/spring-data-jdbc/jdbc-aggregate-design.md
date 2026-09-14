@@ -90,6 +90,14 @@ public interface OrderRepository extends CrudRepository<Order, Long> {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Money` and `OrderLine` and 2 more type(s) with methods `addLine()`, `recomputeTotal()`.
+- Uses the Streams API to process data declaratively.
+- Uses lambda expressions.
+- Uses method references.
+
 ### Walking Through Each Part
 
 **`Money` as a record** — a value object: immutable, no identity, defined by its data. It lives *inside* the aggregate as a column group. Spring Data JDBC stores records/immutable objects with constructor binding automatically.

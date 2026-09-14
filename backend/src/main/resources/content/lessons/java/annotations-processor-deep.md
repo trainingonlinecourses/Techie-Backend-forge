@@ -144,6 +144,14 @@ public class ContactDto {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `PhoneNumber` and `PhoneNumberValidator` and 1 more type(s) with methods `isValid()`.
+- Uses an interface.
+- Uses inheritance.
+- Uses interface implementation.
+
 ### Scenario 3: Annotation processing at compile time
 
 Generate boilerplate code during compilation using annotation processors:
@@ -178,6 +186,14 @@ public class BuilderProcessor extends AbstractProcessor {
 **Annotation processors run at compile time.** They read annotations from source files and generate new source files (or resource files). This is how Lombok, MapStruct, and Dagger work.
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Builder` and `BuilderProcessor` with methods `process()`, `generateBuilderClass()`.
+- Uses an interface.
+- Uses inheritance.
+- Uses the `Set` collection.
+
 ### Scenario 4: Thread-safety annotations
 
 Document thread-safety contracts that static analysis tools can verify:
@@ -202,6 +218,13 @@ public class ThreadSafeCounter {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `ThreadSafe` and `ThreadSafeCounter` with methods `increment()`, `getCount()`.
+- Uses synchronization with `synchronized`.
+- Uses an interface.
 
 Tools like SpotBugs can read `@ThreadSafe` and `@NotThreadSafe` annotations to flag potential race conditions.
 
@@ -235,6 +258,13 @@ public class JobScheduler {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `ScheduledJob` and `DailySyncJob` and 1 more type(s) with methods `execute()`, `registerJobs()`.
+- Uses an interface.
+- Uses interface implementation.
 
 ## The annotation hierarchy
 

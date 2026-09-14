@@ -138,6 +138,13 @@ public class FallbackController {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `FallbackController` with methods `fallback()`.
+- Uses the `Map` collection.
+- Uses generics.
+
 When the breaker opens, the gateway returns the fallback **without the client ever seeing a 500** — graceful degradation at the front door.
 
 ## 7. Discovery locator (zero-route gateway)

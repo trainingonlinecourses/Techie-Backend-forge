@@ -88,6 +88,14 @@ public class TenantResolver implements HandlerMethodArgumentResolver {
 
 @GetMapping("/api/orders")
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `TenantResolver` with methods `supportsParameter()`, `resolveArgument()`.
+- Uses interface implementation.
+- Uses conditionals.
+
 public Page<Order> list(Tenant tenant, Pageable pageable) {
     return orderRepo.findByTenant(tenant.id(), pageable);   // tenant everywhere, zero boilerplate
 }

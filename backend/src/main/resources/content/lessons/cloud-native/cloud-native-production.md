@@ -137,6 +137,12 @@ public class ShutdownCleanup {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `ShutdownCleanup` with methods `cleanup()`.
+- When run, it prints: “Cleaning up before shutdown...”
+
 ## Externalized config — environment variables
 
 ```yaml

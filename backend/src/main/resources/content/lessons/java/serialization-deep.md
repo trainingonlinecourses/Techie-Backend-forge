@@ -111,6 +111,14 @@ public class DatabaseConfig implements Serializable {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `DatabaseConfig` with methods `getInstance()`, `readResolve()`.
+- Uses synchronization with `synchronized`.
+- Uses interface implementation.
+- Uses conditionals.
+
 ### Scenario 3: Externalizable for high-performance serialization
 
 When performance matters (millions of objects per second), `Externalizable` avoids reflection overhead:
@@ -143,6 +151,12 @@ public class MarketDataPoint implements Externalizable {
 
 **Why Externalizable here?** In a financial system processing millions of market data points per second, the reflection overhead of standard serialization is unacceptable. Externalizable writes fields in a fixed order with no metadata — roughly 3x faster.
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `MarketDataPoint` with methods `writeExternal()`, `readExternal()`.
+- Uses interface implementation.
 
 ### Scenario 4: writeReplace for security
 
@@ -185,6 +199,12 @@ public class Credentials implements Serializable {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Credentials` and `SafeCredentialProxy` with methods `writeReplace()`, `readResolve()`.
+- Uses interface implementation.
 
 ## serialVersionUID — why it matters
 

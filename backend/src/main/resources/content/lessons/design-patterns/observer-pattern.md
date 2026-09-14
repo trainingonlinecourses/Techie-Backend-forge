@@ -104,6 +104,14 @@ public class ObserverDemo {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `UserCreatedEvent` and `EventBus` and 2 more type(s) with methods `subscribe()`, `publish()`, `main()`.
+- Uses lambda expressions.
+- Uses a `record`.
+- Uses the `List` collection.
+
 ### Walking Through Each Part
 
 **The event record** — a plain data carrier: "a user was created, here are the details." In Spring this would be a POJO/record too.
@@ -161,6 +169,12 @@ class WelcomeEmailListener {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `UserCreatedEvent` and `UserService` and 1 more type(s).
+- Uses a `record`.
 
 Add `@Async` to the listener method (plus `@EnableAsync`) to handle it on another thread — the producer doesn't wait. This is the pattern you'll meet constantly in real Spring apps: domain events, audit, notifications, cache invalidation all ride on `@EventListener`.
 

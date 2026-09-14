@@ -27,6 +27,11 @@ if (redis.get("job:lock").equals(nodeId)) {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses conditionals.
+
 ## The Correct Pattern: SET NX EX
 
 // Atomic: set only if absent, with a TTL — ONE command
@@ -67,6 +72,13 @@ redis.set("job:lock", nodeId, Duration.ofMinutes(10));
 
 // ✅ Or RENEW the lease (heartbeat) — a watchdog thread extends the TTL
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses inheritance.
+- Uses the java.time date-time API.
+
 scheduler.scheduleAtFixedRate(() ->
     redis.set("job:lock", nodeId, Duration.ofMinutes(2), SetOption.SET_IF_PRESENT), 
 ```java

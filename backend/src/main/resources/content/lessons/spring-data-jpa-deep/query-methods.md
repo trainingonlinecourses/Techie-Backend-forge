@@ -92,6 +92,14 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `ProductRepository`.
+- Uses an interface.
+- Uses inheritance.
+- Uses the `List` collection.
+
 ### @Query — JPQL
 
 For complex queries, use JPQL (Java Persistence Query Language):
@@ -139,6 +147,14 @@ public interface UserRepository extends JpaRepository<User, Long> {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `UserRepository`.
+- Uses an interface.
+- Uses inheritance.
+- Uses the `List` collection.
+
 ### @Query — Native SQL
 
 For database-specific features, use native SQL:
@@ -181,6 +197,14 @@ public interface UserRepository extends JpaRepository<User, Long> {
     int purgeOldInactiveUsers(@Param("date") LocalDate cutoff);
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `UserRepository`.
+- Uses an interface.
+- Uses inheritance.
+- Uses the `List` collection.
 
 ### Common Mistakes
 
@@ -225,6 +249,14 @@ public interface UserRepository extends JpaRepository<User, Long> {
     int deactivateInactive(@Param("cutoff") LocalDate cutoff);
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `UserRepository`.
+- Uses an interface.
+- Uses inheritance.
+- Uses the `List` collection.
 
 ### Key Takeaways
 

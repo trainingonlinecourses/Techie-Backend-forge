@@ -36,12 +36,25 @@ Files.readAllLines(Paths.get(file))
 
 // ✅ Plain loop — checked exceptions are natural
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses exception handling with try/catch.
+- Uses lambda expressions.
+
 List<Long> ids = new ArrayList<>();
 ```java
 for (String line : Files.readAllLines(path)) {
     ids.add(writeToDb(line));      // throws IOException — propagates cleanly
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses file I/O with the NIO API.
+- Uses loops.
 
 ## 2. Debugging: The Stepper's Nightmare
 
@@ -71,6 +84,12 @@ for (Course c : courses) {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses loops.
+- Uses conditionals.
+
 ## 3. Stateful or Ordered Side Effects
 
 ```java
@@ -85,6 +104,13 @@ for (int i = 0; i < courses.size(); i++) {
 
 Any stream that mutates shared state or depends on element *position* is a smell. The state is hidden inside lambdas; a loop shows it.
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses the Streams API to process data declaratively.
+- Uses lambda expressions.
+- Uses loops.
 
 ## 4. Complex Control Flow
 
@@ -101,6 +127,12 @@ for (Course c : courses) {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses loops.
+- Uses conditionals.
+
 Streams have `filter` (skip) but **no break** — "stop processing once a condition hits" is awkward (and error-prone with `limit`). Early-exit loops are loops.
 
 ## 5. Performance-Critical Inner Loops
@@ -113,6 +145,12 @@ for (int i = 0; i < data.length; i++) {   // no allocation, direct indexing
     if (data[i] > threshold) sum += data[i];
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses loops.
+- Uses conditionals.
 
 Streams allocate pipeline objects, box primitives (unless `IntStream`), and pay indirection. For hot numeric loops, plain `for` over arrays is measurably faster — and clearer.
 
@@ -172,6 +210,12 @@ for (Lesson l : candidates) {               // loop for control flow
     schedule(l);
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses loops.
+- Uses conditionals.
 
 This is the most common real-world pattern: streams for shape, loops for flow.
 

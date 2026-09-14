@@ -89,6 +89,13 @@ public class Order {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Order`.
+- Uses the `List` collection.
+- Uses generics.
+
 ### 2. MongoRepository (Simple CRUD)
 
 @Repository
@@ -198,6 +205,14 @@ public class OrderMongoService {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderMongoService` with 4 methods.
+- Uses the `List` collection.
+- Uses sorting with a `Comparator`.
+- Uses conditionals.
+
 ---
 
 ## Real-World Scenarios
@@ -236,6 +251,14 @@ Query query = Query.query(Criteria.where("attributes.color").is("black")
     .and("attributes.weight").lte(2.0));
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Product`.
+- Uses the `List` collection.
+- Uses the `Map` collection.
+- Uses generics.
+
 ### Scenario 2: Logging/Analytics (Time Series)
 
 ```java
@@ -252,6 +275,14 @@ public class AnalyticsEvent {
 
 // Find events in the last 24 hours:
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `AnalyticsEvent`.
+- Uses the `Map` collection.
+- Uses generics.
+
 Query query = Query.query(
     Criteria.where("timestamp").gte(Instant.now().minus(Duration.ofHours(24)))
 ```java
@@ -292,6 +323,13 @@ public class Message {
     private Instant timestamp;
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Conversation` and `Message`.
+- Uses the `List` collection.
+- Uses generics.
 
 ---
 

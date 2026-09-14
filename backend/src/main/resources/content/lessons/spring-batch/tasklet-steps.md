@@ -143,6 +143,12 @@ public class DatabaseMaintenanceTasklet implements Tasklet {
         // Delete archived records
         int deleted = jdbcTemplate.update("""
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses the java.time date-time API.
+
             DELETE FROM orders WHERE created_at < ?
             """, LocalDate.now().minusYears(1));
 
@@ -184,6 +190,14 @@ public class SystemCommandTasklet implements Tasklet {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `SystemCommandTasklet` with methods `execute()`.
+- Uses exception handling with try/catch.
+- Uses interface implementation.
+- Uses conditionals.
 
 ### Conditional Execution
 

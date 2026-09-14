@@ -77,6 +77,11 @@ public class InvoiceCalculator {
 BigDecimal ratio = gross.divide(total, 6, RoundingMode.HALF_UP); // keep 6 digits for ratios
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses `BigDecimal` for exact decimal math.
+
 ## Comparing and storing money
 
 - **Never use `equals` for comparison** — `new BigDecimal("2.0").equals(new BigDecimal("2.00"))` is `false` because the scales differ. Use `compareTo` (`compareTo == 0` means "same value"), or normalize with `stripTrailingZeros()` first.

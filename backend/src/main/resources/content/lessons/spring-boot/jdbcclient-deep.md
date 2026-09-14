@@ -47,6 +47,11 @@ List<User> users = jdbcClient.sql("SELECT * FROM users WHERE age > ?")
     .query((rs, rowNum) -> new User(rs.getLong("id"), rs.getString("name")));
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+
 ---
 
 ## Basic Usage
@@ -63,6 +68,11 @@ public class DatabaseConfig {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `DatabaseConfig` with methods `jdbcClient()`.
 
 ### SELECT — Single Row
 
@@ -169,6 +179,13 @@ public int[] insertBatch(List<User> users) {
         });
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+- Uses the `List` collection.
+- Uses generics.
 
 ### UPDATE and DELETE
 
@@ -385,6 +402,15 @@ public class SearchRepository {
 
         return query.query((rs, rowNum) -> new User(
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+- Uses local type inference with `var`.
+- Uses loops.
+- Uses conditionals.
+
             rs.getLong("id"),
             rs.getString("name"),
             rs.getString("email")

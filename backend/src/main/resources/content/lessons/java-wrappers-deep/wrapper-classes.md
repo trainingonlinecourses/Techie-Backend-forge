@@ -63,6 +63,12 @@ numbers.add(42);
 int value = numbers.get(0);
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses the `List` collection.
+- Uses generics.
+
 ---
 
 ## Line-by-Line Walkthrough
@@ -161,6 +167,13 @@ public class WrapperClassesDemo {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `WrapperClassesDemo` with methods `main()`.
+- Uses exception handling with try/catch.
+- When run, it prints: “Parse error: ”
+
 ---
 
 ## Real-World Scenarios
@@ -180,6 +193,11 @@ public static int safeParseInt(String input, int defaultValue) {
 int port = safeParseInt(config.get("server.port"), 8080);
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses exception handling with try/catch.
+
 ### Scenario 2: Nullable database values
 
 ```java
@@ -196,6 +214,11 @@ public class Employee {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Employee` with methods `getAgeOrDefault()`.
 
 ### Scenario 3: Safe arithmetic with overflow
 

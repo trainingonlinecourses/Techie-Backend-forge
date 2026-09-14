@@ -27,6 +27,14 @@ String result = upper.process("hello");  // "HELLO"
 **Why not just use interfaces with default methods?** Java 8 added default methods to interfaces. But a functional interface has exactly ONE abstract method — default methods don't count.
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `StringProcessor`.
+- Uses lambda expressions.
+- Uses an interface.
+- Uses interface implementation.
+
 ---
 
 ## The java.util.function Package
@@ -75,11 +83,22 @@ Function<String, String> trimAndUpper = trim.andThen(upper);
 // trimAndUpper.apply("  hello  ") -> "HELLO"
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+- Uses generics.
+
 Function<String, Integer> parse = Integer::parseInt;
 Function<Integer, String> backToString = Object::toString;
 ```java
 Function<String, String> roundTrip = parse.andThen(backToString);
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses generics.
 
 ### UnaryOperator<T> — Transforms same type (T -> T)
 UnaryOperator<String> toUpper = String::toUpperCase;
@@ -175,6 +194,14 @@ public class FunctionalInterfaceDemo {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `FunctionalInterfaceDemo` and `RetryPolicy` and 1 more type(s) with methods `main()`.
+- Uses the Streams API to process data declaratively.
+- Uses lambda expressions.
+- Uses method references.
+
 ---
 
 ## Real-World Scenarios
@@ -189,6 +216,13 @@ public interface PricingStrategy {
 
 // Use functional interfaces directly
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `PricingStrategy`.
+- Uses an interface.
+
 Map<String, Function<Order, Double>> pricingStrategies = Map.of(
     "STANDARD",  order -> order.basePrice(),
     "PREMIUM",   order -> order.basePrice() * 0.9,       // 10% discount
@@ -201,6 +235,11 @@ public double getPrice(Order order, String tier) {
     return strategy.apply(order);
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses generics.
 
 ### Scenario 2: Configurable validation
 
@@ -232,6 +271,11 @@ var validator = new ValidationBuilder<User>()
 ```java
     .check(u -> u.email().contains("@"), "Invalid email");
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
 
 List<String> errors = validator.validate(user);
 

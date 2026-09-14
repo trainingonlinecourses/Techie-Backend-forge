@@ -72,6 +72,14 @@ public class Main {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- Uses exception handling with try/catch.
+- Uses lambda expressions.
+- Uses loops.
+
 ### Real Example: Parallel API Calls
 
 @Service
@@ -156,6 +164,14 @@ public class Main {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- Uses lambda expressions.
+- Uses loops.
+- When run, it prints: “All threads reached the barrier!”
+
 ### Real Example: Parallel Data Processing
 
 public class ParallelProcessor {
@@ -219,6 +235,13 @@ for (int i = 0; i < 3; i++) {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses manual threading.
+- Uses lambda expressions.
+- Uses loops.
+
 ### Dynamic Registration
 
 
@@ -257,6 +280,14 @@ public class Main {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- Uses manual threading.
+- Uses exception handling with try/catch.
+- Uses lambda expressions.
 
 ### Phase-Based Processing
 
@@ -298,6 +329,14 @@ public class MultiPhaseProcessor {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `MultiPhaseProcessor` with methods `process()`.
+- Uses manual threading.
+- Uses lambda expressions.
+- Uses loops.
 
 ---
 

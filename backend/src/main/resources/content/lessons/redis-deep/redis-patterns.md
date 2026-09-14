@@ -57,6 +57,12 @@ public class CacheAside {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `CacheAside` with methods `getProduct()`.
+- Uses conditionals.
+
 **The design notes:** the TTL is the staleness bound — at worst the cache is 5 minutes old. The pattern tolerates the database being the source of truth, so a Redis outage degrades performance (every read hits the DB) but not correctness. This is why "Redis down" should never be an outage for a well-designed cache: the cache is an *optimization*, not a dependency — always handle the miss path as the correct path.
 
 ## Pattern 2: Write-Through and Invalidation
@@ -92,6 +98,11 @@ public boolean allowRequest(String userId) {
     return count <= 10;
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses conditionals.
 
 `incr` is atomic — under any concurrency, no two threads can read the same count. The first increment establishes the key and arms its 60-second expiry (setting expire only on first hit avoids resetting the window on every call).
 
@@ -141,6 +152,12 @@ if (acquired) {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses exception handling with try/catch.
+- Uses conditionals.
 
 **The three hard parts, and how they're solved:** (1) *expiry* — `EX` guarantees a crashed holder releases the lock eventually; (2) *ownership* — the random token + compare-and-delete script ensures only the holder can release (never deleting someone else's lock); (3) *reentrancy and safety margins* — production code uses Redisson's `RLock`, which handles renewal (extending the lease while the work is still running). The fundamental caveat: a lock with an expiry is a *lease* — if the critical section runs longer than the lease, a second holder can acquire it. Choose lease times generously and, ideally, use Redisson's watchdog.
 

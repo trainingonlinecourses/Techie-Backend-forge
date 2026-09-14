@@ -123,6 +123,11 @@ byte[] imageBytes = fetchImageFromAPI();
 Files.write(Path.of("downloaded.png"), imageBytes);
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses file I/O with the NIO API.
+
 ## Copying, moving, and deleting files
 
 
@@ -162,6 +167,11 @@ Files.deleteIfExists(Path.of("maybe-exists.txt"));
 
 Files.createDirectories(Path.of("data/2024/january"));
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses file I/O with the NIO API.
 
 ## Directory traversal — walking the file tree
 
@@ -207,6 +217,14 @@ public class Main {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- Uses the Streams API to process data declaratively.
+- Uses lambda expressions.
+- Uses method references.
 
 ## try-with-resources — why it matters
 
@@ -284,6 +302,14 @@ public class CsvImporter {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `CsvImporter` with methods `importUsers()`.
+- Uses the Streams API to process data declaratively.
+- Uses the `List` collection.
+- Uses file I/O with the NIO API.
+
 ### Scenario 2: Log file rotation and compression
 
 A service writes logs that need to be archived weekly:
@@ -331,6 +357,14 @@ public class LogArchiver {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `LogArchiver` with methods `archiveOldLogs()`, `compressAndDelete()`.
+- Uses the Streams API to process data declaratively.
+- Uses exception handling with try/catch.
+- Uses lambda expressions.
 
 ### Scenario 3: File upload validation service
 
@@ -380,6 +414,14 @@ public class FileUploadValidator {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `FileUploadValidator` with methods `validate()`.
+- Uses the `Set` collection.
+- Uses file I/O with the NIO API.
+- Uses local type inference with `var`.
 
 ## Performance comparison
 

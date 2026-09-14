@@ -99,6 +99,11 @@ public class RedirectDemo {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `RedirectDemo` with methods `main()`.
+
 ## Reading both streams without deadlock
 
 stdout and stderr are two separate pipes. Drain them on different threads, or merge them
@@ -118,6 +123,14 @@ public class TwoStreams {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `TwoStreams` with methods `main()`.
+- Uses local type inference with `var`.
+- Uses loops.
+- When run, it prints: “child: ”, “exit: ”
 
 > The `java -version` example is the classic proof that stderr matters: it prints to
 > **stderr**, and code that only reads stdout mysteriously "sees nothing".
@@ -145,6 +158,13 @@ public class ExitContract {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `ExitContract` with methods `main()`.
+- Uses conditionals.
+- When run, it prints: “not a git repository (or no commits) — exit ”, “HEAD is valid”
 
 ## How this shows up in backends
 

@@ -57,6 +57,11 @@ class OrderProcessor {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderProcessor`.
+
 Five reasons to change, five audiences, one class. Changing email logic means touching the class that also owns SQL and inventory — and testing "validation" means constructing the whole monster.
 
 ## The Refactored Version
@@ -114,6 +119,13 @@ class AuditLogger {
     void record(String msg) { /* log code */ }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderService` and `OrderRepository` and 3 more type(s) with methods `validate()`.
+- Uses the `List` collection.
+- Uses generics.
 
 ### What Changed and Why
 

@@ -169,6 +169,12 @@ String query = """
 List<Object[]> findCompletedOrdersSince(@Param("startDate") LocalDateTime startDate);
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses the `List` collection.
+- Uses the java.time date-time API.
+
 ### 3. JSON Templates
 
 String requestJson = """
@@ -206,6 +212,11 @@ String javaClass = """
 String className = "User";
 String code = String.format(javaClass, className, className);
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses formatted output.
 
 ### 5. Markdown / Documentation
 
@@ -295,6 +306,12 @@ String xml = """
 
 // ✅ Or with String.format
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses formatted output.
+
 String xml = String.format("""
                            <root>
                              <name>%s</name>

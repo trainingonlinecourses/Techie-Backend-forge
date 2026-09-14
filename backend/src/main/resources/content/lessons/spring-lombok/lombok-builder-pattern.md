@@ -10,8 +10,6 @@ docs:
 
 ## The Concept, From Zero
 
-The Builder pattern lets you construct complex objects step by step. Lombok's `@Builder` generates the builder class and all the chaining methods automatically.
-
 ```java
 @Builder
 public class Server {
@@ -23,6 +21,10 @@ public class Server {
 
 // Usage
 ```
+
+<!-- why -->
+The Builder pattern lets you construct complex objects step by step. Lombok's `@Builder` generates the builder class and all the chaining methods automatically.
+
 Server server = Server.builder()
     .host("localhost")
     .port(8080)
@@ -46,6 +48,11 @@ public class User {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `User`.
+
 ### On factory method
 
 ```java
@@ -60,6 +67,11 @@ public class User {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `User` with methods `create()`.
+
 ### Custom builder name
 
 ```java
@@ -67,6 +79,11 @@ public class User {
 public class Config { }
 // Generates: Config.ConfigBuilder, not Config.UserBuilder
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Config`.
 
 ### With default values
 
@@ -77,6 +94,11 @@ private int maxRetries = 3;
 @Builder.Default
 private Duration timeout = Duration.ofSeconds(30);
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses the java.time date-time API.
 
 ---
 
@@ -151,6 +173,13 @@ public class Dog extends Animal {
 
 // Usage
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Animal` and `Dog`.
+- Uses inheritance.
+
 Dog dog = Dog.builder()
     .name("Rex")
     .age(3)

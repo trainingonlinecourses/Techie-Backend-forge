@@ -42,6 +42,12 @@ public Mono<Order> getOrder(String id) {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+- Uses generics.
+
 **The key insight:** In the traditional model, one thread handles one request from start to finish. In the reactive model, a few threads handle THOUSANDS of requests by never waiting — they schedule work and move on to the next request.
 
 ## The Reactive Streams spec — four interfaces
@@ -84,6 +90,14 @@ public interface Subscription {
 
 public interface Processor<T, R> extends Publisher<R>, Subscriber<T> {}
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Publisher` and `Subscriber` and 2 more type(s).
+- Uses an interface.
+- Uses inheritance.
+- Uses generics.
 
 **Backpressure** is the killer feature: when the producer is faster than the consumer, the consumer can say "slow down, I can only handle 10 items at a time" via `request(n)`. Nobody buffers unboundedly.
 

@@ -100,6 +100,12 @@ private static final Config config = new Config();
 private final Cache<String, Order> orderCache;
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses the `List` collection.
+- Uses generics.
+
 ---
 
 ## The Code — Line by Line
@@ -230,6 +236,14 @@ private static final Cache<String, UserSession> sessions = Caffeine.newBuilder()
     .build();
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `UserService` with methods `login()`.
+- Uses the `Map` collection.
+- Uses the java.time date-time API.
+- Uses generics.
+
 ### Scenario 2: GC Pause Causing Timeout
 
 @RestController
@@ -284,6 +298,13 @@ public class DatabaseConnection implements AutoCloseable {
 try (var conn = getConnection()) {
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `DatabaseConnection` with methods `finalize()`, `close()`.
+- Uses interface implementation.
+- Uses local type inference with `var`.
 
 ---
 

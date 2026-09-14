@@ -60,6 +60,12 @@ List<String> mutable = new ArrayList<>(Arrays.asList(arr));
 long sum = Arrays.stream(longs).sum();
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses the `List` collection.
+- Uses generics.
+
 `Arrays.asList` returns a **fixed-size view backed by the array** — a classic `UnsupportedOperationException` when a team treats it as a normal list.
 
 ```java
@@ -70,6 +76,11 @@ Arrays.sort(nums);                          // dual-pivot quicksort for primitiv
 int idx = Arrays.binarySearch(nums, 7);     // O(log n) — but REQUIRES sorted input
 // binarySearch returns -(insertion point)-1 on miss — a negative index, not -1!
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses sorting with a `Comparator`.
 
 `binarySearch` returns a *negative insertion point minus one* on a miss, so `== -1` checks are wrong; check `< 0` instead. Sorting objects: `Arrays.sort(objs, Comparator.comparing(Order::createdAt))` (TimSort — stable).
 

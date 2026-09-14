@@ -157,6 +157,14 @@ public class JwtAuthenticationFilter implements WebFilter {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `JwtAuthenticationFilter` with methods `filter()`.
+- Uses lambda expressions.
+- Uses interface implementation.
+- Uses conditionals.
+
 ### 3. Route-Level Authorization
 
 
@@ -232,6 +240,14 @@ public class RouteConfig {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `RouteConfig` with methods `routes()`, `requireAuth()`, `requireAdmin()`.
+- Uses the Streams API to process data declaratively.
+- Uses lambda expressions.
+- Uses method references.
 
 ### 4. Reactive UserDetailsService
 
@@ -339,6 +355,12 @@ public class SecureWebSocketHandler implements WebSocketHandler {
 
         return tokenValidator.validate(token)
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses conditionals.
+
             .flatMap(user -> handleAuthenticated(session, user))
             .switchIfEmpty(session.close(CloseStatus.POLICY_VIOLATION).then());
     }

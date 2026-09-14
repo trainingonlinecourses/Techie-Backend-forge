@@ -163,6 +163,14 @@ public class NestedClassesDemo {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `NestedClassesDemo` and `Connection` and 6 more type(s) with methods `compare()`, `main()`.
+- Uses a `record`.
+- Uses an interface.
+- Uses the `List` collection.
+
 ---
 
 ## Real-World Scenarios
@@ -208,6 +216,14 @@ public class Main {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`, `run()`.
+- Uses manual threading.
+- Uses lambda expressions.
+- When run, it prints: “Running in: ”, “Running”
 
 ---
 

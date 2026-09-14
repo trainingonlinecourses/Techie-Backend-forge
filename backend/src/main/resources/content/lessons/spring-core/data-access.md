@@ -104,6 +104,12 @@ class Service {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Service` with methods `a()`, `b()`, `hidden()`.
+- Uses lambda expressions.
+
 Exception translation: `@Repository` beans get persistence exceptions translated to Spring's `DataAccessException` hierarchy (no Hibernate/SQLException leaking into services).
 
 > **Why it matters (organizational view)** — "My data got half-written" is almost always a transaction boundary problem. The org rules: transactions at the *service* method level (not controllers, not private helpers), `readOnly=true` on reads, `rollbackFor` on checked exceptions, and no async/thread hops inside a transaction. For money-like invariants, prefer row locks (`SELECT ... FOR UPDATE` or optimistic locking via `@Version`) over application locks.

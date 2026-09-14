@@ -122,6 +122,11 @@ public String register(@Valid @ModelAttribute("user") RegisterForm user,
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses conditionals.
+
 ```html
 <form th:action="@{/register}" th:object="${user}" method="post">
     <input type="text"  th:field="*{email}" />

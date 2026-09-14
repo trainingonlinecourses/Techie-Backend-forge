@@ -115,6 +115,12 @@ public String classifyCode(String codeSnippet) {
             Output: {"pattern": "Singleton", "confidence": 0.95, "explanation": "Private constructor + static getInstance = classic Singleton"}
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Singleton` with methods `getInstance()`.
+- Uses conditionals.
+
             Example 2:
             Input: "public interface Observer { void update(String event); } public class EventBus { private List<Observer> observers = new ArrayList<>(); public void notify(String event) { observers.forEach(o -> o.update(event)); } }"
 ```java
@@ -232,6 +238,11 @@ public class AiModelConfig {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `AiModelConfig` with methods `factualModel()`, `creativeModel()`, `codeModel()`.
+
 ---
 
 ## Real-World Scenarios
@@ -268,6 +279,12 @@ public String reviewWithStandards(String code, List<String> standards) {
 
     return chatClient.prompt()
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses the Streams API to process data declaratively.
+
         .system("""
             You are a senior code reviewer. Review code against these standards:
 ```java

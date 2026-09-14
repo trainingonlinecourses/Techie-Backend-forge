@@ -53,6 +53,12 @@ The server expects **RS256** (asymmetric: private key signs, public key verifies
 // jjwt: the key type determines the algorithm family; you cannot
 // "reuse" an RSA public key as an HMAC secret for verification.
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses switch branching.
+
 .verifyWith(publicKey)     // only RS256/ES256-style signatures accepted
 
 Also: never accept `alg` values you didn't configure; and if you support multiple algorithms, keep them explicitly separated.
@@ -116,6 +122,11 @@ if (repository.findByToken(value).isEmpty()
     alertSecurity("refresh token reuse detected");
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses conditionals.
 
 ## The Hardening Checklist
 

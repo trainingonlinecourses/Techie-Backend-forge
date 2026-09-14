@@ -26,6 +26,11 @@ app:
 public class NewSearchService { ... }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `NewSearchService`.
+
 ---
 
 ## Profile-Based Feature Flags
@@ -39,6 +44,12 @@ public class CheckoutV2Service implements CheckoutService { ... }
 @Profile("!feature-checkout-v2")
 public class CheckoutV1Service implements CheckoutService { ... }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `CheckoutV2Service` and `CheckoutV1Service`.
+- Uses interface implementation.
 
 ```yaml
 # Enable in production
@@ -68,6 +79,11 @@ More fine-grained than profiles:
 public class CacheService { ... }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `CacheService`.
+
 ---
 
 ## Real-World Scenarios
@@ -94,6 +110,12 @@ public class TfIdfSearch implements SearchAlgorithm { }
 @ConditionalOnProperty(name = "app.experiment.search-algo", havingValue = "bm25")
 public class Bm25Search implements SearchAlgorithm { }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `TfIdfSearch` and `Bm25Search`.
+- Uses interface implementation.
 
 ---
 

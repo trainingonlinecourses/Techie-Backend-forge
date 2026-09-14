@@ -106,6 +106,14 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `JwtAuthFilter` with methods `doFilterInternal()`.
+- Uses lambda expressions.
+- Uses inheritance.
+- Uses local type inference with `var`.
+
 Registered in the chain: `http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)`.
 
 ## Security config for a stateless API

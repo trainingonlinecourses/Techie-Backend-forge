@@ -148,6 +148,14 @@ public class CloudStorageService {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `CloudStorageService` with 5 methods.
+- Uses the Streams API to process data declaratively.
+- Uses method references.
+- Uses the `List` collection.
+
 ---
 
 ## Real-World Scenarios
@@ -163,6 +171,13 @@ public ResponseEntity<Map<String, String>> getUploadUrl(@RequestParam String fil
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses the `Map` collection.
+- Uses the java.time date-time API.
+- Uses generics.
+
 ### Scenario 2: Streaming download
 
 ```java
@@ -177,6 +192,11 @@ public void download(@PathVariable String key, HttpServletResponse response) thr
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses local type inference with `var`.
 
 ---
 

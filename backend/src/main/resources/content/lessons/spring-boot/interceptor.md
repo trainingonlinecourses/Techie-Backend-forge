@@ -106,6 +106,13 @@ public class AuthInterceptor implements HandlerInterceptor {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `AuthInterceptor` with methods `preHandle()`.
+- Uses interface implementation.
+- Uses conditionals.
+
 ### Scenario 3: Response header interceptor
 
 Add common headers to all API responses:
@@ -124,6 +131,12 @@ public class ResponseHeadersInterceptor implements HandlerInterceptor {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `ResponseHeadersInterceptor` with methods `postHandle()`.
+- Uses interface implementation.
 
 ## Registration and ordering
 

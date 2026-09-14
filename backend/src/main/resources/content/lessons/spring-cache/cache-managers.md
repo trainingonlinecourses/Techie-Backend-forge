@@ -63,6 +63,12 @@ public CacheManager cacheManager() {
 ```java
         Caffeine.newBuilder().maximumSize(10_000).expireAfterWrite(Duration.ofHours(1)).build());
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses the java.time date-time API.
+
     manager.registerCustomCache("user-sessions",
         Caffeine.newBuilder().maximumSize(1_000).expireAfterWrite(Duration.ofMinutes(5)).build());
     return manager;

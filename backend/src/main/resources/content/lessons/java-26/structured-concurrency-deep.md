@@ -55,6 +55,12 @@ try (var scope = new StructuredTaskScope.ShutdownOnFailure()) {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+- Uses local type inference with `var`.
+
 ---
 
 ## Shutdown Strategies
@@ -69,6 +75,13 @@ try (var scope = new StructuredTaskScope.ShutdownOnFailure()) {
 
 // ShutdownOnSuccess: If ANY task succeeds, cancel the rest
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+- Uses local type inference with `var`.
+
 try (var scope = new StructuredTaskScope.ShutdownOnSuccess<String>()) {
     scope.fork(() -> serviceA.call());
     scope.fork(() -> serviceB.call());
@@ -207,6 +220,14 @@ public class StructuredConcurrencyDemo {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `StructuredConcurrencyDemo` and `Dashboard` and 3 more type(s) with 4 methods.
+- Uses lambda expressions.
+- Uses a `record`.
+- Uses the `List` collection.
 
 ---
 

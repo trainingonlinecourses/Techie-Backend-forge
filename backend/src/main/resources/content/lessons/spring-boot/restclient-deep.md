@@ -264,6 +264,12 @@ public class LoggingInterceptor implements ClientHttpRequestInterceptor {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `LoggingInterceptor` with methods `intercept()`.
+- Uses interface implementation.
+
 ### Custom Headers Per Request
 
 User user = client.get()

@@ -23,6 +23,11 @@ public class AsyncConfig {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `AsyncConfig`.
+
 `@EnableAsync` registers an `AsyncAnnotationBeanPostProcessor` that detects `@Async` methods and routes them through an `Executor`. Without a custom executor, Spring falls back to `SimpleAsyncTaskExecutor` — which creates a **new thread per task** and never reuses them. That is a production anti-pattern.
 
 ## The Default Executor Problem
@@ -48,6 +53,12 @@ public class AsyncConfig {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `AsyncConfig` with methods `taskExecutor()`.
+- Uses manual threading.
+
 The `CallerRunsPolicy` is important: when the queue is full, the *calling* thread executes the task instead of throwing `RejectedExecutionException`, giving natural backpressure instead of dropped work.
 
 ## Fire-and-Forget
@@ -66,6 +77,11 @@ public class NotificationService {
 notificationService.sendWelcomeEmail(user.getId());
 log.info("Request finished");  // may log BEFORE the email is sent
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `NotificationService` with methods `sendWelcomeEmail()`.
 
 The caller never blocks and never sees the result. Exceptions thrown inside the async method do **not** propagate to the caller — they land in the `AsyncUncaughtExceptionHandler`.
 
@@ -89,6 +105,11 @@ Customer customer = customerFuture.get();
 CompletableFuture.allOf(orderFuture, customerFuture).join();
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses asynchronous composition with `CompletableFuture`.
+
 Important contract: when `@Async` returns a `CompletableFuture`, Spring's interceptor **completes** that future when the method returns, and **exceptional completion** when it throws. Only `CompletableFuture` (and its subclass) gets this special treatment — `Future` implementations also work, but plain `void` methods lose all error visibility.
 
 ## Why @Async Seems to Not Work
@@ -108,6 +129,11 @@ public class OrderService {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderService` with methods `placeOrder()`, `processPayment()`.
+
 The fix: inject the bean into itself (`@Lazy` self-injection) or move the async method to another bean:
 
 ```java
@@ -126,6 +152,11 @@ public class OrderService {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderService` with methods `placeOrder()`.
+
 ## Handling Async Exceptions
 
 Since exceptions don't reach the caller, register a handler:
@@ -142,6 +173,13 @@ public class AsyncConfig implements AsyncConfigurer {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `AsyncConfig` with methods `getAsyncUncaughtExceptionHandler()`.
+- Uses lambda expressions.
+- Uses interface implementation.
 
 For `CompletableFuture` return types, the future carries the exception — `future.exceptionally(...)` handles it where the result is consumed, so the global handler only catches `void` methods.
 
@@ -160,6 +198,11 @@ public class NightlyJob {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `NightlyJob` with methods `run()`.
 
 Now the single scheduler thread stays free to fire other jobs, while the report generation runs on the larger async pool.
 

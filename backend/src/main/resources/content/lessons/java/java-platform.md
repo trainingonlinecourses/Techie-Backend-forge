@@ -33,6 +33,12 @@ public class HelloWorld {
 // The JVM reads HelloWorld.class and executes it
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `HelloWorld` with methods `main()`.
+- When run, it prints: “Hello, World!”
+
 ## JDK vs JRE vs JVM
 
 | Component | What it is | What it includes |
@@ -121,6 +127,12 @@ public void processOrders() {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses the `List` collection.
+- Uses generics.
+
 ### How the GC works (simplified)
 
 ```
@@ -179,6 +191,12 @@ public class Config {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Config`.
+- When run, it prints: “Config class loaded!”
+
 ## How we use this knowledge in organizations
 
 ### Scenario 1: Diagnosing production memory issues
@@ -198,6 +216,12 @@ public class LeakyCache {
     private static final Map<String, byte[]> cache = new HashMap<>();
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `LeakyCache`.
+- Uses the `Map` collection.
 
 ### Scenario 2: JVM tuning for production
 
@@ -231,6 +255,12 @@ public class PluginClassLoader extends URLClassLoader {
 
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `PluginClassLoader`.
+- Uses inheritance.
 
 ## Key JVM flags for production
 

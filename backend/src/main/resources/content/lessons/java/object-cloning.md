@@ -60,6 +60,11 @@ public static Order copyOf(Order other) { return new Order(other); }
 Order updated = order.withStatus("REFUNDED");
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses the `List` collection.
+
 ## How we use it in an organization: the scenarios
 
 **Scenario 1 — defensive copies at API boundaries.** The #1 org pattern: **never expose your internal mutable state**. If you return the internal list, callers can mutate your object; if you store the caller's list, callers can corrupt you:
@@ -88,6 +93,11 @@ if (approver.ok(working)) orderRepo.save(working);
 
 **Scenario 3 — deep copy for cache or messaging.** When an object crosses a trust boundary (put into a cache, sent to a queue, handed to a plugin), a deep copy prevents aliasing bugs — the receiver can't corrupt the sender's object.
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses conditionals.
 
 ## Deep copy techniques
 

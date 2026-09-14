@@ -55,6 +55,11 @@ public class Customer {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Customer`.
+
 Soft-deleting a customer with email `a@x.com` then creating a new one with the same email **violates the unique constraint** — the tombstoned row still holds the old email. The fix: make the unique constraint **partial** (Postgres):
 
 ```sql

@@ -63,6 +63,12 @@ names.add("Bob");
 String name = names.get(0);
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses the `List` collection.
+- Uses generics.
+
 ## Writing Generic Classes
 
 
@@ -102,6 +108,12 @@ String name = nameAge.getFirst();
 Integer age = nameAge.getSecond();
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Pair` with methods `getFirst()`, `getSecond()`.
+- Uses generics.
+
 ## Writing Generic Methods
 
 
@@ -135,6 +147,14 @@ List<Integer> evens = filter(numbers, n -> n % 2 == 0);
 List<String> names = List.of("Alice", "Bob", "Charlie", "David");
 List<String> shortNames = filter(names, n -> n.length() <= 3);
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+- Uses the `List` collection.
+- Uses loops.
+- Uses conditionals.
 
 ## Bounded Type Parameters — restricting what types are allowed
 
@@ -184,6 +204,14 @@ public class Main {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`, `sum()`.
+- Uses inheritance.
+- Uses the `List` collection.
+- Uses loops.
+
 ## Wildcards — the PECS Rule
 
 Wildcards (`?`) let you work with generic types when you don't know (or don't care about) the exact type parameter. There are three kinds:
@@ -219,6 +247,13 @@ public class Main {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`, `printList()`.
+- Uses the `List` collection.
+- Uses loops.
+
 ### Upper bounded: `? extends T` (Producer — you READ from it)
 
 
@@ -248,6 +283,13 @@ sum(List.of(1, 2, 3));
 sum(List.of(1.5, 2.5));
 sum(List.of(1L, 2L, 3L));
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses inheritance.
+- Uses the `List` collection.
+- Uses loops.
 
 ### Lower bounded: `? super T` (Consumer — you WRITE to it)
 
@@ -282,6 +324,12 @@ List<Integer> integers = new ArrayList<>();
 addNumbers(integers);
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses the `List` collection.
+- Uses generics.
+
 ### The PECS Rule — Producer Extends, Consumer Super
 
 This is the most important wildcard concept. When you see a wildcard parameter:
@@ -312,6 +360,14 @@ List<Integer> integers = List.of(1, 2, 3);
 copy(numbers, integers);
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses inheritance.
+- Uses the `List` collection.
+- Uses loops.
+- Uses generics.
+
 ## Type Erasure — what generics disappear at runtime
 
 
@@ -341,6 +397,14 @@ public class Main {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- Uses the `List` collection.
+- Uses conditionals.
+- Uses generics.
 
 ## How we use it in organizations
 
@@ -429,6 +493,12 @@ Cache<Long, Order> orderCache = new Cache<>(Duration.ofHours(1));
 orderCache.put(12345L, new Order(12345L, Money.of(99.99)));
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses the java.time date-time API.
+- Uses generics.
+
 ### Scenario 3: PECS in utility methods
 
 
@@ -451,6 +521,13 @@ List<Number> numbers = new ArrayList<>(List.of(1, 2, 3));
 List<Integer> moreIntegers = List.of(4, 5, 6);
 mergeLists(numbers, moreIntegers);
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses inheritance.
+- Uses the `List` collection.
+- Uses generics.
 
 ## Common mistakes
 

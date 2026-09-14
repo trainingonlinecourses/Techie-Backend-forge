@@ -52,6 +52,11 @@ public class CliApplication {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `CliApplication` with methods `main()`.
+
 ---
 
 ## Your First Command
@@ -264,6 +269,14 @@ public class ConversionExamples {
     public enum LogLevel { DEBUG, INFO, WARN, ERROR }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `ConversionExamples` and `LogLevel` with methods `demo()`.
+- Uses an `enum`.
+- Uses the `List` collection.
+- Uses the java.time date-time API.
 
 ---
 

@@ -41,6 +41,11 @@ public class OrderService {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderService` with methods `placeOrder()`.
+
 All three writes are one transaction: any exception rolls back **everything** — order, inventory, and payment. This is the atomicity contract you want for a business operation spanning services.
 
 ## REQUIRES_NEW: The Independent Transaction
@@ -66,6 +71,11 @@ public class OrderService {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `AuditService` and `OrderService` with methods `record()`, `placeOrder()`.
 
 **The audit pattern**: `REQUIRES_NEW` suspends the outer transaction, commits the inner one independently, then resumes. The audit entry survives an outer rollback — which is exactly what an audit trail must do.
 
@@ -107,6 +117,11 @@ public void debit(Long accountId, BigDecimal amount) { ... }
 public void runExternalProcess() { ... }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses `BigDecimal` for exact decimal math.
+
 MANDATORY is the "inner helper" contract: a repository-level operation that must be part of the caller's transaction. NEVER guards long-running, non-transactional work from being accidentally wrapped.
 
 ## NOT_SUPPORTED: The Suspension
@@ -146,6 +161,11 @@ public class OrderService {
     public void processPayment(OrderDto dto) { ... }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderService` with methods `placeOrder()`, `processPayment()`.
 
 Fix with self-injection:
 
@@ -192,6 +212,12 @@ class PropagationTest {
     @Test
     void requiredJoinsOuterTransaction() {
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+
         assertThrows(RuntimeException.class,
             () -> orderService.placeOrderFailingAfterInner(dto));
 

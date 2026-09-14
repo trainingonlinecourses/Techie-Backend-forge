@@ -99,6 +99,14 @@ record CsvRow(String name, int count) {}
 record ImportSummary(int rows, int total) {}
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `ImportGateway` and `ImportFlow` and 3 more type(s) with 5 methods.
+- Uses the Streams API to process data declaratively.
+- Uses lambda expressions.
+- Uses method references.
+
 ### Walking Through Each Part
 
 **The gateway** — `submitImport(String)` is a plain method to callers, but it drops a message on `imports.in`. The business code knows nothing about channels, transformers, or the downstream pipeline — the gateway is the seam between the imperative world and the messaging world.

@@ -105,6 +105,12 @@ prices.add(9.99);
 double first = prices.get(0);
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses the `List` collection.
+- Uses generics.
+
 ### How Autoboxing Works Under the Hood
 
 When you write `Integer a = 42;`, the compiler translates it to:
@@ -146,6 +152,11 @@ public class Main {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
 
 **Why?** To save memory. Numbers between -128 and 127 are used so frequently that caching them avoids millions of unnecessary object allocations.
 
@@ -190,6 +201,11 @@ public class Main {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+
 **Rule of thumb**: ALWAYS use `.equals()` to compare wrapper objects. NEVER use `==`.
 
 ---
@@ -221,6 +237,13 @@ if (bobAge != null) {
     int age = bobAge;  // Safe to unbox now
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses the `Map` collection.
+- Uses conditionals.
+- Uses generics.
 
 ### 2. Performance Cost of Autoboxing
 
@@ -345,6 +368,12 @@ public User update(@PathVariable Long id, @RequestBody UserUpdateRequest req) {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `UserUpdateRequest` with methods `update()`.
+- Uses conditionals.
+
 ### Scenario 2: Database Nullable Columns
 
 
@@ -373,6 +402,12 @@ public class Employee {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Employee` with methods `applyBonus()`.
+- Uses conditionals.
 
 ### Scenario 3: Cache Key Confusion
 
@@ -405,6 +440,13 @@ public class Main {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- Uses the `Map` collection.
+- Uses generics.
 
 ---
 

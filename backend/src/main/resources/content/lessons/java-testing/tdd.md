@@ -30,6 +30,12 @@ Test-Driven Development is a **workflow** that makes design and refactoring safe
 
 // 2. GREEN — minimal implementation:
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses `BigDecimal` for exact decimal math.
+
 public Order create(List<Line> lines) {
     return new Order(lines.stream().mapToMoney(...).sum());
 }
@@ -63,6 +69,11 @@ void currentTaxRule_appliesFivePercentAboveThousand() {
 // 3. Where the behavior is wrong, fix the TEST expectations FIRST (a deliberate decision),
 //    then the code — never simultaneously.
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses `BigDecimal` for exact decimal math.
 
 The move: **test everything you're about to touch before you touch it** (Seam-based: Michael Feathers' *Working Effectively with Legacy Code*). A seam is a place where behavior can be altered without editing — extracting a method, injecting a collaborator, wrapping a call. Find the seam, put a characterization test through it, then refactor.
 

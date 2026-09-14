@@ -190,6 +190,12 @@ public class CourseNotFoundException extends RuntimeException {
 Throw them from the service layer; the advice maps them. Services stay decoupled from HTTP.
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `CourseNotFoundException` with methods `getCourseId()`.
+- Uses inheritance.
+
 ## Testing Error Responses
 
 @SpringBootTest

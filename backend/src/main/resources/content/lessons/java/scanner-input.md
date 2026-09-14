@@ -51,6 +51,13 @@ public class Main {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- Uses console input with `Scanner`.
+- When run, it prints: “Age: ”, “Name: ”
+
 Why: `nextInt()` stops as soon as it has a valid number. The **newline you typed is still sitting in the buffer**, and the very next `nextLine()` sees it as "user pressed Enter on an empty line."
 
 The standard fix — clear the leftovers:
@@ -103,6 +110,14 @@ public class Main {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- Uses console input with `Scanner`.
+- Uses loops.
+- Uses conditionals.
 
 The `else` branch matters: `hasNextInt()` only *peeks*. If you don't consume the invalid token with `sc.next()`, the loop spins endlessly staring at the same garbage.
 

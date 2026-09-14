@@ -69,6 +69,14 @@ public class FeatureConfig {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `FeatureConfig` with methods `report()`.
+- Uses the Streams API to process data declaratively.
+- Uses lambda expressions.
+- When run, it prints: “feature.x = ”, “feature.max = ” …
+
 ```properties
 # extra-config.properties (in classpath)
 feature.x=true
@@ -132,6 +140,11 @@ public class DbPropertySourceConfig {
     // (via EnvironmentPostProcessor or ApplicationContextInitializer in real apps)
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `DbPropertySourceConfig`.
 
 This is how Spring Cloud Config works: the config client registers a remote-backed property source, and every `${...}` in your app resolves against it — your code never knows the config came from a server. Same abstraction, different backing.
 

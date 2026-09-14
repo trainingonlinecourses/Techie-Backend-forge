@@ -67,6 +67,9 @@ public class OrderConsumer {
 }
 ```
 
+<!-- why -->
+
+
 ```java
 // ---- The retry advice: bounded retries with backoff, then error channel ----
 import org.springframework.context.annotation.Bean;
@@ -103,6 +106,17 @@ public class RetryConfig {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+- Defines `OrderConsumer` with methods `handle()`, `onError()`.
+- Uses conditionals.
+- When run, it prints: “order ”, “FINAL failure for order ”
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `RetryConfig` with methods `ordersErrors()`, `retryAdvice()`.
+
 ### Walking Through Each Part
 
 **The consumer** — throws on its first two attempts (simulating a transient failure), succeeds on the third. With the retry advice wrapping it, the first two failures are invisible to the outside world — the message is retried with backoff (0.5s → 1s), and only then processed.
@@ -132,6 +146,11 @@ public void handle(Order order) {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses conditionals.
 
 Idempotency patterns: a `processed` table keyed by message id, a dedupe set, or natural idempotency (a `SET balance = balance - x` that's safe to re-run... no — for financial ops use a unique constraint on the operation id).
 

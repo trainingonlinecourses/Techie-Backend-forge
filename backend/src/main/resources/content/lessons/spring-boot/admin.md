@@ -37,6 +37,11 @@ public class AdminServerApplication {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `AdminServerApplication` with methods `main()`.
+
 ## Setup: Client Application
 
 ```xml

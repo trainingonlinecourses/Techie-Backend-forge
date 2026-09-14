@@ -68,6 +68,14 @@ public class HttpClientDemo {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `HttpClientDemo` with methods `main()`.
+- Uses the java.time date-time API.
+- Uses the `HttpClient` API.
+- Uses generics.
+
 **Walking through it:** the `HttpClient` builder sets *client-wide* policy: connect timeout, redirect strategy (`NORMAL` follows redirects only for GET; `ALWAYS` follows for all verbs; `NEVER` for manual control), and preferred protocol version. The `HttpRequest` builder sets *per-request* details: URI, headers, and a whole-request timeout that aborts if the response doesn't complete. `send(request, handler)` is **synchronous** — the calling thread blocks until the response arrives, and `BodyHandlers.ofString()` tells the client to assemble the body into a `String`. The result is a typed `HttpResponse<String>` with everything at your fingertips.
 
 ## Synchronous vs Asynchronous — send vs sendAsync

@@ -103,6 +103,11 @@ class AnnotationDemo {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `AnnotationDemo`.
+
 **The everyday set:** `@Test` (the test itself), `@Disabled` (temporarily off, with a reason — the reason is *required* discipline so nobody forgets why), `@DisplayName` (report/IDE readability), `@Tag` (the grouping mechanism — run "fast" tests in CI, exclude "slow" ones), `@Timeout` (the hang-guard — a test that blocks forever fails instead of hanging the build), `@RepeatedTest` (flakiness detection). The philosophical point: JUnit 5 treats *test structure as API* — display names, tags, and timeouts are first-class, not comments.
 
 ## Assertions: The Verification Language

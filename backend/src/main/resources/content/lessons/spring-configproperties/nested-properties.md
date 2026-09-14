@@ -38,6 +38,11 @@ public class MailProperties {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `MailProperties` and `Ssl`.
+
 ---
 
 ## Line-by-Line Walkthrough

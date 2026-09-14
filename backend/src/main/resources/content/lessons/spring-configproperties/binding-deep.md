@@ -43,6 +43,13 @@ public record PaymentProperties(
 
     public record GatewayConfig(
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `RetryProperties` and `GatewayConfig`.
+- Uses a `record`.
+
         String url,
         String apiKey,
         @DefaultValue("5000") int timeoutMs
@@ -152,6 +159,12 @@ public record EmailProperties(
     @NotBlank String apiKey
 ) {}
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `EmailProperties`.
+- Uses a `record`.
 
 ```yaml
 app:

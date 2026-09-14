@@ -44,6 +44,11 @@ public final class Json {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Json` with methods `toJson()`.
+
 **The rule:** one `ObjectMapper` per application (Spring Boot's bean), configured once. It's thread-safe by design — sharing it is *correct*, not a hack. Creating mappers per-call is the single most common Jackson performance mistake.
 
 ## Habit 2: The Serialization Features

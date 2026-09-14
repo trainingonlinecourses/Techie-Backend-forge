@@ -123,6 +123,14 @@ public class FileUploadController {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `FileUploadController` with methods `saveFile()`.
+- Uses the `List` collection.
+- Uses file I/O with the NIO API.
+- Uses loops.
+
 ---
 
 ## Real-World Scenarios
@@ -156,6 +164,13 @@ public ResponseEntity<?> uploadAvatar(@RequestParam("file") MultipartFile file) 
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+- Uses switch branching.
+- Uses conditionals.
+
 ### Scenario 2: Streaming large files
 
 ```java
@@ -169,6 +184,11 @@ public ResponseEntity<?> uploadLarge(@RequestParam("file") MultipartFile file) t
     return ResponseEntity.ok("Uploaded");
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses file I/O with the NIO API.
 
 ---
 

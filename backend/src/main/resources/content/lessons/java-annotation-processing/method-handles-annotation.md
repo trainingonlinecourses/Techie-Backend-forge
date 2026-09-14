@@ -159,6 +159,14 @@ public class MethodHandleDemo {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `MethodHandleDemo` and `Calculator` with 4 methods.
+- Uses formatted output.
+- Uses loops.
+- When run, it prints: “add(3, 4) = ”, “valueOf(\” …
+
 ---
 
 ## MethodHandle vs Reflection
@@ -192,6 +200,11 @@ for (User user : users) {
     // serialize...
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses loops.
 
 ### Scenario 2: LambdaMetafactory (method handle + lambda)
 
@@ -229,6 +242,12 @@ public class Main {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- Uses generics.
 
 ### Scenario 3: Framework method invocation
 

@@ -119,6 +119,12 @@ public class EchoClient {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `EchoClient` with methods `main()`.
+- When run, it prints: “Server said: ”
+
 **Walking through it:** `new Socket("localhost", 9090)` resolves the host, connects, and performs the TCP three-way handshake (SYN, SYN-ACK, ACK) under the hood. The client then mirrors the server's stream setup and exchanges messages. When the client exits, the socket closes, the server's `readLine()` sees EOF (`null`), and the server logs "Client disconnected." The whole exchange is plain text — the simplest possible protocol.
 
 ## The One-Thread-Per-Client Problem
@@ -138,6 +144,14 @@ try (ServerSocket server = new ServerSocket(9090)) {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses manual threading.
+- Uses exception handling with try/catch.
+- Uses lambda expressions.
+- Uses loops.
 
 Now the accept loop never blocks on a conversation. This is exactly how the first generation of web servers worked — and it's the problem **virtual threads** (Java 21) and **NIO** solve with far better scalability: virtual threads let you write this same blocking style with thousands of concurrent clients, and NIO/reactor models (Netty, Spring WebFlux) avoid threads per connection entirely. You'll see both in the later lessons of this module.
 

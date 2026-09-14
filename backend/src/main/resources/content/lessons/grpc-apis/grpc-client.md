@@ -81,6 +81,12 @@ try {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses exception handling with try/catch.
+- Uses conditionals.
+
 ## Channel Reuse: The Golden Rule
 
 **Channels are expensive; stubs are cheap.** Create one channel per service per process — never per call:
@@ -117,6 +123,11 @@ while (replies.hasNext()) {
     process(course);
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses loops.
 
 ## Client Streaming
 
@@ -193,6 +204,13 @@ public Course getCourse(long id) {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses exception handling with try/catch.
+- Uses lambda expressions.
+- Uses switch branching.
 
 Map gRPC Status codes to your domain exceptions — clients shouldn't see raw gRPC errors.
 

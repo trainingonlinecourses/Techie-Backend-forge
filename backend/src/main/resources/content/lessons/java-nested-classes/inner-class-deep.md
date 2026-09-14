@@ -41,6 +41,11 @@ public class House {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `House` and `Room` with methods `main()`.
+
 ---
 
 ## How the Reference Works
@@ -70,6 +75,11 @@ public class Company {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Company` and `Department`.
 
 ---
 
@@ -140,6 +150,14 @@ public class EventManager {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `EventManager` and `RegistrationHandler` with 4 methods.
+- Uses the `List` collection.
+- Uses generics.
+- When run, it prints: “Attendees: ”, “Total: ”
 
 ---
 
@@ -344,6 +362,11 @@ public class Outer {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Outer` and `Inner` and 1 more type(s).
 
 **Rule of thumb:** If the inner class doesn't use any instance members of the outer class, make it `static nested` to avoid the hidden reference and potential memory leaks.
 

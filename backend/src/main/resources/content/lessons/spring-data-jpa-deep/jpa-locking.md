@@ -68,6 +68,12 @@ for (int attempt = 0; attempt < 3; attempt++) {
 throw new ConflictException("Too many concurrent edits — please retry");
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses exception handling with try/catch.
+- Uses loops.
+
 ## Pessimistic locking — LockModeType
 
 When optimistic retry is unacceptable (long-running workflows, high-contention records, money-critical paths), lock the row **at read time** so concurrent readers block instead of fail:

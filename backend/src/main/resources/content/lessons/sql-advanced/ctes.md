@@ -121,6 +121,11 @@ SELECT * FROM org_tree ORDER BY depth, name;
 **The engineering rule:** use a **view** when the logic is genuinely shared across many queries (it's a schema object — indexed, permissions-able, versioned); use a **CTE** when the logic belongs to one query (it's self-contained and doesn't pollute the schema). The common smell — creating a view nobody else uses — argues for CTEs; the opposite smell — copying the same 30-line subquery into five queries — argues for a view.
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses conditionals.
+
 ## Performance: What the Optimizer Does
 
 A CTE is *not* necessarily executed once — modern PostgreSQL (12+) inlines simple, non-recursive CTEs into the main query (so the planner can reorder and optimize), and only materializes them when they're referenced multiple times or contain side-effecting operations. The practical guidance: **write CTEs for readability first**; if a CTE is expensive and referenced several times, PostgreSQL's materialization handles it. For genuinely expensive shared computations, a materialized view or a temp table is the heavier-duty tool. Don't pre-optimize — profile with `EXPLAIN ANALYZE` and respond to evidence.

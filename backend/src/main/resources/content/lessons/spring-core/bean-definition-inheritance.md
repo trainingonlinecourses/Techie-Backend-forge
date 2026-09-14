@@ -72,6 +72,11 @@ public class CheckoutService {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `CheckoutService` with methods `defaultGateway()`, `refundGateway()`.
+
 **Scenario 4 — controlling init/destroy.** `@PostConstruct`/`@PreDestroy`, or the definition-level `initMethod`/`destroyMethod` for beans you can't annotate:
 
 ```java

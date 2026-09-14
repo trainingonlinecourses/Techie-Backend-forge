@@ -140,6 +140,13 @@ public class Task {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Task` and `Priority` and 1 more type(s) with 13 methods.
+- Uses an `enum`.
+- Uses the java.time date-time API.
+
 ### Step 3: User Entity
 
 @Entity
@@ -196,6 +203,15 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `UserRepository`.
+- Uses an interface.
+- Uses inheritance.
+- Uses generics.
+
     Optional<User> findByUsername(String username);
     boolean existsByUsername(String username);
 }
@@ -215,6 +231,13 @@ public record UpdateTaskRequest(
     @Size(max = 200) String title,
     @Size(max = 2000) String description,
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `UpdateTaskRequest`.
+- Uses a `record`.
+
     Task.Priority priority,
     Task.Status status
 ```java

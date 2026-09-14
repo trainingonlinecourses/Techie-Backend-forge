@@ -53,6 +53,13 @@ public class ReferenceDataSeeder implements ApplicationRunner {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `ReferenceDataSeeder` with methods `run()`.
+- Uses interface implementation.
+- Uses conditionals.
+
 The `count() == 0` guard makes it safe across restarts and across the ephemeral-vs-persistent database moves teams do.
 
 ```java
@@ -70,6 +77,13 @@ public class CacheWarmer implements ApplicationRunner {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `CacheWarmer` with methods `run()`.
+- Uses lambda expressions.
+- Uses interface implementation.
 
 **Scenario 3 — fail-fast health check on boot.** A runner that verifies a critical external dependency and fails the app (via `System.exit(1)`) if it's unreachable — so a misconfigured deployment never serves traffic in a broken state:
 
@@ -100,6 +114,14 @@ public class BackfillRunner implements ApplicationRunner {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `ExternalDependencyCheck` and `BackfillRunner` with methods `run()`.
+- Uses lambda expressions.
+- Uses interface implementation.
+- Uses conditionals.
+
 ## Ordering multiple runners
 
 Multiple runners run in unspecified order unless you order them — implement `Ordered` or annotate `@Order`:
@@ -109,6 +131,12 @@ Multiple runners run in unspecified order unless you order them — implement `O
 @Component @Order(2) public class CacheWarmer implements ApplicationRunner { ... }
 @Component @Order(3) public class ReferenceDataSeeder implements ApplicationRunner { ... }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `DependencyCheck` and `CacheWarmer` and 1 more type(s).
+- Uses interface implementation.
 
 Lower order value runs first. Use `@Order` when the sequence matters (check dependencies before warming caches).
 

@@ -75,6 +75,13 @@ PaymentProcessor p = new StripeProcessor();
 p.execute(request);
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `PaymentProcessor` and `StripeProcessor` with methods `type()`, `validate()`, `execute()`.
+- Uses inheritance.
+- Uses conditionals.
+
 ## Covariant return types
 
 Since Java 5, an overriding method can return a **narrower** (more specific) type than the parent:
@@ -97,6 +104,12 @@ public class InternationalOrderBuilder extends OrderBuilder {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderBuilder` and `InternationalOrderBuilder` with methods `build()`.
+- Uses inheritance.
 
 This means callers of `InternationalOrderBuilder.build()` get an `InternationalOrder` without a cast, while callers of the parent `OrderBuilder` still get `Order`. It is one of the few cases where overriding a method *strengthens* the contract.
 
@@ -169,6 +182,14 @@ public class NotificationDispatcher {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `NotificationSender` and `EmailSender` and 2 more type(s) with methods `send()`, `channel()`, `dispatch()`.
+- Uses the Streams API to process data declaratively.
+- Uses lambda expressions.
+- Uses method references.
+
 The dispatcher calls `sender.send()` without knowing which implementation it holds. Adding `PushSender` requires zero changes to `NotificationDispatcher`.
 
 ### Scenario 2: Template Method — data export pipeline
@@ -220,6 +241,14 @@ public class JsonExporter extends DataExporter {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `DataExporter` and `CsvExporter` and 1 more type(s) with 5 methods.
+- Uses inheritance.
+- Uses the `List` collection.
+- Uses conditionals.
+
 Adding a new export format means writing a new subclass. The `export()` algorithm never changes.
 
 ### Scenario 3: instanceof pattern matching (Java 16+)
@@ -235,6 +264,12 @@ public String describe(Object obj) {
     };
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+- Uses switch branching.
 
 Pattern matching replaces verbose `instanceof` + cast chains with readable, compiler-checked dispatch.
 

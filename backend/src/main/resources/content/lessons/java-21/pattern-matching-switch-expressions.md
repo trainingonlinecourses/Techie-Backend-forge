@@ -33,6 +33,14 @@ switch (obj) {
 };
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+- Uses the `List` collection.
+- Uses switch branching.
+- Uses conditionals.
+
 ---
 
 ## Key Features
@@ -54,6 +62,12 @@ String classify(Object obj) {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+- Uses switch branching.
+
 ### Null handling
 
 ```java
@@ -64,6 +78,12 @@ switch (obj) {
     default      -> "other";
 };
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+- Uses switch branching.
 
 ### Exhaustive matching with sealed classes
 
@@ -82,6 +102,14 @@ double area(Shape shape) {
     };
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Shape` and `Circle` and 2 more type(s).
+- Uses lambda expressions.
+- Uses a `record`.
+- Uses an interface.
 
 ---
 
@@ -189,6 +217,14 @@ public class PatternMatchingSwitchDemo {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `PatternMatchingSwitchDemo` and `Result` and 5 more type(s) with 5 methods.
+- Uses lambda expressions.
+- Uses a `record`.
+- Uses an interface.
+
 ---
 
 ## Real-World Scenarios
@@ -207,6 +243,12 @@ public ResponseEntity<?> handleServiceResult(ServiceResult result) {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+- Uses switch branching.
+
 ### Scenario 2: AST evaluation
 
 ```java
@@ -222,6 +264,12 @@ public double evaluate(Expr expr) {
     };
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+- Uses switch branching.
 
 ---
 

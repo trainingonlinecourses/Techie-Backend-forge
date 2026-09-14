@@ -29,6 +29,11 @@ public class CourseService {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `CourseService` with methods `updateCourse()`.
+
 Every update writes through to the cache, so the next read of that key is fresh. But write-through has a cost: if the DB write succeeds and the cache write fails, you have stale data. If the method throws, nothing is cached — which is correct.
 
 ## @CacheEvict: Invalidation
@@ -73,13 +78,14 @@ public void unpublish(String courseId, CourseDto dto) { ... }
 
 ## Combining Cacheable + Evict: The Update Pattern
 
-The classic trap: a method that writes and returns the new value, annotated `@Cacheable`, which silently **serves the stale cached value instead of the fresh write**:
-
 ```java
 // ❌ WRONG: @Cacheable skips the method, so the DB is never updated
 @Cacheable(value = "courses", key = "#course.id")
 public Course saveCourse(Course course) { ... }
 ```
+
+<!-- why -->
+The classic trap: a method that writes and returns the new value, annotated `@Cacheable`, which silently **serves the stale cached value instead of the fresh write**:
 
 Correct: `@CachePut` for the write path, `@CacheEvict` for deletes:
 

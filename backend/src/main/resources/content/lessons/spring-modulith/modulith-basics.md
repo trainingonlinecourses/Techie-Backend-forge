@@ -91,6 +91,13 @@ public interface PaymentProcessing {
 class PaymentProcessingImpl implements PaymentProcessing { ... }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `PaymentProcessing` and `PaymentProcessingImpl`.
+- Uses an interface.
+- Uses interface implementation.
+
 Other modules depend on `PaymentProcessing` (the interface); the implementation can change, or the whole module can be extracted to a service with the interface as its contract — the named interface *is* the future microservice's API.
 
 ## Events across modules

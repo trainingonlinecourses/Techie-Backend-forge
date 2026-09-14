@@ -69,6 +69,13 @@ Jackson2ObjectMapperBuilderCustomizer moneyCustomizer() {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderDto`.
+- Uses lambda expressions.
+- Uses `BigDecimal` for exact decimal math.
+
 The choice: **per-field** (`@JsonSerialize(using=...)`) for one-off custom types; **global registration** for a type that always maps the same way (money always a string). Spring Boot's `Jackson2ObjectMapperBuilderCustomizer` is the clean hook — it adds your serializers without clobbering Boot's auto-configuration.
 
 ## The Matching Deserializer
@@ -152,6 +159,14 @@ public class BankPayment extends Payment { public String iban; }
 // Deserializing reads "type" -> builds CreditCardPayment.
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Payment` and `CreditCardPayment` and 1 more type(s).
+- Uses lambda expressions.
+- Uses inheritance.
+- Uses `BigDecimal` for exact decimal math.
+
 **The danger zone:** `@JsonTypeInfo` with `Id.CLASS` or default-typing lets JSON name *arbitrary classes* — the deserialization attack from the secure-coding lesson. **Use `Id.NAME` with an explicit `@JsonSubTypes` allowlist** (never `Id.CLASS` on untrusted input) — the allowlist is what keeps polymorphic deserialization safe.
 
 ## Views: One Object, Many Shapes
@@ -182,6 +197,12 @@ public UserDto get(@PathVariable Long id) { ... }
 
 **The trade-off vs DTOs:** views avoid duplicating classes for "same shape, different fields" — but they spread the contract across annotations. For more than two views, explicit DTOs are usually clearer. Views are the right tool when the object is genuinely one type with context-dependent exposure (public profile vs admin record).
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Views` and `Public` and 2 more type(s) with methods `get()`.
+- Uses inheritance.
 
 ## Recap
 

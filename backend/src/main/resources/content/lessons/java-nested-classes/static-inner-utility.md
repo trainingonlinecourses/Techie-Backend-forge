@@ -76,6 +76,14 @@ public class LinkedList<T> {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `LinkedList` and `Node` and 2 more type(s) with methods `iterator()`, `forEach()`.
+- Uses the `List` collection.
+- Uses conditionals.
+- Uses generics.
+
 ## Line-by-Line Explanation
 
 | Line | What It Does | Why It Matters |

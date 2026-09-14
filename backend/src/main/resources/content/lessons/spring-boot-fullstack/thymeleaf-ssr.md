@@ -72,6 +72,12 @@ public class Task {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Task` and `Priority` and 1 more type(s).
+- Uses an `enum`.
+
 ### Step 3: Repository
 
 @Repository
@@ -159,6 +165,13 @@ public class TaskController {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `TaskController` with 6 methods.
+- Uses lambda expressions.
+- Uses conditionals.
 
 ### Step 5: Thymeleaf Templates
 

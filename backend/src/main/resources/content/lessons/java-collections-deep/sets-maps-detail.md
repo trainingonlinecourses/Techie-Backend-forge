@@ -98,6 +98,14 @@ class LruCache<K, V> extends LinkedHashMap<K, V> {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `LruCache` with methods `removeEldestEntry()`.
+- Uses inheritance.
+- Uses the `Map` collection.
+- Uses generics.
+
 `accessOrder = true` reorders on `get` — the map becomes a real LRU cache in ~10 lines.
 
 ### EnumMap: The Forgotten Speed King
@@ -107,6 +115,15 @@ enum Status { NEW, PROCESSING, PAID, CANCELLED }
 
 Map<Status, Integer> counts = new EnumMap<>(Status.class);
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Status`.
+- Uses an `enum`.
+- Uses the `Map` collection.
+- Uses generics.
+
 counts.merge(Status.PAID, 1, Integer::sum);
 
 // Backed by a plain array indexed by ordinal — O(1), tiny memory, no hashing
@@ -121,6 +138,12 @@ IdentityHashMap<Object, String> registry = new IdentityHashMap<>();
 registry.put(c1, "instance-1");
 registry.put(new Course("same-slug"), "instance-2");   // different object, different key
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses the `Map` collection.
+- Uses generics.
 
 Rarely needed — but essential for object-identity tracking (profiling, proxy caches) where `equals` is the wrong semantic.
 
@@ -148,6 +171,13 @@ for (String tag : tags) {
 
 // ✅ iterator.remove()
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses loops.
+- Uses conditionals.
+
 Iterator<String> it = tags.iterator();
 ```java
 while (it.hasNext()) {
@@ -157,6 +187,13 @@ while (it.hasNext()) {
 // ✅ removeIf (Java 8+)
 tags.removeIf(t -> t.startsWith("x"));
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+- Uses loops.
+- Uses conditionals.
 
 ## Choosing the Right Map
 

@@ -30,6 +30,11 @@ public OrderDto get(@PathVariable long id) {
 @DeleteMapping("/users/{id}")
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses conditionals.
+
 Countermeasures: authorization at **every** layer (URL + method + object), deny-by-default `anyRequest().authenticated()`, never rely on client-sent identity, and test with role-matrix tests (user A must not read user B's data — write that test).
 
 ## A02 — Cryptographic Failures
@@ -52,6 +57,11 @@ jdbc.query("SELECT * FROM users WHERE name = '" + input + "'", ...);   // ' OR 1
 jdbc.query("SELECT * FROM users WHERE name = ?", ps -> ps.setString(1, input), ...);
 // Spring Data derived queries and @Query with :params are parameterized by design — use them
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
 
 Countermeasures: **parameterized queries everywhere** (JDBC `?`, JPA named params, Mongo `Criteria` — never string-concatenated `$where`), validate input at the boundary (Bean Validation), least-privilege DB roles (the app user can't `DROP TABLE`). SpEL/user expressions: only `SimpleEvaluationContext` (the SpEL lesson).
 
@@ -111,6 +121,11 @@ if (!ALLOWED_HOSTS.contains(u.getHost())) throw new BadRequestException();
 
 Applies to: webhooks, image fetchers, file-import-by-URL, **AI tool-calling** (a chat model that fetches URLs — the exact surface this academy's AI tutor could expose). Never follow redirects blindly; validate the *final* host.
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses conditionals.
 
 ## The test that proves it
 

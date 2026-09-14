@@ -43,6 +43,12 @@ public final class EmailValidator {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `EmailValidator` with methods `isValid()`.
+- Uses regex matching.
+
 `Pattern.compile` is the expensive part — it parses the regex into a state machine. `matcher(...)` and the match itself are cheap. A **`static final` Pattern** is the standard, and `Pattern` is immutable and thread-safe so one instance serves every thread. `String.matches` compiles a fresh pattern each call — fine for validation scripts, a disaster in a hot request path.
 
 ## How we use it in an organization: real scenarios
@@ -85,6 +91,12 @@ while (m.find()) {
     String val = m.group(2); // 1000
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses regex matching.
+- Uses loops.
 
 `find()` scans for the *next* match anywhere; `matches()` requires the whole string to match; `lookingAt()` anchors at the start only. Choosing the right one is a common review comment.
 

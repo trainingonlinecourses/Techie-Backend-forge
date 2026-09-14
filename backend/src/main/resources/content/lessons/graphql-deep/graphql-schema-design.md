@@ -126,6 +126,13 @@ public class CourseGraphqlController {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `CourseGraphqlController` with methods `course()`, `courses()`, `createCourse()`.
+- Uses the `List` collection.
+- Uses generics.
+
 ### Walking Through Each Part
 
 **The schema file** — Spring GraphQL loads `schema.graphqls` at startup and validates the app against it (a schema that references a non-existent type fails boot). The schema is the contract; the controllers fulfill it.

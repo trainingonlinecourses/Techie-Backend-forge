@@ -111,6 +111,12 @@ public void transfer(...) { ... }
 public List<Entry> leaderboard() { ... }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses the `List` collection.
+- Uses generics.
+
 ## The Anti-Pattern: Pretending There's No Trade
 
 

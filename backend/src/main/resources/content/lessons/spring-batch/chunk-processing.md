@@ -108,6 +108,14 @@ public JdbcBatchItemWriter<ProcessedOrder> writer(DataSource dataSource) {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+- Uses `BigDecimal` for exact decimal math.
+- Uses conditionals.
+- Uses generics.
+
 ## The complete job — putting it together
 
 

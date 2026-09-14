@@ -29,6 +29,12 @@ jobs:
       - name: Verify curriculum integrity
         run: node scripts/verify-content.mjs
 
+      - name: JS unit suites (prereq gating, band recommendation, next-up)
+        run: |
+          node scripts/test-prereqs.mjs
+          node scripts/test-recommend-band.mjs
+          node scripts/test-next-up.mjs
+
   backend:
     name: Backend tests (mvn test)
     runs-on: ubuntu-latest

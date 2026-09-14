@@ -75,6 +75,12 @@ public void reconcileWithRetry() {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses exception handling with try/catch.
+- Uses loops.
+
 ## Pessimistic Locking: Lock Now, Read Later
 
 Locks the row(s) at read time — no one else can modify them until commit:

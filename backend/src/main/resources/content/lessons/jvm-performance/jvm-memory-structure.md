@@ -90,6 +90,12 @@ Map<Long, Order> orders = new HashMap<>();
 // or consider if the wrapper overhead matters for your use case
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses the `Map` collection.
+- Uses generics.
+
 ---
 
 ## Reading the Numbers — Command Line Tools
@@ -161,6 +167,14 @@ private static final Cache<String, UserSession> sessions = Caffeine.newBuilder()
     .expireAfterAccess(Duration.ofMinutes(30))
     .build();
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `UserService` with methods `login()`.
+- Uses the `Map` collection.
+- Uses the java.time date-time API.
+- Uses generics.
 
 ---
 

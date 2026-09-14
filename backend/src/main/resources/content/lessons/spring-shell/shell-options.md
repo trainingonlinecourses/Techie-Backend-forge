@@ -62,8 +62,6 @@ public String process(@ShellOption String... files) { ... }
 
 ---
 
-## Line-by-Line Walkthrough
-
 ```java
 import org.springframework.shell.standard.*;
 import org.springframework.stereotype.Component;
@@ -101,6 +99,9 @@ public class AdvancedCommands {
     }
 }
 ```
+
+<!-- why -->
+## Line-by-Line Walkthrough
 
 ---
 

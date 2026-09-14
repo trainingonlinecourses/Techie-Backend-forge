@@ -87,6 +87,11 @@ public class OrderService {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderService`.
+
 ### 2. Explicit registration (manual)
 
 
@@ -256,6 +261,11 @@ class OrderServiceTest {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderServiceTest`.
+
 ### Scenario 3 — importing a third-party module
 
 // The payment module is a JAR dependency — you can't scan its packages
@@ -267,6 +277,11 @@ public class AppConfig {
     // Line 2: Now PaymentService, PaymentRepository, etc. are beans
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `AppConfig`.
 
 ### Scenario 4 — duplicate beans (the fail-fast feature)
 
@@ -283,6 +298,11 @@ class V2PaymentService { }
 @Primary                                    // This one wins when there's a conflict
 class V1PaymentService { }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `V1PaymentService` and `V2PaymentService`.
 
 ## Debugging component scanning
 
@@ -306,6 +326,13 @@ public class MyBean implements CommandLineRunner {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `MyBean` with methods `run()`.
+- Uses interface implementation.
+- When run, it prints: “MyBean is alive!”
 
 ### The classic "bean not found" bug
 

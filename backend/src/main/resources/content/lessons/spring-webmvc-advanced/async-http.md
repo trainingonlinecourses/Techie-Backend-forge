@@ -88,6 +88,12 @@ CompletableFuture.allOf(callA, callB, callC)
     });
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+- Uses conditionals.
+
 ## Pitfalls
 
 - **Async isn't free** — it trades servlet threads for executor threads; unbounded executors and unclosed emitters leak. Size the async executor (`spring.mvc.async.request-timeout` + a task executor bean) deliberately.

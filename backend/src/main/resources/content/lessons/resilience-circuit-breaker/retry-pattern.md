@@ -87,6 +87,14 @@ public class NotificationService {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `NotificationService` with methods `sendEmail()`, `isTransient()`.
+- Uses lambda expressions.
+- Uses method references.
+- Uses the java.time date-time API.
+
 ### Walking Through Each Part
 
 **`maxAttempts(4)`** — original + 3 retries. Bounded: a permanently failing call gives up after 4 attempts and surfaces the error (the caller handles it or the breaker/fallback takes over).
@@ -108,6 +116,11 @@ public class NotificationService {
 Exponential gives the server room to recover; jitter prevents synchronized waves. For long-running distributed systems, jittered exponential backoff is *the* standard (it's what AWS SDKs, Kubernetes, and most clients use).
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses synchronization with `synchronized`.
+
 ## Idempotency — The Retry Safety Net
 
 The danger case: a POST that creates a resource. Request succeeds server-side but the response is lost (timeout). Retrying creates a **duplicate**.
@@ -120,6 +133,11 @@ public void charge(ChargeRequest request) {
     // Server: "have I seen this key? -> return the original result, don't charge again"
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
 
 With idempotency keys (or naturally idempotent operations like `UPDATE SET balance = balance - x` with a unique operation id), retries become safe: the second attempt returns the *same* result instead of creating a second effect.
 

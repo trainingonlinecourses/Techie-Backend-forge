@@ -70,6 +70,12 @@ public class Course {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Course` with methods `publish()`.
+- Uses conditionals.
+
 ## Use Cases: Application-Specific Rules
 
 public class PublishCourseUseCase {
@@ -141,6 +147,13 @@ public record PublishCourseCommand(CourseId courseId, String reason) {}
 
 @PostMapping("/{id}/publish")
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `PublishRequest` and `PublishCourseCommand`.
+- Uses a `record`.
+
 public ResponseEntity<Void> publish(@PathVariable Long id,
 ```java
                                     @RequestBody PublishRequest request) {
@@ -183,9 +196,17 @@ public class JpaCourseRepository implements CourseRepository {
 }
 ```
 
+<!-- why -->
+
+
 ```java
 Pragmatic note: many teams annotate entities directly for simplicity (the "pragmatic clean architecture" school). The strict form keeps the domain pristine; the pragmatic form accepts framework coupling in exchange for less mapping code. Choose deliberately.
 ```
+
+<!-- why -->
+**What this code shows:**
+- Defines `Course` and `CourseEntity` and 1 more type(s).
+- Uses interface implementation.
 
 ## The Dependency Rule as Tests
 

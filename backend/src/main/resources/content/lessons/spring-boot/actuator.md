@@ -61,6 +61,13 @@ public class DbPingHealthIndicator implements HealthIndicator {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `DbPingHealthIndicator` with methods `health()`.
+- Uses exception handling with try/catch.
+- Uses interface implementation.
+
 ## Micrometer: metrics with standard names
 
 Micrometer is the metrics facade — your code is vendor-neutral, the registry decides where it goes (Prometheus, Datadog, CloudWatch, ...):
@@ -88,6 +95,13 @@ public class PaymentService {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `PaymentService` with methods `create()`.
+- Uses lambda expressions.
+- Uses the java.time date-time API.
+
 ```xml
 <dependency>
     <groupId>io.micrometer</groupId>
@@ -109,6 +123,12 @@ public class AccountService {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `AccountService` with methods `findByIban()`.
+- Uses exception handling with try/catch.
 
 Rules: parameterized messages only (`log.info("x={}", x)` — lazy, no garbage), include the correlation/trace id in the pattern, `log.error` with the exception as the last arg, and never log secrets (passwords, tokens, card numbers).
 

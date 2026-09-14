@@ -195,6 +195,11 @@ public class AcademyApplication {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `AcademyApplication` with methods `main()`.
+
 ### Key Takeaways
 
 1. **Profiles separate configuration** — one codebase, many environments

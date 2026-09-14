@@ -194,6 +194,11 @@ class MetricsTest {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `MetricsTest`.
+
 Or assert against the Prometheus endpoint:
 
 @Test

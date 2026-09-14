@@ -124,6 +124,12 @@ public class NativeHints implements RuntimeHintsRegistrar {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `AcademyApplication` and `NativeHints` with methods `main()`, `registerHints()`.
+- Uses interface implementation.
+
 **The hint model:** `RuntimeHintsRegistrar` is Spring's native-image metadata API — your code declares its dynamic needs, and the build bakes them in. For most Spring Boot apps, the framework's own hints cover the standard stack; custom hints are for *your* dynamic edges (custom Jackson types, reflectively loaded classes, resource files).
 
 ## The Comparison

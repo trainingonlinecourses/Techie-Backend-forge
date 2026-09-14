@@ -83,6 +83,11 @@ public class ImmutablePoint {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `ImmutablePoint` with methods `getX()`, `getY()`.
+
 **The pattern:** immutable classes (final fields, no setters) need `@JsonCreator` on the constructor, with `@JsonProperty` naming each parameter (Jackson matches constructor params to JSON keys by name — without the annotation, the param *names* are used, which needs the `-parameters` compiler flag; the annotations make it explicit and robust). The same annotation works on a `static` factory method (`@JsonCreator public static Point of(@JsonProperty("x") int x, ...)`).
 
 ## Deserialization-Only and Serialization-Only Control
@@ -140,6 +145,12 @@ public enum OrderStatus {
     public String getCode() { return code; }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderStatus` with methods `getCode()`.
+- Uses an `enum`.
 
 **The three options:** default name, per-field string shape, or custom representation via `@JsonValue` (plus `@JsonCreator` for input). For versioned APIs, `@JsonEnumDefaultValue` marks the fallback for unknown enum values — the "forward-compatible enum" pattern.
 

@@ -191,6 +191,14 @@ public class Main {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- Uses the `List` collection.
+- Uses the `Set` collection.
+- Uses generics.
+
 ### LinkedHashSet — maintains insertion order
 
 
@@ -218,6 +226,13 @@ public class Main {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- Uses the `Set` collection.
+- Uses generics.
 
 ### TreeSet — sorted automatically
 
@@ -258,6 +273,14 @@ public class Main {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- Uses method references.
+- Uses the `Set` collection.
+- Uses sorting with a `Comparator`.
 
 ## Map — key → value pairs
 
@@ -332,6 +355,14 @@ public class Main {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- Uses lambda expressions.
+- Uses the `Map` collection.
+- Uses the `Set` collection.
+
 ### TreeMap — sorted by key
 
 
@@ -363,6 +394,13 @@ public class Main {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- Uses the `Map` collection.
+- Uses generics.
 
 ## Queue and Deque — processing orders
 
@@ -412,6 +450,12 @@ priorityQueue.poll();
 priorityQueue.poll();
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses the `List` collection.
+- Uses generics.
+
 ## Immutable collections — safe to share
 
 
@@ -437,6 +481,14 @@ List<String> readOnly = Collections.unmodifiableList(mutable);
 
 List<String> safeCopy = List.copyOf(mutable);
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses the `List` collection.
+- Uses the `Map` collection.
+- Uses the `Set` collection.
+- Uses generics.
 
 ## Collections utility methods
 
@@ -486,6 +538,14 @@ int count = Collections.frequency(names, "Alice");
 boolean noOverlap = Collections.disjoint(Set.of(1, 2), Set.of(3, 4));
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses the Streams API to process data declaratively.
+- Uses the `List` collection.
+- Uses sorting with a `Comparator`.
+- Uses generics.
+
 ## How we use it in organizations
 
 ### Scenario 1: User session cache with HashMap
@@ -507,6 +567,12 @@ public class SessionCache {
     public void invalidateExpired() {
         Instant cutoff = Instant.now().minus(Duration.ofMinutes(30));
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses the java.time date-time API.
+
         sessions.entrySet().removeIf(entry ->      // remove all expired sessions
             entry.getValue().getLastAccess().isBefore(cutoff)
         );
@@ -569,6 +635,14 @@ public class ServiceDeploymentOrder {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `ServiceDeploymentOrder` with methods `addService()`, `getDeploymentOrder()`, `visit()`.
+- Uses the `List` collection.
+- Uses the `Map` collection.
+- Uses the `Set` collection.
 
 ## Choosing the right collection
 

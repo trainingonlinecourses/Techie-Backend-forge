@@ -73,6 +73,12 @@ public class ModerationAdvisor implements Advisor {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `ModerationAdvisor` with methods `before()`, `after()`.
+- Uses interface implementation.
+
 ChatClient safeClient = builder
         .defaultAdvisors(new ModerationAdvisor())
 ```java

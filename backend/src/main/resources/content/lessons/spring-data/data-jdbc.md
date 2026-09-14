@@ -52,6 +52,13 @@ public class Order {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Order`.
+- Uses the `List` collection.
+- Uses generics.
+
 ## The aggregate-first model — explained from zero
 
 In Domain-Driven Design (DDD), an **aggregate** is a cluster of objects treated as a single unit for data changes. Think of it like a family: the parent (aggregate root) is responsible for all the children. You can't modify a child directly — you go through the parent.
@@ -124,6 +131,11 @@ public class OrderService {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderService` with methods `addProductToOrder()`.
+
 **Why "delete and re-insert"?** It's simpler than figuring out which children changed, which were added, which were removed. For small aggregates (10-50 children), it's fast. For unbounded lists (millions of events), it's wrong — use a different pattern.
 
 ## No lazy loading — everything loads eagerly
@@ -147,6 +159,12 @@ List<OrderLine> lines = order.getLines();
 
 Order order = orderRepo.findById(1L);
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses the `List` collection.
+- Uses generics.
 
 **This is a feature, not a limitation.** You know exactly how many queries execute. No hidden performance problems.
 
@@ -273,6 +291,14 @@ public interface OrderRepository extends CrudRepository<Order, Long> {
     long countByStatus(OrderStatus status);
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Order` and `OrderRepository` with methods `addLine()`.
+- Uses `Optional` for null-safe values.
+- Uses an interface.
+- Uses inheritance.
 
 ## Key takeaways
 

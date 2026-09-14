@@ -67,6 +67,12 @@ public class QueueDepthEndpoint {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `QueueDepthEndpoint` and `QueueDepthInfo` with methods `depth()`, `drain()`, `purge()`.
+- Uses a `record`.
+
 Operations: `@ReadOperation` (GET), `@WriteOperation` (POST), `@DeleteOperation` (DELETE). Custom endpoints are how teams expose *their* knobs: cache eviction, feature-flag refresh, job triggers, queue stats — visible to ops without a bespoke admin UI.
 
 ## Liveness vs readiness — the Kubernetes distinction
@@ -96,6 +102,11 @@ public class FeatureFlagEndpoint {
     public void refresh(@Selector String name) { flagService.reload(name); }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `FeatureFlagEndpoint` with methods `refresh()`.
 
 **Scenario 3 — cache statistics for capacity planning.** A `@ReadOperation` exposing hit-rate, size, and eviction counts — the data that tells you when a cache needs a bigger limit.
 

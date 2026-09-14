@@ -84,6 +84,11 @@ Flux<String> stream = chatClient.prompt()
 stream.subscribe(chunk -> sseSink.emit(chunk));
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+
 ## The full response object
 
 ```java

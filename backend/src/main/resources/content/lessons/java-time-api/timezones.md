@@ -87,6 +87,12 @@ public class TimeZoneDemo {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `TimeZoneDemo` with methods `main()`.
+- When run, it prints: “Kolkata: ”, “NY:      ” …
+
 ### Walking Through Each Part
 
 **Part 1 — `ZoneId.of`.** Region/City names are the only correct identifiers. `ZoneId.systemDefault()` returns the machine's zone (useful but rarely what you want to hardcode — users should choose their own zone).

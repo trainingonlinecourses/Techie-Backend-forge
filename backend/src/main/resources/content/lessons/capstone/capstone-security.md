@@ -139,6 +139,14 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `JwtAuthFilter` with methods `doFilterInternal()`.
+- Uses lambda expressions.
+- Uses inheritance.
+- Uses local type inference with `var`.
+
 ## Login & register endpoints
 
 ```java
@@ -194,6 +202,13 @@ public class AuthService {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `AuthController` and `AuthService` with methods `register()`, `login()`, `me()`.
+- Uses local type inference with `var`.
+- Uses conditionals.
 
 ## Try it live
 

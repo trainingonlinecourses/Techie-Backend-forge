@@ -72,6 +72,11 @@ spring:
 http.oauth2ResourceServer(rs -> rs.jwt(Customizer.withDefaults()));
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+
 Now your API validates tokens signed by the IdP — no shared secrets, no local user table needed for authn. Claims are available in controllers:
 
 ```java

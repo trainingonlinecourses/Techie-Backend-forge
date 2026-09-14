@@ -42,6 +42,13 @@ class ReportGenerator {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `ReportGenerator`.
+- Uses lambda expressions.
+- Uses switch branching.
+
 Adding Excel support means **editing** `ReportGenerator.generate` — touching the working method, risking the three existing formats, and making the class grow forever. Every addition is a modification.
 
 ## The Fix — Polymorphism Does the Switch
@@ -107,6 +114,14 @@ public class OpenClosedDemo {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `ReportFormat` and `PdfReport` and 4 more type(s) with methods `name()`, `render()`, `main()`.
+- Uses the Streams API to process data declaratively.
+- Uses lambda expressions.
+- Uses method references.
 
 ### Walking Through Each Part
 

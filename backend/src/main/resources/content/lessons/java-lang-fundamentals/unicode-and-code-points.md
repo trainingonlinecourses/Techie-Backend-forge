@@ -54,6 +54,12 @@ public class UnicodeDemo {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `UnicodeDemo` with methods `main()`.
+- When run, it prints: “ascii.length()  = ”, “rocket.length() = ” …
+
 ## The everyday bugs this causes
 
 **Bug 1 — wrong length and truncation.** Validation like `if (name.length() > 20)` counts
@@ -79,6 +85,13 @@ public class TruncationTrap {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `TruncationTrap` with methods `main()`.
+- Uses conditionals.
+- When run, it prints: “naive : ”, “safe  : ”
+
 **Bug 2 — broken uppercase and casing.** `Character.toUpperCase(char)` only works within
 one code unit. Supplementary characters need the code-point version:
 
@@ -97,6 +110,12 @@ public class Casing {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Casing` with methods `main()`.
+- When run, it prints: “char-based  : ”, “cp-based    : ”
 
 **Bug 3 — reverse without reversing the pairs.** A hand-rolled reverse loop that walks
 `char` by `char` swaps the two halves of every surrogate pair and produces garbage:
@@ -126,6 +145,14 @@ public class ReverseCheck {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `ReverseCheck` with methods `main()`.
+- Uses loops.
+- Uses conditionals.
+- When run, it prints: “manual reverse still intact: ”
+
 ## The code-point API — the correct toolkit
 
 ```java
@@ -153,6 +180,13 @@ public class CodePointToolkit {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `CodePointToolkit` with methods `main()`.
+- Uses lambda expressions.
+- When run, it prints: “code units : ”, “code points: ” …
 
 ## Rules to internalize
 

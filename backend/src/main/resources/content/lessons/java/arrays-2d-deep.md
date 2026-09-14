@@ -113,6 +113,12 @@ public class Main {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- Uses loops.
+
 **Why `matrix[row].length` and not `matrix[0].length`?** Because in a jagged array, each row can have a different length. Always use `matrix[row].length` to get the correct column count for that specific row.
 
 ## Common mistake: the "shallow copy" trap
@@ -147,6 +153,12 @@ public class Main {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- Uses loops.
 
 **Why this happens:** `int[][] shallowCopy = original` copies the reference to the outer array. Both `original` and `shallowCopy` point to the same object. Changing `shallowCopy[0]` changes `original[0]` because they are literally the same inner array. `clone()` creates a new array object with the same values.
 
@@ -218,6 +230,14 @@ public class CinemaSeating {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `CinemaSeating` with methods `reserve()`, `availableCount()`, `printMap()`.
+- Uses formatted output.
+- Uses loops.
+- Uses conditionals.
+
 ### Scenario 2: Image processing (pixel grid)
 
 A grayscale image is a 2D array where each value is a brightness (0-255). Applying a brightness filter:
@@ -277,6 +297,12 @@ public class ImageFilter {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `ImageFilter` with methods `adjustBrightness()`, `boxBlur()`.
+- Uses loops.
+
 ### Scenario 3: Dynamic programming — longest common subsequence
 
 2D arrays are the backbone of dynamic programming. The LCS algorithm fills a grid where `dp[i][j]` represents the answer for the first `i` chars of string A and first `j` chars of string B:
@@ -313,6 +339,12 @@ public static int longestCommonSubsequence(String text1, String text2) {
     return dp[m][n];
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses loops.
+- Uses conditionals.
 
 **Why `dp[m+1][n+1]`?** The extra row and column (index 0) represent the empty string. When either string is empty, the LCS is 0 — this is our base case without special `if` checks.
 

@@ -71,6 +71,11 @@ public class ProductService {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `ProductService` with 4 methods.
+
 ## Cache key generation
 
 By default, Spring generates the key from all method parameters using a `SimpleKeyGenerator`. For custom keys:
@@ -185,6 +190,11 @@ public class UserSessionService {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `UserSessionService` with methods `validateToken()`, `invalidateToken()`.
+
 ### Scenario 3: multi-level cache (L1 Caffeine + L2 Redis)
 
 ```java
@@ -205,6 +215,12 @@ public class MultiLevelCacheConfig {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `MultiLevelCacheConfig` with methods `cacheManager()`.
+- Uses the java.time date-time API.
 
 ## Cache pitfalls
 

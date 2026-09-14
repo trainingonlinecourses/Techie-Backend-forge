@@ -60,6 +60,13 @@ public class StartupInitializer implements CommandLineRunner {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `StartupInitializer` with methods `run()`.
+- Uses interface implementation.
+- Uses loops.
+
 ### Multiple Runners with @Order
 
 ```java
@@ -93,6 +100,13 @@ public class HealthChecker implements CommandLineRunner {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `DatabaseMigration` and `CacheWarmer` and 1 more type(s) with methods `run()`.
+- Uses interface implementation.
+- When run, it prints: “Step 1: Running database migrations...”, “Step 2: Warming cache...” …
 
 ### Conditional Execution
 
@@ -151,6 +165,14 @@ public class DataSeeder implements CommandLineRunner {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `DataSeeder` with methods `run()`, `seedRoles()`, `seedAdminUser()`.
+- Uses interface implementation.
+- Uses conditionals.
+- When run, it prints: “Database is empty — seeding initial data...”, “Database already has data — skipping seed.”
+
 ---
 
 ## ApplicationRunner in Detail
@@ -182,6 +204,14 @@ public class SmartStarter implements ApplicationRunner {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `SmartStarter` with methods `run()`.
+- Uses interface implementation.
+- Uses conditionals.
+- When run, it prints: “Non-option args: ”, “Option names: ” …
 
 ```bash
 # Running with arguments
@@ -277,6 +307,14 @@ public class FeatureFlagLoader implements CommandLineRunner {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `FeatureFlagLoader` with methods `run()`.
+- Uses lambda expressions.
+- Uses interface implementation.
+- Uses the `Map` collection.
+
 ### Scenario 3: Cache Warming
 
 @Component
@@ -363,6 +401,14 @@ public class HealthChecker implements CommandLineRunner {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `HealthChecker` with methods `run()`.
+- Uses exception handling with try/catch.
+- Uses interface implementation.
+- Uses conditionals.
 
 ---
 

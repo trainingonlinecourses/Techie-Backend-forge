@@ -27,6 +27,11 @@ redisTemplate.opsForZSet().add("leaderboard", playerId, score);        // sorted
 Long rank = redisTemplate.opsForZSet().reverseRank("leaderboard", playerId);
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses the java.time date-time API.
+
 ## Hash mapping: @RedisHash entities
 
 Spring Data Redis maps entities to Redis hashes with repository support:

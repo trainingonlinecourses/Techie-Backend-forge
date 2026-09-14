@@ -147,6 +147,11 @@ public void processAll() {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses loops.
+
 For long loops, `clear()` (or batch-size-flush patterns) prevents memory blowup — the persistence context would otherwise keep every entity alive until commit.
 
 ## The Lazy-Loading Window (again)

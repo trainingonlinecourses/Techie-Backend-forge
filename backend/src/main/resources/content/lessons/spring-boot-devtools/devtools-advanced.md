@@ -72,6 +72,11 @@ public class DevToolsConfig {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `DevToolsConfig` with methods `restartConfig()`.
+
 ---
 
 ## Excluding Specific Packages from Restart

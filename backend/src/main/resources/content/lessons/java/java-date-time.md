@@ -43,6 +43,11 @@ LocalDate today = LocalDate.now();
 LocalDateTime now = LocalDateTime.now();
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses the java.time date-time API.
+
 ## The three main types — when to use which
 
 | Type | What it holds | Example | Use for |
@@ -117,6 +122,11 @@ boolean inRange = today.isAfter(LocalDate.of(2024, 1, 1))
                && today.isBefore(LocalDate.of(2024, 12, 31));
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses the java.time date-time API.
+
 ## LocalDateTime — working with date AND time
 
 
@@ -151,6 +161,11 @@ LocalDateTime later = now.plusHours(2).plusMinutes(30);
 LocalDateTime earlier = now.minusDays(7);
 LocalDateTime sameDay3pm = now.withHour(15).withMinute(0).withSecond(0);
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses the java.time date-time API.
 
 ## Instant — UTC timestamps for APIs and databases
 
@@ -188,6 +203,13 @@ public class Main {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- Uses the java.time date-time API.
+- When run, it prints: “Took ”
 
 ## Duration and Period — measuring time
 
@@ -237,6 +259,13 @@ public class Main {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- Uses the java.time date-time API.
+- When run, it prints: “Work day: ”, “Age: ”
+
 ## DateTimeFormatter — parsing and formatting
 
 
@@ -272,6 +301,11 @@ DateTimeFormatter friendly = DateTimeFormatter.ofPattern("MMMM dd, yyyy 'at' h:m
 DateTimeFormatter french = DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.FRENCH);
 String frenchDate = now.format(french);
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses the java.time date-time API.
 
 ## Timezone handling
 
@@ -337,6 +371,13 @@ public class MeetingScheduler {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `MeetingScheduler` with methods `scheduleMeeting()`.
+- Uses the java.time date-time API.
+- Uses conditionals.
+
 ### Scenario 2: Audit logging with precise timestamps
 
 
@@ -378,6 +419,14 @@ public interface AuditLogRepository extends JpaRepository<AuditLog, Long> {
 Instant twentyFourHoursAgo = Instant.now().minus(Duration.ofHours(24));
 List<AuditLog> recent = auditLogRepository.findRecent(twentyFourHoursAgo);
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `AuditLog` and `AuditLogRepository` with methods `prePersist()`.
+- Uses an interface.
+- Uses inheritance.
+- Uses the `List` collection.
 
 ### Scenario 3: Business day calculator
 
@@ -448,6 +497,14 @@ public class BusinessDayCalculator {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `BusinessDayCalculator` with methods `addBusinessDays()`, `isBusinessDay()`, `businessHoursBetween()`.
+- Uses the `Set` collection.
+- Uses the java.time date-time API.
+- Uses loops.
 
 ## Common mistakes
 

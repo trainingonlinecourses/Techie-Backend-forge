@@ -109,6 +109,11 @@ Line-by-line notes:
 "12345".matches("\\d{5}")    // true — matches validates the WHOLE string against regex
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses regex matching.
+
 For user input validation, `isBlank()` is usually what you meant when you wrote `isEmpty()` — "did the user type nothing useful?"
 
 ## Real Organizational Scenarios

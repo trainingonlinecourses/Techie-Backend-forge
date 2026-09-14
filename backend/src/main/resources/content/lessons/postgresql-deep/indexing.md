@@ -48,6 +48,11 @@ In JPA, via `@Index`:
 public class Course { ... }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Course`.
+
 ## Composite Indexes: Column Order Is Everything
 
 ```sql
@@ -141,6 +146,11 @@ Bitmap Heap Scan on courses  (cost=... rows=9000)
 })
 public class Course { ... }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Course`.
 
 ## Summary
 

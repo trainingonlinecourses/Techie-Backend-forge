@@ -4,6 +4,7 @@ summary: What streams are and why they exist, creating streams, intermediate ope
 order: 45
 minutes: 35
 topics: [streams, filter, map, flatmap, reduce, collect, parallel-streams, stream-creation, custom-collector]
+requires: [java-collections, java-functional]
 docs:
   - https://docs.oracle.com/javase/8/docs/api/java/util/stream/package-summary.html
   - https://docs.oracle.com/javase/tutorial/collections/streams/
@@ -41,6 +42,12 @@ long count = List.of(1, 2, 3, 4, 5).stream()
     .count();
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses the Streams API to process data declaratively.
+- Uses lambda expressions.
+
 ## Creating Streams
 
 
@@ -77,6 +84,14 @@ IntStream rangeClosed = IntStream.rangeClosed(1, 10);
 
 IntStream charCodes = "Hello".chars();
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses the Streams API to process data declaratively.
+- Uses method references.
+- Uses the `List` collection.
+- Uses generics.
 
 ## Intermediate Operations — building the pipeline
 
@@ -119,6 +134,14 @@ public class Main {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- Uses the Streams API to process data declaratively.
+- Uses lambda expressions.
+- Uses the `List` collection.
 
 ### transform — map, flatMap
 
@@ -176,6 +199,14 @@ List<String> words = sentences.stream()
     .toList();
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses the Streams API to process data declaratively.
+- Uses lambda expressions.
+- Uses method references.
+- Uses the `List` collection.
+
 ### sorted, distinct, limit, skip
 
 
@@ -219,6 +250,14 @@ List<Integer> after3 = numbers.stream()
     .skip(3)
     .toList();
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses the Streams API to process data declaratively.
+- Uses method references.
+- Uses the `List` collection.
+- Uses sorting with a `Comparator`.
 
 ### peek — debug the pipeline
 
@@ -293,6 +332,14 @@ Map<Boolean, List<Integer>> partitioned = List.of(1, 2, 3, 4, 5, 6).stream()
     .collect(Collectors.partitioningBy(n -> n % 2 == 0));
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses the Streams API to process data declaratively.
+- Uses lambda expressions.
+- Uses method references.
+- Uses the `List` collection.
+
 ### reduce — combine elements into a single value
 
 
@@ -324,6 +371,14 @@ String longest = names.stream()
 Optional<Integer> sum3 = numbers.stream()
     .reduce(Integer::sum);
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses the Streams API to process data declaratively.
+- Uses `Optional` for null-safe values.
+- Uses lambda expressions.
+- Uses method references.
 
 ### forEach, count, anyMatch, allMatch, findFirst
 
@@ -374,6 +429,14 @@ public class Main {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- Uses the Streams API to process data declaratively.
+- Uses `Optional` for null-safe values.
+- Uses lambda expressions.
+
 ## Parallel Streams — automatic multi-threading
 
 
@@ -403,6 +466,14 @@ long parCount = numbers.parallelStream()
 long parDuration = System.nanoTime() - parTime;
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses the Streams API to process data declaratively.
+- Uses lambda expressions.
+- Uses the `List` collection.
+- Uses the java.time date-time API.
+
 **Warning:** Parallel streams are NOT thread-safe for shared mutable state:
 // DANGEROUS: race condition with parallel stream
 List<Integer> sharedList = new ArrayList<>();
@@ -415,6 +486,11 @@ List<Integer> safeList = IntStream.range(0, 1000).parallel()
 ```java
     .collect(Collectors.toList());  // thread-safe collection
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses the Streams API to process data declaratively.
 
 ## How we use it in organizations
 
@@ -457,6 +533,14 @@ public class ReportService {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `ReportService` with methods `generateSalesReport()`.
+- Uses the Streams API to process data declaratively.
+- Uses lambda expressions.
+- Uses method references.
 
 ### Scenario 2: Search and filter with complex predicates
 
@@ -508,6 +592,14 @@ public class Main {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- Uses the Streams API to process data declaratively.
+- Uses method references.
+- When run, it prints: “Count: ”, “Sum: ” …
 
 ## Streams vs Loops — when to use which
 

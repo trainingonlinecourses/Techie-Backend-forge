@@ -110,6 +110,14 @@ public class CatalogService {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `CourseApi` and `ApiClientConfig` and 1 more type(s) with methods `courseApi()`, `showCourse()`.
+- Uses an interface.
+- Uses the `List` collection.
+- Uses generics.
+
 ### Walking Through Each Part
 
 **Part 1 — the interface.** The annotations describe the HTTP call: `@GetExchange("/api/courses/{id}")` + `@PathVariable long id` means "GET that URI with the id substituted". `@RequestBody` on the create method means "serialize this to JSON in the body". The interface reads like the API documentation — because it *is* the contract.

@@ -25,6 +25,11 @@ try {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses exception handling with try/catch.
+
 In reactive code, errors travel **through the stream** — they propagate downstream until handled. An unhandled error kills the entire stream. You need to handle errors **reactively**.
 
 // Reactive:
@@ -179,6 +184,14 @@ public class RetryPatterns {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `RetryPatterns` with 4 methods.
+- Uses the Streams API to process data declaratively.
+- Uses lambda expressions.
+- Uses the java.time date-time API.
+
 ### 3. Global Error Handler
 
 @Component
@@ -273,6 +286,14 @@ public class ResilientContentService {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `ResilientContentService` with methods `getContent()`.
+- Uses lambda expressions.
+- Uses the java.time date-time API.
+- Uses generics.
+
 ### Scenario 2: Parallel Calls with Error Isolation
 
 
@@ -311,6 +332,14 @@ public class AggregationService {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `AggregationService` with methods `getDashboard()`.
+- Uses lambda expressions.
+- Uses the `List` collection.
+- Uses generics.
 
 ### Scenario 3: Error Events in Streams
 

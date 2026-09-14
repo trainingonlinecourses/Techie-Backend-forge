@@ -61,6 +61,11 @@ public class EmailService {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `EmailService` with methods `sendWelcomeEmail()`.
+
 ## HTML email with Thymeleaf template
 
 ```java
@@ -98,6 +103,12 @@ public class TemplatedEmailService {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `TemplatedEmailService` with methods `sendOrderConfirmation()`.
+- Uses exception handling with try/catch.
 
 ## Email with attachment
 

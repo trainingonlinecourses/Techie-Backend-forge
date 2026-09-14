@@ -14,11 +14,6 @@ capstone: false
 
 Not every feature needs a full lesson. Java 23 and 24 shipped a batch of quality-of-life changes that make Java easier to *start* with and nicer to *write* — here are the three you'll meet first.
 
-## What this code does — step by step
-
-1. **Module import declarations (JEP 511)**: `import module java.base;` pulls in everything from the `java.base` module — no more ten-line import blocks for `List`, `Map`, `Path`, `Instant` and friends.
-2. **Compact source files (JEP 512)**: on Java 25 (preview in 23/24) a `main` method can live directly in a class with no `public static void main(String[] args)` ceremony and no explicit class declaration.
-3. **Primitive patterns (JEP 507)**: `switch` can now match on primitive values with guards — `case int i when i > 0`.
 
 ```java
 // NOTE: run with JDK 23+ for import module, JDK 25 for the truly compact form.
@@ -51,6 +46,12 @@ public class ModernBasicsDemo {
     }
 }
 ```
+
+<!-- why -->
+## What this code does — step by step
+1. **Module import declarations (JEP 511)**: `import module java.base;` pulls in everything from the `java.base` module — no more ten-line import blocks for `List`, `Map`, `Path`, `Instant` and friends.
+2. **Compact source files (JEP 512)**: on Java 25 (preview in 23/24) a `main` method can live directly in a class with no `public static void main(String[] args)` ceremony and no explicit class declaration.
+3. **Primitive patterns (JEP 507)**: `switch` can now match on primitive values with guards — `case int i when i > 0`.
 
 ## The one-paragraph version history
 

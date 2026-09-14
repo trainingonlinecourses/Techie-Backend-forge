@@ -33,6 +33,11 @@ class OrderRepositoryIT {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderRepositoryIT`.
+
 `@ServiceConnection` (Boot 3.1+) reads the container's connection info and configures the matching `DataSource`/connection factory automatically — no hard-coded JDBC URL. Without it, you'd extract `getJdbcUrl()` manually into a `DynamicPropertySource`:
 
 @DynamicPropertySource

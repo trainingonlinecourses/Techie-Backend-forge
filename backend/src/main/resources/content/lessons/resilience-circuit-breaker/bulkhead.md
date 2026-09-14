@@ -77,6 +77,13 @@ public class AiTutorService {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `AiTutorService` with methods `ask()`.
+- Uses lambda expressions.
+- Uses the java.time date-time API.
+
 ### Walking Through Each Part
 
 **Semaphore bulkhead** — `maxConcurrentCalls(5)`: at most 5 AI calls in flight. `maxWaitDuration(500ms)`: if all 5 are busy, wait at most half a second, then **fail fast** — the caller gets a quick `BulkheadFullException` instead of an indefinite queue. This is the containment: the AI's slowness can never consume more than 5 slots.

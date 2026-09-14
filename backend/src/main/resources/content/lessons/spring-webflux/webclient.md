@@ -79,6 +79,12 @@ WebClient client = builder
 ```java
                 .doOnNext(res -> log.debug("{} {}", res.statusCode(), request.url())))
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+
         .filter(ExchangeFilterFunctions.basicAuthentication("svc", secret))
 ```java
         .build();
@@ -93,12 +99,23 @@ Flux<CustomerOrders> enriched = customerIds
 ```java
         .flatMap(id -> api.get().uri("/customers/{id}/orders", id)
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+
                 .retrieve()
                 .bodyToFlux(Order.class)
                 .collectList()
 ```java
                 .map(orders -> new CustomerOrders(id, orders)), 8); // concurrency 8
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
 
 `flatMap` with a concurrency limit (8) fans out bounded parallel HTTP calls — servlet would need a thread pool of the same size; reactive needs none.
 

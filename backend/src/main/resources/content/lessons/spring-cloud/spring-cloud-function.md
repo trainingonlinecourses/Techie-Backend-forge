@@ -72,6 +72,13 @@ Function<OrderCreated, OrderCreated> validateOrder() {
 **Routing** picks a function at runtime by a header/payload key:
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+- Uses conditionals.
+- Uses generics.
+
 ```yaml
 spring.cloud.function.routing.enabled: true
 # the consumer inspects the routingKey header → dispatches to the named function

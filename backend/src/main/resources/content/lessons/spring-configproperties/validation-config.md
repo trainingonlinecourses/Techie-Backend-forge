@@ -25,11 +25,14 @@ public class MailProperties {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `MailProperties`.
+
 If `app.mail.host` is missing, the app fails to start with a clear error.
 
 ---
-
-## Line-by-Line Walkthrough
 
 ```java
 import jakarta.validation.constraints.*;
@@ -65,6 +68,9 @@ public class StorageProperties {
 }
 ```
 
+<!-- why -->
+## Line-by-Line Walkthrough
+
 ---
 
 ## Real-World Scenarios
@@ -89,6 +95,13 @@ public class StoragePropertiesValidator implements Validator {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `StoragePropertiesValidator` with methods `supports()`, `validate()`.
+- Uses interface implementation.
+- Uses conditionals.
 
 ### Scenario 2: Profile-specific validation
 

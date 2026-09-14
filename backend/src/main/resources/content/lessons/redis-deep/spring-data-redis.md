@@ -71,6 +71,12 @@ public class SessionService {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `SessionService` with 4 methods.
+- Uses the java.time date-time API.
+
 **Walking through it:** `StringRedisTemplate` is the specialization where keys and values are `String`s — perfect for JSON payloads, tokens, and simple counters. `opsForValue()` returns the *value operations* view — the object-oriented face of the raw `SET`/`GET` commands. The `Duration` overload of `set` is the TTL in Spring idiom. And note the pattern: the service never touches sockets or protocol — it calls typed methods, and Spring handles the rest.
 
 ## The Other Structures via opsFor*
@@ -103,6 +109,12 @@ redis.opsForZSet().add("leaderboard", "Ada", 92.0);
 redis.opsForZSet().incrementScore("leaderboard", "Ada", 3.0);
 Set<String> top2 = redis.opsForZSet().reverseRange("leaderboard", 0, 1);
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses the `Set` collection.
+- Uses generics.
 
 The ops hierarchy mirrors Redis's structures exactly: `ValueOperations`, `ListOperations`, `SetOperations`, `HashOperations`, `ZSetOperations`, plus `StreamOperations` for Redis Streams. Learn the mapping once and every Redis capability is a method call away.
 
@@ -147,6 +159,13 @@ import org.springframework.data.redis.core.RedisHash;
 public record Product(
         @Id Long id,
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Product`.
+- Uses a `record`.
+
         String name,
 ```java
         double price) {}
@@ -154,6 +173,14 @@ public record Product(
 // The repository — Spring generates the implementation:
 public interface ProductRepository extends CrudRepository<Product, Long> {}
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `ProductRepository`.
+- Uses an interface.
+- Uses inheritance.
+- Uses generics.
 
 Then `productRepository.save(p)`, `findById`, `findAll` work like JPA repositories but against Redis hashes. This is convenient for session-like or frequently-read entities — but note: Redis repositories are *not* a relational model; they suit fast lookup by id, not complex queries. For complex querying, keep Postgres; for ultra-fast id lookup, Redis.
 
@@ -177,6 +204,11 @@ public class LessonService {
     public void updateLesson(Long id, LessonDto dto) { /* save */ }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `LessonService` with methods `findById()`, `updateLesson()`.
 
 With `spring.cache.type=redis` and `spring.cache.redis.time-to-live=10m` in properties, `@Cacheable` reads Redis first and populates on miss — transparently. This is the standard way production Spring apps get sub-millisecond reads on hot data without writing a single Redis call. (The dedicated `spring-cache` module in this curriculum covers the abstraction in depth; this is its Redis backend.)
 

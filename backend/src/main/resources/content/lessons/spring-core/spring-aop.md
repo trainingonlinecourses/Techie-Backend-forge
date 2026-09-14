@@ -56,6 +56,13 @@ public class ServiceTimingAspect {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `ServiceTimingAspect` with 4 methods.
+- Uses exception handling with try/catch.
+- Uses conditionals.
+
 ## How Spring AOP works: proxies
 
 Spring AOP uses **proxies** — it never rewrites your bytecode:

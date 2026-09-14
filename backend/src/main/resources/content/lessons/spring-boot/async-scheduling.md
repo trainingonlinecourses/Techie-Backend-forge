@@ -38,6 +38,12 @@ public class NotificationService {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `AsyncConfig` and `NotificationService` with methods `taskExecutor()`, `sendWelcome()`.
+- Uses manual threading.
+
 **The trap**: `@Async` works through the proxy — calling `this.sendWelcome(...)` from inside the same bean silently runs synchronously. Inject the bean (or use `ApplicationContext.getBean`) to go through the proxy (same story as `@Transactional`).
 
 ## @Scheduled: cron and fixed-rate jobs

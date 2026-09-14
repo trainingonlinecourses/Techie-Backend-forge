@@ -72,6 +72,12 @@ public class GatewayConfig {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `GatewayConfig` and `OrderGatewayMarker` with methods `orderFlow()`.
+- Uses an interface.
+
 **The wiring:** the `@MessagingGateway` interface's method `placeOrder` maps to the *request channel* (`orders.request` — the flow's `from(...)`); the flow does the work; the reply channel carries the result back; the proxy blocks the calling thread until the reply arrives, then returns it. **The caller sees a synchronous method with a return value; the flow is fully message-based.** If the flow throws, the exception propagates through the gateway to the caller — the sync facade includes the error semantics.
 
 ## Request-Reply vs Fire-and-Forget
@@ -95,6 +101,12 @@ orderGateway.notifyCustomer(email, msg);
 
 CompletableFuture<OrderReceipt> future = orderGateway.placeOrderAsync(req);
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses asynchronous composition with `CompletableFuture`.
+- Uses generics.
 
 **The three styles map to the integration's needs:** synchronous request-reply for "call me back with the answer" (an API facade over a messaging flow), fire-and-forget for "this side effect must happen, don't wait" (notifications, audit), and `CompletableFuture` when the caller wants *both* the async execution *and* the eventual result. The gateway interface's return type *is* the contract — `void` (fire-forget), `T` (sync reply), or `CompletableFuture<T>` (async reply).
 

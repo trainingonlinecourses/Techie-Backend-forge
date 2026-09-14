@@ -44,6 +44,12 @@ public class AuditListener {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `AccountCreatedEvent` and `AccountService` and 1 more type(s) with methods `createAccount()`, `onCreated()`.
+- Uses a `record`.
+
 ## Synchronous by default
 
 `@EventListener` runs **synchronously in the publishing thread**. Exceptions in a listener propagate to the publisher (unless the listener handles them). That's fine for fast in-process work; for slow side effects, either keep them out of the request path or make them async:
@@ -58,6 +64,11 @@ public class NotificationListener {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `NotificationListener` with methods `onCreated()`.
 
 ## @TransactionalEventListener — the important one
 
@@ -75,6 +86,11 @@ public class EmailListener {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `EmailListener` with methods `onCreated()`.
 
 Phases: `BEFORE_COMMIT`, `AFTER_COMMIT` (default for tx listeners), `AFTER_ROLLBACK`, `AFTER_COMPLETION`.
 

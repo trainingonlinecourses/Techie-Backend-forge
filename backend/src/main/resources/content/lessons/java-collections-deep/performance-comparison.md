@@ -44,6 +44,11 @@ for (int i = 0; i < 1_000_000; i++) {
 **Why**: every LinkedList node is a separate heap allocation (24+ bytes of object headers + next/prev pointers) — cache-unfriendly scattered memory. ArrayList is a single contiguous array — sequential, prefetch-friendly.
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses loops.
+
 | Scenario | Winner |
 |----------|--------|
 | Index access | ArrayList (O(1) vs O(n)) |
@@ -94,6 +99,12 @@ for (int i = 0; i < 100_000; i++) list.add(item(i));
 
 // ✅ one allocation
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses loops.
+
 List<String> list = new ArrayList<>(100_000);
 
 Same rule for maps (`new HashMap<>(expected)`) and `StringBuilder` (`new StringBuilder(estimatedLength)`).
@@ -111,6 +122,12 @@ for (Map.Entry<String, Course> e : map.entrySet()) {
     Course c = e.getValue();
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses loops.
+- Uses generics.
 
 And the capacity trap: `for (String k : hashMap.keySet())` on a 1M-capacity map with 10 entries still scans 1M slots.
 
@@ -136,10 +153,21 @@ if (userRoles.contains("ADMIN")) { ... }
 
 // ✅ contains on a set is O(1)
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses conditionals.
+
 Set<String> adminRoles = Set.of("ADMIN", "SUPERUSER");
 ```java
 if (adminRoles.contains(role)) { ... }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses conditionals.
 
 The single most common performance bug in Java code: `List.contains` in a loop (accidental O(n²)). If you check membership, use a `HashSet`.
 

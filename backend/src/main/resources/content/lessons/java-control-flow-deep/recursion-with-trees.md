@@ -45,6 +45,14 @@ public class TreeWalker {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `TreeWalker` with methods `main()`, `printTree()`.
+- Uses the Streams API to process data declaratively.
+- Uses file I/O with the NIO API.
+- Uses loops.
+
 Notice how the code *reads like the problem*: "print this folder, then for each child — if it's a folder, print it the same way one level deeper; if it's a file, print it." Try expressing the same thing with nested loops and you'll quickly drown in loop variables for "which level am I on now?" The recursion carries that state for free: `depth` is a parameter, one per stack frame, exactly matching one folder level.
 
 ### Doing something with the result: total size
@@ -65,6 +73,14 @@ static long totalSize(Path path) throws IOException {
     return sum;
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses the Streams API to process data declaratively.
+- Uses file I/O with the NIO API.
+- Uses loops.
+- Uses conditionals.
 
 This is exactly the factorial shape from earlier, generalized: the combine step (`sum += ...`) happens on the way back up the recursion. Each folder's frame waits for all its children's totals, adds them, and returns the result to *its* parent.
 

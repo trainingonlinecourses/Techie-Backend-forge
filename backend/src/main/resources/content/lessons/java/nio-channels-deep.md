@@ -126,6 +126,14 @@ public class ChatServer {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `ChatServer` with 4 methods.
+- Uses the `Set` collection.
+- Uses loops.
+- Uses conditionals.
+
 ### Scenario 2: Buffer operations in depth
 
 Understanding buffer states:

@@ -57,6 +57,11 @@ public class Report {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Report` with methods `audit()`.
+
 When two types share a simple name, you import one and fully-qualify the other.
 
 ### Wildcard imports

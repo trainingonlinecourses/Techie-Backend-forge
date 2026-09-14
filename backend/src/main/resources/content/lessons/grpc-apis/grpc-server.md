@@ -179,6 +179,11 @@ public GrpcServerConfigurer serverConfigurer() {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+
 ## Configuring the Server
 
 ```yaml

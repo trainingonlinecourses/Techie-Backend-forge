@@ -99,6 +99,12 @@ public ResponseEntity<Profile> profile(WebRequest request) {
         return null;   // framework sends 304
     }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses conditionals.
+
     ...
 }
 

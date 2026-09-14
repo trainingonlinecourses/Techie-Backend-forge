@@ -30,6 +30,12 @@ User restored = (User) in.readObject();
 in.close();
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `User`.
+- Uses interface implementation.
+
 ---
 
 ## The Serialization Contract
@@ -86,6 +92,12 @@ public class Employee implements Serializable {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Employee` with 4 methods.
+- Uses interface implementation.
+
 ---
 
 ## Externalizable — Better Performance
@@ -138,6 +150,12 @@ public class Product implements Externalizable {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Product` with methods `writeExternal()`, `readExternal()`.
+- Uses interface implementation.
+
 ---
 
 ## Serialization Proxy Pattern — The Safe Way
@@ -188,6 +206,13 @@ public final class Money implements Serializable {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Money` and `SerializationProxy` with methods `readResolve()`, `writeReplace()`, `readObject()`.
+- Uses interface implementation.
+- Uses `BigDecimal` for exact decimal math.
 
 ---
 
@@ -265,6 +290,14 @@ public class UserSession implements Serializable {
     // getters and setters
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `SessionManager` and `UserSession` with methods `saveSession()`, `loadSession()`.
+- Uses interface implementation.
+- Uses the `Map` collection.
+- Uses conditionals.
 
 ---
 

@@ -61,6 +61,12 @@ public class MathUtils {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `MathUtils` and `Calculator` with methods `area()`, `circumference()`, `main()`.
+- When run, it prints: “Area: ”, “Circumference: ”
+
 ---
 
 ## Local Classes
@@ -95,6 +101,12 @@ public class StringProcessor {
         // Use local class
         Processor processor = new Processor("[", "]");
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Processor`.
+
         List<String> result = new ArrayList<>();
         
 ```java
@@ -110,6 +122,14 @@ public class StringProcessor {
     public static void main(String[] args) {
         StringProcessor sp = new StringProcessor();
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses regex matching.
+- Uses loops.
+- Uses conditionals.
+
         List<String> data = List.of("[hello]", "[world]", "test", "[java]");
         
         List<String> processed = sp.processStrings(data);
@@ -179,6 +199,14 @@ public class AnonymousClassDemo {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `AnonymousClassDemo` and `Shape` with methods `main()`, `run()`, `compare()`.
+- Uses the `List` collection.
+- Uses sorting with a `Comparator`.
+- Uses generics.
+
 ---
 
 ## When to Use Each Type
@@ -211,6 +239,13 @@ public class OrderService {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderService` and `OrderValidator` and 1 more type(s) with methods `validate()`, `format()`, `processOrder()`.
+- Uses formatted output.
+- Uses conditionals.
+
 ### Local: Method-specific logic
 
 public class DataProcessor {
@@ -231,6 +266,14 @@ public class DataProcessor {
         HighEarnerFilter filter = new HighEarnerFilter();
         return employees.stream()
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `HighEarnerFilter`.
+- Uses the Streams API to process data declaratively.
+- Uses formatted output.
+
             .filter(filter::matches)
             .toList();
     }
@@ -262,6 +305,13 @@ public class EventSystem {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `EventSystem` with methods `setupListeners()`, `actionPerformed()`, `run()`.
+- Uses manual threading.
+- When run, it prints: “Save clicked!”, “Working in background”
 
 ---
 
@@ -316,6 +366,14 @@ public class Main {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`, `run()`, `compare()`.
+- Uses lambda expressions.
+- Uses method references.
+- Uses sorting with a `Comparator`.
 
 ## References
 

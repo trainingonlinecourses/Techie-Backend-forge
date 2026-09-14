@@ -60,6 +60,12 @@ public class UrlDemo {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `UrlDemo` with methods `main()`.
+- When run, it prints: “Protocol : ”, “Host     : ” …
+
 **Walking through it:** `URL`'s constructor parses the string into components — this is your tool for understanding, building, and validating web addresses. Note `getPort()` returns `-1` when the URL omits the port, meaning "use the protocol default." `openConnection()` doesn't connect yet — it returns a lazily-initialized connection object you configure before actually sending.
 
 ## Making a GET Request, End to End

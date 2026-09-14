@@ -45,6 +45,11 @@ public class BitLogic {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `BitLogic` with methods `main()`.
+
 Reading `&` as a "filter" is the mental model that sticks: `a & b` keeps only the bits both numbers agree on. Reading `|` as a "merge": the result has every bit either side set.
 
 ### Shifts: multiply and divide by powers of two
@@ -80,6 +85,11 @@ if ((n & 1) == 0) { }        // even check: the last bit of an even number is 0
 int fastMod = n & 15;        // n % 16 — works ONLY for powers of two
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses conditionals.
+
 The `& 15` trick is exactly how `HashMap` picks a bucket: `(table.length - 1) & hash`, which is why its capacity is always a power of two. A modulo by a power of two is the same as ANDing off the high bits — and it's a single CPU instruction.
 
 ### Flags: many booleans in one int
@@ -105,6 +115,11 @@ public class Permissions {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Permissions` with methods `main()`.
 
 Each flag must be a distinct power of two so masks never overlap. `EnumSet` and `BitSet` are the modern, safer versions of this pattern — but the bit idiom survives in file systems, network protocols, and half the JDK.
 

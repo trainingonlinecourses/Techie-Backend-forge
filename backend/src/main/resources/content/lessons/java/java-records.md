@@ -61,12 +61,20 @@ public class Point {
 }
 ```
 
+<!-- why -->
+
+
 ```java
 **Records** eliminate ALL that boilerplate with one line:
 
 // New way — same functionality, one line!
 public record Point(int x, int y) {}
 ```
+
+<!-- why -->
+**What this code shows:**
+- Defines `Point` with 5 methods.
+- Uses conditionals.
 
 That's it. The compiler automatically generates:
 - ✅ Private final fields (`x` and `y`)
@@ -128,6 +136,12 @@ public final class Point {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Point` with 5 methods.
+- Uses conditionals.
+
 ---
 
 ## Using Records
@@ -163,6 +177,11 @@ public class Main {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
 
 ---
 
@@ -230,6 +249,11 @@ public class Main {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+
 ### Additional Fields and Methods
 
 Records can have extra fields and methods, but the extra fields must be `static`:
@@ -268,6 +292,13 @@ System.out.println(s.isAdult());  // true
 System.out.println(s介绍());    // Alice (20, CS)
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Student` with methods `isAdult()`, `create()`.
+- Uses a `record`.
+- Uses conditionals.
+
 ### Records Implementing Interfaces
 
 Records can implement interfaces (but cannot extend classes — they're implicitly `final`):
@@ -299,6 +330,14 @@ public record Product(String id, String name, double price) implements Printable
 Product p = new Product("P001", "Laptop", 999.99);
 System.out.println(p.format());  // [P001] Laptop - $999.99
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Printable` and `Product` with methods `format()`.
+- Uses a `record`.
+- Uses an interface.
+- Uses interface implementation.
 
 ### Generic Records
 
@@ -338,6 +377,12 @@ public class Point {
 // Java Record way — no library needed
 public record Point(int x, int y) {}
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Point`.
+- Uses a `record`.
 
 | Feature | Records | Lombok |
 |---------|---------|--------|
@@ -457,6 +502,12 @@ public record DatabaseConfig(
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses the java.time date-time API.
+- Uses conditionals.
+
 ### Scenario 3: Domain Events
 
 // Events as records — immutable, self-documenting
@@ -473,6 +524,14 @@ public record UserRegistered(
 
 public record OrderPlaced(
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderPlaced`.
+- Uses a `record`.
+- Uses the java.time date-time API.
+
     String orderId,
     String userId,
     List<String> productIds,
@@ -504,6 +563,13 @@ public class UserService {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `UserService` with methods `isHighValue()`, `registerUser()`.
+- Uses `BigDecimal` for exact decimal math.
+- Uses the java.time date-time API.
+
 ### Scenario 4: Value Objects (DDD)
 
 ```java
@@ -530,6 +596,14 @@ public record Money(BigDecimal amount, Currency currency) {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Money` with methods `add()`, `usd()`.
+- Uses a `record`.
+- Uses `BigDecimal` for exact decimal math.
+- Uses conditionals.
 
 ---
 

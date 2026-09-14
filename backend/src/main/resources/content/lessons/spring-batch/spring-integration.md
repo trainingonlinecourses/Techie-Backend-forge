@@ -65,6 +65,12 @@ public interface OrderSubmission {
 Confirmation c = orderSubmission.submit(order);
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderSubmission`.
+- Uses an interface.
+
 With `@MessagingGateway` on the interface, Spring generates the implementation. Gateway + `QueueChannel` gives you async fire-and-forget; gateway + reply channel gives request/reply — all without exposing messaging in the business code.
 
 ## Routers, splitters and aggregators
@@ -101,6 +107,11 @@ IntegrationFlow errorFlow() {
         .get();
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
 
 The error message carries the original message in its headers (`ErrorMessage` wraps the failed `Message`) — so the DLQ discipline works here too: park, alert, replay.
 

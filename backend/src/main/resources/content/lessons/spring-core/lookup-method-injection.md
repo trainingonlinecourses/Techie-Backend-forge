@@ -27,6 +27,11 @@ public class AuditService {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `AuditEvent` and `AuditService` with methods `record()`.
+
 Every `record()` call logs the *same* event id. The fix isn't a new annotation — it's **deferring the lookup to call time**. Spring gives you three mechanisms, from simplest to most powerful.
 
 ## ObjectProvider — the cleanest modern answer

@@ -67,6 +67,11 @@ http.headers(h -> h
     .frameOptions(f -> f.sameOrigin()));
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+
 | Header | Blocks |
 |---|---|
 | `Content-Security-Policy` | XSS via inline scripts/styles |
@@ -95,6 +100,14 @@ public class RateLimitFilter extends OncePerRequestFilter {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `RateLimitFilter` with methods `doFilterInternal()`.
+- Uses lambda expressions.
+- Uses inheritance.
+- Uses conditionals.
 
 Also: lock accounts after N failed logins (or back off), validate input at the boundary, and never trust client-supplied identity.
 

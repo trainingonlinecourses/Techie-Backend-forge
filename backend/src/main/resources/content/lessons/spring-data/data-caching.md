@@ -26,6 +26,11 @@ public class ProductService {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `ProductService` with methods `find()`.
+
 Second call with the same `id` → served from the cache; the method never runs.
 
 ## The annotations

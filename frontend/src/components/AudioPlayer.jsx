@@ -20,6 +20,7 @@ export function toSpeechText(md) {
     if (inFence) continue;
     const t = line.trim();
     if (!t) continue;
+    if (/^<!--/.test(t)) continue;                  // HTML comments (why-markers)
     if (/^\|/.test(t)) continue;                    // table rows
     if (/^!\[/.test(t)) continue;                   // images
     if (/^[-*+]\s\[[ x]\]/.test(t)) continue;       // task lists

@@ -24,6 +24,11 @@ Kafka is a **distributed event-streaming platform** — but the cleanest way to 
 **Why this changed the industry:** before Kafka, systems communicated by direct calls (HTTP) or queues (one-shot messages). Kafka's log model enables: **decoupling** (producers and consumers never know about each other), **replay** (reprocess historical events to rebuild state or fix bugs), **multiple consumers** (the same event feeds analytics, search, and billing independently), and **durability** (events survive, replicated across brokers).
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses conditionals.
+
 ## The Core Pieces
 
 ```text
@@ -60,6 +65,11 @@ The partition is the most important concept to internalize. Why partition at all
 // go to the same partition -> guaranteed order per customer.
 producer.send(new ProducerRecord<>("orders", "cust-42", orderJson));
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
 
 ## Producers, Consumers, and the Offset
 

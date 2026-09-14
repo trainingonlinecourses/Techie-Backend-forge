@@ -30,6 +30,11 @@ public class User {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `UserDto` and `User`.
+
 ---
 
 ## Line-by-Line Walkthrough
@@ -119,6 +124,11 @@ public class LombokTestingDemo {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `LombokTestingDemo` and `CreateUserRequest` and 2 more type(s).
+
 ---
 
 ## Real-World Scenarios
@@ -172,6 +182,11 @@ public class User {
     private Role role;
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `User`.
 
 ---
 

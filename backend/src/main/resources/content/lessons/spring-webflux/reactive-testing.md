@@ -241,6 +241,13 @@ class OrderControllerIntegrationTest {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderControllerIntegrationTest`.
+- Uses lambda expressions.
+- Uses method references.
+
 ### 4. TestPublisher — Manual Stream Control
 
 
@@ -297,6 +304,14 @@ class BackpressureTest {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `BackpressureTest`.
+- Uses lambda expressions.
+- Uses the `List` collection.
+- Uses the java.time date-time API.
+
 ---
 
 ## Real-World Scenarios
@@ -344,6 +359,13 @@ class NotificationServiceTest {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `NotificationServiceTest`.
+- Uses lambda expressions.
+- Uses generics.
+
 ### Scenario 2: Testing WebSocket
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -372,6 +394,11 @@ void shouldTimeoutWhenServiceIsSlow() {
 ```java
         .timeout(Duration.ofSeconds(2));                          // 2 second timeout
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses the java.time date-time API.
 
     StepVerifier.withVirtualTime(() -> result)
         .thenAwait(Duration.ofSeconds(3))                        // Fast-forward past timeout

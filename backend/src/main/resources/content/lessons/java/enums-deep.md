@@ -36,6 +36,12 @@ public enum OrderState {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderState`.
+- Uses an `enum`.
+
 Behind the scenes the compiler generates:
 
 | Generated piece | What it does |
@@ -138,6 +144,12 @@ public enum NotificationChannel {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `NotificationChannel` with methods `send()`.
+- Uses an `enum`.
+
 Now callers never branch:
 
 ```java
@@ -153,6 +165,11 @@ switch (channel) {
 channel.send(notification);
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses switch branching.
+
 > 💡 This is the same principle as Spring's Strategy pattern. Effective Java item 34 makes "prefer enums over int constants" a hard standard in most code review checklists.
 
 ## EnumMap and EnumSet — Why They Exist
@@ -163,6 +180,13 @@ Because enum constants are known at compile time and have integer ordinals, the 
 // Count orders by state — no hashing, no bucket collisions
 EnumMap<OrderState, Long> counts = orderRepo.countByState();
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses the `Map` collection.
+- Uses generics.
+
 // Iteration happens in declaration order (CREATED → CANCELLED) — useful for reports
 
 // User permissions — a compact set of roles

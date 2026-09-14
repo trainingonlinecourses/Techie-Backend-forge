@@ -87,6 +87,14 @@ public class ComposeDemo {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `ComposeDemo` with methods `main()`.
+- Uses the Streams API to process data declaratively.
+- Uses lambda expressions.
+- Uses method references.
+
 ### Walking Through Each Part
 
 **Part 1 — the pipeline.** Three tiny functions compose into one: `trim.andThen(lower).andThen(wordCount)` — `"  Hello World  "` → `"Hello World"` → `"hello world"` → `2`. Each step is independently testable: you can test `trim` alone, `lower` alone, `wordCount` alone. The pipeline is just *wiring*. If a later step needs changing, only that step changes.
@@ -106,6 +114,12 @@ Function<Order, Double> subtotal = o -> o.items().stream().mapToDouble(Item::pri
 // IMPURE — cannot be safely composed or tested
 Function<Order, Double> withTax = o -> subtotal.apply(o) * (1 + taxRateService.fetchNow()); // DB call inside!
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+- Uses generics.
 
 ## Practical Patterns
 

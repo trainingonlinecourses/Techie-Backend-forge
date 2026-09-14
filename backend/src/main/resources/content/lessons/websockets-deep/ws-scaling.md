@@ -104,6 +104,11 @@ public class RedisChatRelay {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `RedisChatRelay` with methods `onRelay()`, `publish()`.
+
 ### Walking Through Each Part
 
 **The relay pattern** — every instance has both ears:

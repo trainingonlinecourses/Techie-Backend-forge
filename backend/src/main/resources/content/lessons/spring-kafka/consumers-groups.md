@@ -75,6 +75,14 @@ public class OrderEventConsumer {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderEventConsumer` and `AFTER` with methods `on()`.
+- Uses exception handling with try/catch.
+- Uses a `record`.
+- Uses conditionals.
+
 The `record` + unique constraint is the backbone: it converts at-least-once into effectively-once for your business state.
 
 ## Partition count — decide once, live with it

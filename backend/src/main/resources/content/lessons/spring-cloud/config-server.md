@@ -30,6 +30,11 @@ inventory-service ──GET /inventory-service/prod──▶ config-server
 public class ConfigServerApplication { ... }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `ConfigServerApplication`.
+
 ```xml
 <dependency>
     <groupId>org.springframework.cloud</groupId>

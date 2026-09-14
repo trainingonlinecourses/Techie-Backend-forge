@@ -96,6 +96,12 @@ class Derived extends Base {
 // Output order: (statics first if any), then 2,3,4,5,6
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Base` and `Derived`.
+- Uses inheritance.
+
 ## What Static Blocks Are Actually Used For
 
 ```java

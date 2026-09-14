@@ -84,6 +84,12 @@ public class SerializationDemo {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `User` and `SerializationDemo` with methods `toString()`, `main()`.
+- Uses interface implementation.
+
 ### Walking Through Each Part
 
 **`implements Serializable`** — the marker that opts the class into the mechanism.

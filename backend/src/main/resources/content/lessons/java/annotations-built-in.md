@@ -95,6 +95,13 @@ public class UserController {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `UserService` and `UserController` with methods `findAllUsers()`, `list()`.
+- Uses the `List` collection.
+- Uses generics.
+
 **Why `forRemoval = true`?** It tells consumers: "This will be deleted in version 3.0. Migrate now." Without it, the method stays forever (backward compatibility).
 
 ## @SuppressWarnings — silencing known warnings
@@ -143,6 +150,12 @@ public class Main {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with 5 methods.
+- Uses generics.
+
 **The rule:** Every `@SuppressWarnings` must have a comment explaining why the warning is safe to suppress. Without a comment, it's a code smell.
 
 ## @SafeVarargs — safe generic varargs
@@ -177,6 +190,13 @@ public final <T> List<T> merge(List<T>... lists) {
     return result;
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses the `List` collection.
+- Uses loops.
+- Uses generics.
 
 **Why `final`?** `@SafeVarargs` requires the method to be `final`, `static`, or a constructor — so subclasses can't override it with an unsafe implementation.
 
@@ -246,6 +266,12 @@ public class AbstractPaymentService {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `PaymentService` and `AbstractPaymentService` with methods `process()`.
+- Uses `BigDecimal` for exact decimal math.
+
 ### Scenario 2: @Deprecated for API versioning
 
 
@@ -269,6 +295,13 @@ public class EmailService {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `EmailService` with methods `send()`.
+- Uses the `List` collection.
+- Uses generics.
 
 ### Scenario 3: @FunctionalInterface for type-safe callbacks
 
@@ -300,6 +333,14 @@ public interface RetryPolicy {
 
 retryPolicy.execute(() -> callExternalApi(), RetryPolicy.exponentialBackoff(3));
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `RetryPolicy` with methods `exponentialBackoff()`.
+- Uses exception handling with try/catch.
+- Uses lambda expressions.
+- Uses an interface.
 
 ## Decision guide
 

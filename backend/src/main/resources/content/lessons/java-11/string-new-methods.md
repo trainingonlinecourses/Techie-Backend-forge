@@ -89,6 +89,13 @@ List<String> lineList = "line1\nline2\nline3".lines().toList();
 "line1\r\nline2\nline3".lines().toList();
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses the Streams API to process data declaratively.
+- Uses the `List` collection.
+- Uses generics.
+
 ### repeat() — Repeat a string N times
 
 
@@ -192,6 +199,14 @@ public class StringMethodsDemo {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `StringMethodsDemo` with methods `main()`.
+- Uses lambda expressions.
+- Uses method references.
+- Uses local type inference with `var`.
+
 ---
 
 ## Real-World Scenarios
@@ -223,6 +238,14 @@ public Map<String, String> parseConfig(Path configFile) throws IOException {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses the Streams API to process data declaratively.
+- Uses lambda expressions.
+- Uses method references.
+- Uses the `Map` collection.
+
 ### Scenario 2: Generating formatted output
 
 ```java
@@ -237,6 +260,13 @@ public String formatTable(List<String[]> rows, int[] columnWidths) {
     return sb.toString();
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses the `List` collection.
+- Uses loops.
+- Uses conditionals.
 
 ---
 

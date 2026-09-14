@@ -64,6 +64,11 @@ public String fetch(@RequestParam String path) {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses conditionals.
+
 **The defenses, layered:** allowlist destinations (best), reject private/loopback/link-local IP ranges after DNS resolution, block the cloud metadata addresses, disable redirects or validate them, and use a dedicated egress proxy. The trigger to audit: *any* place your server fetches a URL derived from user input — webhooks, image proxies, "preview" features.
 
 ## Secure Logging: The Audit Trail That Must Not Leak

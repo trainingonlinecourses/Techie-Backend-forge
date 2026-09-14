@@ -287,6 +287,12 @@ public class TenantMetrics {
 
     public void recordLatency(String tenantId, String operation, Duration duration) {
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses the java.time date-time API.
+
         Timer.builder("tenant.operation.latency")
             .tag("tenant", tenantId)
             .tag("operation", operation)

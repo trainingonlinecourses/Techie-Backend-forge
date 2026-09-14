@@ -167,6 +167,14 @@ public class Main {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- Uses loops.
+- Uses conditionals.
+- When run, it prints: “Direct child: ”
+
 ### Step 4: Modify the Document
 
 
@@ -209,6 +217,12 @@ for (int i = 0; i < employees.getLength(); i++) {
 Element firstEmp = (Element) dept.getElementsByTagName("employee").item(0);
 firstEmp.getElementsByTagName("role").item(0).setTextContent("Lead Developer");
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses loops.
+- Uses conditionals.
 
 **Important:** These modifications happen **only in memory**. The original file is unchanged until you serialize.
 
@@ -290,6 +304,12 @@ System.out.println(config.getValue("database", "url"));   // jdbc:postgresql://.
 config.setValue("database", "pool-size", "20");
 config.save();
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `ConfigManager` with methods `getValue()`, `setValue()`, `save()`.
+- Uses conditionals.
 
 ### Scenario 2: SOAP Response Processing
 Legacy enterprise systems often communicate via SOAP XML:

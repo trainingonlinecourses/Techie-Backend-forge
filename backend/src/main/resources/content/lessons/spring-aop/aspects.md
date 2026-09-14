@@ -44,6 +44,11 @@ public class LoggingAspect {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `LoggingAspect` with methods `serviceMethods()`, `logBefore()`, `logAfter()`.
+
 ### Aspect with Dependencies
 
 Aspects are Spring beans, so they can have dependencies injected:
@@ -78,6 +83,12 @@ public class SecurityAspect {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `SecurityAspect` with methods `checkSecurity()`.
+- Uses conditionals.
 
 ### Aspect with Configuration Properties
 
@@ -121,6 +132,11 @@ public class SingletonAspect {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `SingletonAspect`.
+
 ### Per-Prototype
 
 A new aspect instance is created for each proxy:
@@ -134,6 +150,11 @@ public class PrototypeAspect {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `PrototypeAspect`.
+
 ### Per-Request (via Scope)
 
 ```java
@@ -145,6 +166,11 @@ public class RequestScopedAspect {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `RequestScopedAspect`.
+
 ### Per-Session (via Scope)
 
 ```java
@@ -155,6 +181,11 @@ public class SessionScopedAspect {
     // New instance for each HTTP session
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `SessionScopedAspect`.
 
 ## Aspect Configuration Options
 
@@ -168,6 +199,11 @@ public class AopConfig {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `AopConfig`.
+
 ### Advanced Configuration
 
 @Configuration
@@ -179,6 +215,11 @@ public class AopConfig {
 ```java
 public class AdvancedAopConfig {}
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `AdvancedAopConfig`.
 
 ### Configuration Properties
 
@@ -216,6 +257,11 @@ public class PerformanceAspect {
     // Runs third
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `SecurityAspect` and `LoggingAspect` and 1 more type(s).
 
 ### Ordering Rules
 
@@ -271,6 +317,11 @@ public class HighPriorityAspect {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `HighPriorityAspect`.
+
 ## Aspect Lifecycle Hooks
 
 ### @PostConstruct
@@ -305,6 +356,14 @@ public class LifecycleAspect {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `LifecycleAspect` with methods `init()`, `cleanup()`, `before()`.
+- Uses lambda expressions.
+- Uses the `Map` collection.
+- Uses generics.
+
 ### @PreDestroy
 
 ```java
@@ -334,6 +393,12 @@ public class ResourceAspect {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `ResourceAspect` with methods `init()`, `cleanup()`, `ensureConnection()`.
+- Uses conditionals.
 
 ## Aspect Scoping and Proxies
 
@@ -366,6 +431,12 @@ public class AuditableAspect implements Ordered {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `AuditableAspect` with methods `getOrder()`, `audit()`.
+- Uses interface implementation.
+
 ### Aspect without Interface (CGLIB Required)
 
 ```java
@@ -376,6 +447,11 @@ public class NonInterfaceAspect {
     // proxyTargetClass = true must be set
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `NonInterfaceAspect`.
 
 ## Shared Pointcuts
 
@@ -410,6 +486,11 @@ public class ComposedAspect {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `ComposedAspect` with 6 methods.
+
 ### Pointcut in Separate Class
 
 ```java
@@ -443,6 +524,11 @@ public class LoggingAspect {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Pointcuts` and `LoggingAspect` with 5 methods.
+
 ### Pointcut with Parameters
 
 ```java
@@ -468,6 +554,12 @@ public class ParameterizedAspect {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `ParameterizedAspect` with methods `loggableMethods()`, `logWithDetails()`.
+- Uses conditionals.
 
 ## Aspect Testing
 
@@ -515,6 +607,12 @@ class LoggingAspectTest {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `LoggingAspectTest`.
+- Uses lambda expressions.
+
 ### Integration Testing Aspects
 
 @SpringBootTest
@@ -560,6 +658,11 @@ class AspectWithMockedDependenciesTest {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `AspectWithMockedDependenciesTest`.
+
 ## Aspect Best Practices
 
 ### 1. Keep Aspects Focused
@@ -592,6 +695,11 @@ public class MultiPurposeAspect {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `LoggingAspect` and `SecurityAspect` and 1 more type(s).
+
 ### 2. Use Named Pointcuts
 
 ```java
@@ -622,6 +730,11 @@ public class LoggingAspect {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `LoggingAspect` with methods `serviceMethods()`, `logBefore()`, `logAfter()`.
+
 ### 3. Handle Exceptions Properly
 
 ```java
@@ -643,6 +756,12 @@ public class ErrorHandlingAspect {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `ErrorHandlingAspect` with methods `handleError()`.
+- Uses exception handling with try/catch.
 
 ### 4. Avoid Circular Dependencies
 
@@ -674,6 +793,11 @@ public class AspectA {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `AspectA` and `AspectB`.
+
 ### 5. Use Appropriate Proxy Type
 
 // For interfaces — JDK proxy is fine
@@ -703,6 +827,11 @@ public class UserService {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `UserService` with methods `methodA()`, `methodB()`.
+
 **Solution:** Inject the proxy or use `AopContext.currentProxy()`:
 
 ```java
@@ -717,6 +846,11 @@ public class UserService {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `UserService` with methods `methodA()`.
 
 ### 2. Final Methods
 

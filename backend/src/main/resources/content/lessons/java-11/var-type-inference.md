@@ -18,6 +18,11 @@ List<String> names = Arrays.asList("Alice", "Bob");
 HttpClient client = HttpClient.newHttpClient();
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses the `HttpClient` API.
+
 Java 10 introduced `var` — the compiler infers the type from the right-hand side:
 
 var ordersByCustomer = new HashMap<String, List<Order>>();  // inferred as HashMap<String, List<Order>>
@@ -25,6 +30,12 @@ var names = Arrays.asList("Alice", "Bob");                   // inferred as List
 ```java
 var client = HttpClient.newHttpClient();                      // inferred as HttpClient
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses the `HttpClient` API.
+- Uses local type inference with `var`.
 
 **Key rule:** `var` only works for **local variables** with an initializer. NOT for fields, method parameters, or return types.
 
@@ -61,6 +72,14 @@ var data = processData();
 var result = service.execute(request);
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+- Uses method references.
+- Uses the `List` collection.
+- Uses the `Map` collection.
+
 ---
 
 ## When NOT to Use var
@@ -86,6 +105,13 @@ var user = userService.findById(id);
 List<String> list = new ArrayList<>();
 var list2 = new ArrayList<String>();
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses the `List` collection.
+- Uses local type inference with `var`.
+- Uses generics.
 
 ---
 
@@ -147,6 +173,14 @@ public class VarDemo {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `VarDemo` with methods `main()`.
+- Uses the Streams API to process data declaratively.
+- Uses lambda expressions.
+- Uses method references.
+
 ---
 
 ## Real-World Scenarios
@@ -164,6 +198,13 @@ public void processOrder(String orderId) {
 
     var total = items.stream()
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses the Streams API to process data declaratively.
+- Uses local type inference with `var`.
+
         .mapToDouble(Item::getPrice)
         .sum();
 

@@ -210,6 +210,13 @@ public class ExternalApiProcessor implements ItemProcessor<Order, ProcessedOrder
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `ExternalApiProcessor` with methods `process()`.
+- Uses interface implementation.
+- Uses generics.
+
 ### Scenario 2: File Import with Bad Records
 
 @Component

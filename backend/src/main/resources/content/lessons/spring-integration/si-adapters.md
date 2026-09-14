@@ -62,6 +62,12 @@ public IntegrationFlow fileOutbound() {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+- Uses file I/O with the NIO API.
+
 **The inbound file adapter's key decisions:** the **poller** (how often to check), `patternFilter` (which files count), and `preventDuplicates` (idempotency — don't reprocess the same file after a restart). The outbound adapter's `fileNameGenerator` decides the written name — including the `temporaryFileSuffix` option (write to `.tmp`, rename on completion — the standard "don't read half-written files" discipline, implemented by `useTemporaryFileSuffix(true)`).
 
 ## HTTP Adapters: Calling and Exposing APIs
@@ -100,6 +106,11 @@ public IntegrationFlow httpOutbound() {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+
 **The HTTP inbound adapter turns a REST endpoint into a flow's entry point** — the request body becomes the message payload, the handler's return value becomes the response. The **outbound adapter** turns a flow into a REST *client* — each message becomes an HTTP request. The integration between them: an HTTP-triggered flow that calls other APIs, transforms, and replies — the API-facade pattern built entirely from the DSL. (The `headerMapper` is where `Authorization` headers and content types are carried — the security seam.)
 
 ## JDBC Adapters: The Database as Endpoint
@@ -137,6 +148,11 @@ public IntegrationFlow jdbcOutbound() {
             .get();
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
 
 **The JDBC inbound adapter is the "new database rows as events" pattern** (the poor-man's CDC): poll a query, emit each row, and claim it via `updateSql` so concurrent polls never double-process. The outbound gateway inserts per message — with named parameters bound from the payload. This is the adapter that turns Spring Integration into a lightweight, transactional job framework for database-driven work.
 

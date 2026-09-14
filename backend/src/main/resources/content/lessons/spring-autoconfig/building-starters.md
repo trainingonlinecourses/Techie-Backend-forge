@@ -39,6 +39,12 @@ public class MyRedisAutoConfiguration {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `MyRedisAutoConfiguration` with methods `redisTemplate()`.
+- Uses generics.
+
 ---
 
 ## How to Create a Custom Auto-Configuration
@@ -88,6 +94,11 @@ public class EmailAutoConfiguration {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `EmailAutoConfiguration` with methods `emailService()`, `smtpEmailSender()`.
+
 ### Step 2: Create Properties Class
 
 ```java
@@ -98,6 +109,13 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "app.email")
 public record EmailProperties(
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `EmailProperties`.
+- Uses a `record`.
+
     String host,
     int port,
     String username,
@@ -197,6 +215,12 @@ public record EmailProperties(
 ) {}
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `EmailAutoConfiguration` and `EmailProperties` with 4 methods.
+- Uses a `record`.
+
 ---
 
 ## Real-World Scenarios
@@ -261,6 +285,12 @@ public class CustomSecurityAutoConfiguration {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `CustomSecurityAutoConfiguration` with methods `filterChain()`.
+- Uses lambda expressions.
+
 ---
 
 ## Common Mistakes
@@ -296,6 +326,12 @@ class EmailAutoConfigurationTest {
     void shouldNotCreateEmailServiceWhenDisabled() {
         new ApplicationContextRunner()
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+
             .withConfiguration(AutoConfigurations.of(EmailAutoConfiguration.class))
             .withPropertyValues("app.email.enabled=false")
             .run(context -> {

@@ -28,6 +28,13 @@ public interface TaskScheduler {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `TaskScheduler`.
+- Uses an interface.
+- Uses the java.time date-time API.
+
 The return value is a `ScheduledFuture` — cancel it to stop the task, or check `isDone()` to see if it terminated.
 
 ## Programmatic Fixed-Rate Scheduling
@@ -60,6 +67,14 @@ public class DynamicJobService {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `DynamicJobService` with methods `startJob()`, `stopJob()`, `isRunning()`.
+- Uses the `Map` collection.
+- Uses the java.time date-time API.
+- Uses conditionals.
+
 This enables a management API:
 
 ```java
@@ -83,6 +98,12 @@ public class JobController {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `JobController` with methods `start()`, `stop()`.
+- Uses the java.time date-time API.
+
 ## Triggers: Schedules as Objects
 
 A `Trigger` computes the *next* execution time from the current one. Spring ships two implementations:
@@ -103,6 +124,11 @@ trigger.setFixedRate(true);            // default is fixed-delay
 // Or with an initial delay
 PeriodicTrigger trigger2 = new PeriodicTrigger(10_000, TimeUnit.MILLISECONDS);
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses the java.time date-time API.
 
 ### Custom Trigger
 
@@ -149,6 +175,14 @@ public class CatchUpTrigger implements Trigger {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `CatchUpTrigger` with methods `nextExecution()`.
+- Uses interface implementation.
+- Uses the java.time date-time API.
+- Uses conditionals.
+
 ## Scheduling From a Database
 
 Combining `TaskScheduler` with a repository turns schedules into data:
@@ -193,6 +227,11 @@ scheduler.setAwaitTerminationSeconds(30);
 scheduler.setPoolSize(4);
 scheduler.setRemoveOnCancelPolicy(true);
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses manual threading.
 
 `removeOnCancelPolicy(true)` is a small but real optimization: cancelled tasks are removed from the internal queue immediately, freeing memory for long-lived schedules.
 

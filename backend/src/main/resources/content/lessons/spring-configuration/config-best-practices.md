@@ -43,6 +43,11 @@ class Config {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Config`.
+
 The test: *"would this value change if I deployed to another environment?"* If yes, it's a property.
 
 ### 2. Secrets fail fast when missing
@@ -79,6 +84,14 @@ public record AppProperties(
         Duration timeout,
         List<String> admins) {}
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `AppProperties`.
+- Uses a `record`.
+- Uses the `List` collection.
+- Uses the java.time date-time API.
 
 One typed object per *domain* (mail, datasource, ai, retry) — not one class per property, not 50 `@Value`s scattered. Validation (`@Validated`, `@NotBlank`, `@Min`) turns bad config into a startup error.
 
@@ -122,6 +135,12 @@ public record AppProperties(
         @NotBlank String apiKey,
         @Min(1) int maxRetries) {}
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `AppProperties`.
+- Uses a `record`.
 
 Boot validation + `@Validated` = the app **refuses to start** with invalid config. A 10-second startup failure is a gift compared to a 2 AM outage from a bad value discovered at runtime.
 

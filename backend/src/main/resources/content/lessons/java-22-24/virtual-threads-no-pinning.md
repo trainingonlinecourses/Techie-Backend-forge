@@ -14,12 +14,6 @@ capstone: false
 
 Virtual threads (Java 21) promised a million cheap threads — but `synchronized` blocks **pinned** them to their carrier thread, quietly destroying scalability. **Java 24 (JEP 491)** fixes that, and **JEP 483** makes startup faster by loading classes ahead of time.
 
-## What this code does — step by step
-
-1. A virtual thread is cheap: you create it with `Thread.ofVirtual()`, and the JVM schedules it on a few real "carrier" threads.
-2. Before Java 24, entering a `synchronized` block *pinned* the virtual thread to its carrier — blocking I/O inside `synchronized` froze a whole carrier thread.
-3. After Java 24, `synchronized` no longer pins: the JVM can unmount the virtual thread while it waits, exactly like it always did for lock-free code.
-4. The lesson code simulates a server handling many "requests" with virtual threads and a shared counter — the pattern that used to be the footgun.
 
 ```java
 import java.time.Duration;
@@ -55,6 +49,13 @@ public class VirtualThreadsDemo {
     }
 }
 ```
+
+<!-- why -->
+## What this code does — step by step
+1. A virtual thread is cheap: you create it with `Thread.ofVirtual()`, and the JVM schedules it on a few real "carrier" threads.
+2. Before Java 24, entering a `synchronized` block *pinned* the virtual thread to its carrier — blocking I/O inside `synchronized` froze a whole carrier thread.
+3. After Java 24, `synchronized` no longer pins: the JVM can unmount the virtual thread while it waits, exactly like it always did for lock-free code.
+4. The lesson code simulates a server handling many "requests" with virtual threads and a shared counter — the pattern that used to be the footgun.
 
 ## Why this matters
 

@@ -33,8 +33,6 @@ The rule of thumb: create one when **callers need to distinguish this failure fr
 
 Creating an exception per *message* is over-engineering; creating one per *failure category that changes behavior* is good design. A banking app typically has `InsufficientFundsException`, `AccountLockedException`, `TransactionFailedException` — a handful, not hundreds.
 
-## Building a Custom Exception, Step by Step
-
 ```java
 // A checked custom exception: the compiler forces callers to plan for it.
 public class AccountLockedException extends Exception {
@@ -60,6 +58,9 @@ public class AccountLockedException extends Exception {
     public int getLockoutMinutes() { return lockoutMinutes; }
 }
 ```
+
+<!-- why -->
+## Building a Custom Exception, Step by Step
 
 **Walking through it:** extending `Exception` makes this *checked* (callers must catch or declare it); extend `RuntimeException` instead if you want it unchecked. The class adds two domain fields, `accountId` and `lockoutMinutes`, captured at throw time. The first constructor builds a useful message from them and delegates to `super(message)`. The second adds the `Throwable cause` parameter and passes it to `super(message, cause)` — this is the *wrapping* pattern: when a lower-level failure (say, a database timeout) causes the account lock, the cause chain preserves the original exception for debugging. The getters let handlers act on the data: show a countdown, log the account id, notify security.
 
@@ -125,6 +126,12 @@ public class UserRepository {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `UserRepository` with methods `findById()`.
+- Uses exception handling with try/catch.
 
 `UserNotFoundException` is checked (extends Exception) or unchecked (extends RuntimeException) depending on the layer's contract — Spring convention is unchecked for data-access failures. The `cause` parameter keeps `getCause()` pointing at the `SQLException`, so logs still show the full chain: `UserNotFoundException ← SQLException ← connect timeout`.
 

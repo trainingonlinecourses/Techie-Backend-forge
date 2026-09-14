@@ -25,6 +25,11 @@ public class SchedulerConfig {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `SchedulerConfig`.
+
 Once enabled, every `@Scheduled` method in the context becomes a task. Spring Boot applications can also set `spring.task.scheduling.enabled=true` (the default) — disabling it is useful in tests to prevent background work from running during test suites.
 
 ## The Three Scheduling Modes
@@ -43,6 +48,11 @@ public class HeartbeatTask {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `HeartbeatTask` with methods `sendHeartbeat()`.
 
 ### fixedDelay
 
@@ -129,6 +139,12 @@ public class SchedulerConfig {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `SchedulerConfig` with methods `taskScheduler()`.
+- Uses manual threading.
 
 Or purely with properties:
 

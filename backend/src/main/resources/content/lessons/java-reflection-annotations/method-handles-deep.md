@@ -64,6 +64,11 @@ public class MethodHandleDemo {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `MethodHandleDemo` with methods `main()`.
+
 **Walking through it:** `MethodHandles.lookup()` returns a lookup *in your module's context* — it can see your classes and the public API of others, but respects module boundaries automatically (no `setAccessible` free-for-all). `MethodType` is a precise, immutable signature description — this is what makes handles *typed*, which is what lets the JIT optimize them. `findVirtual` is for instance methods; there are also `findStatic` (static methods), `findConstructor`, and `findGetter`/`findSetter` (fields).
 
 ## Invoking: invoke vs invokeExact

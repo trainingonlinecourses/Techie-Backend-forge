@@ -35,6 +35,13 @@ courses.stream()
     .toList();
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses the Streams API to process data declaratively.
+- Uses lambda expressions.
+- Uses method references.
+
 **Nothing runs until the terminal operation.** `.filter` doesn't filter; it *records* a filter. The chain is a recipe; `toList()` cooks it.
 
 ## Pipeline Stages
@@ -98,11 +105,22 @@ courses.stream()
 ```java
     .peek(c -> log.debug("before filter: {}", c.id()))
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+
     .filter(c -> c.published())
 ```java
     .peek(c -> log.debug("after filter: {}", c.id()))
     .toList();
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
 
 `peek` is for debugging — it runs the consumer when the element passes that stage. Don't use it for side effects in production (it's not guaranteed to run without a terminal op, and its timing is unspecified).
 
@@ -134,6 +152,11 @@ String joined = courses.stream()
     .reduce("", (a, b) -> a + ", " + b);
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+
 `reduce(identity, accumulator)` — identity is the result for an empty stream. For most cases, specialized ops (`sum`, `collect(joining())`) are clearer, but reduce is the escape hatch.
 
 ## mapToInt and Primitive Streams
@@ -146,6 +169,12 @@ int totalMinutes = courses.stream()
 
 double avg = courses.stream()
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses the Streams API to process data declaratively.
+
     .mapToInt(Course::minutes)
     .average()
 ```java

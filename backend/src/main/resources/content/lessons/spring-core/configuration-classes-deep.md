@@ -13,8 +13,6 @@ docs:
 
 ## The concept: @Configuration classes are proxied
 
-A class annotated `@Configuration` is **itself a bean**, and — by default — Spring **proxies it** (CGLIB) so that calls between its `@Bean` methods honor the container's singleton semantics:
-
 ```java
 @Configuration
 public class AppConfig {
@@ -29,6 +27,9 @@ public class AppConfig {
     }
 }
 ```
+
+<!-- why -->
+A class annotated `@Configuration` is **itself a bean**, and — by default — Spring **proxies it** (CGLIB) so that calls between its `@Bean` methods honor the container's singleton semantics:
 
 The proxy intercepts `dataSource()` and returns the container-managed singleton instead of executing the method body again. That's **full mode** — the default and the behavior everyone expects: "call the @Bean method, get the shared bean".
 

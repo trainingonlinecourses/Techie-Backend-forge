@@ -52,6 +52,13 @@ class IsolationDemo {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `IsolationDemo`.
+- Uses the `List` collection.
+- Uses generics.
+
 **Why fresh-per-method is the right default:** instance fields are *per-test state*. Two tests sharing a field create hidden coupling — test B's outcome depends on what test A left behind, which depends on ordering, which breaks as soon as tests run in parallel or get reordered. The fresh instance makes every test start from the same blank slate. The discipline that follows: **store per-test state in instance fields (they reset automatically); reserve `static` fields for genuinely shared, immutable setup.**
 
 ## PER_CLASS: When You Deliberately Share
@@ -84,6 +91,11 @@ class PerClassDemo {
     void usesClientAgain() { assertTrue(client.isConnected()); }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `PerClassDemo`.
 
 **The trade-off, stated plainly:** PER_CLASS shares instance state across the class's tests — faster (one setup), but it *reintroduces* the coupling the default removes. The professional rule: use PER_CLASS only for **immutable** shared resources (an expensive client that holds no test-specific state) — never for mutable fields tests write to. If two tests both mutate a shared field, you've recreated the ordering bug in slow motion. (And PER_CLASS enables `@MethodSource` factories that aren't static — a common reason to reach for it.)
 
@@ -132,6 +144,11 @@ junit.jupiter.execution.parallel.mode.classes.default = concurrent
 @Execution(ExecutionMode.SAME_THREAD)
 class SerialOnlyTest { }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `OUT` and `SerialOnlyTest`.
 
 **The contract parallel testing demands:** tests must be *truly independent* — no shared mutable state, no fixed ports, no ordering assumptions. The moment a test touches a shared resource (a static cache, a fixed port, a shared temp file), parallel execution exposes it as flaky failures. Which is the point: **parallel execution is a stress test of your isolation.** Spring Boot tests (which cache a shared context) run parallel safely because the context is read-only after startup; tests that *write* to the context or to shared services need `SAME_THREAD`.
 

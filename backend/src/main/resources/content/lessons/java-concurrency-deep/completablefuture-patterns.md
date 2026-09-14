@@ -51,6 +51,14 @@ public class Main {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- Uses asynchronous composition with `CompletableFuture`.
+- Uses lambda expressions.
+- Uses generics.
+
 ---
 
 ## Chaining Operations
@@ -72,6 +80,13 @@ CompletableFuture<String> future = CompletableFuture
     .thenApply(id -> fetchUserName(id))
     .thenApply(name -> "Hello, " + name);
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses asynchronous composition with `CompletableFuture`.
+- Uses lambda expressions.
+- Uses generics.
 
 ### thenApply vs thenAccept vs thenRun
 
@@ -102,6 +117,14 @@ public class Main {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- Uses asynchronous composition with `CompletableFuture`.
+- Uses lambda expressions.
+- Uses generics.
 
 ---
 
@@ -159,6 +182,12 @@ CompletableFuture<String> future = CompletableFuture
 // Result is either "SUCCESS" or "FALLBACK VALUE"
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+- Uses conditionals.
+
 ### Multiple Exception Handlers
 
 CompletableFuture<String> future = CompletableFuture
@@ -175,6 +204,12 @@ CompletableFuture<String> future = CompletableFuture
     });
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+- Uses conditionals.
+
 ### handle (Process Either Success or Failure)
 
 CompletableFuture<String> future = CompletableFuture
@@ -188,6 +223,12 @@ CompletableFuture<String> future = CompletableFuture
         return result;
     });
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+- Uses conditionals.
 
 ---
 
@@ -207,6 +248,13 @@ CompletableFuture<String> future = CompletableFuture
 
 // Java 8 workaround
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+- Uses conditionals.
+
 CompletableFuture<String> future = CompletableFuture
     .supplyAsync(() -> slowOperation())
 ```java
@@ -261,6 +309,14 @@ public class DashboardAggregator {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `DashboardAggregator` with methods `getDashboard()`.
+- Uses asynchronous composition with `CompletableFuture`.
+- Uses lambda expressions.
+- Uses the `List` collection.
+
 ### Scenario 2: Retry with Backoff
 
 public <T> CompletableFuture<T> retryWithBackoff(
@@ -294,6 +350,14 @@ public <T> CompletableFuture<T> retryWithBackoff(
         .thenCompose(Function.identity());
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses asynchronous composition with `CompletableFuture`.
+- Uses exception handling with try/catch.
+- Uses lambda expressions.
+- Uses conditionals.
 
 ### Scenario 3: Timeout with Fallback
 

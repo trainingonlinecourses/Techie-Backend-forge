@@ -165,6 +165,9 @@ public class OrderService {
 }
 ```
 
+<!-- why -->
+
+
 ```java
 **InventoryClient.java**
 package com.backendforge.orderservice.client;
@@ -172,6 +175,13 @@ package com.backendforge.orderservice.client;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 ```
+
+<!-- why -->
+**What this code shows:**
+- Defines `OrderService` with methods `createOrder()`, `getOrder()`.
+- Uses the Streams API to process data declaratively.
+- Uses lambda expressions.
+- Uses method references.
 
 @FeignClient(name = "inventory-service", url = "${inventory-service.url}")
 ```java
@@ -184,6 +194,12 @@ public interface InventoryClient {
     void reduceStock(@PathVariable Long productId, @RequestParam int quantity);
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `InventoryClient`.
+- Uses an interface.
 
 ### Inventory Service
 
@@ -228,6 +244,13 @@ public class InventoryService {
     
     public void addStock(Long productId, int quantity) {
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+- Uses conditionals.
+
         Stock stock = repository.findByProductId(productId)
             .orElse(new Stock(productId, 0));
         stock.setQuantity(stock.getQuantity() + quantity);
@@ -272,6 +295,13 @@ public class PaymentService {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `PaymentService` with methods `processPayment()`, `getPaymentByOrderId()`.
+- Uses lambda expressions.
+- Uses `BigDecimal` for exact decimal math.
 
 ### docker-compose.yml
 ```yaml
@@ -530,6 +560,14 @@ public class NotificationService {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `NotificationService` with methods `send()`.
+- Uses exception handling with try/catch.
+- Uses lambda expressions.
+- Uses switch branching.
 
 ---
 

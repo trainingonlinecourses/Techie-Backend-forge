@@ -87,6 +87,14 @@ public class StringPerfDemo {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `StringPerfDemo` with methods `main()`.
+- Uses the `List` collection.
+- Uses regex matching.
+- Uses loops.
+
 ### Walking Through Each Part
 
 **Pattern 1 — precompile the regex.** `String.split`, `replaceAll`, `matches` all take a *regex string*. Each call compiles it into an internal pattern object — that compilation is expensive (it builds an automaton). The fix: `Pattern.compile(regex)` once, store it in a static field, and call `pattern.split(...)`. For a regex used in a hot loop this is often a **10–100× speedup**. For trivial delimiters like `","`, Java has a fast path (it's not really regex), but don't rely on that for anything more complex.

@@ -81,6 +81,13 @@ public interface CourseSummary {
     String getTitle();
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `CourseSummary`.
+- Uses an interface.
+
 List<CourseSummary> findTop100ByOrderByCreatedAtDesc();
 
 ### 3. N+1 Queries (the JPA trap)
@@ -94,6 +101,12 @@ for (Course c : courses) {
 // ✅ Fetch join or @EntityGraph — 1 query
 @EntityGraph(attributePaths = "lessons")
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses loops.
+
 List<Course> findAllWithLessons();
 
 ### 4. Connection Pool Exhaustion

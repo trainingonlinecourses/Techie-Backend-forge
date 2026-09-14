@@ -79,6 +79,13 @@ public class OrderAggregate {
     private String orderId;
     private String userId;
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderItemCommand` and `OrderAggregate` with 8 methods.
+- Uses `BigDecimal` for exact decimal math.
+
     private List<OrderItem> items = new ArrayList<>();
 ```java
     private OrderStatus status;
@@ -476,6 +483,14 @@ public class OrderSagaOrchestrator {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderSagaOrchestrator` with methods `executeOrderSaga()`, `compensate()`, `logStep()`.
+- Uses exception handling with try/catch.
+- Uses lambda expressions.
+- Uses local type inference with `var`.
+
 ---
 
 ## Project 24: Distributed Configuration
@@ -498,6 +513,11 @@ public class ConfigServerApplication {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `ConfigServerApplication` with methods `main()`.
 
 ### Config Client
 

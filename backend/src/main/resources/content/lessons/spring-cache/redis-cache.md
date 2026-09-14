@@ -143,6 +143,11 @@ public Course getCourse(String id) {
 "Fail open" (serve from DB) is usually right for reads; "fail closed" (throw) is right when serving stale data is worse than an error.
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses exception handling with try/catch.
+
 ## Local + Remote: Two-Level Cache
 
 For very hot data, layer Caffeine in front of Redis — L1 local, L2 shared:
@@ -157,6 +162,11 @@ public CacheManager localCacheManager() {
 
 L1 gives sub-microsecond hits; L2 gives cluster consistency with a 30s lag. The tradeoff: invalidation is eventually consistent within the L1 TTL.
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses the java.time date-time API.
 
 ## Summary
 

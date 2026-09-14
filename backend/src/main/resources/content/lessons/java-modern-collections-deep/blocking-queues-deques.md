@@ -89,6 +89,12 @@ while (true) {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses loops.
+- Uses conditionals.
+
 ### Deque — A Double-Ended Queue
 
 A `Deque` is a queue that allows insertion and removal at both ends. You can use it as a FIFO queue (add at one end, remove from the other) or as a LIFO stack (add and remove from the same end). The `Deque` interface provides methods for both ends, again in the exception-throwing and special-value flavours.
@@ -251,6 +257,11 @@ BlockingQueue<String> unbounded = new LinkedBlockingQueue<>();
 BlockingQueue<String> bounded = new LinkedBlockingQueue<>(1000);
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses generics.
+
 The choice between `ArrayBlockingQueue` and `LinkedBlockingQueue` is usually about capacity and performance. `ArrayBlockingQueue` is always bounded and uses a single lock. `LinkedBlockingQueue` is optionally bounded and uses two locks, which can give higher throughput when there are many producers and consumers, but it is not dramatically faster in all cases and uses more memory per element (because of the linked nodes).
 
 ### ConcurrentLinkedQueue and ConcurrentLinkedDeque — Non-Blocking Concurrent Queues
@@ -329,6 +340,11 @@ if (queue.size() < 1000) {
 // GOOD: use a bounded blocking queue — the queue handles backpressure internally
 boundedQueue.put(item);   // blocks when full, no manual size check needed
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses conditionals.
 
 ## A Code Example — A Small Thread Pool Using a BlockingQueue
 

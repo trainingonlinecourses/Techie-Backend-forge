@@ -99,6 +99,13 @@ public User authenticate(String email, String raw) {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `UserService` with methods `register()`, `verify()`, `authenticate()`.
+- Uses regex matching.
+- Uses conditionals.
+
 **Scenario 3 — import from an old system.** During a migration, imports come as `{MD5}` or `{noop}` hashes *temporarily* — the delegating encoder lets them sign in, and the login-time rehash upgrades them without a forced password reset (force-reset only the `{noop}` population, since plaintext imports are genuinely dangerous).
 
 ## Pitfalls

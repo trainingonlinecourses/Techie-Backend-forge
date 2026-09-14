@@ -76,6 +76,12 @@ public class DevToolsConfig {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `DevToolsConfig` with methods `triggerRestart()`, `expensiveService()`.
+- Uses conditionals.
+
 ---
 
 ## Performance Optimization
@@ -100,6 +106,11 @@ if (ClassUtils.isPresent("org.springframework.devtools.Restarter", null)) {
     // DevTools is active — optimize for development
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses conditionals.
 
 ---
 
@@ -128,6 +139,11 @@ public class DatabaseMigration {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `DatabaseMigration`.
 
 ---
 

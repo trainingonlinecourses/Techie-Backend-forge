@@ -20,6 +20,11 @@ Three tests that differ only in input/output are three maintenance problems:
 @Test void acceptsTen()      { assertEquals(OK, validate(10)); }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+
 `@ParameterizedTest` collapses them into one test with a **table of inputs** — when a bug shows up, you fix the logic once and the whole table re-verifies.
 
 ## The common sources
@@ -66,6 +71,11 @@ Rules of thumb: `@ValueSource` for scalars, `@CsvSource` for input→expected ta
 @CsvSource({ "2026-08-17,PENDING" })
 void appliesEffectiveDate(@JavaTimeConversionPattern("yyyy-MM-dd") LocalDate date, String status) { ... }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses the java.time date-time API.
 
 (Or simply accept `String` and convert in the test body — often clearer than converters.)
 

@@ -84,6 +84,13 @@ boolean starter = (mine == Level.BEGINNER);  // identity == is CORRECT for enums
                                              // constants are singletons, null-safe
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Level` with methods `total()`.
+- Uses an `enum`.
+- Uses loops.
+
 **Why these two mattered:** varargs made APIs like `String.format(...)` and `List.of(...)` possible; enums replaced `int` constant flags with types the compiler can check — and today they model every order status and workflow stage you'll ship in Spring.
 
 ## Beyond the runnable: what else shipped in the box
@@ -136,6 +143,14 @@ for (Integer n : numbers) {
 // today: streams (covered in the Streams module)
 List<Integer> evens = numbers.stream().filter(n -> n % 2 == 0).toList();
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses the Streams API to process data declaratively.
+- Uses lambda expressions.
+- Uses the `List` collection.
+- Uses loops.
 
 Notice the 2004 code is *honest and readable* — streams didn't make it wrong, just shorter. Learn both voices; legacy code will speak the first forever.
 

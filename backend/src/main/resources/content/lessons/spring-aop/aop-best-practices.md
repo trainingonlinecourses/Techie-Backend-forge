@@ -49,6 +49,12 @@ public class AuditAspect {
 public Order placeOrder(OrderRequest r) { ... }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Audited` and `AuditAspect` with methods `audit()`, `placeOrder()`.
+- Uses an interface.
+
 The annotation pattern is the sweet spot: **the *what* is declared on the method, the *how* lives in one aspect**, and adding auditing to a new method is a one-line annotation.
 
 ```java
@@ -71,6 +77,14 @@ public class RetryAspect {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `RetryAspect` with methods `retry()`.
+- Uses exception handling with try/catch.
+- Uses loops.
+- Uses conditionals.
+
 (Production teams often reach for Spring Retry or Resilience4j instead of hand-rolling — but a small custom aspect is legitimate when the policy is tiny and specific.)
 
 **Pattern 3 — a timing/metrics aspect on service boundaries.** Measure every `@Service` method or every controller handler uniformly, feeding a metrics registry:
@@ -87,6 +101,12 @@ public class MetricsAspect {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `MetricsAspect` with methods `timed()`.
+- Uses exception handling with try/catch.
 
 The `execution(...)` pointcut scoped to a package is the maintainable form — a new `*Service` in that package is *automatically* covered, which is exactly the uniformity AOP promises.
 

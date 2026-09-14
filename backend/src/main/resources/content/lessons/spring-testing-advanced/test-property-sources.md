@@ -129,6 +129,11 @@ class PaymentServiceTest {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `PaymentServiceTest`.
+
 ---
 
 ## Real-World Scenarios

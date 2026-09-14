@@ -184,6 +184,11 @@ public class PerformanceAspect {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `SecurityAuditAspect` and `TransactionAspect` and 1 more type(s) with methods `audit()`, `time()`.
+
 ### Scenario 2: Aspect Conflict (Same Order)
 
 ```java
@@ -199,6 +204,11 @@ public class AspectB { ... }
 // AspectA runs first (A < B alphabetically)
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `AspectA` and `AspectB`.
+
 **Fix:** Give them distinct order values: `@Order(100)` and `@Order(200)`.
 
 ### Scenario 3: Combining with Spring's Built-in Aspects
@@ -213,6 +223,11 @@ public class AspectB { ... }
 @Order(Ordered.LOWEST_PRECEDENCE - 10)   // Just before the default
 public class AfterTransactionAspect { ... }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `AfterTransactionAspect`.
 
 ---
 

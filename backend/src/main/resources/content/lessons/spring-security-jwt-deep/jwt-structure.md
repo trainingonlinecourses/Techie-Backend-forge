@@ -126,6 +126,12 @@ public class JwtStructureDemo {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `JwtStructureDemo` with methods `b64url()`, `main()`.
+- When run, it prints: “signature valid: ”
+
 ### Walking Through Each Part
 
 ```java

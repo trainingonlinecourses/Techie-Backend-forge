@@ -76,6 +76,13 @@ public class RequestContextFilter implements Filter {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `RequestContextFilter` with methods `doFilter()`.
+- Uses exception handling with try/catch.
+- Uses interface implementation.
+
 ```xml
 <!-- logback-spring.xml: include MDC fields in every log line -->
 <pattern>%d{HH:mm:ss.SSS} [%thread] [%X{requestId}] [%X{userId}] %-5level %logger{36} - %msg%n</pattern>
@@ -183,6 +190,11 @@ log.debug("User details: {}", user.toString());
 // BEST — the lambda is not evaluated at all if DEBUG is disabled
 log.atDebug().log(() -> "User details: " + expensiveToJson(user));
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
 
 ## Logback configuration hierarchy
 

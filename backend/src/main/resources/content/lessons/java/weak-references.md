@@ -62,11 +62,8 @@ alice = null;
 System.gc();
 ```
 
-**Line-by-line breakdown:**
-- `new WeakReference<>(alice)` — wraps `alice` in a weak reference; the object is reachable through the weak reference but the GC considers it "weakly reachable"
-- `weakAlice.get()` — returns the referent if still alive, `null` if collected; the GC can collect it at any time
-- `alice = null` — removes the strong reference; now the object is only weakly reachable → eligible for GC
-- `System.gc()` — a hint (not a command); the JVM may or may not run GC in response
+<!-- why -->
+
 
 ```java
 **Real-world scenario — WeakHashMap as a cache:**
@@ -84,6 +81,18 @@ session = null;
 
 **Why WeakHashMap for caches:** you don't need to manually evict entries — the GC does it for you. The trade-off: entries can disappear at any time (even immediately), so you need a fallback (database, default value).
 ```
+
+<!-- why -->
+**What this code shows:**
+- Uses conditionals.
+- Uses generics.
+
+<!-- why -->
+**Line-by-line breakdown:**
+- `new WeakReference<>(alice)` — wraps `alice` in a weak reference; the object is reachable through the weak reference but the GC considers it "weakly reachable"
+- `weakAlice.get()` — returns the referent if still alive, `null` if collected; the GC can collect it at any time
+- `alice = null` — removes the strong reference; now the object is only weakly reachable → eligible for GC
+- `System.gc()` — a hint (not a command); the JVM may or may not run GC in response
 
 ## SoftReference — memory-sensitive cache
 

@@ -64,6 +64,11 @@ public class JmsConfig {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `JmsConfig` with methods `jacksonJmsMessageConverter()`.
+
 The `_type` header carries the class name so the consumer can deserialize without compile-time knowledge of your sender code.
 
 ## Receiving — `@JmsListener`

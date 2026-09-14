@@ -66,6 +66,13 @@ public class InsufficientFundsException extends BusinessException {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `BusinessException` and `UserNotFoundException` and 2 more type(s) with methods `getErrorCode()`, `getAttempted()`, `getAvailable()`.
+- Uses inheritance.
+- Uses `BigDecimal` for exact decimal math.
+
 ## @ControllerAdvice — global exception handling
 
 
@@ -155,6 +162,14 @@ public class GlobalExceptionHandler {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `GlobalExceptionHandler` with 4 methods.
+- Uses the Streams API to process data declaratively.
+- Uses lambda expressions.
+- Uses method references.
+
 ## Standard error response format
 
 
@@ -193,6 +208,14 @@ public record ErrorResponse(
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `ErrorResponse` and `Builder` with 6 methods.
+- Uses a `record`.
+- Uses the `Map` collection.
+- Uses generics.
+
 ## How we use it in organizations
 
 ### Scenario 1: Consistent error API across microservices
@@ -226,6 +249,12 @@ public class GlobalExceptionHandler {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `GlobalExceptionHandler` with methods `handleGeneric()`.
+- Uses generics.
 
 ### Scenario 2: Error handling for file uploads
 
@@ -300,6 +329,13 @@ public class ErrorLoggingAdvice {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `ErrorLoggingAdvice` with methods `handleError()`.
+- Uses conditionals.
+- Uses generics.
 
 ## Common mistakes
 

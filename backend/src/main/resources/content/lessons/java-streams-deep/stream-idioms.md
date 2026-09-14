@@ -85,6 +85,11 @@ Predicate<Course> published = Course::published;
 courses.stream().filter(longEnough.and(published)).toList();
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses the Streams API to process data declaratively.
+
 ## The Loop-to-Stream Refactoring
 
 // Before: imperative loop with mutation
@@ -96,6 +101,14 @@ for (Course c : courses) {
 
 // After: declarative, thread-safe, one line
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+- Uses the `List` collection.
+- Uses loops.
+
 Map<String, List<Course>> byLevel = courses.stream()
     .collect(Collectors.groupingBy(Course::level));
 
@@ -109,12 +122,24 @@ if (found == null) throw new NotFoundException(slug);
 
 // After
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses loops.
+- Uses conditionals.
+
 Course found = courses.stream()
     .filter(c -> c.slug().equals(slug))
     .findFirst()
 ```java
     .orElseThrow(() -> new NotFoundException(slug));
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
 
 ## State Machines and Streams: The fold
 
@@ -123,12 +148,23 @@ Course found = courses.stream()
 record RunningTotal(int count, int minutes) {}
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `RunningTotal`.
+- Uses a `record`.
+
 RunningTotal total = courses.stream()
     .reduce(new RunningTotal(0, 0),
         (acc, c) -> new RunningTotal(acc.count() + 1, acc.minutes() + c.minutes()),
 ```java
         (a, b) -> new RunningTotal(a.count() + b.count(), a.minutes() + b.minutes()));
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
 
 The 3-arg reduce (identity, accumulator, combiner) is the fold — the combiner makes it parallel-safe.
 

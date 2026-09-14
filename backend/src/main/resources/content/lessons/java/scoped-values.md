@@ -132,6 +132,12 @@ public class OrderService {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderService` with methods `createOrder()`.
+- Uses lambda expressions.
+
 ---
 
 ## How ScopedValues Work
@@ -169,6 +175,13 @@ public class App {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `App` with methods `main()`.
+- Uses lambda expressions.
+- Uses generics.
 
 ### Key Rules
 
@@ -208,6 +221,13 @@ public class Main {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- Uses lambda expressions.
+- Uses generics.
 
 ---
 

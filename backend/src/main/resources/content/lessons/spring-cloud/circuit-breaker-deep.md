@@ -110,6 +110,11 @@ public class OrderService {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderService` with methods `getUser()`, `getUserFallback()`.
+
 ### Retry + Circuit Breaker
 
 ```java
@@ -142,6 +147,12 @@ public class CircuitBreakerMetrics {
         // Register health indicator
         registry.getAllCircuitBreakers().forEach(cb -> {
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+
             Gauge.builder("resilience4j.circuitbreaker.state", cb,
                 bcb -> bcb.getState().ordinal())
                 .tag("name", cb.getName())
@@ -182,6 +193,12 @@ public class PaymentService {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `PaymentService` with methods `processPayment()`, `paymentFallback()`.
+- Uses the java.time date-time API.
+
 ### Scenario 2: User Profile with Cache Fallback
 
 ```java
@@ -211,6 +228,14 @@ public class UserProfileService {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `UserProfileService` with methods `getProfile()`, `cachedProfileFallback()`.
+- Uses the java.time date-time API.
+- Uses conditionals.
+- Uses generics.
 
 ### Scenario 3: Multi-Service Aggregation with Fallbacks
 

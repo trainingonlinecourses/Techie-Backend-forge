@@ -43,6 +43,13 @@ public class Main {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` and `Address` and 1 more type(s) with methods `main()`.
+- Uses a `record`.
+- Uses conditionals.
+
 ## Pattern matching with switch
 
 ```java
@@ -67,6 +74,14 @@ double area(Shape shape) {
 **The org power:** the compiler enforces that every case is handled. Add a new record to the sealed interface, and the compiler tells you exactly which switches need updating. No missed cases at runtime.
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Shape` and `Circle` and 2 more type(s).
+- Uses lambda expressions.
+- Uses a `record`.
+- Uses an interface.
+
 ## Guarded patterns — conditions within cases
 
 ```java
@@ -88,6 +103,12 @@ String categorize(Package pkg) {
     };
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+- Uses switch branching.
 
 ## Sealed classes — the exhaustiveness engine
 
@@ -112,6 +133,14 @@ String display(PaymentResult result) {
     // If you add a new permit, every switch that doesn't handle it fails to compile
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `PaymentResult` and `PaymentSuccess` and 2 more type(s).
+- Uses lambda expressions.
+- Uses a `record`.
+- Uses an interface.
 
 ## Nested patterns — deep destructuring
 

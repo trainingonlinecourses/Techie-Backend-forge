@@ -36,6 +36,12 @@ Thread vThread = Thread.startVirtualThread(() -> {
 });
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses virtual threads.
+- Uses lambda expressions.
+
 ```
 Platform thread 1: [VT-A] [VT-C] [VT-E] ...   — VT-A parks on I/O, VT-C runs
 Platform thread 2: [VT-B] [VT-D] ...
@@ -45,6 +51,11 @@ Platform thread 2: [VT-B] [VT-D] ...
 One platform thread (carrier) runs many virtual threads, switching when one blocks. Blocking is free; the JVM handles the multiplexing.
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses virtual threads.
+
 ## Creating Virtual Threads
 
 ```java
@@ -53,6 +64,12 @@ Thread v = Thread.startVirtualThread(() -> work());
 
 // 2. Builder
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+
 Thread v = Thread.ofVirtual()
     .name("vtask-", 0)
 ```java
@@ -63,6 +80,12 @@ ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
 executor.submit(() -> work());
 // one virtual thread per task — no pool sizing, no queue tuning
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses virtual threads.
+- Uses lambda expressions.
 
 `newVirtualThreadPerTaskExecutor` is the killer API: it creates a new virtual thread per task and **shuts down with try-with-resources** (Java 19+):
 
@@ -90,6 +113,12 @@ List<String> bodies = IntStream.range(0, 100_000)
     .toList();
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses exception handling with try/catch.
+- Uses lambda expressions.
+
 100k blocking fetches, one JVM, no pool sizing — each fetch parks its virtual thread and the carriers keep running others.
 
 ## Virtual Threads in Spring Boot
@@ -114,6 +143,11 @@ public OrderDetail getOrder(@PathVariable Long id) {
     return new OrderDetail(order, customer);
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses virtual threads.
 
 ## Constraints and Gotchas
 
@@ -141,6 +175,13 @@ try {
     lock.unlock();
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses virtual threads.
+- Uses synchronization with `synchronized`.
+- Uses exception handling with try/catch.
 
 Pinning = a virtual thread blocks its carrier. Short `synchronized` blocks are fine; long ones (holding through I/O) defeat the purpose.
 

@@ -138,6 +138,14 @@ public class ArrayDeepDive {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `ArrayDeepDive` with methods `main()`.
+- Uses lambda expressions.
+- Uses the `List` collection.
+- Uses sorting with a `Comparator`.
+
 ---
 
 ## Real-World Scenarios
@@ -158,6 +166,11 @@ public static String bytesToHex(byte[] bytes) {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses loops.
+
 ### Scenario 2: Matrix operations
 
 ```java
@@ -175,6 +188,11 @@ public static int[][] multiply(int[][] a, int[][] b) {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses loops.
+
 ### Scenario 3: Binary search on sorted array
 
 ```java
@@ -189,6 +207,12 @@ public static int binarySearch(int[] arr, int target) {
     return -1;
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses loops.
+- Uses conditionals.
 
 ---
 

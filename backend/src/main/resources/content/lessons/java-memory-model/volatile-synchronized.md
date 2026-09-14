@@ -42,6 +42,11 @@ while (running) { /* work */ }
 running = false;
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses loops.
+
 ---
 
 ## Volatile
@@ -151,6 +156,14 @@ public class VolatileVsSynchronized {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `VolatileVsSynchronized` with 6 methods.
+- Uses synchronization with `synchronized`.
+- Uses loops.
+- Uses conditionals.
 
 ---
 

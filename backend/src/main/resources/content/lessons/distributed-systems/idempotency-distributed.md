@@ -53,6 +53,11 @@ public ResponseEntity<?> createPayment(
 **The atomic claim is the whole trick** — the unique constraint on the key column makes two concurrent retries race safely (one inserts, the other reads the winner).
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses conditionals.
+
 ## Mechanism 2: Natural Idempotency
 
 Some operations are *naturally* idempotent — running them twice changes nothing:
@@ -124,6 +129,13 @@ public class Order {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderStatus` and `Order` with methods `pay()`.
+- Uses an `enum`.
+- Uses conditionals.
+
 A duplicate "pay" event arrives → status is already PAID → no-op. The state machine *is* the deduplication.
 
 ## The At-Least-Once Combination
@@ -151,6 +163,11 @@ public void onOrderPlaced(OrderPlacedEvent event) {
     warehouseClient.update(absoluteState);
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses conditionals.
 
 ## Distributed Locks vs. Idempotency
 

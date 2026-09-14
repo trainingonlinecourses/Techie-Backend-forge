@@ -104,6 +104,11 @@ public class RabbitConfig {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `RabbitConfig` with 5 methods.
+
 `durable` queues survive broker restarts; `autoDelete(false)` keeps them until explicitly removed.
 
 ## Sending With RabbitTemplate
@@ -142,6 +147,11 @@ public class OrderConsumer {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderConsumer` with methods `onOrderCreated()`.
 
 The listener runs on the listener container's threads, automatically: deserializes the message, invokes the method, **acks on success** and **nacks on exception** (default: requeue).
 

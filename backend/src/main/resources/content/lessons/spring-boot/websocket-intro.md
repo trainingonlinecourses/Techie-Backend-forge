@@ -76,6 +76,12 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `WebSocketConfig` with methods `configureMessageBroker()`, `registerStompEndpoints()`.
+- Uses interface implementation.
+
 ### Server-Side Message Handling
 
 
@@ -112,6 +118,11 @@ public class ChatController {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `ChatController` with methods `sendMessage()`, `sendPrivate()`.
 
 ### Client-Side (JavaScript)
 
@@ -239,6 +250,12 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `WebSocketConfig` with methods `configureMessageBroker()`, `registerStompEndpoints()`.
+- Uses interface implementation.
 
 ### Key Takeaways
 

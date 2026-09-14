@@ -35,6 +35,11 @@ public class EurekaServerApplication {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `EurekaServerApplication` with methods `main()`.
+
 ```xml
 <dependency>
     <groupId>org.springframework.cloud</groupId>
@@ -91,6 +96,12 @@ public interface InventoryClient {
     InventoryStock getStock(@PathVariable("sku") String sku);
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `InventoryClient`.
+- Uses an interface.
 
 ```yaml
 # Feign + LoadBalancer resolve "inventory-service" through Eureka

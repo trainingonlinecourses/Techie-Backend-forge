@@ -59,6 +59,13 @@ return switch (event) {
 };
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+- Uses switch branching.
+- Uses conditionals.
+
 Spring's own code accepts records naturally: `@ConfigurationProperties` with constructor binding, repository projections, event payloads.
 
 ## Docker Compose support — dev infrastructure as code

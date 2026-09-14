@@ -292,6 +292,11 @@ PaymentResponse result = (PaymentResponse) ctx.createUnmarshaller()
 if (result.isApproved()) { ... }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses conditionals.
+
 ### Scenario 2: Generating reports in XML format for a government system
 ```java
 // Government tax APIs often require XML submissions
@@ -312,6 +317,11 @@ public class UnifiedUser {
     private String name;
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `UnifiedUser`.
 
 ## Common Beginner Pitfalls
 

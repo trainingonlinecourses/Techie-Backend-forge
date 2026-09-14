@@ -82,6 +82,14 @@ counts.computeIfAbsent(endpoint, k -> new AtomicInteger(0)).incrementAndGet();
 counts.merge(endpoint, 1, Integer::sum);
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+- Uses method references.
+- Uses the `Map` collection.
+- Uses generics.
+
 ## CopyOnWriteArrayList — snapshot iteration
 
 `CopyOnWriteArrayList` makes a **fresh copy of the underlying array** on every `add`/`set`/`remove`. Reads see a consistent snapshot without locking; writes are expensive but rare.
@@ -184,6 +192,13 @@ void startConsumer() {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+- Uses loops.
+- Uses generics.
+
 ## ArrayDeque vs LinkedList for queue/deque operations
 
 
@@ -208,6 +223,11 @@ queue.offer("first");
 queue.offer("second");
 String head = queue.poll();
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses generics.
 
 **Why ArrayDeque beats LinkedList:** ArrayDeque uses a circular array — O(1) amortized for add/remove at both ends, better cache locality (contiguous memory), and lower memory per element (no Node objects).
 

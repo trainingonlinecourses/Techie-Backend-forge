@@ -121,6 +121,14 @@ public class ContentController {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `ContentController` with methods `curriculum()`, `me()`.
+- Uses the java.time date-time API.
+- Uses conditionals.
+- Uses generics.
+
 ### Walking Through Each Part
 
 **`Cache-Control: max-age=300, public`** — the curriculum (public, rarely-changing content) is reusable for 5 minutes, cacheable by *anyone* including CDNs. Five minutes of stale curriculum is fine, and the traffic saved is enormous.

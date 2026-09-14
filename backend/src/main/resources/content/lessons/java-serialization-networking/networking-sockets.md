@@ -104,6 +104,12 @@ public class HttpExamples {
     public static void main(String[] args) throws Exception {
         // GET
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+
         String json = get("https://api.example.com/users");
 ```java
         System.out.println(json);
@@ -153,6 +159,12 @@ public class Main {
 
     public static void main(String[] args) {
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+
         HttpRequest request = HttpRequest.newBuilder()
             .uri(URI.create(downloadUrl))
             .GET()

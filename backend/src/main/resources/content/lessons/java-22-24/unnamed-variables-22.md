@@ -14,12 +14,6 @@ capstone: false
 
 Sometimes Java *forces* you to name a variable you never actually use — the exception in a `catch`, the index in a loop, a pattern variable in `switch`. Since **Java 22 (JEP 456)**, you can write a single underscore `_` instead: "yes, there is a value here, and I deliberately ignore it."
 
-## What this code does — step by step
-
-1. Before Java 22, you had to invent names like `e` or `ignored` for values you never touch.
-2. Java 22 lets you replace those names with `_`.
-3. The compiler knows `_` is never read — so it won't warn you about it, and you can't accidentally use it.
-4. The code below compiles and runs on **Java 22+** (the simulator handles the classic form; run it on JDK 22+ to see the `_` forms for real).
 
 ```java
 public class UnnamedDemo {
@@ -52,6 +46,13 @@ public class UnnamedDemo {
     }
 }
 ```
+
+<!-- why -->
+## What this code does — step by step
+1. Before Java 22, you had to invent names like `e` or `ignored` for values you never touch.
+2. Java 22 lets you replace those names with `_`.
+3. The compiler knows `_` is never read — so it won't warn you about it, and you can't accidentally use it.
+4. The code below compiles and runs on **Java 22+** (the simulator handles the classic form; run it on JDK 22+ to see the `_` forms for real).
 
 ## The three rules to remember
 

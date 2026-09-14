@@ -159,6 +159,11 @@ healthStatusManager.setStatus("", HealthCheckResponse.ServingStatus.SERVING);
 healthStatusManager.setStatus("course-db", HealthCheckResponse.ServingStatus.NOT_SERVING);
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+
 ```yaml
 # Kubernetes probe via grpc_health_probe
 livenessProbe:
@@ -180,6 +185,11 @@ public GrpcServerConfigurer reflectionConfigurer() {
         ServerReflectionUtil.createProtoReflectionService());
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
 
 ```bash
 grpcurl -plaintext localhost:9090 list

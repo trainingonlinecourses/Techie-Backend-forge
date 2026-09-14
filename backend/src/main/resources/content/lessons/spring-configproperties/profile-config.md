@@ -35,8 +35,6 @@ app:
 
 ---
 
-## Line-by-Line Walkthrough
-
 ```java
 @Data
 @ConfigurationProperties(prefix = "app.cache")
@@ -55,6 +53,9 @@ public class CacheProperties {
     }
 }
 ```
+
+<!-- why -->
+## Line-by-Line Walkthrough
 
 ### Per-Profile YAML
 
@@ -116,6 +117,12 @@ public class RedisCacheConfig {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `RedisCacheConfig` with methods `redisTemplate()`.
+- Uses generics.
 
 ---
 

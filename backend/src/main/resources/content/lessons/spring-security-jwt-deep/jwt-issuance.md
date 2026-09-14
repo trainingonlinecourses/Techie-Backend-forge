@@ -112,6 +112,13 @@ public class TokenService {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `TokenService` with methods `issueToken()`, `login()`.
+- Uses regex matching.
+- Uses conditionals.
+
 ### Walking Through Each Part
 
 **The key** — derived from the configured secret via `Keys.hmacShaKeyFor` (which enforces the minimum 256-bit length — a weak secret throws at startup, a good fail-fast). The secret lives in config (env var in prod), never in code.

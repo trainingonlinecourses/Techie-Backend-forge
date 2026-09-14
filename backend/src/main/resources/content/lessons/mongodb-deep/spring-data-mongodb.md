@@ -57,6 +57,15 @@ public interface ProductRepository extends MongoRepository<Product, String> {
 
     // Derived queries — method name becomes the query:
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `ProductRepository`.
+- Uses an interface.
+- Uses inheritance.
+- Uses generics.
+
     List<Product> findByName(String name);
     List<Product> findByPriceLessThan(double max);
     List<Product> findByInStockTrue();

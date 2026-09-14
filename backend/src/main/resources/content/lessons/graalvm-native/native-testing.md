@@ -69,6 +69,11 @@ The same code, clean:
 class SerializationTest { ... }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `SerializationTest`.
+
 **The discipline:** run the full test suite (unit + integration + the Spring slices) in native mode. A passing native test suite is the *evidence* that the closed-world analysis saw everything — the integration tests, especially, exercise the reflective edges (JSON binding, Spring Data, Actuator) that the analyzer must have hinted correctly.
 
 ## Test AOT: Making the JVM Loop Closer to Native

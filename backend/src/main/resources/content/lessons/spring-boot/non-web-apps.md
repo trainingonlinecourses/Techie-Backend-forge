@@ -93,6 +93,15 @@ public class DataMigrationRunner implements CommandLineRunner {
 
 **Run it:**
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `DataMigrationRunner` with methods `run()`, `migrateData()`.
+- Uses interface implementation.
+- Uses conditionals.
+- When run, it prints: “Arguments received: ”, “Starting data migration...” …
+
 ```bash
 java -jar myapp.jar migrate              # triggers the migration
 java -jar myapp.jar                      # skips it
@@ -184,6 +193,14 @@ public class MessageListener implements CommandLineRunner {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `QueueProcessorApplication` and `MessageListener` with methods `main()`, `run()`.
+- Uses exception handling with try/catch.
+- Uses lambda expressions.
+- Uses interface implementation.
+
 **How it stays alive:** The `executor.submit()` starts a daemon thread. Spring Boot's main thread is blocked by `SpringApplication.run()` waiting for a shutdown signal (Ctrl+C / SIGTERM). The background thread processes messages until the app is stopped.
 
 ```java
@@ -198,6 +215,12 @@ public class DailyReportJob {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `DailyReportJob` with methods `generateDailyReport()`.
+- When run, it prints: “Generating daily report...”
 
 The `@Scheduled` annotation keeps the Spring context alive (the task scheduler thread pool is a non-daemon thread). No manual thread management needed.
 

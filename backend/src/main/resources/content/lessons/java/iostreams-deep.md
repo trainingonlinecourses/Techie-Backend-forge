@@ -73,6 +73,11 @@ try (BufferedWriter writer = new BufferedWriter(
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses loops.
+
 **Java 8+ simplification:** `Files.newBufferedReader()` and `Files.newBufferedWriter()` eliminate the decorator chain:
 
 try (BufferedReader reader = Files.newBufferedReader(Path.of("orders.csv"), StandardCharsets.UTF_8)) {
@@ -85,6 +90,11 @@ try (BufferedReader reader = Files.newBufferedReader(Path.of("orders.csv"), Stan
 String content = Files.readString(Path.of("config.yml"));
 Files.writeString(Path.of("output.txt"), "Order processed\n");
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses file I/O with the NIO API.
 
 ## NIO: channels and buffers
 

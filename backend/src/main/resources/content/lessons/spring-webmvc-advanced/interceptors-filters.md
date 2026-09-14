@@ -120,8 +120,6 @@ public class WebConfig implements WebMvcConfigurer {
     }
 }
 
-**Why interceptors over filters for auth?** Interceptors know the *handler* — you can skip auth for `@PublicEndpoint`-annotated methods:
-
 ```java
 @Override
 public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
@@ -134,6 +132,9 @@ public boolean preHandle(HttpServletRequest request, HttpServletResponse respons
     return authenticate(request, response);
 }
 ```
+
+<!-- why -->
+**Why interceptors over filters for auth?** Interceptors know the *handler* — you can skip auth for `@PublicEndpoint`-annotated methods:
 
 ## HandlerMethodArgumentResolver
 

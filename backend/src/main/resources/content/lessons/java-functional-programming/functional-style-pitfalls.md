@@ -34,6 +34,11 @@ items.stream()
 // The mutation races/orders unpredictably and breaks functional guarantees.
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+
 **Why it's wrong:** `forEach` with a side effect on *external* state abandons everything functional style promises. The stream's internal iteration order is not guaranteed (and with `parallel()` it's genuinely concurrent) — so `log` ends up in an arbitrary order, and concurrent writers can corrupt it. If you need a result from the stream, **collect it**; if you need a side effect per element, use a plain `for` loop, which is honest about what it does.
 
 ## The Code Walkthrough
@@ -94,6 +99,14 @@ public class FunctionalPitfalls {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `FunctionalPitfalls` with methods `main()`.
+- Uses the Streams API to process data declaratively.
+- Uses lambda expressions.
+- Uses method references.
 
 ### Walking Through Each Part
 

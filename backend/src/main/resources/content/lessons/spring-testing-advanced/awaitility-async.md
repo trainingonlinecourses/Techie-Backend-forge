@@ -151,6 +151,12 @@ void shouldRunDailyCleanup() {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+- Uses the java.time date-time API.
+
 ---
 
 ## Real-World Scenarios

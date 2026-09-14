@@ -53,6 +53,11 @@ public class EmailSender {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `EmailSender`.
+
 Spring converts the string to the field type (int, boolean, `Duration` via `@Value("${x:PT5S}")` with `@DurationUnit` or Boot's binding, enums). A missing property **without a default** fails startup with a clear `Could not resolve placeholder` — the fail-fast behavior teams rely on.
 
 ## Constructor injection of values — the modern form
@@ -90,6 +95,11 @@ private int poolSize;
 @Value("#{T(java.util.concurrent.TimeUnit).SECONDS.toMillis(30)}")
 private long timeoutMs;                          // static-method SpEL
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses local type inference with `var`.
 
 **Scenario 3 — test overrides.** `@SpringBootTest(properties = "app.mail.host=localhost:2525")` overrides the `@Value` resolution for tests — the property source stack handles it without touching prod config.
 

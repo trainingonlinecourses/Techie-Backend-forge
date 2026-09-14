@@ -63,6 +63,12 @@ public record OrderDto(
 The org rule: **global config for system-wide policy** (null handling, money, unknown fields); **annotations for per-contract decisions** (names, ignored fields, formats). Annotations beat config when the same type appears in different shapes on different endpoints.
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderDto`.
+- Uses a `record`.
+
 ## How we use it in an organization: the scenarios
 
 **Scenario 1 — API contract stability.** `FAIL_ON_UNKNOWN_PROPERTIES=false` on the server lets clients send extra fields without breaking; the response with `NON_NULL` stays lean. This is the "evolve without breaking" baseline for a public API.

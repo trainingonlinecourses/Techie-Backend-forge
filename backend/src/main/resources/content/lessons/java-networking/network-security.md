@@ -134,6 +134,12 @@ public class TlsClient {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `TlsClient` with methods `main()`.
+- Uses loops.
+
 **Walking through it:** `SSLContext.getDefault()` gives the properly-configured default (trust store + modern protocols). `createSocket` makes the connection; `startHandshake()` runs the cryptographic negotiation and **throws** if the certificate chain or hostname fails verification — that throw is the security working. After a successful handshake, the socket behaves like any socket, but everything is encrypted. If this were a plain `Socket`, the same "GET" line would fly across the network readable by anyone.
 
 ## Recap

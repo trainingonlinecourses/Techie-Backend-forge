@@ -45,6 +45,7 @@ if (new Set(orders).size !== orders.length) fail('modules.json: duplicate order 
 
 // ---------- 2. lessons ----------
 const seenSlugs = new Map();
+const explicitPrereqs = new Map(); // slug → [required slugs] from `requires:` tags
 let lessonCount = 0;
 
 for (const m of modules) {
@@ -83,6 +84,21 @@ for (const m of modules) {
     const om = /(?:^|\n)order:\s*(\d+)/.exec(meta);
     if (om) moduleOrders.push(+om[1]);
 
+    // `requires: [a, b]` — must be a single-line inline list. The backend's simple
+    // front-matter parser only captures single-line values, so a multi-line list
+    // would be silently dropped: reject it here so it can never ship.
+    const rm = /(?:^|\n)requires:\s*(.*)/.exec(meta);
+    if (rm) {
+      const val = rm[1].trim();
+      if (val === '' || !val.startsWith('[')) {
+        fail(`${rel}: "requires:" must be an inline list like requires: [slug-a, slug-b]`);
+      } else {
+        const slugs = val.slice(1, val.endsWith(']') ? -1 : undefined)
+          .split(',').map((s) => s.trim().replace(/^["']+|["']+$/g, '')).filter(Boolean);
+        explicitPrereqs.set(slug, slugs);
+      }
+    }
+
     // fences balanced
     const fences = (text.match(/^\s*```/gm) || []).length;
     if (fences % 2 !== 0) fail(`${rel}: unbalanced code fences (${fences})`);
@@ -98,6 +114,42 @@ for (const m of modules) {
   if (dup.length) fail(`module "${m.id}": duplicate lesson order values: ${[...new Set(dup)].join(', ')}`);
 }
 
+// ---------- 3. prerequisite graph ----------
+// Every referenced slug must exist (forward references are fine — this runs
+// after all files are read), no self-references, no cycles: a prereq cycle
+// would make the gating banner unsatisfiable for every lesson in the loop.
+const reqErrors = [];
+for (const [slug, reqs] of explicitPrereqs) {
+  for (const r of reqs) {
+    if (r === slug) reqErrors.push(`lesson "${slug}" requires itself`);
+    else if (!seenSlugs.has(r)) reqErrors.push(`lesson "${slug}" requires unknown lesson "${r}"`);
+  }
+}
+if (reqErrors.length) {
+  for (const e of reqErrors.slice(0, 20)) fail(e);
+} else {
+  const WHITE = 0, GRAY = 1, BLACK = 2;
+  const color = new Map();
+  const stack = [];
+  function visit(node) {
+    color.set(node, GRAY);
+    stack.push(node);
+    for (const next of explicitPrereqs.get(node) || []) {
+      if ((color.get(next) ?? WHITE) === GRAY) {
+        const from = stack.indexOf(next);
+        fail(`prerequisite cycle: ${[...stack.slice(from), next].join(' → ')}`);
+      } else if ((color.get(next) ?? WHITE) === WHITE && seenSlugs.has(next)) {
+        visit(next);
+      }
+    }
+    stack.pop();
+    color.set(node, BLACK);
+  }
+  for (const slug of explicitPrereqs.keys()) {
+    if ((color.get(slug) ?? WHITE) === WHITE) visit(slug);
+  }
+}
+
 // ---------- result ----------
 if (errors.length) {
   console.error(`\n✖ Content integrity: ${errors.length} problem(s)\n`);
@@ -106,4 +158,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log(`✓ Content integrity OK: ${modules.length} modules (order 1..${modules.length}), ${lessonCount} lessons, all slugs unique, all fences balanced`);
+console.log(`✓ Content integrity OK: ${modules.length} modules (order 1..${modules.length}), ${lessonCount} lessons, ${explicitPrereqs.size} explicit prereq tags validated (no cycles), all slugs unique, all fences balanced`);

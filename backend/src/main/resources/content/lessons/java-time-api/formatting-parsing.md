@@ -115,6 +115,14 @@ public class FormattingDemo {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `FormattingDemo` with methods `main()`.
+- Uses exception handling with try/catch.
+- Uses the java.time date-time API.
+- When run, it prints: “Rejected: ”, “Written as ”
+
 ### Walking Through Each Part
 
 **Part 1 — formatting.** Three patterns, three styles. `ISO_LOCAL_DATE` is the exchange format — machine-readable, unambiguous, sortable. `"dd MMM yyyy"` is a compact human style. `"EEEE, MMMM d, yyyy"` adds the weekday (`EEEE`) and full month — note the `Locale.US` argument, because "Tuesday" is English; the same pattern with `Locale.FRANCE` prints "mardi".

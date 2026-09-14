@@ -184,6 +184,11 @@ public ResponseEntity<Void> uploadProfilePicture(
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses conditionals.
+
 ### Scenario 2: bulk CSV import with streaming
 
 @PostMapping("/import/orders")

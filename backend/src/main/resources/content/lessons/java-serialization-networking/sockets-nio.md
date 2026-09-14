@@ -99,6 +99,12 @@ public class SimpleClient {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `SimpleServer` and `SimpleClient` with methods `main()`.
+- When run, it prints: “Server listening on port 8080”, “Client connected: ” …
+
 ---
 
 ## Multi-Threaded Server
@@ -213,6 +219,12 @@ public class NioBasic {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `NioBasic` with methods `main()`.
+- Uses file I/O with the NIO API.
+
 ### Selectors — Non-Blocking Network I/O
 
 
@@ -300,6 +312,14 @@ public class NioServer {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `NioServer` with 4 methods.
+- Uses the `Set` collection.
+- Uses loops.
+- Uses conditionals.
+
 ---
 
 ## Real-World Scenarios
@@ -383,6 +403,12 @@ public class FileTransfer {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `FileTransfer` with methods `sendFile()`, `receiveFile()`.
+- Uses loops.
 
 ---
 

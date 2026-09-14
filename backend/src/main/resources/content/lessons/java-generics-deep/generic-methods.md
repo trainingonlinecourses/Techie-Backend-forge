@@ -41,6 +41,13 @@ static Number firstNumber(List<? extends Number> list) {
 
 // Generic method: preserves the exact type.
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses inheritance.
+- Uses the `List` collection.
+
 // Call with List<Integer> -> you get Integer back.
 static <T> T first(List<T> list) {
     return list.get(0);

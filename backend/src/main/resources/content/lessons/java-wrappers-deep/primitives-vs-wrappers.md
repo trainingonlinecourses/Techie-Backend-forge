@@ -34,6 +34,11 @@ for (int i = 0; i < numbers.length; i++) {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses loops.
+
 ## When to Use Wrappers
 
 - Collections (`List<Integer>`, `Map<String, Boolean>`)
@@ -47,6 +52,11 @@ public class User {
     private boolean active;  // primitive: always has a value
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `User`.
 
 ---
 
@@ -105,6 +115,14 @@ public class PrimitivesVsWrappers {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `PrimitivesVsWrappers` with methods `main()`.
+- Uses the `List` collection.
+- Uses loops.
+- Uses generics.
 
 ---
 

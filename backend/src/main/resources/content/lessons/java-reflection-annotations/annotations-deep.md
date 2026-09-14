@@ -48,6 +48,12 @@ import java.lang.annotation.*;
 @interface RuntimeOnly { }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `SourceOnly` and `ClassOnly` and 1 more type(s).
+- Uses an interface.
+
 **Why retention matters:** `@Override` and `@SuppressWarnings` are `SOURCE` — the compiler reads them, then discards them; keeping them at runtime would waste memory for zero benefit. `@FunctionalInterface` is also `SOURCE` — it only guides the compiler. Spring's annotations (`@Service`, `@Transactional`, `@GetMapping`) are `RUNTIME` — Spring's `ApplicationContext` reads them with reflection *while your app runs*. If you write a custom annotation your framework needs to see at runtime, it must be `RUNTIME`; this is the most common annotation bug.
 
 ## Where It Can Be Applied: Target
@@ -72,6 +78,12 @@ public @interface Entity { }
 @Retention(RetentionPolicy.RUNTIME)
 public @interface NotNull { }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Audited` and `Entity` and 1 more type(s).
+- Uses an interface.
 
 The common `ElementType` values: `TYPE` (classes/interfaces/records/enums), `METHOD`, `FIELD`, `PARAMETER`, `CONSTRUCTOR`, `LOCAL_VARIABLE`, `ANNOTATION_TYPE` (meta-annotations like `@Target` themselves), `PACKAGE`, and `TYPE_USE` (which allows annotations in generic type arguments, e.g. `List<@NotNull String>`).
 
@@ -139,6 +151,13 @@ public class RateLimitProcessor {
         if (history.isAnnotationPresent(RateLimit.class)) {
             RateLimit rl = history.getAnnotation(RateLimit.class);
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+- Uses conditionals.
+
             System.out.println("history: " + rl.maxRequests() +
                                " per " + rl.window());
             // -> history: 100 per 1m

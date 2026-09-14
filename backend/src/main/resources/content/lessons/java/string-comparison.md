@@ -27,6 +27,11 @@ public class Main {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+
 `==` on two references asks "are these the *same object*?" — it does not compare content. Strings compare content with **`equals`** (and the variants below). The confusion persists because the **string pool** makes `==` *appear* to work for literals: `"hello" == "hello"` is true (both point at the pooled literal), so the bug hides until a string comes from user input, a database, or `new`.
 
 **The org rule:** **never compare strings with `==`** — except the one legitimate case at the bottom of this lesson. `equals` always, or a `null`-safe `Objects.equals(a, b)`.
@@ -76,6 +81,11 @@ if (order.getStatus().equals("PAID")) { ... }           // NPE if status is null
 // The literal-first idiom ("Yoda") exists for a reason: "PAID".equals(x) never NPEs
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses conditionals.
+
 Teams standardize on **`"constant".equals(variable)`** so a null variable can't throw. Same pattern for `case`-style matching with `equalsIgnoreCase` when input case varies (user-typed values, external codes).
 
 **Scenario 2 — ordering with collation.** `compareTo` is *code-point* ordering — not human/alphabetical for accented text:
@@ -98,6 +108,11 @@ The org rule: **ASCII/code/identifier ordering → `compareTo`; human-language s
 if (status == Status.PAID_NAME) { ... }   // only safe if both are interned/literals
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses conditionals.
+
 This is an optimization for ultra-hot loops; teams generally ban it in review because the guarantee is fragile. Use `equals`.
 
 ```java
@@ -107,6 +122,11 @@ This is an optimization for ultra-hot loops; teams generally ban it in review be
 String normalized = raw.trim().toLowerCase(Locale.ROOT);   // Locale.ROOT avoids Turkish-i surprises
 if (normalized.equals("admin")) { ... }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses conditionals.
 
 `toLowerCase()` *without* a locale uses the default locale — the classic **Turkish-i bug** (`"I".toLowerCase()` becomes `ı` in Turkish locale). Always pass `Locale.ROOT` for code/identifier normalization.
 

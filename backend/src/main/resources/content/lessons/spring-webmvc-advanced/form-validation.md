@@ -37,6 +37,11 @@ public String register(@Valid @ModelAttribute RegistrationForm form,
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses conditionals.
+
 Spring binds `request.getParameter("email")` → `form.email`, runs validation, and populates `BindingResult`. The order matters: **`BindingResult` must immediately follow the `@Valid` parameter**, or Spring throws a 500 instead of binding errors.
 
 ## The BindingResult Contract
@@ -110,6 +115,14 @@ public class PhoneNumberValidator
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `ValidPhone` and `PhoneNumberValidator` with methods `isValid()`.
+- Uses an interface.
+- Uses inheritance.
+- Uses interface implementation.
+
 ## Grouped Validation
 
 Different rules per operation on the same form:
@@ -133,6 +146,12 @@ public String create(@Validated(AccountForm.Create.class) @ModelAttribute Accoun
 
 Registration requires the password; an update doesn't touch it.
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `AccountForm` and `Create` and 1 more type(s) with methods `create()`.
+- Uses an interface.
 
 ## Server-Side Validation Is Mandatory
 

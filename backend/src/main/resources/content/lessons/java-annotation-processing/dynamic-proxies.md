@@ -63,6 +63,12 @@ UserService proxy = (UserService) Proxy.newProxyInstance(
 );
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `UserService`.
+- Uses an interface.
+
 ### InvocationHandler
 
 ```java
@@ -82,6 +88,13 @@ class LoggingHandler implements InvocationHandler {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `LoggingHandler` with methods `invoke()`.
+- Uses interface implementation.
+- When run, it prints: “[LOG] Before: ”, “[LOG] After: ”
 
 ---
 
@@ -179,6 +192,14 @@ public class DynamicProxyDemo {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `DynamicProxyDemo` and `OrderServiceImpl` and 2 more type(s) with 5 methods.
+- Uses interface implementation.
+- Uses the `List` collection.
+- Uses the `Map` collection.
+
 ---
 
 ## JDK Proxy vs CGLIB
@@ -236,6 +257,15 @@ class TransactionHandler implements InvocationHandler {
 
 // Usage
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `TransactionHandler` with methods `invoke()`.
+- Uses exception handling with try/catch.
+- Uses interface implementation.
+- When run, it prints: “[TX] BEGIN”, “[TX] COMMIT” …
+
 UserService txService = (UserService) Proxy.newProxyInstance(
     UserService.class.getClassLoader(),
 ```java

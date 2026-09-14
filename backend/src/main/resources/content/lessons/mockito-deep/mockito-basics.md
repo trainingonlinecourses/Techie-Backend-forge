@@ -72,6 +72,11 @@ class PaymentServiceTest {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `PaymentServiceTest`.
+
 **Walking through it:** `@ExtendWith(MockitoExtension.class)` activates Mockito's JUnit 5 support — it creates the `@Mock` field (a fully-controlled stand-in for `PaymentRepository`) and, with its *strict stubbing* default, fails tests that have unused stubs (catching stubs that no longer matter — the test-writer's lint). The real `PaymentService` receives the mock via its constructor. `when(repo.findById("p1")).thenReturn(p)` is the stubbing line: "when this method is called with exactly `"p1"`, return `p`." The service's real logic runs, calls the mock, gets the stubbed answer — and the test asserts the observable outcome. No database anywhere: fast, deterministic, isolated.
 
 ## Stubbing: The Answer Machine
@@ -136,6 +141,11 @@ void chargeDeductsBalanceAndSaves() {
     verify(repo, atLeastOnce()).findById(anyString());
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
 
 **The verification vocabulary:** `times(n)` (exactly n), `never()`, `atLeastOnce()`, `atMostOnce()`, `atLeast(n)`. The argument matcher `argThat(...)` asserts on the *arguments passed* — the strongest interaction check ("the service saved an account with balance 800"). The discipline: **verify what you care about and nothing more** — verifying every interaction makes tests brittle (any refactor breaks them); verifying none misses the point of mocking.
 

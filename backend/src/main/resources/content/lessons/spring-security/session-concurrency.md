@@ -91,6 +91,11 @@ public class SessionConfig {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `SessionConfig` with methods `sessionRepository()`.
+
 ```properties
 # application.properties
 spring.session.store-type=jdbc                    # Store sessions in database

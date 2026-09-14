@@ -55,8 +55,6 @@ After the handshake, data flows in **frames**:
 
 A message may span multiple frames (fragmentation) and frames may be **masked** (client → server only) — a protocol detail that exists to prevent cache-poisoning attacks on proxies.
 
-## The Code Walkthrough — Spring's WebSocket Handler
-
 ```java
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.*;
@@ -96,6 +94,9 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     }
 }
 ```
+
+<!-- why -->
+## The Code Walkthrough — Spring's WebSocket Handler
 
 ### Walking Through Each Part
 

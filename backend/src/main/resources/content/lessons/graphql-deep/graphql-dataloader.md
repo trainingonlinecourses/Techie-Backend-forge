@@ -90,6 +90,14 @@ public class CourseResolvers {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `LessonBatchLoader` and `CourseResolvers` with methods `lessons()`.
+- Uses the Streams API to process data declaratively.
+- Uses asynchronous composition with `CompletableFuture`.
+- Uses lambda expressions.
+
 ### Walking Through Each Part
 
 **`BatchLoaderRegistry`** — where you register a *batch loader*: given a collection of keys (course ids), return a map of key → values (course → its lessons). The framework collects all pending loads for that field *within one query execution* and calls your loader once.

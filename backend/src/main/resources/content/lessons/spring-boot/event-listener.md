@@ -160,6 +160,11 @@ public class NotificationListener {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `InventoryListener` and `PaymentListener` and 1 more type(s) with methods `deductStock()`, `chargePayment()`, `sendConfirmation()`.
+
 ### Scenario 5: Conditional event listeners
 
 Only listen when certain conditions are met:
@@ -201,6 +206,11 @@ public class ApplicationEventHandler {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `ApplicationEventHandler` with methods `onApplicationReady()`, `onContextClosed()`, `onSessionCreated()`.
 
 ## Event pattern: Domain events
 

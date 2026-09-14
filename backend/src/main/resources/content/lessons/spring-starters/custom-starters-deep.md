@@ -99,6 +99,13 @@ public class MyCompanyRedisProperties {
 com.mycompany.redis.autoconfigure.MyCompanyRedisAutoConfiguration
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `MyCompanyRedisAutoConfiguration` and `MyCompanyRedisProperties` with methods `redisTemplate()`, `redisCacheManager()`.
+- Uses the java.time date-time API.
+- Uses generics.
+
 ---
 
 ## Real-World Scenarios
@@ -139,6 +146,12 @@ public class MyCompanySecurityAutoConfiguration {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `MyCompanySecurityAutoConfiguration` with methods `filterChain()`.
+- Uses lambda expressions.
 
 ### Scenario 2: Database migration starter
 

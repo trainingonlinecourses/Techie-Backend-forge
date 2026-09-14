@@ -29,6 +29,11 @@ public class Account {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Account`.
+
 Without `this.`, `owner = owner` assigns the parameter to itself and the field stays `null`. The rule: when a parameter or local variable shares a name with a field, the *inner* name wins (it "shadows" the field), and only `this.` reaches the field.
 
 **Job 2: pass the current object along.** Methods often need to hand *themselves* to something else — registering with a listener list, adding themselves to a builder:
@@ -43,6 +48,11 @@ public class Player {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Player`.
 
 **Job 3: constructor chaining.** One constructor delegating to another of the *same* class:
 
@@ -62,6 +72,11 @@ public class Account {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Account`.
+
 `this(...)` must be the **first statement** in the constructor — you delegate before doing any of your own work, so initialization happens in exactly one place.
 
 ### The three jobs of `super`
@@ -80,6 +95,12 @@ public class AuditedAccount extends Account {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `AuditedAccount` with methods `withdraw()`.
+- Uses inheritance.
+
 Skip `super.` and you've *replaced* the parent logic instead of *adding* to it — silently losing validation, balance updates, whatever the parent did.
 
 **Job 2: fields.** If a subclass declares a field with the same name as the parent's, you get *two* fields, and `super.fieldName` reads the parent's copy. (Shadowed fields are a design smell — but you must recognize them in the wild.)
@@ -96,6 +117,12 @@ public class AuditedAccount extends Account {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `AuditedAccount`.
+- Uses inheritance.
 
 If you omit `super(...)`, the compiler inserts `super()` — the parent's *no-arg* constructor. If the parent has no no-arg constructor (like our `Account`, which only defined a two-arg one), the code **doesn't compile** until you call a valid parent constructor explicitly. This is the classic "implicit super constructor is undefined" error, and now you know exactly what it means: the parent must be initialized before the child can run.
 

@@ -38,6 +38,14 @@ public class LifecycleLogger implements BeanPostProcessor {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `LifecycleLogger` with methods `postProcessAfterInitialization()`.
+- Uses interface implementation.
+- Uses conditionals.
+- When run, it prints: “wrapped: ”
+
 ## The stereotypes
 
 | Annotation | Meaning | Extras |
@@ -59,6 +67,11 @@ public class InfrastructureConfig {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `InfrastructureConfig` with methods `clock()`, `billingClient()`.
+
 ## Lifecycle annotations
 
 ```java
@@ -71,6 +84,11 @@ public class CacheWarmer {
     public void flush() { /* runs on graceful shutdown */ }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `CacheWarmer` with methods `warm()`, `flush()`.
 
 `@PostConstruct` is for *your* initialization; for infrastructure-level hooks use `ApplicationRunner`/`CommandLineRunner` (Boot) or `InitializingBean`.
 
@@ -92,6 +110,11 @@ public class GoodService {
     public Result doWork(String user) { ... }    // no fields at all
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `BadService` and `GoodService` with methods `doWork()`.
 
 ## Where beans come from
 

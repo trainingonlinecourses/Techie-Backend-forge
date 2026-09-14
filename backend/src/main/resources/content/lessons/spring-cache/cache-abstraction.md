@@ -23,6 +23,11 @@ public class CacheConfig {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `CacheConfig`.
+
 `@EnableCaching` registers a `CacheInterceptor` that wraps annotated methods in a proxy. Like `@Transactional` and `@Async`, **self-invocation bypasses the cache** — call through the proxy.
 
 ## @Cacheable: The Core Annotation
@@ -136,6 +141,12 @@ public class CourseService {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `CourseService` with methods `getCourseWithFallback()`, `getCourse()`.
+- Uses conditionals.
+
 Fix with `@Lazy` self-injection or split into two beans:
 
 ```java
@@ -155,6 +166,12 @@ public class CourseService {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `CourseService` with methods `getCourseWithFallback()`.
+- Uses conditionals.
 
 ## Configuring a CacheManager
 
@@ -213,6 +230,11 @@ class CourseServiceTest {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `CourseServiceTest`.
 
 ## Summary
 

@@ -78,6 +78,12 @@ try {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses exception handling with try/catch.
+- Uses conditionals.
+
 Java 7 made the JVM do it:
 
 ```java
@@ -112,6 +118,14 @@ class SumTask extends RecursiveTask<Long> {
 }
 new ForkJoinPool().invoke(new SumTask(array));
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `SumTask` with methods `compute()`.
+- Uses inheritance.
+- Uses conditionals.
+- Uses generics.
 
 **Why you should care *now*:** `Collection.parallelStream()` (Java 8) runs **on the common ForkJoinPool** — when you meet parallel streams in the Streams module, this is the machinery underneath, and "don't block inside a parallel stream" makes instant sense: a blocked task starves the shared pool every fork/join consumer on the JVM uses.
 

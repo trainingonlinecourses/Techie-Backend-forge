@@ -105,6 +105,12 @@ class OrderServiceTest {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderServiceTest`.
+- Uses lambda expressions.
+
 ## @SpringBootTest — full integration test
 
 
@@ -166,6 +172,12 @@ class UserControllerIntegrationTest {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `UserControllerIntegrationTest`.
+- Uses generics.
 
 ## @WebMvcTest — testing controllers without the database
 
@@ -238,6 +250,11 @@ class UserControllerWebTest {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `UserControllerWebTest`.
+
 ## @DataJpaTest — testing repositories with a real database
 
 
@@ -281,6 +298,13 @@ class UserRepositoryTest {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `UserRepositoryTest`.
+- Uses `Optional` for null-safe values.
+- Uses generics.
+
 ## @MockBean — replacing beans in the test context
 
 
@@ -318,6 +342,11 @@ class NotificationServiceTest {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `NotificationServiceTest`.
 
 ## Test organization — best practices
 

@@ -100,6 +100,12 @@ public class TimeApiOverview {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `TimeApiOverview` with methods `main()`.
+- Uses the java.time date-time API.
+
 ### Walking Through Each Part
 
 **Part 1 — three "now"s.** `LocalDate.now()` and `LocalTime.now()` use the **JVM's default time zone** — they tell you what the *calendar* looks like where the machine is. `Instant.now()` is different: it's the physical moment, expressed in UTC, independent of where the machine sits. If a server in Virginia and a phone in Delhi call `Instant.now()` at the same moment, they get the **same value** — which is why `Instant` is the right thing to store and transmit timestamps.

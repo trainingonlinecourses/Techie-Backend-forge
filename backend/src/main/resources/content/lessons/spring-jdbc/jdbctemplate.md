@@ -37,6 +37,11 @@ public class CourseJdbcRepository {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `CourseJdbcRepository`.
+
 ## Querying With RowMapper
 
 public Course findById(Long id) {
@@ -168,6 +173,11 @@ jdbcTemplate.batchUpdate(
     });
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+
 ## SQL Injection Safety
 
 **Always use `?` placeholders, never string concatenation:**
@@ -194,6 +204,12 @@ Records make RowMappers trivial:
 public record CourseRow(Long id, String title, String level, int minutes) {}
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `CourseRow`.
+- Uses a `record`.
+
 private static final RowMapper<CourseRow> ROW_MAPPER = (rs, n) ->
 ```java
     new CourseRow(rs.getLong("id"), rs.getString("title"),
@@ -216,6 +232,11 @@ try {
     throw new CourseCodeExistsException();
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses exception handling with try/catch.
 
 The hierarchy (via `SQLErrorCodeSQLExceptionTranslator`) maps vendor codes to Spring exceptions: `DuplicateKeyException`, `DataIntegrityViolationException`, `EmptyResultDataAccessException` (queryForObject found nothing), `IncorrectResultSizeDataAccessException` (found >1).
 

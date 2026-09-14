@@ -253,6 +253,14 @@ public interface UserRepository extends JpaRepository<User, Long> {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `UserRepository`.
+- Uses `Optional` for null-safe values.
+- Uses an interface.
+- Uses inheritance.
+
 **No implementation needed** — Spring Data generates the implementation at runtime. The method name IS the query.
 
 ### Spring Security — authentication and authorization
@@ -292,6 +300,12 @@ public class SecurityConfig {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `SecurityConfig` with methods `filterChain()`.
+- Uses lambda expressions.
 
 ### Spring Cloud — distributed systems
 

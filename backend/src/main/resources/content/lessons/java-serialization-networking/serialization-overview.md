@@ -62,6 +62,12 @@ public class User implements Externalizable {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `User` with methods `writeExternal()`, `readExternal()`.
+- Uses interface implementation.
+
 ---
 
 ## Line-by-Line Walkthrough
@@ -202,6 +208,14 @@ public class SerializationDemo {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `SerializationDemo` and `User` and 3 more type(s) with 8 methods.
+- Uses interface implementation.
+- Uses the `List` collection.
+- Uses generics.
+
 ---
 
 ## Real-World Scenarios
@@ -231,6 +245,12 @@ public class User implements Serializable {
     // ...
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `User`.
+- Uses interface implementation.
 
 ---
 

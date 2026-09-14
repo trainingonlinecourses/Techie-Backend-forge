@@ -53,6 +53,11 @@ class PaymentServiceTest {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `PaymentServiceTest`.
+
 **The three rules:** name the *behavior* (not the implementation), state the *scenario* and the *expectation* explicitly, and let the report read like a specification — "charge valid card deducts balance" tells a reviewer what the system guarantees. (JUnit 5's `@DisplayName` gives you full sentences with spaces for reports: `@DisplayName("charging a declined card throws PaymentDeclined")`.)
 
 ## The Structure: Given-When-Then
@@ -124,6 +129,11 @@ class PaymentRepositoryTest {
 class PaymentApiIntegrationTest {
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `PaymentServiceTest` and `PaymentControllerTest` and 2 more type(s).
 
 **The slice philosophy** (covered deeply in the spring-testing-advanced module): use the *smallest* context that exercises the layer under test. A `@WebMvcTest` is faster than `@SpringBootTest` because it loads only the web slice; `@DataJpaTest` loads only the data layer. The pyramid becomes a *context-size* decision: the lower the layer, the smaller (and faster) the context it needs.
 

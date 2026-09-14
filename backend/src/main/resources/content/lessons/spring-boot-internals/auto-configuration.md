@@ -79,6 +79,12 @@ public class MyLibraryAutoConfiguration {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `MyLibraryAutoConfiguration` with methods `myLibraryClient()`, `myLibraryHealth()`.
+- Uses lambda expressions.
+
 ### Walking Through Each Part
 
 **`@Configuration` + `@ConditionalOnClass`** — the whole class activates only when the named class exists on the classpath. This is how Boot adds Tomcat config only when Tomcat is present: the condition *is* the discovery mechanism.

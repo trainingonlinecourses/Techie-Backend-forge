@@ -99,6 +99,11 @@ public class PoolDemo {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `PoolDemo` with methods `main()`.
+
 ### Walking Through Each Part
 
 **Part 1 (`s1`, `s2`):** Both are literals, so both reference the single pooled `"hello"` object. `==` is `true`.

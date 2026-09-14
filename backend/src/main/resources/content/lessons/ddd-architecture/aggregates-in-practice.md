@@ -56,6 +56,11 @@ public class Order {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Order`.
+
 Cross-aggregate references by id keep aggregates small and transactions short. Load the customer separately when you need it.
 
 ## The Size Trade-Off
@@ -195,6 +200,14 @@ public interface OrderRepository extends JpaRepository<OrderEntity, Long> {
     // NO OrderLineRepository — lines are inside Order
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderRepository`.
+- Uses an interface.
+- Uses inheritance.
+- Uses generics.
 
 ## Aggregate Rules Checklist
 

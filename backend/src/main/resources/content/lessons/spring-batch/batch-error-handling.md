@@ -51,6 +51,11 @@ SkipListener<Transaction, Statement> skipListener() {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses generics.
+
 The classic skip use-case: an ETL where a vendor sends one malformed row per file — fail the whole night run, or skip 3 bad rows and alert? Skip + alert.
 
 ## Retry: transient failures deserve a second chance

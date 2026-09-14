@@ -75,6 +75,14 @@ public class JwtHandshakeInterceptor implements HandshakeInterceptor {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `JwtHandshakeInterceptor` with methods `beforeHandshake()`.
+- Uses interface implementation.
+- Uses the `Map` collection.
+- Uses conditionals.
+
 Register the interceptor:
 
 registry.addEndpoint("/ws")
@@ -127,6 +135,13 @@ public class WebSocketSecurityConfig {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `WebSocketSecurityConfig`.
+- Uses local type inference with `var`.
+- Uses conditionals.
 
 **Deny-by-default is the key**: any destination not explicitly allowed is rejected. A user with a valid token but no admin role gets a `403`-style rejection when subscribing to `/topic/admin/**` — at the frame level, before any data flows.
 

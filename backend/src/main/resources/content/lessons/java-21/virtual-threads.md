@@ -52,6 +52,14 @@ public class ThreadComparison {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `ThreadComparison` with methods `main()`.
+- Uses virtual threads.
+- Uses lambda expressions.
+- When run, it prints: “Running on platform thread: ”, “Running on virtual thread: ”
+
 ### Creating Virtual Threads
 
 
@@ -88,6 +96,14 @@ public class CreatingVirtualThreads {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `CreatingVirtualThreads` with methods `main()`.
+- Uses virtual threads.
+- Uses lambda expressions.
+- Uses the java.time date-time API.
 
 ### The Pinning Problem
 
@@ -188,6 +204,13 @@ public class ScopedValueDemo {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `ScopedValueDemo` with methods `processRequest()`, `handleRequest()`.
+- Uses lambda expressions.
+- Uses generics.
+
 ### Platform Threads vs Virtual Threads
 
 | Aspect | Platform Thread | Virtual Thread |
@@ -283,6 +306,14 @@ public class VirtualThreadDemo {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `VirtualThreadDemo` with methods `fetchMultipleUrls()`.
+- Uses the Streams API to process data declaratively.
+- Uses lambda expressions.
+- Uses the `List` collection.
 
 ### Key Takeaways
 

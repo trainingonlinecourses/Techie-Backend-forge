@@ -20,6 +20,11 @@ Many lambdas are nothing but a forwarding call:
 names.forEach(name -> System.out.println(name));
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+
 The lambda exists *only* to call `System.out.println(name)`. Writing the `name ->` wrapper adds noise without adding meaning. Java gives you a shorthand — the **method reference**:
 
 names.forEach(System.out::println);
@@ -98,6 +103,14 @@ public class MethodRefDemo {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `MethodRefDemo` with methods `main()`.
+- Uses the Streams API to process data declaratively.
+- Uses method references.
+- Uses the `List` collection.
+
 ### Walking Through Each Part
 
 **Part 1 — unbound reference as a key extractor.** `Comparator.comparing` wants a `Function<String, R>` that pulls a sort key out of each element. `String::toLowerCase` fits: the incoming String becomes the receiver, `toLowerCase()` runs on it, and its result is the key. This is the single most common method-reference usage in real code.
@@ -124,6 +137,12 @@ items.stream().map(Item::getPrice).toList();
 items.stream().map(item -> item.getPrice()).toList();
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses the Streams API to process data declaratively.
+- Uses lambda expressions.
+
 Prefer the lambda when you're **adding logic** around the call:
 
 ```java
@@ -132,6 +151,13 @@ items.stream().map(item -> item.getPrice() * (1 - discount)).toList();
 
 // Bad — a reference can't express this
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses the Streams API to process data declaratively.
+- Uses lambda expressions.
+
 items.stream().map(Item::getPrice)  // (can't apply the discount)
 
 Rule of thumb: if the body is *exactly* one method call, use `::`. If there's arithmetic, conditions, or multiple calls, use a lambda.

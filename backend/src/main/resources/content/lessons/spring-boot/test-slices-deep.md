@@ -131,6 +131,12 @@ public @interface AuditTest {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `AuditTest`.
+- Uses an interface.
+
 Or use `@ImportAutoConfiguration` to control exactly which auto-configurations load:
 
 ```java
@@ -140,6 +146,12 @@ class AuditEventRepositoryTest {
     // Loads JPA + audit auto-config, nothing else
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `AuditEventRepositoryTest`.
+- Uses conditionals.
 
 ## Common mistakes
 
@@ -177,6 +189,12 @@ verify(orderService).processOrder(any());  // tests how, not what
 
 // RIGHT: verify the output
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderControllerTest`.
+
 mockMvc.perform(post("/api/orders").contentType(APPLICATION_JSON).content(json))
     .andExpect(status().isCreated())
 ```java

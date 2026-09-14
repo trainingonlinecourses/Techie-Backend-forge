@@ -89,6 +89,13 @@ public class LocalDateTimeDemo {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `LocalDateTimeDemo` with methods `main()`.
+- Uses the java.time date-time API.
+- When run, it prints: “next month: ”, “last day of month: ” …
+
 ### Walking Through Each Part
 
 **Part 1 — construction and queries.** `LocalDate.now()` reads the system clock *in the JVM's default zone* and extracts the date. `of(...)` builds exact values. `isLeapYear()` handles leap rules; `getDayOfYear()` counts from Jan 1 (Jan 1 = 1). Note again: months are 1-based in the `of` call — `LocalDate.of(2026, 8, 18)` is August, not September (the old `Calendar` used 0-based months and 1900-based years; `java.time` fixed both).
@@ -121,6 +128,11 @@ List<LocalDate> dates = List.of(LocalDate.of(2026, 1, 1), LocalDate.of(2025, 12,
 ```java
 dates.stream().sorted().toList();   // sorts chronologically
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses the Streams API to process data declaratively.
 
 `isBefore`, `isAfter`, `isEqual` give boolean comparisons; `compareTo` gives ordering for sorters and streams.
 

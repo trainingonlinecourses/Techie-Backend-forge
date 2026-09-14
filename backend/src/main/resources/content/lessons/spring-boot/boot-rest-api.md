@@ -89,6 +89,13 @@ public class UserController {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `UserController` with 5 methods.
+- Uses the `List` collection.
+- Uses generics.
+
 ## @PathVariable vs @RequestParam vs @RequestBody
 
 
@@ -120,6 +127,12 @@ public List<User> searchUsers(
 @PostMapping("/users")
 public User createUser(@RequestBody CreateUserRequest req) { ... }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses the `List` collection.
+- Uses generics.
 
 ## ResponseEntity — controlling the HTTP response
 
@@ -171,6 +184,13 @@ ResponseEntity.badRequest().body(error)
 ResponseEntity.notFound().build()
 ResponseEntity.status(500).body(error)
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses `Optional` for null-safe values.
+- Uses conditionals.
+- Uses generics.
 
 ## DTOs — never expose your entity directly
 
@@ -233,6 +253,12 @@ public class UserMapper {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `User` and `UserResponse` and 2 more type(s) with methods `toResponse()`, `toEntity()`.
+- Uses a `record`.
+
 ## Global exception handling with @ControllerAdvice
 
 
@@ -293,6 +319,14 @@ public class GlobalExceptionHandler {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `GlobalExceptionHandler` with methods `handleNotFound()`, `handleValidation()`, `handleGeneric()`.
+- Uses the Streams API to process data declaratively.
+- Uses lambda expressions.
+- Uses the `List` collection.
+
 ## CORS configuration — allowing cross-origin requests
 
 
@@ -322,6 +356,12 @@ public class CorsConfig implements WebMvcConfigurer {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `CorsConfig` with methods `addCorsMappings()`.
+- Uses interface implementation.
 
 ## How we use it in organizations
 
@@ -396,6 +436,13 @@ public class UserControllerV2 {
 
 // Clients migrate from v1 to v2 at their own pace
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `UserControllerV1` and `UserControllerV2` with methods `getAll()`.
+- Uses the `List` collection.
+- Uses generics.
 
 ### Scenario 3: Request/Response logging with interceptor
 

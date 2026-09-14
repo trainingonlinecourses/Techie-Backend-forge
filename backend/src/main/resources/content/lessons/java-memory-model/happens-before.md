@@ -37,6 +37,12 @@ while (!sharedData.ready) {}
 System.out.println(sharedData.data);
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `SharedData`.
+- Uses loops.
+
 The **Java Memory Model (JMM)** defines the rules for when one thread's writes become visible to other threads. The key concept is **happens-before** — if action A happens-before action B, then A's effects are guaranteed visible to B.
 
 ---
@@ -181,6 +187,14 @@ public class HappensBeforeDemo {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `HappensBeforeDemo` and `Counter` with 7 methods.
+- Uses manual threading.
+- Uses synchronization with `synchronized`.
+- Uses lambda expressions.
+
 ---
 
 ## Real-World Scenarios
@@ -204,6 +218,12 @@ public class GracefulShutdown {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `GracefulShutdown` with methods `requestShutdown()`, `run()`.
+- Uses loops.
+
 ### Scenario 2: Double-checked locking (correct version)
 
 ```java
@@ -222,6 +242,13 @@ public class Singleton {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Singleton` with methods `getInstance()`.
+- Uses synchronization with `synchronized`.
+- Uses conditionals.
 
 ---
 

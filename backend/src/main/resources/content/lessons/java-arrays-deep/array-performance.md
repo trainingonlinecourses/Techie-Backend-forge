@@ -71,6 +71,14 @@ public class ArrayPerformance {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `ArrayPerformance` with methods `sumArrayList()`, `sumPrimitiveArray()`, `main()`.
+- Uses the `List` collection.
+- Uses formatted output.
+- Uses loops.
+
 ## Performance Comparison
 
 | Data Structure | Memory Layout | Cache Friendly | 10M Sum Time |

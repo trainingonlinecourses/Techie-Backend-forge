@@ -85,6 +85,13 @@ System.out.println(alice.toString());
 System.out.println(alice);
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `UserOld` and `User` with 6 methods.
+- Uses a `record`.
+- Uses conditionals.
+
 ## Sealed Classes — controlling who can implement your interface (Java 17)
 
 
@@ -150,6 +157,14 @@ public non-sealed class Rectangle extends Shape { ... }
 public sealed class Triangle extends Shape permits RightTriangle { ... }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `PaymentMethod` and `CreditCard` and 7 more type(s) with methods `charge()`, `describePayment()`.
+- Uses lambda expressions.
+- Uses a `record`.
+- Uses an interface.
+
 ## Pattern Matching for instanceof (Java 16+)
 
 
@@ -194,6 +209,14 @@ public class Main {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` and `Point` with methods `main()`.
+- Uses a `record`.
+- Uses conditionals.
+- When run, it prints: “Long string: ”, “Point at ”
 
 ## Pattern Matching for switch (Java 21)
 
@@ -258,6 +281,14 @@ String describeUser(User user) {
     };
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Street` and `Address` and 1 more type(s).
+- Uses lambda expressions.
+- Uses a `record`.
+- Uses switch branching.
 
 ## Text Blocks — multi-line strings (Java 15+)
 
@@ -371,6 +402,12 @@ int numLetters = switch (day) {
     default -> throw new IllegalArgumentException("Unknown: " + day);
 };
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+- Uses switch branching.
 
 ## How we use it in organizations
 

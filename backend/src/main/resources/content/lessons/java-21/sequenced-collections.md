@@ -132,6 +132,14 @@ public class SequencedCollectionsDemo {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `SequencedCollectionsDemo` with methods `main()`.
+- Uses the `List` collection.
+- Uses the `Map` collection.
+- Uses the `Set` collection.
+
 ---
 
 ## Real-World Scenarios
@@ -165,6 +173,14 @@ public class LRUCache<K, V> {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `LRUCache` with methods `get()`, `put()`.
+- Uses the `Map` collection.
+- Uses conditionals.
+- Uses generics.
 
 ### Scenario 2: Undo/Redo stack
 

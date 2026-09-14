@@ -20,6 +20,11 @@ if (obj instanceof String) {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses conditionals.
+
 Java 16 introduced **pattern matching for instanceof** — combine the check and cast into one:
 
 ```java
@@ -28,6 +33,11 @@ if (obj instanceof String s) {
     System.out.println(s.length());  // 's' is already a String
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses conditionals.
 
 The variable `s` is only in scope inside the `if` block (and `else` block if it's a negative check).
 
@@ -70,6 +80,13 @@ public class Main {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- Uses conditionals.
+- When run, it prints: “String of length ”, “It's a string: ” …
 
 ---
 
@@ -171,6 +188,14 @@ public class PatternMatchingDemo {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `PatternMatchingDemo` and `Circle` and 2 more type(s) with 4 methods.
+- Uses a `record`.
+- Uses the `List` collection.
+- Uses formatted output.
+
 ---
 
 ## Real-World Scenarios
@@ -189,6 +214,11 @@ public void handleException(Exception e) {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses conditionals.
 
 ### Scenario 2: API response handling
 

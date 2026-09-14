@@ -23,6 +23,11 @@ Enable it once:
 public class SecurityConfig { }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `SecurityConfig`.
+
 Then annotate service methods:
 
 @PreAuthorize("hasRole('ADMIN')")                    // role check before the call
@@ -59,6 +64,11 @@ public class OrderService {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderService` and `TenantGuard` with methods `getOrder()`, `canAccess()`.
 
 URL rules only see `/api/orders/{id}` — they cannot know which tenant the order belongs to. The method rule checks the actual record. This is the canonical "why method security exists" scenario.
 

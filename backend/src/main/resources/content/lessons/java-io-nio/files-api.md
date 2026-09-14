@@ -81,6 +81,14 @@ public class FilesApiDemo {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `FilesApiDemo` with methods `main()`.
+- Uses the Streams API to process data declaratively.
+- Uses method references.
+- Uses file I/O with the NIO API.
+
 ### Walking Through Each Part
 
 **Part 1 — paths.** `Path.of(...)` builds a path from components; `resolve` appends a child; `getFileName`/`getParent` navigate. Nothing touches the disk yet — paths are just descriptions. This is a big improvement over `File` string-fiddling: no manual separator handling.

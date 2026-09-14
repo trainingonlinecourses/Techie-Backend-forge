@@ -43,6 +43,11 @@ public class Main {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+
 ---
 
 ## Line-by-Line Walkthrough
@@ -118,6 +123,14 @@ public class AutoboxingDemo {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `AutoboxingDemo` with methods `main()`.
+- Uses loops.
+- Uses conditionals.
+- When run, it prints: “Boxed: ”, “Sum: ” …
 
 ---
 

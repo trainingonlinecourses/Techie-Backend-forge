@@ -78,6 +78,13 @@ System.out.println(myCar.getSpeed());
 myCar.brake();
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Car` with 4 methods.
+- Uses conditionals.
+- When run, it prints: “Out of fuel!”
+
 ## The Four Pillars of OOP
 
 ### Pillar 1: Encapsulation — hiding internal details
@@ -132,6 +139,12 @@ public class BankAccount {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `BankAccount` with methods `deposit()`, `withdraw()`, `getBalance()`.
+- Uses conditionals.
 
 **Why this matters:** If `balance` were public, any code could set it to `-999999` and corrupt the account. With encapsulation, every change goes through `deposit()` or `withdraw()`, which validate the operation.
 
@@ -210,6 +223,12 @@ System.out.println(s1.area());
 System.out.println(s2.area());
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Shape` and `Circle` and 1 more type(s) with methods `getColor()`, `area()`.
+- Uses inheritance.
+
 **The "fragile base class" problem:** If you change `Shape`, you might accidentally break `Circle` and `Rectangle`. This is why many teams prefer composition over inheritance (see below).
 
 ### Pillar 3: Polymorphism — one interface, many implementations
@@ -257,6 +276,13 @@ public class OrderService {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `PaymentProcessor` and `StripeProcessor` and 2 more type(s) with methods `process()`, `checkout()`.
+- Uses an interface.
+- Uses interface implementation.
+
 ### Pillar 4: Abstraction — hiding complexity behind simple contracts
 
 Abstraction means showing only the essential features and hiding the implementation details.
@@ -285,6 +311,13 @@ public class SmtpEmailService implements EmailService {
 
 emailService.sendEmail("alice@example.com", "Welcome!", "Hello Alice!");
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `EmailService` and `SmtpEmailService` with methods `sendEmail()`.
+- Uses an interface.
+- Uses interface implementation.
 
 ## Records — immutable data classes (Java 16+)
 
@@ -354,6 +387,13 @@ System.out.println(alice.name());
 System.out.println(alice.displayName());
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `UserOld` and `User` with 7 methods.
+- Uses a `record`.
+- Uses conditionals.
+
 ## Composition over Inheritance — the modern preference
 
 
@@ -396,6 +436,14 @@ class Car {
 Car gasCar = new Car(new GasEngine(), tires, new FuelTank());
 Car electricCar = new Car(new ElectricEngine(), tires, new Battery());
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Car` with methods `start()`.
+- Uses inheritance.
+- Uses the `List` collection.
+- Uses generics.
 
 ## How we use it in organizations
 
@@ -443,6 +491,14 @@ public class Account {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Account` with methods `debit()`, `getBalance()`, `getHistory()`.
+- Uses the `List` collection.
+- Uses conditionals.
+- Uses generics.
+
 ### Scenario 2: Polymorphism enables the Strategy pattern
 
 
@@ -487,6 +543,13 @@ public class OrderService {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `PricingStrategy` and `StandardPricing` and 3 more type(s) with methods `calculatePrice()`, `calculateTotal()`.
+- Uses an interface.
+- Uses interface implementation.
+
 ### Scenario 3: Sealed classes for type-safe state machines (Java 17+)
 
 // A ride-sharing order can only be in specific states — sealed class enforces this
@@ -517,6 +580,14 @@ public String describeState(OrderState state) {
     };
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Created` and `Accepted` and 3 more type(s) with methods `describeState()`.
+- Uses lambda expressions.
+- Uses a `record`.
+- Uses interface implementation.
 
 ## Composition vs Inheritance — decision guide
 

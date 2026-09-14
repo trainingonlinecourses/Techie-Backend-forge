@@ -30,6 +30,12 @@ static void countDown(int n) {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses conditionals.
+- When run, it prints: “Liftoff!”
+
 becomes:
 
 ```java
@@ -58,6 +64,11 @@ static long factorialLoop(int n) {
     return result;                   // the base-case value
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses loops.
 
 This is the general recipe: the accumulator variable (`result`) replaces the return-value combination, and the loop condition replaces the base case. If you can trace the recursive version on paper, you can write this version.
 
@@ -88,6 +99,14 @@ public class FileWalker {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `FileWalker` with methods `main()`.
+- Uses loops.
+- Uses conditionals.
+- Uses generics.
 
 Why this matters: a real directory tree can be 50 levels deep — fine — but a **linked structure of 1 million nodes** would blow the call stack at ~10,000 frames while the explicit stack version runs happily, because the heap holds far more than the thread stack can.
 

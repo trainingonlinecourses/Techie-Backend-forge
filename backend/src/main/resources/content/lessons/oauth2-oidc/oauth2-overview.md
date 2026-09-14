@@ -33,6 +33,11 @@ The worst way to let an app access your data on another service is to hand over 
 **The fundamental principle:** the resource server and authorization server never share the user's password. The password (or other credentials) travels only between the user and the authorization server; everything else flows through **tokens**.
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses conditionals.
+
 ## The Token: The Valet Key
 
 The **access token** is the currency of OAuth2 — an opaque or self-contained credential carrying *what the holder may do*:

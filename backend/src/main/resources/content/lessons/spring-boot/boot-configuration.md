@@ -78,6 +78,13 @@ public class EmailService {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `EmailService`.
+- Uses the `List` collection.
+- Uses generics.
+
 ## @ConfigurationProperties — binding entire config blocks
 
 
@@ -123,6 +130,9 @@ app:
       - application/pdf
 ```
 
+<!-- why -->
+
+
 ```java
 **Enable the binding:**
 @SpringBootApplication
@@ -134,6 +144,18 @@ public class AcademyApplication { ... }
 @ConfigurationPropertiesScan    // auto-discovers all @ConfigurationProperties
 public class AcademyApplication { ... }
 ```
+
+<!-- why -->
+**What this code shows:**
+- Defines `StorageProperties`.
+- Uses a `record`.
+- Uses the `List` collection.
+- Uses generics.
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `AcademyApplication`.
 
 ## Profile-specific configuration
 
@@ -241,6 +263,11 @@ public class PaymentProperties {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `PaymentProperties`.
+
 ## How we use it in organizations
 
 ### Scenario 1: Feature flags via configuration
@@ -270,6 +297,12 @@ public class RegistrationService {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `RegistrationService` with methods `register()`.
+- Uses conditionals.
 
 # application.yml
 app:

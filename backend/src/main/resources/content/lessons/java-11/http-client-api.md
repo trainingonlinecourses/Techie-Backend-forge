@@ -28,6 +28,13 @@ reader.close();
 // NEW: HttpClient — clean, readable, fluent
 HttpClient client = HttpClient.newHttpClient();
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses the Streams API to process data declaratively.
+- Uses the `HttpClient` API.
+
 HttpRequest request = HttpRequest.newBuilder()
     .uri(URI.create("https://api.example.com/users"))
     .header("Accept", "application/json")
@@ -107,6 +114,12 @@ public class Main {
 
         // ASYNCHRONOUS — returns CompletableFuture, non-blocking
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses asynchronous composition with `CompletableFuture`.
+
         client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
             .thenApply(HttpResponse::body)
             .thenAccept(System.out::println)
@@ -209,6 +222,14 @@ public class HttpClientDemo {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `HttpClientDemo` with methods `fetchUser()`, `createUser()`, `fetchUserOrders()`.
+- Uses asynchronous composition with `CompletableFuture`.
+- Uses lambda expressions.
+- Uses the `List` collection.
 
 ---
 

@@ -5,6 +5,7 @@ order: 2
 minutes: 15
 topics: [capstone, architecture, layering, project-structure]
 capstone: true
+requires: [dependency-injection, boot-philosophy]
 docs:
   - https://docs.spring.io/spring-boot/reference/
 ---

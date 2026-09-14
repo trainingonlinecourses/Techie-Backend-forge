@@ -253,6 +253,11 @@ if (a == b) { /* always true for same constant */ }
 if (a.equals(b)) { /* also true, but slower and unnecessary */ }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses conditionals.
+
 **Rule:** use `==` for enum comparison. It's null-safe (won't throw NPE if left side is null), faster (no method call), and semantically correct (enums are singletons).
 
 ## Real-world scenarios
@@ -292,10 +297,24 @@ status = status.next();
 status = next();
 ```
 
+<!-- why -->
+
+
 ```java
 **Scenario 2 — Feature flags using EnumSet:**
 public enum Feature { DARK_MODE, BETA_FEATURES, ANALYTICS, NOTIFICATIONS }
 ```
+
+<!-- why -->
+**What this code shows:**
+- Defines `OrderStatus` with methods `next()`.
+- Uses an `enum`.
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Feature`.
+- Uses an `enum`.
 
 EnumSet<Feature> enabledFeatures = EnumSet.of(Feature.DARK_MODE, Feature.ANALYTICS);
 
@@ -307,6 +326,12 @@ if (enabledFeatures.contains(Feature.DARK_MODE)) {
 
 **Scenario 3 — Permission matrix using EnumMap:**
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses conditionals.
+
 EnumMap<Role, EnumSet<Permission>> permissions = new EnumMap<>(Role.class);
 ```java
 permissions.put(Role.ADMIN, EnumSet.allOf(Permission.class));
@@ -319,6 +344,11 @@ EnumSet<Permission> userPerms = permissions.getOrDefault(Role.USER, EnumSet.none
 ```java
 if (userPerms.contains(Permission.DELETE)) { /* denied */ }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses conditionals.
 
 ## Common mistakes
 

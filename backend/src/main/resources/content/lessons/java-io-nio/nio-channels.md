@@ -104,6 +104,13 @@ public class NioDemo {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `NioDemo` with methods `main()`.
+- Uses loops.
+- When run, it prints: “after allocate: pos=”, “after put x2:   pos=” …
+
 ### Walking Through Each Part
 
 **Part 1 — the buffer lifecycle.** Watch the pointers:
@@ -139,6 +146,12 @@ while (true) {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses loops.
+- Uses conditionals.
 
 The concept: instead of one thread per connection waiting on a read, one thread calls `select()`, which sleeps until *any* of the thousands of registered channels has data ready. The OS tells the selector which keys are ready; the thread processes just those, then loops. This is the **event loop / reactor** model — one thread serving thousands of connections.
 

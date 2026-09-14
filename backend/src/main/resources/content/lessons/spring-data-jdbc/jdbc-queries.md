@@ -57,6 +57,14 @@ public interface CourseRepository extends CrudRepository<Course, Long> {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `CourseRepository`.
+- Uses `Optional` for null-safe values.
+- Uses an interface.
+- Uses inheritance.
+
 ### The Grammar
 
 ```

@@ -60,6 +60,12 @@ public String toHex(byte[] bytes) {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses formatted output.
+- Uses loops.
+
 **Why not use hashing for passwords?** SHA-256 is too fast! An attacker can try billions of passwords per second. Use BCrypt instead (see the security basics lesson).
 
 ## Digital Signatures — proving authenticity

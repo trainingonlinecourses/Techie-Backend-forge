@@ -270,6 +270,11 @@ class TaskControllerTest {
         task.setTitle("Learn Spring Boot");
         task.setDescription("Complete the tutorials");
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `TaskControllerTest`.
         
         mockMvc.perform(post("/api/tasks")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -580,6 +585,15 @@ import java.util.List;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderStatus` and `OrderItem` and 1 more type(s) with 10 methods.
+- Uses an `enum`.
+- Uses an interface.
+- Uses inheritance.
+
     List<Product> findByCategory(String category);
     List<Product> findByPriceBetween(java.math.BigDecimal min, java.math.BigDecimal max);
     List<Product> findByNameContainingIgnoreCase(String name);
@@ -595,6 +609,15 @@ import java.util.List;
 
 public interface CartRepository extends JpaRepository<CartItem, Long> {
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `CartRepository`.
+- Uses an interface.
+- Uses inheritance.
+- Uses generics.
+
     List<CartItem> findBySessionId(String sessionId);
 ```java
     void deleteBySessionId(String sessionId);
@@ -609,6 +632,15 @@ import java.util.List;
 
 public interface OrderRepository extends JpaRepository<Order, Long> {
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderRepository`.
+- Uses an interface.
+- Uses inheritance.
+- Uses generics.
+
     List<Order> findByCustomerEmail(String email);
     List<Order> findByStatus(com.backendforge.ecommerce.entity.OrderStatus status);
 ```java
@@ -708,6 +740,12 @@ public class CartService {
             throw new RuntimeException("Insufficient stock");
         }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+- Uses conditionals.
         
         List<CartItem> existing = cartRepository.findBySessionId(sessionId);
         CartItem item = existing.stream()

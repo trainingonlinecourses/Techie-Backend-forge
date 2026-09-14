@@ -100,6 +100,12 @@ public OrderDetails getOrderDetails(long orderId) throws Exception {
 **Retry with fallback:** first try with timeout, fallback to cached:
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+- Uses local type inference with `var`.
+
 try (var scope = new StructuredTaskScope.ShutdownOnSuccess<Data>()) {
     scope.fork(() -> freshDataService.get(key));       // primary
     scope.fork(() -> cacheService.get(key));           // fallback

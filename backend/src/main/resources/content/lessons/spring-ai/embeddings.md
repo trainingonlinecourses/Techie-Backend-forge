@@ -42,11 +42,21 @@ public class EmbeddingService {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `AiConfig` and `EmbeddingService` with methods `embed()`.
+
 Spring AI provides `embeddingModel.embed(String)` returning `float[]` — and batches:
 
 ```java
 List<float[]> vectors = embeddingModel.embed(List.of(doc1, doc2, doc3));
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses the `List` collection.
 
 ## VectorStore: store + retrieve
 

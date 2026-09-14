@@ -131,6 +131,11 @@ buf.get(data);          // read the data out
 buf.clear();            // reset for reuse
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+
 Mastering `flip`/`clear` is the NIO rite of passage — get them backwards and you read stale data or nothing at all.
 
 ## Recap

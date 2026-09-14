@@ -49,6 +49,13 @@ public class DemoDataSeeder implements ApplicationRunner {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `DemoDataSeeder` with methods `run()`.
+- Uses interface implementation.
+- Uses conditionals.
+
 The idempotency is the whole game — **the seeder must survive redeploys without touching user data** (this academy learned that the hard way with module seeding: see the loader's reuse-existing-rows fix). Never `deleteAll` + re-seed in a startup runner — that's a data-loss bug wearing a seeding costume.
 
 ## Profile-gated fixtures
@@ -66,6 +73,11 @@ public class DevFixtures {
     ApplicationRunner devData(UserRepository users, OrderRepository orders) { ... }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `DevFixtures`.
 
 The mechanisms vary (Hibernate import, Liquibase contexts, Spring `@Profile` beans) — the discipline is the same: **fixtures are compiled out of every non-dev environment**, so "it works on my machine with 10,000 orders" can't silently become prod's data set.
 

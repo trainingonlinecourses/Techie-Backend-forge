@@ -73,6 +73,11 @@ JobParameters params = new JobParametersBuilder()
     .toJobParameters();
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses the java.time date-time API.
+
 ---
 
 ## Incrementers
@@ -129,6 +134,11 @@ if (lastExecution != null && lastExecution.getStatus() == BatchStatus.FAILED) {
     jobLauncher.run(failedJob, jobParameters);
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses conditionals.
 
 ### Controlling Restart
 

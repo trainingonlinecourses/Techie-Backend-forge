@@ -31,6 +31,11 @@ Three rules make a constructor what it is:
 public class Product { }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Product`.
+
 If you write **no constructor at all**, the compiler silently inserts one that takes no arguments and does nothing beyond calling `super()`:
 
 ```java
@@ -52,6 +57,11 @@ public class Product {
 // new Product("Laptop");    // ✅ fine
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Product`.
+
 > This is why some frameworks complain "no default constructor found" — libraries that create your objects reflectively need a way in.
 
 ### 2. No-arg constructor (explicit)
@@ -65,6 +75,11 @@ public class Product {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Product`.
 
 Useful when a sensible default object is meaningful (an empty cart, a blank form).
 
@@ -136,6 +151,12 @@ class Admin extends User {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `User` and `Admin`.
+- Uses inheritance.
+
 Think of it as building a house: the foundation (`User`) has to be poured before walls (`Admin`) are added. If you don't write `super(...)` explicitly, the compiler inserts a bare `super()` — which fails to compile if the parent has no accessible no-arg constructor.
 
 ## The Copy Constructor
@@ -155,6 +176,12 @@ public class Customer {
     public Customer(Customer other) {          // copy constructor: takes an instance of its own class
         this.id = other.id;                    // primitives/references copied directly
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses the `List` collection.
+
         this.tags = new ArrayList<>(other.tags); // nested mutable objects COPIED too → deep-ish copy
     }
 }
@@ -181,6 +208,13 @@ class Child extends Base {
 new Child();
 // Output order: 1, 4, 2, 3, 5, 6
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Base` and `Child`.
+- Uses inheritance.
+- When run, it prints: “1. Base static init”, “2. Base instance init” …
 
 Memorize the pattern: **statics first (parent→child), then per-instance: parent's initializers+constructor before child's**.
 

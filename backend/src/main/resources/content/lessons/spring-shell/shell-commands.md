@@ -85,6 +85,12 @@ public class FileCommands {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `FileCommands` with 5 methods.
+- Uses conditionals.
+
 ---
 
 ## Real-World Scenarios
@@ -111,6 +117,11 @@ public class DbCommands {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `DbCommands` with methods `dbStats()`, `migrate()`.
+
 ### Scenario 2: Deployment CLI
 
 ```java
@@ -127,6 +138,12 @@ public class DeployCommands {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `DeployCommands` with methods `deploy()`.
+- Uses conditionals.
 
 ---
 

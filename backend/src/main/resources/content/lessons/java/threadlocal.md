@@ -42,6 +42,12 @@ String name = currentUser.get();
 currentUser.remove();
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses manual threading.
+- Uses generics.
+
 **Critical rule:** `set()` and `get()` always operate on the **calling thread's** copy. Thread A calling `set("Alice")` has zero effect on Thread B's value.
 
 ## The problem ThreadLocal solves — request context
@@ -92,6 +98,13 @@ public class OrderService {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderController` and `OrderService` and 1 more type(s) with 5 methods.
+- Uses manual threading.
+- Uses generics.
 
 ## How we use it in organizations
 
@@ -163,6 +176,14 @@ public class OrderService {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `TraceContext` and `TraceFilter` and 1 more type(s) with 6 methods.
+- Uses manual threading.
+- Uses exception handling with try/catch.
+- Uses inheritance.
+
 ### Scenario 2: Multi-tenant database routing
 
 Different customers use different databases. ThreadLocal determines which database to use:
@@ -211,6 +232,14 @@ public class TenantFilter extends OncePerRequestFilter {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `TenantContext` and `TenantRoutingDataSource` and 1 more type(s) with 5 methods.
+- Uses manual threading.
+- Uses exception handling with try/catch.
+- Uses inheritance.
+
 ### Scenario 3: The memory leak trap with thread pools
 
 ```java
@@ -228,6 +257,12 @@ for (int i = 0; i < 1_000_000; i++) {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+- Uses loops.
+
 **Why this happens:** In a thread pool, threads are reused. When a task completes without calling `remove()`, the ThreadLocal value persists for the next task that reuses that thread. With 10 threads and 1M tasks, the first 10 tasks leave stale data that affects all subsequent tasks.
 
 ```java
@@ -242,6 +277,12 @@ executor.submit(() -> {
     }
 });
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses exception handling with try/catch.
+- Uses lambda expressions.
 
 ## InheritableThreadLocal — passing context to child threads
 
@@ -260,6 +301,13 @@ public class Main {
 
         // InheritableThreadLocal — child thread inherits parent's value
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses manual threading.
+- Uses lambda expressions.
+
         private static final InheritableThreadLocal<String> inheritable = new InheritableThreadLocal<>();
         inheritable.set("from-parent");
         new Thread(() -> {

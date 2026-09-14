@@ -96,6 +96,14 @@ public interface ProductRepository extends PagingAndSortingRepository<Product, L
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `ProductRepository`.
+- Uses an interface.
+- Uses inheritance.
+- Uses generics.
+
 ### Disable specific HTTP methods
 
 ```java
@@ -110,6 +118,14 @@ public interface ProductRepository extends PagingAndSortingRepository<Product, L
     // Better approach: use @RepositoryRestResource(exported = false)
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `ProductRepository`.
+- Uses an interface.
+- Uses inheritance.
+- Uses generics.
 
 ### Add custom search endpoints
 
@@ -126,6 +142,12 @@ public interface ProductRepository extends PagingAndSortingRepository<Product, L
     // GET /products/search/findByPriceRange?min=100&max=500
     @Query("SELECT p FROM Product p WHERE p.price BETWEEN :min AND :max")
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses `BigDecimal` for exact decimal math.
+
     List<Product> findByPriceRange(
         @Param("min") BigDecimal min,
         @Param("max") BigDecimal max

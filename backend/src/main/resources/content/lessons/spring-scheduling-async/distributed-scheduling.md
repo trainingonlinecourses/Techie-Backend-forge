@@ -80,6 +80,11 @@ public class ShedLockConfig {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `ShedLockConfig` with methods `lockProvider()`.
+
 ### 4. Annotate jobs
 
 ```java
@@ -124,6 +129,11 @@ public class LeaderService {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `LeaderService` with methods `electLeader()`, `isLeader()`.
+
 Careful: the node that holds the lock *this minute* may lose it *next minute*. Use leadership to gate short tasks, not to hold long-lived state.
 
 ## Kubernetes-Native: Lease API
@@ -159,6 +169,11 @@ public void reconcile() {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses conditionals.
+
 The atomic `UPDATE ... WHERE status='PENDING' RETURNING` claim pattern makes even an unlocked double-run safe.
 
 ## Monitoring Distributed Jobs
@@ -184,6 +199,11 @@ public void reconcile() {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses exception handling with try/catch.
 
 ## Summary
 

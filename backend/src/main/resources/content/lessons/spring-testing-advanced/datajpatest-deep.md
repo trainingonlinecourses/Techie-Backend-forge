@@ -31,6 +31,11 @@ class OrderRepositoryTest {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderRepositoryTest`.
+
 Each test method runs in a **transaction that rolls back** after the test — fast, isolated, no cleanup code. The slice is the right home for: derived-query correctness, JPQL syntax, mappings (columns/relations), and constraint behavior.
 
 ## H2 vs Postgres — the fidelity gap

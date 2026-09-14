@@ -163,6 +163,12 @@ public class OrderService {
 
         // Push update to dashboard subscribers
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+
         messaging.convertAndSend("/topic/orders.status",
             new OrderStatusUpdate(saved.id(), saved.status(), Instant.now()));
 
@@ -185,6 +191,11 @@ public class DocumentHandler {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `DocumentHandler` with methods `handleEdit()`.
 
 ## Common mistakes
 

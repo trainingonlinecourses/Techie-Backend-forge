@@ -28,6 +28,11 @@ Enable it with one annotation:
 public class JpaConfig { }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `JpaConfig`.
+
 ## The mapped superclass — one base for all entities
 
 ```java
@@ -60,6 +65,12 @@ public class Order extends Auditable {
     // ...
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Auditable` and `Order`.
+- Uses inheritance.
 
 `@EntityListeners(AuditingEntityListener.class)` is the wiring — it's the `BeanPostProcessor`-style hook that observes persist/update events. Every entity extending `Auditable` gets the four columns automatically, consistently named and typed.
 

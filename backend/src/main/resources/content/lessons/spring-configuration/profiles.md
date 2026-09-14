@@ -101,6 +101,13 @@ public class DataSourceConfig {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `FakeEmailService` and `SmtpEmailService` and 1 more type(s) with methods `send()`, `h2DataSource()`, `postgresDataSource()`.
+- Uses interface implementation.
+- When run, it prints: “[FAKE] would email ”
+
 ### Walking Through Each Part
 
 **Profile-specific properties** — `application-{profile}.properties` layers over the base file. With `prod` active: `spring.datasource.url` comes from the prod file (or env), `app.email.enabled=true` turns on real email. The base file holds common settings; profiles override.
@@ -120,6 +127,12 @@ public class DataSourceConfig {
 @Profile("!prod")
 public class ConsoleNotifier implements Notifier { ... }   // anything not prod
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `ConsoleNotifier`.
+- Uses interface implementation.
 
 ## Grouping and Inheritance
 
@@ -146,6 +159,11 @@ class UserServiceTest { ... }
 @ActiveProfiles("dev")
 void devBehavior() { ... }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `UserServiceTest`.
 
 `@ActiveProfiles` is how tests pick their environment — test DB, test mocks, faster config — without touching the real profiles.
 

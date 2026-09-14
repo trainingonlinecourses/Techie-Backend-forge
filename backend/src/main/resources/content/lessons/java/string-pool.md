@@ -72,6 +72,11 @@ public class Main {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+
 **Why does this matter?** Because if your code uses `==` to compare strings (a very common beginner bug), it works for literals but breaks when strings come from user input, databases, or network — those are always heap objects.
 
 ## String.intern() — manually entering the pool
@@ -120,6 +125,11 @@ for (int i = 0; i < 1_000_000; i++) {
 **Why this happens:** The pool lives in Metaspace (native memory), which is limited. Each interned string stays forever (or until GC runs a Full GC). In a loop creating millions of unique strings, the pool explodes.
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses loops.
+
 ## Modern Java — the pool is less important
 
 Since Java 7+, strings are stored in the heap (not a separatePermGen space). This means:
@@ -158,6 +168,11 @@ public class OrderService {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderService` with methods `isActive()`.
+
 **Why this is the #1 string bug:** Every ORMs (Hibernate, JPA) returns new String objects for every column value. They're never in the pool. `==` works in unit tests (where you use literals) but fails in production (where data comes from the database). The fix: **always use `.equals()` for string comparison**.
 
 ### Scenario 2: Enums already solve this — don't intern status strings
@@ -188,6 +203,13 @@ public class Order {
 
 if (order.getStatus() == OrderStatus.ACTIVE) { ... }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Order` and `OrderStatus`.
+- Uses an `enum`.
+- Uses conditionals.
 
 ### Scenario 3: Interning for memory optimization in large datasets
 
@@ -244,6 +266,13 @@ public class UserService {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `UserService` with methods `findByRole()`, `isAdmin()`.
+- Uses the Streams API to process data declaratively.
+- Uses lambda expressions.
 
 ## Decision guide
 

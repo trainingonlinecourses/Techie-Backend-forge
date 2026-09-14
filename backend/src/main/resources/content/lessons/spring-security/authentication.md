@@ -98,6 +98,11 @@ public AuthResponse register(RegisterRequest req) {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses conditionals.
+
 ## Failure modes to know
 
 - **`BadCredentialsException`** — wrong username or password (same message for both; don't reveal which).

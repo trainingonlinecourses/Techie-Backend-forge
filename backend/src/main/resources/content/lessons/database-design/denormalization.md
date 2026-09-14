@@ -115,6 +115,11 @@ public void onOrderChanged(OrderLineChanged event) {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderService` with methods `addLine()`, `onOrderChanged()`.
+
 ### Walking Through Each Part
 
 ```java

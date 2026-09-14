@@ -64,6 +64,13 @@ class Config {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Config`.
+- Uses loops.
+- When run, it prints: “Started”
+
 ## Double-checked locking with volatile
 
 The classic pattern for lazy initialization without locks:
@@ -102,6 +109,13 @@ public class ConfigManager {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `ConfigManager` with methods `getInstance()`.
+- Uses synchronization with `synchronized`.
+- Uses conditionals.
 
 **Why must `instance` be volatile?** Without it, Thread B could see a non-null `instance` that points to a partially constructed object — `config` field still null. The `volatile` write in Thread A happens-before the `volatile` read in Thread B, ensuring the constructor's writes are visible.
 
@@ -177,6 +191,14 @@ public class FeatureFlags {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `FeatureFlags` with methods `getInstance()`, `isEnabled()`.
+- Uses synchronization with `synchronized`.
+- Uses the `Map` collection.
+- Uses conditionals.
 
 ### Scenario 3: volatile does NOT protect compound operations
 

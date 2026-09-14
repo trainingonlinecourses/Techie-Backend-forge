@@ -89,6 +89,14 @@ public class GathererDemo {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `GathererDemo` with methods `main()`.
+- Uses the Streams API to process data declaratively.
+- Uses lambda expressions.
+- Uses method references.
+
 ## Line-by-Line Explanation
 
 | Line | What It Does | Why It Matters |

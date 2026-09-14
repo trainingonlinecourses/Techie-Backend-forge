@@ -303,6 +303,14 @@ class FilterProcessor<T> implements Processor<T, T> {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `FilterProcessor` with 5 methods.
+- Uses interface implementation.
+- Uses conditionals.
+- Uses generics.
+
 This is a simplified processor. A production-quality processor manages backpressure more carefully — it respects the upstream subscription's backpressure and tracks the downstream's demand. But the structure is right: the processor subscribes to an upstream publisher, filters the items, and publishes the ones that pass the predicate to a downstream subscriber.
 
 ### Why the JDK Has Flow — and What It Is Not

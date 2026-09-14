@@ -353,6 +353,11 @@ public class TextBlockDemo {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `TextBlockDemo` with methods `main()`.
+
 ### Key Takeaways
 
 1. **Text blocks use `"""` triple quotes** — they start with `"""` followed by a newline

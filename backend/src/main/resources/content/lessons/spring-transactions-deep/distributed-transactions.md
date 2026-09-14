@@ -222,6 +222,11 @@ class OutboxTest {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `OutboxTest`.
+
 ## Summary
 
 | Concern | Pattern |

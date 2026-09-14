@@ -33,6 +33,12 @@ public class OrderService {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderService` with methods `createOrder()`.
+- Uses exception handling with try/catch.
+
 ---
 
 ## Log Levels
@@ -101,6 +107,13 @@ if (log.isDebugEnabled()) {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `LoggingDemo` with methods `processRequest()`.
+- Uses exception handling with try/catch.
+- Uses conditionals.
+
 ---
 
 ## Real-World Scenarios
@@ -161,6 +174,11 @@ public class AuditLoggingAspect {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `AuditLoggingAspect` with methods `audit()`.
 
 ---
 

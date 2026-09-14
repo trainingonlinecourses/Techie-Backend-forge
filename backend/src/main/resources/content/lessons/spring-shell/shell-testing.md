@@ -27,6 +27,11 @@ class GreetingCommandsTest {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `GreetingCommandsTest`.
+
 ---
 
 ## Line-by-Line Walkthrough
@@ -97,6 +102,11 @@ class DeployCommandsTest {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `DeployCommandsTest`.
 
 ### Scenario 2: Test availability
 

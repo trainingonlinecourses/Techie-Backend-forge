@@ -141,6 +141,12 @@ private void process(OrderEvent event) {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses exception handling with try/catch.
+- Uses conditionals.
+
 `AmqpRejectAndDontRequeueException` bypasses the retry ladder — the message is rejected immediately and routed to the DLQ.
 
 ## The Retry Table Pattern (Reprocessing)
@@ -172,6 +178,13 @@ public class DlqReprocessor {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `DlqReprocessor` with methods `drain()`.
+- Uses exception handling with try/catch.
+- Uses loops.
+
 With a retry counter in the header (`x-death`), stop reprocessing after N attempts and page a human.
 
 ## Common RabbitMQ Failure Modes
@@ -198,6 +211,11 @@ public void onDlq(Message message) {
 
 A DLQ rate > 0 is normal (transient storms happen); a **rising** DLQ rate is a deploy regression signal.
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses conditionals.
 
 ## Summary
 

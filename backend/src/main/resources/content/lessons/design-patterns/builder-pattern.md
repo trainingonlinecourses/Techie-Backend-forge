@@ -150,6 +150,14 @@ public class BuilderDemo {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `EmailMessage` and `Priority` and 2 more type(s) with 10 methods.
+- Uses exception handling with try/catch.
+- Uses an `enum`.
+- Uses the `List` collection.
+
 ### Walking Through Each Part
 
 **The immutable target** — all fields `final`, no setters, private constructor. The object, once built, cannot change. `List.copyOf` in the constructor makes a defensive copy so the caller can't mutate the internal list through a shared reference.

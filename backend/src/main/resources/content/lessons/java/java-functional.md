@@ -49,6 +49,12 @@ The same code, clean:
 names.sort((a, b) -> Integer.compare(a.length(), b.length()));
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+- Uses sorting with a `Comparator`.
+
 ### Lambda syntax variations
 
 
@@ -86,6 +92,13 @@ public class Main {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- Uses lambda expressions.
+- When run, it prints: “Hello”
 
 ## Built-in Functional Interfaces — the 4 you need to know
 
@@ -128,6 +141,13 @@ public class Main {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- Uses lambda expressions.
+- Uses generics.
+
 ### Function<T, R> — transforms T into R
 
 
@@ -163,6 +183,13 @@ public class Main {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- Uses lambda expressions.
+- Uses generics.
+
 ### Consumer<T> — performs an action (returns nothing)
 
 
@@ -192,6 +219,14 @@ public class Main {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- Uses lambda expressions.
+- Uses generics.
+- When run, it prints: “Hello, ”
+
 ### Supplier<T> — provides a value (takes nothing)
 
 // Supplier<T> takes nothing, returns T
@@ -203,6 +238,11 @@ Supplier<LocalDateTime> nowFactory = LocalDateTime::now;
 ```java
 LocalDateTime timestamp = nowFactory.get();  // gets current time
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses the java.time date-time API.
 
 ## Method References — shorthand for lambdas
 
@@ -244,6 +284,14 @@ Function<String, String> toUpper = String::toUpperCase;
 Function<String, Integer> len = String::length;
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+- Uses method references.
+- Uses the java.time date-time API.
+- Uses generics.
+
 ## Function Composition — combining functions
 
 
@@ -282,6 +330,14 @@ public class Main {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- Uses lambda expressions.
+- Uses method references.
+- Uses generics.
 
 ## How we use it in organizations
 
@@ -328,6 +384,14 @@ public class PricingService {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `DiscountStrategy` and `TenPercentDiscount` and 1 more type(s) with methods `apply()`, `calculatePrice()`.
+- Uses lambda expressions.
+- Uses an interface.
+- Uses interface implementation.
 
 ### Scenario 2: Event handling with Consumer lambdas
 
@@ -377,6 +441,14 @@ bus.on(UserCreated.class, event -> {
 bus.fire(new UserCreated(newUser));
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `EventBus` with methods `on()`, `fire()`.
+- Uses lambda expressions.
+- Uses the `List` collection.
+- Uses the `Map` collection.
+
 ### Scenario 3: Building a data validation framework
 
 // A validator that chains multiple checks using Predicates
@@ -411,6 +483,11 @@ Validator<User> userValidator = new Validator<User>()
     .check("age", user -> String.valueOf(user.getAge()), age -> Integer.parseInt(age) >= 18, "Must be 18+");
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+
 List<String> errors = userValidator.validate(newUser);
 
 ## Functional vs Imperative — comparison
@@ -426,6 +503,13 @@ for (String name : names) {
 
 // FUNCTIONAL: tell Java WHAT you want
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses loops.
+- Uses conditionals.
+
 List<String> result = names.stream()
     .filter(name -> name.length() > 3)
     .map(String::toUpperCase)

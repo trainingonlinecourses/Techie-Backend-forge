@@ -108,6 +108,13 @@ public class RefreshTokenService {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `RefreshTokenService` with methods `issue()`, `refresh()`, `revoke()`.
+- Uses lambda expressions.
+- Uses conditionals.
+
 ### Walking Through Each Part
 
 **`issue` at login** — a refresh token is a **random unguessable string** (UUID), stored in the database *with* the user id and an expiry. It's a server-side session record — revocable, inspectable, per-user.

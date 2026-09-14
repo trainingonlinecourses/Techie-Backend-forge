@@ -180,6 +180,11 @@ public class MultiStepAgent {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `MultiStepAgent` with methods `executeTask()`.
+
 ### 4. Tool Call Monitoring
 
 @Component
@@ -266,6 +271,15 @@ public class DataAnalysisAgent {
 
     @Tool(description = "Create a chart from data. Accepts a title, chart type " +
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses the `List` collection.
+- Uses the `Map` collection.
+- Uses conditionals.
+- Uses generics.
+
                          "(bar, line, pie), and data points.")
     public String createChart(String title, String chartType, List<DataPoint> data) {
 ```java
@@ -335,6 +349,11 @@ public class MultiAgentOrchestrator {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `MultiAgentOrchestrator` with methods `orchestrate()`.
 
 ---
 

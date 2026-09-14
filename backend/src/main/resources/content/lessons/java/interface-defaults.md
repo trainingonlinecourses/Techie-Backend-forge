@@ -77,6 +77,14 @@ interface C extends A {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `A` and `B` and 1 more type(s) with methods `greet()`.
+- Uses an interface.
+- Uses inheritance.
+- Uses interface implementation.
+
 ## Static methods on interfaces — namespace without a class
 
 Interfaces can have static methods, which belong to the interface itself (not to implementing classes):
@@ -107,6 +115,13 @@ public interface Money {
 Money price = Money.of(1999, "USD");
 Money total = Money.sum(price, Money.of(500, "USD"));
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Money` with 4 methods.
+- Uses an interface.
+- Uses conditionals.
 
 **The org pattern:** use static methods on interfaces for factory methods (`of()`, `from()`, `valueOf()`), comparison utilities (`Comparator.naturalOrder()`), and validation helpers. The interface becomes a self-contained domain object.
 
@@ -150,6 +165,13 @@ new NotificationService(new EmailSender());
 new NotificationService(new SlackSender());
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `NotificationService` and `MessageSender` and 3 more type(s) with methods `notifyUser()`.
+- Uses an interface.
+- Uses interface implementation.
+
 ## Abstract class vs interface — when to use which
 
 | Feature | Interface | Abstract class |
@@ -173,6 +195,13 @@ public interface Loggable {
 
 // Abstract class: shared implementation for a family
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Loggable`.
+- Uses an interface.
+
 public abstract class BaseRepository<T> {
 ```java
     private final JdbcTemplate jdbc;

@@ -38,6 +38,12 @@ Flux<Long> ticks = Flux.interval(Duration.ofSeconds(1));
 Flux<Customer> all = customerRepo.findAll();
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses the java.time date-time API.
+- Uses generics.
+
 ## Nothing happens until you subscribe
 
 A `Publisher` is a **declaration**, not a computation. Operators build a pipeline; **subscribing** starts the flow:
@@ -82,6 +88,14 @@ Mono<OrderSummary> summary = Mono.zip(orderMono, customerMono, OrderSummary::of)
 Flux<Quote> first3 = quoteStream.take(3);
 Mono<Resp> guarded = client.call().timeout(Duration.ofSeconds(2)).retryWhen(Retry.backoff(3, Duration.ofMillis(200)));
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+- Uses method references.
+- Uses `BigDecimal` for exact decimal math.
+- Uses the java.time date-time API.
 
 The **flatMap vs concatMap** distinction is the #1 interview question: `flatMap` subscribes to inner publishers as they arrive (fast, order lost); `concatMap` queues them (order kept, sequential).
 

@@ -25,6 +25,11 @@ class PaymentGatewayClientTest {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `PaymentGatewayClientTest`.
+
 `@RestClientTest` wires a `MockRestServiceServer` bound to your client's `RestTemplate`/`RestClient` — no real HTTP, no configuration.
 
 ## Stubbing Responses
@@ -80,6 +85,12 @@ void handlesGatewayTimeout() {
 void retriesOn502() {
     server.expect(requestTo("/v1/charges")).andRespond(withStatus(HttpStatus.BAD_GATEWAY));
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+
     server.expect(requestTo("/v1/charges"))
         .andRespond(withSuccess("{\"id\":\"ch_2\"}", MediaType.APPLICATION_JSON));
 
@@ -194,6 +205,12 @@ void maps404ToNotFoundDomainException() {
 @Test
 void mapsValidation422ToClientError() {
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+
     server.expect(requestTo("/v1/charges"))
         .andRespond(withStatus(HttpStatus.UNPROCESSABLE_ENTITY)
 ```java

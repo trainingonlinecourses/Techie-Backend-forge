@@ -182,6 +182,13 @@ public class SecurityExceptionHandler {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `SecurityExceptionHandler` with 4 methods.
+- Uses the `Map` collection.
+- Uses generics.
+
 ---
 
 ## Real-World Scenarios

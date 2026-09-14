@@ -37,6 +37,11 @@ public class OrderConstants {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderConstants`.
+
 Safe because `final` prevents reassignment, and `String`/`int` are immutable.
 
 ```java
@@ -60,6 +65,13 @@ public class ConnectionPool {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `ConnectionPool` with methods `getInstance()`, `connect()`.
+- Uses synchronization with `synchronized`.
+- Uses conditionals.
+
 The `activeConnections++` is **not atomic** and is not protected by any lock. Two threads can read the same value, both increment, and store the same result — losing a count. This is a classic race condition.
 
 ```java
@@ -77,6 +89,11 @@ public class ConnectionPool {
 
 Spring manages the lifecycle; no static state; testable; thread-safe.
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `ConnectionPool` with methods `connect()`.
 
 ## Static blocks — initialization order
 
@@ -122,6 +139,12 @@ public class OrderService {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderService`.
+- Uses exception handling with try/catch.
 
 ## Static nested classes — logical grouping without the trap
 
@@ -169,6 +192,11 @@ import static com.myapp.domain.OrderStatus.*;
 if (status == CREATED) { ... }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses conditionals.
+
 Static imports are syntactic sugar. They improve readability for frequently used constants (`HttpStatus.OK`, `Assertions.assertEquals`, `TimeUnit.SECONDS`).
 
 **Rule:** use static imports for constants and utility methods you reference repeatedly in a single file. Do not use them for types (never `import static java.util.List.*`).
@@ -191,6 +219,12 @@ public final class MoneyUtils {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `MoneyUtils` with methods `roundHalfUp()`, `isWithinTolerance()`.
+- Uses `BigDecimal` for exact decimal math.
 
 ### Scenario: static factory method (instead of constructor)
 
@@ -219,6 +253,11 @@ public class OrderResult {
 OrderResult result = OrderResult.success("Order placed");
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderResult` with methods `success()`, `failure()`.
+
 ### Scenario: static test pollution
 
 ```java
@@ -232,6 +271,14 @@ public class FeatureFlags {
 
 // Test 1 enables a flag
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `FeatureFlags` with methods `enable()`, `isEnabled()`.
+- Uses the `Map` collection.
+- Uses generics.
+
 // Test 2 runs — flag is still enabled → flaky test
 
 **Fix:** replace the static map with an injected bean, or reset state in `@BeforeEach`.

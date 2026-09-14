@@ -111,6 +111,11 @@ public class OrderEventHandlers {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderEventHandlers` with methods `sendConfirmation()`, `reserveInventory()`, `notifyFraudTeam()`.
+
 Each handler is independent — one failing doesn't stop the others (async + after-commit).
 
 ## Event Sourcing: The Event Is the State
@@ -171,6 +176,12 @@ public void placeOrder(PlaceOrderCommand cmd) { ... }
 public record OrderSummary(Long orderId, String status, int lineCount) {}
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderSummary` with methods `placeOrder()`.
+- Uses a `record`.
+
 public List<OrderSummary> recentOrders(Long customerId) {
     return readModelRepository.findByCustomerIdOrderByPlacedAtDesc(customerId);
 }
@@ -189,6 +200,12 @@ Events outlive code. Version them:
 public record OrderPlacedV2(OrderId orderId, Long customerId, Money total,
                             String currency, Instant occurredAt) {}
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderPlacedV2`.
+- Uses a `record`.
 
 Or add `eventVersion` and keep the parser tolerant — consumers must handle old versions during rollout.
 

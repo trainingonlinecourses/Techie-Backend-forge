@@ -121,6 +121,13 @@ client.delete()
     .toBodilessEntity();
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+- Uses the `List` collection.
+- Uses generics.
+
 ### Error Handling
 
 // Handle specific status codes
@@ -205,6 +212,14 @@ public class PaymentGateway {
     public PaymentGateway(PaymentConfig config) {
         this.client = RestClient.builder()
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `PaymentGateway`.
+- Uses exception handling with try/catch.
+- Uses the `HttpClient` API.
+
             .baseUrl(config.getBaseUrl())
             .defaultHeader("Authorization", "Bearer " + config.getApiKey())
 ```java
@@ -214,6 +229,12 @@ public class PaymentGateway {
     public PaymentResult charge(BigDecimal amount, String currency) {
         return client.post()
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses `BigDecimal` for exact decimal math.
+
             .uri("/v1/charges")
             .body(Map.of("amount", amount, "currency", currency))
             .retrieve()

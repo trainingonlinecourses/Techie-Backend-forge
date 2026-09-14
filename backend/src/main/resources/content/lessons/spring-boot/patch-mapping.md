@@ -109,6 +109,14 @@ public class UserController {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `PatchUserRequest` and `UserController` with methods `patchUser()`.
+- Uses a `record`.
+- Uses conditionals.
+- Uses generics.
+
 ---
 
 ## PUT vs PATCH
@@ -189,6 +197,14 @@ public ResponseEntity<UserResponse> mergePatchUser(
     return ResponseEntity.ok(toResponse(updated));
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+- Uses the `Map` collection.
+- Uses switch branching.
+- Uses generics.
 
 ---
 

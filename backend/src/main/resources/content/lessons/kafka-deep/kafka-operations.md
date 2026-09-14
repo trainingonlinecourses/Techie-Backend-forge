@@ -49,10 +49,25 @@ public class AdminDemo {
 
             // Describe the cluster and the topic:
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses exception handling with try/catch.
+- Uses conditionals.
+- When run, it prints: “Topic 'orders' created”, “Topic already exists — fine”
+
             admin.describeCluster().nodes().get()
 ```java
                  .forEach(n -> System.out.println("Broker: " + n.host() + ":" + n.port()));
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+- When run, it prints: “Broker: ”
+
             admin.describeTopics(List.of("orders")).allTopicNames().get()
                  .forEach((name, desc) -> System.out.println(
 ```java
@@ -60,6 +75,12 @@ public class AdminDemo {
 
             // List consumer groups and their lag:
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+
             admin.listConsumerGroups().all().get()
                  .forEach(g -> System.out.println("Group: " + g.groupId()));
         }

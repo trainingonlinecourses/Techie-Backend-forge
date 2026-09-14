@@ -95,6 +95,14 @@ public class LambdaDemo {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `LambdaDemo` with methods `main()`.
+- Uses lambda expressions.
+- Uses the `List` collection.
+- Uses sorting with a `Comparator`.
+
 ### Walking Through Each Part
 
 **Part 1 — sort.** `sort` expects a `Comparator<String>` (one abstract method: `compare`). The lambda `(a, b) -> a.length() - b.length()` supplies it: negative means `a` first, positive means `b` first, zero means equal. The subtraction idiom works for ints; for other types use `Integer.compare(...)` or `Comparator.comparing`.
@@ -115,6 +123,13 @@ for (String n : names) { if (n.length() > 3) total += n.length(); }
 
 // Lambda/stream — expressive when you're transforming a collection
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses loops.
+- Uses conditionals.
+
 long total = names.stream().filter(n -> n.length() > 3).mapToLong(String::length).sum();
 
 Neither is "always better". Loops win for: early `break`, `continue`, index access, exceptions with precise control. Lambdas/streams win for: filtering/mapping/collecting pipelines, passing behavior as a parameter, and avoiding mutable loop state. In later lessons you'll combine them with the Stream API.

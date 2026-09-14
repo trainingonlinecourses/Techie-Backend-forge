@@ -39,6 +39,12 @@ public Order getOrder(@PathVariable Long id,
 
 **How Spring Security prevents it:**
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses conditionals.
+
 .authorizeHttpRequests(auth -> auth
     .requestMatchers("/api/admin/**").hasRole("ADMIN")   // Line 1: Admin only
     .requestMatchers("/api/orders/**").authenticated()    // Line 2: Must be logged in
@@ -133,6 +139,11 @@ public void resetPassword(@RequestBody ResetRequest req) {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses the java.time date-time API.
+
 ## A05: Security Misconfiguration
 
 **What it is:** Default settings, unnecessary features, or missing security headers.
@@ -169,6 +180,11 @@ http.headers(headers -> headers
     )
 );
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
 
 ## A06: Vulnerable and Outdated Components
 
@@ -229,6 +245,12 @@ public class LoginService {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `LoginService` with methods `login()`.
+- Uses conditionals.
 
 ## A08: Software and Data Integrity Failures
 
@@ -317,6 +339,13 @@ private boolean isAllowedUrl(String url) {
     return allowedHosts.contains(uri.getHost());
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses the `List` collection.
+- Uses conditionals.
+- Uses generics.
 
 ## Key takeaways
 

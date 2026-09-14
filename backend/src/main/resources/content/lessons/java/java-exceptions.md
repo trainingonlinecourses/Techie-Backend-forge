@@ -45,6 +45,13 @@ public class Main {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- Uses exception handling with try/catch.
+- When run, it prints: “Config file not found, using defaults”
+
 ## The Exception Hierarchy — why there are two types
 
 ```
@@ -131,6 +138,11 @@ public int divide(int a, int b) {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses conditionals.
+
 ## try-catch-finally — the basic structure
 
 
@@ -172,6 +184,13 @@ public class Main {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- Uses exception handling with try/catch.
+- When run, it prints: “Value: ”, “File not found: ” …
+
 ## Multi-catch — handling multiple exceptions the same way
 
 
@@ -208,6 +227,11 @@ try {
     alertAdmin();
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses exception handling with try/catch.
 
 ## try-with-resources — automatic cleanup
 
@@ -260,6 +284,14 @@ public class Main {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- Uses exception handling with try/catch.
+- Uses local type inference with `var`.
+- Uses loops.
 
 ## throw vs throws — the difference
 
@@ -345,6 +377,14 @@ public class AccountService {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `InsufficientFundsException` and `InvalidOrderStateException` and 1 more type(s) with 5 methods.
+- Uses inheritance.
+- Uses `BigDecimal` for exact decimal math.
+- Uses conditionals.
+
 ## How we use it in organizations
 
 ### Scenario 1: Layered exception handling in a web application
@@ -400,6 +440,13 @@ public class OrderService {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderController` and `OrderService` with methods `create()`.
+- Uses exception handling with try/catch.
+- Uses conditionals.
+
 ### Scenario 2: Retry logic with exception classification
 
 
@@ -439,6 +486,14 @@ public class ResilientHttpClient {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `ResilientHttpClient` with methods `executeWithRetry()`.
+- Uses exception handling with try/catch.
+- Uses the `HttpClient` API.
+- Uses loops.
 
 ### Scenario 3: Exception logging with context
 
@@ -483,6 +538,14 @@ try {
     );
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderProcessingException`.
+- Uses exception handling with try/catch.
+- Uses inheritance.
+- Uses the `Map` collection.
 
 ## Common mistakes
 

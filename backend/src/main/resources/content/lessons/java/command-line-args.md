@@ -123,6 +123,13 @@ class ReconCommand implements Runnable {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `ReconCommand` with methods `run()`.
+- Uses manual threading.
+- Uses interface implementation.
+
 ## Common Mistakes
 
 | Mistake | Symptom | Fix |

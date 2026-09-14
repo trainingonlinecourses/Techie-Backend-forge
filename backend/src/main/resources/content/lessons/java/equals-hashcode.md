@@ -30,6 +30,11 @@ public class Main {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+
 The default `equals()` from `Object` is just `==` — it asks "are these the **same object in memory**?" For a business system, you usually want "do they represent the **same customer**?" — meaning the same `id`, not the same memory address.
 
 ## equals() — How to Override Correctly
@@ -126,6 +131,12 @@ public record Customer(Long id, String email) { }
 // Automatically generates: constructor, getters, equals(), hashCode(), toString()
 // Immutable by default — all fields are final
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Customer`.
+- Uses a `record`.
 
 This is why most new Java code uses records for data carriers. The boilerplate is gone, the contract is always satisfied, and the compiler enforces immutability.
 

@@ -79,9 +79,17 @@ public class InventorySagaStep {
 }
 ```
 
+<!-- why -->
+
+
 ```java
 **The choreography pros:** zero central coordinator, pure events, each service independent. **The cons:** the flow is *implicit* — scattered across listeners — and hard to see or debug; adding a step means wiring new events; loops are possible. For short, simple sagas, choreography is the natural fit — it's just event-driven programming with compensations.
 ```
+
+<!-- why -->
+**What this code shows:**
+- Defines `InventorySagaStep` with methods `onOrderPlaced()`, `onPaymentFailed()`.
+- Uses exception handling with try/catch.
 
 ## Orchestration: The Central Conductor
 
@@ -121,11 +129,18 @@ public class OrderSagaOrchestrator {
 }
 ```
 
+<!-- why -->
+
+
 ```java
 **The orchestration pros:** the flow is *explicit* — one component, a visible state machine, easy to trace and test; failure handling is centralized. **The cons:** the orchestrator is a single point of coupling (and, if poorly built, a bottleneck) — a "smart" component that must itself be reliable.
 
 **The choice:** **choreography** for short, naturally event-driven flows; **orchestration** when the saga is long, failure paths are complex, or the flow must be visible and audited (which is most real business sagas).
 ```
+
+<!-- why -->
+**What this code shows:**
+- Defines `OrderSagaOrchestrator` with methods `start()`, `onStockReserved()`, `onPaymentFailed()`.
 
 ## The Saga Reliability Requirements
 

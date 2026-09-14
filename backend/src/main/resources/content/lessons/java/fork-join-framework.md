@@ -65,6 +65,14 @@ ForkJoinPool pool = new ForkJoinPool();
 long sum = pool.invoke(new SumTask(hugeArray, 0, hugeArray.length));
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `SumTask` with methods `compute()`.
+- Uses inheritance.
+- Uses loops.
+- Uses conditionals.
+
 ## Work-stealing — why ForkJoinPool is different
 
 In a regular `ExecutorService`, threads pull from a shared queue. If one task is slow, other threads sit idle. ForkJoinPool gives each thread its own **deque** — when a thread finishes its work, it **steals** from the busiest thread's deque. This eliminates contention and keeps all cores busy.
@@ -80,6 +88,11 @@ ForkJoinPool customPool = new ForkJoinPool(8);  // 8 worker threads
 
 **When to use ForkJoinPool:** CPU-bound recursive tasks (sorting, image processing, tree traversal, matrix multiplication). **When NOT to use it:** I/O-bound tasks (HTTP calls, database queries), blocking operations, or tasks that don't split naturally.
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
 
 ## Common pitfalls — the parallel stream trap
 
@@ -148,6 +161,12 @@ public class ChunkedParser extends RecursiveTask<List<Order>> {
 protected NodeCount compute() {
     if (node.children().isEmpty()) return new NodeCount(1, 0);
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses conditionals.
+
     List<NodeCount> childCounts = node.children().stream()
         .map(child -> new NodeCount(child).fork())
         .map(forked -> forked.join())

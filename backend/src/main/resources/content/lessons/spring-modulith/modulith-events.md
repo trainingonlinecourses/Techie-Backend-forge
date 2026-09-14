@@ -30,6 +30,11 @@ public class BillingService {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `BillingService` with methods `markPaid()`.
+
 The `EventPublicationRegistry` table stores the event + its state (`IN_PROGRESS`, `COMPLETED`, `CANCELLED`, or failed) inside the same database transaction as the business data — **atomic: either the payment is recorded AND the event is recorded, or neither**.
 
 ## Listening: synchronous or async
@@ -59,6 +64,11 @@ public class FulfillmentListener {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `FulfillmentListener`.
+
 The three modes are a decision, not a pick-one: same-transaction for *consistency* (both write or neither), after-commit for *external side effects*, async for *throughput*.
 
 ## Completion handling: the retry story
@@ -79,6 +89,11 @@ public class OrderPaidCompletion {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderPaidCompletion`.
+
 Combined with the **`EventPublicationRegistry`**, this gives you the full DLQ discipline in-process: events that failed are *queryable* (`registry.findIncompletePublications()`), replayable (`registry.markCompleted(...)` after a fix), and auditable — without Kafka.
 
 ## The admin/ops surface
@@ -89,6 +104,11 @@ List<EventPublication> stuck = registry.findIncompletePublications();
 // after fixing the listener, complete them:
 stuck.forEach(p -> registry.markCompleted(p.getIdentifier(), Instant.now(), null));
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
 
 A scheduled reconcile ("complete any publication that's been IN_PROGRESS for > 5 min with a still-pending listener") is the in-process version of the Kafka consumer's rebalance: **events can't vanish silently**.
 

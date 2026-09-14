@@ -30,8 +30,6 @@ The compiler compiles and runs in one step. This makes Java feel more like a scr
 
 ---
 
-## How It Works
-
 ```java
 // Hello.java — no package declaration needed
 public class Hello {
@@ -40,6 +38,9 @@ public class Hello {
     }
 }
 ```
+
+<!-- why -->
+## How It Works
 
 ```bash
 # Run it directly
@@ -75,6 +76,13 @@ public class WeatherCheck {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `WeatherCheck` with methods `main()`.
+- Uses local type inference with `var`.
+- When run, it prints: “Checking weather for ”, “Temperature: ”
 
 ```bash
 # Make executable
@@ -189,6 +197,13 @@ public class Fibonacci {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Fibonacci` with methods `main()`.
+- Uses loops.
+- When run, it prints: “Fibonacci(”
 
 ```bash
 java Fibonacci.java 30

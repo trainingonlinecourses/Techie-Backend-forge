@@ -56,6 +56,12 @@ public class OrderService {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderService` and `OrderResult` and 2 more type(s) with methods `create()`, `run()`.
+- Uses `BigDecimal` for exact decimal math.
+
 ## How we use it in an organization: the patterns
 
 **Pattern 1 — static nested for grouped helpers.** The `Builder`, `Result`, or `Key` classes that belong to one type and need no outer state. `Map.Entry` and `Builder`-style classes are the canonical examples — static nesting is *namespacing*, not composition:
@@ -79,6 +85,11 @@ public class OrderList {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Customer` and `Address` and 2 more type(s) with methods `hasNext()`, `next()`.
 
 **Pattern 3 — anonymous classes are legacy behavior-passing.** Before lambdas, every `Comparator`, `Runnable`, `ActionListener` was an anonymous class. Modern code uses **lambdas** — shorter, and they compile to the same functional interface:
 

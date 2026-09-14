@@ -31,11 +31,24 @@ Thread t = new Thread(() -> {
 t.start();
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses manual threading.
+- Uses lambda expressions.
+
 ## Runnable vs Callable
 
 ```java
 Runnable task = () -> System.out.println("no result");        // void
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+- When run, it prints: “no result”
+
 Callable<Integer> c = () -> compute();                        // returns a value, can throw
 
 `Callable` is the useful one — it returns results and throws exceptions, which `Future` then captures.
@@ -68,6 +81,12 @@ int result = future.get(5, TimeUnit.SECONDS);
 boolean done = future.isDone();
 future.cancel(true);
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+- Uses generics.
 
 **The timeout `get` is the production rule**: a never-ending task shouldn't block your thread forever.
 
@@ -102,6 +121,11 @@ ExecutorService pool = new ThreadPoolExecutor(
     new ArrayBlockingQueue<>(200),
     new ThreadPoolExecutor.CallerRunsPolicy());
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses manual threading.
 
 ## The ThreadPoolExecutor Mechanics
 
@@ -147,6 +171,11 @@ try (ExecutorService pool = Executors.newFixedThreadPool(4)) {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses conditionals.
+
 **Never skip shutdown**: a non-daemon pool thread keeps the JVM alive forever — the classic "application won't exit" bug.
 
 ## Naming Threads
@@ -162,6 +191,11 @@ ThreadFactory named = new ThreadFactory() {
 };
 ExecutorService pool = Executors.newFixedThreadPool(4, named);
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses manual threading.
 
 Named threads turn "which thread is stuck?" from a mystery into a log line. Guava's `ThreadFactoryBuilder` does this in one line if you use Guava.
 
@@ -184,6 +218,12 @@ public class AsyncConfig {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `AsyncConfig` with methods `reportExecutor()`.
+- Uses manual threading.
 
 Used by `@Async("reportExecutor")` — the pool becomes a Spring bean with a name, a prefix, and a policy. (Full coverage in the scheduling module.)
 
@@ -208,6 +248,12 @@ pool.execute(() -> {
     }
 });
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses exception handling with try/catch.
+- Uses lambda expressions.
 
 ## Summary
 

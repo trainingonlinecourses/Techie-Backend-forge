@@ -214,6 +214,13 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     // Complex search with multiple optional filters
     @Query("SELECT o FROM Order o WHERE " +
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses `BigDecimal` for exact decimal math.
+- Uses the java.time date-time API.
+
            "(:status IS NULL OR o.status = :status) AND " +
            "(:customerId IS NULL OR o.customer.id = :customerId) AND " +
            "(:minTotal IS NULL OR o.total >= :minTotal)")
@@ -259,12 +266,25 @@ public class Order {
 }
 ```
 
+<!-- why -->
+
+
 ```java
 @Configuration
 @EnableJpaAuditing                           // Enable auditing globally
 public class JpaConfig {
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+- Defines `Order`.
+- Uses the java.time date-time API.
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `JpaConfig`.
 
 ### Scenario 3: Custom Repository Implementation
 

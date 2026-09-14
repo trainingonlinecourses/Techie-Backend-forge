@@ -122,6 +122,12 @@ public class OrderSaga {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderSaga` with methods `run()`.
+- Uses exception handling with try/catch.
+
 Better — persistent, resumable:
 
 ```java
@@ -135,6 +141,11 @@ public class SagaState {
 
 **Pros**: the whole flow in one place, resumable, testable. **Cons**: the orchestrator is a coupling point and a potential bottleneck.
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `SagaState`.
 
 ## Choreography vs. Orchestration
 

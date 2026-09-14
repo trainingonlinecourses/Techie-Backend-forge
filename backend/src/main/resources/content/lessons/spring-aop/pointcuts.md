@@ -337,6 +337,11 @@ public class LoggingAspect {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `LoggingAspect` with 4 methods.
+
 ### Inline Pointcuts (One-time Use)
 
 ```java
@@ -355,6 +360,11 @@ public class LoggingAspect {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `LoggingAspect` with methods `logServiceCall()`, `logAuditableRepositoryCall()`.
 
 ### Pointcut Composition in XML
 
@@ -464,6 +474,11 @@ public class DebugAspect {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `DebugAspect` with methods `debugMatch()`.
+
 ## Common Pitfalls
 
 ### 1. Forgetting .. for Parameters
@@ -487,6 +502,11 @@ public class OrderService {
     public void validateOrder() { ... }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderService` with methods `processOrder()`, `validateOrder()`.
 
 AOP proxies intercept calls through the proxy, not internal calls within the same object.
 

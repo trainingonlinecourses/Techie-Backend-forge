@@ -99,6 +99,14 @@ public class DataQueue<T> {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `DataQueue` with methods `put()`, `take()`, `close()`.
+- Uses synchronization with `synchronized`.
+- Uses the `List` collection.
+- Uses loops.
+
 **Why `while` not `if`?** Because a thread can wake up spuriously (the JVM spec allows this) or because another thread consumed the item before this one could. The `while` loop re-checks the condition after waking.
 
 ### Scenario 2: Daemon threads for background cleanup
@@ -170,6 +178,14 @@ processor.start();
 processor.interrupt();
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `LogProcessor` with methods `run()`.
+- Uses manual threading.
+- Uses exception handling with try/catch.
+- Uses interface implementation.
+
 **Key rule:** Never swallow `InterruptedException`. Always either re-throw it or call `Thread.currentThread().interrupt()` to restore the flag.
 
 ### Scenario 4: Thread coordination with CountDownLatch
@@ -195,6 +211,14 @@ public class ServiceWarmup {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `ServiceWarmup` with methods `startServices()`.
+- Uses manual threading.
+- Uses exception handling with try/catch.
+- Uses lambda expressions.
 
 ### Scenario 5: Daemon thread naming for debugging
 

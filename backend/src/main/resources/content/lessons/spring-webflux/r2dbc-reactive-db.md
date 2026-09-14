@@ -97,6 +97,11 @@ public class User {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `User`.
+
 ### Repository Interface
 
 public interface UserRepository extends ReactiveCrudRepository<User, Long> {
@@ -168,6 +173,13 @@ public class UserService {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `UserService` with 5 methods.
+- Uses lambda expressions.
+- Uses generics.
 
 ---
 
@@ -256,6 +268,14 @@ public class DashboardService {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `DashboardService` with methods `getDashboard()`.
+- Uses lambda expressions.
+- Uses the `List` collection.
+- Uses generics.
 
 ---
 

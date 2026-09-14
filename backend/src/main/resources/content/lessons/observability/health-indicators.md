@@ -130,6 +130,12 @@ public Health health() {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses exception handling with try/catch.
+- Uses the java.time date-time API.
+
 ## Health Groups
 
 Different consumers need different subsets:

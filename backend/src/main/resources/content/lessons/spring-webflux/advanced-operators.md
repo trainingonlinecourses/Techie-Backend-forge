@@ -161,6 +161,14 @@ public class FilterOperators {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `FilterOperators` with 6 methods.
+- Uses lambda expressions.
+- Uses the java.time date-time API.
+- Uses generics.
+
 ### 3. Combining Operators
 
 
@@ -287,6 +295,14 @@ public class BatchOperators {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `BatchOperators` with 6 methods.
+- Uses method references.
+- Uses the `List` collection.
+- Uses `BigDecimal` for exact decimal math.
+
 ### 5. Error Handling Operators
 
 
@@ -340,6 +356,14 @@ public class ErrorOperators {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `ErrorOperators` with 4 methods.
+- Uses lambda expressions.
+- Uses the java.time date-time API.
+- Uses generics.
+
 ---
 
 ## Real-World Scenarios
@@ -376,6 +400,14 @@ public class DashboardService {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `DashboardService` with methods `streamDashboard()`.
+- Uses method references.
+- Uses the java.time date-time API.
+- Uses generics.
 
 ### Scenario 2: Batch Processing with Backpressure
 
@@ -419,6 +451,14 @@ public class BatchProcessor {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `BatchProcessor` with methods `processInBatches()`, `processBatch()`.
+- Uses lambda expressions.
+- Uses method references.
+- Uses the `List` collection.
 
 ### Scenario 3: Circuit Breaker with Reactive
 

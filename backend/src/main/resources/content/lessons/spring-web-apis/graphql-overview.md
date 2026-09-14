@@ -85,6 +85,11 @@ public class OrderLineResolvers {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderLineResolvers` with methods `product()`.
+
 This lazy per-field resolution is the source of both GraphQL's power (cheap nesting) and its risk (**n+1 per field**) — the DataLoader pattern (batch per field) is the standard fix.
 
 ## When GraphQL wins (and when it loses)

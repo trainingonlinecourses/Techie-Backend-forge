@@ -141,6 +141,11 @@ jdbcTemplate.batchUpdate(INSERT_SQL, courses, 500, setter);
 log.info("Batched: {} ms", TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start));
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+
 Typical: 100k rows, one-by-one ≈ 40s → batched ≈ 1.5s (with `rewriteBatchedStatements`). Always measure — the numbers justify the pattern.
 
 ## Error Handling in Batches

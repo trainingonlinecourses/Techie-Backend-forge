@@ -100,6 +100,14 @@ public class CourseController {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `CourseController` with 6 methods.
+- Uses the `List` collection.
+- Uses the `Map` collection.
+- Uses generics.
+
 ### Walking Through Each Part
 
 **GET → `@GetMapping`** — the read path. No state change, cacheable, repeatable. This is where 90% of traffic should live.

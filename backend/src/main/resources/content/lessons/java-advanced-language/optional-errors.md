@@ -65,6 +65,14 @@ course.ifPresent(c -> log.info("Loaded {}", c.id()));
 Course c = course.orElseThrow(() -> new CourseNotFoundException(slug));
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses `Optional` for null-safe values.
+- Uses lambda expressions.
+- Uses method references.
+- Uses generics.
+
 ## The Anti-Patterns
 
 
@@ -93,6 +101,13 @@ Course c = course.orElse(loadDefaultCourse());
 
 Course c = course.orElseGet(this::loadDefaultCourse);
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+- Uses method references.
+- Uses conditionals.
 
 ## Optional + Streams
 
@@ -126,6 +141,11 @@ public class CourseService {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `CourseService` with methods `create()`, `findInCache()`.
+
 With IDE support, `@Nullable`/`@NonNull` turn null bugs into warnings at the call site. Spring ships these annotations; add `-Xep:NullAway` or IDE inspections to enforce.
 
 ## Fail Fast vs. Fail Safe
@@ -143,6 +163,11 @@ public Course getCourseOrDefault(String slug) {
     return repository.findBySlug(slug).orElse(defaultCourse);
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses conditionals.
 
 The discipline: **fail fast at boundaries** (controllers, service entry points), **fail safe in the middle** (lookups with defaults, cache misses).
 
@@ -175,6 +200,13 @@ public CourseDto get(@PathVariable String slug) {
 Rule of thumb: **checked exceptions for recoverable external conditions** (file missing, connection refused) when the caller should decide; **unchecked for programmer errors** (bad args, null, invalid state).
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `CourseNotFoundException` with methods `get()`.
+- Uses lambda expressions.
+- Uses inheritance.
+
 ## The Three-Layer Error Pattern
 
 ```java
@@ -195,6 +227,13 @@ public Course findBySlug(String slug) {
 
 // Repository: return Optional
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `GlobalExceptionHandler` with methods `handle()`, `findBySlug()`.
+- Uses lambda expressions.
+
 public Optional<Course> findBySlug(String slug) { ... }
 
 Repository → Optional; service → domain exception; controller → HTTP status. Each layer speaks its own language; nothing leaks.
@@ -211,6 +250,12 @@ void missingCourseThrows() {
 @Test
 void optionalHandlesAbsence() {
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+
     Optional<Course> result = repository.findBySlug("nope");
 ```java
     assertTrue(result.isEmpty());

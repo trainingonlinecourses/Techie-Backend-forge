@@ -26,6 +26,11 @@ public class Course {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Course`.
+
 | Strategy | Mechanism | Use |
 |----------|-----------|-----|
 | `IDENTITY` | DB auto-increment | Simple, but INSERT happens immediately |
@@ -43,6 +48,11 @@ public class Course {
     private Long id;
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Course`.
 
 **The batch-insert trap**: with `IDENTITY`, Hibernate can't batch inserts (it must execute to get the id). `SEQUENCE` with a healthy `allocationSize` enables batch inserts — a 10× write-speedup for imports.
 
@@ -148,6 +158,11 @@ public class Customer {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Address` and `Customer`.
+
 Embedding maps value objects (the DDD kind) to columns — no separate table, no join.
 
 ## Naming Strategies
@@ -186,6 +201,12 @@ public class Course {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Course` with methods `equals()`, `hashCode()`.
+- Uses conditionals.
 
 **Rule**: base `equals`/`hashCode` on a stable business key, never on the generated id — a transient entity's id is null, breaking `Set` semantics.
 

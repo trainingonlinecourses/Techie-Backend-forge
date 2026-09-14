@@ -100,6 +100,12 @@ public class StructuredLoggingDemo {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `StructuredLoggingDemo` with methods `main()`.
+- Uses exception handling with try/catch.
+
 ---
 
 ## Real-World Scenarios
@@ -141,6 +147,13 @@ public class RequestContextFilter implements Filter {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `RequestContextFilter` with methods `doFilter()`.
+- Uses exception handling with try/catch.
+- Uses interface implementation.
 
 ---
 

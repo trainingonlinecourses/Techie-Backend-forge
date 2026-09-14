@@ -181,6 +181,11 @@ public class CourseService {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `CourseService` with methods `doBoth()`, `updateCourse()`.
+
 Same proxy problem as `@Async`/`@Cacheable`. Fix with self-injection or `TransactionTemplate`:
 
 ```java
@@ -203,6 +208,12 @@ public class CourseService {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `CourseService` with methods `doBoth()`.
+- Uses lambda expressions.
+
 ## Testing Transactions
 
 ```java
@@ -219,6 +230,11 @@ class TransactionTest {
     // rolled back after the test — no cleanup needed
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `TransactionTest`.
 
 With `@JdbcTest` + `@Transactional`, each test runs in a rollback-only transaction: assertions see the writes, and nothing leaks to the next test.
 

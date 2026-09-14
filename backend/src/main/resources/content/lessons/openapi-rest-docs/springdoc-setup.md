@@ -61,6 +61,11 @@ public class OpenApiConfig {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `OpenApiConfig` with methods `academyOpenApi()`.
+
 ```properties
 # ---- 3. Runtime configuration (application.properties) ----
 springdoc.api-docs.path=/v3/api-docs          # where the spec lives

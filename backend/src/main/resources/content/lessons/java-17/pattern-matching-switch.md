@@ -52,6 +52,12 @@ static String describe(Object obj) {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+- Uses switch branching.
+
 **One line per case. No casts. No intermediate variables.** The pattern variable `s`, `i`, `arr` is automatically bound if the type matches.
 
 ### How Switch Expressions Work
@@ -112,6 +118,13 @@ public class TypePatterns {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `TypePatterns` with methods `format()`, `main()`.
+- Uses lambda expressions.
+- Uses switch branching.
+
 ### Guarded Patterns (When Clauses)
 
 Sometimes you need more than just a type check. Use `when` to add conditions:
@@ -138,6 +151,13 @@ public class GuardedPatterns {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `GuardedPatterns` with methods `classify()`, `main()`.
+- Uses lambda expressions.
+- Uses switch branching.
 
 ### Pattern Matching with Sealed Classes
 
@@ -171,6 +191,14 @@ public class ShapeCalculator {
 **Why this matters:** The compiler enforces exhaustiveness. If you add a new shape to the sealed hierarchy and forget to handle it, you get a compile error.
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Shape` and `Circle` and 3 more type(s) with methods `area()`.
+- Uses lambda expressions.
+- Uses a `record`.
+- Uses an interface.
+
 ### Null Handling
 
 Pattern matching for switch has special null handling:
@@ -187,6 +215,13 @@ public class NullHandling {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `NullHandling` with methods `process()`.
+- Uses lambda expressions.
+- Uses switch branching.
 
 ### Nested Pattern Matching
 
@@ -209,6 +244,14 @@ public class NestedPatterns {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Point` and `Line` and 1 more type(s) with methods `describeLine()`.
+- Uses lambda expressions.
+- Uses a `record`.
+- Uses switch branching.
 
 ### Organization Use Cases
 
@@ -254,6 +297,13 @@ public class AstEvaluator {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `RequestRouter` and `OrderStateMachine` and 1 more type(s) with methods `route()`, `transition()`.
+- Uses lambda expressions.
+- Uses switch branching.
 
 ### Common Mistakes
 
@@ -302,6 +352,13 @@ public class PatternMatchingDemo {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `PatternMatchingDemo` with methods `describeShape()`.
+- Uses lambda expressions.
+- Uses switch branching.
 
 ### Key Takeaways
 

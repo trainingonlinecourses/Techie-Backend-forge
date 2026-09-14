@@ -235,6 +235,14 @@ public class TaskNotFoundException extends RuntimeException {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `TaskService` and `TaskNotFoundException` with 7 methods.
+- Uses lambda expressions.
+- Uses inheritance.
+- Uses the `List` collection.
+
 ### Step 4: The Controller (Web Layer)
 
 
@@ -325,6 +333,12 @@ public class TaskController {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `TaskController` with 7 methods.
+- Uses conditionals.
+
 ### Step 5: The Thymeleaf Template
 
 ```html
@@ -394,6 +408,11 @@ public class AdminUserController {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `AdminUserController`.
+
 ### Scenario 2: E-commerce product catalog
 ```java
 @Controller
@@ -410,6 +429,12 @@ public class ProductController {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `ProductController` with methods `list()`.
+- Uses conditionals.
 
 ## Common Beginner Pitfalls
 

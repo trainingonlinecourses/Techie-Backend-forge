@@ -124,6 +124,14 @@ public class Main {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- Uses lambda expressions.
+- Uses generics.
+- When run, it prints: “Indexed: ”, “Hit: ”
+
 **Walking through it:** the client is built on the REST transport with a JSON mapper (Jackson). Indexing is `index(...)` with the document; searching is `search(...)` with a query built from the fluent builder (`match` → the `match` query). The typed client maps results back into your POJO/record. Note the syntax shape: every Elasticsearch feature — queries, aggregations, mappings — follows the same fluent-builder pattern, so once you can read one you can read them all.
 
 ## The Deployment Reality

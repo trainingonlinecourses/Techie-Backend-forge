@@ -71,6 +71,14 @@ public class CheckedDemo {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `CheckedDemo` with methods `readConfig()`, `divide()`, `main()`.
+- Uses exception handling with try/catch.
+- Uses conditionals.
+- When run, it prints: “Config: ”, “Could not read config: ” …
+
 **Walking through it:** `readConfig` touches the file system, and the file API's methods *declare* `throws IOException`. Because `IOException` is checked, every caller must acknowledge it — here via try/catch. Remove the catch *and* the `throws` and the program won't compile; that's the compiler forcing you to plan for "the file might not exist." `divide` throws `IllegalArgumentException` — unchecked — so callers compile cleanly even though the method can fail. The compiler's stance: a missing file is an environmental reality you must design for; passing zero as a divisor is a bug in your code that you must fix.
 
 ## The Deep Reason: Who Can Recover?
@@ -119,6 +127,12 @@ public class Config {
     // No caller needs to catch this; the app's startup failure handler owns it.
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `PaymentService` and `Config` with methods `refund()`, `timeout()`.
+- Uses conditionals.
 
 ## The Sharp Edges
 

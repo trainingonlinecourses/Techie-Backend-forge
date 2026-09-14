@@ -98,6 +98,12 @@ names.stream().sorted(Comparator.nullsFirst(Comparator.naturalOrder())).toList()
 names.stream().sorted(Comparator.nullsLast(Comparator.naturalOrder())).toList();
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses the Streams API to process data declaratively.
+- Uses sorting with a `Comparator`.
+
 **Org scenario:** A customer list has some entries without emails. Sorting by email with `Comparator.comparing(Customer::getEmail)` would NPE on the nulls. The org standard is `Comparator.comparing(Customer::getEmail, Comparator.nullsLast(Comparator.naturalOrder()))` — put missing data at the bottom, don't crash.
 
 ## Real-World Patterns

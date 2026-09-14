@@ -65,6 +65,11 @@ s3.putObject(bucket, key, file.getInputStream(), s3Meta(file));
 // URL = /api/files/{key} — the app serves a signed link, not the bytes
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses conditionals.
+
 Production teams almost always put uploads in object storage, not the app's filesystem — the app stays stateless and horizontally scalable. Local disk is for dev and small internal tools.
 
 ```java

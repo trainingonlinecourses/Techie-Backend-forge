@@ -142,6 +142,11 @@ public class NativeConfig {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `NativeConfig`.
+
 ---
 
 ## Real-World Scenarios
@@ -193,6 +198,13 @@ public class AcademyCli implements CommandLineRunner {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `AcademyCli` with methods `run()`.
+- Uses interface implementation.
+- When run, it prints: “All lessons validated successfully.”
 
 ---
 

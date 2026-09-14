@@ -30,6 +30,12 @@ Animal a = animals.get(0);              // OK — we know it's at least an Anima
 animals.add(new Cat());                 // COMPILE ERROR — compiler can't guarantee safety
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses inheritance.
+- Uses the `List` collection.
+
 ## The three wildcard forms
 
 ### Unbounded wildcard: `?`
@@ -48,6 +54,12 @@ printList(List.of("a", "b", "c"));  // OK
 printList(List.of(new Dog()));       // OK
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses the `List` collection.
+- Uses loops.
+
 ### Upper-bounded: `? extends T`
 
 The wildcard is **some subtype of T**. You can **read** T from it but cannot **write** to it:
@@ -61,6 +73,13 @@ public static double sum(List<? extends Number> numbers) {
     return total;
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses inheritance.
+- Uses the `List` collection.
+- Uses loops.
 
 sum(List.of(1, 2, 3));              // List<Integer> — OK
 sum(List.of(1.5, 2.5));            // List<Double> — OK
@@ -94,6 +113,12 @@ List<Number> numbers = new ArrayList<>();
 addNumbers(numbers);
 addNumbers(new ArrayList<Object>());
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses the `List` collection.
+- Uses generics.
 
 ## The PECS Rule
 
@@ -141,6 +166,14 @@ public class EmailSender implements NotificationSender {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `NotificationSender` and `EmailSender` with methods `sendAll()`, `registerHandlers()`.
+- Uses an interface.
+- Uses inheritance.
+- Uses interface implementation.
+
 ### Scenario 2: Generic repositories
 
 public interface ReadOnlyRepository<T, ID> {
@@ -175,6 +208,14 @@ public static <T extends Comparable<? super T>> void sort(List<T> list) {
 List<String> names = List.of("Charlie", "Alice", "Bob");
 Collections.sort(names);
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses inheritance.
+- Uses the `List` collection.
+- Uses sorting with a `Comparator`.
+- Uses generics.
 
 ## Type erasure and wildcards
 

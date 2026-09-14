@@ -59,6 +59,13 @@ public final class Money {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Money` with 7 methods.
+- Uses `BigDecimal` for exact decimal math.
+- Uses conditionals.
+
 **The invariant lives here**: money is always 2-dp, currencies never mix, and every math operation goes through one class. No `double` anywhere in the codebase.
 
 ## Account: entity with a guarded balance
@@ -114,6 +121,13 @@ public class Account {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Account` with methods `getBalanceCents()`.
+- Uses `BigDecimal` for exact decimal math.
+- Uses conditionals.
+
 Note: `credit`/`debit` are the *only* mutators and they're not part of the public API — money moves exclusively through `TransferService` (a JPA entity is shared state, so all mutation goes through services). The entity guards its own invariant: no negative balances.
 
 ## Transfer: the atomic unit of work
@@ -162,6 +176,11 @@ public class Transfer {
     // getters...
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Transfer`.
 
 ## The business rule, in one transaction
 

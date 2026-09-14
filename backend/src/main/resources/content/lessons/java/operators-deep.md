@@ -109,6 +109,12 @@ String label = (age >= 18) ? "Adult" : "Minor";
 // This is unreadable and error-prone. Use an if/else or switch expression instead.
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses switch branching.
+- Uses conditionals.
+
 **Org rule:** Most style guides cap ternaries at one level of nesting. Beyond that, use `if/else` or `switch` expressions — readability wins over cleverness.
 
 ## String Concatenation in Loops — The Hidden N² Problem

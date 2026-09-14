@@ -37,6 +37,13 @@ public class Main {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- Uses exception handling with try/catch.
+- When run, it prints: “Invalid number: ”
+
 ### Optional-Based
 
 Optional<Integer> parsed = Optional.ofNullable(input)
@@ -50,6 +57,12 @@ Optional<Integer> parsed = Optional.ofNullable(input)
 int value = parsed.orElse(0);  // default to 0
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses exception handling with try/catch.
+- Uses lambda expressions.
+
 ### Apache Commons / Guava
 
 ```java
@@ -62,9 +75,12 @@ try {
 } catch (Exception e) { ... }
 ```
 
----
+<!-- why -->
+**What this code shows:**
 
-## Line-by-Line Walkthrough
+- Uses exception handling with try/catch.
+
+---
 
 ```java
 import java.util.*;
@@ -124,6 +140,9 @@ public class NumberParsingDemo {
     }
 }
 ```
+
+<!-- why -->
+## Line-by-Line Walkthrough
 
 ---
 

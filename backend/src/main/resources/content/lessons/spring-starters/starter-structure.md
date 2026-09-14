@@ -73,6 +73,11 @@ public class MyAutoConfiguration {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `MyAutoConfiguration` with methods `myService()`.
+
 ### pom.xml
 
 ```xml

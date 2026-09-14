@@ -56,6 +56,13 @@ public class AppUserDetailsService implements UserDetailsService {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `AppUserDetailsService` with methods `loadUserByUsername()`.
+- Uses lambda expressions.
+- Uses interface implementation.
+
 The provider handles the timing-safe `matches()` check, unlocks/locks disabled accounts (`UserDetails.isEnabled()`), and populates authorities.
 
 ## How we use it in an organization: the scenarios

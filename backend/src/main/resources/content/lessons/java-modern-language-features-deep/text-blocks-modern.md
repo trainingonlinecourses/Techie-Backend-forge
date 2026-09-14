@@ -130,6 +130,11 @@ String path = """
     """;   // backslash must be escaped: \\ -> \
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+
 String withQuote = """
     He said, "hello"
 ```java

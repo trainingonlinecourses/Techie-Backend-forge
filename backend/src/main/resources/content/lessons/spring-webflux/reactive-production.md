@@ -72,6 +72,11 @@ Mono<Resp> call = client.call()
         .onErrorResume(e -> Mono.just(Resp.degraded()));                 // fallback
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+
 Resilience4j also ships reactive adapters (`Resilience4JCircuitBreakerFactory` with Reactor/`ReactiveResilience4JCircuitBreaker`) for circuit breakers in WebFlux. Combine: timeout → retry with jitter → circuit breaker → fallback, same as any microservice.
 
 ## Observability — context propagation is mandatory
@@ -94,6 +99,11 @@ Without it, a request spanning 5 reactive hops produces 5 unrelated log lines �
 ```java
 The pragmatic org pattern: **reactive only where it pays** — gateway, streaming, high-concurrency fan-out — and servlet everywhere else. Mixed stacks are normal; mixed stacks *within one service* are the problem.
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses conditionals.
 
 > **Why it matters (organizational view)** — Reactive production discipline is three rules: **never block the event loop** (boundedElastic or it's a review failure), **propagate context** (tracing across threads, else debugging is archaeology), and **enforce the stack boundary** (reactive for the hot paths, servlet for the rest — decided per service, not per developer mood). Instrument the event-loop occupancy and reactive metrics before launch; the failure modes (event-loop starvation, pool exhaustion) only appear under real load.
 

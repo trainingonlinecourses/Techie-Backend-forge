@@ -137,6 +137,12 @@ public class JsonMapper {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `JsonMapper` with methods `fromJson()`.
+- Uses generics.
+
 For nested generics like `List<User>`, a plain `Class` can't express it — that's why Spring and Jackson use `ParameterizedTypeReference<List<User>>` or `TypeReference<List<User>>`, which capture the full generic type at compile time (through the generic-superclass reflection trick) and hand it to the runtime. As a library author, accepting a type token instead of guessing is what makes your API both safe and flexible.
 
 ## Pitfall 6: Overloading on Erasure

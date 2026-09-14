@@ -162,6 +162,11 @@ public class OrderPricingService {     // DOMAIN service — pure business logic
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderPricingService` with methods `calculateTotal()`.
+
 ## The Layers
 
 ```
@@ -232,6 +237,12 @@ class OrderTest {
     void cannotConfirmEmptyOrder() {
         Order order = new Order(1L);
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+
         assertThrows(IllegalStateException.class, order::confirm);
     }
 }

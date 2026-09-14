@@ -137,6 +137,14 @@ public class ProductSearchService {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `ProductSearchService` with methods `search()`, `nativeSearch()`.
+- Uses regex matching.
+- Uses conditionals.
+- Uses generics.
+
 **Walking through it:** `Criteria` is the type-safe query builder — `and`, `matches` (analyzed full-text), `is` (term), `lessThanEqual` (range) compose into a query with the familiar Java fluency. `operations.search(query, Product.class)` runs it and returns `SearchHits<Product>` — which carries the hits *and their scores*, plus facets/aggregations. For the full Query DSL (bool/must/filter with boosts), `NativeQuery` accepts raw Lucene query builders — the entire Elasticsearch query language, from Spring. **SearchHits is the return type to know**: `hit.getContent()`, `hit.getScore()`, and `searchHits.getTotalHits()` give you results plus the relevance data the whole engine exists to produce.
 
 ## Index Management and the Write Side

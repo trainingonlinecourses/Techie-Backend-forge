@@ -105,6 +105,14 @@ public class CatalogService {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Course` and `CourseRepository` and 1 more type(s) with methods `addCourse()`, `search()`.
+- Uses an interface.
+- Uses inheritance.
+- Uses the `List` collection.
+
 ### Walking Through Each Part
 
 **The aggregate** — `Course` is the aggregate root (`@Id` on its id); `Lesson` is an embedded child. Spring Data JDBC manages the aggregate as a unit: save → course row + lesson rows; load → eager, complete aggregate. The table names derive from the class names (`course`, `course_lesson`), overridable via `@Table`.

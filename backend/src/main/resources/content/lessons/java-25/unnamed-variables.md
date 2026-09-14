@@ -82,6 +82,14 @@ public class Main {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- Uses exception handling with try/catch.
+- Uses lambda expressions.
+- Uses loops.
+
 ---
 
 ## When to Use `_`
@@ -124,6 +132,14 @@ public class Main {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` and `Result` with methods `main()`.
+- Uses exception handling with try/catch.
+- Uses a `record`.
+- Uses local type inference with `var`.
 
 ---
 
@@ -215,6 +231,14 @@ public class UnnamedVariablesDemo {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `UnnamedVariablesDemo` and `User` with 5 methods.
+- Uses the Streams API to process data declaratively.
+- Uses exception handling with try/catch.
+- Uses lambda expressions.
+
 ---
 
 ## Real-World Scenarios
@@ -239,6 +263,11 @@ public void copyFile(String from, String to) throws IOException {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses local type inference with `var`.
 
 ---
 

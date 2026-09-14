@@ -99,6 +99,11 @@ MDC.put("correlationId", reqId);   // set in a servlet filter
 try { ... } finally { MDC.remove("correlationId"); }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses exception handling with try/catch.
+
 Every line in that request then carries the same ID — the field that makes log-diving possible across services.
 
 ## Key takeaways

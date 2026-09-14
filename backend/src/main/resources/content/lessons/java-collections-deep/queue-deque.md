@@ -42,6 +42,11 @@ String h = queue.remove();
 String head = queue.peek();
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses generics.
+
 **Production rule**: use `offer`/`poll`/`peek` — the status-returning trio — unless you *want* the exception.
 
 ## ArrayDeque: The Default

@@ -94,6 +94,14 @@ class Office {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Printer` and `Scanner` and 5 more type(s) with methods `print()`, `scan()`, `fax()`.
+- Uses an interface.
+- Uses interface implementation.
+- When run, it prints: “printing ”, “printing ” …
+
 ### What Changed and Why
 
 - **Each implementer implements only its roles** — no `UnsupportedOperationException` anywhere. A printer is honestly just a `Printer`.
@@ -130,6 +138,12 @@ class PrinterAdapter implements Printer {
     public void print(String doc) { machine.print(doc); }   // only the needed method
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `PrinterAdapter` with methods `print()`.
+- Uses interface implementation.
 
 ## Common Beginner Pitfalls
 

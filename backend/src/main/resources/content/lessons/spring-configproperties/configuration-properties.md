@@ -40,6 +40,12 @@ public record AppProperties(
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `DatabaseProperties` and `PoolProperties` and 1 more type(s).
+- Uses a `record`.
+
 // Access: appProperties.database().pool().maxSize() → 20
 
 ---
@@ -118,6 +124,14 @@ public class MetricsProperties {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `AppProperties` and `ServerProperties` and 4 more type(s) with methods `main()`, `createOrder()`.
+- Uses a `record`.
+- Uses the `Map` collection.
+- Uses the java.time date-time API.
+
 ---
 
 ## Real-World Scenarios
@@ -169,6 +183,13 @@ public record ExternalApisProperties(
     public record ApiConfig(String url, String key, Duration timeout, int retryAttempts) {}
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `ApiConfig`.
+- Uses a `record`.
+- Uses the java.time date-time API.
 
 ---
 

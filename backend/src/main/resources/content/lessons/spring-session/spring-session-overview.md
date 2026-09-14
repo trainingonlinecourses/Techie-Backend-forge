@@ -89,6 +89,11 @@ public class Application {
 **That's it.** Your sessions are now stored in Redis. Every instance of your app reads/writes to the same Redis, so sessions are shared.
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Application` with methods `main()`.
+
 ### Line-by-Line Breakdown
 
 ```yaml

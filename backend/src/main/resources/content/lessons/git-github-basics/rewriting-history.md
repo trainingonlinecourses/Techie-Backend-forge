@@ -126,6 +126,11 @@ The reflog means **almost nothing is unrecoverable** — even a botched `--hard`
 **The test before rewriting:** *has anyone else pulled this history?* If yes — don't rewrite; add a new commit instead. If no — reshape freely.
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses conditionals.
+
 ## Common Beginner Pitfalls
 
 1. **Amending a pushed commit** — the push rejects (or you force-push and break teammates). Amend only unpushed commits.

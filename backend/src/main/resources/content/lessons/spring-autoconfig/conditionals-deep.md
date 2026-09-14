@@ -120,6 +120,12 @@ public class NotificationConfiguration {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `CacheConfiguration` and `FeatureConfiguration` and 1 more type(s) with 6 methods.
+- When run, it prints: “Creating Redis cache manager”, “Creating default in-memory cache manager”
+
 ---
 
 ## Real-World Scenarios
@@ -152,6 +158,11 @@ public class DataSourceAutoConfiguration {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `DataSourceAutoConfiguration` with methods `dataSource()`, `jdbcTemplate()`.
 
 ### Scenario 2: Feature flags
 
@@ -186,6 +197,11 @@ public class FeatureFlags {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `FeatureFlags` with methods `darkModeTheme()`, `lightModeTheme()`, `aiAssistant()`.
+
 ### Scenario 3: Profile-specific beans
 
 ```java
@@ -207,6 +223,11 @@ public class EnvironmentConfiguration {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `EnvironmentConfiguration` with methods `devDataLoader()`, `prodDataLoader()`.
 
 ---
 

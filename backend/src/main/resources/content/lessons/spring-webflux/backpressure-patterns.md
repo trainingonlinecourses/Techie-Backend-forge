@@ -58,6 +58,11 @@ Flux.range(1, 1_000_000)
     .subscribe();
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses method references.
+
 ### 2. Drop — Discard New Items
 
 Flux.range(1, 1_000_000)
@@ -157,6 +162,14 @@ public class LogIngestionService {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `LogIngestionService` with methods `ingestLogs()`.
+- Uses lambda expressions.
+- Uses method references.
+- Uses generics.
+
 ### Scenario 2: Real-Time Sensor Data
 
 @Service
@@ -207,6 +220,14 @@ public class MessageConsumer {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `MessageConsumer` with methods `consumeMessages()`.
+- Uses lambda expressions.
+- Uses method references.
+- Uses generics.
 
 ---
 

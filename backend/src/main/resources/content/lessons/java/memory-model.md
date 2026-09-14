@@ -25,6 +25,12 @@ class StopFlag {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `StopFlag`.
+- Uses loops.
+
 Without synchronization, the JVM is *allowed* to keep the loop running forever — no guarantee, no error, just a hang. This is a **data race** (unsynchronized read/write of the same field), and the Java Memory Model (JMM) defines exactly when visibility *is* guaranteed.
 
 ## The happens-before rules

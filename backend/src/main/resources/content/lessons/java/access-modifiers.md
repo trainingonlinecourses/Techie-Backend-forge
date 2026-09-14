@@ -100,6 +100,14 @@ public abstract class ReportGenerator {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `ReportGenerator` with methods `fetchData()`, `generate()`, `render()`.
+- Uses the `List` collection.
+- Uses generics.
+- When run, it prints: “Rendering ”
+
 `protected` says: "subclasses anywhere may touch or override this, but random unrelated classes may not." The Template Method pattern above is the textbook use.
 
 ## `public` — The published API

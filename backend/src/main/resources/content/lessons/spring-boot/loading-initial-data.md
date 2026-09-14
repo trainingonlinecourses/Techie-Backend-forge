@@ -226,6 +226,13 @@ public class ProdDataSeeder implements CommandLineRunner {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `DevDataSeeder` and `StagingDataSeeder` and 1 more type(s) with methods `run()`.
+- Uses interface implementation.
+- When run, it prints: “Loading development data...”, “Loading staging data...” …
+
 ```bash
 # Run with a specific profile
 java -jar app.jar --spring.profiles.active=dev

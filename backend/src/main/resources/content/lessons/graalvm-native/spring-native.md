@@ -132,6 +132,12 @@ public class AcademyRuntimeHints implements RuntimeHintsRegistrar {
 class NativeConfig { }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `AcademyApplication` and `AcademyRuntimeHints` and 1 more type(s) with methods `registerHints()`.
+- Uses interface implementation.
+
 **The mental model for hints:** ask "what does my code do *dynamically* that the compiler can't see?" — reflectively accessed classes, loaded resources, serialized types, dynamic proxies — and declare each with a hint. The `RuntimeHintsRegistrar` API is the sanctioned surface: type-safe, conditional, and processed at AOT time.
 
 ## The Framework-Specific Considerations

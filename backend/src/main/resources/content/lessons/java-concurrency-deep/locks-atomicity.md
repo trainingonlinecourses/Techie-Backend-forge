@@ -33,6 +33,11 @@ public void run() {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses loops.
+
 `volatile` guarantees visibility and ordering, but **not atomicity**:
 
 ```java
@@ -80,6 +85,14 @@ public class Registry {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Registry` with methods `add()`.
+- Uses synchronization with `synchronized`.
+- Uses exception handling with try/catch.
+- Uses the `Map` collection.
+
 ## The synchronized Block
 
 ```java
@@ -94,6 +107,12 @@ public void transfer(Account from, Account to, BigDecimal amount) {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses synchronization with `synchronized`.
+- Uses `BigDecimal` for exact decimal math.
+
 This is where **deadlock** is born: two threads transferring in opposite directions each hold one account and wait for the other. The fix — always lock in a **global order**:
 
 ```java
@@ -104,6 +123,11 @@ synchronized (first) {
     synchronized (second) { ... }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses synchronization with `synchronized`.
 
 ## ReentrantLock: The Explicit Lock
 
@@ -119,6 +143,11 @@ public void process() {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses exception handling with try/catch.
 
 ReentrantLock's advantages over synchronized:
 
@@ -142,6 +171,12 @@ if (lock.tryLock(5, TimeUnit.SECONDS)) {
     log.warn("Lock not acquired in 5s — proceeding with stale state");
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses exception handling with try/catch.
+- Uses conditionals.
 
 ## The Atomic Classes
 
@@ -167,6 +202,12 @@ AtomicLong, AtomicBoolean, AtomicReference<T>
 AtomicLongArray, LongAdder, LongAccumulator
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+- Uses generics.
+
 ### CAS: Compare-And-Set
 
 ```java
@@ -179,6 +220,12 @@ public int incrementAndGet() {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses loops.
+- Uses conditionals.
 
 CAS is a hardware primitive (LOCK CMPXCHG) — **lock-free**: no blocking, no deadlock, no context switch. Contended CAS retries, which is why `LongAdder` exists for high contention.
 

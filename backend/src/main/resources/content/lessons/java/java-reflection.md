@@ -87,6 +87,12 @@ public class Main {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- When run, it prints: “Name: ”, “Simple name: ” …
+
 ## Accessing fields dynamically
 
 
@@ -137,6 +143,13 @@ nameField.set(user, "Bob");
 System.out.println(user.getName());
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `User`.
+- Uses loops.
+- When run, it prints: “Name: ”
+
 ## Accessing methods dynamically
 
 
@@ -179,6 +192,14 @@ public class Main {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- Uses the Streams API to process data declaratively.
+- Uses method references.
+- Uses loops.
+
 ## Creating instances dynamically
 
 
@@ -213,6 +234,14 @@ public class Main {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- Uses the Streams API to process data declaratively.
+- Uses method references.
+- Uses loops.
 
 ## Annotation processing with reflection
 
@@ -282,6 +311,14 @@ SimpleJsonSerializer serializer = new SimpleJsonSerializer();
 System.out.println(serializer.serialize(user));
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `JsonField` and `User` and 1 more type(s) with methods `serialize()`.
+- Uses an interface.
+- Uses loops.
+- Uses conditionals.
+
 ## How we use it in organizations
 
 ### Scenario 1: How Spring Dependency Injection works
@@ -324,6 +361,13 @@ public class SpringContainer {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderService` and `SpringContainer` with methods `injectDependencies()`.
+- Uses loops.
+- Uses conditionals.
+
 ### Scenario 2: Automatic DTO mapping
 
 
@@ -362,6 +406,14 @@ public class BeanMapper {
 UserEntity entity = new UserEntity(1L, "Alice", "alice@example.com");
 UserDTO dto = BeanMapper.map(entity, UserDTO.class);
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `BeanMapper` with methods `map()`.
+- Uses exception handling with try/catch.
+- Uses loops.
+- Uses conditionals.
 
 ### Scenario 3: Validation framework using annotations + reflection
 
@@ -428,6 +480,14 @@ UserForm form = new UserForm();
 List<String> errors = AnnotationValidator.validate(form);
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `NotBlank` and `Min` and 2 more type(s) with methods `validate()`.
+- Uses an interface.
+- Uses the `List` collection.
+- Uses loops.
+
 ## Performance considerations
 
 Reflection is **slow** compared to direct method calls (10-50x slower). Use it wisely:
@@ -465,6 +525,11 @@ for (int i = 0; i < 1_000_000; i++) {
     handle.invoke(processor, data);
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses loops.
 
 ## Common mistakes
 

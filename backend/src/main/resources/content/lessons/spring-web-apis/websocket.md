@@ -44,6 +44,12 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `WebSocketConfig` with methods `configureMessageBroker()`, `registerStompEndpoints()`.
+- Uses interface implementation.
+
 The path model: client sends to `/app/...` (handled by your controllers), server publishes to `/topic/...` (broadcast) or `/queue/...` (one user). The broker (simple in-memory, or a real one like RabbitMQ/ActiveMQ) routes messages.
 
 ## Handling messages server-side

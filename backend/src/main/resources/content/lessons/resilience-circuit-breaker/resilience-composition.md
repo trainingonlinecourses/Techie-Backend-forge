@@ -72,6 +72,14 @@ public PaymentResult pay(PaymentRequest request) {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses exception handling with try/catch.
+- Uses lambda expressions.
+- Uses the java.time date-time API.
+- Uses generics.
+
 ### Why This Order
 
 - **Bulkhead outermost (beneath breaker)** — limits concurrency *before* anything else consumes threads.

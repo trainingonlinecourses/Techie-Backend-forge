@@ -153,6 +153,14 @@ public enum Operation {
 **Line-by-line explanation:**
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Operation` with methods `apply()`, `getSymbol()`, `fromSymbol()`.
+- Uses an `enum`.
+- Uses interface implementation.
+- Uses loops.
+
 | Line | What it does | Why it matters |
 |------|-------------|----------------|
 | `ADD("+") { @Override public double apply(...) }` | Each constant overrides the abstract method | This IS the strategy pattern — each constant is a strategy |
@@ -183,6 +191,11 @@ public double calculate(Operation op, double a, double b) {
     return op.apply(a, b);  // Adding a new operation = adding a new enum constant
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses switch branching.
 
 ### Step 3: EnumSet and EnumMap — Blazing-Fast Collections
 
@@ -317,6 +330,12 @@ public enum OrderStatus {
     public abstract String describe();
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderStatus` with methods `next()`, `describe()`.
+- Uses an `enum`.
 
 ### Scenario 2: Database column mapping
 public enum ColumnType {

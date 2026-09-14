@@ -137,6 +137,11 @@ public class UserController {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `UserController` with methods `main()`.
+
 ---
 
 ## Real-World Scenarios

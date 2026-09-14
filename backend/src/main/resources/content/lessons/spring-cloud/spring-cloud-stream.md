@@ -102,6 +102,11 @@ class OrderBindingsTest {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderBindingsTest`.
+
 ## Key takeaways
 
 - Functional beans (`Consumer`/`Supplier`/`Function`) are the bindings; the bean name determines the binding name.

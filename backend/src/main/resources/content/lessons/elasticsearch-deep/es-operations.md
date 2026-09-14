@@ -100,6 +100,12 @@ SearchQuery query = new NativeSearchQueryBuilder()
 List<Product> products = operations.queryForList(query, Product.class);
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses the `List` collection.
+- Uses generics.
+
 ## Common search patterns
 
 ### Full-text search
@@ -179,6 +185,12 @@ public class Main {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- Uses loops.
+
 ## Real-world scenario — product search
 
 
@@ -230,6 +242,13 @@ public class ProductSearchService {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `ProductSearchService` with methods `search()`.
+- Uses conditionals.
+- Uses generics.
 
 ## Common mistakes
 

@@ -29,6 +29,11 @@ for (Order o : orders) {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses loops.
+
 The single-threaded **`StringBuilder`** is the standard mutable string builder. **`StringBuffer`** is its thread-safe twin — every method synchronized — which costs performance for zero benefit in single-threaded code. **The org rule: `StringBuilder` by default; `StringBuffer` only for genuinely shared, mutable, multi-threaded buffers (nearly never).**
 
 ## When + is fine (and when it isn't)
@@ -67,6 +72,13 @@ String ids = orders.stream()
     .map(String::valueOf)
     .collect(Collectors.joining(", ", "(", ")"));
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses the Streams API to process data declaratively.
+- Uses lambda expressions.
+- Uses method references.
 
 `Collectors.joining` is the modern default for building delimited strings from collections — it's null-safe (empty collection → `""`), has no trailing-delimiter bug, and reads clearly.
 

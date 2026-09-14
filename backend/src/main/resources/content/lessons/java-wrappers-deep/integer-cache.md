@@ -27,6 +27,11 @@ public class Main {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+
 ---
 
 ## Cache Ranges
@@ -75,6 +80,11 @@ public class Main {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+
 ---
 
 ## Real-World Scenarios
@@ -98,6 +108,13 @@ public class Main {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- Uses the `Map` collection.
+- Uses generics.
+
 ### Scenario 2: Thread safety of cache
 
 ```java
@@ -111,6 +128,13 @@ for (int i = 0; i < 1000; i++) {
     });
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses synchronization with `synchronized`.
+- Uses lambda expressions.
+- Uses loops.
 
 ---
 

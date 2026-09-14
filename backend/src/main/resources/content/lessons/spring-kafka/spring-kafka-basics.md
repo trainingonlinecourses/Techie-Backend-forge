@@ -53,6 +53,11 @@ public class OrderEventConsumer {
 The method runs in the **consumer container**; returning normally commits the offset. Throwing triggers redelivery — which is why listeners must be **idempotent** (process by event id).
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderEventConsumer` with methods `onOrderCreated()`.
+
 ## Configuration (application.yml)
 
 ```yaml
@@ -94,6 +99,14 @@ future.whenComplete((res, ex) -> {
     if (ex != null) log.error("Failed to publish order event {}", event.orderId(), ex);
 });
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses asynchronous composition with `CompletableFuture`.
+- Uses lambda expressions.
+- Uses conditionals.
+- Uses generics.
 
 `send` is async — check the future or listen for errors, and **never swallow producer exceptions silently** (the message is lost).
 

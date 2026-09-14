@@ -114,6 +114,13 @@ public class CourseController implements CoursesApi {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `IS` and `CoursesApi` and 1 more type(s) with methods `listCourses()`.
+- Uses an interface.
+- Uses interface implementation.
+
 ### Walking Through Each Part
 
 **The spec as source of truth** — `operationId: listCourses` becomes the method name on both sides. The schema (`CoursePage`, `Course`) becomes the type on both sides. One file, two languages, zero drift: if the backend returns a field the frontend doesn't know, neither side compiled against the other's guess.

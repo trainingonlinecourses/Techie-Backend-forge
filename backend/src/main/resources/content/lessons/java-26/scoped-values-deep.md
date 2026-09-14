@@ -46,6 +46,11 @@ public void handleRequest() {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+
 ---
 
 ## How Scoped Values Work
@@ -79,6 +84,13 @@ public class Main {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- Uses lambda expressions.
+- Uses generics.
 
 ---
 
@@ -196,6 +208,14 @@ public class ScopedValuesDemo {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `ScopedValuesDemo` with 6 methods.
+- Uses manual threading.
+- Uses exception handling with try/catch.
+- Uses lambda expressions.
 
 ---
 

@@ -100,6 +100,14 @@ public class CheckoutService {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `PaymentProvider` and `StripePaymentProvider` and 1 more type(s) with methods `charge()`, `getName()`, `checkout()`.
+- Uses lambda expressions.
+- Uses an interface.
+- Uses interface implementation.
+
 ---
 
 ## Real-World Scenarios

@@ -47,6 +47,12 @@ public class Customer {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Customer`.
+- Uses conditionals.
+
 Because callbacks fire inside the persistence provider, they run for **every** save path — service method, bulk save, test fixture — which is exactly why teams use them for invariants that must never be missed.
 
 ## Entity listeners — callbacks for many entities
@@ -74,6 +80,12 @@ public class AuditListener {
 public abstract class Auditable { /* createdAt, updatedAt, setters */ }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `AuditListener` and `Auditable`.
+- Uses conditionals.
+
 `@EntityListeners` on a `@MappedSuperclass` is inherited by every subclass — this is how Spring Data's auditing (`@CreatedDate`) works under the hood (its `AuditingEntityListener` is exactly this pattern). Listeners take the entity as a parameter; callbacks inside the entity take none.
 
 ## How we use it in an organization: the scenarios
@@ -91,6 +103,11 @@ void hashSecret() {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses conditionals.
 
 **Scenario 3 — default/derived values at load.** `@PostLoad` computes transient fields (age from birth date, a display label) so reads always see current values without recomputing in every endpoint.
 

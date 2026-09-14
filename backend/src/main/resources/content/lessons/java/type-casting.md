@@ -95,6 +95,9 @@ Integer b = 20;
 Integer sum = a + b;
 ```
 
+<!-- why -->
+
+
 ```java
 **Performance in loops:** Autoboxing inside a tight loop allocates thousands of objects:
 
@@ -110,6 +113,16 @@ for (int i = 0; i < 10_000_000; i++) {
     total += i;
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+- Uses the `List` collection.
+- Uses generics.
+
+<!-- why -->
+**What this code shows:**
+
+- Uses loops.
 
 ## The Integer cache trap — == lies
 
@@ -130,6 +143,11 @@ public class Main {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
 
 **The org rule:** never use `==` to compare `Integer`, `Long`, `Double`, or any wrapper type. Always use `.equals()`. Autoboxed values in ternaries and method returns may or may not be cached.
 
@@ -192,6 +210,14 @@ public class Main {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- Uses the `List` collection.
+- Uses conditionals.
+- Uses generics.
+
 ## Common org scenarios
 
 **Payment service:** casting `long` cents to `BigDecimal` without losing precision:
@@ -217,6 +243,12 @@ public static int safeInt(String value, int defaultValue) {
 
 **Enum from int:** the reverse of ordinal:
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses exception handling with try/catch.
+- Uses `BigDecimal` for exact decimal math.
 
 public static <E extends Enum<E>> E fromOrdinal(Class<E> enumType, int ordinal) {
     E[] values = enumType.getEnumConstants();

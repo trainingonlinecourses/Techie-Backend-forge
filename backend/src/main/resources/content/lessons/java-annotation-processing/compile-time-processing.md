@@ -28,6 +28,11 @@ public class User {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `User`.
+
 ---
 
 ## How APT Works
@@ -86,6 +91,14 @@ public class BuilderProcessor extends AbstractProcessor {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `BuilderProcessor` with methods `process()`.
+- Uses exception handling with try/catch.
+- Uses inheritance.
+- Uses the `Set` collection.
 
 ---
 
@@ -209,6 +222,12 @@ com.example.ToStringProcessor
 @SupportedSourceVersion(SourceVersion.RELEASE_21)
 public class ToStringProcessor extends AbstractProcessor { }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `ToStringProcessor`.
+- Uses inheritance.
 
 ---
 

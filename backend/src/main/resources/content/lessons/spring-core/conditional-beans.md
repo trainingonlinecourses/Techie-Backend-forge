@@ -36,6 +36,11 @@ public class DataSourceConfig {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `DataSourceConfig` with methods `prodDataSource()`, `embeddedDataSource()`.
+
 `spring.profiles.active=prod` on the command line or in the environment picks the set. Profiles compose — you can activate several at once (`dev,fast-tests`). They're the standard for **deployment environments**, not for fine-grained feature control.
 
 ## How we use it in an organization: the patterns
@@ -52,6 +57,13 @@ public class StripePaymentGateway implements PaymentGateway { ... }
 public class AdyenPaymentGateway implements PaymentGateway { ... }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `StripePaymentGateway` and `AdyenPaymentGateway`.
+- Uses interface implementation.
+- Uses switch branching.
+
 Flip `payments.provider=adyen` in config, restart — the container now wires Adyen and *drops* Stripe. No code change, no risk of both beans colliding on `@Autowired PaymentGateway`.
 
 ```java
@@ -62,6 +74,11 @@ Flip `payments.provider=adyen` in config, restart — the container now wires Ad
 @ConditionalOnProperty(name = "app.kafka.enabled", havingValue = "true", matchIfMissing = true)
 public class KafkaProducerAutoConfig { ... }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `KafkaProducerAutoConfig`.
 
 `@ConditionalOnClass` checks whether the class *can be loaded* (it doesn't force loading) — this is how Spring Boot ships one jar of auto-configurations that activate only for the starters you added.
 
@@ -81,6 +98,12 @@ public class V2SearchFlag implements Condition {
 @Conditional(V2SearchFlag.class)
 public class V2SearchConfig { @Bean SearchEngine v2Engine() { ... } }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `V2SearchFlag` and `V2SearchConfig` with methods `matches()`.
+- Uses interface implementation.
 
 A `Condition` gets the full `Environment` — so the flag can come from config server, env var, or system property, and the decision is made once, at startup.
 

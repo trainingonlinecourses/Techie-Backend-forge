@@ -56,6 +56,12 @@ public class OrderService {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `PaymentService` and `OrderService` with methods `placeOrder()`.
+- Uses an interface.
+
 **Key principle:** Module A can use Module B's public API, but NOT its internal classes. This is enforced by Java packages and Spring Modulith's dependency rules.
 
 ## Why microservices fail when chosen first
@@ -144,6 +150,13 @@ public class Payment {
     private PaymentStatus status;
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Order` and `Payment`.
+- Uses the `List` collection.
+- Uses generics.
 
 ## Real-world scenario — starting a startup
 

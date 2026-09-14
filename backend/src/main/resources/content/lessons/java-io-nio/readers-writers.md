@@ -73,6 +73,14 @@ public class ReaderWriterDemo {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `ReaderWriterDemo` with methods `main()`.
+- Uses file I/O with the NIO API.
+- Uses loops.
+- When run, it prints: “>> ”
+
 ### Walking Through Each Part
 
 **Part 1 — `Files.writeString`.** The modern, preferred API. The charset argument makes the encoding decision *explicit*. If you omit it, Java uses the **platform default** — on Windows that's typically Windows-1252, on Linux UTF-8. Code that relies on the default produces different files on different machines. This is a classic "works on my machine" bug.

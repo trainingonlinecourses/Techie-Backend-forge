@@ -47,6 +47,11 @@ List<SessionInformation> sessions = sessionRegistry.getAllSessions(user, false);
 sessions.forEach(s -> s.expireNow());
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+
 Register sessions by adding `http.sessionManagement(sm -> sm.sessionRegistry(sessionRegistry()))` — concurrent-session control **requires** the registry.
 
 ## Storage: single-instance default, Redis for scale-out
@@ -64,6 +69,11 @@ The default in-memory `HttpSession` dies on restart and breaks load-balanced dep
 @EnableRedisHttpSession(defaultMaxInactiveIntervalSeconds = 3600)  // 1h TTL
 public class SessionConfig { }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `SessionConfig`.
 
 Now: sessions survive restarts, any instance serves any user, and the session has a **server-enforced TTL** (the Redis key expires). The same pattern covers JDBC-backed sessions (`spring-session-jdbc`) when Redis isn't in the stack.
 

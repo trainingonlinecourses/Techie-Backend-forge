@@ -97,6 +97,14 @@ public class ResilientCatalogClient {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `ResilientCatalogClient` with methods `getCourse()`, `isTransient()`.
+- Uses lambda expressions.
+- Uses the java.time date-time API.
+- Uses generics.
+
 ### Walking Through Each Part
 
 **Part 1 — the retry.** `maxAttempts(3)` = original + 2 retries. `waitDuration` is the base backoff; real configs add `multiplier` for exponential growth. The critical line: `retryOnException` — **only retry transient failures** (5xx, timeouts, connection errors). Never retry 4xx (the request itself is wrong — retrying won't fix it) or permanent errors.
@@ -139,6 +147,11 @@ Bulkhead bulkhead = Bulkhead.of("catalog", BulkheadConfig.custom()
 
 When the catalog is slow, at most 10 threads wait on it; the other 190 threads serve everything else normally. Without bulkheads, a single dying dependency can take down the entire service by hogging every thread.
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses conditionals.
 
 ## Testing Resilience
 

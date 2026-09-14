@@ -36,6 +36,11 @@ class CourseControllerTest {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `CourseControllerTest` and `TestConfig`.
+
 **Inner `@TestConfiguration` classes are applied automatically** to the enclosing test. Standalone classes must be imported:
 
 ```java
@@ -50,6 +55,11 @@ public class TestClockConfig {
 @Import(TestClockConfig.class)
 class ExpiringTokenTest { ... }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `TestClockConfig` and `ExpiringTokenTest`.
 
 The fixed `Clock` bean is a classic: tests for expiry, TTL, and time-based logic become deterministic.
 
@@ -78,6 +88,11 @@ abstract class WebMvcTestBase {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `WebMvcTestBase`.
+
 ## @SpyBean: Real Bean, Selective Stubbing
 
 ```java
@@ -103,6 +118,11 @@ Unstubbed methods run for real; stubbed ones are intercepted.
 @ActiveProfiles("test")
 class IntegrationTest { ... }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `IntegrationTest`.
 
 ```yaml
 # application-test.yml

@@ -66,6 +66,12 @@ public class ClassLoaderDemo {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `ClassLoaderDemo` with methods `main()`.
+- When run, it prints: “App loader: ”, “Platform loader: ” …
+
 ## The delegation model — parent-first loading
 
 When a class loader needs to load a class, it **delegates to its parent first**:
@@ -135,6 +141,14 @@ public class CleanupListener implements ServletContextListener {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `CleanupListener` with methods `contextDestroyed()`.
+- Uses interface implementation.
+- Uses loops.
+- Uses generics.
 
 ## Real-world scenario — debugging a classloader leak
 

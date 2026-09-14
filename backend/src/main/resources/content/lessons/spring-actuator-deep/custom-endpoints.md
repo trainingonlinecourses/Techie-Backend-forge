@@ -214,6 +214,13 @@ public class QueueHealthEndpoint {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `QueueHealthEndpoint` with methods `all()`, `byName()`, `metric()`.
+- Uses the `Map` collection.
+- Uses generics.
+
 ---
 
 ## Real-World Scenario — API Rate Limiter Endpoint

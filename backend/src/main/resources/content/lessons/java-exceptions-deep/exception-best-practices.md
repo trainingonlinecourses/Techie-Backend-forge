@@ -41,6 +41,13 @@ public class PaymentService {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `PaymentService` with methods `charge()`.
+- Uses `BigDecimal` for exact decimal math.
+- Uses conditionals.
+
 The alternative — proceeding with a blank account id — could charge the wrong account, write bad rows, or throw a confusing `NullPointerException` three layers deep. Failing at the boundary means the error message names the actual problem, at the actual location. Spring Boot's bean validation (`@Valid`, `@NotNull`) automates this at REST boundaries; the same principle applies inside your code.
 
 ## Rule 2: Catch at the Right Layer
@@ -69,6 +76,13 @@ public class ApiExceptionHandler {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `LessonController` and `ApiExceptionHandler` with methods `getLesson()`, `notFound()`.
+- Uses the `Map` collection.
+- Uses generics.
 
 The `@RestControllerAdvice` pattern is the production-standard way to keep controllers clean while giving every failure a consistent HTTP shape.
 
@@ -112,6 +126,11 @@ try {
 Even "expected" failures deserve a log line at debug/trace level; the cost is tiny and the visibility is priceless.
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses exception handling with try/catch.
+
 ## Rule 5: Be Specific in Catch Blocks
 
 Catch the *most specific* type that matches your intent, not `Exception`:
@@ -127,6 +146,11 @@ try {
     log.error("Failed to send email to {}", user.email(), e);
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses exception handling with try/catch.
 
 Catching `Exception` lumps "network down" with "programming bug" — two failures needing entirely different responses — into one pile. Specific catches let each failure take its correct path. Multi-catch (`catch (A | B e)`) is the clean way to share handling when types are genuinely equivalent.
 
@@ -149,6 +173,11 @@ try {
 int value = userInput == null ? 0 : parseIntSafely(userInput);
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses exception handling with try/catch.
+
 Note there's a legitimate nuance: the JDK itself uses `NumberFormatException` as a parsing signal, and `Optional`/`isPresent` exist to avoid null-check pyramids. The rule is about *your* code: reserve exceptions for genuine failures, and design normal paths with normal branching.
 
 ## Rule 8: Log the Exception Object, Not Just the Message
@@ -162,6 +191,11 @@ log.error("Failed to charge account {}", accountId, e);
 log.error("Failed to charge account {}: {}", accountId, e.getMessage());
 // Only the message — the stack, cause chain, and line number are gone.
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
 
 Logging frameworks (SLF4J/Logback, which Spring Boot uses) treat a trailing `Throwable` argument specially: they render the full stack trace. Pass the exception object — that's where the debugging value lives.
 
@@ -185,6 +219,13 @@ public class OrderService {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderService` with methods `createOrder()`.
+- Uses exception handling with try/catch.
+- Uses conditionals.
 
 The controller above catches `OrderCreationFailedException` and returns 503 (service unavailable) with a clean JSON body; the log, thanks to the preserved cause, shows the exact database statement and driver line that failed. Every rule in this lesson is at work: fast validation, right-layer catching, cause preservation, specific types, and loud failure.
 

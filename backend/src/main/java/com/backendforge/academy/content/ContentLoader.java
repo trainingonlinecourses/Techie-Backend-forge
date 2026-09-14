@@ -164,6 +164,26 @@ public class ContentLoader implements CommandLineRunner {
         }
     }
 
+    /**
+     * Prerequisite lesson slugs from a front-matter {@code requires:} value —
+     * the inline-list form {@code [a, b]} or a bare single slug. Blank values
+     * yield an empty list. Mirrors the loader's generic list parsing; the CI
+     * gate (scripts/verify-content.mjs) validates that every referenced slug
+     * exists and the prereq graph has no cycles.
+     */
+    static List<String> parsePrereqSlugs(String value) {
+        if (value == null || value.isBlank()) return List.of();
+        String trimmed = value.trim();
+        if (trimmed.startsWith("[")) {
+            trimmed = trimmed.substring(1, trimmed.length() - 1);
+        }
+        return Arrays.stream(trimmed.split(","))
+                .map(String::trim)
+                .map(s -> s.replaceAll("^[\"']+|[\"']+$", ""))
+                .filter(s -> !s.isBlank())
+                .toList();
+    }
+
     // ---- change detection ----------------------------------------------------
 
     /**
@@ -221,6 +241,10 @@ public class ContentLoader implements CommandLineRunner {
         lesson.setCapstone(Boolean.parseBoolean(sl.meta().getOrDefault("capstone", "false")));
         lesson.getTopics().addAll(parseList(sl.meta().get("topics")));
         lesson.getDocs().addAll(parseList(sl.meta().get("docs")));
+        // Prerequisite lesson ids from `requires: [slug, slug]` (inline list — the
+        // simple KEY_VALUE parser only captures single-line values; CI's
+        // verify-content.mjs rejects the multi-line form so it can't silently drop).
+        lesson.getPrereqs().addAll(parseList(sl.meta().get("requires")));
         lesson.setBody(sl.body());
         lesson.setContentHash(sl.hash());
         return lesson;

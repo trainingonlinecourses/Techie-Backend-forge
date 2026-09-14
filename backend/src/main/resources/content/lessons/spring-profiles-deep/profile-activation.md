@@ -71,6 +71,11 @@ SpringApplicationBuilder app = new SpringApplicationBuilder(Application.class)
 class UserServiceTest { }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `UserServiceTest`.
+
 ---
 
 ## Real-World Scenarios

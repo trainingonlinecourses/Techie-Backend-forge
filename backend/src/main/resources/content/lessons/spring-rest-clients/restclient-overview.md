@@ -113,6 +113,14 @@ public class CourseCatalogClient {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `CourseCatalogClient` with 4 methods.
+- Uses exception handling with try/catch.
+- Uses the `List` collection.
+- Uses the `HttpClient` API.
+
 ### Walking Through Each Part
 
 **The builder** — `RestClient.Builder` (inject it; Boot configures it with your `ObjectMapper` and default settings). Configure shared things once: `baseUrl` (relative URIs in calls), default headers. The client is a thread-safe singleton — build once, share.

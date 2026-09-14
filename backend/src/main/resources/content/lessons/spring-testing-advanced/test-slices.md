@@ -84,6 +84,11 @@ If the app has Spring Security, `@WebMvcTest` loads it — every request is 401 
 class CourseControllerTest { ... }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `CourseControllerTest`.
+
 Or authenticate in tests:
 
 mockMvc.perform(get("/api/courses/1")
@@ -140,6 +145,11 @@ class CourseRepositoryTest {
     @Autowired CourseRepository repository;
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `CourseRepositoryTest`.
 
 `@ServiceConnection` wires the container into the test context automatically — no config properties needed.
 

@@ -95,6 +95,12 @@ public class ChannelConfig {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `ChannelConfig` with 5 methods.
+- Uses manual threading.
+
 ### Walking Through Each Part
 
 **`DirectChannel`** — the default. A producer's `send` blocks until the single handler processes the message. It's synchronous like a method call — predictable, no ordering surprises, but the producer waits.

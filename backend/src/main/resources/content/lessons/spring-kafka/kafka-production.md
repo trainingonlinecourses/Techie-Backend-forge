@@ -237,6 +237,13 @@ public class OrderEventHandler {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderEventHandler` with methods `handleOrderEvent()`.
+- Uses exception handling with try/catch.
+- Uses conditionals.
+
 ### Scenario 2: Partition Ordering
 
 

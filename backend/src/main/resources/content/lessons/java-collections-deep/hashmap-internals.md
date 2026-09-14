@@ -85,6 +85,11 @@ new HashMap<>(100_000);                  // capacity 131072, no resize
 new HashMap<>();                         // resizes ~13 times during inserts
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses the `Map` collection.
+
 Size the map when you know the size — one `new HashMap<>(expected)` beats a dozen silent resizes.
 
 ## Why Mutable Keys Break HashMaps
@@ -98,6 +103,12 @@ c.setTitle("Spring Boot");                // ❌ hashCode changes!
 
 map.get(c);          // may return null — the key is in the wrong bucket now
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses the `Map` collection.
+- Uses generics.
 
 **Rule: keys must be immutable** (or at least never mutated after insertion). Records, `String`, boxed primitives — immutable by design. This is the #1 HashMap production bug.
 
@@ -116,6 +127,13 @@ map.get(c);          // may return null — the key is in the wrong bucket now
 ConcurrentHashMap<String, Course> cache = new ConcurrentHashMap<>();
 cache.putIfAbsent("spring", course);          // atomic
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses the `Map` collection.
+- Uses generics.
+
 cache.computeIfAbsent("spring", CourseService::load);   // atomic compute
 
 ## The Iterator Fail-Fast Contract
@@ -126,6 +144,14 @@ for (var entry : map.entrySet()) {
     map.put("new", "value");    // ❌ ConcurrentModificationException
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses the `Map` collection.
+- Uses local type inference with `var`.
+- Uses loops.
+- Uses generics.
 
 HashMap iterators are **fail-fast**: they track a `modCount`, and any structural modification during iteration throws `ConcurrentModificationException`. (Not a guarantee — a heuristic, as the docs say.)
 

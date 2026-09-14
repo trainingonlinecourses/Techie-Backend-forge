@@ -41,6 +41,11 @@ public class AddressValidationServer {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `AddressValidationServer` with methods `validate()`.
+
 Spring AMQP's listener container detects a return value and publishes it to the `replyTo` queue with the matching `correlationId`. Zero manual plumbing.
 
 ## The Client: convertSendAndReceive
@@ -58,6 +63,11 @@ public class AddressValidationClient {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `AddressValidationClient` with methods `validate()`.
+
 `convertSendAndReceive` blocks until the reply arrives (or times out). The reply is correlated automatically via a private reply queue + correlation id.
 
 ### Timeouts
@@ -74,6 +84,11 @@ ValidationResult result = (ValidationResult) template
         return message;
     });
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
 
 A hanging RPC is worse than a failed one — always set timeouts.
 
@@ -94,6 +109,11 @@ public class AsyncValidationClient {
         this.template.setMessageConverter(new Jackson2JsonMessageConverter(mapper));
     }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses the `Map` collection.
 
     public CompletableFuture<ValidationResult> validateAsync(AddressRequest request) {
         CompletableFuture<ValidationResult> future = new CompletableFuture<>();
@@ -156,6 +176,11 @@ public Object validate(AddressRequest request) {
 
 Return an error envelope; reserve throws for cases where you *want* the retry ladder.
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses exception handling with try/catch.
 
 ## Testing Request-Reply
 

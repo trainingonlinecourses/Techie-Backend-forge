@@ -43,6 +43,12 @@ String dayType = switch (day) {
 };
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+- Uses switch branching.
+
 ---
 
 ## Arrow Syntax vs Colon Syntax
@@ -87,6 +93,14 @@ public class Main {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- Uses lambda expressions.
+- Uses switch branching.
+- When run, it prints: “Processing A”, “Processing B”
 
 ---
 
@@ -192,6 +206,14 @@ public class SwitchExpressionsDemo {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `SwitchExpressionsDemo` and `HttpRequest` with 5 methods.
+- Uses lambda expressions.
+- Uses a `record`.
+- Uses local type inference with `var`.
+
 ---
 
 ## Real-World Scenarios
@@ -213,6 +235,12 @@ public String statusMessage(int code) {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+- Uses switch branching.
+
 ### Scenario 2: State machine transitions
 
 ```java
@@ -228,6 +256,14 @@ public String nextState(String current, String event) {
     };
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Transition` with methods `nextState()`.
+- Uses lambda expressions.
+- Uses a `record`.
+- Uses switch branching.
 
 ---
 

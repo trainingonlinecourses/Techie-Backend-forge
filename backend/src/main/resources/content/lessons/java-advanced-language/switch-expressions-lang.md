@@ -38,6 +38,12 @@ String name = switch (level) {
 };
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+- Uses switch branching.
+
 The arrow form has no fall-through — each arm is independent. The whole switch *is* a value.
 
 ## The Three Syntaxes
@@ -62,6 +68,12 @@ String r3 = switch (x) {
 };
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+- Uses switch branching.
+
 `yield` is how a block body returns a value — think of it as `return` for switch arms.
 
 ## Null Handling
@@ -78,6 +90,12 @@ String describe(String s) {
     };
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+- Uses switch branching.
 
 `case null` must come before other patterns (null doesn't match `default` by default). Multiple comma-separated labels group arms.
 
@@ -97,6 +115,12 @@ public String size(Object o) {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+- Uses switch branching.
+
 More specific patterns win: `Integer` before `Number`, `Number` before `default`.
 
 ## Guards: When Patterns Need Conditions
@@ -113,6 +137,12 @@ public String classify(Number n) {
     };
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+- Uses switch branching.
 
 `when` adds a boolean guard to a pattern; the pattern matches only if the guard holds. Arms are evaluated top-down, first match wins.
 
@@ -136,6 +166,14 @@ public double area(Shape shape) {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Shape` and `Circle` and 2 more type(s) with methods `area()`.
+- Uses lambda expressions.
+- Uses a `record`.
+- Uses an interface.
+
 Add `Rectangle` to `permits` → this switch stops compiling until you handle it. Exhaustiveness turns "forgot a case" from a runtime bug into a compile error.
 
 ## switch Over Enums
@@ -151,6 +189,14 @@ public String label(Status status) {
     };
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Status` with methods `label()`.
+- Uses lambda expressions.
+- Uses an `enum`.
+- Uses switch branching.
 
 Enums are exhaustive without `default` — the compiler enumerates the constants.
 
@@ -171,6 +217,12 @@ public void process(Command cmd) {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+- Uses switch branching.
 
 Statement switches (void) work with arrow syntax too — blocks for multi-step arms.
 

@@ -68,6 +68,13 @@ public class Main {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` and `MyInterface` with methods `main()`, `staticMethod()`, `helperMethod()`.
+- Uses an interface.
+- When run, it prints: “Default implementation”, “Static interface method” …
+
 ---
 
 ## The Diamond Problem
@@ -102,6 +109,13 @@ class Duck implements Flyable, Swimmable {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Flyable` and `Swimmable` and 1 more type(s) with methods `move()`.
+- Uses an interface.
+- Uses interface implementation.
 
 ---
 
@@ -157,6 +171,14 @@ System.out.println(userCache.containsKey("u1"));
 System.out.println(userCache.getOrDefault("u2", Guest));
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Cache` and `InMemoryCache` with methods `createInMemory()`, `get()`, `put()`.
+- Uses an interface.
+- Uses interface implementation.
+- Uses the `Map` collection.
+
 ---
 
 ## Real-World Scenarios
@@ -183,6 +205,14 @@ public interface PaymentProcessor {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `PaymentProcessor`.
+- Uses an interface.
+- Uses the java.time date-time API.
+- Uses loops.
 
 ### Scenario 2: Mixin-style capabilities
 

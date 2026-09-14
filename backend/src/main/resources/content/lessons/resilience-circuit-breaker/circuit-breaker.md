@@ -91,6 +91,14 @@ public class PaymentService {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `PaymentService` with methods `charge()`.
+- Uses lambda expressions.
+- Uses the java.time date-time API.
+- Uses generics.
+
 ### Walking Through Each Part
 
 **`failureRateThreshold(50)` + `slidingWindowSize(20)`** — the breaker tracks the last 20 calls; if 50%+ failed, it opens. The sliding window means recent behavior matters (a service that recovered 10 minutes ago re-enters CLOSED naturally).

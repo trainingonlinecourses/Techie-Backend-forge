@@ -80,6 +80,11 @@ public String register(@Valid @ModelAttribute("form") RegisterForm form,
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses conditionals.
+
 With `@ModelAttribute`, the `BindingResult` must immediately follow the validated parameter — the framework validates, and *you* decide the outcome (re-render vs redirect), unlike the `@RequestBody` path where the advice handles it.
 
 ## How we use it in an organization: the scenarios

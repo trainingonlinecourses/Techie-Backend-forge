@@ -140,6 +140,14 @@ sm.fireEvent(PaymentEvent.REFUND_REQUESTED);
 System.out.println(sm.getHistory());
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `PaymentStateMachine` with methods `fireEvent()`, `canFire()`, `getHistory()`.
+- Uses exception handling with try/catch.
+- Uses the `List` collection.
+- Uses the `Map` collection.
+
 ---
 
 ## Enum Serialization — The Subtle Trap
@@ -166,6 +174,11 @@ public class Main {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
 
 ### Why It Works (and When It Doesn't)
 
@@ -197,6 +210,12 @@ public class Order implements Serializable {
     private PaymentState state;
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Order` with methods `readResolve()`.
+- Uses interface implementation.
 
 ### Custom Serialization with Enums
 
@@ -233,6 +252,12 @@ public enum ConfigMode {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `ConfigMode` with methods `readResolve()`, `writeReplace()`.
+- Uses an `enum`.
 
 ---
 
@@ -301,6 +326,13 @@ public enum AIState {
     public abstract AIState update(GameWorld world);
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `AIState` with methods `update()`.
+- Uses an `enum`.
+- Uses conditionals.
 
 ---
 

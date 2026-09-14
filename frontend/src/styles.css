@@ -1553,6 +1553,153 @@ kbd {
   box-shadow: 0 0 10px rgba(245,166,35,0.4);
 }
 
+/* ---- prerequisite chips + warn/gate banner ---- */
+.prereq-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 14px 0 4px;
+}
+.prereq-label {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--dim);
+  font-weight: 600;
+}
+.prereq-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  padding: 3px 10px;
+  max-width: 280px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  border-radius: 999px;
+  border: 1px solid var(--line2);
+  background: var(--surface2);
+  color: var(--mut);
+  text-decoration: none;
+  transition: border-color 0.15s, color 0.15s;
+}
+.prereq-chip:hover {
+  border-color: var(--amber);
+  color: var(--txt);
+}
+.prereq-chip.done {
+  border-color: rgba(111, 206, 111, 0.45);
+  color: var(--green);
+}
+
+.prereq-banner {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  border: 1px solid rgba(245, 166, 35, 0.4);
+  background: rgba(245, 166, 35, 0.08);
+  border-radius: 12px;
+  padding: 16px 18px;
+  margin: 18px 0;
+}
+.prereq-banner.gate {
+  border-color: rgba(255, 107, 107, 0.45);
+  background: rgba(255, 107, 107, 0.08);
+}
+.prereq-banner.slim {
+  padding: 10px 14px;
+  opacity: 0.85;
+}
+.pb-icon { font-size: 22px; line-height: 1.2; }
+.pb-text { flex: 1; min-width: 0; }
+.pb-title {
+  font-weight: 700;
+  font-family: var(--disp);
+  margin-bottom: 4px;
+}
+.prereq-banner.gate .pb-title { color: var(--red); }
+.prereq-banner.warn .pb-title { color: var(--amber); }
+.pb-text p { margin: 0 0 8px; color: var(--txt); font-size: 14px; }
+.pb-missing { display: flex; flex-wrap: wrap; gap: 6px 14px; }
+.pb-link {
+  font-size: 13px;
+  color: var(--blue);
+  text-decoration: none;
+}
+.pb-link:hover { text-decoration: underline; }
+.pb-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: stretch;
+  flex-shrink: 0;
+}
+.pb-actions .btn { white-space: nowrap; font-size: 13px; }
+
+/* Soft content veil while the gate is engaged — the page stays skimmable,
+   but reading requires a conscious "show anyway" choice. */
+.lesson-body.prereq-locked > .markdown,
+.lesson-body.prereq-locked .lesson-quiz-section,
+.lesson-body.prereq-locked .lesson-code-section,
+.lesson-body.prereq-locked .docsbox {
+  filter: blur(6px);
+  user-select: none;
+  pointer-events: none;
+}
+
+/* "Next up" recommendation card */
+.nextup-card {
+  display: block;
+  position: relative;
+  border: 1px solid var(--line2);
+  border-left: 3px solid var(--amber);
+  background: var(--surface2);
+  border-radius: 12px;
+  padding: 14px 18px;
+  margin: 22px 0;
+  text-decoration: none;
+  overflow: hidden;
+  transition: border-color 0.15s, transform 0.15s, box-shadow 0.15s;
+}
+.nextup-card:hover {
+  border-color: var(--amber);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+}
+.nextup-card .nu-eyebrow {
+  display: block;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--amber);
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.nextup-card .nu-title {
+  display: block;
+  font-family: var(--disp);
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--txt);
+  margin-bottom: 4px;
+}
+.nextup-card .nu-meta {
+  display: block;
+  font-size: 12px;
+  color: var(--mut);
+}
+.nextup-card .nu-go {
+  position: absolute;
+  right: 18px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-weight: 700;
+  color: var(--amber);
+  font-size: 14px;
+}
+
 /* Back to top button */
 .totop {
   position: fixed; bottom: 28px; right: 28px; z-index: 50;

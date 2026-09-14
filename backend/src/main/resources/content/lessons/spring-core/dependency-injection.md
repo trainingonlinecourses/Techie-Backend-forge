@@ -54,6 +54,11 @@ public class FeeConfig {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `ReportingService` and `FeeConfig`.
+
 Resolution order: `@Qualifier` name → `@Primary` → unique type → fail with `NoUniqueBeanDefinitionException`. Use `@Qualifier` at the injection site for *named* alternatives; use `@Primary` for the default.
 
 ## Optional dependencies
@@ -68,6 +73,12 @@ public class AuditService {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `AuditService`.
+
 // or cleaner: ObjectProvider<AuditSink>
 public AuditService(ObjectProvider<AuditSink> sinkProvider) {
     this.sink = sinkProvider.getIfAvailable(() -> NullSink.INSTANCE);
@@ -78,6 +89,12 @@ public AuditService(ObjectProvider<AuditSink> sinkProvider) {
 ```java
 @Service class A { A(B b) { this.b = b; } }   // A needs B
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `A`.
+
 @Service class B { B(A a) { this.a = a; } }   // B needs A  → cycle!
 
 Constructor-injected cycles fail at startup (good — loud, not at runtime). Fix by redesign: extract the shared dependency into a third bean, or introduce an interface to break the cycle. If you see "The dependencies of some of the beans in the application context form a cycle", that's a design smell — fix the design.
@@ -94,6 +111,11 @@ class AccountServiceTest {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `AccountServiceTest`.
 
 > **Why it matters (organizational view)** — Constructor injection is the org standard because it makes *dependencies visible in the constructor*, which makes architecture reviewable: if a service takes 8 dependencies, that's a review comment, not a surprise. The container enforces the dependency graph at startup, so wiring errors fail in CI, not in production.
 

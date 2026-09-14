@@ -90,6 +90,14 @@ List<OrderRow> rows = orderReadRepo.findByCustomer(customerId);
 return rows;
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses the Streams API to process data declaratively.
+- Uses method references.
+- Uses the `List` collection.
+- Uses generics.
+
 The read model is a **query shape**, not an entity graph — which is exactly the projection/query-methods discipline from the Spring Data module, applied structurally.
 
 ## When CQRS pays for itself

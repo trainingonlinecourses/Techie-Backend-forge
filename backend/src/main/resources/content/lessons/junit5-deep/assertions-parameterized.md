@@ -54,6 +54,13 @@ class OrderTest {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderTest` and `Order`.
+- Uses lambda expressions.
+- Uses a `record`.
+
 **The lambda shape matters:** each assertion is a `() -> ...` — they're *all executed* even when one fails, and the failures aggregate into a single `MultipleFailuresError` listing every message. This is the single biggest report-quality upgrade for state-heavy assertions (DTO validation, entity invariants, response shapes) — one test run shows the complete failure picture.
 
 ## Parameterized Tests: One Test, Many Inputs

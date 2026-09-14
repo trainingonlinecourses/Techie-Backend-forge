@@ -49,6 +49,14 @@ if (level.isAtLeast(LogLevel.WARN)) {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `LogLevel` with methods `fromString()`, `isAtLeast()`.
+- Uses exception handling with try/catch.
+- Uses an `enum`.
+- Uses conditionals.
+
 ### Pattern 2: State Machine
 
 **What this code does — step by step:**
@@ -96,6 +104,13 @@ state = state.next();
 state.canCancel();
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderState` with methods `next()`, `canCancel()`, `cancel()`.
+- Uses an `enum`.
+- Uses conditionals.
+
 ### Pattern 3: Strategy Dispatch
 ```java
 public enum PaymentMethod {
@@ -122,6 +137,14 @@ public enum PaymentMethod {
 PaymentMethod method = PaymentMethod.valueOf(order.getPaymentType());
 method.process(order.getTotal());
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `PaymentMethod` with methods `process()`.
+- Uses an `enum`.
+- Uses `BigDecimal` for exact decimal math.
+- Uses conditionals.
 
 ## Line-by-Line Explanation
 

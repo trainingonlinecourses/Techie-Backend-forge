@@ -49,6 +49,12 @@ public class OrderService {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderService` with methods `createOrder()`, `getOrder()`.
+- Uses exception handling with try/catch.
+
 This violates the **DRY principle** — the logging, timing, and error handling code is identical across methods. AOP lets you extract this into a single, reusable module.
 
 ## Core AOP Terminology
@@ -66,6 +72,11 @@ public class UserService {
     private User mapToEntity(CreateUserDto dto) { ... } // NOT a join point (private)
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `UserService` with methods `findById()`, `create()`, `mapToEntity()`.
 
 ### Pointcut
 
@@ -137,6 +148,13 @@ public class LoggingAspect {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `LoggingAspect` with 5 methods.
+- Uses exception handling with try/catch.
+- Uses lambda expressions.
+
 ### Aspect
 
 An **aspect** is a modularization of a concern that cuts across multiple classes. It's a class that combines pointcuts and advice. In Spring AOP, aspects are typically implemented as regular Spring beans.
@@ -148,6 +166,11 @@ public class PerformanceMonitoringAspect {
     // Pointcut + Advice = Aspect
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `PerformanceMonitoringAspect`.
 
 ### Introduction (or Inter-type Declaration)
 
@@ -173,6 +196,13 @@ public class DefaultMonitorable implements Monitorable {
     public void setMonitorEnabled(boolean enabled) { this.enabled = enabled; }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `MonitorableIntroduction` and `Monitorable` and 1 more type(s) with methods `isMonitorEnabled()`, `setMonitorEnabled()`.
+- Uses an interface.
+- Uses interface implementation.
 
 ### Weaving
 
@@ -223,6 +253,11 @@ Or via `@EnableAspectJAutoProxy`:
 @EnableAspectJAutoProxy(proxyTargetClass = true)
 public class AopConfig {}
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `AopConfig`.
 
 ## Pointcut Designators
 
@@ -407,6 +442,11 @@ class LoggingAspectTest {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `LoggingAspectTest`.
 
 ## Summary
 

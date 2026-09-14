@@ -75,6 +75,13 @@ public class LspDemo {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Rectangle` and `Square` and 1 more type(s) with 5 methods.
+- Uses inheritance.
+- When run, it prints: “Expected area 20, got ”
+
 ### Why This Violates LSP
 
 - The caller set `width = 4, height = 5` and expects `area = 20` — that's the **Rectangle contract**.
@@ -109,6 +116,14 @@ record Square(int side) implements Shape {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Square` and `Shape` and 1 more type(s) with methods `setSide()`, `area()`.
+- Uses a `record`.
+- Uses an interface.
+- Uses interface implementation.
+
 With **immutable** shapes there is no "set width" to break — a `Square` is simply a `Shape` with one dimension. The whole class of violations evaporates. This is a general lesson: LSP violations are often born from *mutable state* in inheritance — the subclass can't honor the parent's mutation contract.
 
 ## LSP Violations You'll Meet in Real Code
@@ -133,6 +148,13 @@ class RemoteLoader extends Loader {
 If callers weren't told "load may throw", any code that assumed success breaks. (Checked exceptions in the signature are a *compiled* contract; runtime throws are a *silent* one — the latter is the danger.)
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Loader` and `RemoteLoader`.
+- Uses inheritance.
+- Uses conditionals.
+
 ### 2. The "weakened guarantee"
 
 ```java
@@ -146,6 +168,12 @@ class WeirdList extends SortedList {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `SortedList` and `WeirdList`.
+- Uses inheritance.
+
 ### 3. The "impossible operation"
 
 ```java
@@ -158,6 +186,12 @@ class Penguin extends Bird {
     void fly() { throw new UnsupportedOperationException(); }   // penguins can't fly
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Bird` and `Penguin`.
+- Uses inheritance.
 
 A `List<Bird>` containing a `Penguin` breaks any code that calls `fly()` on everything. The fix: don't put `fly()` on the base `Bird` — model capability separately (`interface Flyable { void fly(); }`).
 

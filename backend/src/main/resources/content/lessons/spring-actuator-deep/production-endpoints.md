@@ -218,6 +218,14 @@ public class QueueSizeMetrics {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `DatabaseHealthIndicator` and `ExternalApiHealthIndicator` and 3 more type(s) with methods `health()`, `contribute()`, `createOrder()`.
+- Uses exception handling with try/catch.
+- Uses lambda expressions.
+- Uses method references.
+
 ---
 
 ## Real-World Scenarios

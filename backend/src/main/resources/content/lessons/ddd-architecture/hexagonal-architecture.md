@@ -63,10 +63,22 @@ public interface PlaceOrderUseCase {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `PlaceOrderUseCase`.
+- Uses an interface.
+
 public record PlaceOrderCommand(Long customerId, List<OrderLineCommand> lines) {}
 ```java
 public record OrderLineCommand(String productCode, int quantity) {}
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderLineCommand`.
+- Uses a `record`.
 
 ### Outbound Port: The Repository
 
@@ -110,6 +122,12 @@ public class Order {
     public OrderId id() { return id; }
     public OrderStatus status() { return status; }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses conditionals.
+
     public List<OrderLine> lines() { return List.copyOf(lines); }
 }
 

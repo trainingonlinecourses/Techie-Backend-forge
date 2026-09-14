@@ -38,6 +38,11 @@ public class BeforeAdviceExample {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `BeforeAdviceExample` with methods `beforeMethod()`.
+
 #### Use Cases
 - **Logging** — Log method entry with parameters
 - **Security checks** — Verify permissions before execution
@@ -97,6 +102,11 @@ public class AfterAdviceExample {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `AfterAdviceExample` with methods `afterMethod()`.
 
 #### Use Cases
 - **Cleanup** — Release resources
@@ -290,6 +300,12 @@ public class AroundAdviceExample {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `AroundAdviceExample` with methods `aroundMethod()`.
+- Uses exception handling with try/catch.
+
 #### ProceedingJoinPoint
 
 `@Around` advice receives a `ProceedingJoinPoint` instead of `JoinPoint`:
@@ -371,6 +387,14 @@ public class ComprehensiveAspect {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `ComprehensiveAspect` with 4 methods.
+- Uses exception handling with try/catch.
+- Uses loops.
+- Uses conditionals.
+
 ## Advice Ordering
 
 When multiple aspects apply to the same join point, their execution order is determined by:
@@ -400,6 +424,11 @@ public class LoggingAspect {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `SecurityAspect` and `LoggingAspect` with methods `checkSecurity()`, `log()`.
 
 **Lower order = higher priority**. For `@Before` advice, lower order runs first. For `@After` advice, lower order runs last (reverse order).
 
@@ -539,6 +568,12 @@ public class SecurityAuthorizationAspect {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `SecurityAuthorizationAspect` with methods `checkRole()`, `checkPermission()`.
+- Uses conditionals.
+
 ### 3. Caching Aspect
 
 @Aspect
@@ -640,6 +675,14 @@ public class RetryAspect {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `RetryAspect` with methods `retryOnException()`, `isRetryable()`.
+- Uses exception handling with try/catch.
+- Uses inheritance.
+- Uses loops.
+
 ### 5. Transaction Propagation Aspect
 
 ```java
@@ -678,6 +721,14 @@ public class TransactionPropagationAspect {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `TransactionPropagationAspect` with methods `manageTransaction()`, `shouldRollback()`.
+- Uses exception handling with try/catch.
+- Uses lambda expressions.
+- Uses inheritance.
+
 ## Advanced Techniques
 
 ### 1. Modifying Arguments
@@ -697,6 +748,12 @@ public Object modifyArguments(ProceedingJoinPoint joinPoint) throws Throwable {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses loops.
+- Uses conditionals.
+
 ### 2. Modifying Return Value
 
 ```java
@@ -711,6 +768,11 @@ public Object modifyReturnValue(JoinPoint joinPoint, Object result) {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses conditionals.
+
 ### 3. Suppressing Exceptions
 
 ```java
@@ -724,6 +786,11 @@ public Object suppressException(ProceedingJoinPoint joinPoint) throws Throwable 
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses exception handling with try/catch.
 
 ### 4. Multiple Proceed Calls
 
@@ -746,6 +813,13 @@ public Object withRetry(ProceedingJoinPoint joinPoint) throws Throwable {
     throw new IllegalStateException("Should not reach here");
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses exception handling with try/catch.
+- Uses loops.
+- Uses conditionals.
 
 ## Common Mistakes
 
@@ -777,6 +851,11 @@ public Object around(ProceedingJoinPoint jp) throws Throwable {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses exception handling with try/catch.
+
 ### 3. Not Handling Checked Exceptions
 
 ```java
@@ -790,6 +869,11 @@ public Object around(ProceedingJoinPoint jp) {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses exception handling with try/catch.
 
 ## Summary
 

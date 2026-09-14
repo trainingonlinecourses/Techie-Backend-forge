@@ -57,6 +57,14 @@ EnumSet<Permission> basic = EnumSet.range(Permission.READ, Permission.EXECUTE);
 EnumSet<Permission> restricted = EnumSet.complementOf(readWrite);
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Permission`.
+- Uses an `enum`.
+- Uses the `Set` collection.
+- Uses generics.
+
 ### Set Operations
 
 
@@ -88,6 +96,12 @@ onlyAdmin.removeAll(userPerms);
 
 boolean canDelete = userPerms.contains(Permission.DELETE);
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses the `Set` collection.
+- Uses generics.
 
 ### Line-by-Line Walkthrough of the Internals
 
@@ -124,6 +138,14 @@ class SmallEnumSet<E extends Enum<E>> extends AbstractEnumSet<E> {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `SmallEnumSet` with methods `add()`, `contains()`, `size()`.
+- Uses inheritance.
+- Uses the `Set` collection.
+- Uses generics.
 
 **This is why EnumSet is so fast** — no hashing, no buckets, no collision chains. A single bitwise operation does the work.
 
@@ -167,6 +189,14 @@ public class Main {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` and `Day` with methods `main()`.
+- Uses an `enum`.
+- Uses the `Map` collection.
+- Uses loops.
 
 ### Why EnumMap Wins Over HashMap
 
@@ -242,6 +272,14 @@ public class Main {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` and `DiscountStrategy` with methods `main()`, `calculate()`, `applyAll()`.
+- Uses an `enum`.
+- Uses formatted output.
+- Uses loops.
+
 ### State Machine with Enums
 
 ```java
@@ -280,6 +318,13 @@ public class Main {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` and `OrderState` with methods `main()`, `next()`, `describe()`.
+- Uses an `enum`.
+- Uses loops.
 
 ---
 

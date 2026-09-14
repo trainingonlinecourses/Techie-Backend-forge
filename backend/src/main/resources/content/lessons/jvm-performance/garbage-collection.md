@@ -83,6 +83,12 @@ private static final Map<String, Config> configCache = new HashMap<>();
 private final EntityManager em;
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses the `Map` collection.
+- Uses generics.
+
 ### Concurrent GC (G1, ZGC, Shenandoah)
 
 Modern GCs do most of their work **concurrently** (while your app runs), minimizing pause times:

@@ -168,6 +168,15 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `WebConfig` with methods `newBucket()`, `clientKey()`, `addInterceptors()`.
+- Uses interface implementation.
+- Uses the java.time date-time API.
+- Uses conditionals.
+
         registry.addInterceptor(interceptor)
             .addPathPatterns("/api/**")
             .excludePathPatterns("/api/auth/**");   // don't rate-limit login (or do, carefully)
@@ -201,6 +210,11 @@ Bandwidth perKey = Bandwidth.classic(10, Refill.greedy(1, Duration.ofSeconds(1))
 Bandwidth global = Bandwidth.classic(1000, Refill.greedy(100, Duration.ofSeconds(1)));
 Bucket bucket = Bucket.builder().addLimit(perKey).addLimit(global).build();
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses the java.time date-time API.
 
 ## The 429 Response
 

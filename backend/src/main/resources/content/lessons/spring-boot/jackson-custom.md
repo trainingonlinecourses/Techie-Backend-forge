@@ -61,6 +61,12 @@ public Jackson2ObjectMapperBuilderCustomizer inetAddressMixin() {
 // Now InetAddress serializes as {"address": "192.168.1.1"} instead of {}
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `InetAddressMixin` with methods `inetAddressMixin()`.
+- Uses lambda expressions.
+
 ## Naming strategies — camelCase, snake_case, kebab-case
 
 ```yaml
@@ -79,6 +85,11 @@ spring:
 @RestController
 public class UserController { }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `UserController`.
 
 ## Per-field control with annotations
 
@@ -101,6 +112,13 @@ public record OrderDto(
     @JsonValue Money total
 ) {}
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderDto`.
+- Uses a `record`.
+- Uses the java.time date-time API.
 
 ## Global ObjectMapper customization
 
@@ -150,6 +168,14 @@ public enum OrderStatus {
 public record UserResponse(
     long id,
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderStatus` and `UserResponse` with methods `toApiValue()`, `fromApiValue()`.
+- Uses a `record`.
+- Uses an `enum`.
+
     String displayName,
 ```java
     @JsonIgnore String passwordHash,       // never serialize

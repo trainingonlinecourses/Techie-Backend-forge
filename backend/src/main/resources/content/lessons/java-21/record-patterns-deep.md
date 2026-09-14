@@ -32,6 +32,12 @@ public class Main {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- Uses conditionals.
+
 ---
 
 ## Basic Destructuring
@@ -51,6 +57,14 @@ if (obj instanceof Person(String name, int age) && age > 18) {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Point` and `Person`.
+- Uses a `record`.
+- Uses conditionals.
+- When run, it prints: “Adult: ”
+
 ---
 
 ## Nested Destructuring
@@ -64,6 +78,13 @@ if (obj instanceof Person(String name, Address(String city, String zip))) {
     System.out.println(name + " lives in " + city + " " + zip);
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Address` and `Person`.
+- Uses a `record`.
+- Uses conditionals.
 
 ---
 
@@ -178,6 +199,14 @@ public class RecordPatternsDemo {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `RecordPatternsDemo` and `Point` and 4 more type(s) with 6 methods.
+- Uses lambda expressions.
+- Uses a `record`.
+- Uses the `List` collection.
 
 ---
 

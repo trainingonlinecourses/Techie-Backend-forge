@@ -28,6 +28,11 @@ public class ImportService {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `ImportService`.
+
 `PlatformTransactionManager` is the bean Spring uses internally for `@Transactional`. Wrapping it in a `TransactionTemplate` gives you programmatic control with the same semantics.
 
 ## The Two Callback Forms
@@ -104,6 +109,11 @@ public void reconcile() {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+
 ## Mixing Declarative and Programmatic
 
 @Transactional
@@ -170,6 +180,13 @@ public class PaymentService {
     public void charge(ChargeRequest req) { ... }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `PaymentService` with methods `chargeWithRetry()`, `charge()`.
+- Uses exception handling with try/catch.
+- Uses loops.
 
 Or replace `self.charge(req)` with a `TransactionTemplate` — same isolation, no proxy trickery:
 

@@ -95,9 +95,18 @@ public class AccountRepository {
 }
 ```
 
+<!-- why -->
+
+
 ```java
 **The version discipline:** each event carries a sequence number; appends must be *optimistically locked* (the version you loaded must match at append time) — otherwise two concurrent commands interleave events and the replay is corrupted. This is the event-sourced version of the lost-update problem.
 ```
+
+<!-- why -->
+**What this code shows:**
+- Defines `AccountRepository` with methods `findById()`, `save()`.
+- Uses the `List` collection.
+- Uses generics.
 
 ## Snapshots: The Performance Escape Hatch
 

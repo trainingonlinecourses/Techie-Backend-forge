@@ -41,6 +41,13 @@ public class FileController {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `FileController` with methods `upload()`.
+- Uses file I/O with the NIO API.
+- Uses generics.
+
 ### File Upload Configuration
 
 ```properties
@@ -125,6 +132,14 @@ public class SecureFileController {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `SecureFileController`.
+- Uses the `Set` collection.
+- Uses conditionals.
+- Uses generics.
 
 ### Common Mistakes
 

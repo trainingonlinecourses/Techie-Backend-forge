@@ -92,6 +92,12 @@ int raw = count;
 List<Integer> numbers = List.of(1, 2, 3);
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses the `List` collection.
+- Uses generics.
+
 ### The critical difference: == on primitives vs objects
 
 
@@ -125,6 +131,11 @@ public class Main {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
 
 ## Operators — what you can do with values
 
@@ -164,6 +175,11 @@ public class Main {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+
 ### Comparison operators — produce boolean results
 
 
@@ -193,6 +209,11 @@ public class Main {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
 
 ### Logical operators — combine boolean conditions
 
@@ -231,6 +252,12 @@ public class Main {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- Uses conditionals.
 
 ### Assignment operators
 
@@ -294,6 +321,13 @@ public class Main {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- Uses conditionals.
+- When run, it prints: “Grade: A”, “Grade: B” …
+
 ### switch — multi-way branching
 
 
@@ -346,6 +380,14 @@ public class Main {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- Uses lambda expressions.
+- Uses switch branching.
+- When run, it prints: “Weekday”, “Weekend” …
 
 ### Loops — repeating actions
 
@@ -411,6 +453,14 @@ public class Main {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- Uses loops.
+- Uses conditionals.
+- When run, it prints: “Count: ”, “Processing: ”
+
 ## Strings — the most used object in Java
 
 ### String is immutable
@@ -451,6 +501,11 @@ for (int i = 0; i < 10000; i++) {
 }
 String result = sb.toString();
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses loops.
 
 ### Essential String methods
 
@@ -550,6 +605,13 @@ public class Main {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- Uses the `List` collection.
+- Uses generics.
+
 ## How we use it in organizations
 
 ### Scenario 1: Type safety prevents production bugs
@@ -581,6 +643,11 @@ public class Order {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Order` with methods `isActive()`.
 
 ### Scenario 3: Integer overflow in financial calculations
 

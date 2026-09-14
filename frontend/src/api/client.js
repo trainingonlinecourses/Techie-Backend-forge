@@ -27,7 +27,12 @@ api.interceptors.response.use(
     return res;
   },
   (error) => {
-    if (error.response?.status === 401 && !error.config?.url?.includes('/api/auth/')) {
+    // A 401 only means "your session expired" if a token was actually sent.
+    // Guests hit authenticated endpoints all the time from public pages (quiz
+    // widgets, progress pings) — bouncing them to /login mid-lesson was wrong
+    // and made lesson pages unviewable while signed out.
+    const hadToken = !!error.config?.headers?.Authorization;
+    if (error.response?.status === 401 && hadToken && !error.config?.url?.includes('/api/auth/')) {
       localStorage.removeItem(TOKEN_KEY);
       if (window.location.pathname !== '/login') {
         window.location.href = '/login';

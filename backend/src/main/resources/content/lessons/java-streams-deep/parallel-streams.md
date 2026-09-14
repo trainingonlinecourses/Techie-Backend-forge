@@ -102,6 +102,12 @@ List<Course> results = courses.parallelStream()
 
 // ✅ Explicit concurrent collection
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses the Streams API to process data declaratively.
+
 Set<String> levels = courses.parallelStream()
     .map(Course::level)
     .collect(Collectors.toConcurrentMap(
@@ -135,6 +141,14 @@ List<String> ordered = courses.parallelStream()
     .map(Course::title)
     .toList();
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses the Streams API to process data declaratively.
+- Uses lambda expressions.
+- Uses method references.
+- Uses the `List` collection.
 
 `toList`/`collect(toList())` still produce encounter-ordered results in parallel (the framework recombines in order). Side-effect operations (`forEach`) don't.
 

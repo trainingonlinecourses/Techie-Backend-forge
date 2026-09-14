@@ -20,6 +20,12 @@ List<String> names = people.stream()
 
 // JAVA 16+
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses the Streams API to process data declaratively.
+
 List<String> names = people.stream()
     .map(Person::name)
 ```java
@@ -35,6 +41,12 @@ var list = Stream.of(1, 2, 3).toList();
 var mutableList = Stream.of(1, 2, 3).collect(Collectors.toList());
 mutableList.add(4);  // OK — it's a mutable ArrayList
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses the Streams API to process data declaratively.
+- Uses local type inference with `var`.
 
 ---
 
@@ -65,6 +77,14 @@ List<String> unmodNames = people.stream()
     .map(Person::name)
     .collect(Collectors.toUnmodifiableList());
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses the Streams API to process data declaratively.
+- Uses method references.
+- Uses the `List` collection.
+- Uses generics.
 
 ---
 
@@ -145,6 +165,14 @@ public class ToListDemo {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `ToListDemo` and `Product` with methods `main()`.
+- Uses the Streams API to process data declaratively.
+- Uses exception handling with try/catch.
+- Uses lambda expressions.
 
 ---
 

@@ -92,6 +92,12 @@ public class ImmutabilityDemo {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `ImmutabilityDemo` with methods `main()`.
+- When run, it prints: “a = ”, “b = ” …
+
 ### Walking Through Each Line
 
 **Line-by-line:**

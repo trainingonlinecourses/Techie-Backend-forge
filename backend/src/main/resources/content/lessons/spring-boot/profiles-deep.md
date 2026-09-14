@@ -157,6 +157,11 @@ public class CustomPrometheusExporter {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `CustomPrometheusExporter`.
+
 ## How we use it in organizations
 
 ### Scenario 1: different payment gateways per environment
@@ -184,6 +189,11 @@ public class PaymentGatewayConfig {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `PaymentGatewayConfig` with methods `sandboxGateway()`, `productionGateway()`, `mockGateway()`.
 
 Developers use `local` (mock), QA uses `sandbox` (test keys), production uses `prod` (real keys). Zero config changes needed to switch.
 
@@ -224,6 +234,11 @@ public class DailyReportScheduler {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `DailyReportScheduler` with methods `generateDailyReport()`.
 
 Developers do not get spammed with daily reports during local development.
 

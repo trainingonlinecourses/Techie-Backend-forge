@@ -102,6 +102,12 @@ public class SessionController {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `SessionController` with methods `login()`, `me()`, `logout()`.
+- Uses conditionals.
+
 ### Walking Through Each Part
 
 **The login** — authenticate, then store identity *server-side* in the `HttpSession`. The container manages the cookie (`JSESSIONID`) — set as `HttpOnly` by default in Spring Boot. The session is server state; the cookie is just its key.

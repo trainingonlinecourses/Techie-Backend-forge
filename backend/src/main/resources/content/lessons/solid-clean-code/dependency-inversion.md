@@ -97,6 +97,13 @@ public class App {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `UserRepository` and `PostgresUserRepository` and 2 more type(s) with methods `save()`, `findById()`, `main()`.
+- Uses an interface.
+- Uses interface implementation.
+
 ### What Changed and Why
 
 - **`UserService` depends on `UserRepository` (interface), not on Postgres** — the dependency arrow now points *up* from the implementation to the abstraction. That's the inversion.
@@ -144,6 +151,14 @@ class UserService {
 @Repository
 interface UserRepository extends JpaRepository<User, Long> { }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `UserService` and `UserRepository`.
+- Uses an interface.
+- Uses inheritance.
+- Uses generics.
 
 Spring *is* the composition root: `@Configuration`/component scanning decides which concrete bean fills which interface, and constructor injection hands it to the business code. Changing the implementation = changing a bean definition (or a profile), never editing services. This is DIP made operational, at scale.
 

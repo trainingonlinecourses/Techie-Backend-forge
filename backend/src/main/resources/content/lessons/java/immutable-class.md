@@ -120,6 +120,13 @@ public final class Appointment {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Appointment` with methods `getStartTime()`, `getAttendees()`.
+- Uses the `List` collection.
+- Uses generics.
+
 **Why the defensive copy in the constructor?** If someone passes a `Date` object and then mutates it afterward, our Appointment would silently change. The copy breaks that link:
 
 ```java
@@ -164,6 +171,14 @@ public record Money(BigDecimal amount, Currency currency) {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Money` with methods `add()`.
+- Uses a `record`.
+- Uses `BigDecimal` for exact decimal math.
+- Uses conditionals.
 
 ## How we use it in organizations
 
@@ -212,6 +227,12 @@ public record UserResponse(String name, String email, Instant createdAt) {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `UserResponse`.
+- Uses a `record`.
+
 ### Scenario 3: Event sourcing — immutable events
 
 In event-driven architectures, events must be immutable (you can't change history):
@@ -250,6 +271,14 @@ public class EventStore {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderCreated` and `OrderShipped` and 1 more type(s) with methods `append()`, `getEvents()`.
+- Uses the Streams API to process data declaratively.
+- Uses lambda expressions.
+- Uses a `record`.
 
 ### Scenario 4: Builder pattern for complex immutable objects
 
@@ -306,6 +335,14 @@ HttpRequest request = new HttpRequest.Builder("https://api.example.com/users")
     .timeout(Duration.ofSeconds(5))
     .build();
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `HttpRequest` and `Builder` with 5 methods.
+- Uses the `Map` collection.
+- Uses the java.time date-time API.
+- Uses generics.
 
 ## Comparison: mutable vs immutable
 

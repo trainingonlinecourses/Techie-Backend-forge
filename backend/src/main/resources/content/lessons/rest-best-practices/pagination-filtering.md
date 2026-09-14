@@ -92,6 +92,12 @@ public Page<CourseDto> list(
         cb.greaterThanOrEqualTo(root.get("minutes"), minMinutes));
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+- Uses conditionals.
+
     return repository.findAll(spec, pageable).map(CourseDto::from);
 }
 
@@ -169,6 +175,12 @@ public Page<CourseDto> list(Pageable pageable) {
 
 public final class PageableUtil {
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `PageableUtil`.
+
     private static final Set<String> BLOCKED = Set.of(
         ";", "--", "drop", "select", "union", "\\", "'", "\"", "`");
 

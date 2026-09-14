@@ -157,6 +157,13 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `JwtAuthFilter` with methods `doFilterInternal()`.
+- Uses inheritance.
+- Uses conditionals.
+
 ## The filter chain — how security works
 
 Every request passes through a chain of **filters**. Security filters run BEFORE your controller:
@@ -206,6 +213,11 @@ public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         .build();
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
 
 ## Real-world scenario — user registration and login
 
@@ -265,6 +277,14 @@ public class AuthService {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `AuthService` with methods `register()`, `login()`.
+- Uses lambda expressions.
+- Uses regex matching.
+- Uses conditionals.
 
 ## Common mistakes
 

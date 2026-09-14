@@ -14,12 +14,6 @@ capstone: false
 
 `map`, `filter` and `collect` cover the common cases, but "pair each element with its neighbor" or "keep a running total" were awkward. **Stream Gatherers (finalized in Java 24, JEP 485)** add `Stream.gather(...)` — one new step that can transform a stream in any element-by-element way, including looking at neighbors and state.
 
-## What this code does — step by step
-
-1. `Gatherers.windowSliding(size)` hands you overlapping windows of the stream — each window slides forward by one element.
-2. `Gatherers.scan(() -> seed, accumulator)` is a *running* fold: it emits every intermediate value, not just the final one.
-3. You can write your own gatherer for truly custom logic (we stick to the built-ins here).
-4. Run the code: it shows sensor readings paired with their previous reading, and a running sum.
 
 ```java
 import java.util.List;
@@ -49,6 +43,13 @@ public class GatherersDemo {
     }
 }
 ```
+
+<!-- why -->
+## What this code does — step by step
+1. `Gatherers.windowSliding(size)` hands you overlapping windows of the stream — each window slides forward by one element.
+2. `Gatherers.scan(() -> seed, accumulator)` is a *running* fold: it emits every intermediate value, not just the final one.
+3. You can write your own gatherer for truly custom logic (we stick to the built-ins here).
+4. Run the code: it shows sensor readings paired with their previous reading, and a running sum.
 
 ## The gatherers you'll use most
 

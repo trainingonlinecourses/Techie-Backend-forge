@@ -116,6 +116,11 @@ class NotificationServiceTest {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `NotificationServiceTest`.
+
 **Walking through it:** `@Spy` creates a genuine `NotificationService` — `sendWithRetry` runs its real retry loop, and only the stubbed `sendViaEmail` is replaced. This is *partial mocking*: real behavior where you want it, controlled behavior where you need it.
 
 **The traps:** with spies, use `doReturn`/`doThrow` (not `when().thenReturn()` — that invokes the real method during stubbing, which can throw or have side effects); and *stub sparingly* — a heavily-stubbed spy is a sign the design should have been a smaller seam. The classic legitimate uses: testing retry loops, timers, or legacy code with an awkward hard-coded dependency.

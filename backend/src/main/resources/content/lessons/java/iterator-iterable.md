@@ -25,6 +25,11 @@ while (it.hasNext()) {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses loops.
+
 **Why this matters:** if you implement `Iterable` on your custom collection, it becomes compatible with `for-each`, `StreamSupport.stream()`, `Stream.of()`, `Collection.addAll()`, and every library that accepts `Iterable<T>` (Spring's `JpaRepository`, Guava's `Lists.newArrayList()`, etc.).
 
 ## The Iterator contract
@@ -163,6 +168,12 @@ for (String name : names) {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses loops.
+- Uses conditionals.
+
 The iterator detects that `names` was structurally modified and throws. **Safe alternatives:**
 
 // Option 1: use Iterator.remove()
@@ -179,6 +190,14 @@ names.removeIf(name -> name.equals("Bob"));
 
 // Option 3: collect to a new list
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+- Uses loops.
+- Uses conditionals.
+
 List<String> filtered = names.stream()
     .filter(name -> !name.equals("Bob"))
 ```java

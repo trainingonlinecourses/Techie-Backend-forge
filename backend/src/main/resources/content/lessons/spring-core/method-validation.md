@@ -62,6 +62,13 @@ public class CustomerService {
     public void update(@Validated(UpdateGroup.class) @Valid CustomerDto dto) { ... }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderService` and `CreateGroup` and 2 more type(s) with methods `placeOrder()`, `create()`, `update()`.
+- Uses an interface.
+
 // @NotNull(groups = CreateGroup.class) on email → required on create, optional on update
 
 ```java

@@ -36,6 +36,11 @@ class CourseControllerTest {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `CourseControllerTest`.
+
 Tests the real MVC configuration: converters, validation, interceptors, security.
 
 ## The Request DSL

@@ -27,6 +27,13 @@ for (Employee e : employees) {
 
 // NEW: Same logic in a fluent, declarative pipeline
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses loops.
+- Uses conditionals.
+
 List<String> highEarnerNames = employees.stream()
     .filter(e -> e.getSalary() > 80000)
     .map(e -> e.getName().toUpperCase())
@@ -78,6 +85,14 @@ IntStream range = IntStream.range(1, 11);
 IntStream closed = IntStream.rangeClosed(1, 10);
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses the Streams API to process data declaratively.
+- Uses lambda expressions.
+- Uses method references.
+- Uses the `List` collection.
+
 ---
 
 ## Intermediate Operations (Lazy)
@@ -110,6 +125,13 @@ The same code, clean:
 .skip(long)
 .peek(Consumer<T>)
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses the Streams API to process data declaratively.
+- Uses sorting with a `Comparator`.
+- Uses generics.
 
 ### Line-by-Line Walkthrough
 
@@ -193,6 +215,14 @@ public class StreamDemo {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `StreamDemo` with methods `main()`.
+- Uses the Streams API to process data declaratively.
+- Uses `Optional` for null-safe values.
+- Uses lambda expressions.
+
 ---
 
 ## Terminal Operations (Eager)
@@ -236,6 +266,12 @@ The same code, clean:
 .average()
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses sorting with a `Comparator`.
+- Uses generics.
+
 ---
 
 ## Collectors — The Swiss Army Knife
@@ -268,6 +304,14 @@ DoubleSummaryStatistics stats = orders.stream()
     .mapToDouble(Order::total)
     .summaryStatistics();
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses the Streams API to process data declaratively.
+- Uses lambda expressions.
+- Uses method references.
+- Uses the `List` collection.
 
 ---
 

@@ -173,6 +173,12 @@ public class OrderService {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderService` with methods `init()`, `cleanup()`.
+- When run, it prints: “OrderService created”, “OrderService initialized” …
+
 ## Bean scopes — how many instances?
 
 | Scope | What it means | When to use |
@@ -215,6 +221,11 @@ public class OrderCounter {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderCounter` with methods `increment()`.
 
 ### The prototype injection trap
 
@@ -259,6 +270,12 @@ public class ReportService {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `ReportService` with methods `build()`.
+- Uses generics.
+
 ## Real-world scenario — e-commerce dependency injection
 
 
@@ -299,6 +316,14 @@ public class OrderService {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderRepository` and `OrderService` with methods `placeOrder()`.
+- Uses an interface.
+- Uses inheritance.
+- Uses the `List` collection.
 
 ## Common mistakes
 

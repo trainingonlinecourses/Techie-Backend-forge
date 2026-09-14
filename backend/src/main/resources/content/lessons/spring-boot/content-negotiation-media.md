@@ -130,6 +130,12 @@ public class ApiVersionConfig implements WebMvcConfigurer {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `ProductControllerV1` and `ProductControllerV2` and 1 more type(s) with methods `getProduct()`, `configureContentNegotiation()`.
+- Uses interface implementation.
+
 ### Scenario 3: Custom MessageConverter for CSV export
 
 @Component
@@ -164,6 +170,11 @@ public List<Order> exportOrders(
     return orderService.findAll();
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses conditionals.
 
 ## Common mistakes
 

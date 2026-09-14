@@ -52,6 +52,13 @@ public class DownloadController {
 
         return ResponseEntity.ok()
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses file I/O with the NIO API.
+- Uses conditionals.
+
             .header(HttpHeaders.CONTENT_DISPOSITION,
 ```java
                     "attachment; filename=\"" + filename + "\"")

@@ -86,6 +86,14 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `CourseRepository`.
+- Uses an interface.
+- Uses inheritance.
+- Uses generics.
+
 Spring Data repositories are already transactional (each method joins or creates one). Don't add `@Transactional` to repository methods — the service owns the boundary.
 
 ## readOnly = true: The Contract
@@ -175,6 +183,12 @@ class RollbackRuleTest {
     @Test
     void defaultCommitsOnCheckedException() {
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+
         assertThrows(IOException.class,
             () -> courseService.createCourseDefault(dto));
 

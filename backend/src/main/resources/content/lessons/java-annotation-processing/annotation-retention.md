@@ -22,6 +22,12 @@ These two properties control whether a framework can see your annotation at runt
 public @interface MyAnnotation { }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `MyAnnotation`.
+- Uses an interface.
+
 ---
 
 ## Retention Policies
@@ -41,6 +47,12 @@ public @interface Override { }  // like the real @Override
 public String toString() { return "hello"; }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Override` with methods `toString()`.
+- Uses an interface.
+
 ### CLASS — Bytecode but Not Runtime
 
 The annotation is stored in the `.class` file but is NOT available via reflection. The JVM loads it into memory but doesn't expose it.
@@ -52,6 +64,12 @@ public @interface Internal { }
 
 **When to use:** Static analysis tools (SpotBugs, SonarQube) that read bytecode. Spring does NOT use CLASS retention — it needs RUNTIME.
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Internal`.
+- Uses an interface.
 
 ### RUNTIME — Visible Everywhere
 
@@ -66,6 +84,12 @@ public @interface Cacheable { }
 @Cacheable("users")
 public User findById(Long id) { ... }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Cacheable` with methods `findById()`.
+- Uses an interface.
 
 ---
 
@@ -148,6 +172,13 @@ public class RetentionDemo {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `RetentionDemo` and `CompileCheck` and 4 more type(s) with methods `findUser()`, `deleteUser()`, `main()`.
+- Uses an interface.
+- When run, it prints: “CompileCheck at runtime: ”, “AuditLog action: ” …
+
 ---
 
 ## ElementType Targets
@@ -191,6 +222,12 @@ The same code, clean:
 public @interface RestController { }  // can go on class OR method
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `RestController` and `OR`.
+- Uses an interface.
+
 ### No @Target
 
 If you omit `@Target`, the annotation can go **anywhere** — fields, methods, classes, parameters, etc. This is usually a mistake:
@@ -199,6 +236,12 @@ If you omit `@Target`, the annotation can go **anywhere** — fields, methods, c
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Tag { }  // can go on ANYTHING — usually unintended
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Tag`.
+- Uses an interface.
 
 ---
 
@@ -215,6 +258,12 @@ public @interface NotNull {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `NotNull`.
+- Uses an interface.
+
 ### Scenario 2: Framework configuration
 
 ```java
@@ -227,6 +276,12 @@ public @interface Transactional {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Transactional`.
+- Uses an interface.
+
 ### Scenario 3: Bytecode instrumentation
 
 ```java
@@ -237,6 +292,12 @@ public @interface Generated {
     String value();
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Generated`.
+- Uses an interface.
 
 ---
 

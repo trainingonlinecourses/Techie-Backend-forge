@@ -101,6 +101,11 @@ class KafkaContainerIT {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `KafkaContainerIT`.
+
 The trade-off: Docker required, slower, but catches real-broker bugs (serde headers, partition behavior) that embedded mode glosses over. Common strategy: **embedded for fast CI unit-ish tests, containers for the critical flows.**
 
 > **Why it matters (organizational view)** — Messaging bugs are the most expensive bugs to find in production (they surface as data loss and order weirdness, not stack traces). The org should treat the **outbox→relay→consumer→effect** flow test as mandatory for every event-emitting feature, and run embedded-Kafka tests in CI so they're fast. A failing DLT test means "your failure handling is broken" — catch it before a real incident, not after.

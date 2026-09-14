@@ -44,6 +44,12 @@ public class UserRateLimiter {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `UserRateLimiter` with methods `tryConsume()`.
+- Uses the java.time date-time API.
+
 ### Scenario 2: Filter-based rate limiting
 
 @Component
@@ -134,6 +140,14 @@ public class RateLimitConfig {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `RateLimitConfig` with methods `endpointLimits()`.
+- Uses the `Map` collection.
+- Uses the java.time date-time API.
+- Uses generics.
 
 ### Scenario 5: Rate limit headers
 

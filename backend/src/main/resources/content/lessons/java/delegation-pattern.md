@@ -211,6 +211,11 @@ public class UserRepository {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `UserRepository` with methods `findById()`.
+
 **Scenario 1 — Payment processing:** A `PaymentService` delegates to different payment gateways (Stripe, PayPal, bank transfer). The service doesn't know how each gateway works — it just calls `gateway.charge(amount, currency)`. You can add a new gateway without touching `PaymentService`.
 
 **Scenario 2 — Caching:** A `CachedUserService` wraps a `UserService` and adds caching. It checks the cache first; on miss, it delegates to the real `UserService`. The caching decorator can be added or removed without changing `UserService`.

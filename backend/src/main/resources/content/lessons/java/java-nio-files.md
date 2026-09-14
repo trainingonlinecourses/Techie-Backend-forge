@@ -51,6 +51,11 @@ Files.createDirectories(Path.of("a", "b", "c"));
 Files.walk(root)
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses file I/O with the NIO API.
+
 ## Streaming a large file without loading it
 
 try (Stream<String> lines = Files.lines(Path.of("big.csv"))) {
@@ -86,6 +91,12 @@ ch.read(buf, 0, null, new CompletionHandler<Integer, Void>() {
     public void failed(Throwable e, Void attach) { ... }
 });
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses generics.
+
 // Or the future style: Future<Integer> f = ch.read(buf, 0);
 
 Use async channels when a **single thread** must juggle many I/O operations (high-concurrency gateways). For ordinary applications, blocking I/O on a bounded thread pool is simpler and often faster.

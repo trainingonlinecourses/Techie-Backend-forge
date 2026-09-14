@@ -105,6 +105,13 @@ public class InsufficientBalanceException extends AppException {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `AppException` and `ResourceNotFoundException` and 2 more type(s) with methods `getCode()`.
+- Uses inheritance.
+- Uses `BigDecimal` for exact decimal math.
+
 ### RFC 7807 Problem Details Format
 
 The industry standard for error responses:
@@ -167,6 +174,11 @@ public class ExceptionHandlers {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `ExceptionHandlers` with methods `handleDuplicateEmail()`, `handleApp()`, `handleGeneral()`.
+
 ### Common Mistakes
 
 | Mistake | Problem | Fix |
@@ -215,6 +227,14 @@ public class GlobalExceptionHandler {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `GlobalExceptionHandler` with methods `handleValidation()`.
+- Uses lambda expressions.
+- Uses the `Map` collection.
+- Uses generics.
 
 ### Key Takeaways
 

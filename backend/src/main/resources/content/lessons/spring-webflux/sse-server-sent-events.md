@@ -70,6 +70,12 @@ public class EventController {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `EventController` with methods `stream()`.
+- Uses lambda expressions.
+
 ### SseEmitter Manager
 
 @Component
@@ -194,6 +200,13 @@ public class EventPublisher {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `EventPublisher` with methods `publish()`, `getEventFlux()`.
+- Uses the `Map` collection.
+- Uses generics.
 
 ---
 

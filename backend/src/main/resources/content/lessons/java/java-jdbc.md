@@ -59,6 +59,12 @@ public class Main {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- When run, it prints: “Connected: ”
+
 ## Statement vs PreparedStatement — always use PreparedStatement
 
 
@@ -143,6 +149,14 @@ public class Main {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- Uses formatted output.
+- Uses loops.
+- When run, it prints: “User %d: %s (%s) age %d%n”
+
 ## try-with-resources — automatic cleanup
 
 ```java
@@ -167,6 +181,12 @@ public class Main {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- Uses loops.
 
 ## INSERT, UPDATE, DELETE — executeUpdate
 
@@ -212,6 +232,12 @@ public class Main {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- When run, it prints: “Inserted ”, “Updated ” …
 
 ## Transactions — all-or-nothing operations
 
@@ -267,6 +293,14 @@ public class Main {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- Uses exception handling with try/catch.
+- Uses `BigDecimal` for exact decimal math.
+- Uses conditionals.
+
 ## Connection pooling — reusing connections
 
 Creating a database connection is expensive (TCP handshake, authentication, SSL negotiation). A **connection pool** keeps a pool of pre-opened connections and reuses them.
@@ -317,6 +351,11 @@ public User findUser(long id) {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses conditionals.
+
 ## Batch operations — processing many rows efficiently
 
 
@@ -355,6 +394,11 @@ try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
     conn.commit();
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses loops.
 
 ## How we use it in organizations
 
@@ -395,6 +439,11 @@ public class DatabaseConfig {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `DatabaseConfig` with methods `dataSource()`.
 
 ### Scenario 2: Transactional service method
 

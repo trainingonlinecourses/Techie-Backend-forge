@@ -48,6 +48,13 @@ class OrderServiceTest {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderServiceTest`.
+- Uses lambda expressions.
+- Uses generics.
+
 `@ExtendWith(MockitoExtension.class)` replaces the manual `openMocks` — the cleaner Spring/Boot idiom.
 
 ## The when/then grammar
@@ -116,6 +123,11 @@ class OrderControllerTest {
     // MockMvc performs requests; service interactions are stubbed/verified
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderControllerTest`.
 
 (`@MockitoBean` in Boot 3.4+ is the newer name; `@MockBean` still works.) The rule from the testing pyramid: mock at the **service boundary** in slice tests, use real beans (Testcontainers) in `@SpringBootTest` integration tests.
 

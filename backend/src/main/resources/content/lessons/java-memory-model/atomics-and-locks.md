@@ -228,6 +228,14 @@ public class AtomicsAndLocksDemo {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `AtomicsAndLocksDemo` and `Balance` and 3 more type(s) with 11 methods.
+- Uses manual threading.
+- Uses exception handling with try/catch.
+- Uses lambda expressions.
+
 ---
 
 ## Real-World Scenarios
@@ -257,6 +265,13 @@ public class RateLimiter {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `RateLimiter` with methods `tryAcquire()`.
+- Uses loops.
+- Uses conditionals.
 
 ### Scenario 2: Reader-writer cache
 
@@ -291,6 +306,14 @@ public class RWCache<K, V> {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `RWCache` with methods `getOrCreate()`.
+- Uses exception handling with try/catch.
+- Uses the `Map` collection.
+- Uses conditionals.
 
 ---
 

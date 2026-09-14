@@ -72,6 +72,12 @@ public class RateLimitProperties {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `RateLimitProperties`.
+- Uses the java.time date-time API.
+
 ```yaml
 # application.yml — user just adds this
 rate-limit:
@@ -156,6 +162,11 @@ public class AuditAutoConfiguration {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `AuditAutoConfiguration` with methods `auditService()`, `auditInterceptor()`.
 
 ```yaml
 # Teams enable with one property

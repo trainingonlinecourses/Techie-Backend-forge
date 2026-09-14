@@ -23,6 +23,11 @@ for (int i = 0; i < 1000; i++) {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses loops.
+
 With 1,000 iterations, this creates roughly **2,000–3,000 intermediate String objects**, each one copying all the previous content. That's O(n²) copying — for large loops it becomes brutally slow and churns the garbage collector.
 
 **`StringBuilder`** solves this: it is a **mutable** sequence of characters. Instead of copying the whole string on every change, it holds an internal **character array** (a buffer) and appends into it in place, growing the buffer only when needed.
@@ -77,6 +82,11 @@ public class StringBuilderDemo {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `StringBuilderDemo` with methods `main()`.
+
 ### Walking Through Each Part
 
 **Part 1 — `new StringBuilder(128)`:** We pre-size the internal buffer to 128 characters. This is an optimization: if we know the output will be roughly 100–150 chars, starting with a big-enough buffer avoids the copy-on-grow cost entirely. If you don't know the size, the default constructor (capacity 16) works fine — the buffer just grows as needed.
@@ -128,6 +138,11 @@ for (...) {
     result = result + x;   // a NEW StringBuilder per iteration — still quadratic
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses loops.
 
 That's why the rule is: **in a loop, write the `StringBuilder` yourself, outside the loop.**
 

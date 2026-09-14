@@ -58,6 +58,11 @@ public class Account {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Account`.
+
 Rules: entities have an identity (`@Id`), a no-arg constructor (JPA requirement), and accessors; **don't serialize entities directly to JSON** — map to DTOs/records at the boundary.
 
 ## Explicit queries with @Query
@@ -112,6 +117,12 @@ public abstract class AuditedEntity {
 }
 // entity extends AuditedEntity — timestamps maintained automatically
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `JpaConfig` and `AuditedEntity`.
+- Uses inheritance.
 
 ## Transactions with repositories
 

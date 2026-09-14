@@ -122,6 +122,11 @@ public class FeatureFlags {
     private String logLevel;                                 // INFO in prod, DEBUG elsewhere
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses conditionals.
+
     @Value("#{${app.replicas:1} > 1 ? true : false}")
     private boolean multiInstance;                           // True if multiple replicas
 }

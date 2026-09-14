@@ -48,6 +48,16 @@ public class Lesson {
     @org.hibernate.annotations.BatchSize(size = 50)
     private List<String> docs = new ArrayList<>();
 
+    /**
+     * Lesson ids this lesson builds on, seeded from the front-matter
+     * {@code requires: [a, b]} tag. Empty for most lessons — the service layer
+     * then derives prerequisites from the curriculum's teaching order, so the
+     * frontend can warn/gate learners who jump ahead.
+     */
+    @ElementCollection(fetch = FetchType.EAGER)
+    @org.hibernate.annotations.BatchSize(size = 50)
+    private List<String> prereqs = new ArrayList<>();
+
     @Column(nullable = false)
     private boolean capstone;
 
@@ -67,6 +77,7 @@ public class Lesson {
     public void setBody(String body) { this.body = body; }
     public List<String> getTopics() { return topics; }
     public List<String> getDocs() { return docs; }
+    public List<String> getPrereqs() { return prereqs; }
     public boolean isCapstone() { return capstone; }
     public void setCapstone(boolean capstone) { this.capstone = capstone; }
     public String getContentHash() { return contentHash; }

@@ -23,6 +23,12 @@ public class HelloWorld {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `HelloWorld` with methods `main()`.
+- When run, it prints: “Hello, World”
+
 Three lines, but each line carries a piece of the contract between your code and the JVM.
 
 ### Line 1 — `public class HelloWorld`

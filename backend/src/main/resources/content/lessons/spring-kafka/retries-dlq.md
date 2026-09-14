@@ -54,6 +54,11 @@ public class PaymentEventListener {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `PaymentEventListener` with methods `onPaymentCaptured()`, `onDlt()`.
+
 Spring Kafka creates retry topics (`payments-retry-0`, `payments-retry-1`, ...) with increasing delays and a final DLT (`payments-dlt`). Records hop topics while backing off, so **your main topic/partition is never blocked**.
 
 ## The deserialization failure — a special poison message
@@ -85,6 +90,11 @@ public void onPaymentCaptured(PaymentCaptured event) {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses exception handling with try/catch.
 
 `RetryableException` tells the container "retry me". Any other exception → default behavior (or DLT, per config). Reserve this for cases where `@RetryableTopic` doesn't fit (e.g. you need custom logic to decide retryability).
 

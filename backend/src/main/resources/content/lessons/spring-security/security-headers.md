@@ -151,6 +151,11 @@ The same code, clean:
 )
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+
 ---
 
 ## Real-World Scenarios

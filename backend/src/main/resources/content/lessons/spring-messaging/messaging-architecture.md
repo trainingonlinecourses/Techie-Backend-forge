@@ -105,6 +105,14 @@ public class OrderHandler {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderGateway` and `OrderFlow` and 1 more type(s) with methods `validate()`, `handle()`.
+- Uses an interface.
+- Uses conditionals.
+- When run, it prints: “processing order ”
+
 ### Walking Through Each Part
 
 **The `@MessagingGateway`** — the entry point. Your service calls `orderGateway.submit(order)` like a plain method; behind the scenes, Spring Integration drops a `Message` onto the `orders.in` channel. The caller is decoupled from whatever happens downstream.

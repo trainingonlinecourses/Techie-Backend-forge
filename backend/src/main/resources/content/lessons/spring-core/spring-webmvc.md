@@ -46,6 +46,11 @@ public class AccountController {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `AccountController` with methods `find()`, `create()`.
+
 ## Argument resolution (what the framework fills in for you)
 
 Spring resolves method parameters automatically: `@PathVariable`, `@RequestParam`, `@RequestBody`, `@RequestHeader`, `@AuthenticationPrincipal`, `Pageable`, `HttpServletRequest`, and more. Controllers stay thin — no parsing, no binding code.
@@ -57,6 +62,14 @@ Spring resolves method parameters automatically: `@PathVariable`, `@RequestParam
 ```java
 record AccountView(String iban, Money balance, @JsonFormat(shape = STRING) BigDecimal amount) {}
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `AccountView`.
+- Uses a `record`.
+- Uses `BigDecimal` for exact decimal math.
+
 // - ISO-8601 for dates (JavaTimeModule)
 // - @JsonIgnore for fields that must never leak (password hashes!)
 // - DTOs, never entities, over the wire

@@ -44,13 +44,6 @@ counter.compareAndSet(6, 10);
 int val = counter.get();
 ```
 
-**Line-by-line breakdown:**
-- `incrementAndGet()` — atomic `++counter`; uses CAS (compare-and-swap) internally: reads current value, computes new value, attempts CAS; if another thread changed it in between, retries automatically
-- `getAndIncrement()` — atomic `counter++`; same CAS mechanism, returns the old value
-- `addAndGet(5)` — atomic `counter += 5`; one CAS operation, not three separate ones
-- `compareAndSet(6, 10)` — the CAS primitive: if current value is 6, set to 10 atomically; returns `false` if the value changed (caller can retry or give up)
-- `get()` — volatile read; always sees the latest committed value
-
 ```java
 **How CAS works internally (simplified):**
 // AtomicInteger.incrementAndGet() pseudocode:
@@ -63,6 +56,14 @@ public int incrementAndGet() {
     return new;
 }
 ```
+
+<!-- why -->
+**Line-by-line breakdown:**
+- `incrementAndGet()` — atomic `++counter`; uses CAS (compare-and-swap) internally: reads current value, computes new value, attempts CAS; if another thread changed it in between, retries automatically
+- `getAndIncrement()` — atomic `counter++`; same CAS mechanism, returns the old value
+- `addAndGet(5)` — atomic `counter += 5`; one CAS operation, not three separate ones
+- `compareAndSet(6, 10)` — the CAS primitive: if current value is 6, set to 10 atomically; returns `false` if the value changed (caller can retry or give up)
+- `get()` — volatile read; always sees the latest committed value
 
 **The CAS retry loop:** if thread A reads `old=5`, then thread B changes it to `6` before A's CAS, A's CAS fails (expected 5, found 6). A re-reads (`old=6`), computes `new=7`, and retries CAS. Under low contention, the retry almost always succeeds on the first try.
 
@@ -100,6 +101,11 @@ void reloadConfig() {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses conditionals.
 
 ## LongAdder — high-contention counters
 
@@ -177,6 +183,12 @@ public class Order {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Order` with methods `updateStatus()`.
+- Uses generics.
 
 **Why it exists:** wrapping every mutable field in an `AtomicReference<Order>` is wasteful (one extra object per field). The updater lets you do CAS on a single `volatile` field of an existing object — memory-efficient for high-cardinality objects.
 

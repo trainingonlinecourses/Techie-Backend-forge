@@ -24,6 +24,13 @@ public record CreateOrderRequest(
 ) {}
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `CreateOrderRequest`.
+- Uses a `record`.
+- Uses `BigDecimal` for exact decimal math.
+
 Spring Boot autoconfigures a `Validator` (`LocalValidatorFactoryBean`) the moment `spring-boot-starter-validation` is on the classpath — no config needed.
 
 ## The core constraints
@@ -74,6 +81,14 @@ public class StrongPasswordValidator implements ConstraintValidator<StrongPasswo
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `StrongPassword` and `StrongPasswordValidator` with methods `isValid()`.
+- Uses an interface.
+- Uses inheritance.
+- Uses interface implementation.
+
 ## Validation groups
 
 Groups let one class carry different rules for different flows (create vs. update):
@@ -89,6 +104,12 @@ Long id;
 // later:
 @Validated(OnCreate.class) ... // select which group Spring applies
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `OnCreate` and `OnUpdate`.
+- Uses an interface.
 
 ## Error responses
 

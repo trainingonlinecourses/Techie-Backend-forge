@@ -46,6 +46,12 @@ public Long insert(String title, String level, int minutes) {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses the `Map` collection.
+- Uses generics.
+
 `executeAndReturnKey` runs the INSERT and returns the generated key. The column list comes from the map keys; the SQL is built from table metadata once at startup.
 
 ## Insert From a Bean
@@ -83,6 +89,12 @@ public Object insertWithCompositeKey(Course course) {
     return id;
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses the `Map` collection.
+- Uses generics.
 
 `getKeys()` returns every generated column (useful for DB-generated UUIDs, timestamps, or composite keys).
 

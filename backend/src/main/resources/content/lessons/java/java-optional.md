@@ -65,6 +65,11 @@ String name = Optional.ofNullable(customer)
     .orElse("Unknown");
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses method references.
+
 ## What is Optional?
 
 `Optional<T>` is a **wrapper** that either contains a value (`Optional.of(value)`) or is empty (`Optional.empty()`). It forces you to handle the "no value" case explicitly.
@@ -101,6 +106,14 @@ public class Main {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- Uses `Optional` for null-safe values.
+- Uses lambda expressions.
+- Uses conditionals.
+
 ## Common patterns
 
 ### Pattern 1: map — transform the value
@@ -129,6 +142,13 @@ public Optional<String> getCustomerCity(Customer customer) {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses `Optional` for null-safe values.
+- Uses method references.
+- Uses generics.
+
 ### Pattern 2: flatMap — when the transformation returns Optional
 
 // If the transformation itself returns Optional, use flatMap
@@ -137,6 +157,12 @@ public Optional<Order> findOrder(String orderId) {
     return Optional.ofNullable(orderId)       // Line 1: Wrap the ID
         .flatMap(id -> orderRepo.findById(id));  // Line 2: flatMap because findById returns Optional
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+
     // Line 3: Without flatMap, you'd get Optional<Optional<Order>> (wrong!)
 }
 
@@ -151,10 +177,21 @@ String name = getCustomerName().orElseGet(() -> generateDefaultName());
 
 // orElseThrow — throw exception if empty
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+
 Customer customer = findCustomer(id)
 ```java
     .orElseThrow(() -> new NotFoundException("Customer not found: " + id));
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
 
 ### Pattern 4: filter — conditional check
 
@@ -165,6 +202,11 @@ Optional<String> email = Optional.of("alice@example.com")
     .filter(e -> e.length() > 5);       // Line 2: Keep if longer than 5 chars
 // Line 3: Returns Optional.empty() if filter fails
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
 
 ## When NOT to use Optional
 
@@ -203,6 +245,13 @@ public class Customer {
 public void process(Optional<String> input) {
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Customer` with methods `findOrder()`, `process()`.
+- Uses `Optional` for null-safe values.
+- Uses generics.
 
 ## Real-world scenario — e-commerce order lookup
 
@@ -255,6 +304,13 @@ public class OrderService {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderService` with methods `getOrderSummary()`, `sendOrderConfirmation()`.
+- Uses lambda expressions.
+- Uses method references.
 
 ## Common mistakes
 

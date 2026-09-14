@@ -72,6 +72,13 @@ public class CourseResolvers {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `CourseResolvers` with methods `lessons()`, `durationLabel()`.
+- Uses the `List` collection.
+- Uses generics.
+
 ### Walking Through Each Part
 
 **`@SchemaMapping(typeName = "Course", field = "lessons")`** — binds a method to a schema field: "when the client asks for `Course.lessons`, call `lessons(course)`." The method receives the *parent source* (the `Course` from the level above) and returns the field's value. This is where the **N+1 trap** lurks — see the next lesson.

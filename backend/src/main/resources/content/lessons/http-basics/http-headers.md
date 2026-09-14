@@ -102,6 +102,12 @@ public class CourseController {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `CourseController` with methods `get()`, `create()`, `export()`.
+- Uses generics.
+
 ### Walking Through Each Part
 
 **Reading headers** — `@RequestHeader` binds a header to a method parameter: `X-Tenant-Id` for multi-tenant routing, `Authorization` for the token (though in Spring Security you'd use the framework's access, not parse it yourself).

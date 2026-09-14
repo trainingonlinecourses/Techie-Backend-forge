@@ -43,6 +43,13 @@ public interface OrderView {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderView`.
+- Uses an interface.
+- Uses `BigDecimal` for exact decimal math.
+
 Open projections force a full-entity load (the SpEL needs the target), so they're for *computed* views — use them deliberately, not as the default.
 
 ## DTO projections with constructor expressions — the explicit alternative
@@ -78,6 +85,13 @@ public interface OrderWithCustomer {
 
 // derived:
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderWithCustomer` and `CustomerView`.
+- Uses an interface.
+
 List<OrderWithCustomer> findTop100By();
 // produces: SELECT o.id, o.status, c.name, c.email FROM orders o JOIN customers c ...
 

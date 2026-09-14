@@ -195,6 +195,13 @@ public class ProfileChecker {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `AppConfig` and `MockEmailService` and 2 more type(s) with 7 methods.
+- Uses interface implementation.
+- When run, it prints: “[DEV] Email to ”
+
 ---
 
 ## Real-World Scenarios

@@ -51,6 +51,12 @@ public class MailProperties {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `MailProperties`.
+- Uses the java.time date-time API.
+
 Then inject the whole thing:
 
 ```java
@@ -61,6 +67,11 @@ class EmailService {
     EmailService(MailProperties props) { this.props = props; }   // one dependency, typed
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `EmailService`.
 
 ## Relaxed Binding — "mail.host" Means Many Things
 
@@ -127,6 +138,14 @@ public class MailProperties {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `MailProperties` and `Retry`.
+- Uses exception handling with try/catch.
+- Uses the `List` collection.
+- Uses the java.time date-time API.
+
 ```properties
 # application.properties
 mail.host=smtp.example.com
@@ -160,6 +179,11 @@ public record MailProperties(
         boolean tls,
         Duration timeout) {}
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses the java.time date-time API.
 
 Bind via `@EnableConfigurationProperties` and constructor injection; no setters needed. Records make config objects immutable and trivially testable.
 

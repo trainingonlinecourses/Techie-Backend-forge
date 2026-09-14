@@ -30,6 +30,11 @@ public class Config {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Config` with methods `getInstance()`.
+
 The `static final` field means the JVM creates it **exactly once** (when the class is first used) — thread-safe by construction, no locks needed.
 
 ## The Thread-Safety Question
@@ -62,6 +67,12 @@ public enum Config {
     public String dbUrl() { return dbUrl; }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Config` with methods `dbUrl()`.
+- Uses an `enum`.
 
 An `enum` with a single constant is a **bulletproof singleton**: the JVM guarantees exactly one instance, it's thread-safe, and it survives serialization correctly (enums serialize by name). Access: `Config.INSTANCE.dbUrl()`. This is the recommended modern approach — though even this is unnecessary if you have dependency injection (see below).
 
@@ -109,6 +120,11 @@ public class SingletonDemo {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `AppConfig` and `SingletonDemo` with 4 methods.
 
 ### Walking Through Each Part
 

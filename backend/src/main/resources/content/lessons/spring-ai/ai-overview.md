@@ -187,6 +187,13 @@ public class SearchService {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `SearchService` with methods `embed()`, `indexLesson()`, `searchSimilar()`.
+- Uses the `List` collection.
+- Uses generics.
+
 ---
 
 ## Real-World Scenarios

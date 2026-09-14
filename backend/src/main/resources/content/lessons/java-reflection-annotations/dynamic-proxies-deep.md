@@ -121,6 +121,13 @@ InvocationHandler txHandler = (proxy, method, args) -> {
 };
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses exception handling with try/catch.
+- Uses lambda expressions.
+- Uses conditionals.
+
 This is a miniature `@Transactional` — Spring's actual implementation does exactly this (plus more sophisticated proxy factories). The *same* pattern, with different before/after logic, produces: `@Async` (run on a thread pool), `@Cacheable` (check cache, then delegate, then populate cache), `@Secured` (check the current user's authorities before delegating), and audit logging (record who did what).
 
 **The key architectural insight:** the *business class* stays completely clean — no transaction code, no logging code, no security code inside it. The cross-cutting behavior lives in the proxy, applied declaratively. This is **AOP (aspect-oriented programming)** in its simplest form, and it's why Spring can add transactions to any bean without you writing a single transaction call.

@@ -120,6 +120,12 @@ class LessonController {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `LessonController`.
+- Uses lambda expressions.
+
 **The invisible magic:** `@RequestBody` tells Spring "deserialize the body into this type" (it uses the configured `ObjectMapper`); the return value of a `@RestController` method is serialized by the same mapper. `@JsonIgnoreProperties`, `@JsonProperty`, `@JsonFormat` annotations on your DTOs customize per-type. The ecosystem: `ResponseEntity<T>` for status codes, `Page<T>` for pagination, records for DTOs — all flowing through the same translator.
 
 ## The Common First-Project Surprises

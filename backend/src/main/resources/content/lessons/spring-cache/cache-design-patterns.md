@@ -57,6 +57,12 @@ public class CourseService {
 **Cons**: same miss penalty; the "loader" lives in your service rather than the cache.
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `CourseService` with methods `getCourse()`.
+- Uses lambda expressions.
+
 ## Pattern 3: Write-Through
 
 Writes go to the cache and the DB in the same transaction — `@CachePut`:
@@ -114,6 +120,14 @@ public Course getCourse(String id) {
     return loadAndCache(id);
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `CachedCourse` with methods `getCourse()`.
+- Uses lambda expressions.
+- Uses a `record`.
+- Uses conditionals.
 
 ## The Anti-Patterns
 

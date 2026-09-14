@@ -84,6 +84,14 @@ public class Main {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- Uses `Optional` for null-safe values.
+- Uses lambda expressions.
+- Uses method references.
+
 ---
 
 ## Line-by-Line Walkthrough
@@ -141,6 +149,14 @@ public class OptionalDemo {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `OptionalDemo` with methods `main()`.
+- Uses `Optional` for null-safe values.
+- Uses exception handling with try/catch.
+- Uses lambda expressions.
+
 ---
 
 ## Real-World Scenarios
@@ -157,6 +173,11 @@ User user = userRepository.findById(userId)
 ```java
     .orElseThrow(() -> new NotFoundException("User not found: " + userId));
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
 
 String displayName = userRepository.findById(userId)
     .map(User::getDisplayName)

@@ -87,6 +87,14 @@ public class SensorHandler extends DefaultHandler {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `SensorHandler` with 4 methods.
+- Uses inheritance.
+- Uses the `List` collection.
+- Uses conditionals.
+
 ### Step 2: Drive the Parser
 
 
@@ -115,6 +123,14 @@ public class Main {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- Uses the `List` collection.
+- Uses generics.
+- When run, it prints: “Processed ”
 
 ### Important SAX Behaviors
 
@@ -211,6 +227,14 @@ while (reader.hasNext()) {
 reader.close();
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses the `List` collection.
+- Uses switch branching.
+- Uses loops.
+- Uses conditionals.
+
 ### Option 2: Cursor-Based (Higher Level)
 
 public class Main {
@@ -266,6 +290,12 @@ while (reader.hasNext()) {
     // Process other elements normally...
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses loops.
+- Uses conditionals.
 
 ---
 

@@ -56,6 +56,9 @@ Integer avg = a.avgDurationSec();
 long safeAvg = avg == null ? 0 : avg;
 ```
 
+<!-- why -->
+
+
 ```java
 **The classic NPE in the wild:**
 
@@ -64,6 +67,12 @@ Long total = orderRepo.sumRevenue();
 // ...
 return total / orderCount;              // NPE if total is null — unboxing happens here!
 ```
+
+<!-- why -->
+**What this code shows:**
+- Defines `Analytics`.
+- Uses a `record`.
+- Uses the java.time date-time API.
 
 JPA/Hibernate returns `Long` (nullable) for aggregate queries. Any arithmetic unboxes it. The org rule: `sum()`/`count()` results are treated as nullable, checked, and defaulted — never used directly in arithmetic.
 
@@ -98,6 +107,11 @@ for (Long n : bigListOfLongs) {   // unboxes each read
 long[] raw = ...;                 // long[] is contiguous primitives, zero boxing
 for (long n : raw) sum += n;
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses loops.
 
 For numeric-heavy code (analytics, aggregations), prefer primitive arrays and `IntStream`/`LongStream` over `List<Integer>`/`List<Long>`. This matters most in batch jobs that process millions of rows.
 

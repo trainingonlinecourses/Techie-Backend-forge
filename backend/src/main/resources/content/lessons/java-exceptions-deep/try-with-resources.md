@@ -41,6 +41,13 @@ public class Main {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- Uses exception handling with try/catch.
+- Uses conditionals.
+
 **Why this is fragile:** three separate things can go wrong. First, `close()` throws a checked `IOException` that itself needs handling. Second, if `readLine()` throws and then `close()` also throws, the *second* exception silently replaces the first — you lose the original failure, and debugging becomes archaeology. Third, you must remember the null-check and the finally block *every single time* — and with nested resources (a file reader wrapping a stream wrapping a socket), the nesting explodes into pyramids of try/finally.
 
 Java 7 gave us the tool that makes all of this vanish: **try-with-resources**.
@@ -98,6 +105,13 @@ public class Main {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- Uses loops.
+- When run, it prints: “Primary:   ”, “Suppressed: ”
+
 The `getSuppressed()` array is where you find close-time failures — they're preserved for debugging instead of stomping on the real error. This is why logs of try-with-resources code show the true root cause with "Suppressed:" lines beneath it.
 
 ## Multiple Resources in One try
@@ -119,6 +133,13 @@ public class Main {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- Uses loops.
+- When run, it prints: “Copy failed: ”
 
 Both resources close automatically, **in reverse order** — `out` first, then `in`. That ordering matters: you want the destination flushed and closed before you release the source. A file copy with zero explicit close calls — this is the everyday power of the construct.
 
@@ -157,6 +178,11 @@ try (BufferedReader reader = new BufferedReader(new FileReader("f.txt"))) {
 } catch (IOException e) { }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses exception handling with try/catch.
+
 If the resource genuinely can only exist after some logic, wrap that logic in a helper method that returns the resource, and call the helper inside the parentheses: `try (BufferedReader reader = openReader()) { ... }`.
 
 ## Writing Your Own AutoCloseable
@@ -187,6 +213,14 @@ public class ApiConnection implements AutoCloseable {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `ApiConnection` with methods `send()`, `close()`, `main()`.
+- Uses interface implementation.
+- Uses conditionals.
+- When run, it prints: “Sending: ”, “Connection closed — resources released”
 
 Note the guard inside `close()` — it makes close idempotent (safe to call twice). That's a good habit: try-with-resources guarantees `close()` is called once, but defensive double-close protection costs nothing.
 

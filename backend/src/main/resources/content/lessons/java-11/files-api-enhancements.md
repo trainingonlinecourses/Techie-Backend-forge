@@ -26,6 +26,11 @@ Files.write(Path.of("output.txt"), "Hello".getBytes());
 Files.writeString(Path.of("output.txt"), "Hello");
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses file I/O with the NIO API.
+
 ---
 
 ## The New Methods
@@ -54,6 +59,11 @@ Files.writeString(Path.of("log.txt"), "New log entry\n",
     StandardOpenOption.APPEND
 );
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses file I/O with the NIO API.
 
 ---
 
@@ -125,6 +135,14 @@ public class FilesApiDemo {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `FilesApiDemo` with methods `main()`.
+- Uses the Streams API to process data declaratively.
+- Uses lambda expressions.
+- Uses method references.
 
 ---
 

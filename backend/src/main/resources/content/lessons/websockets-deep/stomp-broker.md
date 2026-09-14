@@ -80,6 +80,9 @@ public class ChatController {
 }
 ```
 
+<!-- why -->
+
+
 ```java
 // The config: enable STOMP with an in-memory broker
 import org.springframework.context.annotation.Configuration;
@@ -102,6 +105,16 @@ public class StompConfig implements WebSocketMessageBrokerConfigurer {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+- Defines `ChatController` with methods `broadcast()`, `notifyNewLesson()`.
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `StompConfig` with methods `configureMessageBroker()`, `registerStompEndpoints()`.
+- Uses interface implementation.
 
 ### Walking Through Each Part
 

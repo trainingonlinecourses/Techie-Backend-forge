@@ -63,6 +63,12 @@ public class ReflectionBasics {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `ReflectionBasics` with methods `main()`.
+- Uses generics.
+
 **Walking through it:** `Class.forName("java.util.ArrayList")` is the line that unlocks reflection's power — the class name is a *string*, so you can load classes your code never mentions: plugins, drivers, dynamically configured beans. Notice `getClass()` on an instance returns the *runtime* class — for `ArrayList` it returns `ArrayList.class`, even if the variable's declared type was `List`. That runtime truth is exactly what frameworks need.
 
 ## Inspecting a Class: Methods, Fields, Constructors
@@ -138,6 +144,11 @@ public class InvokeDemo {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `InvokeDemo` with methods `main()`.
+
 **Walking through it:** `getMethod("toUpperCase")` returns the `Method` object describing the method; `invoke(target)` executes it on the given instance. With parameters, you pass the *types* to `getMethod` and the *values* to `invoke`. Notice that everything is dynamic — `methodName` could come from a config file, and the program would still work. That's the superpower (and the danger): the compiler can't verify `methodName` exists, so a typo throws `NoSuchMethodException` at runtime instead of a compile error.
 
 ## Accessing Private Fields — and the Cost
@@ -163,6 +174,11 @@ public class PrivateAccessDemo {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `PrivateAccessDemo` and `Secret` with methods `main()`.
 
 `setAccessible(true)` is the "master key" — it bypasses Java's access control for that member. Frameworks use it constantly (Spring's field injection, ORM hydration, serialization of private state). But it also breaks encapsulation, and in modern Java (17+) it's gated: the `java.lang.reflect` access-control module and `--add-opens` flags exist precisely to stop arbitrary code from reaching into JDK internals. Use it only where you own both sides of the contract.
 
@@ -192,6 +208,11 @@ public class NewInstanceDemo {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `NewInstanceDemo` with methods `main()`.
 
 This is how dependency-injection frameworks instantiate beans, how `ServiceLoader` loads providers, and how ORMs build entities from database rows — all without the source code knowing the concrete class.
 

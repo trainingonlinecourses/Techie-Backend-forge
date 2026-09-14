@@ -12,6 +12,11 @@ import CodeBlock from './CodeBlock.jsx';
  *  - external links opened in a new tab
  */
 export default function Markdown({ children }) {
+  // HTML comments are internal markers (e.g. the `<!-- why -->` explanation
+  // anchors written by scripts/relocate-explanations.mjs). react-markdown has
+  // no raw-HTML renderer, so without this they leak into the page as literal
+  // text — strip them before parsing.
+  const src = String(children || '').replace(/<!--[\s\S]*?-->/g, '');
   return (
     <div className="markdown">
       <ReactMarkdown
@@ -48,7 +53,7 @@ export default function Markdown({ children }) {
           h3: ({ children }) => <h3 id={slug(children)}>{children}</h3>,
         }}
       >
-        {children}
+        {src}
       </ReactMarkdown>
     </div>
   );

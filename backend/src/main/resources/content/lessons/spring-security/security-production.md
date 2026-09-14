@@ -128,6 +128,14 @@ public class RateLimitFilter extends OncePerRequestFilter {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `RateLimitFilter` with methods `doFilterInternal()`.
+- Uses inheritance.
+- Uses the java.time date-time API.
+- Uses conditionals.
+
 ### 4. Audit Logging
 
 ```java
@@ -156,6 +164,11 @@ public class SecurityAuditListener {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `SecurityAuditListener` with methods `onAuthenticationSuccess()`, `onAuthenticationFailure()`, `getCurrentRequest()`.
 
 ---
 

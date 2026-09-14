@@ -91,6 +91,13 @@ public class OrderController {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderController` and `MdcFilter` and 1 more type(s) with methods `doFilter()`, `createOrder()`, `create()`.
+- Uses exception handling with try/catch.
+- Uses interface implementation.
+
 ---
 
 ## Real-World Scenarios
@@ -124,6 +131,14 @@ public class ContextCopyingDecorator implements TaskDecorator {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `ContextCopyingDecorator` with methods `decorate()`.
+- Uses exception handling with try/catch.
+- Uses lambda expressions.
+- Uses interface implementation.
 
 ---
 

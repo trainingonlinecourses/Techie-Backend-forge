@@ -14,12 +14,6 @@ capstone: false
 
 For 25+ years, documentation comments meant memorizing HTML: `<p>`, `@param`, `<code>`. **Java 23 (JEP 467)** adds a second syntax — `///` comments written in **Markdown** — so documenting code feels like writing a README.
 
-## What this code does — step by step
-
-1. Lines starting with `///` are documentation comments in Markdown (note: **three** slashes, not two).
-2. Inside them you write plain Markdown: `#` headings, `*` lists, backticks for code — no HTML tags needed.
-3. The old `/** ... */` style keeps working; the two can coexist in the same codebase.
-4. `javadoc` renders both; IDEs show both on hover.
 
 ```java
 /// A tiny utility for converting temperatures.
@@ -49,6 +43,13 @@ public class Convert {
     }
 }
 ```
+
+<!-- why -->
+## What this code does — step by step
+1. Lines starting with `///` are documentation comments in Markdown (note: **three** slashes, not two).
+2. Inside them you write plain Markdown: `#` headings, `*` lists, backticks for code — no HTML tags needed.
+3. The old `/** ... */` style keeps working; the two can coexist in the same codebase.
+4. `javadoc` renders both; IDEs show both on hover.
 
 ## Why this matters for learners
 

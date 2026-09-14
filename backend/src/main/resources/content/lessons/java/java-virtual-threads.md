@@ -4,6 +4,7 @@ summary: Java 21 virtual threads explained from scratch — what they solve, how
 order: 72
 minutes: 20
 topics: [virtual-threads, loom, thread-per-request, carrier-threads, pinning, synchronized]
+requires: [threads-deep, java-concurrency]
 docs:
   - https://docs.oracle.com/en/java/javase/21/core/virtual-threads.html
   - https://spring.io/blog/2023/10/16/spring-boot-3-2-virtual-threads
@@ -50,6 +51,14 @@ try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses the Streams API to process data declaratively.
+- Uses lambda expressions.
+- Uses the `List` collection.
+- Uses local type inference with `var`.
 
 ## How virtual threads work internally
 
@@ -119,6 +128,11 @@ public class OrderController {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderController` with methods `order()`.
+
 ## The rules that keep virtual threads fast
 
 ### Rule 1: Never pool virtual threads
@@ -130,6 +144,11 @@ ExecutorService pool = Executors.newFixedThreadPool(100);  // Platform threads
 // RIGHT — one virtual thread per task
 ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();  // Virtual threads
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses virtual threads.
 
 Virtual threads are cheap (a few KB each). Pooling them is like pooling objects — you create them when needed and let the GC collect them.
 
@@ -158,6 +177,12 @@ try {
     cacheLock.unlock();
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses synchronization with `synchronized`.
+- Uses exception handling with try/catch.
 
 **What "pinning" means:** When a virtual thread holds a `synchronized` lock while blocking on I/O, the JVM can't unmount it from the carrier thread. The carrier thread is stuck, waiting for the I/O — exactly the problem virtual threads were designed to solve.
 
@@ -234,6 +259,14 @@ public class CheckoutService {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `CheckoutService` with methods `checkout()`.
+- Uses asynchronous composition with `CompletableFuture`.
+- Uses lambda expressions.
+- Uses the `List` collection.
 
 ## Measuring the impact
 

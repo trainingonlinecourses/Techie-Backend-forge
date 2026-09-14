@@ -150,6 +150,12 @@ public class RoomWebSocketHandler implements WebSocketHandler {
                     case "leave" -> {
                         rooms.getOrDefault(message.roomId(), Set.of()).remove(session);
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+
                         sendToRoom(message.roomId(),
                             new ChatEvent("system", "server",
                                 session.getId() + " left the room",
@@ -225,6 +231,14 @@ public class AuthenticatedWebSocketHandler implements WebSocketHandler {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `AuthenticatedWebSocketHandler` with methods `handle()`, `handleAuthenticated()`.
+- Uses lambda expressions.
+- Uses interface implementation.
+- Uses generics.
 
 ---
 

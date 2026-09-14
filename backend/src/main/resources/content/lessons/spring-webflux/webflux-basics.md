@@ -106,6 +106,11 @@ public class ApiExceptionHandler {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `ApiExceptionHandler` with methods `handle()`.
+
 `Mono.error(...)` / thrown exceptions in reactive chains are routed to `@RestControllerAdvice` the same way as servlet.
 
 > **Why it matters (organizational view)** — Pick ONE endpoint style per service and stay consistent — mixing annotation and functional routes across a codebase doubles the review/onboarding surface. Standardize the error contract (ProblemDetail) and the streaming approach (SSE via `text/event-stream`) so clients treat all services the same. Also: enable the Reactor **context propagation** with your tracer (Micrometer Tracing) — without it, trace ids don't flow across threads in reactive chains, and debugging reactive incidents becomes guesswork.

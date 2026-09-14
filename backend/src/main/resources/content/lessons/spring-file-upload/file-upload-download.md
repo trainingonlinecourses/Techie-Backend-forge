@@ -157,6 +157,14 @@ public ResponseEntity<List<Map<String, String>>> uploadMultiple(
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `FileUploadController` and `DocumentController` and 1 more type(s) with methods `upload()`, `download()`, `uploadMultiple()`.
+- Uses exception handling with try/catch.
+- Uses the `List` collection.
+- Uses the `Map` collection.
+
 ---
 
 ## Real-World Scenarios

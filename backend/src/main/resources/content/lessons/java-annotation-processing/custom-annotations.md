@@ -78,6 +78,12 @@ int limit = annotation.limit();
 long window = annotation.window();
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `RateLimited`.
+- Uses an interface.
+
 ---
 
 ## Retention Policies
@@ -268,6 +274,14 @@ public class CustomAnnotationsDemo {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `CustomAnnotationsDemo` and `NotBlank` and 6 more type(s) with 6 methods.
+- Uses an interface.
+- Uses the `List` collection.
+- Uses the `Map` collection.
+
 ---
 
 ## Real-World Scenarios
@@ -296,6 +310,14 @@ public static boolean isValidEmail(Object obj) throws IllegalAccessException {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Email` with methods `isValidEmail()`.
+- Uses an interface.
+- Uses regex matching.
+- Uses loops.
+
 ### Scenario 2: AOP-based audit logging
 
 ```java
@@ -316,6 +338,11 @@ public class AuditAspect {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `AuditAspect` with methods `audit()`.
 
 ---
 

@@ -111,6 +111,12 @@ public class PaymentFacade {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `PaymentClient` and `PaymentFacade` with methods `processPayment()`, `paymentFallback()`.
+- Uses an interface.
+
 ### Scenario 3: WebClient for streaming responses
 
 When you need to stream large responses (SSE, paginated data):
@@ -163,6 +169,12 @@ public class ServiceAuthInterceptor implements ClientHttpRequestInterceptor {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `ServiceAuthInterceptor` with methods `intercept()`.
+- Uses interface implementation.
+
 ### Scenario 5: Error handling with custom exceptions
 
 Transform HTTP errors into domain exceptions:
@@ -192,6 +204,13 @@ public class ClientErrorHandler implements ClientHttpResponseErrorHandler {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `ClientErrorHandler` with methods `hasError()`, `handleError()`.
+- Uses interface implementation.
+- Uses conditionals.
 
 ## Common mistakes
 

@@ -107,6 +107,14 @@ public class AsyncQuoteClient {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `QuoteGateway` and `QuoteService` and 1 more type(s) with methods `answer()`, `ask()`, `replyChannel()`.
+- Uses asynchronous composition with `CompletableFuture`.
+- Uses lambda expressions.
+- Uses an interface.
+
 ### Walking Through Each Part
 
 **The gateway (synchronous)** — `requestQuote(order)` looks like a plain method call to the caller, but under the hood: the message goes to `quotes.in` **with a temporary reply channel**; the gateway *blocks* until an answer arrives on `quotes.out`; the answer is returned. Request-reply with the machinery hidden.

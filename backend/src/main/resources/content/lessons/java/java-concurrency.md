@@ -57,6 +57,14 @@ executor.submit(() -> {
 executor.shutdown();
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `MyThread` with methods `run()`.
+- Uses manual threading.
+- Uses lambda expressions.
+- Uses inheritance.
+
 ## Synchronized — preventing race conditions
 
 A **race condition** happens when two threads modify the same data simultaneously, causing unpredictable results.
@@ -195,6 +203,14 @@ public class Main {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- Uses lambda expressions.
+- Uses generics.
+- When run, it prints: “Hello”
+
 ## CompletableFuture — composing async operations
 
 
@@ -250,6 +266,13 @@ CompletableFuture<Object> anyDone = CompletableFuture.anyOf(future1, future2, fu
 Object first = anyDone.join();
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses asynchronous composition with `CompletableFuture`.
+- Uses lambda expressions.
+- Uses generics.
+
 ## ExecutorService — managing thread pools
 
 
@@ -301,6 +324,14 @@ public class Main {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- Uses lambda expressions.
+- Uses conditionals.
+- When run, it prints: “Delayed task”, “Periodic task”
+
 ## How we use it in organizations
 
 ### Scenario 1: Parallel API calls — reducing response time
@@ -340,6 +371,14 @@ public class DashboardService {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `DashboardService` with methods `getDashboard()`.
+- Uses asynchronous composition with `CompletableFuture`.
+- Uses lambda expressions.
+- Uses the `List` collection.
+
 ### Scenario 2: Thread-safe cache with synchronized
 
 
@@ -375,6 +414,14 @@ public class ThreadSafeCache<K, V> {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `ThreadSafeCache` with methods `get()`.
+- Uses synchronization with `synchronized`.
+- Uses the `Map` collection.
+- Uses conditionals.
 
 ### Scenario 3: Graceful shutdown with ScheduledExecutorService
 

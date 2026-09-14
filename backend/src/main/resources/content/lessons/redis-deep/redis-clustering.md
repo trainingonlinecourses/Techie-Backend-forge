@@ -113,6 +113,11 @@ public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factor
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses generics.
+
 ## Redis Sentinel — high availability
 
 **Sentinel** monitors Redis instances and automatically promotes a slave to master if the current master fails:
@@ -201,6 +206,14 @@ public class ProductCacheService {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `ProductCacheService` with methods `cacheProduct()`, `getProduct()`, `getProductWithCache()`.
+- Uses the java.time date-time API.
+- Uses conditionals.
+- Uses generics.
 
 ## Common mistakes
 

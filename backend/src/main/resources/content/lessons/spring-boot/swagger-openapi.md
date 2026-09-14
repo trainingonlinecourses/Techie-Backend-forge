@@ -125,6 +125,12 @@ public class OpenApiGroupConfig {
     public GroupedOpenApi orderApis() {
         return GroupedOpenApi.builder()
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `OpenApiGroupConfig` with methods `orderApis()`.
+
             .group("Orders")
             .pathsToMatch("/api/orders/**")
 ```java
@@ -167,6 +173,11 @@ class OrderApiContractTest {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderApiContractTest`.
 
 ### Scenario 3: API versioning documentation
 

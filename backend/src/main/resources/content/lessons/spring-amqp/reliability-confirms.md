@@ -128,6 +128,11 @@ public void onOrderCreated(OrderEvent event) {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses exception handling with try/catch.
+
 A unique constraint on the processed-id table turns redelivery into a no-op.
 
 ## At-Most-Once vs At-Least-Once

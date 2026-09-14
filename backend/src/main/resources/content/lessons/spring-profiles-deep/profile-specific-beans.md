@@ -28,6 +28,12 @@ public class EmailNotificationService implements NotificationService {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `ConsoleNotificationService` and `EmailNotificationService` with methods `send()`.
+- Uses interface implementation.
+
 ---
 
 ## Profile Activation
@@ -53,6 +59,11 @@ spring:
 @Profile("default")
 public class H2DataSourceConfig { ... }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `H2DataSourceConfig`.
 
 ---
 
@@ -115,6 +126,12 @@ public class V2SearchService implements SearchService { ... }
 public class V1SearchService implements SearchService { ... }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `V2SearchService` and `V1SearchService`.
+- Uses interface implementation.
+
 ### Scenario 2: Testing with mocks
 
 ```java
@@ -126,6 +143,12 @@ public class MockPaymentGateway implements PaymentGateway {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `MockPaymentGateway` with methods `charge()`.
+- Uses interface implementation.
 
 ---
 

@@ -38,6 +38,12 @@ public record AccountView(Long id, String iban, String currency, long balanceCen
 **Entities never cross the boundary** — services return views, controllers return views. The wire format is stable even when the entity changes.
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `CreateAccountRequest` and `AccountView` with methods `from()`.
+- Uses a `record`.
+
 ## The controller
 
 package com.example.payments.account;
@@ -99,6 +105,12 @@ public record CreateTransferRequest(
         @NotBlank String idempotencyKey) {}
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `TransferController` and `CreateTransferRequest` with methods `transfer()`.
+- Uses a `record`.
+
 ## The uniform error contract
 
 ```java
@@ -109,6 +121,13 @@ import java.util.List;
 
 public record ApiError(String timestamp, int status, String error, String message, String path,
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `ApiError`.
+- Uses a `record`.
+
                        List<FieldError> fieldErrors) {
 ```java
     public record FieldError(String field, String message) {}

@@ -109,6 +109,14 @@ public record PagedResponse<T>(
 ) {}
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `UserResponse` and `CreateUserRequest` and 2 more type(s).
+- Uses a `record`.
+- Uses the `List` collection.
+- Uses generics.
+
 ### Mapping Entities to DTOs
 
 **Option 1: Manual mapping (simple, explicit)**
@@ -234,6 +242,12 @@ public class UserController {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `UserController` with 5 methods.
+- Uses generics.
+
 ### Common Mistakes
 
 | Mistake | Problem | Fix |
@@ -278,6 +292,12 @@ public record CreateUserRequest(
 ) {}
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `CreateUserRequest`.
+- Uses a `record`.
+
 ### Organization Use Cases
 
 **1. E-Commerce Product API**
@@ -300,6 +320,12 @@ public record PostResponse(Long id, String content, String authorName,
     Instant createdAt, int likeCount, boolean isLikedByMe) {}
 // ^ Includes computed fields (likeCount, isLikedByMe) — not in database
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `PostResponse`.
+- Uses a `record`.
 
 ### Key Takeaways
 

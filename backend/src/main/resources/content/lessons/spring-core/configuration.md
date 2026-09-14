@@ -243,6 +243,13 @@ public record RedisProperties(
 ) {}
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `RedisProperties`.
+- Uses a `record`.
+- Uses the java.time date-time API.
+
 ### Scenario 3: @Profile for Environment-Specific Beans
 
 ```java
@@ -271,6 +278,13 @@ public class ProdConfig {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `DevConfig` and `ProdConfig` with methods `demoDataLoader()`, `securityCheck()`.
+- Uses lambda expressions.
+- Uses conditionals.
 
 ---
 

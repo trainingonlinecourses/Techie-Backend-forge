@@ -67,6 +67,13 @@ public class InventoryClientFallback implements InventoryClient {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `InventoryClient` and `InventoryClientFallback` with methods `getStock()`.
+- Uses an interface.
+- Uses interface implementation.
+
 ```yaml
 spring:
   cloud:

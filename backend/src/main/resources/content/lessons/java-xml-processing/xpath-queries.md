@@ -89,6 +89,12 @@ public class Main {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- Uses loops.
+
 ### Step 2: Different Return Types
 
 
@@ -219,6 +225,13 @@ public Map<String, String> extractBuildConfig(String pomXml) throws Exception {
     return config;
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses the `Map` collection.
+- Uses loops.
+- Uses generics.
 
 ### Scenario 3: Compliance Validation
 Checking XML documents against business rules:

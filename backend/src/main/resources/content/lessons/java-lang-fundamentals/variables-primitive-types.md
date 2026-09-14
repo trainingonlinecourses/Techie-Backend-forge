@@ -85,6 +85,11 @@ public class Main {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Demo` and `Main` with methods `main()`.
+
 This distinction between fields and local variables is important. Fields are part of an object and are given defaults so that an object is always in a valid state even if you only set some of its fields. Local variables live only inside a method and the compiler enforces that you assign them before use, which catches bugs earlier.
 
 ### Literals — How You Write a Value in Code
@@ -163,6 +168,11 @@ public class Main {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+
 This is not a Java problem — it is how binary floating-point works, and it affects Python, C, JavaScript, and most languages. The fix for money and other exact decimal values is `BigDecimal`, not `float` or `double`.
 
 ```java
@@ -178,6 +188,12 @@ public class Main {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- Uses `BigDecimal` for exact decimal math.
 
 Use `double` for measurements, scientific calculations, and cases where tiny imprecision is acceptable. Use `BigDecimal` for money, percentages that must be exact, and any calculation where the decimal value matters exactly.
 
@@ -214,6 +230,13 @@ public class Main {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- Uses conditionals.
+- When run, it prints: “welcome”
 
 `boolean` values are the result of comparisons: `x > 0`, `name.equals("Alice")`, `list.isEmpty()`, `number % 2 == 0`. Every condition in every `if`, `while`, `for`, and `switch` boils down to a `boolean`.
 
@@ -292,6 +315,12 @@ public class Main {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`, `process()`.
+- Uses conditionals.
+
 Shadowing happens when a local variable or parameter has the same name as a field. The local one hides the field inside its scope, which is a common source of bugs.
 
 ```java
@@ -304,6 +333,11 @@ class User {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `User` with methods `setName()`.
 
 ## A Code Example — Declaring and Using Variables
 

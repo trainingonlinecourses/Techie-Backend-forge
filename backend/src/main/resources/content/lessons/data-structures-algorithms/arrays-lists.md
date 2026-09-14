@@ -109,6 +109,12 @@ while (it.hasNext()) {
 // for (String w : words) { if (w.equals("b")) words.remove(w); }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses loops.
+- Uses conditionals.
+
 The enhanced for-loop hides the iterator; calling `list.remove` while iterating changes the structure the iterator relies on, and Java's *fail-fast* design throws `ConcurrentModificationException` rather than silently corrupt the iteration. Removing through the iterator itself is the sanctioned path.
 
 ## Recap

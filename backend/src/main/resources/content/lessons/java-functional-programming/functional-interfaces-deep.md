@@ -29,6 +29,12 @@ interface Greeter {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Greeter`.
+- Uses an interface.
+
 If you add a second abstract method, the compiler refuses to compile — the interface is no longer functional, and lambdas can't target it.
 
 ## The Big Four (and Friends) in java.util.function
@@ -100,6 +106,14 @@ public class FunctionalInterfaceDemo {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `FunctionalInterfaceDemo` with methods `main()`.
+- Uses lambda expressions.
+- Uses generics.
+- When run, it prints: “[log] ”
+
 ### Walking Through Each Part
 
 **Part 1 — `Predicate`.** One input, `boolean` out. The *test* method name tells you its purpose: it's the "does this value pass?" check used by `filter` and `removeIf`.
@@ -144,10 +158,21 @@ When a method is overloaded with different functional interfaces, the compiler c
 // Both take a functional interface — ambiguous!
 // void handle(Function<String,Integer> f) {...}
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses generics.
+
 // void handle(Consumer<String> c) {...}
 ```java
 // handle(s -> s.length());   // COMPILE ERROR: which one?
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
 
 Fix: cast to the target type (`handle((Function<String,Integer>) s -> s.length())`) or rename the methods. In practice this is rare — just know it exists.
 

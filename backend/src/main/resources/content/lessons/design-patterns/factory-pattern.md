@@ -34,6 +34,11 @@ else if (order.contains("veggie")) pizza = new VeggiePizza();
 else pizza = new MargheritaPizza();
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses conditionals.
+
 With a factory:
 
 ```java
@@ -113,6 +118,14 @@ public class FactoryDemo {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Pizza` and `MargheritaPizza` and 4 more type(s) with 4 methods.
+- Uses an interface.
+- Uses interface implementation.
+- Uses conditionals.
 
 ### Walking Through Each Part
 

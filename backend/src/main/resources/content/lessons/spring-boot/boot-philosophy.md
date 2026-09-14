@@ -51,6 +51,11 @@ public class HelloController {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `MyApp` and `HelloController` with methods `main()`, `hello()`.
+
 ## What @SpringBootApplication actually does
 
 
@@ -77,6 +82,11 @@ The same code, clean:
 @ComponentScan(basePackages = "com.backendforge.academy")
 public class AcademyApplication { ... }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `AcademyApplication`.
 
 ### How auto-configuration works
 
@@ -110,6 +120,11 @@ public class DataSourceAutoConfiguration {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `DataSourceAutoConfiguration` with methods `dataSource()`.
 
 ## Convention over Configuration
 
@@ -262,6 +277,13 @@ spring:
     hibernate:
       ddl-auto: validate  # validate schema in production
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `UserController` with methods `getAllUsers()`, `getUser()`, `createUser()`.
+- Uses the `List` collection.
+- Uses generics.
 
 ### Scenario 2: Profile-based configuration
 

@@ -82,6 +82,9 @@ public abstract class PaymentProcessor {
 }
 ```
 
+<!-- why -->
+
+
 ```java
 public class CreditCardProcessor extends PaymentProcessor {
 
@@ -98,6 +101,17 @@ public class CreditCardProcessor extends PaymentProcessor {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+- Defines `PaymentProcessor` with methods `process()`, `validate()`, `charge()`.
+- Uses conditionals.
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `CreditCardProcessor` with methods `charge()`.
+- Uses inheritance.
 
 **Why abstract class here, not interface?** Because `process()` is a fixed algorithm (template method) that depends on shared fields (`auditLog`, `repository`) and a constructor. An interface cannot hold those.
 
@@ -146,6 +160,14 @@ public class AuditService {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Auditable` and `Order` and 2 more type(s) with methods `toAuditEntry()`, `auditCategory()`, `record()`.
+- Uses an interface.
+- Uses interface implementation.
+- Uses `BigDecimal` for exact decimal math.
+
 **Why interface here, not abstract class?** Because `Order` and `Payment` have nothing else in common. Forcing them to extend a shared base class would be an artificial hierarchy. The interface says "you *can* produce an audit entry" without forcing a shared identity.
 
 ### Scenario 3: Diamond problem with default methods
@@ -169,6 +191,13 @@ public class Session implements Loggable, Cacheable {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Loggable` and `Cacheable` and 1 more type(s) with methods `describe()`.
+- Uses an interface.
+- Uses interface implementation.
 
 This is rare in practice because well-designed interfaces avoid overlapping default methods. When it happens, the compiler forces you to make a conscious decision — which is the right behavior.
 

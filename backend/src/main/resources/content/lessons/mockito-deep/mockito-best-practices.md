@@ -50,6 +50,11 @@ class EasyToTestService {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `HardToTestService` and `EasyToTestService` with methods `sendReport()`.
+
 **The rule:** dependencies enter through the **constructor** (or an explicit setter — never via `new` inside methods or static singletons). This is the single highest-leverage testability practice, and it's exactly what Spring's constructor injection enforces in production code — the framework's design philosophy *is* the testability philosophy. When you see a class that's awkward to mock, the fix is usually in the class, not the test.
 
 ## Rule 2: Strict Stubbing Is Your Linter
@@ -70,6 +75,12 @@ class ServiceTest {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `ServiceTest`.
+- Uses lambda expressions.
 
 **Why strictness matters:** an unused stub means the test's *setup describes behavior the code no longer performs* — a stale expectation that will eventually mislead (the stub "documents" a call that doesn't happen, and a future refactor may silently break the real contract). Strict stubs fail the test immediately, forcing cleanup. The rule: **stub exactly what the path under test uses** — no more. (The escape hatch for genuinely conditional stubs is `lenient()`: `lenient().when(...)...` — use it sparingly and knowingly.)
 
@@ -92,6 +103,11 @@ verify(repo).save(argThat(o -> o.status().equals("PENDING")));
 verify(repo, times(1)).findById(1L);
 verify(metrics).record("cache.hit");
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
 
 **The discipline:** verify interactions that are *contractual* — "the payment was captured," "the audit entry was written," "the cache was invalidated." Skip the incidental — helper call counts, intermediate method invocations, logging. When a refactor that changes no behavior breaks your tests, the tests were over-verified.
 

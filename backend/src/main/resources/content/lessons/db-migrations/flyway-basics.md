@@ -199,6 +199,11 @@ public class FlywayConfig {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `FlywayConfig` with methods `flywayInitializer()`.
+
 ## The production checklist
 
 - [ ] **Test migrations locally** before pushing — run `mvn flyway:migrate` against a test database

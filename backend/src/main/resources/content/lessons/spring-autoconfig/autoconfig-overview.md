@@ -29,6 +29,11 @@ public class MyApp {
 // @SpringBootApplication = @Configuration + @EnableAutoConfiguration + @ComponentScan
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `MyApp` with methods `main()`.
+
 ---
 
 ## How It Works
@@ -58,6 +63,11 @@ public class DataSourceAutoConfiguration {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `DataSourceAutoConfiguration` with methods `dataSource()`.
 
 ---
 
@@ -138,6 +148,12 @@ public class AppWithoutDatabase {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Application` and `MyConfig` and 2 more type(s) with 5 methods.
+- Uses generics.
+
 ---
 
 ## Real-World Scenarios
@@ -168,6 +184,13 @@ public class MetricsAutoConfiguration {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `MetricsAutoConfiguration` with methods `prometheusCustomizer()`.
+- Uses lambda expressions.
+- Uses generics.
+
 ### Scenario 2: Database auto-configuration with multiple databases
 
 ```java
@@ -189,6 +212,11 @@ public class MultiDatabaseAutoConfiguration {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `MultiDatabaseAutoConfiguration` with methods `primaryDataSource()`, `secondaryDataSource()`.
 
 ---
 

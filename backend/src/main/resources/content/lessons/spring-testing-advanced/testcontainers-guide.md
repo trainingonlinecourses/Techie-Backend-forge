@@ -41,6 +41,11 @@ class CourseRepositoryTest {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `CourseRepositoryTest`.
+
 `@ServiceConnection` (Spring Boot 3.1+) auto-wires the container's connection into the context — no `spring.datasource.url` properties needed.
 
 ## Multiple Dependencies
@@ -67,6 +72,12 @@ class FullStackIntegrationTest {
     @Autowired KafkaTemplate<String, String> kafkaTemplate;
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `FullStackIntegrationTest`.
+- Uses generics.
 
 One context, three real dependencies, everything wired. Tests exercise the exact stack production runs.
 

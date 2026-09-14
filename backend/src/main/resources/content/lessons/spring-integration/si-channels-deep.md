@@ -37,6 +37,11 @@ MessageChannel ordersChannel() {
 **Why it's the default:** transactions and error handling stay in the caller's thread. If the flow must be *transactional* ("consume this JMS message, transform it, and write to the DB — all-or-nothing"), the direct channel is the vehicle: the whole chain runs inside the consuming transaction. The backpressure is natural: a slow consumer blocks the producer. **The caveat:** the synchronous chain runs *in your request thread* — a long pipeline (file processing, slow API calls) ties up the thread; that's when a queue or an async poller is the right switch.
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses switch branching.
+
 ## QueueChannel: The Async Buffer
 
 ```java
@@ -100,6 +105,11 @@ MessageChannel slowTasks() {
     return MessageChannels.executor(Executors.newFixedThreadPool(4)).get();
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
 
 **The family portrait:** direct (sync, transactional), queue (async, buffered, bounded), executor (async, thread-pooled), priority (async, ordered by priority), rendezvous (blocking hand-off), and publish-subscribe (broadcast). Most integrations need one of the first three plus pub-sub for fan-out — the others are the specialized tools.
 

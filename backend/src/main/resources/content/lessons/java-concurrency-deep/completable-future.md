@@ -36,6 +36,12 @@ List<Order> orders = getOrders(id);
 String recommendations = getRecs(id);
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses the `List` collection.
+- Uses generics.
+
 With CompletableFuture:
 // Parallel — all run simultaneously
 CompletableFuture<String> userF = CompletableFuture.supplyAsync(() -> getUser(id));
@@ -46,6 +52,11 @@ CompletableFuture<String> recsF = CompletableFuture.supplyAsync(() -> getRecs(id
 // Wait for all — total time: 300ms (the slowest one)
 CompletableFuture.allOf(userF, ordersF, recsF).join();
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses asynchronous composition with `CompletableFuture`.
 
 ### Creating CompletableFutures
 
@@ -71,6 +82,13 @@ CompletableFuture<String> future2 = CompletableFuture.supplyAsync(() -> {
     return fetchFromDatabase();
 }, customExecutor);
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses asynchronous composition with `CompletableFuture`.
+- Uses lambda expressions.
+- Uses generics.
 
 ### Chaining Operations
 
@@ -107,6 +125,13 @@ CompletableFuture<Void> cleanupFuture = CompletableFuture
     .thenRun(() -> cleanupTempFiles());
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses asynchronous composition with `CompletableFuture`.
+- Uses lambda expressions.
+- Uses generics.
+
 ### Combining Multiple Futures
 
 
@@ -139,6 +164,13 @@ CompletableFuture<Object> first = CompletableFuture.anyOf(
 );
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses asynchronous composition with `CompletableFuture`.
+- Uses lambda expressions.
+- Uses generics.
+
 ### Exception Handling
 
 // exceptionally — handle errors, return fallback
@@ -152,6 +184,12 @@ CompletableFuture<String> safe = CompletableFuture
 
 // handle — handle both success and failure
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+
 CompletableFuture<String> handled = CompletableFuture
     .supplyAsync(() -> riskyOperation())
 ```java
@@ -165,6 +203,13 @@ CompletableFuture<String> handled = CompletableFuture
 
 // exceptionallyCompose — try alternative on failure
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+- Uses conditionals.
+
 CompletableFuture<String> retry = CompletableFuture
     .supplyAsync(() -> primaryService.call())
     .exceptionallyCompose(ex -> 
@@ -189,6 +234,13 @@ CompletableFuture<String> withTimeout = CompletableFuture
 
 // Complete with default after timeout
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+- Uses conditionals.
+
 CompletableFuture<String> withDefault = CompletableFuture
     .supplyAsync(() -> slowOperation())
 ```java
@@ -311,6 +363,14 @@ public class FutureComposition {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `FutureComposition` with methods `fetchUserName()`, `fetchOrderSummary()`, `main()`.
+- Uses asynchronous composition with `CompletableFuture`.
+- Uses lambda expressions.
+- Uses generics.
 
 ### Key Takeaways
 

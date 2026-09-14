@@ -57,6 +57,11 @@ spec:
 **Cost**: double the infrastructure while both are live. **Database**: schema must be compatible in both directions (the DB is shared; a v2 schema change breaks v1 during the switch window). Use expand/contract migrations.
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses switch branching.
+
 ## Canary
 
 Ship the new version to a small slice of traffic, watch metrics, then ramp:
@@ -129,6 +134,12 @@ public class CheckoutService {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `FeatureFlags` and `CheckoutService` with methods `isEnabled()`, `checkout()`.
+- Uses conditionals.
+
 **The killer combination**: ship `checkout-v2` dark, run it for your own team (internal flag), ramp to 1% (canary by flag), then 100% — *without a redeploy*. Rollback is flipping a boolean.
 
 ### Kill Switches
@@ -140,6 +151,11 @@ if (flags.killSwitch("payments")) {
     throw new PaymentsUnavailableException();
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses conditionals.
 
 When the payment gateway misbehaves, ops flips one flag instead of redeploying.
 

@@ -10,12 +10,14 @@ import JavaIdeEditor from '../components/JavaIdeEditor.jsx';
 import KeyboardShortcuts from '../components/KeyboardShortcuts.jsx';
 import { SkeletonLesson } from '../components/Skeleton.jsx';
 import { trackManualNavigation, isRecommendedVisit } from '../lib/analytics.js';
+import { analyzePrereqs, prereqWarning, setGateOpenFor } from '../lib/prereqs.js';
+import { nextUpLesson } from '../lib/nextUp.js';
 
 export default function LessonPage() {
   const { lessonId } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { progress, toggle } = useProgress();
+  const { progress, toggle, ready } = useProgress();
   const [lesson, setLesson] = useState(null);
   const [curriculum, setCurriculum] = useState(null);
   const [error, setError] = useState(null);
@@ -23,6 +25,7 @@ export default function LessonPage() {
   const [showTop, setShowTop] = useState(false);
   const [activeToc, setActiveToc] = useState(null);
   const [toast, setToast] = useState(null);
+  const [gateOpen, setGateOpen] = useState(false); // per-visit "show anyway" override
   const articleRef = useRef(null);
 
   useEffect(() => {
@@ -83,12 +86,39 @@ export default function LessonPage() {
     return out;
   }, [lesson]);
 
+  // Prerequisite analysis: explicit `requires:` tags + curriculum-path context,
+  // compared against the learner's completed lessons. Guests get the chips but
+  // never a banner (no progress to be ahead/behind of); signed-in learners get
+  // warn/gate once progress has actually loaded (progress.ready).
+  const analysis = useMemo(() => {
+    const l0 = lesson?.lesson;
+    if (!l0) return null;
+    const modLessons = curriculum?.find((m) => m.module.id === l0.moduleId)?.lessons;
+    const ids = Array.isArray(modLessons) ? modLessons.map((x) => x.id) : null;
+    return analyzePrereqs(l0, progress, ids);
+  }, [lesson, curriculum, progress]);
+  const [bannerDismissed, setBannerDismissed] = useState(false);
+  useEffect(() => {
+    setGateOpen(false); // navigating to another lesson re-arms the gate
+    setBannerDismissed(false);
+  }, [lessonId]);
+  const gateLocked = !!(analysis?.gateLocked && !gateOpen);
+  const showBanner = !!user && ready && analysis && !bannerDismissed &&
+    (gateLocked || (analysis.severity === 'warn' && analysis.missing.length > 0));
+
   const nav = useMemo(() => {
     if (!Array.isArray(curriculum) || !lesson) return { prev: null, next: null };
     const all = curriculum.flatMap((m) => m.lessons);
     const idx = all.findIndex((l) => l.id === lesson.lesson.id);
     return { prev: idx > 0 ? all[idx - 1] : null, next: idx >= 0 && idx < all.length - 1 ? all[idx + 1] : null };
   }, [curriculum, lesson]);
+
+  // "Next up" recommendation: the pedagogically next lesson (module-scoped,
+  // rolling into the next module's first lesson at module end).
+  const nextUp = useMemo(
+    () => nextUpLesson(curriculum, lesson?.lesson?.id, progress),
+    [curriculum, lesson, progress]
+  );
 
   function flash(msg) {
     setToast(msg);
@@ -132,6 +162,7 @@ export default function LessonPage() {
 
   const l = lesson.lesson;
   const completed = !!progress[l.id];
+  const prereqDone = (id) => !!progress[id];
 
   return (
     <div className="page lesson">
@@ -154,6 +185,23 @@ export default function LessonPage() {
         </div>
         <h1 className="ptitle">{l.title}</h1>
         <p className="lede">{l.summary}</p>
+
+        {l.prereqs?.length > 0 && (
+          <div className="prereq-row" data-testid="prereq-row">
+            <span className="prereq-label">Builds on</span>
+            {l.prereqs.map((p) => (
+              <Link
+                key={p.id}
+                to={`/lessons/${p.id}`}
+                className={`prereq-chip ${user && prereqDone(p.id) ? 'done' : ''}`}
+                title={p.moduleTitle ? `${p.moduleTitle} · lesson ${p.order}` : p.title}
+              >
+                {user && prereqDone(p.id) ? '✓ ' : ''}{p.title}
+              </Link>
+            ))}
+          </div>
+        )}
+
         <AudioPlayer body={lesson.body} title={l.title} />
         <div className="head-actions">
           {user ? (
@@ -173,8 +221,51 @@ export default function LessonPage() {
         </div>
       </div>
 
+      {showBanner && (
+        <div className={`prereq-banner ${gateLocked ? 'gate' : 'warn'}`} role="alert" data-testid="prereq-banner">
+          <div className="pb-icon">{gateLocked ? '🔒' : '⚠️'}</div>
+          <div className="pb-text">
+            <div className="pb-title">{gateLocked ? 'Slow down — you’re skipping ahead' : 'Heads up — prerequisites pending'}</div>
+            <p>{prereqWarning(analysis)}</p>
+            <div className="pb-missing">
+              {analysis.missing.slice(0, 3).map((p) => (
+                <Link key={p.id} to={`/lessons/${p.id}`} className="pb-link">{p.title} →</Link>
+              ))}
+            </div>
+          </div>
+          <div className="pb-actions">
+            {analysis.missing[0] && (
+              <Link to={`/lessons/${analysis.missing[0].id}`} className="btn primary">
+                Start with “{analysis.missing[0].title}”
+              </Link>
+            )}
+            {gateLocked ? (
+              <button
+                className="btn ghost"
+                onClick={() => {
+                  setGateOpenFor(l.id, true);
+                  setGateOpen(true);
+                }}
+              >
+                Show this lesson anyway
+              </button>
+            ) : (
+              <button className="btn ghost" onClick={() => setBannerDismissed(true)}>
+                Continue anyway
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+      {analysis?.severity === 'gate' && gateOpen && (
+        <div className="prereq-banner warn slim" role="status">
+          <div className="pb-icon">👀</div>
+          <div className="pb-text"><p>Viewing ahead-of-track content for this visit — prerequisites still show as pending.</p></div>
+        </div>
+      )}
+
       <div className="lesson-layout">
-        <article className="lesson-body" ref={articleRef}>
+        <article className={`lesson-body ${gateLocked ? 'prereq-locked' : ''}`} ref={articleRef}>
           <Markdown>{lesson.body}</Markdown>
 
           {/* Interactive Quiz */}
@@ -225,6 +316,20 @@ export default function LessonPage() {
                 </div>
               )}
             </div>
+          )}
+
+          {nextUp && (
+            <Link to={`/lessons/${nextUp.id}`} className="nextup-card" data-testid="nextup">
+              <span className="nu-eyebrow">
+                {nextUp.wrapped ? `NEXT UP · ${nextUp.moduleTitle}` : 'NEXT UP'}
+              </span>
+              <span className="nu-title">{nextUp.title}</span>
+              <span className="nu-meta">
+                Lesson {nextUp.order} · ⏱ {nextUp.minutes} min
+                {nextUp.completed ? ' · ✓ already completed' : ''}
+              </span>
+              <span className="nu-go">{nextUp.completed ? 'Review' : 'Continue'} →</span>
+            </Link>
           )}
 
           <div className="pn">

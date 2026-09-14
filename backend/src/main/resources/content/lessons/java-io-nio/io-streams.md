@@ -76,6 +76,13 @@ public class StreamDemo {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `StreamDemo` with methods `main()`.
+- Uses loops.
+- When run, it prints: “read ”, “line: ”
+
 ### Walking Through Each Part
 
 **Part 1 — writing with decoration.** `new FileOutputStream("out.bin")` is the raw byte sink to the file. Wrapping it in `BufferedOutputStream` adds an internal buffer (8 KB by default): the `write` calls land in the buffer, and the buffer is flushed to disk in bigger, fewer system calls. **Decorating** — wrapping one stream in another to add behavior — is the core design pattern of `java.io` (it's the Decorator pattern).
@@ -87,6 +94,11 @@ byte[] buffer = new byte[4096];
 int bytesRead;
 while ((bytesRead = in.read(buffer)) != -1) { ... }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses loops.
 
 `read(buffer)` fills up to `buffer.length` bytes and returns how many it actually got — which can be **less than requested** (a stream delivers whatever is available). `-1` means end of stream. Always loop on the *returned count*, never assume the buffer is full. This pattern handles files, sockets, and pipes identically.
 
@@ -108,6 +120,12 @@ OutputStream out = null;
 try { out = ...; ... } finally { if (out != null) out.close(); }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses exception handling with try/catch.
+- Uses conditionals.
+
 ## The Decorator Pattern in Practice
 
 Streams compose, and the composition is the feature:
@@ -128,6 +146,12 @@ public class Main {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- Uses loops.
 
 Reading the chain **from the inside out**: `FileInputStream` gets bytes from the file → `GZIPInputStream` decompresses them → `InputStreamReader` decodes bytes to chars (UTF-8) → `BufferedReader` groups chars into lines. Each layer adds one behavior. This is why stream-based code is so flexible — and why it looks nested.
 

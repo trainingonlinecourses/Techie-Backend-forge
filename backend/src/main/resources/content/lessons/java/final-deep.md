@@ -35,6 +35,13 @@ public record Money(BigDecimal amount, Currency currency) {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Money`.
+- Uses a `record`.
+- Uses `BigDecimal` for exact decimal math.
+
 Even pre-Java-16, the pattern was:
 
 ```java
@@ -51,6 +58,12 @@ public class Money {
     public Currency currency() { return currency; }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Money` with methods `amount()`, `currency()`.
+- Uses `BigDecimal` for exact decimal math.
 
 If `amount` were not `final`, a thread reading `money.amount()` from a different thread could see `null` even after the constructor completed — the JMM has no obligation to reorder the writes for visibility.
 
@@ -121,6 +134,12 @@ public final class UserId {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `UserId` with 4 methods.
+- Uses conditionals.
+
 **Why `final`?** Because `equals`/`hashCode`/`toString` are defined on the assumption that `value` never changes and no subclass alters behavior. If someone extended `UserId` and added a field, `equals` might not compare it, leading to hidden bugs in hash maps.
 
 ## `final` in lambdas — effectively final
@@ -151,6 +170,12 @@ public class Main {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- Uses lambda expressions.
 
 This is because the lambda captures a *copy* of the value. If the variable could be reassigned, the lambda and the surrounding code would see different values — a source of subtle bugs.
 

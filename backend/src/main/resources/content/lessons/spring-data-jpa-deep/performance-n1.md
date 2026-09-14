@@ -26,6 +26,11 @@ for (Course c : courses) {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses loops.
+
 ```sql
 -- What actually hits the DB:
 SELECT * FROM courses;                    -- 1 query (N courses)
@@ -106,6 +111,11 @@ For read-heavy, rarely-changing data, cache the entities:
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Course { ... }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Course`.
 
 ```yaml
 spring:

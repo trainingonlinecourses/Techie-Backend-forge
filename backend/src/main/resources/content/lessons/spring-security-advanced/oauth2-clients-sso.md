@@ -69,6 +69,12 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `CustomOAuth2UserService` with methods `loadUser()`.
+- Uses inheritance.
+
 http.oauth2Login(oauth -> oauth
     .userInfoEndpoint(ui -> ui.userService(customService))
 ```java

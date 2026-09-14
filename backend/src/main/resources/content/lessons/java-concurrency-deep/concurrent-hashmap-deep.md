@@ -46,6 +46,13 @@ if (!cache.containsKey("key")) {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses the `Map` collection.
+- Uses conditionals.
+- Uses generics.
+
 ---
 
 ## ConcurrentHashMap Basics
@@ -80,6 +87,12 @@ cache.remove("key");
 cache.replace("key", 42, 100);
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses the `Map` collection.
+- Uses generics.
+
 ### Atomic Compound Operations
 
 
@@ -107,6 +120,13 @@ cache.compute("counter", (key, value) -> {
 
 cache.merge("total", 100, Long::sum);
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+- Uses method references.
+- Uses the java.time date-time API.
 
 ---
 
@@ -142,6 +162,12 @@ User user = users.get("alice");
 
 users.put("bob", new User("Bob"));
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses the `Map` collection.
+- Uses generics.
 
 ---
 
@@ -251,6 +277,14 @@ public class ConnectionPool {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `ConnectionPool` with methods `acquire()`, `release()`, `cleanupStale()`.
+- Uses lambda expressions.
+- Uses the `Map` collection.
+- Uses conditionals.
 
 ---
 

@@ -94,6 +94,12 @@ public final class Triangle extends Shape {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Shape` and `Circle` and 2 more type(s) with methods `area()`.
+- Uses inheritance.
+
 ### The Three Modifiers for Permitted Subclasses
 
 ```java
@@ -107,6 +113,13 @@ public sealed class Polygon extends Shape
 // 3. NON-SEALED — removes restrictions (someone else can extend)
 public non-sealed class CustomShape extends Shape { ... }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Circle` and `Polygon` and 1 more type(s).
+- Uses inheritance.
+- Uses conditionals.
 
 ### Exhaustive Pattern Matching
 
@@ -127,6 +140,13 @@ public class ShapePrinter {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `ShapePrinter` with methods `describe()`.
+- Uses lambda expressions.
+- Uses switch branching.
+
 ### In the Same Package or Module
 
 By default, permitted subclasses must be in the **same package** or **same module**:
@@ -138,6 +158,12 @@ public sealed class Shape permits Circle, Rectangle { ... }
 // Circle and Rectangle must be in:
 // 1. Same package (com.example.shapes), OR
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Shape`.
+
 // 2. Same module (if module system is used)
 
 You can override this with `permits` in a different compilation unit (Java 17 relaxes this).
@@ -176,6 +202,14 @@ public record Add(Expr left, Expr right) implements Expr {}
 public record Multiply(Expr left, Expr right) implements Expr {}
 public record Negate(Expr operand) implements Expr {}
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `DomainEvent` and `OrderCreated` and 8 more type(s).
+- Uses a `record`.
+- Uses an interface.
+- Uses interface implementation.
 
 ### Line-by-Line Code Explanation
 
@@ -230,6 +264,14 @@ static String describe(Payment payment) {
     };
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Payment` and `CreditCardPayment` with methods `transactionId()`, `describe()`.
+- Uses lambda expressions.
+- Uses inheritance.
+- Uses switch branching.
 
 ### Key Takeaways
 

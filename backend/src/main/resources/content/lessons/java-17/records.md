@@ -88,6 +88,13 @@ public record Employee(
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Employee` with methods `isHighEarner()`, `of()`.
+- Uses a `record`.
+- Uses conditionals.
+
 ---
 
 ## Line-by-Line Walkthrough
@@ -197,6 +204,14 @@ public class RecordsDemo {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `RecordsDemo` and `Coordinate` and 5 more type(s) with 4 methods.
+- Uses the Streams API to process data declaratively.
+- Uses exception handling with try/catch.
+- Uses method references.
+
 ---
 
 ## Real-World Scenarios
@@ -210,6 +225,13 @@ public class RecordsDemo {
 record CreateUserRequest(String name, String email, String password) {}
 record UserResponse(String id, String name, String email, Instant createdAt) {}
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `CreateUserRequest` and `UserResponse`.
+- Uses a `record`.
+
 record ApiResponse<T>(boolean success, String message, T data) {}
 
 // Usage
@@ -241,6 +263,13 @@ Money price = Money.usd(new BigDecimal("29.99"));
 // price.amount().add(...) would need reassignment, which isn't possible
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Money` with methods `convert()`, `usd()`.
+- Uses a `record`.
+- Uses `BigDecimal` for exact decimal math.
+
 ### Scenario 3: Event sourcing
 
 record OrderCreated(String orderId, String customerId, List<String> items, Instant timestamp) {}
@@ -260,6 +289,14 @@ String describeEvent(OrderEvent event) {
     };
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderShipped` and `OrderCancelled` and 1 more type(s).
+- Uses lambda expressions.
+- Uses a `record`.
+- Uses an interface.
 
 ---
 

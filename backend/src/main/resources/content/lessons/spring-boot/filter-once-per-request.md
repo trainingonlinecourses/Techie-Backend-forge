@@ -176,6 +176,13 @@ public class RateLimitFilter extends OncePerRequestFilter {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `RateLimitFilter` with methods `doFilterInternal()`.
+- Uses inheritance.
+- Uses conditionals.
+
 ## Filter registration ordering
 
 Spring Boot auto-registers `Filter` beans with a default order. For explicit control:

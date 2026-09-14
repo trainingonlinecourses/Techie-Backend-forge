@@ -54,6 +54,11 @@ if (transfers.existsByIdempotencyKey(key)) throw new DuplicateTransferException(
 // or: unique constraint on the key, retries return the original result
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses conditionals.
+
 ## Inter-service security
 
 | Layer | Standard |

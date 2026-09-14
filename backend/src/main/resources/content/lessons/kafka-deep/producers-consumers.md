@@ -78,6 +78,13 @@ try (KafkaProducer<String, String> producer = new KafkaProducer<>(props)) {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+- Uses conditionals.
+- Uses generics.
+
 The `send` is asynchronous; the `get()` (or the callback) is where success or failure surfaces. Production code never ignores the result of `send` for critical data — silent send failures are lost events.
 
 ## Consumer Configuration: The Offset Dial

@@ -75,6 +75,14 @@ public interface UpdateGroup {}
 public record UserRequest(
     @NotBlank(groups = CreateGroup.class)   // required only on create
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `CreateGroup` and `UpdateGroup` and 1 more type(s).
+- Uses a `record`.
+- Uses an interface.
+
     String id,
 
 ```java
@@ -125,6 +133,14 @@ public record Address(
     @NotBlank String zipCode
 ) {}
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `OrderRequest` and `OrderLineItem` and 1 more type(s).
+- Uses a `record`.
+- Uses the `List` collection.
+- Uses `BigDecimal` for exact decimal math.
 
 When `OrderRequest` is validated, Spring validates `shippingAddress` and every item in `items` — recursively.
 
@@ -186,6 +202,14 @@ public class ValidPaymentRequestValidator implements ConstraintValidator<ValidPa
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `ValidPayment` and `ValidPaymentRequestValidator` with methods `isValid()`.
+- Uses an interface.
+- Uses inheritance.
+- Uses interface implementation.
 
 ### Scenario 3: validation error response contract
 

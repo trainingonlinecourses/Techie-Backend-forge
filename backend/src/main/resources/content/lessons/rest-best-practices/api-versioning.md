@@ -40,6 +40,11 @@ public class CourseV2Controller { ... }
 **Verdict**: the pragmatic default for most teams.
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `CourseV1Controller` and `CourseV2Controller`.
+
 ## Strategy 2: Query Parameter Versioning
 
 ```
@@ -58,6 +63,13 @@ public CourseDto list(@RequestParam(defaultValue = "1") int version) {
 
 **Pros**: trivial to implement, single URL.
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+- Uses switch branching.
+
 **Cons**: pollutes every request; caches treat all versions as one URL (version must join the cache key); easy to forget `version` in a URL and silently get v1.
 
 ```java

@@ -104,6 +104,14 @@ public class ReactiveCourseClient {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `ReactiveCourseClient` with 4 methods.
+- Uses lambda expressions.
+- Uses method references.
+- Uses the java.time date-time API.
+
 ### Walking Through Each Part
 
 **Part 1 — `bodyToMono`.** The call returns immediately with a `Mono<Course>`. The server call hasn't happened yet — it starts when something subscribes. The *shape* matches the expected response: one object → `Mono`.
@@ -135,6 +143,11 @@ Course course = webClient.get().uri("/api/courses/1").retrieve()
 ```java
         .block(Duration.ofSeconds(5));   // wait (bounded) for the result
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses the java.time date-time API.
 
 Never call `block()` inside a reactive pipeline (it blocks an event-loop thread — the exact anti-pattern). Use it only at *imperative boundaries* (scheduled jobs, `@PostConstruct`, plain tests).
 

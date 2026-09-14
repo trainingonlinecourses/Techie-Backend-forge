@@ -62,6 +62,11 @@ try {
 // alert on: p95 latency, error rate, cost/day
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Uses exception handling with try/catch.
+
 ## Evaluation: does it actually answer well?
 
 Quality isn't a metric endpoint — it's a **test discipline**:
@@ -106,6 +111,11 @@ public final class Prompts {
     public static final String SUPPORT_V2 = "You are... (revised)";
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Prompts`.
 
 Version prompts, log which version produced which answer, and A/B before shipping a prompt change.
 

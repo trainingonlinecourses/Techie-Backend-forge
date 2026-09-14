@@ -47,6 +47,14 @@ public class SchedulingConfig implements SchedulingConfigurer {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `SchedulingConfig` with methods `configureSchedulers()`, `taskScheduler()`.
+- Uses manual threading.
+- Uses lambda expressions.
+- Uses interface implementation.
+
 ## @Scheduled timing strategies
 
 
@@ -194,6 +202,11 @@ public class CacheRefreshScheduler {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `CacheRefreshScheduler` with methods `refreshCatalog()`.
+
 ### Scenario 2: retry failed jobs every 30 minutes
 
 @Component
@@ -229,6 +242,12 @@ public class CleanupScheduler {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `CleanupScheduler` with methods `cleanupExpiredSessions()`.
+- Uses the java.time date-time API.
 
 ## Common mistakes
 

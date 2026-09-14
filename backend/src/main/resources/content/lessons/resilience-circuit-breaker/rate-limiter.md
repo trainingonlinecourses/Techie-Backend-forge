@@ -96,6 +96,13 @@ public class AiQuotaService {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `AiQuotaService` with methods `ask()`.
+- Uses lambda expressions.
+- Uses the java.time date-time API.
+
 ### Walking Through Each Part
 
 **`limitForPeriod(10)` + `limitRefreshPeriod(1 min)`** — 10 tokens per minute (a token bucket internally). The user gets 10 AI calls per minute; bursts up to the bucket capacity pass instantly.

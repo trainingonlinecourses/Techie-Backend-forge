@@ -61,6 +61,13 @@ public class Main {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- Uses method references.
+- Uses sorting with a `Comparator`.
+
 ### Searching
 
 
@@ -93,6 +100,13 @@ public class Main {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- Uses method references.
+- Uses sorting with a `Comparator`.
+
 ### Filling
 
 
@@ -119,6 +133,11 @@ public class Main {
     }
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
 
 ### Comparing and Copying
 
@@ -173,6 +192,14 @@ public class Main {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `Main` with methods `main()`.
+- Uses the Streams API to process data declaratively.
+- Uses lambda expressions.
+- Uses the `List` collection.
+
 ---
 
 ## parallelSort vs sort
@@ -195,6 +222,12 @@ if (data.length < 8192) {
     Arrays.parallelSort(data); // Faster for large arrays (uses all CPU cores)
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses sorting with a `Comparator`.
+- Uses conditionals.
 
 ---
 

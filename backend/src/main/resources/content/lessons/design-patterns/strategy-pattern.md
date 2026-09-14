@@ -105,6 +105,13 @@ public class StrategyDemo {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `DiscountStrategy` and `MemberDiscount` and 4 more type(s) with methods `apply()`, `tax()`, `main()`.
+- Uses an interface.
+- Uses interface implementation.
+
 ### Walking Through Each Part
 
 **The interface** — `DiscountStrategy` is the *contract*: "any rule takes a base price and returns a discounted price." The context doesn't know (or care) which rule it's talking to.
@@ -124,6 +131,11 @@ checkout.setStrategy(p -> p * 0.80);              // anonymous rule
 // or from a config value:
 checkout.setStrategy(price -> price * (1 - coupon.rate()));
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
 
 For simple rules, the interface can even be a functional interface and callers supply lambdas. For *complex* multi-method strategies, keep real classes.
 

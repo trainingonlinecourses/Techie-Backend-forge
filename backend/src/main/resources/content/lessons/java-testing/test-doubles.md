@@ -261,6 +261,13 @@ class PaymentServiceTest {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `PaymentServiceTest`.
+- Uses lambda expressions.
+- Uses `BigDecimal` for exact decimal math.
+
 ### Scenario 2: Argument Captor (Capture and Inspect)
 
 @Test

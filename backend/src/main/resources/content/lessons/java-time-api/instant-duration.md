@@ -88,6 +88,13 @@ public class InstantDurationDemo {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `InstantDurationDemo` with methods `main()`.
+- Uses the java.time date-time API.
+- When run, it prints: “elapsed ms: ”, “epoch seconds: ” …
+
 ### Walking Through Each Part
 
 **Part 1 — measuring.** `Instant.now()` reads the system clock (UTC-based). `Duration.between(start, end)` is the gap. `toMillis()` gives it in milliseconds. Note `Instant.now()` has nanosecond precision when the platform clock supports it — use it instead of `System.currentTimeMillis()` when you need sub-millisecond measurement.

@@ -61,6 +61,11 @@ public class CourseMetadata {
 }
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `CourseMetadata`.
+
 ```sql
 INSERT INTO course_metadata (course_id, attributes)
 VALUES (1, '{"tags": ["java", "spring"], "rating": 4.8, "instructor": {"name": "Ada"}}');
@@ -156,6 +161,11 @@ public class Course {
     private String metadata;            // jsonb: flexible extras
 }
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `Course`.
 
 ```sql
 -- Hybrid query: indexed column + jsonb filter

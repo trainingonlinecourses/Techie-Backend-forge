@@ -84,6 +84,11 @@ public class PaymentService {
 // first hit the transaction interceptor, then your real method.
 ```
 
+<!-- why -->
+**What this code shows:**
+
+- Defines `PaymentService` with methods `charge()`.
+
 That's why self-invocation (`this.someTransactionalMethod()`) bypasses transactions — the proxy isn't in the path; the real object is.
 
 ## When you need to write your own

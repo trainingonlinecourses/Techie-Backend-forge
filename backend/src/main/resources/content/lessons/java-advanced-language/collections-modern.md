@@ -73,6 +73,12 @@ List<String> titles = courses.stream()
 
 // Java 11+: toArray(IntFunction)
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses the Streams API to process data declaratively.
+
 String[] arr = titles.stream().toArray(String[]::new);
 
 `Stream.toList()` returns an immutable list — a subtle behavioral change from `Collectors.toList()` (mutable). Prefer it unless you need mutability.
@@ -147,6 +153,13 @@ public record CourseSummary(Long id, String title, int minutes) {
 
 // Mapping collections is now trivial:
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `CourseSummary` with methods `from()`.
+- Uses a `record`.
+
 List<CourseSummary> summaries = courses.stream()
     .map(CourseSummary::from)
 ```java
@@ -180,6 +193,12 @@ void immutableCollectionsRejectMutation() {
 @Test
 void copyOfIsolatesFromSource() {
 ```
+
+<!-- why -->
+**What this code shows:**
+
+- Uses lambda expressions.
+
     List<String> source = new ArrayList<>(List.of("a"));
     List<String> copy = List.copyOf(source);
     source.add("b");
