@@ -6,6 +6,39 @@ export const TOKEN_KEY = 'backendforge_token';
 // the deployed backend (e.g. https://your-backend-host.com/api) during the build.
 export const api = axios.create({ baseURL: import.meta.env.VITE_API_URL || '/api' });
 
+// ---- Render cold-start resilience -----------------------------------------
+// The free-tier backend sleeps after ~15 idle minutes and takes 30-60s to wake.
+// Without retry, a learner who opens the site during a cold start sees skeleton
+// pages and dead logins — the app looks broken even though it works. Idempotent
+// GETs therefore retry through the wake-up (the long first attempt IS the wake
+// trigger; Render queues the request and serves it once booted).
+const isColdStartError = (error) =>
+  !error.response && // network failure / timeout / abort — never an HTTP error status
+  (error.code === 'ECONNABORTED' || error.code === 'ERR_NETWORK' || error.code === 'ETIMEDOUT' || !error.code);
+const WAKE_RETRIES = 2;
+const WAKE_RETRY_DELAY_MS = 4000;
+
+api.interceptors.response.use(
+  undefined,
+  (error) => {
+    const config = error.config || {};
+    const retryable =
+      config.__wakeRetried === undefined && // retry only once per request chain
+      isColdStartError(error) &&
+      (config.method || 'get').toLowerCase() === 'get' &&
+      !config.url?.includes('/auth/'); // never blind-retry auth endpoints
+    if (retryable) {
+      config.__wakeRetried = true;
+      return new Promise((resolve, reject) => {
+        setTimeout(() => {
+          api.request(config).then(resolve, reject);
+        }, WAKE_RETRY_DELAY_MS);
+      });
+    }
+    return Promise.reject(error);
+  }
+);
+
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem(TOKEN_KEY);
   if (token) config.headers.Authorization = `Bearer ${token}`;

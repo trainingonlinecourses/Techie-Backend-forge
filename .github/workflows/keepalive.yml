@@ -8,8 +8,19 @@ name: Keep Render backend awake
 # the same URL — see README "Render keep-alive" section.
 on:
   schedule:
-    - cron: '*/5 * * * *'
+    # GitHub throttles scheduled workflows under load — a single */5 cron ran
+    # hours apart in practice (19:10 → 13:58 → 07:06), letting Render sleep and
+    # making the site look broken to first visitors. Several offset crons give
+    # more chances per hour; whichever slots survive still keep the instance warm.
+    - cron: '2,17,32,47 * * * *'
+    - cron: '7,22,37,52 * * * *'
+    - cron: '12,27,42,57 * * * *'
   workflow_dispatch: {}
+
+# A stalled keep-alive run must never block the next one.
+concurrency:
+  group: keepalive
+  cancel-in-progress: true
 
 jobs:
   ping:

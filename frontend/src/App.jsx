@@ -38,14 +38,13 @@ export default function App() {
   useEffect(() => {
     let cancelled = false;
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 8000);
+    // Patient probe: a cold-starting Render instance can take 45-60s to answer.
+    // 8s gave up mid-wake-up and made the site look broken; the wake-and-retry
+    // interceptor only retries idempotent GETs, so give the probe one patient
+    // attempt through the wake-up window.
+    const timer = setTimeout(() => controller.abort(), 75000);
     api
-      .get('/content/stats', { signal: controller.signal, timeout: 8000 })
-      .then((res) => {
-        if (cancelled) return;
-        if (typeof res.data !== 'object' || res.data === null) throw new Error('not an API');
-        setApiDown(false);
-      })
+      .get('/content/stats', { signal: controller.signal, timeout: 75000 })
       .catch((err) => {
         if (cancelled) return;
         // A network error or timeout in development (e.g. the Render free tier is
