@@ -122,8 +122,11 @@ public class AiChatService {
         if (!StringUtils.hasText(apiKey) && !StringUtils.hasText(baseUrl)) {
             return answer(message, user);
         }
+        // Validate BEFORE the try: a rejected endpoint must surface as a 400 to the
+        // caller, not silently fall back to the local assistant as if nothing happened.
+        String safeBaseUrl = validateUserEndpoint(baseUrl);
         try {
-            return answerWithUserLlm(message, user, apiKey, baseUrl, model);
+            return answerWithUserLlm(message, user, apiKey, safeBaseUrl, model);
         } catch (Exception e) {
             log.warn("LLM call failed (user-provided key), falling back to local assistant: {}",
                     e.getMessage());
@@ -159,7 +162,7 @@ public class AiChatService {
     private ChatAnswer answerWithUserLlm(String message, User user, String apiKey, String baseUrl, String model) {
         ChatClient client = buildClient(
                 StringUtils.hasText(apiKey) ? apiKey : "keyless-endpoint",
-                StringUtils.hasText(baseUrl) ? baseUrl : null,
+                validateUserEndpoint(baseUrl),
                 StringUtils.hasText(model) ? model : props.openai().model());
         String response = runPrompt(client, message);
         List<Source> sources = content.search(message).stream().limit(5)
@@ -168,6 +171,40 @@ public class AiChatService {
         String label = StringUtils.hasText(baseUrl) ? "user-endpoint" : "user-key";
         return new ChatAnswer(response, sources,
                 StringUtils.hasText(model) ? model : props.openai().model(), label);
+    }
+
+    /**
+     * SSRF guard for the "bring your own endpoint" feature. The base URL arrives from
+     * the browser; without validation an attacker could point the server at cloud
+     * metadata (169.254.169.254), localhost services, or private network ranges and
+     * read responses back through chat errors. Only public HTTPS endpoints pass.
+     */
+    private String validateUserEndpoint(String baseUrl) {
+        if (!StringUtils.hasText(baseUrl)) return null;
+        URI uri;
+        try {
+            uri = URI.create(baseUrl.trim());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid endpoint URL");
+        }
+        String host = uri.getHost();
+        if (host == null || host.isBlank()) {
+            throw new IllegalArgumentException("Endpoint URL has no host");
+        }
+        if (!"https".equalsIgnoreCase(uri.getScheme())) {
+            throw new IllegalArgumentException("Endpoint must use HTTPS");
+        }
+        String h = host.toLowerCase();
+        if (h.equals("localhost") || h.endsWith(".localhost") || h.equals("0.0.0.0")
+                || h.endsWith(".local") || h.endsWith(".internal")) {
+            throw new IllegalArgumentException("Endpoint must be a public host");
+        }
+        if (h.matches("^10\\..*") || h.matches("^192\\.168\\..*")
+                || h.matches("^172\\.(1[6-9]|2\\d|3[01])\\..*")
+                || h.matches("^127\\..*") || h.equals("169.254.169.254")) {
+            throw new IllegalArgumentException("Endpoint must not point at a private network");
+        }
+        return baseUrl.trim();
     }
 
     private ChatClient buildClient(String apiKey, String baseUrl, String model) {

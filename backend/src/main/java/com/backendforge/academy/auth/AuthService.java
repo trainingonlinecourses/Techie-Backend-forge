@@ -60,10 +60,14 @@ public class AuthService {
         try {
             var auth = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(req.username().toLowerCase(), req.password()));
-            rateLimiter.reset(clientIp); // reset on success
+            rateLimiter.reset(clientIp); // success clears the failure window
             UserPrincipal principal = (UserPrincipal) auth.getPrincipal();
             return new AuthResponse(jwtService.issue(principal.user()), UserDto.from(principal.user()));
         } catch (BadCredentialsException e) {
+            // Count only FAILURES toward the brute-force limit — attempts that never
+            // happened (user changed their mind) or that succeeded must not push a
+            // legitimate user toward lockout.
+            rateLimiter.recordFailure(clientIp);
             // Don't reveal whether the username exists — just say credentials are wrong
             throw new BadCredentialsException("Invalid username or password");
         }

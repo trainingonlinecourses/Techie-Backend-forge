@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import { api } from './api/client';
-import { useAuth } from './context/AuthContext.jsx';
 import { useProgress } from './hooks/useProgress.js';
 import Navbar from './components/Navbar.jsx';
 import Sidebar from './components/Sidebar.jsx';
@@ -20,15 +19,9 @@ import CertificatePage from './pages/CertificatePage.jsx';
 import ProgressPage from './pages/ProgressPage.jsx';
 import TimelinePage from './pages/TimelinePage.jsx';
 import AdminReorderPage from './pages/AdminReorderPage.jsx';
+import SecureRouter from './components/SecureRouter.jsx';
 import MobileBottomNav from './components/MobileBottomNav.jsx';
 import './components/mobile.css';
-
-function Protected({ children }) {
-  const { user, loading } = useAuth();
-  if (loading) return <div className="page-loading">Loading…</div>;
-  if (!user) return <Navigate to="/login" replace />;
-  return children;
-}
 
 export default function App() {
   const { progress } = useProgress();
@@ -102,9 +95,9 @@ export default function App() {
             <Route
               path="/chat"
               element={
-                <Protected>
+                <SecureRouter>
                   <ChatPage />
-                </Protected>
+                </SecureRouter>
               }
             />
             <Route path="/login" element={<LoginPage />} />
@@ -113,8 +106,8 @@ export default function App() {
             <Route path="/certificates" element={<CertificatePage />} />
             <Route path="/certificates/verify/:code" element={<CertificatePage />} />
             <Route path="/progress" element={<ProgressPage />} />
-            <Route path="/lab" element={<LabPage />} />
-            <Route path="/admin/reorder" element={<Protected><AdminReorderPage /></Protected>} />
+            <Route path="/lab" element={<SecureRouter><LabPage /></SecureRouter>} />
+            <Route path="/admin/reorder" element={<SecureRouter><AdminReorderPage /></SecureRouter>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </main>

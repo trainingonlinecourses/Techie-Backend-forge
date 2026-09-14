@@ -83,21 +83,42 @@ public class SecurityConfig {
             .exceptionHandling(e -> e
                 .authenticationEntryPoint(entryPoint)
                 .accessDeniedHandler(deniedHandler))
-            .headers(h -> h
-                .frameOptions(f -> f.deny())                     // X-Frame-Options: DENY (no frames)
-                .httpStrictTransportSecurity(hsts -> hsts         // HSTS: force HTTPS for 1 year
+            // Security headers, written as independent statements on h — no receiver
+            // chaining between the different nested-config DSLs (their return types
+            // differ across Spring Security versions, which breaks method chains).
+            .headers(h -> {
+                h.frameOptions(f -> f.deny());                     // X-Frame-Options: DENY (no frames)
+                h.httpStrictTransportSecurity(hsts -> hsts         // HSTS: force HTTPS for 1 year
                     .includeSubDomains(true)
-                    .maxAgeInSeconds(31536000))
-                .contentTypeOptions(cto -> {})                     // X-Content-Type-Options: nosniff
-                .referrerPolicy(rp -> rp.policy(                   // Referrer-Policy: strict-origin
+                    .maxAgeInSeconds(31536000)
+                    // Unconditional: TLS terminates at the platform edge, so the
+                    // app itself never sees an HTTPS request — without this matcher
+                    // Spring would omit the header exactly where it matters.
+                    .requestMatcher(request -> true));
+                h.contentTypeOptions(cto -> {});                   // X-Content-Type-Options: nosniff
+                h.referrerPolicy(rp -> rp.policy(                  // Referrer-Policy: strict-origin
                     org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter
-                        .ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN))
-                .permissionsPolicy(pp -> pp.policy(                // Permissions-Policy: deny camera, mic, geolocation
-                    "camera=(), microphone=(), geolocation=()")))
+                        .ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN));
+                h.permissionsPolicy(pp -> pp.policy(               // Permissions-Policy: deny camera, mic, geolocation
+                    "camera=(), microphone=(), geolocation=()"));
+                // CSP: the API serves JSON (and, if something ever renders a page from
+                // this origin, that page may not load scripts/frames from anywhere).
+                h.contentSecurityPolicy(csp -> csp.policyDirectives(
+                    "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; "
+                        + "img-src 'self' data:; connect-src 'self'; font-src 'self' data:; "
+                        + "frame-ancestors 'none'; base-uri 'self'; form-action 'self'"));
+            })
             .authorizeHttpRequests(a -> a
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                .requestMatchers("/api/auth/**", "/api/content/**", "/api/labs/**",
+                .requestMatchers("/api/auth/**", "/api/content/**",
                         "/api/version", "/actuator/health", "/actuator/info", "/error").permitAll()
+                // Certificate verification is public by design (like any credential
+                // verification portal) — a code holder can confirm authenticity.
+                .requestMatchers(HttpMethod.GET, "/api/certificates/verify/*").permitAll()
+                // /api/labs is NOT public: lab sessions allocate server memory keyed by
+                // session id, so an anonymous flood could exhaust the heap (memory DoS).
+                // Quiz reads, certificates and analytics are also authenticated-only;
+                // the SPA already gates those surfaces behind sign-in.
                 .anyRequest().authenticated())
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();

@@ -1,23 +1,35 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Link, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import { errorMessage } from '../api/client';
 
 export default function LoginPage() {
-  const { login } = useAuth();
+  const { user, loading, login } = useAuth();
   const navigate = useNavigate();
-  const [username, setUsername] = useState('admin');
+  const location = useLocation();
+  // Where the learner came from (e.g. a protected page that bounced them here).
+  // After sign-in we return there instead of always dropping them at '/'.
+  const from = location.state?.from || '/';
+
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
   const [busy, setBusy] = useState(false);
+
+  // Already signed in? Then this page has nothing to do — sending the learner
+  // back to the app (instead of showing a second login form) is what makes
+  // browser Back/Forward through /login harmless.
+  if (!loading && user) {
+    return <Navigate to={from} replace />;
+  }
 
   async function submit(e) {
     e.preventDefault();
     setBusy(true);
     setError(null);
     try {
-      await login(username, password);
-      navigate('/');
+      await login(username.trim(), password);
+      navigate(from, { replace: true });
     } catch (err) {
       setError(errorMessage(err, 'Login failed'));
     } finally {
@@ -39,12 +51,14 @@ export default function LoginPage() {
 
         {error && <div className="call warn"><div className="ct">⚠ Error</div><p>{error}</p></div>}
 
+        {/* Empty, controlled fields: the previously-prefilled 'admin' username made
+            every back/forward revisit fail with "Invalid username or password". */}
         <form onSubmit={submit} className="authform">
           <label>Username
-            <input value={username} onChange={(e) => setUsername(e.target.value)} autoComplete="username" />
+            <input value={username} onChange={(e) => setUsername(e.target.value)} autoComplete="username" autoFocus required />
           </label>
           <label>Password
-            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="current-password" />
+            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="current-password" required />
           </label>
           <button className="btn primary full" disabled={busy}>{busy ? 'Signing in…' : 'Sign in'}</button>
         </form>
@@ -54,8 +68,8 @@ export default function LoginPage() {
         </p>
         <div className="demo">
           <b>Demo accounts</b>
-          <span><code className="inline">admin / admin123</code> — full access</span>
           <span><code className="inline">learner / learner123</code> — standard user</span>
+          <span><code className="inline">admin / admin123</code> — full access</span>
         </div>
       </div>
     </div>

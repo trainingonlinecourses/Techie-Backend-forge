@@ -109,7 +109,7 @@ class AuthServiceTest {
     }
 
     @Test
-    @DisplayName("login: wrong password → BadCredentialsException (handler maps to 401)")
+    @DisplayName("login: wrong password records a FAILURE, not a mere attempt")
     void loginWrongPasswordThrows() {
         when(rateLimiter.tryAcquire("1.2.3.4")).thenReturn(true);
         when(authenticationManager.authenticate(any()))
@@ -118,7 +118,25 @@ class AuthServiceTest {
         assertThatThrownBy(() -> service.login(new LoginRequest("dave", "wrongpw"), "1.2.3.4"))
                 .isInstanceOf(BadCredentialsException.class);
 
+        verify(rateLimiter).recordFailure("1.2.3.4");
         verify(rateLimiter, never()).reset(anyString());
+    }
+
+    @Test
+    @DisplayName("login: a successful attempt consumes NO failure budget")
+    void loginSuccessNeverCountsAsFailure() {
+        User dbUser = new User();
+        dbUser.setUsername("frank");
+        dbUser.setDisplayName("Frank");
+        UserPrincipal principal = new UserPrincipal(dbUser);
+        var auth = new UsernamePasswordAuthenticationToken(principal, null, List.of());
+        when(rateLimiter.tryAcquire("9.9.9.9")).thenReturn(true);
+        when(authenticationManager.authenticate(any())).thenReturn(auth);
+        when(jwtService.issue(dbUser)).thenReturn("jwt-frank");
+
+        service.login(new LoginRequest("frank", "pw123456"), "9.9.9.9");
+
+        verify(rateLimiter, never()).recordFailure(anyString());
     }
 
     @Test
@@ -132,5 +150,7 @@ class AuthServiceTest {
                 .hasMessageContaining("120");
 
         verify(authenticationManager, never()).authenticate(any());
+        // A blocked request must not count as a failure either — the window is already closed
+        verify(rateLimiter, never()).recordFailure(anyString());
     }
 }

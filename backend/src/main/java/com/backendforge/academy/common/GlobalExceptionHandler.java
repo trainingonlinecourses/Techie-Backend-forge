@@ -58,6 +58,13 @@ public class GlobalExceptionHandler {
                 .body(ApiError.of(429, "Too Many Requests", ex.getMessage(), req.getRequestURI()));
     }
 
+    /** Guards (SSRF validation, bad slugs, malformed input) throw IllegalArgumentException → 400. */
+    @ExceptionHandler(IllegalArgumentException.class)
+    ResponseEntity<ApiError> badArgument(IllegalArgumentException ex, HttpServletRequest req) {
+        return ResponseEntity.badRequest()
+                .body(ApiError.of(400, "Bad Request", ex.getMessage(), req.getRequestURI()));
+    }
+
     @ExceptionHandler({BadCredentialsException.class, AuthenticationException.class})
     ResponseEntity<ApiError> badCredentials(Exception ex, HttpServletRequest req) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)

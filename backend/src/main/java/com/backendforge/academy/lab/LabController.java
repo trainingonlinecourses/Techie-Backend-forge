@@ -116,6 +116,12 @@ public class LabController {
         }
 
         String output = body.getOrDefault("output", "");
+        // Sessions are in-memory server-side: an unbounded output string would let
+        // one client grow the heap at will (memory DoS). Cap what we're willing to
+        // store; the client displays its own full output regardless.
+        if (output.length() > 100_000) {
+            output = output.substring(0, 100_000);
+        }
         lab.recordOutput(sessionId, output);
 
         return ResponseEntity.ok(Map.of("ok", true, "minutesRemaining", lab.minutesRemaining(sessionId)));

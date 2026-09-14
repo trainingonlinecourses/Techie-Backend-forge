@@ -2,6 +2,11 @@ server:
   # ${PORT} is injected by hosting platforms (Render, Railway, Fly.io...);
   # falls back to 8080 for local dev.
   port: ${PORT:8080}
+  # Deliberately NO forward-headers-strategy: Spring's forwarded-header filter
+  # adopts the FIRST X-Forwarded-For hop as the client address, which an attacker
+  # fully controls (rotate the header → rotate the rate-limit key). The client IP
+  # used for brute-force protection is resolved explicitly in AuthController,
+  # trusting only the proxy-APPENDED last hop.
   error:
     include-message: never
     include-stacktrace: never

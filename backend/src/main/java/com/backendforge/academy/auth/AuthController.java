@@ -32,10 +32,22 @@ public class AuthController {
         return authService.login(req, clientIp);
     }
 
+    /**
+     * Best-effort client IP for rate limiting.
+     *
+     * X-Forwarded-For is attacker-forgeable, so it is only trusted when it carries a
+     * PROXY-APPENDED chain (more than one hop): a real client sends either no XFF or
+     * one spoofed value, the trusted edge proxy then APPENDS the actual peer address,
+     * and the last hop becomes the only trustworthy entry. A single-hop XFF (the
+     * attacker claiming an IP directly) is ignored in favor of the socket address —
+     * otherwise rotating fake headers would defeat the limiter entirely. The limiter
+     * additionally sanitizes and bounds whatever key it gets.
+     */
     private String getClientIp(HttpServletRequest request) {
         String xff = request.getHeader("X-Forwarded-For");
-        if (xff != null && !xff.isBlank()) {
-            return xff.split(",")[0].trim();
+        if (xff != null && xff.contains(",")) {
+            String[] hops = xff.split(",");
+            return hops[hops.length - 1].trim();
         }
         return request.getRemoteAddr();
     }

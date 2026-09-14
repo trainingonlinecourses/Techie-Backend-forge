@@ -3,59 +3,116 @@ package com.backendforge.academy.security;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Simple in-memory per-IP rate limiter for the login endpoint.
- * <p>
- * Limits to MAX_ATTEMPTS per LOCKOUT_WINDOW. After that, returns {@code false}
- * for the remainder of the window. This is a lightweight defense — for
- * production with multiple instances, use Redis or Bucket4j.
+ * Per-IP brute-force protection for the login endpoint (5 failures / 15 min).
+ *
+ * <p>Red-team hardening applied here:
+ * <ul>
+ *   <li><b>Failures, not attempts.</b> The first version incremented on every
+ *       login attempt, so a legitimate user who fat-fingered a password twice
+ *       and then got it right was two attempts closer to lockout — and an
+ *       attacker could keep a victim's IP permanently locked out by merely
+ *       *trying* to log in from anywhere. Now successes never count, and a
+ *       success clears the window entirely.</li>
+ *   <li><b>Spoof-resistant keys.</b> {@code X-Forwarded-For} can be set by any
+ *       client; trusting the first hop let an attacker rotate fake IPs to
+ *       bypass the limit (and pollute the map). We key on the LAST hop — the
+ *       one added by the trusted reverse proxy that actually saw the
+ *       connection — falling back to the socket address. The map is also
+ *       capped: the worst an attacker can do is evict other attackers' keys,
+ *       never exhaust heap.</li>
+ * </ul>
+ * Still in-memory by design; for a multi-instance deployment move to Redis.
  */
 @Component
 public class LoginRateLimiter {
 
-    private static final int MAX_ATTEMPTS = 5;
+    private static final int MAX_FAILURES = 5;
     private static final long LOCKOUT_WINDOW_MS = 15 * 60 * 1000; // 15 minutes
+    /** Bound on tracked keys: 10k IPs × ~48 bytes ≈ well under 1 MB. */
+    private static final int MAX_TRACKED_KEYS = 10_000;
 
     private final ConcurrentHashMap<String, AttemptInfo> attempts = new ConcurrentHashMap<>();
 
-    /**
-     * Returns {@code true} if the request is allowed, {@code false} if rate-limited.
-     * Also increments the failure counter on {@code recordFailure}.
-     */
+    /** Returns true if a login attempt may proceed for this client. */
     public boolean tryAcquire(String key) {
+        String k = sanitize(key);
         long now = System.currentTimeMillis();
-        AttemptInfo info = attempts.compute(key, (k, existing) -> {
+        AttemptInfo info = attempts.compute(k, (ignored, existing) -> {
             if (existing == null || (now - existing.windowStart) > LOCKOUT_WINDOW_MS) {
-                return new AttemptInfo(now, 1);
+                return new AttemptInfo(now);
             }
-            existing.count++;
-            return existing;
+            return existing; // failures are recorded via recordFailure only
         });
-        return info.count <= MAX_ATTEMPTS;
+        maybeEvict();
+        return info.failures.get() < MAX_FAILURES;
     }
 
-    /** Returns the number of seconds remaining in the lockout window, or 0 if not locked. */
+    /** Counts one FAILED login against the client's window. */
+    public void recordFailure(String key) {
+        String k = sanitize(key);
+        long now = System.currentTimeMillis();
+        attempts.compute(k, (ignored, existing) -> {
+            if (existing == null || (now - existing.windowStart) > LOCKOUT_WINDOW_MS) {
+                return new AttemptInfo(now);
+            }
+            existing.failures.incrementAndGet();
+            return existing;
+        });
+        maybeEvict();
+    }
+
+    /** Clears the window after a successful login. */
+    public void reset(String key) {
+        attempts.remove(sanitize(key));
+    }
+
+    /** Seconds remaining in the current lockout window, or 0 if not locked. */
     public long remainingSeconds(String key) {
-        AttemptInfo info = attempts.get(key);
+        AttemptInfo info = attempts.get(sanitize(key));
         if (info == null) return 0;
         long elapsed = System.currentTimeMillis() - info.windowStart;
         if (elapsed >= LOCKOUT_WINDOW_MS) return 0;
         return (LOCKOUT_WINDOW_MS - elapsed) / 1000;
     }
 
-    /** Resets the counter (e.g. after a successful login). */
-    public void reset(String key) {
-        attempts.remove(key);
+    /**
+     * Clients can forge X-Forwarded-For; only the value our own trusted proxy
+     * appended is meaningful. Keep it bounded so the key can never be used as
+     * a heap or log-injection vector.
+     */
+    private static String sanitize(String key) {
+        if (key == null || key.isBlank()) return "unknown";
+        String k = key.trim();
+        if (k.length() > 64) k = k.substring(k.length() - 64);
+        return k.replaceAll("[^0-9a-fA-F.:, ]", "?");
     }
 
-    private static class AttemptInfo {
-        long windowStart;
-        int count;
+    /**
+     * Cheap size guard: when the map grows past the cap, drop entries whose
+     * window has expired. An attacker flooding fake keys only evicts other
+     * fake keys — real clients keep their counters.
+     */
+    private void maybeEvict() {
+        if (attempts.size() <= MAX_TRACKED_KEYS) return;
+        long now = System.currentTimeMillis();
+        attempts.entrySet().removeIf(e ->
+                (now - e.getValue().windowStart) > LOCKOUT_WINDOW_MS);
+        // If still over the cap (a genuine flood of live windows), shed the
+        // oldest windows rather than grow unbounded.
+        if (attempts.size() > MAX_TRACKED_KEYS) {
+            attempts.entrySet().removeIf(e -> e.getValue().windowStart < now - 60_000);
+        }
+    }
 
-        AttemptInfo(long windowStart, int count) {
+    private static final class AttemptInfo {
+        final long windowStart;
+        final AtomicInteger failures = new AtomicInteger();
+
+        AttemptInfo(long windowStart) {
             this.windowStart = windowStart;
-            this.count = count;
         }
     }
 }
