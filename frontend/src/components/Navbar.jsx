@@ -174,7 +174,10 @@ export default function Navbar({ onMenu, drawerOpen }) {
               <Link to="/certificates" onClick={() => setMenuOpen(false)}>🏆 Certificates</Link>
               <Link to="/chat" onClick={() => setMenuOpen(false)}>✦ AI Tutor</Link>
               {user.role === 'ADMIN' && (
-                <Link to="/admin/reorder" onClick={() => setMenuOpen(false)}>🔀 Reorder Lessons</Link>
+                <>
+                  <Link to="/admin/reorder" onClick={() => setMenuOpen(false)}>🔀 Reorder Lessons</Link>
+                  <Link to="/admin/analytics" onClick={() => setMenuOpen(false)}>🧪 A/B Analytics</Link>
+                </>
               )}
               <button
                 onClick={() => {

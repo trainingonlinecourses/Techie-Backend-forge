@@ -19,6 +19,7 @@ import CertificatePage from './pages/CertificatePage.jsx';
 import ProgressPage from './pages/ProgressPage.jsx';
 import TimelinePage from './pages/TimelinePage.jsx';
 import AdminReorderPage from './pages/AdminReorderPage.jsx';
+import AdminAnalyticsPage from './pages/AdminAnalyticsPage.jsx';
 import SecureRouter from './components/SecureRouter.jsx';
 import MobileBottomNav from './components/MobileBottomNav.jsx';
 import './components/mobile.css';
@@ -107,6 +108,7 @@ export default function App() {
             <Route path="/progress" element={<ProgressPage />} />
             <Route path="/lab" element={<SecureRouter><LabPage /></SecureRouter>} />
             <Route path="/admin/reorder" element={<SecureRouter><AdminReorderPage /></SecureRouter>} />
+            <Route path="/admin/analytics" element={<SecureRouter><AdminAnalyticsPage /></SecureRouter>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </main>

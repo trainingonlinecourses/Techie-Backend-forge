@@ -475,6 +475,44 @@ h1.ptitle { font-family: var(--disp); font-weight: 700; font-size: clamp(24px, 4
 .cww-body .markdown > :last-child { margin-bottom: 0; }
 @keyframes cww-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) { .cww-body { animation: none; } }
+
+/* Admin A/B analytics dashboard */
+.abdash .pagesub { color: var(--mut); margin: 4px 0 22px; }
+.ab-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 26px; }
+.ab-card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
+.ab-cardval { font: 600 1.7rem/1.1 var(--disp); color: var(--amber); }
+.ab-cardlabel { font-weight: 600; margin-top: 4px; }
+.ab-cardhint { font-size: 0.78rem; color: var(--dim); margin-top: 2px; }
+.ab-section { margin: 26px 0; }
+.ab-section h2 { font-size: 1.05rem; margin-bottom: 12px; }
+.ab-compare { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
+.ab-variant { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; }
+.ab-variant h3 { margin: 0 0 2px; }
+.ab-variantnote { font-size: 0.8rem; color: var(--dim); margin: 0 0 12px; }
+.ab-metric { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px dashed var(--line); }
+.ab-metric b { font-variant-numeric: tabular-nums; }
+.ab-rates { display: flex; gap: 26px; margin-top: 14px; }
+.ab-rateval { font: 600 1.4rem/1.2 var(--disp); color: var(--green); }
+.ab-ratelabel { font-size: 0.78rem; color: var(--dim); }
+.ab-lift { margin-top: 12px; font-weight: 600; }
+.ab-lift.pos { color: var(--green); }
+.ab-lift.neg { color: var(--red); }
+.ab-small { font-size: 0.78rem; color: var(--dim); margin-top: 8px; }
+.ab-split { display: flex; height: 34px; border-radius: 999px; overflow: hidden; border: 1px solid var(--line); }
+.ab-split-chip { background: var(--amber); color: #1a1206; display: flex; align-items: center; justify-content: center; font-size: 0.78rem; font-weight: 700; min-width: 40px; }
+.ab-split-ctl { background: var(--surface2); color: var(--mut); display: flex; align-items: center; justify-content: center; font-size: 0.78rem; font-weight: 700; min-width: 40px; }
+.ab-surfaces { display: grid; gap: 10px; }
+.ab-surfrow { display: grid; grid-template-columns: 180px 1fr 150px; align-items: center; gap: 12px; }
+.ab-surflabel { font-size: 0.85rem; color: var(--mut); }
+.ab-surfbar { height: 10px; background: var(--surface2); border-radius: 999px; overflow: hidden; }
+.ab-surfbar > div { height: 100%; background: linear-gradient(90deg, var(--amber), var(--amber2)); border-radius: 999px; }
+.ab-surfnums { font-size: 0.82rem; font-variant-numeric: tabular-nums; text-align: right; }
+.ab-surfnums em { color: var(--dim); font-style: normal; }
+.ab-trend { display: flex; align-items: flex-end; gap: 6px; height: 120px; padding: 4px 2px 0; }
+.ab-trendcol { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 4px; height: 100%; }
+.ab-trendbar { width: 100%; max-width: 34px; background: linear-gradient(180deg, var(--amber2), var(--amber)); border-radius: 6px 6px 2px 2px; }
+.ab-trendday { font-size: 0.62rem; color: var(--dim); }
+@media (max-width: 720px) { .ab-surfrow { grid-template-columns: 1fr; gap: 4px; } .ab-surfnums { text-align: left; } }
 .codeblock:hover { border-color: var(--line2); box-shadow: 0 8px 24px rgba(0,0,0,0.2); }
 .codeblock figcaption {
   display: flex; align-items: center; gap: 10px;

@@ -53,6 +53,13 @@ public class AnalyticsController {
         return service.summary();
     }
 
+    /** Full A/B dashboard payload (counts, conversion rates, reach, trend) — admin only. */
+    @GetMapping("/dashboard")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Map<String, Object> dashboard() {
+        return service.dashboard();
+    }
+
     private static AnalyticsEvent.Surface parse(String raw) {
         if (raw == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "surface is required");
