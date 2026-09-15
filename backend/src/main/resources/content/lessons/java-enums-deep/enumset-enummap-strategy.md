@@ -202,11 +202,6 @@ public class Main {
 ### Why EnumMap Wins Over HashMap
 
 
-**What this code does — step by step:**
-
-1. HashMap: hash the key → find bucket → handle collisions → compare keys. EnumMap: enum.ordinal() → array[ordinal] → done
-2. Memory: HashMap stores Entry objects with hash, key, value, next pointer. EnumMap stores a flat array of values (null for missing entries)
-3. Benchmark: EnumMap.put() is ~3x faster than HashMap.put() for enum keys. Benchmark: EnumMap.get() is ~4x faster than HashMap.get() for enum keys
 
 
 ---

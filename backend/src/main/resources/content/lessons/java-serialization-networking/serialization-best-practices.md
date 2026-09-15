@@ -313,10 +313,6 @@ public class UserSession implements Serializable {
 | Debugging | Binary format | JSON (human-readable) |
 
 
-**What this code does — step by step:**
-
-1. Instead of Java serialization: ❌ ObjectOutputStream out = new ObjectOutputStream(...); ✅ ObjectMapper mapper = new ObjectMapper(); mapper.writeValue(new File("data.json"), object);
-2. Or for binary: ✅ Protocol Buffers. ✅ Avro. ✅ MessagePack
 
 
 ---

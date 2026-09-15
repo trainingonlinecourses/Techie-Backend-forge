@@ -222,12 +222,6 @@ spring:
 Spring Boot checks multiple locations, in this priority order (highest first):
 
 
-**What this code does — step by step:**
-
-1. 1. Command-line arguments (highest priority). Java -jar app.jar --server.port=9090
-2. 2. SPRING_APPLICATION_JSON environment variable. Export SPRING_APPLICATION_JSON='{"server":{"port":9090}}'
-3. 3. OS environment variables. Export SERVER_PORT=9090
-4. 4. application-{profile}.yml. 5. application.yml. 6. @PropertySource annotations. 7. Default properties (lowest priority)
 
 
 // Example: environment variable overrides application.yml

@@ -25,10 +25,6 @@ Injection, XSS, and access control get the attention; the quieter vulnerabilitie
 **The danger:** deserialization reconstructs *objects* from bytes — and object construction can *execute code*. The classic attack: a serialized object whose class has a dangerous `readObject`/gadget chain runs arbitrary commands the moment it's deserialized. Java's native `ObjectInputStream` + `Serializable` is the highest-risk combo — which is why the ecosystem moved away from it.
 
 
-**What this code does — step by step:**
-
-1. VULNERABLE pattern — deserializing untrusted input with the JDK: ObjectInputStream in = new ObjectInputStream(untrustedStream); Object obj = in.readObject(); // could be an attack gadget!
-2. The mitigations, in order: 1. DON'T use Java serialization for untrusted input. Use safe formats: JSON (Jackson) / Protobuf / etc. — data, not executable objects. 2. If you MUST deserialize, validate the stream's classes against an. ALLOWLIST (not a denylist) before constructing: in.setObjectInputFilter(Filter.classNameMatches("com.academy.**"). .maxDepth(10).maxArrayLength(1000).build()); 3. Never accept serialized objects from clients — serialization is for. Your own trusted persistence, not for network boundaries.
 
 
 **The practical rules:** JSON APIs (the norm in Spring) don't hit the `readObject` danger — Jackson builds POJOs from typed, bounded data. The risk returns with: Java serialization over the wire, unsafe `yaml.load` of untrusted YAML (snakeyaml gadgets), and unsafe deserialization of RMI/JMX payloads. The single rule that covers them all: **never deserialize untrusted input with a format that can instantiate arbitrary classes.** Jackson's `DefaultTyping` (polymorphic typing) is the subtle one — enable it only with a strict allowlist.

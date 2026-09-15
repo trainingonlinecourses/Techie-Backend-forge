@@ -57,11 +57,6 @@ public class JavaFive {
 }
 ```
 
-**What this code does — step by step:**
-
-1. `List<String>` — the type argument travels with the variable; `langs.add(42)` would now be a *compile error*, not a production crash.
-2. `Integer boxed = 10;` — **autoboxing**: the compiler silently writes `Integer.valueOf(10)`. The reverse (`int unboxed`) auto-unboxes. No more `new Integer(10)` ceremony.
-3. `int[] points = {3, 5, 7};` with `for (int n : points)` — the **enhanced for** loop: read it "for each `int n` in `points`". It replaced index bookkeeping forever and it works over arrays *and* every `Collection`.
 
 > 🔧 **Try it in Practice**, then break it on purpose: change one `langs.add(...)` argument to a number and watch the *compile* fail — that compile-time refusal is the entire point of generics.
 

@@ -88,10 +88,6 @@ When a class loader needs to load a class, it **delegates to its parent first**:
 **Why parent-first?** Prevents loading the same class twice with different implementations. If you wrote your own `java.lang.String`, the parent-first model ensures the bootstrap loader's `String` is used instead — critical for security and consistency.
 
 
-**What this code does — step by step:**
-
-1. The delegation model prevents this: Your classloader loads: java.lang.String (malicious). Bootstrap classloader loads: java.lang.String (real). Without delegation: two String classes exist → chaos
-2. With delegation: parent loaders always win → consistent behavior
 
 
 ## How Spring Boot uses class loading

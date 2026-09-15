@@ -135,10 +135,6 @@ cache.merge("total", 100, Long::sum);
 ### Segment Locking (Java 7) vs CAS (Java 8+)
 
 
-**What this code does — step by step:**
-
-1. Java 7: Segment locking — the map is divided into 16 segments. Each segment has its own lock — 16 threads can write simultaneously. But only to different segments
-2. Java 8+: CAS (Compare-And-Swap) — no locking at all! Uses hardware-level atomic operations for individual cells. Much faster than segment locking
 
 
 ### Reading Is Always Lock-Free

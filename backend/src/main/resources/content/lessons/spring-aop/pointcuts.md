@@ -445,10 +445,6 @@ When a pointcut doesn't match as expected, use these debugging techniques:
 ### 2. Verify Method Signatures
 
 
-**What this code does — step by step:**
-
-1. The method signature must match exactly. If the method is: public User findById(Long id). Use: execution(* com.acme.service.*.findById(Long))
-2. If you want any parameters: Use: execution(* com.acme.service.*.findById(..))
 
 
 ### 3. Enable AOP Proxy Logging

@@ -88,12 +88,6 @@ public class CollectionsEra {
 }
 ```
 
-**What this code does — step by step:**
-
-1. `new HashMap<String, Integer>()` — note the pre-diamond generic syntax; the diamond `<>` arrives in Java 7 (lesson 4).
-2. `scores.get("Ada")` — hash the key, find the bucket, return the value: O(1) average.
-3. `put` on an existing key **replaces** the value — maps are keyed, not append-only. (One classic trap the block deliberately avoids: `get` on an *absent* key returns `null`, not an error — the NPE source that Java 8's `getOrDefault` and `Optional` later softened.)
-4. `size()` counts distinct keys.
 
 > 🔧 **Try it:** run this in **Practice**. Predict each printed line *before* running — especially what a missing key returns.
 

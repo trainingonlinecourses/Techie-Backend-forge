@@ -274,9 +274,6 @@ public class InventoryService {
 Every cross-service flow should have a consistency decision table:
 
 
-**What this code does — step by step:**
-
-1. Part of the design review document: . Flow: Place Order → Charge Payment → Ship. . Step | Consistency | Max Skew | Reconciliation. ------------------|---------------|-----------|----------------. Order + Outbox | Atomic | 0ms | None (same TX). Payment charge | Idempotent | 30s | PaymentReconciler. Mark order PAID | Eventual | 5min | OrderReconciler. Ship item | Eventual | 15min | InventoryReconciler. Send email | Best-effort | 1hr | DeadLetterHandler
 
 
 ---

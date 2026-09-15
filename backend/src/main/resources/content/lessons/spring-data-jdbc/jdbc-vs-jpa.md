@@ -61,9 +61,6 @@ public class Course {
 }
 
 
-**What this code does — step by step:**
-
-1. The N+1 story: JPA: courseRepository.findAll() then course.getLessons() per course -> N extra queries (unless you fetch-join) — the classic N+1. . JDBC: courseRepository.findAll() loads course + lessons in 2 queries total -> the aggregate IS the fetch unit — N+1 by construction impossible
 
 
 That contrast is the whole decision: JPA gives you power over *relationships* but you must master fetch strategies (see the N+1 lesson in the Data JPA module); JDBC gives you predictability — the aggregate is the unit, period.

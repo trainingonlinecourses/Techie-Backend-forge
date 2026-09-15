@@ -55,12 +55,6 @@ public class JavaSeven {
 }
 ```
 
-**What this code does — step by step:**
-
-1. `new HashMap<>()` — the **diamond**: the compiler infers `String, Integer` from the variable's declared type. Before 7, you repeated the full generic type twice; every repetition was a chance to mistype it.
-2. `stock.get("GPU")` — the O(1) map read you met in lesson 2, now with cleaner syntax.
-3. `switch (cmd)` on a **String** — legal since Java 7. The compiler compiles this to a hash-based jump, so it's also *faster* than an equals-chain.
-4. `break` after each case prevents fall-through — the default handles everything else.
 
 > 🔧 **Try it:** change `"status"` to `"start"` and run again — one variable, three behaviors. Then try removing `break` and observe fall-through (a real, historical source of bugs).
 

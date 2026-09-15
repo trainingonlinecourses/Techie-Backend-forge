@@ -124,10 +124,6 @@ Beyond IDOR, broken access control has more faces:
 - **Vertical escalation** — a lower role reaching higher privileges: calling an admin URL directly, replaying an admin's request with your cookie, or *manipulating claims* — a client that *sends* its role and the server trusts it:
 
 
-**What this code does — step by step:**
-
-1. VULNERABLE — the client declares its own role: POST /api/login body: { user: "ada", role: "ADMIN" } -> the server stores role: ADMIN for the session.
-2. SAFE — roles come from the SERVER's authority (the DB, the token), never. From client-supplied input.
 
 
 - **Missing function-level checks** — the admin *button* is hidden in the UI, but the admin *endpoint* is open. UI hiding is not security; the server must enforce.
