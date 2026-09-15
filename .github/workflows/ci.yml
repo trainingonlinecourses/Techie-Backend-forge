@@ -120,7 +120,8 @@ jobs:
         run: |
           cd ../backend
           mvn -B --no-transfer-progress package -DskipTests
-          nohup java -jar target/academy-api-*.jar --server.port=8080 --spring.profiles.active=local > ../.freebuff/backend-e2e.log 2>&1 &
+          mkdir -p ../e2e-logs
+          nohup java -jar target/academy-api-*.jar --server.port=8080 --spring.profiles.active=local > ../e2e-logs/backend.log 2>&1 &
           for i in $(seq 1 60); do
             if curl -sf http://localhost:8080/api/content/stats > /dev/null; then break; fi
             sleep 2
