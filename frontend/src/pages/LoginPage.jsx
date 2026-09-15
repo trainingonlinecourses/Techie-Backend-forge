@@ -64,7 +64,7 @@ export default function LoginPage() {
         </form>
 
         <p className="authfoot">
-          New here? <Link to="/register">Create an account</Link>
+          New here? <Link to="/register">Create an account</Link> · <Link to="/forgot-password">Forgot password?</Link>
         </p>
         <div className="demo">
           <b>Demo accounts</b>

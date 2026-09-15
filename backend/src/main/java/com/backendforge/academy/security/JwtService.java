@@ -14,6 +14,7 @@ import org.springframework.core.env.Environment;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.time.Instant;
 
 /**
@@ -80,10 +81,50 @@ public class JwtService {
                 JwsHeader.with(MacAlgorithm.HS256).build(), claims)).getTokenValue();
     }
 
-    /** Returns the subject (username) if the token is valid, else null. */
+    /**
+     * Issues a PURPOSE-SCOPED token: carries a {@code purpose} claim, a custom
+     * TTL, and is rejected by session authentication ({@link #subject} returns
+     * null for any purpose-bearing token). Used for one-shot flows like the
+     * password-reset handoff.
+     */
+    public String issueScoped(User user, String purpose, Duration ttl) {
+        Instant now = Instant.now();
+        JwtClaimsSet claims = JwtClaimsSet.builder()
+                .issuer("backendforge-academy")
+                .issuedAt(now)
+                .expiresAt(now.plus(ttl))
+                .subject(user.getUsername())
+                .claim("uid", user.getId())
+                .claim("role", user.getRole().name())
+                .claim("purpose", purpose)
+                .build();
+        return encoder.encode(JwtEncoderParameters.from(
+                JwsHeader.with(MacAlgorithm.HS256).build(), claims)).getTokenValue();
+    }
+
+    /**
+     * Returns the subject (username) if the token is a valid SESSION token,
+     * else null. Purpose-scoped tokens are deliberately rejected here so a
+     * reset token can never be replayed as a login session.
+     */
     public String subject(String token) {
         try {
-            return decoder.decode(token).getSubject();
+            Jwt jwt = decoder.decode(token);
+            if (jwt.getClaimAsString("purpose") != null) return null; // scoped ≠ session
+            return jwt.getSubject();
+        } catch (JwtException e) {
+            return null;
+        }
+    }
+
+    /**
+     * Returns the subject if the token is valid AND carries exactly the
+     * expected purpose claim — the mirror check for scoped flows.
+     */
+    public String scopedSubject(String token, String expectedPurpose) {
+        try {
+            Jwt jwt = decoder.decode(token);
+            return expectedPurpose.equals(jwt.getClaimAsString("purpose")) ? jwt.getSubject() : null;
         } catch (JwtException e) {
             return null;
         }

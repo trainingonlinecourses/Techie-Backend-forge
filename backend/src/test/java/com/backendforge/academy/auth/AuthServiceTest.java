@@ -45,12 +45,13 @@ class AuthServiceTest {
     @Mock private AuthenticationManager authenticationManager;
     @Mock private JwtService jwtService;
     @Mock private LoginRateLimiter rateLimiter;
+    @Mock private PasswordRecoveryService recoveryService;
 
     private AuthService service;
 
     @BeforeEach
     void setUp() {
-        service = new AuthService(users, encoder, authenticationManager, jwtService, rateLimiter);
+        service = new AuthService(users, encoder, authenticationManager, jwtService, rateLimiter, recoveryService);
     }
 
     @Test
@@ -60,7 +61,7 @@ class AuthServiceTest {
         when(encoder.encode("secret123")).thenReturn("$2a$10$hashed");
         when(jwtService.issue(any(User.class))).thenReturn("jwt-token");
 
-        AuthResponse res = service.register(new RegisterRequest("Alice", "secret123", "Alice A"));
+        AuthResponse res = service.register(new RegisterRequest("Alice", "secret123", "Alice A", null, null));
 
         assertThat(res.token()).isEqualTo("jwt-token");
         assertThat(res.user().username()).isEqualTo("alice"); // lowercased
@@ -78,12 +79,26 @@ class AuthServiceTest {
     void registerRejectsDuplicateUsername() {
         when(users.existsByUsername("bob")).thenReturn(true);
 
-        assertThatThrownBy(() -> service.register(new RegisterRequest("Bob", "secret123", "Bob")))
+        assertThatThrownBy(() -> service.register(new RegisterRequest("Bob", "secret123", "Bob", null, null)))
                 .isInstanceOf(ConflictException.class)
                 .hasMessageContaining("already taken");
 
         verify(users, never()).save(any());
         verify(jwtService, never()).issue(any());
+    }
+
+    @Test
+    @DisplayName("register: arms recovery question when provided; display name defaults to username")
+    void registerArmsRecoveryAndDefaultsDisplayName() {
+        when(users.existsByUsername("dorothy")).thenReturn(false);
+        when(encoder.encode("secret123")).thenReturn("$2a$10$hashed");
+        when(jwtService.issue(any(User.class))).thenReturn("jwt-d");
+
+        AuthResponse res = service.register(
+                new RegisterRequest("dorothy", "secret123", null, "First pet's name?", "blue whale"));
+
+        assertThat(res.user().displayName()).isEqualTo("dorothy"); // blank display → username
+        verify(recoveryService).setRecoveryQuestion(any(User.class), eq("First pet's name?"), eq("blue whale"));
     }
 
     @Test

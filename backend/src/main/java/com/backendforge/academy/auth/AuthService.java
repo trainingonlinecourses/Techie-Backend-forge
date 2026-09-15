@@ -25,15 +25,17 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
     private final LoginRateLimiter rateLimiter;
+    private final PasswordRecoveryService recoveryService;
 
     public AuthService(UserRepository users, PasswordEncoder encoder,
                        AuthenticationManager authenticationManager, JwtService jwtService,
-                       LoginRateLimiter rateLimiter) {
+                       LoginRateLimiter rateLimiter, PasswordRecoveryService recoveryService) {
         this.users = users;
         this.encoder = encoder;
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
         this.rateLimiter = rateLimiter;
+        this.recoveryService = recoveryService;
     }
 
     @Transactional
@@ -43,10 +45,25 @@ public class AuthService {
         }
         User user = new User();
         user.setUsername(req.username().toLowerCase());
-        user.setDisplayName(req.displayName());
+        user.setDisplayName(
+                req.displayName() == null || req.displayName().isBlank()
+                        ? req.username() // default display name: the username itself
+                        : req.displayName());
         user.setPassword(encoder.encode(req.password())); // BCrypt — never store plaintext
+        // Optional at signup: arming now means the account can always be
+        // recovered. A partial arm (question without answer) is ignored rather
+        // than rejected — the user just hasn't opted into recovery.
+        if (req.recoveryQuestion() != null && !req.recoveryQuestion().isBlank()
+                && req.recoveryAnswer() != null && !req.recoveryAnswer().isBlank()) {
+            recoveryService.setRecoveryQuestion(user, req.recoveryQuestion(), req.recoveryAnswer());
+        }
         users.save(user);
         return new AuthResponse(jwtService.issue(user), UserDto.from(user));
+    }
+
+    /** Issues a fresh session token for a user (used after a completed password reset). */
+    public String issueToken(User user) {
+        return jwtService.issue(user);
     }
 
     public AuthResponse login(LoginRequest req, String clientIp) {

@@ -6,7 +6,10 @@ import { errorMessage } from '../api/client';
 export default function RegisterPage() {
   const { register } = useAuth();
   const navigate = useNavigate();
-  const [form, setForm] = useState({ username: '', displayName: '', password: '' });
+  const [form, setForm] = useState({
+    username: '', displayName: '', password: '',
+    recoveryQuestion: '', recoveryAnswer: '',
+  });
   const [error, setError] = useState(null);
   const [busy, setBusy] = useState(false);
 
@@ -19,7 +22,13 @@ export default function RegisterPage() {
     setBusy(true);
     setError(null);
     try {
-      await register(form.username, form.password, form.displayName || form.username);
+      await register(
+        form.username,
+        form.password,
+        form.displayName || form.username,
+        form.recoveryQuestion,
+        form.recoveryAnswer,
+      );
       navigate('/');
     } catch (err) {
       setError(errorMessage(err, 'Registration failed'));
@@ -52,6 +61,22 @@ export default function RegisterPage() {
           <label>Password
             <input type="password" value={form.password} onChange={set('password')} minLength={6} autoComplete="new-password" required />
           </label>
+
+          <details className="rec-optin">
+            <summary>🛟 Add a security question (recommended — the only way to recover a forgotten password)</summary>
+            <label>Question
+              <input value={form.recoveryQuestion} onChange={set('recoveryQuestion')}
+                     maxLength={200}
+                     placeholder="e.g. What was my first pet's name?" />
+            </label>
+            <label>Answer
+              <input value={form.recoveryAnswer} onChange={set('recoveryAnswer')}
+                     maxLength={200}
+                     placeholder="Typed loosely — case and punctuation don't matter" />
+            </label>
+            <p className="rec-optin-hint">Stored as a one-way hash. You can add or change it later under Settings.</p>
+          </details>
+
           <button className="btn primary full" disabled={busy}>{busy ? 'Creating…' : 'Create account'}</button>
         </form>
 

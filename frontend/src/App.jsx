@@ -12,6 +12,8 @@ import DocsPage from './pages/DocsPage.jsx';
 import ChatPage from './pages/ChatPage.jsx';
 import LoginPage from './pages/LoginPage.jsx';
 import RegisterPage from './pages/RegisterPage.jsx';
+import ForgotPasswordPage from './pages/ForgotPasswordPage.jsx';
+import SettingsPage from './pages/SettingsPage.jsx';
 import LabPage from './pages/LabPage.jsx';
 import NotFound from './pages/NotFound.jsx';
 import QuizPage from './pages/QuizPage.jsx';
@@ -102,6 +104,8 @@ export default function App() {
             />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="/settings" element={<SecureRouter><SettingsPage /></SecureRouter>} />
             <Route path="/quiz/:lessonId" element={<QuizPage />} />
             <Route path="/certificates" element={<CertificatePage />} />
             <Route path="/certificates/verify/:code" element={<CertificatePage />} />

@@ -103,14 +103,20 @@ class AuthIntegrationTest {
     }
 
     @Test
-    @DisplayName("register: blank fields → 400 with errors for every missing field")
+    @DisplayName("register: blank username/password → 400; blank displayName is now OK (defaults to username)")
     void registerRejectsBlankFields() throws Exception {
         mvc.perform(post("/api/auth/register").contentType("application/json")
                         .content("{\"username\":\"\",\"password\":\"\",\"displayName\":\"\"}"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.fieldErrors[?(@.field=='username')]").isNotEmpty())
-                .andExpect(jsonPath("$.fieldErrors[?(@.field=='password')]").isNotEmpty())
-                .andExpect(jsonPath("$.fieldErrors[?(@.field=='displayName')]").isNotEmpty());
+                .andExpect(jsonPath("$.fieldErrors[?(@.field=='password')]").isNotEmpty());
+
+        // displayName is optional since the recovery flow landed: a blank one
+        // registers fine and defaults to the username.
+        mvc.perform(post("/api/auth/register").contentType("application/json")
+                        .content("{\"username\":\"no_display_name\",\"password\":\"Secret123\",\"displayName\":\"\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.user.displayName").value("no_display_name"));
     }
 
     @Test

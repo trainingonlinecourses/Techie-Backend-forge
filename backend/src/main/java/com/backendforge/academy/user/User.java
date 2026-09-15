@@ -30,6 +30,18 @@ public class User {
     @Column(nullable = false, length = 20)
     private Role role = Role.USER;
 
+    /**
+     * Security question shown on the forgot-password page. Storing the TEXT is
+     * safe — it is chosen by the user and shown only to whoever already knows
+     * the username, exactly like the login page trusts a username.
+     */
+    @Column(length = 200)
+    private String recoveryQuestion;
+
+    /** BCrypt hash of the (normalized) answer — never the answer itself. */
+    @Column(length = 100)
+    private String recoveryAnswerHash;
+
     @Column(nullable = false)
     private Instant createdAt = Instant.now();
 
@@ -48,6 +60,10 @@ public class User {
     public void setDisplayName(String displayName) { this.displayName = displayName; }
     public Role getRole() { return role; }
     public void setRole(Role role) { this.role = role; }
+    public String getRecoveryQuestion() { return recoveryQuestion; }
+    public void setRecoveryQuestion(String recoveryQuestion) { this.recoveryQuestion = recoveryQuestion; }
+    public String getRecoveryAnswerHash() { return recoveryAnswerHash; }
+    public void setRecoveryAnswerHash(String recoveryAnswerHash) { this.recoveryAnswerHash = recoveryAnswerHash; }
     public Instant getCreatedAt() { return createdAt; }
     public List<ProgressEntry> getProgress() { return progress; }
     public List<ChatMessage> getChatMessages() { return chatMessages; }

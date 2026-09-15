@@ -171,6 +171,7 @@ export default function Navbar({ onMenu, drawerOpen }) {
               </div>
               <Link to="/" onClick={() => setMenuOpen(false)}>Dashboard</Link>
               <Link to="/progress" onClick={() => setMenuOpen(false)}>📊 My Progress</Link>
+              <Link to="/settings" onClick={() => setMenuOpen(false)}>⚙ Account settings</Link>
               <Link to="/certificates" onClick={() => setMenuOpen(false)}>🏆 Certificates</Link>
               <Link to="/chat" onClick={() => setMenuOpen(false)}>✦ AI Tutor</Link>
               {user.role === 'ADMIN' && (
