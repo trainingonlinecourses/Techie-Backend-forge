@@ -86,8 +86,10 @@ Immutable `final` fields, testable constructor, no hidden wiring. Record-based c
 ```java
 private String region;
 // locally defaults to us-east-1; in prod the env var CLOUD_REGION wins
+```
 
 **Scenario 2 — SpEL for bean-derived values.** A value computed from another bean:
+```java
 
 @Value("#{threadPoolCoreSize}")                  // a bean property
 private int poolSize;

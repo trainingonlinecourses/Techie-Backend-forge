@@ -16,9 +16,7 @@ docs:
 
 ## The Concept: Two Ends of a Conversation
 
-```java
 Every network conversation in Java — HTTP requests, database connections, message queues — ultimately runs over **sockets**. A socket is the endpoint of a two-way communication link between two programs, possibly on different machines. One program opens a *server* socket and waits; the other opens a *client* socket and connects; once connected, both sides send and receive bytes.
-```
 
 **The mental model:** think of a phone call. The server is the business that publishes its phone number (IP address + port) and has someone waiting by the phone (`ServerSocket.accept()` — blocking until someone calls). The client dials the number (`new Socket(host, port)`). When the call connects, both people can talk at once — that's full-duplex communication over two streams. The call stays open until either side hangs up; the bytes flowing are whatever the protocol defines (HTTP text, JSON, binary data).
 

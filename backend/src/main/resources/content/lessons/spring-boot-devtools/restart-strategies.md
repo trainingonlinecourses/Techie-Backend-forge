@@ -7,6 +7,7 @@ topics: [restart, triggers, exclusions, classpath, performance, fast-restart]
 docs:
   - https://docs.spring.io/spring-boot/reference/using/devtools.html
 ---
+# Restart Strategies — Configuring Fast Development
 
 ## The Concept, From Zero
 

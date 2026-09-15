@@ -7,6 +7,7 @@ topics: [versioning, bom, dependency-management, version-conflict, spring-boot-b
 docs:
   - https://docs.spring.io/spring-boot/reference/features/dependency-management.html
 ---
+# Starter Versioning — Dependency Management and BOMs
 
 ## The Concept, From Zero
 

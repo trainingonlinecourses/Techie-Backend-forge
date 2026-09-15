@@ -28,7 +28,6 @@ The three failure families:
 List<String> log = new ArrayList<>();
 items.stream()
      .filter(i -> i.isValid())
-```java
      .forEach(i -> log.add(i.getName()));      // <-- mutation inside the stream!
 
 // The mutation races/orders unpredictably and breaks functional guarantees.
@@ -62,7 +61,7 @@ items.stream()
 
 The same code, clean:
 
-```java
+```
 import java.util.*;
 import java.util.stream.*;
 
@@ -112,9 +111,7 @@ public class FunctionalPitfalls {
 
 **Part 1 — collect, don't mutate.** The correct functional way to "build a list from a stream" is `collect(Collectors.toList())` — a *reduction* that produces a result without touching external state. Rule: if a stream produces a value, `collect`/`reduce`/`toList()` it; `forEach` is only for terminal side effects that *must* happen (logging, sending), and even then prefer a loop for clarity.
 
-```java
 **Part 2 — multiple passes.** Each stream pipeline is a separate pass. Three pipelines over the same data = three traversals (and three allocations of intermediate results). When you need several statistics, either chain operations in **one** pipeline or use a custom collector. For small collections it rarely matters; for large ones it does — measure before optimizing, but don't casually multiply passes.
-```
 
 **Part 3 — boxing.** `Stream<Integer>` boxes every int into an `Integer` object at every stage. `IntStream` (via `mapToInt`) operates on primitive `int` values directly — often 3–5× faster for numeric-heavy pipelines. The rule: for numeric work, go through `IntStream`/`LongStream`/`DoubleStream` (or `mapToInt`/`mapToLong`).
 
@@ -127,7 +124,6 @@ public class FunctionalPitfalls {
 // parallel() does NOT make everything faster:
 int slow = nums.parallelStream()
         .map(n -> heavyCpuWork(n))       // maybe faster with cores...
-```java
         .sum();
 ```
 

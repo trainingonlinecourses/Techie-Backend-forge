@@ -80,7 +80,6 @@ message Course {
 Course course = Course.newBuilder()
     .addTags("java")
     .addAllTags(List.of("spring", "boot"))
-```java
     .build();
 ```
 
@@ -88,7 +87,7 @@ List<String> tags = course.getTagsList();   // immutable view
 
 ## Nested Messages
 
-```proto
+```
 message Course {
   message Author {
     string name = 1;
@@ -99,7 +98,6 @@ message Course {
 ```
 
 Course.Author author = Course.Author.newBuilder()
-```java
     .setName("Ada").setEmail("ada@example.com").build();
 ```
 

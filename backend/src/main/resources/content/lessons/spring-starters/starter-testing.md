@@ -7,6 +7,7 @@ topics: [starter-testing, application-context-runner, conditional-bean-test, con
 docs:
   - https://docs.spring.io/spring-boot/reference/testing/spring-boot-applications.html
 ---
+# Testing Your Starter — Auto-Configuration Tests
 
 ## The Concept, From Zero
 

@@ -8,6 +8,7 @@ docs:
   - https://docs.spring.io/spring-boot/reference/microservices.html
   - https://docs.spring.io/spring-cloud/reference/
 ---
+# Microservices Projects — 10 Complete Distributed Systems
 
 ## Why Microservices?
 
@@ -168,8 +169,8 @@ public class OrderService {
 <!-- why -->
 
 
-```java
 **InventoryClient.java**
+```java
 package com.backendforge.orderservice.client;
 
 import org.springframework.cloud.openfeign.FeignClient;
@@ -222,7 +223,6 @@ public class InventoryService {
     
     public boolean checkStock(Long productId, int quantity) {
         Stock stock = repository.findByProductId(productId)
-```java
             .orElse(new Stock(productId, 0));
         return stock.getQuantity() >= quantity;
     }
@@ -231,7 +231,6 @@ public class InventoryService {
     public void reduceStock(Long productId, int quantity) {
 ```
         Stock stock = repository.findByProductId(productId)
-```java
             .orElseThrow(() -> new RuntimeException("Product not in inventory"));
         
         if (stock.getQuantity() < quantity) {
@@ -260,8 +259,8 @@ public class InventoryService {
 
 ### Payment Service
 
-```java
 **PaymentService.java**
+```java
 package com.backendforge.paymentservice.service;
 
 import com.backendforge.paymentservice.entity.Payment;
@@ -446,24 +445,20 @@ public class JwtService {
             .setIssuedAt(new Date())
             .setExpiration(new Date(System.currentTimeMillis() + accessTokenExpiration))
             .signWith(signingKey, SignatureAlgorithm.HS256)
-```java
             .compact();
     }
     
     public String generateRefreshToken(String userId) {
         return Jwts.builder()
-```
             .setSubject(userId)
             .setIssuedAt(new Date())
             .setExpiration(new Date(System.currentTimeMillis() + refreshTokenExpiration))
             .signWith(signingKey, SignatureAlgorithm.HS256)
-```java
             .compact();
     }
     
     public Claims extractClaims(String token) {
         return Jwts.parserBuilder()
-```
             .setSigningKey(signingKey)
             .build()
             .parseClaimsJws(token)

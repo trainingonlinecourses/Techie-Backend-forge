@@ -59,9 +59,9 @@ Two keys with the same bucket → collision. Java 8 handles it in two stages:
 static final int TREEIFY_THRESHOLD = 8;
 static final int UNTREEIFY_THRESHOLD = 6;
 static final int MIN_TREEIFY_CAPACITY = 64;
+```
 
 **Why 8?** With a good hash, collisions follow a Poisson distribution — the probability of 8+ collisions in one bucket is under 1 in 10 million. If you hit treeification, your hash function is bad, not unlucky.
-```
 
 ## Load Factor and Resize
 
@@ -69,9 +69,9 @@ static final int MIN_TREEIFY_CAPACITY = 64;
 new HashMap<>();                 // capacity 16, load factor 0.75
 new HashMap<>(10_000);           // capacity rounds up to power of 2 (16384)
 new HashMap<>(10_000, 0.75f);
+```
 
 **Resize threshold = capacity × load factor**. At 16×0.75 = 12 entries, the table doubles to 32 and **rehashes every entry**:
-```
 
 - New table of 2× length
 - Every entry re-indexed: `index = (newLen - 1) & hash`

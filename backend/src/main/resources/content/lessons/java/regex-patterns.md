@@ -53,8 +53,8 @@ public final class EmailValidator {
 
 ## How we use it in an organization: real scenarios
 
-```java
 **Scenario 1 — extracting values with groups:**
+```java
 
 // Parse "GET /api/orders/12345 HTTP/1.1" from an access log
 Pattern ACCESS = Pattern.compile("^(\\w+) (/[^ ]*) HTTP/1\\.[01]$");
@@ -74,14 +74,18 @@ String clean = rawBio.replaceAll("<[^>]*>", "")      // strip tags
 ```java
                      .replaceAll("[\\p{Cntrl}]", "")  // strip control chars
                      .trim();
+```
 
 **Scenario 3 — validating with a strict anchor and a lookahead:**
+```java
 
 // Password policy: 8-64 chars, at least one letter and one digit
 Pattern PASSWORD = Pattern.compile("^(?=.*[A-Za-z])(?=.*\\d).{8,64}$");
 // (?=...) lookaheads assert a condition without consuming characters
+```
 
 **Scenario 4 — extracting tokens from structured text (config, headers):**
+```java
 
 // Parse "rate_limit=1000; window=60" style header values
 Pattern KV = Pattern.compile("(\\w+)=([^;\\s]+)");

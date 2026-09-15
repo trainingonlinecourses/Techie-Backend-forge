@@ -7,6 +7,7 @@ topics: [annotations, custom-annotations, retention, target, reflection, annotat
 docs:
   - https://docs.oracle.com/javase/tutorial/java/annotations/
 ---
+# Custom Annotations — Metadata for Your Code
 
 ## The Concept, From Zero
 

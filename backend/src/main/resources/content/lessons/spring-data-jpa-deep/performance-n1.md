@@ -85,12 +85,14 @@ Same effect as the fetch join, declared on the method. Supports nested paths —
 
 ## Fix 3: Batch Fetching (the global fix)
 
+```yaml
 # application.yml
 spring:
   jpa:
     properties:
       hibernate:
         default_batch_fetch_size: 50
+```
 
 With batch fetching, lazy collections load **in batches**:
 

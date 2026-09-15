@@ -57,14 +57,12 @@ public class PromptPatterns {
                 """)
             .user("Explain " + topic)
             .call()
-```java
             .content();
     }
 
     // Pattern 2: Chain of Thought (step-by-step reasoning)
     public String solveProblem(String problem) {
         return chatClient.prompt()
-```
             .system("""
                 You are a problem solver. Think step by step:
                 1. Identify the key information
@@ -75,14 +73,12 @@ public class PromptPatterns {
                 """)
             .user(problem)
             .call()
-```java
             .content();
     }
 
     // Pattern 3: Output format control
     public String generateStructured(String task) {
         return chatClient.prompt()
-```
             .system("""
                 Generate output in EXACTLY this JSON format:
                 {
@@ -166,14 +162,12 @@ public class PromptTemplateService {
             .param("minutes", request.minutes())
             .param("difficulty", request.difficulty())
             .call()
-```java
             .content();
     }
 
     // Template for code review:
     public String reviewCode(String code, String standards) {
         return chatClient.prompt()
-```
             .system("""
                 You are a code reviewer. Review against these standards:
 ```java

@@ -7,6 +7,7 @@ topics: [@Validated, jakarta-validation, nested-properties, custom-validator, fa
 docs:
   - https://docs.spring.io/spring-boot/reference/features/external-config.html#features.external-config.typesafe-configuration-properties
 ---
+# Validating Configuration Properties — Fail Fast on Bad Config
 
 ## The Concept, From Zero
 

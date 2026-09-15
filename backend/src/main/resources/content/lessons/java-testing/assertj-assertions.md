@@ -37,20 +37,15 @@ The killer feature for money: **`isEqualByComparingTo`** for `BigDecimal` — pl
 assertThat(lines)
     .hasSize(2)
     .extracting(Line::productId)              // project a field — the money assert
-```java
     .containsExactly("p1", "p2")              // order matters; use containsExactlyInAnyOrder otherwise
     .doesNotContainNull();
-```
 
 assertThat(orderService.findByCustomer("ada"))
     .extracting(Order::status)
-```java
     .containsOnly(PENDING, COMPLETED);
-```
 
 assertThat(map)
     .containsEntry("tenant", "acme")
-```java
     .containsKeys("id", "name");
 ```
 
@@ -61,13 +56,11 @@ assertThat(map)
 assertThatThrownBy(() -> service.create(null))
     .isInstanceOf(IllegalArgumentException.class)
     .hasMessageContaining("customer")
-```java
     .hasMessageStartingWith("Order requires");
 
 // or the more declarative form:
 ```
 assertThatCode(() -> service.cancel(paidOrder))
-```java
     .doesNotThrowAnyException();
 ```
 
@@ -77,7 +70,7 @@ assertThatCode(() -> service.cancel(paidOrder))
 
 JUnit stops at the **first** failed assertion. `SoftAssertions` collects them all:
 
-```java
+```
 SoftAssertions softly = new SoftAssertions();
 softly.assertThat(order.id()).isNotNull();
 softly.assertThat(order.total()).isEqualByComparingTo(new BigDecimal("19.98"));
@@ -97,7 +90,6 @@ When one failed assert makes you rerun the test five times to find the rest, sof
 // Response DTO validation — the bread and butter of API tests:
 assertThat(response.getBody())
     .extracting(OrderDto::id, OrderDto::total, OrderDto::status)
-```java
     .containsExactly(orderId, new BigDecimal("19.98"), "PENDING");
 
 // Deep into the graph:
@@ -111,7 +103,6 @@ assertThat(response.getBody())
 assertThat(orders)
     .flatExtracting(Order::getLines)          // one list of all lines across orders
     .extracting(Line::productId)
-```java
     .contains("p1");
 ```
 
@@ -121,7 +112,6 @@ assertThat(orders)
 
 assertThat(order.createdAt())
     .isAfter(Instant.now().minusSeconds(5))
-```java
     .isBefore(Instant.now());
 
 assertThat(Path.of("target/test.csv")).exists().isRegularFile().hasSizeGreaterThan(0);

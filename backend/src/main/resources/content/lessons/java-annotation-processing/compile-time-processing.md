@@ -7,6 +7,7 @@ topics: [apt, annotation-processor, abstract-processor, code-generation, javapoe
 docs:
   - https://docs.oracle.com/javase/8/docs/api/javax/annotation/processing/AbstractProcessor.html
 ---
+# Compile-Time Annotation Processing — Code Generation with APT
 
 ## The Concept, From Zero
 
@@ -130,11 +131,9 @@ public class ToStringProcessor extends AbstractProcessor {
             TypeElement typeElement = (TypeElement) element;
             String className = typeElement.getSimpleName().toString();
             String packageName = processingEnv.getElementUtils()
-```java
                 .getPackageOf(typeElement).getQualifiedName().toString();
 
             // Collect all fields
-```
             List<VariableElement> fields = new ArrayList<>();
             for (Element enclosed : typeElement.getEnclosedElements()) {
                 if (enclosed.getKind() == ElementKind.FIELD) {

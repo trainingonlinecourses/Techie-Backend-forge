@@ -7,6 +7,7 @@ topics: [structured-logging, json, elk, datadog, log-aggregation, key-value]
 docs:
   - https://docs.spring.io/spring-boot/reference/features/logging.html
 ---
+# Structured Logging — Machine-Readable Logs
 
 ## The Concept, From Zero
 

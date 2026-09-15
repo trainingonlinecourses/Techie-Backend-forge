@@ -8,6 +8,7 @@ docs:
   - https://spring.io/guides/gs/rest-service
   - https://spring.io/guides/gs/securing-web
 ---
+# Building a Full-Stack Spring Boot Application — REST + JPA + Security
 
 ## The Concept, From Zero
 
@@ -440,14 +441,12 @@ class TaskControllerTest {
             .andExpect(status().isCreated())
             .andExpect(jsonPath("$.title").value("Fix bug"))
             .andExpect(jsonPath("$.priority").value("HIGH"))
-```java
             .andExpect(jsonPath("$.status").value("TODO"));
     }
     
     @Test
     void shouldRejectBlankTitle() throws Exception {
         CreateTaskRequest request = new CreateTaskRequest("", null, Task.Priority.LOW, null);
-```
         
         mockMvc.perform(post("/api/tasks")
                 .contentType(MediaType.APPLICATION_JSON)

@@ -9,6 +9,7 @@ docs:
     title: JEP 491 — Synchronize Virtual Threads without Pinning
 capstone: false
 ---
+# Java 24 — Synchronized Virtual Threads & AOT Loading (JEP 491, 483)
 
 ## The idea in one sentence
 

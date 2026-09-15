@@ -7,6 +7,7 @@ topics: [services, service-loader, provides, uses, spi, pluggable]
 docs:
   - https://docs.oracle.com/en/java/javase/17/language/module-system.html
 ---
+# Module Services — ServiceLoader and Provides/Uses
 
 ## The Concept, From Zero
 

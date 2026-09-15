@@ -7,6 +7,7 @@ topics: [retention, target, source, class, runtime, element-type, annotation-met
 docs:
   - https://docs.oracle.com/javase/tutorial/java/annotations/declaring.html
 ---
+# Annotation Retention and Targets — Where Annotations Live
 
 ## The Concept, From Zero
 
@@ -40,8 +41,10 @@ The annotation is discarded after the compiler processes it. It never appears in
 @Retention(RetentionPolicy.SOURCE)
 @Target(ElementType.METHOD)
 public @interface Override { }  // like the real @Override
+```
 
 **When to use:** Compile-time checks only. The compiler can warn you (e.g., "this method doesn't override anything"), but no framework can read it at runtime.
+```java
 
 @Override  // SOURCE retention — disappears after compilation
 public String toString() { return "hello"; }
@@ -61,9 +64,9 @@ The annotation is stored in the `.class` file but is NOT available via reflectio
 @Retention(RetentionPolicy.CLASS)
 @Target(ElementType.TYPE)
 public @interface Internal { }
+```
 
 **When to use:** Static analysis tools (SpotBugs, SonarQube) that read bytecode. Spring does NOT use CLASS retention — it needs RUNTIME.
-```
 
 <!-- why -->
 **What this code shows:**

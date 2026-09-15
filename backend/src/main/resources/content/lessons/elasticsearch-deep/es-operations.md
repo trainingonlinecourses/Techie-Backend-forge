@@ -113,7 +113,6 @@ List<Product> products = operations.queryForList(query, Product.class);
 // "find products where name OR description contains 'wireless'"
 SearchQuery query = new NativeSearchQueryBuilder()
     .withQuery(QueryBuilders.multiMatchQuery("wireless", "name", "description"))
-```java
     .build();
 ```
 
@@ -123,7 +122,6 @@ SearchQuery query = new NativeSearchQueryBuilder()
 SearchQuery query = new NativeSearchQueryBuilder()
     .withQuery(QueryBuilders.fuzzyQuery("name", "iphon")
         .fuzziness(Fuzziness.AUTO))  // Line 1: Allow typos
-```java
     .build();
 ```
 

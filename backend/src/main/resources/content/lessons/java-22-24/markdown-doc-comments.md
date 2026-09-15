@@ -9,6 +9,7 @@ docs:
     title: JEP 467 — Markdown Documentation Comments
 capstone: false
 ---
+# Java 23 — Markdown Documentation Comments (JEP 467)
 
 ## The idea in one sentence
 

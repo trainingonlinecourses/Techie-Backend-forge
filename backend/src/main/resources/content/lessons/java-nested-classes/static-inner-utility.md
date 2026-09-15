@@ -7,6 +7,7 @@ topics: [static-nested, inner-class, anonymous-class, local-class, memory-leak]
 docs:
   - https://docs.oracle.com/javase/tutorial/java/javaOO/nested.html
 ---
+# Static Nested vs Inner Classes — When to Use Which
 
 ## The Concept, From Zero
 

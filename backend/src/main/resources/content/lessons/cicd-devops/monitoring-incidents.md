@@ -124,9 +124,7 @@ Follow-ups:
 
 ## Chaos: Test the Failure Modes
 
-```java
 Production is a system of systems; the only way to trust the failure modes is to practice them:
-```
 
 - **Game days** — simulate a dependency outage (kill the DB) and watch the app behave (fail open? queue? degrade?).
 - **Load tests** — before releases, not after.

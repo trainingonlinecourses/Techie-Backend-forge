@@ -7,6 +7,7 @@ topics: [single-file, script-mode, shebang, java11]
 docs:
   - https://docs.oracle.com/en/java/javase/11/language/single-source-file-programs.html
 ---
+# Single-File Source-Code Programs — Run Java Like a Script
 
 ## The Concept, From Zero
 

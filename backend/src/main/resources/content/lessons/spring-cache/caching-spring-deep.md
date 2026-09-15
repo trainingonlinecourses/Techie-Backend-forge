@@ -8,6 +8,7 @@ docs:
   - https://docs.spring.io/spring-framework/reference/integration/cache.html
   - https://docs.spring.io/spring-boot/docs/current/reference/htmlio/features.html#features.caching
 ---
+# Spring Caching — Speed Up Your App Without Changing Code
 
 ## The Concept, From Zero
 

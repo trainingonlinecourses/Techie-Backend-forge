@@ -39,14 +39,12 @@ IntegrationFlow fileFlow() {
         .route(Order::kind, m -> m
             .channelMapping("standard", "orders.channel")
             .channelMapping("priority", "priority.channel"))
-```java
         .get();
 }
 
 @Bean
 IntegrationFlow handlerFlow() {
     return IntegrationFlow.from("orders.channel")
-```
         .handle("orderService", "handleOrder")               // service activator
         .get();
 }

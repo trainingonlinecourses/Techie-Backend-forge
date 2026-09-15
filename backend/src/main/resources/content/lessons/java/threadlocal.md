@@ -265,8 +265,8 @@ for (int i = 0; i < 1_000_000; i++) {
 
 **Why this happens:** In a thread pool, threads are reused. When a task completes without calling `remove()`, the ThreadLocal value persists for the next task that reuses that thread. With 10 threads and 1M tasks, the first 10 tasks leave stale data that affects all subsequent tasks.
 
-```java
 **The fix — always remove in a finally block:**
+```java
 
 executor.submit(() -> {
     try {

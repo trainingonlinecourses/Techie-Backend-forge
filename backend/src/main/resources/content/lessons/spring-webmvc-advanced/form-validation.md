@@ -216,13 +216,11 @@ class RegistrationFormTest {
                 .param("password", "s3cret!!")
                 .param("firstName", "Ada")
                 .param("age", "30"))
-```java
             .andExpect(status().is3xxRedirection());
     }
 
     @Test
     void invalidFormRerendersWithErrors() throws Exception {
-```
         mockMvc.perform(post("/register")
                 .param("email", "not-an-email")
                 .param("password", "x")

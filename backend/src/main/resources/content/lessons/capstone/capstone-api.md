@@ -34,9 +34,9 @@ public record AccountView(Long id, String iban, String currency, long balanceCen
                 a.getOwner(), a.getCreatedAt());
     }
 }
+```
 
 **Entities never cross the boundary** — services return views, controllers return views. The wire format is stable even when the entity changes.
-```
 
 <!-- why -->
 **What this code shows:**

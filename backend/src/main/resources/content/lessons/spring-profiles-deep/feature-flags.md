@@ -7,6 +7,7 @@ topics: [feature-flags, conditional-beans, conditional-on-property, gradual-roll
 docs:
   - https://docs.spring.io/spring-boot/reference/features/developing-auto-configuration.html
 ---
+# Feature Flags with Spring Profiles
 
 ## The Concept, From Zero
 

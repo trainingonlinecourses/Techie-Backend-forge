@@ -29,9 +29,7 @@ Single instance:                     Cluster:
 
 ## Redis replication — copying data
 
-```java
 **Replication** means one master and one or more slaves (replicas). The master handles writes; slaves handle reads and provide backup.
-```
 
 ```
 Master ←──writes──→ Client

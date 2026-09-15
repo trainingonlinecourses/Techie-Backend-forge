@@ -7,6 +7,7 @@ topics: [rest-client, http-client, webclient, timeouts, interceptors, resilience
 docs:
   - https://docs.spring.io/spring-framework/reference/integration/rest-clients.html
 ---
+# RestClient — The Modern Way to Call REST APIs from Spring
 
 ## The Concept, From Zero
 
@@ -18,8 +19,8 @@ Spring has three HTTP clients for calling REST APIs:
 2. **WebClient** (reactive) — non-blocking, reactive, complex
 3. **RestClient** (new in Spring 6.1) — blocking, fluent, modern
 
-```java
 **RestClient** is the modern replacement for RestTemplate. It's simpler, fluent, and supports the latest features:
+```java
 
 // Old way — RestTemplate
 RestTemplate restTemplate = new RestTemplate();
@@ -38,11 +39,8 @@ ResponseEntity<User> response = restTemplate.exchange(
 RestClient client = RestClient.create("https://api.example.com");
 
 User user = client.get()
-```java
     .uri("/users/{id}", userId)
-```
     .retrieve()
-```java
     .body(User.class);
 ```
 
@@ -57,7 +55,6 @@ RestClient client = RestClient.builder()
     .defaultHeader("Authorization", "Bearer " + token)
     .defaultHeader("Accept", MediaType.APPLICATION_JSON_VALUE)
     .requestFactory(new JdkClientHttpRequestFactory())  // Java 11+ HttpClient
-```java
     .build();
 
 // With timeouts
@@ -68,7 +65,6 @@ RestClient client = RestClient.builder()
             .connectTimeout(Duration.ofSeconds(5))
             .build()
     ))
-```java
     .build();
 ```
 
@@ -85,7 +81,7 @@ RestClient client = RestClient.builder()
 
 The same code, clean:
 
-```java
+```
 User user = client.get()
     .uri("/users/{id}", userId)
     .retrieve()
@@ -132,9 +128,7 @@ client.delete()
 
 // Handle specific status codes
 User user = client.get()
-```java
     .uri("/users/{id}", userId)
-```
     .retrieve()
     .onStatus(HttpStatusCode::is4xxClientError, (req, resp) -> {
         if (resp.getStatusCode().value() == 404) {
@@ -164,7 +158,7 @@ try {
 RestClient client = RestClient.builder()
     .requestInterceptor((request, body, execution) -> {
         log.info("→ {} {} {}bytes", request.getMethod(), request.getURL(), body.length);
-```java
+```
         long start = System.currentTimeMillis();
         ClientHttpResponse response = execution.execute(request, body);
         long duration = System.currentTimeMillis() - start;
@@ -193,7 +187,7 @@ public class UserServiceClient {
     }
     
     public Optional<User> findById(Long id) {
-```java
+```
         try {
             User user = client.get().uri("/users/{id}", id)
                 .retrieve().body(User.class);
@@ -203,8 +197,10 @@ public class UserServiceClient {
         }
     }
 }
+```
 
 **2. External API Integration**
+```
 @Service
 public class PaymentGateway {
     private final RestClient client;
@@ -222,7 +218,6 @@ public class PaymentGateway {
 
             .baseUrl(config.getBaseUrl())
             .defaultHeader("Authorization", "Bearer " + config.getApiKey())
-```java
             .build();
     }
     

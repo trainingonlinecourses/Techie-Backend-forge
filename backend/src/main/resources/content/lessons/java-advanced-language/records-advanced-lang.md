@@ -149,6 +149,7 @@ The old cast dance:
 public class Main {
 
     public static void main(String[] args) {
+        Object obj = "pattern matching";
         // OLD
         if (obj instanceof String) {
             String s = (String) obj;
@@ -172,6 +173,7 @@ public class Main {
 With flow scoping — `s` is usable *only where it's safe*:
 
 ```java
+Object obj = "a long pattern-matching string";
 if (obj instanceof String s && s.length() > 5) {
     System.out.println(s.toUpperCase());   // s in scope here
 }
@@ -287,9 +289,7 @@ No annotations needed for the common case — records' canonical constructor mat
 | instanceof patterns | Safe casts | Java 16 |
 | Record patterns | Nested destructuring | Java 21 |
 
-```java
 Records make data immutable and terse; sealed classes make hierarchies exhaustive; pattern matching makes handling them elegant and compiler-checked. This trio is the foundation of modern Java domain modeling — and it composes perfectly with the next lesson's switch expressions and richer language features.
-```
 
 <!-- why -->
 **What this code shows:**

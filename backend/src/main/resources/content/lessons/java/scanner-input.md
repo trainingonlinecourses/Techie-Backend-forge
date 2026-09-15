@@ -7,6 +7,7 @@ topics: [scanner, user-input, nextline-trap, console, input-validation]
 docs:
   - https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Scanner.html
 ---
+# Scanner & User Input — Reading Data the Safe Way
 
 ## The Concept, From Zero
 

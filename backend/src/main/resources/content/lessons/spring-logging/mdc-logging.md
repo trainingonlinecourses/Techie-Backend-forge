@@ -7,6 +7,7 @@ topics: [mdc, diagnostic-context, request-scoped, thread-local, logging-context]
 docs:
   - https://www.slf4j.org/manual.html#mdc
 ---
+# MDC Logging — Context Across Threads
 
 ## The Concept, From Zero
 

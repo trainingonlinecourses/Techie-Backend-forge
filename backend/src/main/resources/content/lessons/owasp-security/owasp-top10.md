@@ -17,8 +17,8 @@ OWASP (Open Worldwide Application Security Project) is a nonprofit that identifi
 
 ## A01: Broken Access Control (most common!)
 
-```java
 **What it is:** Users can access data or perform actions they shouldn't be able to.
+```java
 
 // VULNERABLE — no authorization check
 @GetMapping("/api/orders/{id}")
@@ -36,9 +36,9 @@ public Order getOrder(@PathVariable Long id,
     }
     return order;
 }
+```
 
 **How Spring Security prevents it:**
-```
 
 <!-- why -->
 **What this code shows:**
@@ -276,8 +276,8 @@ User user = mapper.readValue(jsonInput, User.class);
 
 ## A09: Security Logging and Monitoring Failures
 
-```java
 **What it is:** Not logging security events, making incidents undetectable.
+```java
 
 // Log security events
 @Component
@@ -295,9 +295,9 @@ public class SecurityAuditLogger {
         log.error("UNAUTHORIZED user={} resource={}", username, resource);  // Line 3: Error for access denial
     }
 }
+```
 
 **What to log:**
-```
 - Login success/failure
 - Password changes
 - Privileged actions

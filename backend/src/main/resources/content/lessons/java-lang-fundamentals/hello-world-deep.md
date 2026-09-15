@@ -8,6 +8,7 @@ docs:
   - https://docs.oracle.com/javase/8/docs/technotes/tools/windows/java.html
   - https://docs.oracle.com/javase/specs/jvms/se21/html/
 ---
+# Hello World — What Actually Happens When You Run It
 
 ## The Concept, From Zero
 

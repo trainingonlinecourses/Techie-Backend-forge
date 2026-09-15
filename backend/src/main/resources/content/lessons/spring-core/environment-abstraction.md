@@ -55,8 +55,8 @@ app.features.new-checkout=false
 app.db.url=jdbc:h2:mem:testdb
 ```
 
-```java
 **Scenario 2 — reading the environment programmatically.** Feature toggles, region, or instance metadata:
+```java
 
 @Service
 public class RegionRouter {
@@ -77,8 +77,8 @@ public class RegionRouter {
 
 `@Value` covers most needs; `Environment` is for dynamic lookups, defaults, and reading typed values (`getProperty("x", Integer.class)`).
 
-```java
 **Scenario 3 — active profiles in code.** Knowing which profile is active for conditional behavior:
+```java
 
 if (env.acceptsProfiles(Profiles.of("prod"))) {
     metricsRegistry.enable();   // only register prod-only collectors

@@ -22,7 +22,6 @@ void flux_emits_in_order() {
     StepVerifier.create(Flux.just("a", "b", "c"))
             .expectNext("a", "b", "c")
             .expectComplete()
-```java
             .verify();
 }
 
@@ -68,7 +67,6 @@ class CustomerApiTest {
         client.post().uri("/api/customers")
                 .bodyValue(new Customer("Ada", "ada@example.com"))
                 .exchange()
-```java
                 .expectStatus().isCreated();
 ```
 
@@ -76,7 +74,6 @@ class CustomerApiTest {
                 .exchange()
                 .expectStatus().isOk()
                 .expectBodyList(Customer.class)
-```java
                 .hasSize(1);
     }
 
@@ -101,7 +98,6 @@ void sse_stream_emits() {
             .exchange()
             .expectStatus().isOk()
             .returnResult(Quote.class)
-```java
             .getResponseBody();
 ```
 

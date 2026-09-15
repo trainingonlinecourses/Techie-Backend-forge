@@ -4,10 +4,8 @@ module: jackson-json
 order: 4
 minutes: 24
 topics: ["JSON Schema", "validation", "Bean Validation", "JsonNode validation", "integration", "error handling"]
-```java
 summary: Serialization handles shape; validation handles correctness. The JSON your API accepts isn't just wellformed — it must satisfy business rules: a to...
 docs:
-```
   - title: "JSON Schema (json-schema.org)"
     url: "https://json-schema.org/"
   - title: "Networknt JSON Schema Validator"
@@ -18,9 +16,7 @@ docs:
 
 ## The Concept: The Contract Beyond the Code
 
-```java
 Serialization handles *shape*; **validation** handles *correctness*. The JSON your API accepts isn't just well-formed — it must satisfy business rules: a total can't be negative, an email must look like an email, required fields must be present. This lesson is the contract layer: **JSON Schema** (the machine-readable specification of what valid JSON looks like — the API's documentation *and* its guard) and **Bean Validation** (the Spring-side validation that enforces those rules before your service code runs).
-```
 
 **The mental model:** the DTO defines the *types*; validation defines the *rules*. Jackson turns bytes into objects; validation then decides whether those objects are *acceptable*. JSON Schema is the language for expressing the rules independent of Java; Bean Validation (`@NotBlank`, `@Min`, `@Email`) is the Java-native way — and for a Spring API, the two can be complementary: Bean Validation for the 90% (declarative, integrated with `@RequestBody`), JSON Schema for the contract-first 10% (published specs, schema-driven generation, cross-language agreements).
 
@@ -120,7 +116,6 @@ public class Main {
         // networknt's validator (the standard choice):
         com.networknt.schema.JsonSchema schema = JsonSchemaFactory
                 .getInstance(SpecVersion.VersionFlag.V202012)
-```java
                 .getSchema(schemaDocument);              // the schema above
 ```
 
@@ -142,11 +137,10 @@ Jackson can *generate* a schema from your Java types (the reverse direction):
 
 // Generate a draft-07 schema from a POJO:
 com.fasterxml.jackson.module.jsonSchema.JsonSchema schema =
-```java
+```
         mapper.generateJsonSchema(Lesson.class);
 ```
 String schemaJson = mapper.writerWithDefaultPrettyPrinter()
-```java
                           .writeValueAsString(schema);
 ```
 

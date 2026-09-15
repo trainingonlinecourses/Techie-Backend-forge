@@ -9,6 +9,7 @@ docs:
     title: JDK 24 — all JEPs
 capstone: false
 ---
+# Java 23–24 — The Rest of the Train (Primitive Patterns, Module Imports, Compact Files)
 
 ## The idea in one sentence
 

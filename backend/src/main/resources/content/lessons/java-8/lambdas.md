@@ -8,6 +8,7 @@ docs:
   - https://docs.oracle.com/javase/tutorial/java/javaOO/lambdaexpressions.html
   - https://docs.oracle.com/javase/8/docs/api/java/util/function/package-summary.html
 ---
+# Lambda Expressions — Java's Most Transformative Feature
 
 ## The Concept, From Zero
 
@@ -228,9 +229,9 @@ Consumer<OrderEvent> handler = handlers.get(event.type());
 if (handler != null) {
     handler.accept(event);
 }
+```
 
 **Why lambdas here:** Each handler is a small, focused piece of behavior. Without lambdas, you'd need a separate class for each handler — four classes instead of four lambdas.
-```
 
 <!-- why -->
 **What this code shows:**
@@ -262,9 +263,9 @@ Function<Request, Request> pipeline = addAuth
     .andThen(addTimestamp);
 
 Request enrichedRequest = pipeline.apply(originalRequest);
+```
 
 **Why lambdas here:** Functional composition lets you build pipelines from small, testable pieces.
-```
 
 ### Scenario 3: Retry logic with exponential backoff
 

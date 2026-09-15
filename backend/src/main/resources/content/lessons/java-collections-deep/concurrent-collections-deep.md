@@ -8,6 +8,7 @@ docs:
   - https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/package-summary.html
   - https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/ConcurrentHashMap.html
 ---
+# Concurrent Collections — Thread-Safe Data Structures That Actually Scale
 
 ## The Concept, From Zero
 
@@ -243,8 +244,10 @@ public class RateLimiter {
         return requests.size() <= 100;  // Allow 100 req/sec
     }
 }
+```
 
 **3. Event Bus**
+```java
 public class EventBus {
 ```
     private final ConcurrentHashMap<Class<?>, CopyOnWriteArrayList<Object>> listeners = new ConcurrentHashMap<>();

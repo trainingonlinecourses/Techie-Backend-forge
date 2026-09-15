@@ -28,9 +28,9 @@ public class OrderService {
         return repo.save(order);  // Line 2: YOU call the repository
     }
 }
+```
 
 **Problems with this approach:**
-```
 1. `OrderService` is hardcoded to `PostgresOrderRepository` — can't switch to MongoDB without changing code
 2. Can't test without a real database — no way to inject a mock
 3. `OrderService` is responsible for BOTH creating AND using the repository

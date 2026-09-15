@@ -8,6 +8,7 @@ docs:
   - https://projectlombok.org/features/all
   - https://mapstruct.org/documentation/stable/reference/html/
 ---
+# Lombok & MapStruct — Eliminate Boilerplate Code
 
 ## The Concept, From Zero
 
@@ -145,14 +146,12 @@ Order order = Order.builder()
     .shippingAddress("123 Main St")
     .paymentMethod(PaymentMethod.CREDIT_CARD)
     .expedited(true)
-```java
     .build();
 
 // Partial update with builder
 ```
 Order updated = order.toBuilder()
     .shippingAddress("456 Oak Ave")
-```java
     .build();
 ```
 

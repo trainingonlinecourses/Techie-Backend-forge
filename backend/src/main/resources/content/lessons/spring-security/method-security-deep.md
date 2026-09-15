@@ -46,8 +46,8 @@ Then annotate service methods:
 
 ## How we use it in an organization: the scenarios
 
-```java
 **Scenario 1 — tenant isolation (the data-scoped rule that URL security can't do):**
+```java
 
 @Service
 public class OrderService {
@@ -72,14 +72,16 @@ public class OrderService {
 
 URL rules only see `/api/orders/{id}` — they cannot know which tenant the order belongs to. The method rule checks the actual record. This is the canonical "why method security exists" scenario.
 
-```java
 **Scenario 2 — ownership via method arguments:**
+```java
 
 @PreAuthorize("#userId == authentication.principal.id")
 public Profile getProfile(String userId) { ... }
 // Only the profile owner (or an explicit admin bypass) may read it.
+```
 
 **Scenario 3 — multi-role with escalation rules:**
+```java
 
 @PreAuthorize("hasAnyRole('ADMIN','AUDITOR') and @auditPolicy.allowsExport()")
 public byte[] exportLedger(LedgerFilter filter) { ... }

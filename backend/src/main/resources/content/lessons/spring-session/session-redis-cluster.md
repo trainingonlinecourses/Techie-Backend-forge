@@ -7,6 +7,7 @@ topics: [spring-session, redis-cluster, distributed-session, session-serializati
 docs:
   - https://docs.spring.io/spring-session/reference/
 ---
+# Spring Session with Redis Cluster — Distributed Session Management
 
 ## The Concept, From Zero
 

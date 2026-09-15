@@ -80,9 +80,9 @@ class FullContextTest {
         // the REAL service logic runs, backed by the mock repository
     }
 }
+```
 
 **The costs to know (why @MockBean is not always the answer):**
-```
 
 1. **Context caching is invalidated.** Spring caches contexts between tests for speed; every `@MockBean` change *rebuilds the context* (a new cached entry). Many tests with different `@MockBean` sets = many context rebuilds = slow suites. The guidance: group tests that share the same mock set, and prefer slice tests (`@WebMvcTest`) over full `@SpringBootTest` with mocks.
 2. **It's a blunt instrument.** Mocking the *repository* in a full-context test means the service's real SQL never runs — a contract you may want covered at the integration level (that's what `@DataJpaTest` + Testcontainers is for).
@@ -96,9 +96,7 @@ MockMvc lets you assert on the full HTTP response:
 
 mockMvc.perform(post("/api/lessons")
         .contentType(MediaType.APPLICATION_JSON)
-```java
         .content("{\"title\":\"A\",\"minutes\":-5}"))     // invalid input
-```
     .andExpect(status().isBadRequest())                    // 1. status
     .andExpect(jsonPath("$.message").exists())             // 2. body shape
     .andExpect(header().string("Content-Type", containsString("application/json")))

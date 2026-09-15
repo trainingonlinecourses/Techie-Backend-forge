@@ -7,6 +7,7 @@ topics: [logging, slf4j, logback, log-levels, structured-logging, spring-boot]
 docs:
   - https://docs.spring.io/spring-boot/reference/features/logging.html
 ---
+# Spring Boot Logging — From SLF4J to Production
 
 ## The Concept, From Zero
 

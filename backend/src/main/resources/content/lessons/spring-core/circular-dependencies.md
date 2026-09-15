@@ -66,8 +66,8 @@ public class AuditService {
 
 `ObjectProvider` defers the lookup to call time, so the constructor cycle disappears while keeping constructor injection on both sides.
 
-```java
 **Fix 3 — @Lazy on one side (the pragmatic escape hatch).** Inject a lazy proxy so construction order can proceed:
+```java
 
 @Service
 public class A {

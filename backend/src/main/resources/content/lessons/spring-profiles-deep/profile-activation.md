@@ -7,6 +7,7 @@ topics: [profile-activation, command-line, environment, system-property, test-pr
 docs:
   - https://docs.spring.io/spring-boot/reference/features/profiles.html
 ---
+# Profile Activation Methods — Ways to Enable Profiles
 
 ## The Concept, From Zero
 

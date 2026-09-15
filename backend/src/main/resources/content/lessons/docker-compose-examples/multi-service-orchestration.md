@@ -8,6 +8,7 @@ docs:
   - https://docs.docker.com/compose/
   - https://docs.docker.com/compose/compose-file/
 ---
+# Docker Compose — Multi-Service Application Orchestration
 
 ## The Concept, From Zero
 

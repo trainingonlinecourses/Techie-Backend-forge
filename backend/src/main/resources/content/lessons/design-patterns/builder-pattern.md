@@ -16,16 +16,16 @@ docs:
 
 Here's a real object that needs a lot of configuration: an `EmailMessage` with a recipient, subject, body, attachments, priority, and whether to track read receipts. How do you construct it?
 
-```java
 **Option A — one constructor with all parameters:**
+```java
 
 new EmailMessage("a@b.com", "Hello", "Body...", null, null, Priority.HIGH, true, false);
 ```
 
 Unreadable. Which `null` is the attachment? Which boolean is tracking? And if a field is optional, callers must pass `null`/`false` anyway. This is the **telescoping constructor** anti-pattern — constructors with ever-growing parameter lists (`(a)`, `(a,b)`, `(a,b,c)`, ...).
 
-```java
 **Option B — setters after construction:**
+```java
 
 EmailMessage m = new EmailMessage();
 m.setRecipient("a@b.com");

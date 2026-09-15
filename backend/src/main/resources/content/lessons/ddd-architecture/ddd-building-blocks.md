@@ -82,9 +82,9 @@ public record Money(BigDecimal amount, Currency currency) {
         return new Money(amount.multiply(BigDecimal.valueOf(quantity)), currency);
     }
 }
+```
 
 **Value-object rules**:
-```
 - Immutable
 - Equality by values, not identity
 - Self-validating (cannot be constructed invalid)

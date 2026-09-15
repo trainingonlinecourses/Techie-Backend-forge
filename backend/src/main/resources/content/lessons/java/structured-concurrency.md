@@ -82,8 +82,8 @@ try (var scope = new StructuredTaskScope.ShutdownOnFailure()) {
 
 ## org patterns
 
-```java
 **Parallel API aggregation:** call 3 microservices simultaneously, combine results:
+```java
 
 public OrderDetails getOrderDetails(long orderId) throws Exception {
     try (var scope = new StructuredTaskScope.ShutdownOnFailure()) {
@@ -96,9 +96,9 @@ public OrderDetails getOrderDetails(long orderId) throws Exception {
         return new OrderDetails(order.get(), customer.get(), shipping.get());
     }
 }
+```
 
 **Retry with fallback:** first try with timeout, fallback to cached:
-```
 
 <!-- why -->
 **What this code shows:**

@@ -60,7 +60,6 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers("/api/auth/**", "/actuator/health").permitAll()
                 .anyRequest().authenticated())                        // everything else needs a token
-```java
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
@@ -68,7 +67,6 @@ public class SecurityConfig {
     @Bean
     UserDetailsService userDetailsService(UserRepository users) {
         return username -> users.findByUsername(username)
-```
                 .map(UserPrincipal::new)
                 .orElseThrow(() -> new UsernameNotFoundException("Unknown user"));
     }

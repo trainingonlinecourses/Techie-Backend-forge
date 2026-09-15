@@ -7,6 +7,7 @@ topics: [@configurationproperties, type-safe-config, validation, defaults, sprin
 docs:
   - https://docs.spring.io/spring-boot/reference/features/external-config.html
 ---
+# @ConfigurationProperties — Type-Safe Configuration
 
 ## The Concept, From Zero
 

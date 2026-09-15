@@ -7,6 +7,7 @@ topics: [module-testing, jdeps, module-path, add-reads, module-boundaries]
 docs:
   - https://docs.oracle.com/en/java/javase/17/jtools/jdeps.html
 ---
+# Testing Module Systems — Strategies and Tools
 
 ## The Concept, From Zero
 

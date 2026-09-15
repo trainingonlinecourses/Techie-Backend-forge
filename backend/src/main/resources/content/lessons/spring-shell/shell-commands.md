@@ -7,6 +7,7 @@ topics: [@ShellMethod, cli, commands, availability, options, interactive]
 docs:
   - https://docs.spring.io/spring-shell/reference/
 ---
+# Shell Commands — Building CLI Interfaces
 
 ## The Concept, From Zero
 

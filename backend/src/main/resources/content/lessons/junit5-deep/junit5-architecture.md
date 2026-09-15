@@ -61,9 +61,9 @@ class LifecycleDemo {
     @Test
     void secondTest() { System.out.println("test 2"); }
 }
+```
 
 **Walking through the lifecycle:**
-```
 
 - **Default instance-per-test:** JUnit creates a *new instance of the test class for each test method*. That's why `@BeforeAll`/`@AfterAll` must be `static` — there's no instance yet when they run. (You can opt into per-class instances with `@TestInstance(Lifecycle.PER_CLASS)` — useful for stateful or `@BeforeAll`-on-instance setups.)
 - **Per-test setup/teardown:** `@BeforeEach`/`@AfterEach` run around every test — the place to reset state, start/stop mocks, open/close resources.

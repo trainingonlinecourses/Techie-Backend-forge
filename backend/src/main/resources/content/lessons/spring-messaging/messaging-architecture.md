@@ -40,9 +40,7 @@ Producer ──> Topic ──> Consumer A
 
 A message on a topic goes to **every** subscriber. Each consumer gets its own copy. Classic use: events — "user registered" goes to email-sender, analytics, and audit simultaneously.
 
-```java
 **The rule:** a *task* belongs in a queue (one worker should do it); a *fact/event* belongs on a topic (everyone interested should hear it).
-```
 
 ## The Broker — The Middleman
 

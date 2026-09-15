@@ -92,9 +92,7 @@ Expose this via an Actuator endpoint or Micrometer and you can see whether the c
 
 ## JCacheCacheManager (Ehcache 3)
 
-```java
 JSR-107 is a Java standard; Ehcache 3 is the reference implementation. Configuration lives in an XML file, which some teams prefer for tuning:
-```
 
 ```xml
 <dependency>

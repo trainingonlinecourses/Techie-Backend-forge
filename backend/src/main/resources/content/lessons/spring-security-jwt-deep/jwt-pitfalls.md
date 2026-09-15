@@ -47,8 +47,8 @@ The server expects **RS256** (asymmetric: private key signs, public key verifies
 3. Signs it with the **public key as the HMAC secret**.
 4. If the server verifies HS256 tokens using "the key" (and that key happens to be the public key) — the forgery validates.
 
-```java
 **The fix:** a library that ties the algorithm to the key type and *refuses to switch*:
+```java
 
 // jjwt: the key type determines the algorithm family; you cannot
 // "reuse" an RSA public key as an HMAC secret for verification.

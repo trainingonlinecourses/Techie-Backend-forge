@@ -184,7 +184,6 @@ String name = getCustomerName().orElseGet(() -> generateDefaultName());
 - Uses lambda expressions.
 
 Customer customer = findCustomer(id)
-```java
     .orElseThrow(() -> new NotFoundException("Customer not found: " + id));
 ```
 
@@ -198,7 +197,6 @@ Customer customer = findCustomer(id)
 // Only keep the value if it matches a condition
 Optional<String> email = Optional.of("alice@example.com")
     .filter(e -> e.contains("@"))       // Line 1: Keep if contains @
-```java
     .filter(e -> e.length() > 5);       // Line 2: Keep if longer than 5 chars
 // Line 3: Returns Optional.empty() if filter fails
 ```

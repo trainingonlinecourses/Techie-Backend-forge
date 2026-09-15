@@ -7,6 +7,7 @@ topics: [pattern-matching-switch, guarded-pattern, sealed-switch, java21]
 docs:
   - https://docs.oracle.com/en/java/javase/21/language/pattern-matching.html
 ---
+# Pattern Matching for switch — Type-Safe, Exhaustive Switch
 
 ## The Concept, From Zero
 

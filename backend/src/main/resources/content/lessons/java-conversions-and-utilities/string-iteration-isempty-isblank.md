@@ -8,6 +8,7 @@ docs:
   - https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html
   - https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Character.html
 ---
+# String Iteration, isEmpty vs isBlank, and String Inspection — How to Look at a String Correctly
 
 ## The Concept, From Zero
 

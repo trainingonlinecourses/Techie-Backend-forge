@@ -8,6 +8,7 @@ docs:
   - https://docs.oracle.com/javase/tutorial/java/nutsandbolts/op3.html
 capstone: false
 ---
+# Bitwise Operators — The Hidden Machinery of Integers
 
 ## The Concept, From Zero
 
@@ -17,10 +18,8 @@ An `int` is 32 bits. You normally treat it as one number, but every operator you
 
 Java writes binary literals with a `0b` prefix. Each bit position is worth a power of two:
 
-```java
 int a = 0b1010;   // 10  — 8 + 2
 int b = 0b0110;   // 6   — 4 + 2
-```
 
 The four logic operators compare two numbers **bit by bit**, position by position:
 

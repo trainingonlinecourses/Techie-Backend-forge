@@ -8,6 +8,7 @@ docs:
   - https://docs.spring.io/spring-boot/reference/features/auto-configuration.html
   - https://docs.spring.io/spring-framework/reference/core/beans/condition-annotations.html
 ---
+# Conditional Beans — Creating Beans Only When Needed
 
 ## The Concept, From Zero
 

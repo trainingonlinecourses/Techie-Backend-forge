@@ -7,6 +7,7 @@ topics: [switch-expression, arrow-syntax, yield, java17]
 docs:
   - https://docs.oracle.com/en/java/javase/17/language/switch-expressions.html
 ---
+# Switch Expressions — Modern Switch That Returns Values
 
 ## The Concept, From Zero
 

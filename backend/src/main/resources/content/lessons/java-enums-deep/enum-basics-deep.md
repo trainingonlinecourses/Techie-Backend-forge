@@ -149,9 +149,9 @@ public enum Operation {
         throw new IllegalArgumentException("Unknown symbol: " + symbol);
     }
 }
+```
 
 **Line-by-line explanation:**
-```
 
 <!-- why -->
 **What this code shows:**
@@ -167,12 +167,14 @@ public enum Operation {
 | `public abstract double apply(...)` | Abstract method forces each constant to implement | Compile error if you forget to implement for a new constant |
 | `Operation.fromSymbol("+")` | Static lookup method | Type-safe way to convert user input to enum constant |
 
-```java
 **Usage:**
+```java
 double result = Operation.MULTIPLY.apply(4, 5);  // 20.0
 Operation op = Operation.fromSymbol("+");          // Operation.ADD
+```
 
 **Why this is better than switch statements:**
+```java
 
 // BAD: switch-based approach (fragile, doesn't scale)
 public double calculate(String op, double a, double b) {

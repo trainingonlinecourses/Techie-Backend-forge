@@ -37,13 +37,11 @@ List<User> users = jdbcTemplate.query(
 ```
 String name = jdbcClient.sql("SELECT name FROM users WHERE id = ?")
     .param(userId)
-```java
     .queryForObject(String.class);
 ```
 
 List<User> users = jdbcClient.sql("SELECT * FROM users WHERE age > ?")
     .param(18)
-```java
     .query((rs, rowNum) -> new User(rs.getLong("id"), rs.getString("name")));
 ```
 
@@ -100,7 +98,6 @@ public class UserRepository {
             .param("email", email)
             .query((rs, rowNum) -> mapUser(rs))
             .stream()
-```java
             .findFirst();
     }
 
@@ -161,7 +158,7 @@ public List<User> findPage(int page, int size) {
 
 The same code, clean:
 
-```java
+```
 public Long insert(User user) {
     return jdbcClient.sql("INSERT INTO users (name, email, age) VALUES (:name, :email, :age)")
         .param("name", user.getName())
@@ -195,14 +192,12 @@ public int updateUser(Long id, String name, String email) {
         .param("id", id)
         .param("name", name)
         .param("email", email)
-```java
         .update();
 }
 
 // Delete user
 public int deleteUser(Long id) {
     return jdbcClient.sql("DELETE FROM users WHERE id = :id")
-```
         .param("id", id)
         .update();
 }
@@ -273,7 +268,6 @@ public class TransferService {
         jdbcClient.sql("UPDATE accounts SET balance = balance - :amount WHERE id = :id")
             .param("amount", amount)
             .param("id", fromId)
-```java
             .update();
 
         // Credit receiver

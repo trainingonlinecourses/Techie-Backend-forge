@@ -72,7 +72,6 @@ Thread v = Thread.startVirtualThread(() -> work());
 
 Thread v = Thread.ofVirtual()
     .name("vtask-", 0)
-```java
     .start(() -> work());
 
 // 3. With an executor
@@ -106,7 +105,6 @@ try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
 
 List<String> bodies = IntStream.range(0, 100_000)
     .mapToObj(i -> executor.submit(() -> fetch(url(i))))
-```java
     .map(f -> {
         try { return f.get(); } catch (Exception e) { return "error"; }
     })

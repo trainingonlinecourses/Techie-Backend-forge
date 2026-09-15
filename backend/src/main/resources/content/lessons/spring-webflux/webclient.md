@@ -68,7 +68,6 @@ Mono<Customer> c = api.get().uri("/customers/{id}", id)
         .retrieve()
         .onStatus(HttpStatusCode::is4xxClientError,
                 res -> Mono.error(new CustomerLookupException("not found: " + id)))
-```java
         .bodyToMono(Customer.class);
 ```
 
@@ -76,7 +75,6 @@ Mono<Customer> c = api.get().uri("/customers/{id}", id)
 
 WebClient client = builder
         .filter((request, next) -> next.exchange(request)          // auth header on every call
-```java
                 .doOnNext(res -> log.debug("{} {}", res.statusCode(), request.url())))
 ```
 
@@ -86,7 +84,6 @@ WebClient client = builder
 - Uses lambda expressions.
 
         .filter(ExchangeFilterFunctions.basicAuthentication("svc", secret))
-```java
         .build();
 ```
 
@@ -96,7 +93,6 @@ Filters compose like servlet filters: auth, logging, trace-id propagation, retri
 
 // Fetch all customers' orders concurrently — no thread pool needed:
 Flux<CustomerOrders> enriched = customerIds
-```java
         .flatMap(id -> api.get().uri("/customers/{id}/orders", id)
 ```
 

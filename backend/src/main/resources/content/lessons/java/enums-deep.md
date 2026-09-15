@@ -8,6 +8,7 @@ docs:
   - https://docs.oracle.com/javase/tutorial/java/javaOO/enum.html
   - https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Enum.html
 ---
+# Enums in Depth — Constants with Behavior
 
 ## The Concept, From Zero
 

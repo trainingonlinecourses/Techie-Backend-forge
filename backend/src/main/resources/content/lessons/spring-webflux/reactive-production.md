@@ -24,14 +24,13 @@ Two operators control *where* work runs:
 
 Flux<Row> rows = repo.findAll()
         .subscribeOn(Schedulers.boundedElastic())   // where the SOURCE runs
-```java
         .publishOn(Schedulers.parallel());          // where DOWNSTREAM operators run
 ```
 
 - `subscribeOn` — picks the thread for the source (the DB query).
 - `publishOn` — switches the downstream chain to another scheduler.
 
-```java
+```
 The event loop handles I/O; anything CPU-heavy or blocking must hop off it.
 ```
 
@@ -68,7 +67,6 @@ Reactive chains compose failure handling without new frameworks:
 Mono<Resp> call = client.call()
         .timeout(Duration.ofSeconds(2))                                  // fail fast
         .retryWhen(Retry.backoff(3, Duration.ofMillis(200)).jitter(0.5)) // transient retries
-```java
         .onErrorResume(e -> Mono.just(Resp.degraded()));                 // fallback
 ```
 
@@ -83,9 +81,7 @@ Resilience4j also ships reactive adapters (`Resilience4JCircuitBreakerFactory` w
 
 Reactive hops threads on every operator; **trace ids do not follow automatically**. Wire Reactor context propagation (Micrometer Tracing + `Hooks.enableAutomaticContextPropagation()` / `ContextSnapshotFactory`), and thread-hop-aware logging:
 
-```java
 Hooks.enableAutomaticContextPropagation();   // at startup — trace/span across threads
-```
 
 Without it, a request spanning 5 reactive hops produces 5 unrelated log lines — the incident-response nightmare that makes teams quit reactive.
 
@@ -96,9 +92,7 @@ Without it, a request spanning 5 reactive hops produces 5 unrelated log lines �
 - **Thin services around blocking SDKs** — if 80% of your I/O is blocking anyway, reactive adds cost without benefit.
 - **Small team, tight deadline, no reactive experience** — the learning curve is real.
 
-```java
 The pragmatic org pattern: **reactive only where it pays** — gateway, streaming, high-concurrency fan-out — and servlet everywhere else. Mixed stacks are normal; mixed stacks *within one service* are the problem.
-```
 
 <!-- why -->
 **What this code shows:**

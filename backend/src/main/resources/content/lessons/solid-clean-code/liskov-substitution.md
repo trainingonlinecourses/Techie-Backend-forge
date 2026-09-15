@@ -197,9 +197,7 @@ A `List<Bird>` containing a `Penguin` breaks any code that calls `fly()` on ever
 
 ## The Practical "Is-A" Test
 
-```java
 Before extending a class, ask: **can every parent behavior be honored by the child, under all conditions, with the same results?** If the child must override methods to *do nothing*, *throw*, or *behave differently* — it is not a subtype; use composition or an interface instead.
-```
 
 Also worth remembering: **prefer interfaces over inheritance for behavior sharing.** An interface is a pure contract — no mutable state, no inherited implementation to break. Records + interfaces (the Option B above) sidestep most LSP landmines by construction.
 

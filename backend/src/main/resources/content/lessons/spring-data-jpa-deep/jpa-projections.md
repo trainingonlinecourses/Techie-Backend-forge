@@ -34,8 +34,8 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
 The repository method returns the interface; Spring Data generates a **proxy implementation** backed by the selected values. **Closed projections** (every property comes from the entity, matching getter names) produce a tight `SELECT` of exactly those columns. That's the big win: the SQL itself changes, not just the Java type.
 
-```java
 **Open projections** use SpEL to compute values:
+```java
 
 public interface OrderView {
     @Value("#{target.amount.multiply(target.quantity)}")
@@ -101,11 +101,9 @@ Nested projections compose into a single query with joins — the correct fix wh
 
 **Scenario 1 — list endpoints (the 90% case).** Every "list orders", "search products", "my tickets" endpoint returns a projection, not entities. The payload is smaller, the SQL is narrower, and lazy-loading surprises disappear (no entity → no proxy → no N+1 from serialization).
 
-```java
 **Scenario 2 — export/report queries.** A report selecting 12 of 40 columns over millions of rows — projection keeps the result-set narrow and the query plan simple.
 
 **Scenario 3 — API versioning of shapes.** The entity changes internally; the projection interface stays the contract — the API shape is decoupled from the persistence shape, so renaming a column doesn't break the endpoint.
-```
 
 **Scenario 4 — counting/aggregates that still need shape.** Derived aggregate projections (`countByStatus`) or JPQL `select new ...(o.status, count(o))` group results into typed views instead of `Object[]`.
 

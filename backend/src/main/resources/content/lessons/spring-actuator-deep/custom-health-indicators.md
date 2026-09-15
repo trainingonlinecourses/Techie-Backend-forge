@@ -7,6 +7,7 @@ topics: [health-indicator, readiness-probe, liveness-probe, kubernetes-health, c
 docs:
   - https://docs.spring.io/spring-boot/docs/current/reference/html/actuator.html
 ---
+# Custom Health Indicators — Beyond /actuator/health
 
 ## The Concept, From Zero
 
@@ -44,11 +45,9 @@ public class ExternalApiHealthIndicator implements HealthIndicator {
             return Health.down()
                 .withDetail("api", apiUrl)
                 .withDetail("status", response.getStatusCode())
-```java
                 .build();
         } catch (Exception e) {
             return Health.down()
-```
                 .withDetail("api", apiUrl)
                 .withException(e)
                 .build();

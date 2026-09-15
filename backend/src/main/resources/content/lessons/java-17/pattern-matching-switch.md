@@ -8,6 +8,7 @@ docs:
   - https://openjdk.org/jeps/441
   - https://openjdk.org/jeps/427
 ---
+# Pattern Matching for switch — Eliminating Type-Check Boilerplate
 
 ## The Concept, From Zero
 
@@ -31,15 +32,15 @@ static String describe(Object obj) {
         return "Unknown: " + obj.getClass();
     }
 }
+```
 
 **The problems:**
-```
 1. You check the type, then cast — repeated boilerplate
 2. Easy to forget the cast after the `instanceof` check
 3. Long if-else chains are hard to read
 
-```java
 **Pattern matching for switch fixes this** (finalized in Java 21, JEP 441):
+```java
 
 // NEW way — clean and safe
 static String describe(Object obj) {
@@ -87,9 +88,9 @@ public class Main {
         };
     }
 }
+```
 
 **Key differences from traditional switch:**
-```
 - Use `->` instead of `case:`
 - No `break` needed — arrow cases don't fall through
 - Returns a value — can assign to a variable
@@ -187,9 +188,9 @@ public class ShapeCalculator {
         // No default needed — the compiler knows all cases are covered!
     }
 }
+```
 
 **Why this matters:** The compiler enforces exhaustiveness. If you add a new shape to the sealed hierarchy and forget to handle it, you get a compile error.
-```
 
 <!-- why -->
 **What this code shows:**
@@ -255,8 +256,8 @@ public class NestedPatterns {
 
 ### Organization Use Cases
 
-```java
 **1. API Request Routing**
+```java
 public class RequestRouter {
     public String route(Request request) {
         return switch (request) {
@@ -268,8 +269,10 @@ public class RequestRouter {
         };
     }
 }
+```
 
 **2. State Machine**
+```java
 public class OrderStateMachine {
     public OrderState transition(OrderState current, Event event) {
         return switch (current) {
@@ -284,8 +287,10 @@ public class OrderStateMachine {
         };
     }
 }
+```
 
 **3. Visitor Pattern Simplified**
+```java
 public class AstEvaluator {
     double evaluate(AstNode node) {
         return switch (node) {

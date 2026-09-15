@@ -8,6 +8,7 @@ docs:
   - https://docs.oracle.com/en/java/javase/21/jshell/
 capstone: false
 ---
+# JShell — Running Java Without a Project
 
 ## The Concept, From Zero
 

@@ -7,6 +7,7 @@ topics: [var, local-variable-type-inference, type-inference, java11]
 docs:
   - https://docs.oracle.com/en/java/javase/11/language/local-variable-type-inference.html
 ---
+# var — Local Variable Type Inference
 
 ## The Concept, From Zero
 

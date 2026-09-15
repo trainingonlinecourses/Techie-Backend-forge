@@ -218,13 +218,11 @@ class ViewTest {
             .andExpect(status().isOk())
             .andExpect(view().name("course/detail"))
             .andExpect(model().attributeExists("course"))
-```java
             .andExpect(content().string(containsString("Spring Boot")));
     }
 
     @Test
     void postRedirectsAfterCreate() throws Exception {
-```
         mockMvc.perform(post("/courses")
                 .param("title", "New Course"))
             .andExpect(status().is3xxRedirection())

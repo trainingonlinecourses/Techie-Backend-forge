@@ -109,9 +109,9 @@ listeners.remove(deadListener);
 for (Listener l : listeners) {       // iterates over the snapshot taken at loop start
     l.onEvent(event);                // safe even if another thread modifies the list
 }
+```
 
 **When to use it:**
-```
 | Scenario | Why CopyOnWriteArrayList fits |
 |---|---|
 | Event listener registries | Listeners change rarely; iteration is frequent |

@@ -90,9 +90,7 @@ Both are "interface = client" — the difference is the ecosystem wiring:
 | Circuit breaker | wrap yourself | integrated (`feign.circuitbreaker.enabled`) |
 | Best when | plain Spring app, or reactive stack | **Spring Cloud microservices with discovery** |
 
-```java
 Rule: inside a Spring Cloud/Eureka stack, Feign is the idiomatic client; in a plain Boot app (or reactive), HTTP interfaces are lighter. The contract-first mindset is identical — and OpenAPI + the generator produces either one (the openapi lesson).
-```
 
 ## The Feign-specific traps
 

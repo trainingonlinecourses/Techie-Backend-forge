@@ -12,9 +12,7 @@ docs:
 
 # Clean Architecture and the Dependency Rule
 
-```java
 Clean Architecture (Uncle Bob) generalizes hexagonal: concentric circles of responsibility, with **the dependency rule** — source code dependencies point *inward only*. Outer circles (frameworks, UI, DB) depend on inner circles (use cases, entities); never the reverse.
-```
 
 ## The Circles
 
@@ -238,12 +236,10 @@ class ArchitectureTest {
     static final ArchRule domainRule = classes()
         .that().resideInAPackage("..domain..")
         .should().onlyDependOnClassesThat()
-```java
         .resideInAnyPackage("..domain..", "java..");
 
     @ArchTest
     static final ArchRule dependencyRule = layeredArchitecture()
-```
         .consideringAllDependencies()
         .layer("Controllers").definedBy("..adapter.in..")
         .layer("UseCases").definedBy("..application..")

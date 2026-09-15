@@ -67,7 +67,6 @@ Each stage pulls from the previous. Elements flow through **one at a time**, ver
 // This never hangs — the pipeline pulls only until the first match
 Optional<Course> first = Stream.generate(() -> expensiveLoad())
     .filter(c -> c.isLong())
-```java
     .findFirst();
 ```
 
@@ -95,14 +94,12 @@ Stateless stages process one element independently. **Stateful stages buffer**: 
 courses.stream()
     .sorted(Comparator.comparing(Course::title))
     .limit(5)                    // still sorts all before taking 5
-```java
     .toList();
 ```
 
 ## peek: The Debugging Tool
 
 courses.stream()
-```java
     .peek(c -> log.debug("before filter: {}", c.id()))
 ```
 
@@ -112,7 +109,6 @@ courses.stream()
 - Uses lambda expressions.
 
     .filter(c -> c.published())
-```java
     .peek(c -> log.debug("after filter: {}", c.id()))
     .toList();
 ```
@@ -148,7 +144,6 @@ int total = courses.stream()
 // Custom accumulation
 String joined = courses.stream()
     .map(Course::title)
-```java
     .reduce("", (a, b) -> a + ", " + b);
 ```
 
@@ -164,7 +159,6 @@ String joined = courses.stream()
 // Boxing avoided: IntStream, LongStream, DoubleStream
 int totalMinutes = courses.stream()
     .mapToInt(Course::minutes)
-```java
     .sum();
 
 double avg = courses.stream()
@@ -177,13 +171,11 @@ double avg = courses.stream()
 
     .mapToInt(Course::minutes)
     .average()
-```java
     .orElse(0.0);
 ```
 
 IntSummaryStatistics stats = courses.stream()
     .mapToInt(Course::minutes)
-```java
     .summaryStatistics();
 // count, sum, min, max, average in one pass
 ```

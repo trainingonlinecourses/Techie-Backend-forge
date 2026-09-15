@@ -125,9 +125,7 @@ Symptoms: `Connection is not available, request timed out`, latency spikes, 500s
 
 ### 5. Table Bloat and Stale Stats
 
-```java
 Postgres keeps dead row versions (MVCC). **VACUUM** reclaims space; **ANALYZE** refreshes planner statistics:
-```
 
 ```sql
 VACUUM (ANALYZE) courses;          -- manual

@@ -21,7 +21,6 @@ MockMvc is the Swiss-army knife of Spring MVC testing: it drives the full dispat
 MockMvc mockMvc = MockMvcBuilders
     .standaloneSetup(new CourseController(courseService))
     .setControllerAdvice(new GlobalExceptionHandler())
-```java
     .build();
 ```
 
@@ -29,7 +28,7 @@ Explicit, isolated, instant. You wire exactly the beans the test needs.
 
 ### Web context (real config)
 
-```java
+```
 @WebMvcTest(CourseController.class)
 class CourseControllerTest {
     @Autowired MockMvc mockMvc;   // wired from the slice
@@ -46,7 +45,7 @@ Tests the real MVC configuration: converters, validation, interceptors, security
 ## The Request DSL
 
 mockMvc.perform(
-```java
+```
     get("/api/courses/{id}", 1L)
 ```
         .header("Authorization", "Bearer " + token)
@@ -54,9 +53,7 @@ mockMvc.perform(
         .param("size", "20")
         .contentType(MediaType.APPLICATION_JSON)
         .accept(MediaType.APPLICATION_JSON)
-```java
         .content("{\"title\":\"New\"}")
-```
         .sessionAttr("cart", cart)
 )
 
@@ -75,7 +72,7 @@ Request builders: `get`, `post`, `put`, `patch`, `delete`, `options`, `multipart
 
 The same code, clean:
 
-```java
+```
 mockMvc.perform(get("/api/courses"))
     .andExpect(status().isOk())
     .andExpect(status().is(200))
@@ -110,7 +107,6 @@ jsonPath supports the full Jayway JsonPath syntax: filters, wildcards, deep scan
 
 mockMvc.perform(get("/api/courses/1"))
     .andDo(print())                       // dump request + response to stdout
-```java
     .andExpect(status().isOk());
 ```
 
@@ -122,9 +118,7 @@ mockMvc.perform(get("/api/courses/1"))
 void invalidPayloadReturnsFieldErrors() throws Exception {
     mockMvc.perform(post("/api/courses")
             .contentType(MediaType.APPLICATION_JSON)
-```java
             .content("{\"title\":\"\",\"minutes\":-5}"))
-```
         .andExpect(status().isBadRequest())
         .andExpect(jsonPath("$.fieldErrors[*].field",
 ```java
@@ -162,9 +156,7 @@ For `DeferredResult`, `CompletableFuture`, or SSE, MockMvc needs async handling:
 void asyncEndpointEventuallyResolves() throws Exception {
     MvcResult result = mockMvc.perform(get("/api/orders/async"))
         .andExpect(request().asyncStarted())      // dispatch started
-```java
         .andReturn();
-```
 
     mockMvc.perform(asyncDispatch(result))         // complete the async result
         .andExpect(status().isOk())
@@ -177,14 +169,12 @@ void asyncEndpointEventuallyResolves() throws Exception {
 @WithMockUser(username = "admin", roles = "ADMIN")
 void adminCanDelete() throws Exception {
     mockMvc.perform(delete("/api/courses/1"))
-```java
         .andExpect(status().isNoContent());
 }
 
 @Test
 @WithAnonymousUser
 void anonymousIs401() throws Exception {
-```
     mockMvc.perform(get("/api/courses/1"))
         .andExpect(status().isUnauthorized());
 }
@@ -192,7 +182,6 @@ void anonymousIs401() throws Exception {
 // Custom user:
 mockMvc.perform(get("/api/me")
         .with(user("alice").password("pw").roles("USER")))
-```java
     .andExpect(status().isOk());
 ```
 
@@ -202,7 +191,6 @@ mockMvc.perform(post("/api/courses")
         .with(csrf())                                  // auto CSRF token
         .contentType(MediaType.APPLICATION_JSON)
         .content(body))
-```java
     .andExpect(status().isCreated());
 
 // without csrf(): 403 Forbidden
@@ -212,13 +200,11 @@ mockMvc.perform(post("/api/courses")
 
 mockMvc.perform(get("/api/profile")
         .sessionAttr("userId", 42L))
-```java
     .andExpect(status().isOk());
 
 // capture a cookie and reuse it
 MvcResult result = mockMvc.perform(post("/login")).andReturn();
 Cookie session = result.getResponse().getCookie("JSESSIONID");
-```
 
 mockMvc.perform(get("/api/profile").cookie(session))
 ```java

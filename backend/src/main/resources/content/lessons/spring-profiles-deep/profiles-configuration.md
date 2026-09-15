@@ -7,6 +7,7 @@ topics: [profiles, configuration, environment, yaml, @profile, application-prope
 docs:
   - https://docs.spring.io/spring-boot/reference/features/profiles.html
 ---
+# Spring Profiles — Environment-Specific Configuration
 
 ## The Concept, From Zero
 

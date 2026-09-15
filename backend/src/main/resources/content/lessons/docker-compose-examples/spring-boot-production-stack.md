@@ -8,6 +8,7 @@ docs:
   - https://docs.docker.com/samples/spring-boot-containerize/
   - https://spring.io/guides/gs/spring-boot-docker/
 ---
+# Spring Boot + Docker Compose — Full Production Stack
 
 ## The Concept, From Zero
 

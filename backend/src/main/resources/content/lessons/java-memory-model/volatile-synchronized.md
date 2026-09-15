@@ -7,6 +7,7 @@ topics: [volatile, synchronized, memory-visibility, happens-before, monitor, mut
 docs:
   - https://docs.oracle.com/javase/tutorial/essential/concurrency/memconsist.html
 ---
+# Volatile and Synchronized — Memory Visibility
 
 ## The Concept, From Zero
 
@@ -21,10 +22,10 @@ while (running) { /* work */ }
 
 // Thread 2
 running = false;  // Thread 1 may loop forever!
+```
 
 
 **What this code does — step by step:**
-```
 
 1. FIXED with volatile
 2. Thread 1
@@ -79,9 +80,9 @@ synchronized (lock) {
     // Only one thread can execute this block at a time
     counter++;
 }
+```
 
 **Use synchronized for:**
-```
 - Compound operations (`counter++`)
 - Protecting mutable shared state
 - When you need both visibility and atomicity

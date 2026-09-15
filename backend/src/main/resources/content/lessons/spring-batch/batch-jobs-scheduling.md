@@ -18,7 +18,6 @@ docs:
 JobExecution ex = jobLauncher.run(job, new JobParametersBuilder()
     .addString("inputFile", "/data/orders-20260817.csv")
     .addLong("runId", System.currentTimeMillis())
-```java
     .toJobParameters());
 
 // 3. From a REST endpoint (an "admin trigger"):
@@ -33,7 +32,7 @@ public String runStatements() { ... jobLauncher.run(...); }
 `JobInstance` = `Job` + `JobParameters`. This drives the rerun rules:
 
 // Same params on an already-COMPLETED job → JobInstanceAlreadyCompleteException
-```java
+```
 // (protects against double-processing the same input!)
 jobLauncher.run(job, new JobParametersBuilder().addString("inputFile", path).toJobParameters());
 
@@ -42,7 +41,6 @@ jobLauncher.run(job, new JobParametersBuilder().addString("inputFile", path).toJ
 jobLauncher.run(job, new JobParametersBuilder()
     .addString("inputFile", path)
     .addLong("runId", System.currentTimeMillis())   // unique → new JobInstance
-```java
     .toJobParameters());
 ```
 

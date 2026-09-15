@@ -7,6 +7,7 @@ topics: [@Profile, conditional, environment, default-profile, profile-groups, de
 docs:
   - https://docs.spring.io/spring-framework/reference/core/beans/environment-profiles.html
 ---
+# Profile-Specific Beans — Conditional Registration
 
 ## The Concept, From Zero
 
@@ -82,7 +83,6 @@ public class ProfileConfig {
         return new EmbeddedDatabaseBuilder()
             .setType(EmbeddedDatabaseType.H2)
             .addScript("schema-dev.sql")
-```java
             .build();
     }
 
@@ -90,7 +90,6 @@ public class ProfileConfig {
     @Profile("prod")
     public DataSource prodDataSource() {
         return DataSourceBuilder.create()
-```
             .url("jdbc:postgresql://prod-db:5432/myapp")
             .build();
     }

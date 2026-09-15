@@ -7,6 +7,7 @@ topics: [keywords, language, syntax, identifiers, reserved-words, java-lang]
 docs:
   - https://docs.oracle.com/javase/specs/jls/se21/html/jls-3.html#jls-3.9
 ---
+# The 50 Java Keywords — What Each One Actually Does
 
 ## The Concept, From Zero
 
@@ -520,6 +521,7 @@ Map<String, Integer> scores = new HashMap<>();
 public class Main {
 
     public static void main(String[] args) {
+        Object obj = "hello instanceof";
         // Classic: check then cast
         if (obj instanceof String) {
             String s = (String) obj;

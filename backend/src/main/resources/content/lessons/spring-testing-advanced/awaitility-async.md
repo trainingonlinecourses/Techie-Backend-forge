@@ -21,9 +21,9 @@ orderService.processPayment(orderId);
 Thread.sleep(5000);                                    // Wait 5 seconds
 Order order = orderRepository.findById(orderId).orElseThrow();
 assertThat(order.getStatus()).isEqualTo(OrderStatus.PAID);   // Check result
+```
 
 **Problems with Thread.sleep:**
-```
 1. **Too short**: If the operation takes 6 seconds, the test fails (flaky!)
 2. **Too long**: If the operation takes 100ms, you waste 4.9 seconds per test (slow CI!)
 3. **No signal**: You don't know WHEN the condition becomes true — you just guess and wait

@@ -91,8 +91,10 @@ public class ResilientCatalogClient {
 
     private boolean isTransient(Throwable t) {
         return t instanceof org.springframework.web.client.HttpServerErrorException
+```
                 || t instanceof java.net.SocketTimeoutException
                 || t instanceof java.net.ConnectException;
+```java
     }
 }
 ```

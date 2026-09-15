@@ -449,6 +449,32 @@ h1.ptitle { font-family: var(--disp); font-weight: 700; font-size: clamp(24px, 4
   background: var(--bg2); margin: 16px 0;
   transition: all .3s ease;
 }
+
+/* Code block + collapsible explanation ("What this code shows") */
+.cww { margin: 16px 0; }
+.cww .codeblock { margin: 0; }
+.cww-toggle {
+  display: inline-flex; align-items: center; gap: 6px;
+  margin: 6px 0 0; padding: 5px 12px;
+  font: inherit; font-size: 0.82rem; font-weight: 600;
+  color: var(--mut);
+  background: var(--surface); border: 1px solid var(--line);
+  border-radius: 999px; cursor: pointer;
+  transition: color .15s ease, border-color .15s ease, background .15s ease;
+}
+.cww-toggle:hover { color: var(--amber); border-color: var(--amber); }
+.cww-toggle.open { color: var(--amber); border-color: var(--line2); }
+.cww-chev { font-size: 0.75rem; line-height: 1; }
+.cww-body {
+  margin-top: 8px; padding: 10px 16px;
+  border-left: 3px solid var(--amber); border-radius: 0 10px 10px 0;
+  background: var(--surface);
+  animation: cww-in .18s ease;
+}
+.cww-body .markdown > :first-child { margin-top: 0; }
+.cww-body .markdown > :last-child { margin-bottom: 0; }
+@keyframes cww-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .cww-body { animation: none; } }
 .codeblock:hover { border-color: var(--line2); box-shadow: 0 8px 24px rgba(0,0,0,0.2); }
 .codeblock figcaption {
   display: flex; align-items: center; gap: 10px;

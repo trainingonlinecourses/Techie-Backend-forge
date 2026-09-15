@@ -26,12 +26,12 @@ public Order getOrder(String id) {
     // If 1000 requests come in, you need 1000 threads
     return order;
 }
+```
 
 **Virtual threads flip the model:** Instead of expensive OS threads, you get millions of cheap JVM-managed threads. When a virtual thread blocks on I/O, the JVM **parks it** and runs another virtual thread on the same OS thread. Thread-per-request is back, at scale:
 
 
 **What this code does — step by step:**
-```
 
 1. Virtual threads — millions of cheap threads, scheduled by the JVM
 2. Line 1: Create an executor that gives each task its own virtual thread

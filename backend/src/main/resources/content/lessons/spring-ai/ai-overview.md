@@ -216,12 +216,10 @@ public class AiTutorRAG {
 ```
         String context = relevantDocs.stream()
             .map(Document::getContent)
-```java
             .collect(Collectors.joining("\n\n"));
 
         // 3. Ask AI with the context
         return chatClient.prompt()
-```
             .system("""
                 You are a Java tutor. Answer based ONLY on the provided curriculum context.
                 If the context doesn't contain enough information, say so.

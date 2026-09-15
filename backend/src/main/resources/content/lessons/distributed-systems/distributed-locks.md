@@ -136,9 +136,7 @@ public void runNightly() { ... }
 | Use for | Job dedup, rate limits | Critical coordination |
 | Consensus | None | Raft/ZAB |
 
-```java
 **Redlock** (Redis's multi-node lock) has a famous critique — it's not as safe as consensus-based locks. For *critical* coordination (leader election, split-brain-sensitive work), use etcd/ZooKeeper; for job dedup, Redis is fine.
-```
 
 ## The Decision Checklist
 
@@ -161,9 +159,7 @@ public void runNightly() { ... }
 | Stale holders | Fencing tokens — the resource rejects |
 | Production | ShedLock (JDBC/Redis) or etcd/ZooKeeper |
 
-```java
 Distributed locks are a lease, not a guarantee: TTLs make them crash-safe, renewals keep long jobs covered, and fencing tokens make stale holders harmless. For job scheduling, use ShedLock; for critical coordination, use a consensus system — and when you can, prefer idempotency, which makes the lock's failure mode irrelevant.
-```
 
 ## References
 

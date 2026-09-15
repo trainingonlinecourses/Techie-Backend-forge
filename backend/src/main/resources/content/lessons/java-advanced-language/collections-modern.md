@@ -68,7 +68,6 @@ List<String> immutable = List.copyOf(mutableList);
 // Java 16+: Stream.toList() — immutable, no collectors needed
 List<String> titles = courses.stream()
     .map(Course::title)
-```java
     .toList();                       // instead of .collect(Collectors.toList())
 
 // Java 11+: toArray(IntFunction)
@@ -100,13 +99,13 @@ String[] arr = titles.stream().toArray(String[]::new);
 The fluent mutation style (Java 8+):
 
 List<String> tags = new ArrayList<>();
-```java
+```
 tags.add("java");
 tags.add("spring");
 // vs
 ```
 List<String> tags = new ArrayList<>();
-```java
+```
 Collections.addAll(tags, "java", "spring");
 ```
 
@@ -115,14 +114,12 @@ Collections.addAll(tags, "java", "spring");
 // Take courses until the first one over 40 minutes
 List<Course> shortOnes = courses.stream()
     .takeWhile(c -> c.minutes() <= 40)
-```java
     .toList();
 
 // Drop everything up to and including the first long course
 ```
 List<Course> after = courses.stream()
     .dropWhile(c -> c.minutes() <= 40)
-```java
     .toList();
 ```
 
@@ -132,19 +129,17 @@ List<Course> after = courses.stream()
 
 // Finite iteration with a predicate (Java 9+)
 List<Integer> powers = Stream.iterate(1, n -> n < 1000, n -> n * 2)
-```java
     .toList();   // [1, 2, 4, 8, ..., 512]
 
 // Old: infinite + limit
 ```
 List<Integer> powers = Stream.iterate(1, n -> n * 2)
-```java
     .limit(10).toList();
 ```
 
 ## Records and Collections: The DTO Pattern
 
-```java
+```
 public record CourseSummary(Long id, String title, int minutes) {
     public static CourseSummary from(Course c) {
         return new CourseSummary(c.id(), c.title(), c.minutes());
@@ -162,7 +157,6 @@ public record CourseSummary(Long id, String title, int minutes) {
 
 List<CourseSummary> summaries = courses.stream()
     .map(CourseSummary::from)
-```java
     .toList();
 ```
 

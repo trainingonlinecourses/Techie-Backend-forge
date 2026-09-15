@@ -7,6 +7,7 @@ topics: [stream, toList, collectors, unmodifiable, java17]
 docs:
   - https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/stream/Stream.html#toList()
 ---
+# Stream.toList() — The Simplest Terminal Operation
 
 ## The Concept, From Zero
 
@@ -15,7 +16,6 @@ Before Java 16, collecting a stream to a list required a verbose collector:
 // OLD WAY
 List<String> names = people.stream()
     .map(Person::name)
-```java
     .collect(Collectors.toList());  // verbose
 
 // JAVA 16+
@@ -28,7 +28,6 @@ List<String> names = people.stream()
 
 List<String> names = people.stream()
     .map(Person::name)
-```java
     .toList();  // simple!
 ```
 

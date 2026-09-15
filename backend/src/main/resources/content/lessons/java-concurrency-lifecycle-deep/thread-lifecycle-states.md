@@ -8,6 +8,7 @@ docs:
   - https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Thread.State.html
   - https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Thread.html
 ---
+# Thread Lifecycle & States — How Threads Actually Live and Die
 
 ## The Concept, From Zero
 

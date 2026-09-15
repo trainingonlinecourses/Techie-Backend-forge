@@ -7,6 +7,7 @@ topics: [functional-interface, @functionalinterface, predicate, consumer, suppli
 docs:
   - https://docs.oracle.com/javase/8/docs/api/java/util/function/package-summary.html
 ---
+# Functional Interfaces — The Contracts Behind Lambdas
 
 ## The Concept, From Zero
 
@@ -23,9 +24,9 @@ public interface StringProcessor {
 StringProcessor upper = s -> s.toUpperCase();
 StringProcessor trim = s -> s.trim();
 String result = upper.process("hello");  // "HELLO"
+```
 
 **Why not just use interfaces with default methods?** Java 8 added default methods to interfaces. But a functional interface has exactly ONE abstract method — default methods don't count.
-```
 
 <!-- why -->
 **What this code shows:**

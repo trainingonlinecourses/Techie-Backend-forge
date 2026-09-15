@@ -93,8 +93,8 @@ public RedirectView resolve(@PathVariable String code) {
 
 ## How we use it in an organization: the scenarios
 
-```java
 **Scenario 1 — legacy URL migration.** Old paths redirect (301) to new ones so bookmarks, links, and SEO equity transfer:
+```java
 
 @GetMapping("/products/item/{oldId}")
 public RedirectView legacy(@PathVariable String oldId) {

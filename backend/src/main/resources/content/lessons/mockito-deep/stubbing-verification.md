@@ -168,8 +168,8 @@ verifyNoInteractions(mock);               // it was never touched at all
 
 **`verifyNoMoreInteractions` and `verifyNoInteractions`** are the strictness tools: they assert the *absence* of unexpected calls. `verifyNoInteractions(mock)` is the standard "this path must not touch the dependency" assertion — e.g., "a cached read must not hit the repository."
 
-```java
 **In-order verification** — asserting the sequence of calls:
+```java
 
 InOrder inOrder = inOrder(repo, auditLog);
 

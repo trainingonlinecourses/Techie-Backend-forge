@@ -8,6 +8,7 @@ docs:
   - https://docs.oracle.com/javase/8/docs/api/java/util/EnumSet.html
   - https://docs.oracle.com/javase/8/docs/api/java/util/EnumMap.html
 ---
+# EnumSet, EnumMap & Strategy Pattern — Enums Beyond Basics
 
 ## The Concept, From Zero
 

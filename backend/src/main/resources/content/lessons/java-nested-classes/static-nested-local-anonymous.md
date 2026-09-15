@@ -7,6 +7,7 @@ topics: [static-nested, local-class, anonymous-class, lambda-replacement, callba
 docs:
   - https://docs.oracle.com/javase/tutorial/java/javaOO/index.html
 ---
+# Static Nested, Local, and Anonymous Classes — All Three Explained
 
 ## The Concept, From Zero
 

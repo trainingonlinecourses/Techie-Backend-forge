@@ -121,8 +121,8 @@ Result: The event was processed TWICE (at-least-once)
 2. **At-least-once** — Commit AFTER processing. Crash = duplicate processing. **Default.**
 3. **Exactly-once** — Achievable with Kafka transactions + idempotent consumers.
 
-```java
 **Because at-least-once is the practical default, every consumer must be idempotent:**
+```java
 
 @KafkaListener(topics = "orders")
 public void handleOrder(OrderCreated event) {
@@ -207,9 +207,9 @@ record ShipmentDispatched(UUID orderId, TrackingNumber tracking) {}
 // BAD — commands (things to do)
 record CreateOrder(UUID orderId) {}      // This is a command, not a fact
 record ProcessPayment(UUID orderId) {}   // This tells someone what to do
+```
 
 **Why:** An event represents something that ALREADY happened. "OrderCreated" means the order WAS created. You can't un-create it. A command like "CreateOrder" implies it might not happen — that's a different pattern.
-```
 
 <!-- why -->
 **What this code shows:**

@@ -50,9 +50,9 @@ static void changeNumber(int n) {
     n = 99;  // This changes the COPY, not the original
     System.out.println("Inside method: " + n);     // 99
 }
+```
 
 **What happens step by step:**
-```
 
 <!-- why -->
 **What this code shows:**
@@ -130,9 +130,9 @@ static void reassignReference(StringBuilder s) {
     s = new StringBuilder("World");  // Creates a NEW object, reassigns the local reference
     System.out.println("Inside: " + s);  // World
 }
+```
 
 **What happened:**
-```
 
 <!-- why -->
 **What this code shows:**

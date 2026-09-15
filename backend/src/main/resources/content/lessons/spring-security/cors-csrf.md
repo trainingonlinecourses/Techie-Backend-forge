@@ -48,9 +48,7 @@ http.csrf(AbstractHttpConfigurer::disable);
 
 ## Security headers
 
-```java
 Spring Security sets sane defaults; tune the important ones:
-```
 
 ```yaml
 server:

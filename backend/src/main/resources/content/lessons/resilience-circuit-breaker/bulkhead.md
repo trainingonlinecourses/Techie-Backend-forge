@@ -90,9 +90,7 @@ public class AiTutorService {
 
 **Thread-pool bulkhead** — a dedicated pool (`maxThreadPoolSize(10)`, queue 20) for catalog calls. Catalog's slowness fills *its own* pool; the main request threads never wait on it.
 
-```java
 **The asymmetry of protection** — without bulkheads, the *whole* pool is shared, so one slow dependency starves everything. With bulkheads, each dependency has its own ceiling; the blast radius is contained to the compartment.
-```
 
 ## Bulkhead + Circuit Breaker + Retry — The Stack
 

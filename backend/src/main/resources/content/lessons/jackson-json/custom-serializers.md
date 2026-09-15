@@ -194,9 +194,9 @@ public class UserDto {
 public UserDto get(@PathVariable Long id) { ... }
 
 // A public endpoint uses the Public view — phone is omitted.
+```
 
 **The trade-off vs DTOs:** views avoid duplicating classes for "same shape, different fields" — but they spread the contract across annotations. For more than two views, explicit DTOs are usually clearer. Views are the right tool when the object is genuinely one type with context-dependent exposure (public profile vs admin record).
-```
 
 <!-- why -->
 **What this code shows:**

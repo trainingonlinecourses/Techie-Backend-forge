@@ -54,9 +54,9 @@ public class Application {
         startServer(pool, broker);
     }
 }
+```
 
 **Order is NOT guaranteed.** Hooks run concurrently in separate threads. If broker depends on the database being available during shutdown, you need explicit ordering within the hooks.
-```
 
 <!-- why -->
 **What this code shows:**

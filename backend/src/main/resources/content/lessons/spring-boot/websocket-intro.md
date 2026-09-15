@@ -8,6 +8,7 @@ docs:
   - https://docs.spring.io/spring-framework/reference/web/websocket.html
   - https://spring.io/guides/gs/messaging-stomp-websocket
 ---
+# WebSockets — Real-Time Communication Without Polling
 
 ## The Concept, From Zero
 

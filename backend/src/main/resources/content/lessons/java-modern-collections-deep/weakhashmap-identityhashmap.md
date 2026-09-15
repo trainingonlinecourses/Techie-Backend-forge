@@ -9,6 +9,7 @@ docs:
   - https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/IdentityHashMap.html
   - https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/ref/WeakReference.html
 ---
+# WeakHashMap and IdentityHashMap — The Unusual Map Implementations
 
 ## The Concept, From Zero
 

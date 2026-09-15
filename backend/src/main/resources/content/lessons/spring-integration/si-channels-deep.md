@@ -18,9 +18,7 @@ docs:
 
 The channel is the *pipe* of the integration — but not all pipes behave alike. The channel type you choose *is* the integration's semantics: **direct** channels are synchronous calls (transactional, blocking), **queue** channels are async buffers (decoupled, buffered), **publish-subscribe** channels broadcast to every subscriber, and **priority** channels reorder by importance. Choosing wrong is how integrations deadlock, drop messages, or silently reorder them — so the channel decision deserves deliberate thought, not the default.
 
-```java
 **The mental model:** a direct channel is a phone call — connected the instant you dial, synchronous, one listener. A queue channel is a mailbox — you drop the letter and leave; the recipient collects it whenever. A publish-subscribe channel is a town crier — *everyone* hears it. Each serves a different need, and the *channel* (not the endpoints) embodies that difference.
-```
 
 ## DirectChannel: The Synchronous Default
 
@@ -33,9 +31,7 @@ MessageChannel ordersChannel() {
 
 **The semantics:** the sender invokes the receiver *in the same thread* — a synchronous method call through the message abstraction. `channel.send(message)` blocks until the (single) subscriber's endpoint finishes.
 
-```java
 **Why it's the default:** transactions and error handling stay in the caller's thread. If the flow must be *transactional* ("consume this JMS message, transform it, and write to the DB — all-or-nothing"), the direct channel is the vehicle: the whole chain runs inside the consuming transaction. The backpressure is natural: a slow consumer blocks the producer. **The caveat:** the synchronous chain runs *in your request thread* — a long pipeline (file processing, slow API calls) ties up the thread; that's when a queue or an async poller is the right switch.
-```
 
 <!-- why -->
 **What this code shows:**
@@ -139,9 +135,7 @@ public IntegrationFlow processEmail() {
 | Process by importance | **Priority** |
 | Reliable cross-restart messaging | **A real broker via an adapter**, not an in-memory channel |
 
-```java
 **The production wisdom:** direct channels for the *transactional* parts of a flow; queue/executor channels at the *boundaries* where speed must be decoupled; pub-sub for fan-out; and — the recurring theme — *in-memory channels are for in-process integration*, while *reliable, durable messaging belongs to a broker* (Kafka/RabbitMQ/JMS) reached through adapters. The channel is the semantics; choose it like you'd choose a data structure.
-```
 
 ## Recap
 

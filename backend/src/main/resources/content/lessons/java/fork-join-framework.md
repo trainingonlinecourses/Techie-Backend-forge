@@ -85,9 +85,9 @@ ForkJoinPool.commonPool().submit(() -> {
 
 // Custom pool for CPU-bound work
 ForkJoinPool customPool = new ForkJoinPool(8);  // 8 worker threads
+```
 
 **When to use ForkJoinPool:** CPU-bound recursive tasks (sorting, image processing, tree traversal, matrix multiplication). **When NOT to use it:** I/O-bound tasks (HTTP calls, database queries), blocking operations, or tasks that don't split naturally.
-```
 
 <!-- why -->
 **What this code shows:**
@@ -155,8 +155,10 @@ public class ChunkedParser extends RecursiveTask<List<Order>> {
     // Split file into 10MB chunks, parse each in parallel
     // Each chunk is independent — perfect for fork/join
 }
+```
 
 **Tree processing:** when you have a tree structure (organizational chart, file system, AST), fork at each node:
+```java
 
 protected NodeCount compute() {
     if (node.children().isEmpty()) return new NodeCount(1, 0);

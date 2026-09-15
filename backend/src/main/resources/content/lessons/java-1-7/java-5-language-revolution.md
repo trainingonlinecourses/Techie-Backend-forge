@@ -9,6 +9,7 @@ docs:
   - https://dev.java/learn/generics/
 capstone: false
 ---
+# Java 5 (2004) — Generics, Enums, Autoboxing, Varargs: the Language Revolution
 
 ## The idea in one sentence
 

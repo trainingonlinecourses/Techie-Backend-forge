@@ -7,6 +7,7 @@ topics: [structured-concurrency, shutdown-scope, task-group, jep502, java26]
 docs:
   - https://openjdk.org/jeps/502
 ---
+# Structured Concurrency — Clean Task Management
 
 ## The Concept, From Zero
 

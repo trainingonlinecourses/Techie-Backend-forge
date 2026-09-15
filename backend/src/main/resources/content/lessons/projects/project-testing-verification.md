@@ -8,6 +8,7 @@ docs:
   - https://docs.spring.io/spring-boot/reference/testing.html
   - https://docs.docker.com/compose/
 ---
+# Project Testing & Verification — Proving Every Project Works
 
 ## Why Testing Matters
 

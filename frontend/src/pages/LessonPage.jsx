@@ -4,6 +4,7 @@ import { api } from '../api/client';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useProgress } from '../hooks/useProgress.js';
 import Markdown from '../components/Markdown.jsx';
+import { buildWhyBlocks } from '../lib/whyBlocks.js';
 import Quiz from '../components/Quiz.jsx';
 import AudioPlayer from '../components/AudioPlayer.jsx';
 import JavaIdeEditor from '../components/JavaIdeEditor.jsx';
@@ -12,6 +13,7 @@ import { SkeletonLesson } from '../components/Skeleton.jsx';
 import { trackManualNavigation, isRecommendedVisit } from '../lib/analytics.js';
 import { analyzePrereqs, prereqWarning, setGateOpenFor } from '../lib/prereqs.js';
 import { nextUpLesson } from '../lib/nextUp.js';
+import CodeWithWhy from '../components/CodeWithWhy.jsx';
 
 export default function LessonPage() {
   const { lessonId } = useParams();
@@ -266,7 +268,7 @@ export default function LessonPage() {
 
       <div className="lesson-layout">
         <article className={`lesson-body ${gateLocked ? 'prereq-locked' : ''}`} ref={articleRef}>
-          <Markdown>{lesson.body}</Markdown>
+          <LessonBody body={lesson.body} />
 
           {/* Interactive Quiz */}
           <div className="lesson-quiz-section">
@@ -376,6 +378,26 @@ export default function LessonPage() {
 
 function slug(text) {
   return String(text).toLowerCase().replace(/[^a-z0-9\s-]/g, '').trim().replace(/\s+/g, '-');
+}
+
+/**
+ * Renders the lesson markdown as why-blocks: each fenced code block becomes
+ * a CodeWithWhy unit carrying its "What this code shows" walkthrough behind
+ * a Show/Hide toggle; everything else renders as ordinary markdown.
+ */
+function LessonBody({ body }) {
+  const items = React.useMemo(() => buildWhyBlocks(body || ''), [body]);
+  return (
+    <>
+      {items.map((item, i) =>
+        item.type === 'code' ? (
+          <CodeWithWhy key={`c${i}`} code={item.code} lang={item.lang} explanation={item.explanation} />
+        ) : (
+          <Markdown key={`m${i}`}>{item.markdown}</Markdown>
+        ),
+      )}
+    </>
+  );
 }
 
 function extractCodeExample(body) {

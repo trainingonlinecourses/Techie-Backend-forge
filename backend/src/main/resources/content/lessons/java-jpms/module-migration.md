@@ -7,6 +7,7 @@ topics: [migration, split-packages, automatic-modules, add-opens, modular-path]
 docs:
   - https://openjdk.org/projects/jigsaw/doc/tutorials/MigrationToModules.html
 ---
+# Migrating to JPMS — Step by Step
 
 ## The Concept, From Zero
 

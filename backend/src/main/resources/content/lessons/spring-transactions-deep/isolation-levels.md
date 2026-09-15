@@ -121,10 +121,10 @@ public class Course {
     @Version
     private long version;     // incremented on every update
 }
+```
 
 
 **What this code does — step by step:**
-```
 
 1. Two concurrent updates: Tx A reads version=1. Tx B reads version=1. Tx A updates → version=2, commits. Tx B updates WHERE version=1 → 0 rows → OptimisticLockException
 

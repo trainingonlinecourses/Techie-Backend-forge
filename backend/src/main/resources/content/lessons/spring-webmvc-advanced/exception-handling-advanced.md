@@ -219,22 +219,18 @@ class ExceptionHandlingTest {
     void unmappedEndpointReturnsStructuredError() throws Exception {
         mockMvc.perform(get("/api/nonexistent"))
             .andExpect(status().isNotFound())
-```java
             .andExpect(jsonPath("$.status").value(404));
     }
 
     @Test
     void domainExceptionMapsToProblemDetails() throws Exception {
-```
         mockMvc.perform(get("/api/orders/nope"))
             .andExpect(status().isNotFound())
-```java
             .andExpect(jsonPath("$.detail").value(containsString("not found")));
     }
 
     @Test
     void internalErrorsDoNotLeakDetails() throws Exception {
-```
         mockMvc.perform(get("/api/orders/boom"))
             .andExpect(status().isInternalServerError())
             .andExpect(jsonPath("$.message").doesNotExist());

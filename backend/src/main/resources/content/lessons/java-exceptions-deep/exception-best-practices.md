@@ -16,9 +16,7 @@ docs:
 
 ## The Concept: Exception Handling Is a Design Activity
 
-```java
 Beginners treat exceptions as something to "wrap around" code when it crashes. Senior engineers treat exception handling as a *contract with the caller* — part of the API's design, decided before the code is written. The difference shows up in production: one codebase has clear error responses, actionable logs, and recoverable failures; the other has swallowed exceptions, empty catches, and three-day debugging sessions.
-```
 
 This lesson distills the practices that scale — the rules professional Java teams (Spring, Kafka, microservices) actually follow. Each rule is a *decision about where failures are handled and what information survives*.
 

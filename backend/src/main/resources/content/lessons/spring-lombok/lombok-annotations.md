@@ -7,6 +7,7 @@ topics: [lombok, @Data, @Getter, @Setter, @Builder, @Value, @Slf4j, boilerplate]
 docs:
   - https://projectlombok.org/features/all
 ---
+# Lombok Annotations — Eliminate Boilerplate
 
 ## The Concept, From Zero
 

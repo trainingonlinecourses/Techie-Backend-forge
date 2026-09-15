@@ -69,8 +69,8 @@ public PasswordEncoder passwordEncoder() {
 
 ## How we use it in an organization: the scenarios
 
-```java
 **Scenario 1 — user registration and login.** The service layer never sees the raw password outside the encode/verify boundary:
+```java
 
 @Service
 public class UserService {
@@ -85,8 +85,10 @@ public class UserService {
         return encoder.matches(raw, storedHash);         // constant-time-ish comparison inside
     }
 }
+```
 
 **Scenario 2 — re-hash on login (drain legacy):**
+```java
 
 public User authenticate(String email, String raw) {
     User u = userRepo.findByEmail(email).orElseThrow();

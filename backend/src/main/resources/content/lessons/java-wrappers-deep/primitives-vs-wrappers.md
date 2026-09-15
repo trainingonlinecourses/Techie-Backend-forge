@@ -7,6 +7,7 @@ topics: [primitives, wrappers, performance, nullability, generics, api-design]
 docs:
   - https://docs.oracle.com/javase/tutorial/java/data/numberclasses.html
 ---
+# Primitives vs Wrappers — When to Use Which
 
 ## The Concept, From Zero
 

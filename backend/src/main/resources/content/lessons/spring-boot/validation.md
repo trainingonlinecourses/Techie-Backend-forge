@@ -8,6 +8,7 @@ docs:
   - https://beanvalidation.org/2.0/spec/
   - https://docs.jboss.org/hibernate/validator/8.0/reference/htmlsingle/
 ---
+# Bean Validation — Reject Bad Data Before It Touches Your Code
 
 ## The Concept, From Zero
 

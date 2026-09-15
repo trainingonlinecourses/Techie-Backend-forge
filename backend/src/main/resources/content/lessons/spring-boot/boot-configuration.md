@@ -133,8 +133,8 @@ app:
 <!-- why -->
 
 
-```java
 **Enable the binding:**
+```java
 @SpringBootApplication
 @EnableConfigurationProperties(StorageProperties.class)  // bind StorageProperties
 public class AcademyApplication { ... }
@@ -304,6 +304,7 @@ public class RegistrationService {
 - Defines `RegistrationService` with methods `register()`.
 - Uses conditionals.
 
+```yaml
 # application.yml
 app:
   features:
@@ -311,7 +312,9 @@ app:
     ai-tutor-enabled: true
     max-courses-per-user: 50
     maintenance-message: ""
+```
 
+```yaml
 # application-prod.yml
 app:
   features:
@@ -328,6 +331,7 @@ app:
 
 The same code, clean:
 
+```
 ```java
 spring:
   datasource:
@@ -340,6 +344,9 @@ app:
 
 ### Scenario 3: Configuration for multiple environments
 
+```
+
+```
 ```yaml
 # application.yml
 spring:

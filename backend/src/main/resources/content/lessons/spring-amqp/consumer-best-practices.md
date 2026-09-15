@@ -67,8 +67,8 @@ Queue: [A, B, C]
 Consumer 1 takes A, Consumer 2 takes B → B may finish before A
 ```
 
-```java
 **If order matters** (money movements, state machines):
+```java
 
 // Option 1: one consumer per queue
 factory.setConcurrentConsumers(1);

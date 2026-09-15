@@ -7,6 +7,7 @@ topics: [dynamic-proxy, proxy, invocation-handler, cglib, spring-aop, runtime-ge
 docs:
   - https://docs.oracle.com/javase/8/docs/api/java/lang/reflect/Proxy.html
 ---
+# Dynamic Proxies — Runtime Code Generation
 
 ## The Concept, From Zero
 

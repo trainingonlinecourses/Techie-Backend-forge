@@ -8,6 +8,7 @@ docs:
   - https://docs.spring.io/spring-boot/reference/features/developing-auto-configuration.html
   - https://docs.spring.io/spring-boot/reference/packaging-structre.html
 ---
+# Custom Auto-Configuration — Building Your Own Starters
 
 ## The Concept, From Zero
 

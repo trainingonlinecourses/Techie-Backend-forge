@@ -7,11 +7,12 @@ topics: [serializable, externalizable, serialversionuid, proxy-pattern, security
 docs:
   - https://docs.oracle.com/javase/tutorial/essential/io/serializing.html
 ---
+# Java Serialization Best Practices — When and How to Serialize Safely
 
 ## The Concept, From Zero
 
-```java
 **Serialization** is converting an object to a byte stream so it can be saved to a file, sent over a network, or stored in a database. **Deserialization** is converting it back.
+```java
 
 // Serializable — marker interface (no methods to implement)
 public class User implements Serializable {

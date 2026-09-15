@@ -8,6 +8,7 @@ docs:
   - url: "https://docs.spring.io/spring-boot/reference/features/configuration-properties.html"
     title: "Type-Safe Configuration"
 ---
+# @ConfigurationProperties Deep Dive — Type-Safe Configuration Binding
 
 ## The Concept, From Zero
 

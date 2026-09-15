@@ -7,6 +7,7 @@ topics: [livereload, browser-extension, auto-refresh, devtools, hot-reload]
 docs:
   - https://docs.spring.io/spring-boot/reference/using/devtools.html
 ---
+# LiveReload — Instant Browser Refresh
 
 ## The Concept, From Zero
 

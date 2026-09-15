@@ -8,6 +8,7 @@ docs:
   - https://docs.spring.io/spring-framework/reference/web/webmvc/mvc-ann-controller-advice.html
   - https://www.javaguides.net/2019/09/spring-boot-rest-api-exception-handling.html
 ---
+# Exception Handling — Clean Error Responses That Clients Actually Understand
 
 ## The Concept, From Zero
 

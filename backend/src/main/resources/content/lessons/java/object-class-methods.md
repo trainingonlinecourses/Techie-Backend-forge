@@ -7,6 +7,7 @@ topics: [object-class, tostring, equals, hashcode, getclass, clone]
 docs:
   - https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html
 ---
+# The Object Class — Every Class's Hidden Parent
 
 ## The Concept, From Zero
 

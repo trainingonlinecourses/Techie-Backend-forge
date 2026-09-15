@@ -47,9 +47,9 @@ public void uploadVideo(@RequestParam("file") MultipartFile file) throws IOExcep
     Path dest = Path.of(uploadDir, UUID.randomUUID() + "-" + sanitize(file.getOriginalFilename()));
     file.transferTo(dest);                       // framework handles spooling/copying
 }
+```
 
 **Scenario 2 — validating before storing.** Check type, size, and content *before* writing anything:
-```
 
 private static final Set<String> ALLOWED = Set.of("image/png", "image/jpeg", "application/pdf");
 
@@ -58,8 +58,10 @@ if (file.isEmpty()) throw new BadRequestException("empty file");
 if (file.getSize() > MAX) throw new PayloadTooLargeException("too large");
 if (!ALLOWED.contains(file.getContentType())) throw new BadRequestException("unsupported type");
 // remember: Content-Type is client-declared — verify magic bytes for security-sensitive uploads
+```
 
 **Scenario 3 — storing in object storage (S3-compatible) rather than local disk.** The upload streams straight to the bucket:
+```java
 
 s3.putObject(bucket, key, file.getInputStream(), s3Meta(file));
 // URL = /api/files/{key} — the app serves a signed link, not the bytes
@@ -72,8 +74,8 @@ s3.putObject(bucket, key, file.getInputStream(), s3Meta(file));
 
 Production teams almost always put uploads in object storage, not the app's filesystem — the app stays stateless and horizontally scalable. Local disk is for dev and small internal tools.
 
-```java
 **Scenario 4 — serving files with Content-Disposition.** Download endpoint that forces a filename:
+```java
 
 @GetMapping("/api/files/{id}/download")
 ```

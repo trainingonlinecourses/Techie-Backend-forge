@@ -18,9 +18,7 @@ docs:
 
 Reliable tests share one property: **isolation** — each test runs as if it were the only test. The three enemies are *shared mutable state* (a field that leaks between tests), *hidden ordering dependencies* (test B only passes because test A ran first), and *environment coupling* (tests that depend on wall-clock time, random values, or real services). This lesson is the JUnit 5 toolkit for defeating all three — instance lifecycles, ordering, and parallel execution.
 
-```java
 **The mental model:** each test is a scientist's experiment. The experiment must be reproducible: clean apparatus (fresh instance), controlled conditions (no leftovers from the previous experiment), and independence (running experiments in any order or in parallel must not change results). JUnit 5 gives you the switches; *your discipline* decides whether tests are truly isolated.
-```
 
 ## The Default: PER_METHOD Isolation
 

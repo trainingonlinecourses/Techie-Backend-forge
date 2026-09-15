@@ -8,6 +8,7 @@ docs:
   - url: "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Arrays.html"
     title: "Arrays Class (JavaDoc)"
 ---
+# java.util.Arrays — The Swiss Army Knife for Arrays
 
 ## The Concept, From Zero
 

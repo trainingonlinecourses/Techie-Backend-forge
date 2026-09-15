@@ -8,6 +8,7 @@ docs:
   - https://docs.oracle.com/en/java/javase/21/language/strings.html
   - https://docs.oracle.com/javase/specs/jls/se21/html/jls-3.html#jls-3.10.7
 ---
+# Text Blocks — Multiline Strings Without the Escaping Nightmare
 
 ## The Concept, From Zero
 
@@ -54,7 +55,6 @@ String html = """
             <p>Hello</p>
         </body>
     </html>
-```java
     """;
 ```
 
@@ -76,7 +76,6 @@ There is also a new escape sequence that is especially useful in text blocks: `\
 String spaces = """
     line one   \s
     line two   \s
-```java
     """;
 ```
 
@@ -101,11 +100,9 @@ String query = """
       AND o.total > ?
     ORDER BY o.total DESC
     LIMIT 10
-```java
     """;
 
 // A text block for JSON in a test assertion
-```
 String expected = """
     {
         "id": 1,
@@ -126,7 +123,6 @@ You still need to escape in a few cases:
 // Escaping still matters in a text block
 String path = """
     C:\\Users\\Alice\\Documents
-```java
     """;   // backslash must be escaped: \\ -> \
 ```
 
@@ -137,13 +133,10 @@ String path = """
 
 String withQuote = """
     He said, "hello"
-```java
     """;   // single quotes are fine inside a text block
-```
 
 String tricky = """
     a\"\"\"b
-```java
     """;   // three consecutive quotes — escape one to avoid ending the block
 ```
 
@@ -303,7 +296,6 @@ String query = """
     WHERE u.status = :status
       AND o.created_at >= :since
     ORDER BY o.created_at DESC
-```java
     """;
 ```
 
@@ -326,7 +318,6 @@ String greeting = """
     Hello, %s!
     Welcome to %s.
     Your account was created on %s.
-```java
     """.formatted("Alice", "BackendForge", "2025-01-15");
 ```
 

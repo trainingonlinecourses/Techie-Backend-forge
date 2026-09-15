@@ -7,6 +7,7 @@ topics: [docker-compose, postgresql, redis, spring-boot, health-checks]
 docs:
   - https://docs.docker.com/compose/compose-file/compose-file-v3/
 ---
+# Spring Boot + PostgreSQL + Redis — Production-Ready Compose Stack
 
 ## The Concept, From Zero
 

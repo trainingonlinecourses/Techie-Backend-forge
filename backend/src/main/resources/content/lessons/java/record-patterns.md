@@ -20,22 +20,26 @@ Pattern matching lets you check the type of an object and extract its components
 ```java
 public class Main {
 
+    record Point(int x, int y) {}
+    record Address(String city, String zip) {}
+    record User(String name, Address address) {}
+
     public static void main(String[] args) {
+        Object obj = new Point(3, 4);
+        User user = new User("Ada", new Address("London", "E1 6AN"));
+
         // BEFORE pattern matching (verbose)
         if (obj instanceof Point) {
             Point p = (Point) obj;
-            return p.x() + p.y();
+            System.out.println(p.x() + p.y());
         }
 
         // AFTER pattern matching (concise)
         if (obj instanceof Point(int x, int y)) {
-            return x + y;
+            System.out.println(x + y);
         }
 
         // Nested destructuring
-        record Address(String city, String zip) {}
-        record User(String name, Address address) {}
-
         if (user instanceof User(String name, Address(String city, String zip))) {
             System.out.println(name + " lives in " + city);
         }
@@ -70,9 +74,9 @@ double area(Shape shape) {
         // No default needed — sealed interface guarantees exhaustiveness
     };
 }
+```
 
 **The org power:** the compiler enforces that every case is handled. Add a new record to the sealed interface, and the compiler tells you exactly which switches need updating. No missed cases at runtime.
-```
 
 <!-- why -->
 **What this code shows:**

@@ -8,6 +8,7 @@ docs:
   - url: "https://spring.io/projects/spring-session-data-redis"
     title: "Spring Session Data Redis"
 ---
+# Redis-Backed Sessions — Shared State at Scale
 
 ## The Concept, From Zero
 

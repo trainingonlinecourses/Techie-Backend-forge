@@ -8,6 +8,7 @@ docs:
   - https://docs.spring.io/spring-boot/docs/current/reference/html/howto.html#howto.servlets.file-upload
   - https://spring.io/guides/gs/uploading-files
 ---
+# File Upload & Download — Handling Binary Data in REST APIs
 
 ## The Concept, From Zero
 

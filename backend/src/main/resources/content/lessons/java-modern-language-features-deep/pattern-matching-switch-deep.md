@@ -8,6 +8,7 @@ docs:
   - https://docs.oracle.com/en/java/javase/21/language/switch-expressions.html
   - https://docs.oracle.com/en/java/javase/21/language/pattern-matching.html
 ---
+# Pattern Matching in Switch — Branching by Shape, Not Just by Value
 
 ## The Concept, From Zero
 

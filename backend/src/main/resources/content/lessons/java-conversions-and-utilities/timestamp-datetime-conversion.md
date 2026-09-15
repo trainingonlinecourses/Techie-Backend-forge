@@ -9,6 +9,7 @@ docs:
   - https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/time/LocalDateTime.html
   - https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/time/Instant.html
 ---
+# Timestamp ↔ LocalDateTime Conversion — When to Use Which and How to Convert Safely
 
 ## The Concept, From Zero
 

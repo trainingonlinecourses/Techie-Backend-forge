@@ -7,6 +7,7 @@ topics: [memory-model, happens-before, visibility, volatile, synchronized, java-
 docs:
   - https://docs.oracle.com/javase/specs/jls/se17/html/jls-17.html
 ---
+# Happens-Before Relationship — Why Threads Don't See Each Other's Writes
 
 ## The Concept, From Zero
 

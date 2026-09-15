@@ -16,8 +16,8 @@ Concurrency bugs don't crash at compile time — they corrupt data under load, h
 
 ## 1. Race Conditions
 
-```java
 **Definition**: the outcome depends on the interleaving of threads — a check-then-act window where two threads can both observe the same pre-condition and act inconsistently.
+```java
 
 public class BookingService {
     private int seats = 10;
@@ -28,10 +28,12 @@ public class BookingService {
         }
     }
 }
+```
 
 **Recognition**: works in dev, corrupts under load; wrong counts; missing bookings; "it only happens in production."
 
 **Fix**: make check-then-act atomic (synchronized, lock, or an atomic op):
+```java
 
 private final AtomicInteger seats = new AtomicInteger(10);
 
@@ -97,17 +99,19 @@ synchronized (first) { synchronized (second) { ... } }
 
 ## 3. Livelock
 
-```java
 **Definition**: threads aren't blocked — they're *spinning*, each undoing the other's progress forever.
+```java
 
 // Two threads, both politely yielding on contention — neither progresses
 while (!tryLock()) {
     Thread.yield();    // both yield to each other forever
 }
+```
 
 **Recognition**: CPU pegged, threads RUNNABLE but no progress, jstack shows them retrying in a loop.
 
 **Fix**: add randomness/backoff so they desynchronize:
+```java
 
 while (!lock.tryLock()) {
     Thread.sleep(ThreadLocalRandom.current().nextLong(1, 50));  // jitter breaks the symmetry
@@ -121,15 +125,15 @@ while (!lock.tryLock()) {
 
 ## 4. Starvation
 
-```java
 **Definition**: a thread is *runnable* but never gets scheduled — others keep winning the lock.
+```java
 
 // Non-fair lock: a burst of thread A acquisitions starves thread B
 // (synchronized is non-fair; ReentrantLock can be fair)
 ReentrantLock lock = new ReentrantLock(true);   // fair — FCFS, prevents starvation
+```
 
 **Recognition**: one thread never progresses while others complete; thread dump shows it RUNNABLE but the same others always hold the lock.
-```
 
 <!-- why -->
 **What this code shows:**
@@ -150,9 +154,9 @@ threadB: while (!done) { }          // may never see the write
 
 // ✅ volatile: visibility guaranteed
 private volatile boolean done = false;
+```
 
 **Recognition**: infinite loops, stale values that "should" have updated, works after adding a print (which incidentally syncs).
-```
 
 <!-- why -->
 **What this code shows:**

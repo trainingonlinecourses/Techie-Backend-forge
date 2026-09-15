@@ -22,7 +22,6 @@ docs:
 // Without backpressure — 1 million events per second, but consumer handles 100/s
 Flux.range(1, 1_000_000)
     .map(this::processEvent)  // Consumer is overwhelmed!
-```java
     .subscribe();             // 💥 Memory overflow after a few seconds
 ```
 
@@ -32,7 +31,6 @@ Flux.range(1, 1_000_000)
 Flux.range(1, 1_000_000)
     .onBackpressureBuffer(1000)  // Buffer up to 1000 items
     .map(this::processEvent)     // Consumer processes at its own pace
-```java
     .subscribe();
 ```
 
@@ -68,7 +66,6 @@ Flux.range(1, 1_000_000)
 Flux.range(1, 1_000_000)
     .onBackpressureDrop()            // Drop items when consumer is busy
     .map(this::processEvent)
-```java
     .subscribe();
 
 // If consumer can't keep up, new items are simply discarded
@@ -80,7 +77,6 @@ Flux.range(1, 1_000_000)
 Flux.range(1, 1_000_000)
     .onBackpressureLatest()          // Keep only the latest item
     .map(this::processEvent)
-```java
     .subscribe();
 
 // When consumer catches up, it gets the LATEST item
@@ -92,7 +88,6 @@ Flux.range(1, 1_000_000)
 Flux.range(1, 1_000_000)
     .onBackpressureError()           // Throw exception when backpressured
     .map(this::processEvent)
-```java
     .subscribe();
 
 // Throws BackpressureException immediately
@@ -109,7 +104,6 @@ Flux.range(1, 1_000_000)
 Flux.range(1, 1_000_000)
     .limitRate(100)                  // Request 100 items at a time
     .map(this::processEvent)
-```java
     .subscribe();
 
 // Consumer processes 100, then requests 100 more

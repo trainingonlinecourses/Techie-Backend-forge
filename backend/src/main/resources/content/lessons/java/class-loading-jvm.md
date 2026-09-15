@@ -19,9 +19,9 @@ When you run a Java program, the JVM doesn't load all your code at once. It load
 // This triggers class loading:
 Order order = new Order();  // Line 1: JVM loads Order.class when this line executes
                             // Line 2: Before this, Order.class wasn't loaded
+```
 
 **The three steps of class loading:**
-```
 1. **Loading** — Find the `.class` file and read the bytecode
 2. **Linking** — Verify the bytecode, allocate memory for static fields, resolve references
 3. **Initialization** — Run static initializers (`static { }` blocks, static field assignments)

@@ -64,8 +64,8 @@ If you *don't* want resets (rare — usually a sign of poor isolation), `@MockBe
 
 **Scenario 2 — avoid the DB in service tests.** `@MockBean` the repository in a `@SpringBootTest` when you specifically test service orchestration, not persistence. (For repository behavior itself, use `@DataJpaTest` with a real DB — see the test-slices lesson.)
 
-```java
 **Scenario 3 — assert side effects happened.** Mock + verify — the "did we call the audit service?" assertion:
+```java
 
 verify(auditService).record(eq("ORDER_CREATED"), any(Order.class));
 ```

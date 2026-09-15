@@ -117,8 +117,8 @@ public class Course {
 
 **`orphanRemoval = true`** — removing a child from the parent's collection deletes it from the DB. Without it, the child becomes an orphan row.
 
-```java
 **The #1 JPA bug — one-sided sync**:
+```java
 
 // ❌ ONLY the parent side set
 course.addLesson(new Lesson("AOP"));   // if addLesson doesn't set the back-reference...

@@ -75,14 +75,16 @@ public List<Order> search(String query) { return search(query, 20, Sort.DEFAULT)
 public List<Order> search(String query, int limit) { return search(query, limit, Sort.DEFAULT); }
 public List<Order> search(String query, int limit, Sort sort) { /* real implementation */ }
 
-```java
 Keep the *full* signature as the single implementation; shorter overloads delegate. Review rule: **don't duplicate logic across overloads — chain to the richest one.**
 
 **Scenario 3 — builder-style fluent APIs.** Varargs shines for "any number of" semantics in builders and configuration:
+```java
 
 new SearchSpec().sortBy("createdAt", "status")     // sortBy(String... fields)
+```
 
 **Scenario 4 — overriding with @Override always.** The annotation is mandatory in review: it turns a typo'd override (silently a new method) into a compile error, and it documents intent:
+```java
 
 @Override
 ```

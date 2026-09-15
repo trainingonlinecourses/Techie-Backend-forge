@@ -7,6 +7,7 @@ topics: [wrapper-classes, autoboxing, unboxing, integer-cache, numberformatexcep
 docs:
   - https://docs.oracle.com/javase/tutorial/java/data/autoboxing.html
 ---
+# Wrapper Classes — Autoboxing, Caching, and Pitfalls
 
 ## The Concept, From Zero
 

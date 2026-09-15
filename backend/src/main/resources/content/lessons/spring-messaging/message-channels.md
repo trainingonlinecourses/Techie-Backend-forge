@@ -16,9 +16,7 @@ docs:
 
 ## The Concept: The Channels Are the Architecture
 
-```java
 If messaging is a plumbing system, **channels** are the pipes. Producers write into a channel; consumers read from it. The channel *is* the coupling point — and its type determines the semantics:
-```
 
 - **Point-to-point channel** — one message, one consumer (queue semantics in-process).
 - **Publish-subscribe channel** — one message, every subscriber (topic semantics in-process).

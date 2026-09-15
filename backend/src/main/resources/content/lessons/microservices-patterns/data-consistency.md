@@ -259,9 +259,9 @@ public class InventoryService {
         }
     }
 }
+```
 
 **Line-by-line explained:**
-```
 - `redisson.getLock("inventory:" + productId)` — Creates a distributed lock for this specific product. Only one service instance can hold it at a time.
 - `lock.lock(5, TimeUnit.SECONDS)` — Wait up to 5 seconds to acquire the lock. If another instance holds it, we wait. After 5s, we fail fast.
 - The actual inventory check and update happens inside the lock — preventing two simultaneous orders from overselling the same product.

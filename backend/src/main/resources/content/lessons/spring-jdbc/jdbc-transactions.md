@@ -39,14 +39,12 @@ public class CourseService {
     public void publishCourse(Long courseId, String adminUser) {
         jdbcTemplate.update("""
             UPDATE courses SET published = true WHERE id = ?
-```java
             """, courseId);
 ```
 
         jdbcTemplate.update("""
             INSERT INTO audit_log (entity, entity_id, action, actor)
             VALUES ('course', ?, 'publish', ?)
-```java
             """, courseId, adminUser);
 ```
 

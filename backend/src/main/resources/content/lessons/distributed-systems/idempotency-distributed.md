@@ -49,9 +49,9 @@ public ResponseEntity<?> createPayment(
     idempotencyService.complete(key, payment);
     return ResponseEntity.created(...).body(payment);
 }
+```
 
 **The atomic claim is the whole trick** — the unique constraint on the key column makes two concurrent retries race safely (one inserts, the other reads the winner).
-```
 
 <!-- why -->
 **What this code shows:**

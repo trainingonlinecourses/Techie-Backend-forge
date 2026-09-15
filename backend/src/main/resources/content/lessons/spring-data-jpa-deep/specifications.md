@@ -193,9 +193,7 @@ class SpecificationTest {
         Specification<Course> spec = Specification
             .where(CourseSpecifications.hasLevel("BEGINNER"))
             .and(CourseSpecifications.isPublished())
-```java
             .and(CourseSpecifications.minutesAtLeast(20));
-```
 
         List<Course> results = repository.findAll(spec);
 

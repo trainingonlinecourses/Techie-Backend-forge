@@ -150,8 +150,8 @@ public class CleanupService {
 
 ## org scenarios
 
-```java
 **Email service:** async email sending so the HTTP response returns immediately:
+```java
 
 @Async
 public void sendOrderConfirmation(Order order) {
@@ -159,17 +159,19 @@ public void sendOrderConfirmation(Order order) {
     smtpTransport.send(email);
 }
 // Controller calls this and returns 200 — email sends in background
+```
 
 **Audit logging:** non-blocking audit trail writes:
+```java
 
 @Async
 public void audit(User user, String action, Map<String, Object> details) {
     AuditEvent event = new AuditEvent(user.id(), action, details, Instant.now());
     auditRepository.save(event);
 }
+```
 
 **Parallel task execution:** combine multiple @Async calls:
-```
 
 <!-- why -->
 **What this code shows:**

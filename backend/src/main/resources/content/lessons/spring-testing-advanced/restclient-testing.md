@@ -61,7 +61,6 @@ server.expect(requestTo("/v1/charges"))
     .andExpect(header("Idempotency-Key", notNullValue()))
     .andExpect(content().contentType(MediaType.APPLICATION_JSON))
     .andExpect(jsonPath("$.amount").value(2500))
-```java
     .andExpect(jsonPath("$.currency").value("USD"));
 ```
 
@@ -72,7 +71,6 @@ If your client stops sending the auth header or the idempotency key, the test fa
 @Test
 void handlesGatewayTimeout() {
     server.expect(requestTo("/v1/charges"))
-```java
         .andRespond(withStatus(HttpStatus.GATEWAY_TIMEOUT));
 ```
 
@@ -122,7 +120,6 @@ class WebClientIntegrationTest {
         server.start();
         client = WebClient.builder()
             .baseUrl(server.url("/").toString())
-```java
             .build();
     }
 
@@ -135,11 +132,8 @@ class WebClientIntegrationTest {
     void fetchesCourse() throws JsonProcessingException {
 ```
         server.enqueue(new MockResponse()
-```java
             .setBody("{\"id\":1,\"title\":\"Spring\"}")
-```
             .setHeader("Content-Type", "application/json")
-```java
             .setResponseCode(200));
 ```
 
@@ -178,7 +172,6 @@ void circuitBreakerOpensAfterFailures() {
 @Test
 void timesOutWhenServerIsSlow() {
     server.expect(requestTo("/slow"))
-```java
         .andRespond(withSuccess("{}", MediaType.APPLICATION_JSON)
             .withBodyDelay(5, TimeUnit.SECONDS));   // delayed response
 
@@ -193,7 +186,6 @@ void timesOutWhenServerIsSlow() {
 @Test
 void maps404ToNotFoundDomainException() {
     server.expect(requestTo("/v1/courses/999"))
-```java
         .andRespond(withStatus(HttpStatus.NOT_FOUND));
 ```
 

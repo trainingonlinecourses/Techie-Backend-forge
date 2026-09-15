@@ -49,7 +49,6 @@ new FlatFileItemWriterBuilder<Order>()
     .names("id", "customer", "amount")
     .headerCallback(w -> w.write("id,customer,amount"))
     .shouldDeleteIfEmpty(true)
-```java
     .build();
 ```
 
@@ -61,7 +60,6 @@ new JsonItemReaderBuilder<Order>()
     .name("jsonReader")
     .resource(new FileSystemResource("/data/orders.json"))
     .jsonObjectReader(new JacksonJsonObjectReader<>(Order.class))
-```java
     .build();
 
 // Process every file in an FTP drop directory:
@@ -70,7 +68,6 @@ new MultiResourceItemReaderBuilder<Order>()
     .name("allFiles")
     .resources(fileSystemResources)   // Resource[] — use a pattern like /drop/*.csv
     .delegate(singleFileReader())     // the per-file reader
-```java
     .build();
 ```
 
@@ -88,7 +85,6 @@ Some jobs need header/footer records (a total line). Use **state in the processo
 
 new FlatFileItemWriterBuilder<Order>()
     .footerCallback(w -> w.write("total," + totalService.sum()))
-```java
     .build();
 ```
 

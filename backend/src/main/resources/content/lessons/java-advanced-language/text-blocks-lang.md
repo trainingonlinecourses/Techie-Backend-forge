@@ -37,7 +37,6 @@ String json = """
 String block = """
     Line one
     Line two
-```java
     """;
 ```
 
@@ -49,7 +48,6 @@ String sql = """
         SELECT id, title
         FROM courses
         WHERE level = ?
-```java
         """;
 ```
 // The closing """ at column 0 → all 8 spaces of content indentation are incidental and stripped
@@ -59,7 +57,6 @@ String sql = """
 String message = """
     Hello %s,
     Your order %d is %s.
-```java
     """.formatted("Ada", 12345, "shipped");
 ```
 
@@ -78,9 +75,7 @@ public class CourseRepository {
         WHERE (:title IS NULL OR title ILIKE '%' || :title || '%')
           AND (:level IS NULL OR level = :level)
         ORDER BY title
-```java
         """;
-```
 
     public List<Course> search(String title, String level) {
         return namedJdbc.query(SEARCH_SQL,
@@ -117,7 +112,6 @@ String email = """
         <p>Your account is ready.</p>
       </body>
     </html>
-```java
     """.formatted(userName);
 ```
 
@@ -128,7 +122,6 @@ String block = """
     Unicode: \u0041
     Line continuation: \
         continues on the same line
-```java
     """;
 ```
 
@@ -142,7 +135,7 @@ Java 21 previews the `STR` processor:
 
 // Preview in Java 21, finalized path in later versions
 String message = STR."""
-```java
+```
     Hello \{name},
     Your order \{order.id()} is \{status}.
     """;
@@ -154,13 +147,12 @@ String message = STR."""
 
 Text blocks compile to regular `String` constants — no runtime parsing, no hidden cost:
 
-```java
+```
 // Both compile to the same constant pool entry
 String a = "SELECT * FROM courses WHERE level = 'BEGINNER'";
 ```
 String b = """
     SELECT * FROM courses WHERE level = 'BEGINNER'
-```java
     """;
 ```
 

@@ -79,9 +79,7 @@ List<OrderSummary> findSummariesByStatus(OrderStatus status);
 @Query("select new com.app.dto.OrderStats(o.customer, count(o)) from Order o group by o.customer")
 List<OrderStats> statsPerCustomer();
 
-```java
 Projections turn a full-entity query into a narrow one — less data over the wire, less mapping. (The same idea as DTOs at the REST boundary; the capstone applies it end to end.)
-```
 
 ## 5. Paging and sorting
 

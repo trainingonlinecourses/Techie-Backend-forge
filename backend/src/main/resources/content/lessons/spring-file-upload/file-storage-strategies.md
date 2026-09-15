@@ -7,6 +7,7 @@ topics: [storage, local-disk, s3, cloud-storage, abstraction, blob-store]
 docs:
   - https://docs.spring.io/spring-boot/reference/features/io.html
 ---
+# File Storage Strategies — Local, S3, and Cloud
 
 ## The Concept, From Zero
 

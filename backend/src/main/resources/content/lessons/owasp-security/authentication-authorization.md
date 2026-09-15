@@ -16,11 +16,9 @@ docs:
 
 ## The Concept: Proving Who You Are, and Limiting What You Can Do
 
-```java
 Two separate jobs, one acronym away from each other, and both in the Top 10: **authentication** — proving *who* you are (A07, Identification and Authentication Failures) — and **authorization** — enforcing *what* you may do (A01, Broken Access Control, the #1 web risk). The devastating bugs usually aren't in the login itself; they're in the *forgotten checks* after it: the endpoint that trusts "the user is logged in" and never asks "should *this* user access *this* object?"
 
 **The mental model:** authentication is the ID check at the door; authorization is the permissions inside. The door check (login) is well-guarded in most apps — it's the *rooms* that leak: an authenticated student walking into the admin office, or into *another student's* exam. Broken access control is "the door was fine; the room doors were open." The most common real-world form is **IDOR** (Insecure Direct Object Reference): the app uses a user-supplied identifier to fetch an object, and never verifies the caller may see that object.
-```
 
 ## IDOR: The #1 Real-World Bug
 
@@ -110,9 +108,9 @@ A07 covers the ways "proving who you are" goes wrong:
 PasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder();   // salts automatically, ~100ms per hash
 }
+```
 
 **2. Credential stuffing.** Attackers replay passwords leaked from other sites (users reuse passwords). **The fixes:** rate-limit login attempts, lock out/throttle after failures, require MFA for sensitive actions, and check breached-password lists.
-```
 
 **3. Weak session management.** Session IDs predictable, not rotated on login, exposed in URLs, or readable by JavaScript. **The fixes:** Spring's defaults — random session ids, `HttpOnly` + `Secure` + `SameSite` cookies, session fixation protection (a new session id on login — Spring does this automatically), and `sessionManagement` with fixed timeouts.
 

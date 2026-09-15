@@ -105,9 +105,7 @@ By default `SimpleJdbcInsert` includes every column in the table — which fails
 private final SimpleJdbcInsert courseInsert = new SimpleJdbcInsert(jdbcTemplate)
     .withTableName("courses")
     .usingGeneratedKeyColumns("id")
-```java
     .usingColumns("title", "level", "minutes");   // only these — created_at, published etc. come from DB defaults
-```
 
 `usingColumns` is the correct production configuration: it documents the insert contract and prevents surprises from schema drift.
 

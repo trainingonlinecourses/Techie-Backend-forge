@@ -8,6 +8,7 @@ docs:
   - https://docs.oracle.com/en/java/javase/17/language/records.html
   - https://openjdk.org/jeps/395
 ---
+# Records — Immutable Data Classes in One Line
 
 ## The Concept, From Zero
 
@@ -34,8 +35,10 @@ public final class Point {
 
     @Override public String toString() { return "Point[x=" + x + ", y=" + y + "]"; }
 }
+```
 
 **Records** reduce this to one line:
+```java
 
 // JAVA 16+: Same thing in one line
 public record Point(int x, int y) {}

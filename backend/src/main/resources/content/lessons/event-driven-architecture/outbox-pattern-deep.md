@@ -70,8 +70,8 @@ public void publishPending() {
 
 **The at-least-once contract:** the relay publishes, then marks done. Crash between publish and mark → the event is re-published on the next tick → **duplicates are possible** — which is why consumers must be idempotent (dedupe on event id). The relay can also retry failures with a dead-letter/backoff policy: a permanently-failing event (malformed payload) gets quarantined, not infinitely retried.
 
-```java
 **3. Idempotent consumers** — the pattern's completion:
+```java
 
 @KafkaListener(topics = "orders")
 public void onOrderPlaced(OrderPlaced event) {

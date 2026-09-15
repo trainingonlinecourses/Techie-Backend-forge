@@ -20,7 +20,6 @@ Streams are elegant — and occasionally the wrong tool. This lesson is the hone
 Files.readAllLines(Paths.get(file))
     .stream()
     .map(line -> writeToDb(line))     // throws IOException — DOESN'T COMPILE
-```java
     .toList();
 
 // ❌ Workaround — sneaky throws, terrible code
@@ -44,7 +43,7 @@ Files.readAllLines(Paths.get(file))
 - Uses lambda expressions.
 
 List<Long> ids = new ArrayList<>();
-```java
+```
 for (String line : Files.readAllLines(path)) {
     ids.add(writeToDb(line));      // throws IOException — propagates cleanly
 }
@@ -66,7 +65,6 @@ courses.stream()
     .map(Lesson::title)
     .distinct()
     .sorted()
-```java
     .toList();
 ```
 
@@ -164,7 +162,6 @@ List<String> publishedTitles = courses.stream()
     .sorted(byMinutes)
     .map(Course::title)
     .limit(10)
-```java
     .toList();
 
 // ❌ Contorted — rewrite as a loop
@@ -202,7 +199,6 @@ Pure transformation of a collection?
 List<Lesson> candidates = courses.stream()
     .filter(Course::published)
     .flatMap(c -> c.lessons().stream())
-```java
     .toList();                              // stream for the easy part
 
 for (Lesson l : candidates) {               // loop for control flow
@@ -229,9 +225,7 @@ This is the most common real-world pattern: streams for shape, loops for flow.
 | One-line aggregation | Position/state logic |
 | Readable chains | Hot numeric loops |
 
-```java
 Streams and loops are complementary tools, not rivals. Use streams when the pipeline is a pure, readable transformation; use loops when control flow, exceptions, or debugging dominate. The best codebases mix both — each where it's honest.
-```
 
 ## References
 

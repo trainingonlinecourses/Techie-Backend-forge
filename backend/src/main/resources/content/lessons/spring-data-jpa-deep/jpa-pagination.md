@@ -78,9 +78,7 @@ The cursor is the *last seen* (`createdAt`, `id`) pair — the composite key mus
 
 **Scenario 2 — activity feed / infinite scroll.** `Slice` or keyset cursor — the count query would double every feed request for no user value.
 
-```java
 **Scenario 3 — bulk export job.** Iterate with keyset pagination in a batch loop; each page is an index range-read and the job never re-scans skipped rows.
-```
 
 **Scenario 4 — search result paging.** If the UI shows total results, count once and cache; on large filtered sets, prefer `Slice` + "load more".
 

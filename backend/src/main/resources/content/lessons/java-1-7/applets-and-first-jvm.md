@@ -9,6 +9,7 @@ docs:
   - https://en.wikipedia.org/wiki/Java_version_history
 capstone: false
 ---
+# Java 1.0 (1996) — Applets, AppletContext and the First JVM
 
 ## The idea in one sentence
 

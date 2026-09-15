@@ -7,6 +7,7 @@ topics: [logback, pattern, conversion, layout, color, timestamp]
 docs:
   - https://docs.spring.io/spring-boot/reference/features/logging.html
 ---
+# Logback Patterns — Structuring Your Logs
 
 ## The Concept, From Zero
 

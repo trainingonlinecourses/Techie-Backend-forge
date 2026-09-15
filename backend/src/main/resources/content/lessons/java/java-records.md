@@ -64,8 +64,8 @@ public class Point {
 <!-- why -->
 
 
-```java
 **Records** eliminate ALL that boilerplate with one line:
+```java
 
 // New way — same functionality, one line!
 public record Point(int x, int y) {}

@@ -87,8 +87,8 @@ public class StreamDemo {
 
 **Part 1 — writing with decoration.** `new FileOutputStream("out.bin")` is the raw byte sink to the file. Wrapping it in `BufferedOutputStream` adds an internal buffer (8 KB by default): the `write` calls land in the buffer, and the buffer is flushed to disk in bigger, fewer system calls. **Decorating** — wrapping one stream in another to add behavior — is the core design pattern of `java.io` (it's the Decorator pattern).
 
-```java
 **Part 2 — reading in a loop.** The universal read idiom:
+```java
 
 byte[] buffer = new byte[4096];
 int bytesRead;

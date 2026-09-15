@@ -7,6 +7,7 @@ topics: [initializer-blocks, static-block, initialization-order, field-initializ
 docs:
   - https://docs.oracle.com/javase/tutorial/java/javaOO/initial.html
 ---
+# Initializer Blocks & Initialization Order — The Hidden Constructor Code
 
 ## The Concept, From Zero
 

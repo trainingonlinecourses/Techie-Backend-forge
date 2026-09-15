@@ -8,6 +8,7 @@ docs:
   - https://docs.oracle.com/javase/tutorial/java/IandI/super.html
 capstone: false
 ---
+# this and super — Talking to the Current Object and Its Parent
 
 ## The Concept, From Zero
 

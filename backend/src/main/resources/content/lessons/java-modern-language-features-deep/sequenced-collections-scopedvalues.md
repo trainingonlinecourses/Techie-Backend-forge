@@ -10,6 +10,7 @@ docs:
   - https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/SequencedMap.html
   - https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/ScopedValue.html
 ---
+# Sequenced Collections and Scoped Values — Java 21's Ordered Collections and Context Propagation
 
 ## The Concept, From Zero
 

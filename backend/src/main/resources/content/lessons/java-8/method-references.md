@@ -7,6 +7,7 @@ topics: [method-references, constructor-reference, static-method, instance-metho
 docs:
   - https://docs.oracle.com/javase/tutorial/java/javaOO/methodreferences.html
 ---
+# Method References — Lambdas Made Even Shorter
 
 ## The Concept, From Zero
 

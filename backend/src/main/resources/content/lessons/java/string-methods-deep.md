@@ -7,6 +7,7 @@ topics: [string-methods, substring, split, indexof, format, isblank]
 docs:
   - https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html
 ---
+# Essential String Methods — The API You Use Every Single Day
 
 ## The Concept, From Zero
 

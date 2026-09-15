@@ -8,6 +8,7 @@ docs:
   - https://docs.spring.io/spring-boot/docs/current/reference/html/features.html#features.profiles
   - https://docs.spring.io/spring-framework/reference/core/beans/environment.html
 ---
+# Profile-Specific Configuration — One Codebase, Many Environments
 
 ## The Concept, From Zero
 
@@ -56,8 +57,8 @@ java -jar app.jar --spring.profiles.active=prod
 export SPRING_PROFILES_ACTIVE=prod
 ```
 
-```java
 **Option 4: Programmatic**
+```java
 SpringApplication app = new SpringApplication(App.class);
 app.setAdditionalProfiles("dev");
 app.run(args);

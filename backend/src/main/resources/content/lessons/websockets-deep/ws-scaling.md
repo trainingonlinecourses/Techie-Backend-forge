@@ -116,9 +116,7 @@ public class RedisChatRelay {
 - **Local delivery**: `template.convertAndSend("/topic/chat", ...)` reaches this instance's STOMP subscribers.
 - **Relay**: publishing to the Redis channel tells every *other* instance "a message happened" — each of them delivers it to *its* local subscribers.
 
-```java
 The result: one logical topic spread across N instances, each instance handling only its own sockets, all instances seeing all messages. **Redis pub/sub is the lightweight glue** (no message durability needed — a missed real-time chat message is acceptable); RabbitMQ is the heavyweight option with the same role.
-```
 
 ## The Broker Relay Option (Spring + RabbitMQ)
 

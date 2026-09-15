@@ -82,9 +82,7 @@ The PR description *is* the documentation of the change: what, why, how, and how
 | Scope | Does the PR do *one* thing? |
 | Performance | N+1? Unnecessary work in hot paths? |
 
-```java
 The reviewer's job isn't perfection — it's catching the issues the author can't see. **Small PRs get real reviews; giant PRs get rubber stamps.**
-```
 
 ## Merge Strategies — What "Merge" Means on GitHub
 

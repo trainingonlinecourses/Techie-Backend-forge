@@ -49,8 +49,8 @@ User B: UPDATE account SET balance=130, version=2 WHERE id=7 AND version=1  → 
 
 `@Version` gives you: automatic per-update increment, conflict detection with zero database locks, and no read overhead. The cost: a failed write at the end of a long transaction means **retrying the whole business operation**.
 
-```java
 **Org pattern — the retry:**
+```java
 
 @Transactional
 public void transfer(TransferRequest r) {
@@ -106,9 +106,7 @@ public void adjustBalance(Long id, BigDecimal delta) {
 | Money-critical, must-not-fail-late | Pessimistic `FOR UPDATE` in a *short* transaction |
 | Read-heavy screens | Neither — reads don't need locks (repeatable read handles snapshot) |
 
-```java
 The general rule teams teach: **optimistic by default; pessimistic only where the failure cost of an optimistic retry outweighs the lock cost** — and always keep pessimistic transactions short, because locks serialize traffic.
-```
 
 ## Pessimistic locks in practice — the scenarios
 

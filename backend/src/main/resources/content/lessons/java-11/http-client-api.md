@@ -7,6 +7,7 @@ topics: [http-client, httprequest, httpresponse, async-http, websocket, java11]
 docs:
   - https://docs.oracle.com/en/java/javase/11/docs/api/java.net.http/java/net/http/HttpClient.html
 ---
+# HTTP Client API — Modern HTTP in the JDK
 
 ## The Concept, From Zero
 
@@ -39,9 +40,7 @@ HttpRequest request = HttpRequest.newBuilder()
     .uri(URI.create("https://api.example.com/users"))
     .header("Accept", "application/json")
     .GET()
-```java
     .build();
-```
 HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 ```java
 int status = response.statusCode();
@@ -58,7 +57,6 @@ HttpRequest get = HttpRequest.newBuilder()
     .header("Accept", "application/json")
     .header("Authorization", "Bearer " + token)
     .GET()
-```java
     .build();
 
 // POST with JSON body
@@ -68,11 +66,10 @@ HttpRequest post = HttpRequest.newBuilder()
     .header("Content-Type", "application/json")
     .header("Accept", "application/json")
     .POST(HttpRequest.BodyPublishers.ofString("""
-```java
+```
         {"name": "Alice", "email": "alice@example.com"}
 ```
         """))
-```java
     .build();
 
 // PUT
@@ -85,7 +82,6 @@ HttpRequest put = HttpRequest.newBuilder()
         {"name": "Alice Updated"}
 ```
         """))
-```java
     .build();
 
 // DELETE
@@ -93,7 +89,6 @@ HttpRequest put = HttpRequest.newBuilder()
 HttpRequest delete = HttpRequest.newBuilder()
     .uri(URI.create("https://api.example.com/users/123"))
     .DELETE()
-```java
     .build();
 ```
 
@@ -123,7 +118,6 @@ public class Main {
         client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
             .thenApply(HttpResponse::body)
             .thenAccept(System.out::println)
-```java
             .join();  // blocks only at .join()
 
         // ASYNCHRONOUS with chaining
@@ -157,7 +151,7 @@ public class Main {
 
 The same code, clean:
 
-```java
+```
 import java.net.URI;
 import java.net.http.*;
 import java.time.Duration;
@@ -249,7 +243,6 @@ public class OrderServiceClient {
                 .header("Accept", "application/json")
                 .timeout(Duration.ofSeconds(3))
                 .GET()
-```java
                 .build();
 ```
 

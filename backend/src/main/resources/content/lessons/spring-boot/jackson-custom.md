@@ -143,8 +143,8 @@ public class JacksonConfig {
 
 ## org scenarios
 
-```java
 **Enum as string in API:**
+```java
 
 public enum OrderStatus {
     @JsonProperty("pending") PENDING,
@@ -162,8 +162,10 @@ public enum OrderStatus {
     }
 }
 // API sees: "pending", "shipped", "delivered" — not "PENDING"
+```
 
 **Hiding internal fields from the API:**
+```java
 
 public record UserResponse(
     long id,

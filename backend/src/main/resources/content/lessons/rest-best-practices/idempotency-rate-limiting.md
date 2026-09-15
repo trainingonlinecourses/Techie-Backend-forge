@@ -191,9 +191,7 @@ In a cluster, in-memory buckets are per-instance (3 replicas = 3× the limit). B
 public ProxyManager<String> bucketProxyManager(RedisConnectionFactory factory) {
     RedisBasedProxyManager<String> manager = RedisBasedProxyManager
         .builderFor(new LettuceBasedRedisClient(factory))
-```java
         .build();
-```
     return new ProxyManager<String>() {
         public Bucket getProxy(String key, Supplier<BucketConfiguration> config) {
             return manager.getProxy(key, config);

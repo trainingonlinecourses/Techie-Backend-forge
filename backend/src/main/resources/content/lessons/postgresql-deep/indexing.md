@@ -66,9 +66,7 @@ CREATE INDEX idx ON courses (level, minutes, id);
 | `WHERE minutes > 30` | ❌ (skips the leftmost column) |
 | `WHERE level = ? ORDER BY minutes` | ✅ (sorted by the index) |
 
-```java
 **The rule**: put the most selective / most-filtered column first; the index only helps queries that use its *leftmost prefix*.
-```
 
 ## Covering Indexes: Index-Only Scans
 

@@ -126,9 +126,9 @@ public class LoggingAspect {
 public class MetricsAspect {
     // ...
 }
+```
 
 **Default rules:**
-```
 1. Aspects with `@Order` run first, sorted by value (lower = first)
 2. Aspects without `@Order` run last, in undefined order relative to each other
 3. Spring's built-in `@Transactional` has a default order of `Ordered.LOWEST_PRECEDENCE` (runs last)

@@ -73,8 +73,10 @@ public class Customer {
         public Address(String street) { this.street = street; }
     }
 }
+```
 
 **Pattern 2 — inner classes for stateful adapters.** When the nested behavior needs the outer's fields — e.g., an iterator over a collection:
+```java
 
 public class OrderList {
     private final Order[] items;

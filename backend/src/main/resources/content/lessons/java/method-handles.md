@@ -16,9 +16,7 @@ docs:
 
 `Method.invoke(Object, args)` is slow because the JVM can't optimize through it — the call site is opaque to the JIT. `MethodHandle` provides the same dynamic invocation but is **inlineable by the JIT**: after a few invocations, the JIT compiles the handle call into direct machine code, approaching the speed of a direct method call.
 
-```java
 **The mental model:** reflection is like calling through a switchboard (every call goes through an operator); a MethodHandle is like having the direct number (the JIT wires it straight through after the first few calls).
-```
 
 ## Creating method handles
 
@@ -163,9 +161,9 @@ MethodHandle privateMethod = privateLookup.findVirtual(
     MyClass.class, "secretMethod",
 ```java
     MethodType.methodType(String.class));
+```
 
 **Access rules:**
-```
 | Lookup type | Can access |
 |---|---|
 | `lookup()` | Public methods of all classes; protected/package/private of the calling class |

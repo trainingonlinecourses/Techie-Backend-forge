@@ -8,6 +8,7 @@ docs:
   - https://openjdk.org/jeps/395
   - https://openjdk.org/jeps/441
 ---
+# Records in Depth — More Than Just Data Classes
 
 ## The Concept, From Zero
 

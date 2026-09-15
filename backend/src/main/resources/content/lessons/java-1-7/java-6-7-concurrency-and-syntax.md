@@ -9,6 +9,7 @@ docs:
   - https://docs.oracle.com/javase/7/docs/technotes/guides/lang/enhancements.html
 capstone: false
 ---
+# Java 6–7 (2006–2011) — Fork/Join, try-with-resources, Diamond and NIO.2
 
 ## The idea in one sentence
 

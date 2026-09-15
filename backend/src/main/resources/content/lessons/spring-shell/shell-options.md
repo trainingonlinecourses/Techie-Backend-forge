@@ -7,6 +7,7 @@ topics: [options, parameters, defaults, completion, value-providers, validation]
 docs:
   - https://docs.spring.io/spring-shell/reference/
 ---
+# Shell Options — Parameters, Defaults, and Validation
 
 ## The Concept, From Zero
 

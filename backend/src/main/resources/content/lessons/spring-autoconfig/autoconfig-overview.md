@@ -7,6 +7,7 @@ topics: [auto-configuration, @EnableAutoConfiguration, conditional, spring-boot-
 docs:
   - https://docs.spring.io/spring-boot/reference/features/auto-configuration.html
 ---
+# Spring Boot Auto-Configuration — How the Magic Works
 
 ## The Concept, From Zero
 

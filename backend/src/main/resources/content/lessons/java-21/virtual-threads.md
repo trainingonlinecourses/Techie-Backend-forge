@@ -8,6 +8,7 @@ docs:
   - https://openjdk.org/jeps/444
   - https://openjdk.org/jeps/453
 ---
+# Virtual Threads — Millions of Threads Without the Pain
 
 ## The Concept, From Zero
 

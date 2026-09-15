@@ -7,6 +7,7 @@ topics: [default-methods, interface-evolution, diamond-problem, static-interface
 docs:
   - https://docs.oracle.com/javase/tutorial/java/IandI/defaultmethods.html
 ---
+# Default Methods — Evolving Interfaces Without Breaking Code
 
 ## The Concept, From Zero
 

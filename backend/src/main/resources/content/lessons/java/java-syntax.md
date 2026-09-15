@@ -470,9 +470,9 @@ String s = "Hello";
 s.concat(" World");                  // Returns a NEW string "Hello World"
 System.out.println(s);               // Still "Hello"! The original is unchanged
 s = s.concat(" World");              // NOW s points to "Hello World" (new object)
+```
 
 **Why immutable?** Because strings are shared everywhere. If one thread could change a string, all threads seeing that string would break. Immutability makes strings thread-safe by design.
-```
 
 ### String building — don't concatenate in loops
 

@@ -8,6 +8,7 @@ docs:
   - https://docs.spring.io/spring-boot/reference/
   - https://spring.io/guides/gs/rest-service
 ---
+# Monolith Projects — 10 Complete Production-Ready Applications
 
 ## Why Build Projects?
 
@@ -131,8 +132,10 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
     List<Task> findByTitleContainingIgnoreCase(String keyword);
 ```java
 }
+```
 
 **TaskService.java**
+```java
 package com.backendforge.taskmanager.service;
 
 import com.backendforge.taskmanager.entity.Task;
@@ -238,8 +241,10 @@ public class TaskController {
         return service.getTasksByStatus(status);
     }
 }
+```
 
 **TaskControllerTest.java**
+```java
 package com.backendforge.taskmanager.controller;
 
 import com.backendforge.taskmanager.entity.Task;
@@ -281,22 +286,18 @@ class TaskControllerTest {
                 .content(objectMapper.writeValueAsString(task)))
             .andExpect(status().isCreated())
             .andExpect(jsonPath("$.title").value("Learn Spring Boot"))
-```java
             .andExpect(jsonPath("$.status").value("TODO"));
     }
     
     @Test
     void shouldGetAllTasks() throws Exception {
-```
         mockMvc.perform(get("/api/tasks"))
             .andExpect(status().isOk())
-```java
             .andExpect(jsonPath("$").isArray());
     }
     
     @Test
     void shouldReturn404ForNonexistentTask() throws Exception {
-```
         mockMvc.perform(get("/api/tasks/999"))
             .andExpect(status().isNotFound());
     }
@@ -540,8 +541,10 @@ public class Order {
 }
 
 enum OrderStatus { PENDING, CONFIRMED, SHIPPED, DELIVERED, CANCELLED }
+```
 
 **OrderItem.java**
+```java
 package com.backendforge.ecommerce.entity;
 
 import jakarta.persistence.*;
@@ -575,8 +578,10 @@ public class OrderItem {
     public BigDecimal getUnitPrice() { return unitPrice; }
     public void setUnitPrice(BigDecimal price) { this.unitPrice = price; }
 }
+```
 
 **ProductRepository.java**
+```java
 package com.backendforge.ecommerce.repository;
 
 import com.backendforge.ecommerce.entity.Product;
@@ -599,8 +604,10 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findByNameContainingIgnoreCase(String name);
 ```java
 }
+```
 
 **CartRepository.java**
+```java
 package com.backendforge.ecommerce.repository;
 
 import com.backendforge.ecommerce.entity.CartItem;
@@ -622,8 +629,10 @@ public interface CartRepository extends JpaRepository<CartItem, Long> {
 ```java
     void deleteBySessionId(String sessionId);
 }
+```
 
 **OrderRepository.java**
+```java
 package com.backendforge.ecommerce.repository;
 
 import com.backendforge.ecommerce.entity.Order;
@@ -645,8 +654,10 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     List<Order> findByStatus(com.backendforge.ecommerce.entity.OrderStatus status);
 ```java
 }
+```
 
 **ProductService.java**
+```java
 package com.backendforge.ecommerce.service;
 
 import com.backendforge.ecommerce.entity.Product;

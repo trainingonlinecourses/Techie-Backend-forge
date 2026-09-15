@@ -8,6 +8,7 @@ docs:
   - https://docs.oracle.com/javase/9/language/java-module-system.htm
   - https://openjdk.org/jeps/261
 ---
+# Java Platform Module System — Encapsulation at Scale
 
 ## The Concept, From Zero
 

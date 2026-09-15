@@ -45,8 +45,8 @@ public class DataSourceConfig {
 
 ## How we use it in an organization: the patterns
 
-```java
 **Pattern 1 — kill-switch a feature via a property flag.** The most common org pattern: a config property that switches between implementations without a redeploy:
+```java
 
 @Service
 @ConditionalOnProperty(name = "payments.provider", havingValue = "stripe", matchIfMissing = true)
@@ -66,8 +66,8 @@ public class AdyenPaymentGateway implements PaymentGateway { ... }
 
 Flip `payments.provider=adyen` in config, restart — the container now wires Adyen and *drops* Stripe. No code change, no risk of both beans colliding on `@Autowired PaymentGateway`.
 
-```java
 **Pattern 2 — only wire the integration if its client library is on the classpath.** Auto-configuration does this constantly:
+```java
 
 @Configuration
 @ConditionalOnClass(name = "org.apache.kafka.clients.producer.KafkaProducer")
@@ -82,8 +82,8 @@ public class KafkaProducerAutoConfig { ... }
 
 `@ConditionalOnClass` checks whether the class *can be loaded* (it doesn't force loading) — this is how Spring Boot ships one jar of auto-configurations that activate only for the starters you added.
 
-```java
 **Pattern 3 — feature flag for a gradual rollout.** Tying conditionals to a feature-flag service needs the dynamic check at *runtime*, not startup — so the condition reads a property that ops can flip between restarts:
+```java
 
 @Component
 public class V2SearchFlag implements Condition {

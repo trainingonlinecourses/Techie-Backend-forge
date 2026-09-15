@@ -16,6 +16,7 @@ docs:
   - url: https://www.codecademy.com/learn/learn-java
     title: Codecademy — Learn Java
 ---
+# Unicode and Code Points — What a char Really Is
 
 ## The idea in one sentence
 

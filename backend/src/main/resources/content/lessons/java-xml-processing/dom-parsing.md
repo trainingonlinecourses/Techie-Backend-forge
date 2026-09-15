@@ -8,6 +8,7 @@ docs:
   - https://docs.oracle.com/javase/8/docs/api/javax/xml/parsers/DocumentBuilderFactory.html
   - https://docs.oracle.com/javase/tutorial/jaxp/dom/index.html
 ---
+# DOM Parsing — Loading XML Into a Navigable Tree
 
 ## The Concept, From Zero
 
@@ -94,9 +95,9 @@ Document doc = builder.parse(new InputSource(new StringReader(xmlString)));
 
 // Or parse from an input stream (useful for network data)
 Document doc = builder.parse(connection.getInputStream());
+```
 
 **What happens internally:**
-```
 1. The parser reads the XML byte stream
 2. Validates against the DTD/XSD if configured
 3. Builds a complete tree of Node objects

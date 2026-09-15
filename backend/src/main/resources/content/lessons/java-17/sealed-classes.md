@@ -8,6 +8,7 @@ docs:
   - https://openjdk.org/jeps/409
   - https://docs.oracle.com/en/java/javase/17/language/sealed-classes-and-interfaces.html
 ---
+# Sealed Classes — Controlling Who Can Extend Your Code
 
 ## The Concept, From Zero
 
@@ -18,16 +19,18 @@ Imagine you're building a payment system. You have a `Payment` class with three 
 ```java
 // Anyone can add a new payment type
 public class EvilPayment extends Payment { ... }
+```
 
 **Sealed classes fix this.** Introduced as a preview in Java 15 and finalized in Java 17 (JEP 409), a sealed class lets you explicitly list which classes can extend it:
+```java
 
 public sealed class Payment 
     permits CreditCardPayment, BankTransferPayment, CryptoPayment {
     // Only the three listed classes can extend this
 }
+```
 
 **Now the compiler knows ALL possible subtypes.** This enables:
-```
 - Exhaustiveness checking in switch expressions
 - Better optimization by the JVM
 - Clear intent — you document your design decisions
@@ -181,8 +184,8 @@ public record SuccessResponse<T>(T data, int statusCode) implements ApiResponse<
 public record ErrorResponse<T>(String message, String errorCode) implements ApiResponse<T> {}
 public record LoadingResponse<T>() implements ApiResponse<T> {}
 
-```java
 **2. Domain Events**
+```java
 public sealed interface DomainEvent 
     permits OrderCreated, OrderShipped, OrderDelivered, OrderCancelled {
 }
@@ -191,8 +194,10 @@ public record OrderCreated(String orderId, Instant timestamp) implements DomainE
 public record OrderShipped(String orderId, String trackingNumber) implements DomainEvent {}
 public record OrderDelivered(String orderId, Instant timestamp) implements DomainEvent {}
 public record OrderCancelled(String orderId, String reason) implements DomainEvent {}
+```
 
 **3. AST for Expression Evaluation**
+```java
 public sealed interface Expr 
     permits Literal, Add, Multiply, Negate {
 }

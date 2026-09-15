@@ -8,6 +8,7 @@ docs:
   - https://docs.oracle.com/javase/tutorial/java/javaOO/methods.html
 capstone: false
 ---
+# Recursion Basics — A Method That Calls Itself
 
 ## The Concept, From Zero
 

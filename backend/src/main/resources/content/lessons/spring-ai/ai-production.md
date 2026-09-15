@@ -78,9 +78,7 @@ public SseEmitter stream(@RequestParam String question) {
 
 ## MCP: the ecosystem standard
 
-```java
 **MCP** (Model Context Protocol) standardizes how AI tools talk to systems — servers expose tools/resources; clients (Claude, IDEs, your app) consume them. Spring AI has first-class MCP support:
-```
 
 <!-- why -->
 **What this code shows:**

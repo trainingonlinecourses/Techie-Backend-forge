@@ -9,6 +9,7 @@ docs:
     title: JEP 456 — Unnamed Variables & Patterns
 capstone: false
 ---
+# Java 22 — Unnamed Variables & Patterns (JEP 456)
 
 ## The idea in one sentence
 

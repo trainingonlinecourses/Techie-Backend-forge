@@ -28,13 +28,12 @@ public GrpcServerConfigurer serverConfigurer() {
 ManagedChannel channel = ManagedChannelBuilder
     .forAddress(host, 443)
     .useTransportSecurity()                            // TLS by default
-```java
     .build();
 ```
 
 Or via properties:
 
-```yaml
+```
 grpc:
   server:
     security:
@@ -58,7 +57,7 @@ HTTP/2 multiplexes many streams over one connection. Classic round-robin load ba
 
 // Client-side round robin over multiple addresses
 NameResolverRegistry.getDefaultRegistry().register(
-```java
+```
     new StaticNameResolverProvider(List.of(
         new EquivalentAddressGroup(new SocketAddress[]{inet("10.0.0.1", 9090)}),
         new EquivalentAddressGroup(new SocketAddress[]{inet("10.0.0.2", 9090)}))));
@@ -67,7 +66,6 @@ NameResolverRegistry.getDefaultRegistry().register(
 ManagedChannel channel = ManagedChannelBuilder
     .forTarget("static:///backends")
     .defaultLoadBalancingPolicy("round_robin")
-```java
     .build();
 
 **The rule**: with HTTP/2 + gRPC, load balancing moves to the client or to a proxy like Envoy — plain TCP round-robin won't spread load correctly.

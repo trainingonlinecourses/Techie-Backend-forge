@@ -8,6 +8,7 @@ docs:
   - https://docs.oracle.com/javase/specs/jls/se21/html/jls-3.html#jls-3.7
 capstone: false
 ---
+# Comments & Javadoc — Writing Notes the Tools Can Read
 
 ## The Concept, From Zero
 

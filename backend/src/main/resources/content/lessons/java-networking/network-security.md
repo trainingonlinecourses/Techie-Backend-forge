@@ -18,9 +18,7 @@ docs:
 
 A raw socket sends bytes in plaintext: anyone on the network path (a Wi-Fi eavesdropper, a router, an ISP) can read everything — passwords, tokens, credit card numbers. **TLS (Transport Layer Security)**, the successor to SSL, wraps the socket in a *cryptographic envelope*: the two parties first prove their identities with **certificates**, then negotiate a secret key, then exchange data encrypted with that key. Everything HTTPS does, it does through TLS.
 
-```java
 **The mental model:** TLS is a two-phase conversation. Phase one, the **handshake**: the client says "hello," the server presents its **certificate** (a signed statement of "I am api.example.com" issued by a trusted authority), the client verifies the signature, and both sides derive a shared secret via public-key cryptography. Phase two: all further messages are encrypted with the shared secret — fast symmetric encryption. The envelope is closed; only the two parties hold the key.
-```
 
 ## The Three Questions TLS Answers
 
@@ -76,8 +74,8 @@ keytool -importcert -trustcacerts -alias my-internal-ca \
 
 Now Java trusts certificates signed by your internal CA — normal code, no bypass.
 
-```java
 **3. Use a custom trust store per client (scoped, not global):**
+```java
 
 System.setProperty("javax.net.ssl.trustStore", "/etc/app/truststore.jks");
 System.setProperty("javax.net.ssl.trustStorePassword", "changeit");

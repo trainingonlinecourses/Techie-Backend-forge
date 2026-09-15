@@ -7,6 +7,7 @@ topics: [actuator, health, metrics, info, custom-health, custom-metrics, product
 docs:
   - https://docs.spring.io/spring-boot/docs/current/reference/html/actuator.html
 ---
+# Spring Boot Actuator — Production Monitoring Endpoints
 
 ## The Concept, From Zero
 

@@ -62,7 +62,6 @@ ctx.setVariable("order", order);
 
 // 2. SimpleEvaluationContext — deliberately limited (no type references, no constructors)
 SimpleEvaluationContext simple = SimpleEvaluationContext
-```java
     .forReadOnlyDataBinding().withInstanceMethods().build();
 ```
 
@@ -84,7 +83,6 @@ SimpleEvaluationContext simple = SimpleEvaluationContext
 
 // Rule stored per tenant: "orders.amount > 500 and customer.tier == 'GOLD'"
 SimpleEvaluationContext ctx = SimpleEvaluationContext
-```java
     .forReadOnlyDataBinding().build();
 ctx.setVariable("orders", recentOrders);
 boolean eligible = ruleParser.parse(tenant.getRule()).getValue(ctx, Boolean.class);
@@ -92,10 +90,10 @@ boolean eligible = ruleParser.parse(tenant.getRule()).getValue(ctx, Boolean.clas
 
 `SimpleEvaluationContext` keeps tenant-supplied rules read-only — no `T(...)`, no methods that mutate, no RCE.
 
-```java
 **Scenario 2 — dynamic cache keys.** Keys that combine multiple args in a stable way (see above).
 
 **Scenario 3 — conditional event handling.** React only to specific event states:
+```java
 
 @EventListener(condition = "#event instanceof T(com.acme.PaymentEvent) and #event.amount > 1000")
 public void onLargePayment(PaymentEvent event) { ... }

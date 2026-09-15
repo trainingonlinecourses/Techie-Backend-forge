@@ -18,9 +18,7 @@ docs:
 
 The worst deployment anti-pattern is *baking configuration into the image*: change a database URL, a feature flag, a log level → rebuild and redeploy the container. **ConfigMaps** (non-secret config) and **Secrets** (sensitive config) decouple configuration from the image: the same image runs in dev, staging, and prod, differing only in the config injected at deploy time. One image, many environments.
 
-```java
 **The mental model:** the container image is the binary of your app; ConfigMaps and Secrets are the *settings files* handed to it when it starts. Same program, different settings per environment — no rebuilds, no "prod image" vs "dev image". Spring Boot's entire externalized-config philosophy (properties, profiles, env vars) is the natural partner: K8s provides the config; Spring reads it.
-```
 
 ## ConfigMap: Non-Secret Configuration
 

@@ -7,6 +7,7 @@ topics: [serialization, serializable, externalizable, serialVersionUID, java-io]
 docs:
   - https://docs.oracle.com/javase/tutorial/essential/io/serializing.html
 ---
+# Java Serialization — Converting Objects to Bytes
 
 ## The Concept, From Zero
 
@@ -26,9 +27,9 @@ byte[] bytes = bos.toByteArray();
 ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
 ObjectInputStream ois = new ObjectInputStream(bis);
 User restored = (User) ois.readObject();
+```
 
 **⚠️ Warning:** Java serialization has known security vulnerabilities. For new projects, use JSON, Protocol Buffers, or records instead.
-```
 
 ---
 

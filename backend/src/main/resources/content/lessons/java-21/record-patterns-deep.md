@@ -7,6 +7,7 @@ topics: [record-patterns, destructuring, nested-patterns, java21]
 docs:
   - https://docs.oracle.com/en/java/javase/21/language/pattern-matching.html
 ---
+# Record Patterns — Destructuring Records in Pattern Matching
 
 ## The Concept, From Zero
 
@@ -15,7 +16,10 @@ Records hold data. Pattern matching lets you extract that data. **Record pattern
 ```java
 public class Main {
 
+    record Point(int x, int y) {}
+
     public static void main(String[] args) {
+        Object obj = new Point(3, 4);
         // Without record patterns — verbose
         if (obj instanceof Point p) {
             int x = p.x();
@@ -46,6 +50,8 @@ public class Main {
 record Point(int x, int y) {}
 record Person(String name, int age) {}
 
+Object obj = new Point(3, 4);
+
 // Destructure a single record
 if (obj instanceof Point(int x, int y)) {
     // x and y are now local variables
@@ -72,6 +78,8 @@ if (obj instanceof Person(String name, int age) && age > 18) {
 ```java
 record Address(String city, String zip) {}
 record Person(String name, Address address) {}
+
+Object obj = new Person("Ada", new Address("London", "E1 6AN"));
 
 // Destructure nested records — extracts everything at once
 if (obj instanceof Person(String name, Address(String city, String zip))) {

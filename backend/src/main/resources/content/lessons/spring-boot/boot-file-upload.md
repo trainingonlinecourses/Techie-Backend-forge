@@ -127,12 +127,11 @@ public class S3FileStorageService {
                 .bucket(bucket)
                 .key(key)
                 .contentType(file.getContentType())
-```java
                 .build();
 ```
 
             s3.putObject(request,
-```java
+```
                 RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
 ```
 
@@ -148,7 +147,7 @@ public class S3FileStorageService {
 
 ## Client-side upload with progress (AJAX)
 
-```javascript
+```
 const formData = new FormData();
 formData.append('file', fileInput.files[0]);
 formData.append('category', 'documents');
@@ -166,7 +165,7 @@ fetch('/api/files/upload', {
 
 @PostMapping("/profile/picture")
 public ResponseEntity<Void> uploadProfilePicture(
-```java
+```
         @RequestParam("file") MultipartFile file) {
 
     // Validate before storing
@@ -225,7 +224,6 @@ public ResponseEntity<PresignedUrl> getPresignedUploadUrl(
         .bucket(bucket)
         .key(key)
         .contentType(contentType)
-```java
         .build();
 
     PresignedPutObjectRequest presigned = presigner.presignPutObject(request);

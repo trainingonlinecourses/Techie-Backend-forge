@@ -35,14 +35,12 @@ class OrderControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id").value(1))
             .andExpect(jsonPath("$.company").value("ACME"))
-```java
             .andExpect(jsonPath("$.totalCents").value(1999));
     }
 
     @Test
     void shouldReturn404() throws Exception {
         when(orderService.getOrder(99L)).thenThrow(new NotFoundException("Order not found"));
-```
 
         mockMvc.perform(get("/api/orders/99"))
             .andExpect(status().isNotFound())
@@ -68,13 +66,11 @@ class AdminControllerTest {
     @WithMockUser(roles = "ADMIN")
     void adminCanAccess() throws Exception {
         mockMvc.perform(get("/api/admin/stats"))
-```java
             .andExpect(status().isOk());
     }
 
     @Test
     void unauthenticatedGets401() throws Exception {
-```
         mockMvc.perform(get("/api/admin/stats"))
             .andExpect(status().isUnauthorized());
     }
@@ -155,8 +151,8 @@ class AuditEventRepositoryTest {
 
 ## Common mistakes
 
-```java
 **Mistake 1: loading too many beans**
+```java
 
 // WRONG: @SpringBootTest loads everything — slow and fragile
 @SpringBootTest
@@ -170,8 +166,10 @@ class OrderControllerTest {
 class OrderControllerTest {
     @Autowired private MockMvc mockMvc;
 }
+```
 
 **Mistake 2: forgetting @MockBean for dependencies**
+```java
 
 // WRONG: controller depends on OrderService — but @WebMvcTest doesn't load it
 // Results in UnsatisfiedDependencyException
@@ -181,8 +179,10 @@ class OrderControllerTest {
     @Autowired MockMvc mockMvc;
     // Missing: @MockBean OrderService orderService;
 }
+```
 
 **Mistake 3: testing implementation details**
+```java
 
 // WRONG: verifying internal method calls
 verify(orderService).processOrder(any());  // tests how, not what

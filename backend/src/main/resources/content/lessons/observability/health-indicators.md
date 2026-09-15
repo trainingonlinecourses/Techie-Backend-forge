@@ -205,13 +205,11 @@ class HealthTest {
     void healthReportsUp() throws Exception {
         mockMvc.perform(get("/actuator/health"))
             .andExpect(status().isOk())
-```java
             .andExpect(jsonPath("$.status").value("UP"));
     }
 
     @Test
     void readinessIncludesCustomIndicator() throws Exception {
-```
         mockMvc.perform(get("/actuator/health/readiness"))
             .andExpect(jsonPath("$.components.paymentGateway.status").exists());
     }

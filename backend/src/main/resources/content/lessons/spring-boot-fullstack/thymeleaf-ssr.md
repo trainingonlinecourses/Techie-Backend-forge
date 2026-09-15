@@ -8,6 +8,7 @@ docs:
   - https://www.thymeleaf.org/doc/tutorials/3.1/understandingthymeleaf
   - https://spring.io/guides/gs/serving-web-content
 ---
+# Full-Stack with Thymeleaf — Server-Side Rendering in Spring Boot
 
 ## The Concept, From Zero
 

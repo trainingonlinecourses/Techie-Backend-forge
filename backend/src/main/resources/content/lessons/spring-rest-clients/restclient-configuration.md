@@ -128,9 +128,9 @@ ClientHttpRequestInterceptor retryInterceptor() {
         }
     };
 }
+```
 
 **Important:** retry only **idempotent** requests (GET, PUT, DELETE — safe to repeat). Never blindly retry a POST that creates a resource without idempotency keys (see the idempotency lesson in REST best practices).
-```
 
 <!-- why -->
 **What this code shows:**

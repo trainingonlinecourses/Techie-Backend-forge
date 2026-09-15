@@ -7,6 +7,7 @@ topics: [docker-networks, volumes, bind-mounts, service-isolation, data-persiste
 docs:
   - https://docs.docker.com/compose/networking/
 ---
+# Docker Compose Networks & Volumes — Isolating Services and Persisting Data
 
 ## The Concept, From Zero
 

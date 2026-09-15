@@ -7,6 +7,7 @@ topics: [pattern-matching, instanceof, java17]
 docs:
   - https://docs.oracle.com/en/java/javase/17/language/pattern-matching.html
 ---
+# Pattern Matching for instanceof — Cast and Check in One Step
 
 ## The Concept, From Zero
 
@@ -14,6 +15,7 @@ Before Java 16, type-checking and casting required two separate steps:
 
 ```java
 // OLD WAY: check then cast
+Object obj = "pattern matching";
 if (obj instanceof String) {
     String s = (String) obj;       // explicit cast — redundant and error-prone
     System.out.println(s.length());
@@ -29,6 +31,7 @@ Java 16 introduced **pattern matching for instanceof** — combine the check and
 
 ```java
 // JAVA 16+: check and bind in one step
+Object obj = "pattern matching";
 if (obj instanceof String s) {
     System.out.println(s.length());  // 's' is already a String
 }
@@ -61,6 +64,7 @@ The same code, clean:
 public class Main {
 
     public static void main(String[] args) {
+        Object obj = "pattern matching";
         if (obj instanceof String s) {
             System.out.println("String of length " + s.length());
         }

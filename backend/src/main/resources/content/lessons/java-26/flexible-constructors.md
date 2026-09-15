@@ -7,6 +7,7 @@ topics: [flexible-constructors, super-before, constructor-ordering, preview]
 docs:
   - https://openjdk.org/jeps/482
 ---
+# Flexible Constructors — Fields Before super()
 
 ## The Concept, From Zero
 

@@ -8,6 +8,7 @@ docs:
   - url: "https://docs.spring.io/spring-boot/reference/actuator/endpoints.html"
     title: "Custom Endpoints"
 ---
+# Custom Actuator Endpoints — Exposing Your Own Health and Metrics
 
 ## The Concept, From Zero
 

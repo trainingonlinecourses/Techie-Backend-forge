@@ -33,12 +33,12 @@ public class CourseV1Controller { ... }
 @RestController
 @RequestMapping("/api/v2/courses")
 public class CourseV2Controller { ... }
+```
 
 **Pros**: obvious, cacheable (different URLs = different cache keys), works in any client (curl, browsers, SDKs), easy to A/B test.
 **Cons**: URLs leak versioning; every endpoint must be duplicated or aliased during migration.
 
 **Verdict**: the pragmatic default for most teams.
-```
 
 <!-- why -->
 **What this code shows:**
@@ -60,9 +60,9 @@ public CourseDto list(@RequestParam(defaultValue = "1") int version) {
         default -> throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
     };
 }
+```
 
 **Pros**: trivial to implement, single URL.
-```
 
 <!-- why -->
 **What this code shows:**
@@ -72,9 +72,7 @@ public CourseDto list(@RequestParam(defaultValue = "1") int version) {
 
 **Cons**: pollutes every request; caches treat all versions as one URL (version must join the cache key); easy to forget `version` in a URL and silently get v1.
 
-```java
 **Verdict**: fine for internal tools; weak for public APIs.
-```
 
 ## Strategy 3: Header Versioning
 
@@ -89,12 +87,12 @@ public CourseDto listV1() { ... }
 
 @GetMapping(value = "/api/courses", headers = "X-API-Version=2")
 public CourseDto listV2() { ... }
+```
 
 **Pros**: clean URLs.
 **Cons**: invisible in the address bar; harder to debug; caching must vary on the header.
 
 **Verdict**: used by some big APIs (e.g., some Google APIs); rarely worth the hidden complexity.
-```
 
 ## Strategy 4: Media Type Versioning
 
@@ -106,12 +104,12 @@ Accept: application/vnd.acme.courses.v2+json
     produces = "application/vnd.acme.courses.v2+json")
 ```java
 public CourseDto listV2() { ... }
+```
 
 **Pros**: the most "RESTful" — versioning rides content negotiation; single URL.
 **Cons**: hidden from browsers; client libraries must set the Accept header; cache keys must include the media type.
 
 **Verdict**: elegant but operationally heavy; choose only if you already do content negotiation everywhere.
-```
 
 ## Comparison
 
@@ -188,22 +186,18 @@ void v1ReturnsLegacyShape() throws Exception {
     mockMvc.perform(get("/api/v1/courses/1"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.title").exists())
-```java
         .andExpect(jsonPath("$.minutes").doesNotExist());
 }
 
 @Test
 void v2AddsNewFields() throws Exception {
-```
     mockMvc.perform(get("/api/v2/courses/1"))
         .andExpect(status().isOk())
-```java
         .andExpect(jsonPath("$.minutes").value(25));
 }
 
 @Test
 void v1DeclaresDeprecation() throws Exception {
-```
     mockMvc.perform(get("/api/v1/courses/1"))
         .andExpect(header().string("Deprecation", "true"));
 }

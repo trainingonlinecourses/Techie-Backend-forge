@@ -8,6 +8,7 @@ docs:
   - url: "https://spring.io/projects/spring-shell"
     title: "Spring Shell"
 ---
+# Spring Shell — Building Interactive CLI Applications
 
 ## The Concept, From Zero
 

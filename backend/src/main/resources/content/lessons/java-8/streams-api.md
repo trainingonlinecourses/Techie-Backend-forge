@@ -8,6 +8,7 @@ docs:
   - https://docs.oracle.com/javase/tutorial/collections/streams/
   - https://docs.oracle.com/javase/8/docs/api/java/util/stream/package-summary.html
 ---
+# Stream API — Processing Collections the Functional Way
 
 ## The Concept, From Zero
 
@@ -22,8 +23,10 @@ for (Employee e : employees) {
         highEarnerNames.add(name);
     }
 }
+```
 
 **Streams** let you describe *what* you want, not *how* to do it:
+```java
 
 // NEW: Same logic in a fluent, declarative pipeline
 ```
@@ -37,13 +40,12 @@ for (Employee e : employees) {
 List<String> highEarnerNames = employees.stream()
     .filter(e -> e.getSalary() > 80000)
     .map(e -> e.getName().toUpperCase())
-```java
     .toList();
+```
 
 **Key insight:** A Stream is NOT a data structure. It's a **pipeline** — a description of operations to perform on data. The data flows through the pipeline lazily, element by element.
 
 **Analogy:** Think of a Stream like a water pipe:
-```
 - **Source** = the faucet (your collection)
 - **Intermediate operations** = filters, valves (filter, map, flatMap)
 - **Terminal operation** = the tap where water comes out (collect, forEach, reduce)
@@ -67,7 +69,7 @@ Water only flows when you turn on the tap (terminal operation). Until then, the 
 
 The same code, clean:
 
-```java
+```
 List<String> names = List.of("Alice", "Bob", "Carol");
 Stream<String> stream = names.stream();
 
@@ -114,7 +116,7 @@ These operations return a new Stream. They are **lazy** — nothing happens unti
 
 The same code, clean:
 
-```java
+```
 .filter(Predicate<T>)
 .map(Function<T,R>)
 .flatMap(Function<T,Stream<R>>)
@@ -161,7 +163,7 @@ The same code, clean:
 
 The same code, clean:
 
-```java
+```
 import java.util.*;
 import java.util.stream.*;
 
@@ -249,7 +251,7 @@ These consume the stream and produce a result:
 
 The same code, clean:
 
-```java
+```
 .forEach(Consumer<T>)
 .collect(Collector<T,A,R>)
 .reduce(BinaryOperator<T>)
@@ -289,7 +291,7 @@ The same code, clean:
 
 The same code, clean:
 
-```java
+```
 String csv = orders.stream()
     .map(Order::id)
     .collect(Collectors.joining(", "));
@@ -320,18 +322,15 @@ DoubleSummaryStatistics stats = orders.stream()
 // Sequential (default)
 double sum1 = orders.stream()
     .mapToDouble(Order::total)
-```java
     .sum();
 
 // Parallel — uses ForkJoinPool automatically
 double sum2 = orders.parallelStream()
-```
     .mapToDouble(Order::total)
-```java
     .sum();
+```
 
 **When to use parallel:**
-```
 - Large datasets (>10,000 elements)
 - CPU-intensive operations per element
 - No shared mutable state between operations

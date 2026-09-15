@@ -106,13 +106,11 @@ Errors travel down the pipeline as events. Handle them with operators, not `try/
 Mono<Customer> customer = repo.findById(id)
         .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
         .onErrorResume(DataAccessException.class, e -> Mono.just(Customer.empty())) // fallback value
-```java
         .onErrorReturn(Customer.empty());                    // blanket fallback
 // doOnError: observe only (log); doFinally: always run (cleanup)
 ```
 Mono<Customer> c = repo.findById(id)
         .doOnError(e -> log.warn("lookup failed", e))
-```java
         .doFinally(sig -> metrics.count(sig));
 ```
 

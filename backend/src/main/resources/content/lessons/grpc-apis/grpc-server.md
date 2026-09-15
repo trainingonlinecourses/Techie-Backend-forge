@@ -81,7 +81,6 @@ public class CourseGrpcService extends CourseServiceGrpc.CourseServiceImplBase {
         Course course = repository.findById(request.getId())
             .orElseThrow(() -> Status.NOT_FOUND
                 .withDescription("Course " + request.getId() + " not found")
-```java
                 .asRuntimeException());
 
         responseObserver.onNext(toReply(course));
@@ -90,7 +89,6 @@ public class CourseGrpcService extends CourseServiceGrpc.CourseServiceImplBase {
 
     private CourseReply toReply(Course c) {
         return CourseReply.newBuilder()
-```
             .setId(c.getId()).setTitle(c.getTitle())
             .setLevel(c.getLevel()).setMinutes(c.getMinutes())
             .build();
@@ -118,7 +116,6 @@ gRPC has 17 standardized error codes — the equivalent of HTTP status but typed
 throw Status.INVALID_ARGUMENT
     .withDescription("minutes must be positive")
     .withCause(e)
-```java
     .asRuntimeException();
 
 // With metadata
@@ -172,7 +169,7 @@ public class GrpcServerInterceptor implements ServerInterceptor {
 
 Configured via `GrpcServerConfigurer`:
 
-```java
+```
 @Bean
 public GrpcServerConfigurer serverConfigurer() {
     return builder -> builder.intercept(grpcServerInterceptor);
@@ -186,7 +183,7 @@ public GrpcServerConfigurer serverConfigurer() {
 
 ## Configuring the Server
 
-```yaml
+```
 grpc:
   server:
     port: 9090
@@ -207,7 +204,6 @@ class GrpcServerTest {
         Server server = InProcessServerBuilder.forName("test")
             .directExecutor()
             .addService(new CourseGrpcService(repository))
-```java
             .build().start();
 ```
 

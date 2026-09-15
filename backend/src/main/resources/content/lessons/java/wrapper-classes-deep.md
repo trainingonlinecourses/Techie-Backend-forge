@@ -229,8 +229,10 @@ ages.put("Bob", null);  // Null is a valid value in a HashMap
 
 // 💥 NullPointerException if Bob's age is unboxed
 int bobAge = ages.get("Bob");
+```
 
 **Safe way to handle this:**
+```java
 
 Integer bobAge = ages.get("Bob");  // Use Integer, not int
 if (bobAge != null) {

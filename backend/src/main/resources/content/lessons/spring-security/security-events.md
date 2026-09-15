@@ -74,16 +74,18 @@ public void onFailure(AuthenticationFailureBadCredentialsEvent e) {
     loginAttemptService.recordFailure(name, requestInfo());   // increments a counter, may lock
     auditRepo.save(new LoginFailure(name, Instant.now(), requestInfo()));
 }
+```
 
 **Scenario 2 — the success trail.** "Who logged in when and from where" — the first query in any security investigation and the compliance answer for privileged systems:
+```java
 
 @EventListener
 public void onSuccess(AuthenticationSuccessEvent e) {
     auditRepo.save(new LoginSuccess(e.getAuthentication().getName(), Instant.now()));
 }
+```
 
 **Scenario 3 — account-state changes.** Locked, disabled, expired events feed both the audit and the *user-facing* message ("Your account is locked — contact support").
-```
 
 **Scenario 4 — authorization denials.** `AuthorizationDeniedEvent` records *attempted but denied* access — the signal for over-privileged users and probing:
 

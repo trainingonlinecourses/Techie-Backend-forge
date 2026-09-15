@@ -44,8 +44,8 @@ counter.compareAndSet(6, 10);
 int val = counter.get();
 ```
 
-```java
 **How CAS works internally (simplified):**
+```java
 // AtomicInteger.incrementAndGet() pseudocode:
 public int incrementAndGet() {
     int old, new;
@@ -85,9 +85,9 @@ UserSession expected = currentSession.get();
 UserSession updated = new UserSession(expected.username(), Instant.now());
 boolean success = currentSession.compareAndSet(expected, updated);
 // success == false means another thread changed it between get() and CAS()
+```
 
 **Real-world scenario — optimistic lock for a config object:**
-```
 AtomicReference<AppConfig> config = new AtomicReference<>(AppConfig.defaultConfig());
 
 ```java

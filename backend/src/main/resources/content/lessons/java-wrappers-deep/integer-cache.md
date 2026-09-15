@@ -7,6 +7,7 @@ topics: [integer-cache, valueOf, interning, -128-127, object-identity, performan
 docs:
   - https://docs.oracle.com/javase/8/docs/api/java/lang/Integer.html#valueOf-int-
 ---
+# The Integer Cache and Wrapper Interning
 
 ## The Concept, From Zero
 

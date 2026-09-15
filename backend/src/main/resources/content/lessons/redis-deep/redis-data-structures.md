@@ -22,9 +22,7 @@ docs:
 
 **The mental model:** Redis is a giant, fast, shared dictionary with *typed values*. Unlike a plain key-value store where values are opaque blobs, Redis knows what each value *is* (a list? a set? a hash?) and can run efficient operations *inside* the structure server-side — `LPUSH`, `SADD`, `ZINCRBY` — without shipping data back and forth to your application. The operations live next to the data, so they're atomic and fast.
 
-```java
 **Why in-memory matters:** a disk read is ~10,000× slower than a RAM read. Databases optimize for durability and big data; Redis optimizes for *speed* on the working set. The classic architecture: hot data lives in Redis (fast reads), the authoritative copy lives in Postgres (durable writes) — Redis as a caching layer in front of the database, exactly how Spring Boot apps wire it.
-```
 
 ## The Five Core Structures
 
@@ -120,15 +118,15 @@ TTLs are what keep caches from growing forever and stale data from living foreve
 
 ## Pipelining and Atomicity: Doing More, Faster
 
-```java
 **Pipelining** batches many commands into one round trip — the difference between 1000 network round trips and 1:
+```java
 
 Pipeline p = redis.pipelined();
 for (int i = 0; i < 1000; i++) p.set("k" + i, "v" + i);
 p.sync();   // all 1000 sent together
+```
 
 **MULTI/EXEC** gives *transactions*: commands buffer, then execute atomically — no other client's commands interleave. Redis single-threaded execution model means each command is already atomic; MULTI extends that to a *sequence*. (Lua scripts give even richer atomicity — the basis of the Redis rate-limiter patterns.)
-```
 
 <!-- why -->
 **What this code shows:**

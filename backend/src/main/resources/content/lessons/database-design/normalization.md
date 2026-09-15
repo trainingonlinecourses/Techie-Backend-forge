@@ -34,9 +34,7 @@ Now imagine the author changes their email. You must update **every row** with t
 
 ### 1NF — Atomic Values
 
-```java
 Every column holds a single value; no lists or repeated groups:
-```
 
 ```sql
 -- VIOLATES 1NF: a list in one column
@@ -99,9 +97,9 @@ CREATE TABLE orders_denormalized (
 
 ```java
 Problems: a customer's city repeated on every order (update anomaly); the same product's price repeated on every order line (update anomaly + a price change requires touching history).
+```
 
 **Step 1 — Split customer into its own table (3NF):**
-```
 
 ```sql
 CREATE TABLE customers (
@@ -163,9 +161,7 @@ Each table answers one question; the join composes them.
 
 Perfect normalization (up to 3NF/Boyce-Codd) is the *baseline* — most schemas should be 3NF. The later forms (4NF, 5NF) solve exotic edge cases rarely worth the complexity. And sometimes you *deliberately* denormalize for performance — that's the next lesson's topic (denormalization as a conscious trade).
 
-```java
 The tension: **joins cost** — a heavily normalized schema means more joins per query. For read-heavy, high-throughput paths, teams store precomputed/duplicated values *deliberately* (a denormalized read model) while keeping the normalized source of truth. The rule: **normalize the source of truth; denormalize the read path — consciously, with synchronization.**
-```
 
 ## Common Beginner Pitfalls
 

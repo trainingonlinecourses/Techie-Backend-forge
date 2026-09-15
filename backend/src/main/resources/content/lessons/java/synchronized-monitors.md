@@ -90,8 +90,10 @@ public class Counter {
         count++;  // every thread queues on this monitor
     }
 }
+```
 
 **The fix:** reduce lock scope or use a lock-free alternative.
+```java
 
 // Fix 1: narrow the synchronized block
 public class Counter {
@@ -256,9 +258,9 @@ public T dequeue() throws InterruptedException {
         lock.unlock();
     }
 }
+```
 
 **When to prefer ReentrantLock over synchronized:**
-```
 
 <!-- why -->
 **What this code shows:**

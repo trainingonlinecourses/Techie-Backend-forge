@@ -4,10 +4,8 @@ module: redis-deep
 order: 3
 minutes: 28
 topics: ["cache-aside", "rate limiting", "queues", "distributed locks", "Redis patterns", "counter"]
-```java
 summary: Redis's structures are ingredients; patterns are the recipes — proven arrangements of structures and commands that solve recurring production probl...
 docs:
-```
   - title: "Redis Patterns (redis.io)"
     url: "https://redis.io/docs/latest/develop/use/patterns/"
   - title: "Cache-Aside Pattern (Microsoft Learn)"
@@ -18,9 +16,7 @@ docs:
 
 ## The Concept: Recipes for Real Problems
 
-```java
 Redis's structures are ingredients; **patterns** are the recipes — proven arrangements of structures and commands that solve recurring production problems. Every serious Redis user reaches for the same handful: cache-aside reads, cache invalidation, rate limiting, queues, distributed locks, and atomic counters. This lesson walks through each with working code and the reasoning behind the design.
-```
 
 ## Pattern 1: Cache-Aside (Lazy Loading)
 
@@ -81,9 +77,9 @@ public void updateProductWriteThrough(Long id, Product p) {
     database.save(p);
     redis.setex("product:" + id, 300, serialize(p));
 }
+```
 
 **Invalidation (A) is usually the better default:** deleting is idempotent and avoids the "write the cache but crash before the DB" inconsistency window. The subtle bug to avoid: updating the cache *before* the DB commit can leave the cache ahead of the DB if the commit fails. Delete-after-commit sidesteps the whole class.
-```
 
 ## Pattern 3: Rate Limiting — The Fixed Window and the Token Bucket
 

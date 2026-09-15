@@ -8,6 +8,7 @@ docs:
   - https://openjdk.org/jeps/378
   - https://docs.oracle.com/en/java/javase/17/text-blocks/index.html
 ---
+# Text Blocks — Multi-Line Strings Without the Escape Hell
 
 ## The Concept, From Zero
 
@@ -31,7 +32,6 @@ String modern = """
         FROM users u
         WHERE u.active = true
         ORDER BY u.name
-```java
         """;
 
 **Same result, dramatically cleaner code.** No escape characters. No concatenation. Just write what you mean.
@@ -52,7 +52,6 @@ A text block starts with `"""` followed by a mandatory newline:
 // CORRECT — newline after opening """
 String good = """
     Hello World
-```java
     """;
 
 // WRONG — no newline after opening """

@@ -33,9 +33,9 @@ public Course getCourse(String id) { ... }
 
 @CacheEvict(value = "courses", key = "#id")               // write path
 public void updateCourse(String id, CourseDto dto) { ... }
+```
 
 **Pros**: simple, only hot data gets cached, easy to reason about.
-```
 **Cons**: first read after eviction pays a full DB round-trip (miss penalty); stampede risk without `sync`.
 
 ## Pattern 2: Read-Through
@@ -52,10 +52,10 @@ public class CourseService {
             .orElseThrow(() -> new NotFoundException(id));
     }
 }
+```
 
 **Pros**: callers never touch the DB path; consistent API.
 **Cons**: same miss penalty; the "loader" lives in your service rather than the cache.
-```
 
 <!-- why -->
 **What this code shows:**
@@ -73,10 +73,10 @@ Writes go to the cache and the DB in the same transaction — `@CachePut`:
 public Course saveCourse(Course course) {
     return courseRepository.save(course);
 }
+```
 
 **Pros**: reads are always fresh.
 **Cons**: doubles write latency; if the cache write fails after the DB commit, the cache goes stale silently.
-```
 
 ## Pattern 4: Write-Behind (Write-Back)
 
@@ -88,10 +88,10 @@ public void touchSession(String sessionId, SessionData data) {
     // cached instantly; a background flusher persists to DB
     asyncFlusher.offer(new SessionUpdate(sessionId, data));
 }
+```
 
 **Pros**: very fast writes.
 **Cons**: data loss window if the app dies before the flush; complex. Rarely worth it for backend caches — use for session stores, counters, or queue buffers.
-```
 
 ## The Stampede Problem in Depth
 
@@ -102,8 +102,8 @@ With 100 concurrent cold misses:
 
 But `sync` has a subtlety: the lock is **per key within the cache manager**. If two *different* keys are cold, they still each run — correct. And in a Redis-backed cluster, the lock is distributed.
 
-```java
 **The deeper fix — probabilistic early expiration**: refresh entries *before* they expire, so a TTL expiry never coincides with a traffic spike:
+```java
 
 // Store an "expiresAt" hint inside the cached value
 record CachedCourse(Course course, Instant expiresAt) {}

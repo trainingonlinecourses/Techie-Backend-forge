@@ -7,6 +7,7 @@ topics: [array-performance, cache-locality, memory-layout, simd, primitive-array
 docs:
   - https://docs.oracle.com/javase/tutorial/java/nutsandbolts/arrays.html
 ---
+# Array Performance — Cache Locality, Memory Layout, and SIMD
 
 ## The Concept, From Zero
 

@@ -116,14 +116,12 @@ Rules:
 // ❌ Cardinality explosion: one series per user!
 Counter.builder("api.requests")
     .tag("userId", userId)      // 1M users = 1M time series
-```java
     .register(registry);
 
 // ❌ Same: request-scoped values
 ```
 Counter.builder("api.requests")
     .tag("requestId", UUID.randomUUID().toString())
-```java
     .register(registry);
 ```
 

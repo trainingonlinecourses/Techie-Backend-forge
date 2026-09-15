@@ -425,9 +425,7 @@ public <T> ResponseEntity<?> toHttpEntity(ApiResponse<T> response) {
     return switch (response) {
         case Success<T> s  -> ResponseEntity.ok(s.data());
         case Error<T> e    -> ResponseEntity.status(e.statusCode())
-```java
                                        .body(Map.of("error", e.message(), "details", e.details()));
-```
         case Loading<T>    -> ResponseEntity.status(202).body("Loading...");
     };
 }
@@ -460,7 +458,6 @@ public class UserRepository {
               AND u.created_at > :since
             ORDER BY u.name ASC
             LIMIT :limit
-```java
             """;
 
     private static final String UPDATE_USER = """
@@ -470,7 +467,6 @@ public class UserRepository {
                 email = :email,
                 updated_at = CURRENT_TIMESTAMP
             WHERE id = :id
-```java
             """;
 
     @Query(value = FIND_ACTIVE_USERS, nativeQuery = true)

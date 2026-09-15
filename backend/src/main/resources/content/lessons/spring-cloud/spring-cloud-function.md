@@ -68,9 +68,9 @@ Function<OrderCreated, OrderCreated> validateOrder() {
     return o -> { if (!o.valid()) throw new IllegalArgumentException(); return o; };
 }
 // validateOrder|planShipping = the pipeline, declared in config, reorderable without code
+```
 
 **Routing** picks a function at runtime by a header/payload key:
-```
 
 <!-- why -->
 **What this code shows:**

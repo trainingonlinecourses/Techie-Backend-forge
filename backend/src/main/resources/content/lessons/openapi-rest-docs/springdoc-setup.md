@@ -107,14 +107,12 @@ public GroupedOpenApi publicApi() {
     return GroupedOpenApi.builder()
             .group("public")
             .pathsToMatch("/api/courses/**", "/api/auth/**")
-```java
             .build();
 }
 
 @Bean
 public GroupedOpenApi internalApi() {
     return GroupedOpenApi.builder()
-```
             .group("internal")
             .pathsToMatch("/admin/**", "/internal/**")
             .build();

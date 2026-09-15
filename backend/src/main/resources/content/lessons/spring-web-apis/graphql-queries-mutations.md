@@ -13,9 +13,7 @@ docs:
 
 ## Arguments and the input discipline
 
-```java
 Query arguments come from the schema; complex payloads use **input types** (never graph types — input types can't have resolvers, fields are just data):
-```
 
 ```graphql
 input OrderFilter { status: OrderStatus, minAmount: BigDecimal, customerId: ID }

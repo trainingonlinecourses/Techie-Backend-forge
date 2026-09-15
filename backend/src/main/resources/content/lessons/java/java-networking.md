@@ -230,7 +230,6 @@ public class OrderService {
                 mapper.writeValueAsString(new ChargeRequest(orderId, amount))
             ))
             .timeout(Duration.ofSeconds(5))     // 5-second timeout
-```java
             .build();
 ```
 
@@ -272,7 +271,6 @@ public class HealthChecker {
                 .uri(URI.create(url))
                 .GET()
                 .timeout(Duration.ofSeconds(3))
-```java
                 .build();
 ```
             HttpResponse<String> resp = client.send(request,

@@ -7,6 +7,7 @@ topics: [yaml, multi-document, profile-properties, property-source, configuratio
 docs:
   - https://docs.spring.io/spring-boot/reference/features/external-config.html
 ---
+# YAML Multi-Document and Profile Configuration
 
 ## The Concept, From Zero
 

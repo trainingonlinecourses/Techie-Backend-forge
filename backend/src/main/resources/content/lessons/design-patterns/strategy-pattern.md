@@ -32,9 +32,7 @@ Every new rule means editing this method — which risks breaking existing rules
 2. **Concrete strategies** — one class per algorithm (member discount, holiday discount, none).
 3. **A context** — holds a *current* strategy and delegates to it.
 
-```java
 The key move: **the algorithm becomes a pluggable object**. The checkout doesn't contain the rules; it holds a reference to whichever rule object it was given — and that reference can change at **runtime** (per order, per user, per request).
-```
 
 ## Composition over Inheritance
 

@@ -24,9 +24,7 @@ Deploying a hello-world pod teaches the concepts; running a production system te
 
 ## Helm: The Package Manager for Kubernetes
 
-```java
 Raw YAML manifests are fine for one service; a real system has dozens (Deployment, Service, Ingress, ConfigMap, Secret, autoscaler, ...) repeated across environments. **Helm** packages all of it into a **chart** — a versioned, templated bundle:
-```
 
 ```text
 payments-chart/

@@ -16,9 +16,7 @@ docs:
 
 ## The Concept: Untrusted Input That Becomes Code
 
-```java
 **Injection** happens when untrusted input (from a form, a URL, an API body) is combined with an *interpreter* — SQL, NoSQL query, OS command, LDAP — in a way that lets the input *change the meaning* of the instruction. The attacker isn't just providing data; they're providing *code* that the interpreter executes. It's the third most critical web risk, and it's almost always a *developer error* — a missing parameterization — rather than an exotic attack.
-```
 
 **The mental model:** SQL is a sentence with a grammar. Your code builds the sentence by *gluing strings*; the attacker's input contains *punctuation and keywords* that hijack the grammar. `' OR '1'='1` isn't a name — it's a *clause* that makes the WHERE always true. Parameterization is the fix because it changes the grammar: the `?` placeholder reserves a slot where the input can only ever be a *value* — punctuation in the value stays punctuation in the value, never becoming grammar. The sentence is fixed; only the words change.
 
@@ -135,9 +133,7 @@ The principle generalizes: **any interpreter that receives untrusted input — S
 
 ## The Defense-in-Depth Layers
 
-```java
 Parameterization is the primary defense; real systems layer more:
-```
 
 1. **Parameterized queries** — the fix itself (primary).
 2. **Input validation** — reject/coerce at the boundary: types, lengths, allowed-character sets (`@Valid`, `@Pattern`). Validation alone is *not sufficient* (encodings and edge cases evade it), but it shrinks the attack surface.

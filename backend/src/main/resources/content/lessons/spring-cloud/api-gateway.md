@@ -21,9 +21,7 @@ client ──▶ GATEWAY (:9090) ──lb://ORDER-SERVICE──▶ order-service
                   └── auth check, rate limit, tracing, logging (edge filters)
 ```
 
-```java
 Spring Cloud Gateway is **reactive** (WebFlux-based) — no Tomcat/Spring MVC in the gateway app; it proxies requests efficiently without blocking threads.
-```
 
 ## 1. The dependency (and what NOT to add)
 

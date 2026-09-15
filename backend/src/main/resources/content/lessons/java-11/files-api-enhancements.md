@@ -7,6 +7,7 @@ topics: [files, readstring, writestring, file-io, java11]
 docs:
   - https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/nio/file/Files.html
 ---
+# Files API Enhancements — Reading and Writing Made Simple
 
 ## The Concept, From Zero
 

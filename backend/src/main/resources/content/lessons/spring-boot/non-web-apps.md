@@ -37,9 +37,9 @@ public class BatchApplication {
         app.run(args);                                        // Line 2: start and run
     }
 }
+```
 
 **Line-by-line walkthrough:**
-```
 
 1. **`setWebApplicationType(WebApplicationType.NONE)`** — This tells Spring Boot "don't start Tomcat, Jetty, or Netty. Don't even load web-related auto-configuration." The app starts faster, uses less memory, and has no ports open.
 
@@ -90,9 +90,9 @@ public class DataMigrationRunner implements CommandLineRunner {
         System.out.println("Migration complete!");
     }
 }
+```
 
 **Run it:**
-```
 
 <!-- why -->
 **What this code shows:**
@@ -121,6 +121,7 @@ java -jar myapp.jar                      # skips it
 
 `ApplicationRunner` is identical to `CommandLineRunner` but wraps the arguments in an `ApplicationArguments` object that parses `--key=value` flags:
 
+```java
 @Component
 public class ReportGenerator implements ApplicationRunner {
 
@@ -142,6 +143,7 @@ public class ReportGenerator implements ApplicationRunner {
         }
     }
 }
+```
 
 **Run it:**
 ```bash
@@ -203,8 +205,9 @@ public class MessageListener implements CommandLineRunner {
 
 **How it stays alive:** The `executor.submit()` starts a daemon thread. Spring Boot's main thread is blocked by `SpringApplication.run()` waiting for a shutdown signal (Ctrl+C / SIGTERM). The background thread processes messages until the app is stopped.
 
-```java
 **For scheduled tasks (no background thread needed):**
+
+```java
 @Component
 public class DailyReportJob {
 
@@ -237,7 +240,8 @@ The `@Scheduled` annotation keeps the Spring context alive (the task scheduler t
 ## Production Considerations
 
 1. **Health checks:** Even non-web apps can expose health via Spring Boot Actuator on a separate management port:
-```yaml
+
+   ```yaml
    management:
      server:
        port: 8081  # separate port for Actuator

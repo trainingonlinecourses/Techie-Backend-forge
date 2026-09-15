@@ -44,9 +44,7 @@ A true rolling window (last 60 seconds, however they align) — smooth, no bound
 
 ### Token bucket (the classic)
 
-```java
 A bucket holds N tokens; each request spends one; tokens refill at a rate. Bursts up to N are allowed instantly, sustained traffic is capped at the refill rate:
-```
 
 ```
 Bucket capacity: 10 tokens, refill 2/sec

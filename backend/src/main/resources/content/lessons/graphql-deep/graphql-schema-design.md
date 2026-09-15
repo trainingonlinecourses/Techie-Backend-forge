@@ -79,9 +79,7 @@ type Lesson {
 }
 ```
 
-```java
 **The rule: non-null only for fields that are truly always there.** Making a field non-null commits the API: adding nullability *later* is a breaking change; removing it isn't. The classic mistake: marking everything non-null for optimism, then having to break clients when a field legitimately becomes optional. **Start nullable, tighten later.**
-```
 
 ## The Code Walkthrough — Schema First in Spring
 

@@ -53,9 +53,7 @@ spec:
           image: ghcr.io/org/backend:v2
 ```
 
-```java
 **Cost**: double the infrastructure while both are live. **Database**: schema must be compatible in both directions (the DB is shared; a v2 schema change breaks v1 during the switch window). Use expand/contract migrations.
-```
 
 <!-- why -->
 **What this code shows:**
@@ -103,9 +101,7 @@ spec:
       istioctl traffic-rule ...   # (concept: adjust weights)
 ```
 
-```java
 **Pros**: real production traffic on the new version, automatic detection of regressions. **Cons**: needs metric comparison infrastructure; two versions run concurrently.
-```
 
 ## Feature Flags
 

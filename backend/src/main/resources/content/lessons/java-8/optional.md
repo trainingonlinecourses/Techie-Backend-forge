@@ -7,6 +7,7 @@ topics: [optional, null-safety, monadic, java8]
 docs:
   - https://docs.oracle.com/javase/8/docs/api/java/util/Optional.html
 ---
+# Optional — Handling Null the Type-Safe Way
 
 ## The Concept, From Zero
 
@@ -15,8 +16,10 @@ docs:
 ```java
 // DANGEROUS: Any of these can throw NullPointerException
 String name = employee.getDepartment().getManager().getName();
+```
 
 **Optional** is a container that represents a value that *might or might not exist*. It forces you to handle the absence case explicitly:
+```java
 
 // SAFE: Optional forces you to handle the empty case
 ```
@@ -170,7 +173,6 @@ public Optional<User> findById(String id) {
 
 // Usage — no NPE possible
 User user = userRepository.findById(userId)
-```java
     .orElseThrow(() -> new NotFoundException("User not found: " + userId));
 ```
 
@@ -181,7 +183,6 @@ User user = userRepository.findById(userId)
 
 String displayName = userRepository.findById(userId)
     .map(User::getDisplayName)
-```java
     .orElse("Anonymous");
 ```
 

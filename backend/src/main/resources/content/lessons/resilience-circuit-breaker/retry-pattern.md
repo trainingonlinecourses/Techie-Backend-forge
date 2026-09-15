@@ -16,9 +16,7 @@ docs:
 
 ## The Concept: Some Failures Are Just a Blip
 
-```java
 Not all failures are outages. A database briefly restarts; a network packet drops; a service is *momentarily* overloaded (503). These **transient failures** often succeed on a second attempt. **Retry** is the pattern that tries again — with discipline.
-```
 
 The discipline matters because naive retries cause damage:
 
@@ -81,8 +79,10 @@ public class NotificationService {
 
     private boolean isTransient(Throwable t) {
         return t instanceof org.springframework.web.client.HttpServerErrorException
+```
                 || t instanceof java.net.SocketTimeoutException
                 || t instanceof java.net.ConnectException;
+```java
     }
 }
 ```

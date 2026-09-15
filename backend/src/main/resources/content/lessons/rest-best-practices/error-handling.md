@@ -210,18 +210,14 @@ class ErrorHandlingTest {
             .andExpect(status().isNotFound())
             .andExpect(jsonPath("$.status").value(404))
             .andExpect(jsonPath("$.title").value("Course not found"))
-```java
             .andExpect(jsonPath("$.courseId").value("nope"));
     }
 
     @Test
     void invalidBodyReturnsFieldErrors() throws Exception {
-```
         mockMvc.perform(post("/api/courses")
                 .contentType(MediaType.APPLICATION_JSON)
-```java
                 .content("{\"title\":\"\"}"))
-```
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$.fieldErrors[0].field").value("title"));
     }
@@ -239,9 +235,7 @@ class ErrorHandlingTest {
 | Leakage | Never expose internals; log them server-side |
 | Tests | Assert the JSON shape, not just the status |
 
-```java
 Consistent errors are a feature — they cut support cost, enable good client SDKs, and make your API pleasant to integrate against. Spend the 30 minutes on the advice class; it pays back on every endpoint.
-```
 
 ## References
 

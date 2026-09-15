@@ -4,10 +4,8 @@ module: spring-configuration
 order: 4
 minutes: 24
 topics: ["@Profile", "profiles", "environment-specific config", "active profiles", "conditional beans"]
-```java
 summary: Dev, test, staging, production — each environment wants slightly different behavior: dev uses an inmemory H2 database and fake email; production us...
 docs:
-```
   - title: "Profiles (Spring Boot docs)"
     url: "https://docs.spring.io/spring-boot/reference/features/profiles.html"
 ---
@@ -16,9 +14,7 @@ docs:
 
 ## The Concept: One App, Several Personas
 
-```java
 Dev, test, staging, production — each environment wants slightly *different behavior*: dev uses an in-memory H2 database and fake email; production uses Postgres and real email. You don't want four codebases — you want **one app that knows which environment it's in** and activates the matching behavior.
-```
 
 **Profiles** are named sets of configuration and beans. The app activates one or more profiles (e.g., `prod`), and:
 

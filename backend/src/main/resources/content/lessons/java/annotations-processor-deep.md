@@ -39,9 +39,9 @@ public @interface Auditable {
     int priority() default 0;
     boolean sensitive() default false;
 }
+```
 
 **@Target** — Controls where the annotation can be placed:
-```
 - `TYPE` — Class, interface, enum
 - `METHOD` — Methods only
 - `FIELD` — Fields only
@@ -182,9 +182,9 @@ public class BuilderProcessor extends AbstractProcessor {
         // This is how Lombok's @Builder works internally
     }
 }
+```
 
 **Annotation processors run at compile time.** They read annotations from source files and generate new source files (or resource files). This is how Lombok, MapStruct, and Dagger work.
-```
 
 <!-- why -->
 **What this code shows:**

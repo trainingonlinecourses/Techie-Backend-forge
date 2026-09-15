@@ -8,6 +8,7 @@ docs:
   - https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/CopyOnWriteArrayList.html
   - https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/CopyOnWriteArraySet.html
 ---
+# CopyOnWriteArrayList and CopyOnWriteArraySet — The Write-Seldom Maps
 
 ## The Concept, From Zero
 

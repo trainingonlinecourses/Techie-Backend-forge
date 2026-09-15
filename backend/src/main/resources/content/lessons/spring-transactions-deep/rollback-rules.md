@@ -72,9 +72,7 @@ public class CourseService {
 }
 ```
 
-```java
 **The boundary is the business operation**: the service method that must be all-or-nothing. Controllers orchestrate HTTP; repositories do single operations; services own the transaction.
-```
 
 ### Repository-Level Transactions
 

@@ -170,23 +170,19 @@ void returnsJsonByDefault() throws Exception {
     mockMvc.perform(get("/api/courses/1").accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
         .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-```java
         .andExpect(jsonPath("$.id").value(1));
 }
 
 @Test
 void returnsXmlWhenRequested() throws Exception {
-```
     mockMvc.perform(get("/api/courses/1").accept(MediaType.APPLICATION_XML))
         .andExpect(status().isOk())
         .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_XML))
-```java
         .andExpect(xpath("//Course/id").string("1"));
 }
 
 @Test
 void returnsCsvWhenRequested() throws Exception {
-```
     mockMvc.perform(get("/api/courses").accept(new MediaType("text", "csv")))
         .andExpect(status().isOk())
         .andExpect(content().string(containsString(",title")))

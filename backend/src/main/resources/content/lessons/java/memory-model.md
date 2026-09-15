@@ -71,8 +71,8 @@ class Config {
 
 Records and immutable value objects rely on this — publishing an immutable object needs **no** locking.
 
-```java
 **Pattern 3 — volatile is not atomic.** The classic bug: incrementing a volatile counter is *three* operations (read, add, write) and can lose updates:
+```java
 
 volatile int count = 0;
 ```

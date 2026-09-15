@@ -73,9 +73,9 @@ public class TryWithResourcesDemo {
         // At this point the file is ALREADY closed — no finally needed.
     }
 }
+```
 
 **Walking through it, line by line:**
-```
 
 - `try (BufferedReader reader = new BufferedReader(new FileReader("data.txt")))` — the parentheses after `try` declare resources. The **only** requirement: the resource type must implement `AutoCloseable` (which `BufferedReader`, `FileReader`, `Connection`, `Statement`, `ResultSet`, `Socket`, and thousands of others do). That interface declares a single method, `close()`.
 

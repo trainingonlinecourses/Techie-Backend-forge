@@ -34,12 +34,10 @@ The performance lesson from the primitives lesson applies here: `long[]` beats `
 
 ## How we use it in an organization: the scenarios
 
-```java
 **Scenario 1 — the array/List bridge.** Collections are the API layer; arrays are the compute layer:
 
 
 **What this code does — step by step:**
-```
 
 1. List → array (the idiomatic way)
 2. `String[] arr = ids.toArray(new String[0]);` — new String[0] is the idiom — sized correctly
@@ -68,8 +66,8 @@ long sum = Arrays.stream(longs).sum();
 
 `Arrays.asList` returns a **fixed-size view backed by the array** — a classic `UnsupportedOperationException` when a team treats it as a normal list.
 
-```java
 **Scenario 2 — sort and binary search.**
+```java
 
 int[] nums = {5, 2, 9, 1, 7};
 Arrays.sort(nums);                          // dual-pivot quicksort for primitives
@@ -84,8 +82,8 @@ int idx = Arrays.binarySearch(nums, 7);     // O(log n) — but REQUIRES sorted 
 
 `binarySearch` returns a *negative insertion point minus one* on a miss, so `== -1` checks are wrong; check `< 0` instead. Sorting objects: `Arrays.sort(objs, Comparator.comparing(Order::createdAt))` (TimSort — stable).
 
-```java
 **Scenario 3 — multidimensional arrays (grids, matrices, images).**
+```java
 
 int[][] grid = new int[4][4];        // array of 4 arrays — jagged by nature
 int[][] board = { {1,2}, {3,4} };

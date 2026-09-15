@@ -7,6 +7,7 @@ topics: [starter-structure, auto-configuration, imports, dependency-management, 
 docs:
   - https://docs.spring.io/spring-boot/reference/features/developing-auto-configuration.html
 ---
+# Starter Structure — Anatomy of a Spring Boot Starter
 
 ## The Concept, From Zero
 

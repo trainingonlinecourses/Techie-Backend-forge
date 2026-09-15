@@ -8,6 +8,7 @@ docs:
   - https://docs.spring.io/spring-boot/reference/features/logging.html
   - https://docs.spring.io/spring-boot/reference/actuator.html
 ---
+# Debugging Auto-Configuration — Understanding Why Beans Are Created (or Not)
 
 ## The Concept, From Zero
 

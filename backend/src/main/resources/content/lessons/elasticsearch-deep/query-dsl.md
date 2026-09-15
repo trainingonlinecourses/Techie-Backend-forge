@@ -73,9 +73,9 @@ SearchResponse<Product> response = es.search(s -> s
         .filter(f -> f.term(t -> t.field("inStock").value(true)))
 ```java
     ), Product.class);
+```
 
 **The bool clause roles:**
-```
 
 - **`must`** — required *and* scored (the search terms). Docs must match; they also contribute to ranking.
 - **`filter`** — required but *not* scored (the constraints). Docs must match; ranking ignores them. **Cacheable** — the reason to put pure constraints here instead of `must`.

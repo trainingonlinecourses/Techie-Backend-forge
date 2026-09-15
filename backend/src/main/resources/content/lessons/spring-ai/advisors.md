@@ -35,7 +35,6 @@ chatClient.prompt()
         .user("What did I just ask about?")
         .advisors(a -> a.param(ChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY, conversationId))
         .call()
-```java
         .content();
 ```
 
@@ -45,7 +44,6 @@ For multi-user apps, scope memory per user: `conversationId = user.getId()` — 
 
 .builder()
     .defaultAdvisors(new SimpleLoggerAdvisor())    // logs request + response
-```java
     .build();
 ```
 

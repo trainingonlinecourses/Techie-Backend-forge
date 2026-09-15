@@ -7,6 +7,7 @@ topics: [profile-config, yaml-multidoc, environment, conditional-binding, profil
 docs:
   - https://docs.spring.io/spring-boot/reference/features/external-config.html
 ---
+# Profile-Specific Configuration Properties
 
 ## The Concept, From Zero
 

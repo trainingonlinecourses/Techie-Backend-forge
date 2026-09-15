@@ -14,9 +14,7 @@ docs:
 
 ## The Concept: Who Should Decide Which Object to Create?
 
-```java
 Imagine a pizza restaurant. The customer says "I want a pizza." The kitchen decides *which* pizza — margherita, pepperoni, or veggie — based on what's ordered, what's in stock, or the time of day. The customer never names a specific kitchen station; they just get a pizza.
-```
 
 In code, the same situation appears constantly: you need an object, but *which* concrete class it should be depends on data, configuration, or context — and you'd rather not scatter `if`/`switch` chains creating objects all over your codebase.
 

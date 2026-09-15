@@ -18,7 +18,6 @@ docs:
 
 courses.parallelStream()   // or .stream().parallel()
     .map(this::expensiveTransform)
-```java
     .toList();
 ```
 
@@ -41,7 +40,6 @@ Source (1000 elements)
 // ✅ Good parallel candidate: heavy, independent work
 List<Report> reports = ids.parallelStream()
     .map(id -> reportGenerator.generate(id))   // seconds each
-```java
     .toList();
 
 // ❌ Bad: trivial work — overhead dominates
@@ -50,7 +48,6 @@ List<Integer> squares = IntStream.range(0, 100)
     .parallel()
     .map(i -> i * i)                           // nanoseconds each
     .boxed()
-```java
     .toList();
 ```
 
@@ -61,7 +58,7 @@ List<Integer> squares = IntStream.range(0, 100)
 
 You can't easily resize the common pool (system property `java.util.concurrent.ForkJoinPool.common.parallelism`), and you should rarely need to. **The fix is to use your own executor for long-running parallel work:**
 
-```java
+```
 // Custom pool for blocking-heavy parallel work
 ExecutorService pool = Executors.newFixedThreadPool(8);
 ```
@@ -71,7 +68,6 @@ List<Report> reports = ids.stream()
     .toList()
     .stream()
     .map(CompletableFuture::join)
-```java
     .toList();
 ```
 
@@ -82,7 +78,6 @@ ForkJoinPool customPool = new ForkJoinPool(8);
 ```
 List<Report> reports = customPool.submit(() ->
         ids.parallelStream().map(id -> generate(id)).toList())
-```java
     .join();
 ```
 
@@ -97,7 +92,6 @@ courses.parallelStream()
 // ✅ Collectors are thread-safe (concurrent-aware)
 List<Course> results = courses.parallelStream()
     .filter(Course::published)
-```java
     .collect(Collectors.toList());
 
 // ✅ Explicit concurrent collection

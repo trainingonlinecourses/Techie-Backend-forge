@@ -7,6 +7,7 @@ topics: [sequenced-collection, sequenced-set, sequenced-map, reversed, java21]
 docs:
   - https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/SequencedCollection.html
 ---
+# Sequenced Collections — First, Last, and Reversed
 
 ## The Concept, From Zero
 

@@ -48,7 +48,6 @@ public class RagService {
 ```
         String context = relevant.stream()
                 .map(d -> "Source: " + d.getMetadata().get("lesson") + "\n" + d.getContent())
-```java
                 .collect(Collectors.joining("\n\n---\n\n"));
 
         // 3. GENERATE: answer grounded in the context
@@ -65,7 +64,6 @@ public class RagService {
                         context. If the context doesn't contain the answer, say so.
                         Cite the source lesson ids you used.
                         """)
-```java
                 .user(u -> u.text("Context:\n{context}\n\nQuestion: {question}")
 ```
 

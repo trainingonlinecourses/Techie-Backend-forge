@@ -143,9 +143,7 @@ public List<Event> pageAfter(Long lastId, int limit) {
 - ❌ No random access to "page 5" — only next/prev
 - ❌ Sorting must be on an indexed, unique column
 
-```java
 **Choose cursor for feeds/timelines/audit logs; offset for admin tables and small datasets.**
-```
 
 ## Defaults and Guards
 
@@ -224,13 +222,11 @@ class CourseControllerPaginationTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.page").value(1))
             .andExpect(jsonPath("$.size").value(5))
-```java
             .andExpect(jsonPath("$.items.length()").value(5));
     }
 
     @Test
     void rejectsOversizedPages() throws Exception {
-```
         mockMvc.perform(get("/api/courses").param("size", "100000"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.size").value(100));   // clamped by max-page-size

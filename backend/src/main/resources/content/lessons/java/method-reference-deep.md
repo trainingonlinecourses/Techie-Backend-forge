@@ -7,6 +7,7 @@ topics: [method-reference, lambda, streams, constructor-reference, functional-pr
 docs:
   - https://docs.oracle.com/javase/tutorial/java/javaOO/methodreferences.html
 ---
+# Method References — Lambdas That Just Point at Existing Code
 
 ## The Concept, From Zero
 
@@ -46,7 +47,6 @@ Function<String, Integer> parser = Integer::parseInt;
 List<String> raw = List.of("42", "17", "99");
 List<Integer> nums = raw.stream()
         .map(Integer::parseInt)     // each string flows into parseInt as its single argument
-```java
         .toList();
 ```
 
@@ -54,11 +54,11 @@ The stream hands each element as the argument. You write zero parameters — the
 
 ### Kind 2 — Bound (instance of a specific object): `object::instanceMethod`
 
-```java
+```
 String prefix = "ORDER-";
 ```
 Function<String, String> tagger = prefix::concat;
-```java
+```
 // 'prefix' is a SPECIFIC object captured here
 // same as: s -> prefix.concat(s)
 
@@ -75,7 +75,7 @@ tagger.apply("1001");   // "ORDER-1001"
 ### Kind 3 — Unbound (instance method of the parameter): `ClassName::instanceMethod`
 
 BiFunction<String, String, Boolean> contains = String::contains;
-```java
+```
 // same as: (haystack, needle) -> haystack.contains(needle)
 // first parameter becomes the RECEIVER, the rest become arguments
 ```
@@ -86,7 +86,7 @@ BiFunction<String, String, Boolean> contains = String::contains;
 - Uses lambda expressions.
 
 Comparator<String> byLength = Comparator.comparing(String::length);
-```java
+```
 // same as comparing(s -> s.length())
 ```
 
@@ -100,7 +100,6 @@ This is the workhorse inside streams:
 List<String> names = people.stream()
         .map(Person::getName)       // unbound: each Person element is the receiver
         .sorted()                   // Comparable on the resulting strings
-```java
         .toList();
 ```
 

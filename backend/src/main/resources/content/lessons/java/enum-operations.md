@@ -190,9 +190,9 @@ public enum PaymentMethod {
 // Usage — clean, no switch statement needed
 PaymentMethod method = PaymentMethod.valueOf(userChoice);
 method.process(orderTotal);      // dispatches to the right implementation
+```
 
 **Line-by-line breakdown:**
-```
 - Each constant (`CREDIT_CARD`, `BANK_TRANSFER`, `CRYPTO`) is an **anonymous subclass** of `PaymentMethod` that overrides `process()`
 - `public abstract void process(...)` — declared in the enum body; every constant must implement it or the code won't compile
 - `processWithFee()` — a concrete shared method; all constants inherit it without overriding
@@ -300,8 +300,8 @@ status = next();
 <!-- why -->
 
 
-```java
 **Scenario 2 — Feature flags using EnumSet:**
+```java
 public enum Feature { DARK_MODE, BETA_FEATURES, ANALYTICS, NOTIFICATIONS }
 ```
 
@@ -323,9 +323,9 @@ EnumSet<Feature> enabledFeatures = EnumSet.of(Feature.DARK_MODE, Feature.ANALYTI
 if (enabledFeatures.contains(Feature.DARK_MODE)) {
     // show dark mode toggle
 }
+```
 
 **Scenario 3 — Permission matrix using EnumMap:**
-```
 
 <!-- why -->
 **What this code shows:**

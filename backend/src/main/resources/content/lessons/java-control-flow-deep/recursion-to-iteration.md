@@ -8,6 +8,7 @@ docs:
   - https://docs.oracle.com/javase/tutorial/java/nutsandbolts/for.html
 capstone: false
 ---
+# Recursion to Iteration — When to Convert, and How
 
 ## The Concept, From Zero
 

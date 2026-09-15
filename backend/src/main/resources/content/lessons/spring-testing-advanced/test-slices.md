@@ -48,13 +48,10 @@ class CourseControllerTest {
     @Test
     void getCourseReturnsDto() throws Exception {
         when(courseService.findById(1L))
-```java
             .thenReturn(new CourseDto(1L, "Spring Boot"));
-```
 
         mockMvc.perform(get("/api/courses/1"))
             .andExpect(status().isOk())
-```java
             .andExpect(jsonPath("$.title").value("Spring Boot"));
     }
 
@@ -62,9 +59,7 @@ class CourseControllerTest {
     void missingCourseIs404() throws Exception {
 ```
         when(courseService.findById(999L))
-```java
             .thenThrow(new CourseNotFoundException("999"));
-```
 
         mockMvc.perform(get("/api/courses/999"))
             .andExpect(status().isNotFound())
@@ -78,7 +73,7 @@ class CourseControllerTest {
 
 If the app has Spring Security, `@WebMvcTest` loads it — every request is 401 unless you permit:
 
-```java
+```
 @WebMvcTest(CourseController.class)
 @AutoConfigureMockMvc(addFilters = false)      // skip security filters
 class CourseControllerTest { ... }
@@ -93,7 +88,6 @@ Or authenticate in tests:
 
 mockMvc.perform(get("/api/courses/1")
         .with(user("admin").roles("ADMIN")))
-```java
     .andExpect(status().isOk());
 ```
 

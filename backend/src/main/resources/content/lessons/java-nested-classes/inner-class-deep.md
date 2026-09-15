@@ -7,6 +7,7 @@ topics: [inner-class, member-class, outer-reference, memory-leak, encapsulation]
 docs:
   - https://docs.oracle.com/javase/tutorial/java/javaOO/nested.html
 ---
+# Inner Classes — Accessing the Outer World
 
 ## The Concept, From Zero
 

@@ -40,9 +40,9 @@ for (int i = 0; i < 1_000_000; i++) {
 }
 // ArrayList: ~10ms
 // LinkedList: ~400ms   (40× slower!)
+```
 
 **Why**: every LinkedList node is a separate heap allocation (24+ bytes of object headers + next/prev pointers) — cache-unfriendly scattered memory. ArrayList is a single contiguous array — sequential, prefetch-friendly.
-```
 
 <!-- why -->
 **What this code shows:**

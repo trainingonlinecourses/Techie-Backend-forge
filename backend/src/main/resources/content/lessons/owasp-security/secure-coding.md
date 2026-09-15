@@ -18,9 +18,7 @@ docs:
 
 ## The Concept: The Vulnerabilities Beyond the Top 10's Headlines
 
-```java
 Injection, XSS, and access control get the attention; the quieter vulnerabilities get the breaches. This lesson covers four production-critical areas that every serious codebase must handle deliberately: **deserialization** (untrusted data that becomes objects), **SSRF** (server-side fetches of attacker-chosen URLs), **secure logging** (what you log and what you never log), and **secrets management** (where credentials live). None is exotic — all four appear in everyday Spring applications.
-```
 
 ## Deserialization: Turning Untrusted Bytes Into Objects
 
@@ -73,12 +71,10 @@ public String fetch(@RequestParam String path) {
 
 ## Secure Logging: The Audit Trail That Must Not Leak
 
-```java
 Logging cuts both ways: **not enough** logging hides attacks (A09); **too much** logging leaks secrets. The discipline:
 
 
 **What this code does — step by step:**
-```
 
 1. NEVER log:
 2. `log.info("User logged in: {}", user.getPassword());` — password!
@@ -143,9 +139,7 @@ The meta-pattern behind every lesson in this module:
 
 ## Recap
 
-```java
 Beyond the headline vulnerabilities: **deserialization** must never reconstruct arbitrary classes from untrusted input (JSON/typed formats over Java serialization; allowlists over denylists); **SSRF** means no server-side fetch of user-chosen URLs (allowlist destinations, block private/metadata addresses); **secure logging** records who/when/from-where for incident response while never leaking credentials; and **secrets** live in deploy-time environment stores, never in repos or logs. The mindset uniting them — deny by default, least privilege, fail closed, validate at the boundary, defend in depth — is what makes a codebase *secure by design* rather than secure by patching. Run every feature through the audit checklist, and the quiet vulnerabilities stop being quiet surprises.
-```
 
 ## References
 

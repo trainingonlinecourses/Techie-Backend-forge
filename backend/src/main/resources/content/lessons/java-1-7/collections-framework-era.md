@@ -9,6 +9,7 @@ docs:
   - https://dev.java/learn/api/collections-framework/
 capstone: false
 ---
+# Java 2 (1998) — The Collections Framework Replaces Vector and Hashtable
 
 ## The idea in one sentence
 

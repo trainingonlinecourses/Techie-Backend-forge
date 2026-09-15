@@ -9,6 +9,7 @@ docs:
     title: JEP 454 — Foreign Function & Memory API (final)
 capstone: false
 ---
+# Java 22 — The Foreign Function & Memory API (JEP 454, finalized)
 
 ## The idea in one sentence
 

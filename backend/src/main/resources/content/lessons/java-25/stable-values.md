@@ -7,6 +7,7 @@ topics: [stable-values, value-classes, lazy-initialization, thread-safety]
 docs:
   - https://openjdk.org/jeps/477
 ---
+# Stable Values — Lazy, Thread-Safe, Single-Assignment Variables
 
 ## The Concept, From Zero
 

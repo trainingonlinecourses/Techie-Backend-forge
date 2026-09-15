@@ -8,6 +8,7 @@ docs:
   - https://www.thymeleaf.org/doc/tutorials/3.1/usingthymeleaf.html
   - https://docs.spring.io/spring-boot/reference/web/servlet.html
 ---
+# Thymeleaf — Server-Side HTML Templates in Spring Boot
 
 ## The Concept, From Zero
 
@@ -159,9 +160,7 @@ Fragments are how template projects get a shared navbar/footer without a JS fram
 
 **Scenario 2 — Transactional emails.** Order confirmation emails are Thymeleaf templates rendered with `TemplateEngine.process(...)` then sent via SMTP — same templating skills reused outside the browser.
 
-```java
 **Scenario 3 — SEO-critical public pages.** Product listing pages must be crawlable with fast first paint. Server-rendered Thymeleaf ships complete HTML instantly; an SPA would need extra SSR infrastructure for the same result.
-```
 
 ## Common Mistakes
 

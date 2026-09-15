@@ -479,7 +479,6 @@ public class Validator<T> {
 Validator<User> userValidator = new Validator<User>()
     .check("name", User::getName, name -> name != null && !name.isBlank(), "Name is required")
     .check("email", User::getEmail, email -> email != null && email.contains("@"), "Valid email required")
-```java
     .check("age", user -> String.valueOf(user.getAge()), age -> Integer.parseInt(age) >= 18, "Must be 18+");
 ```
 
@@ -494,7 +493,7 @@ List<String> errors = userValidator.validate(newUser);
 
 // IMPERATIVE: tell Java HOW to do it
 List<String> result = new ArrayList<>();
-```java
+```
 for (String name : names) {
     if (name.length() > 3) {
         result.add(name.toUpperCase());
@@ -513,7 +512,6 @@ for (String name : names) {
 List<String> result = names.stream()
     .filter(name -> name.length() > 3)
     .map(String::toUpperCase)
-```java
     .toList();
 ```
 

@@ -41,8 +41,8 @@ From the caller's side it's transparent — `@Autowired OrderService` receives t
 
 ## How we use it in an organization: the scenarios
 
-```java
 **Scenario 1 — why self-invocation breaks @Transactional (the classic).**
+```java
 
 @Service
 public class OrderService {

@@ -7,6 +7,7 @@ topics: [stream-gatherers, gatherer, intermediate-operations, custom-streams]
 docs:
   - https://openjdk.org/jeps/461
 ---
+# Stream Gatherers — Custom Intermediate Operations
 
 ## The Concept, From Zero
 
@@ -119,8 +120,10 @@ users.stream()
     .gather(window(100))
 ```java
     .forEach(batch -> emailService.sendBatch(batch));
+```
 
 **Scenario 2: Real-time sensor averaging**
+```java
 // Average temperature readings over 5-minute windows
 ```
 sensorReadings.stream()

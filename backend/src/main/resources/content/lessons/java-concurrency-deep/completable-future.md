@@ -7,6 +7,7 @@ topics: [completable-future, async, chaining, exception-handling, composition, t
 docs:
   - https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/CompletableFuture.html
 ---
+# CompletableFuture — Asynchronous Composition Without the Pain
 
 ## The Concept, From Zero
 
@@ -176,7 +177,6 @@ CompletableFuture<Object> first = CompletableFuture.anyOf(
 // exceptionally — handle errors, return fallback
 CompletableFuture<String> safe = CompletableFuture
     .supplyAsync(() -> riskyOperation())
-```java
     .exceptionally(ex -> {
         log.error("Failed: {}", ex.getMessage());
         return "fallback value";
@@ -192,7 +192,6 @@ CompletableFuture<String> safe = CompletableFuture
 
 CompletableFuture<String> handled = CompletableFuture
     .supplyAsync(() -> riskyOperation())
-```java
     .handle((result, ex) -> {
         if (ex != null) {
             log.error("Error: {}", ex.getMessage());
@@ -224,7 +223,6 @@ CompletableFuture<String> retry = CompletableFuture
 CompletableFuture<String> withTimeout = CompletableFuture
     .supplyAsync(() -> slowOperation())
     .orTimeout(5, TimeUnit.SECONDS)
-```java
     .exceptionally(ex -> {
         if (ex instanceof TimeoutException) {
             return "Request timed out";
@@ -243,7 +241,6 @@ CompletableFuture<String> withTimeout = CompletableFuture
 
 CompletableFuture<String> withDefault = CompletableFuture
     .supplyAsync(() -> slowOperation())
-```java
     .completeOnTimeout("default value", 5, TimeUnit.SECONDS);
 ```
 

@@ -199,9 +199,7 @@ The classic example: a blocking service that sleeps 200ms per call with a 200-th
 - **Blocking third-party libraries** — JDBC, blocking SDKs. Forcing them into reactive is an antipattern
 - **Team experience** — if the team knows servlet and has deadlines, the learning curve is real
 
-```java
 **The honest industry pattern:** most services should stay servlet; WebFlux is the right tool for the hot paths.
-```
 
 ## A real-world scenario — API Gateway
 

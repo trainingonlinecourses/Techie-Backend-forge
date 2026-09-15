@@ -7,6 +7,7 @@ topics: [arrays, multidimensional, copyof, sort, binarysearch, arrayutil]
 docs:
   - https://docs.oracle.com/javase/tutorial/java/nutsandbolts/arrays.html
 ---
+# Java Arrays — From Basics to Advanced Patterns
 
 ## The Concept, From Zero
 
@@ -17,9 +18,9 @@ An **array** is a fixed-size container holding elements of the same type:
 int[] numbers = new int[5];          // 5 elements, all 0
 String[] names = {"Alice", "Bob"};    // 2 elements
 double[] scores = new double[]{95.5, 87.3, 92.1};  // 3 elements
+```
 
 **Arrays vs Collections:**
-```
 - Arrays: fixed size, faster, primitive-friendly
 - Collections: dynamic size, richer API, generics
 

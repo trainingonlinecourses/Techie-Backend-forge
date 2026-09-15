@@ -8,6 +8,7 @@ docs:
   - https://docs.spring.io/spring-data/jpa/reference/repositories/query-methods.html
   - https://docs.spring.io/spring-data/jpa/reference/jpa/query-methods.html
 ---
+# Query Methods — From Method Names to Native SQL
 
 ## The Concept, From Zero
 

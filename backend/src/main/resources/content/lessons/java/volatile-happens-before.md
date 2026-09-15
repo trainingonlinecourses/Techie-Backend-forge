@@ -13,9 +13,7 @@ docs:
 
 ## The concept
 
-```java
 When a thread writes to a **non-volatile** variable, the value may sit in that thread's CPU cache or store buffer for an indefinite period. Other threads may never see the update — or see a stale value. This is not a bug in Java; it is how modern CPUs work. They optimize for speed by caching variables per-core.
-```
 
 The `volatile` keyword tells the JVM: **every read of this variable goes to main memory, and every write is flushed to main memory immediately.** This guarantees **visibility** — all threads see the latest value.
 

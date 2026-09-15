@@ -7,6 +7,7 @@ topics: [nested-classes, inner-class, static-inner, local-class, anonymous-class
 docs:
   - https://docs.oracle.com/javase/tutorial/java/javaOO/nested.html
 ---
+# Nested Classes — Inner, Static, Local, and Anonymous
 
 ## The Concept, From Zero
 

@@ -7,6 +7,7 @@ topics: [enum-validation, state-machine, strategy-dispatch, null-object, type-sa
 docs:
   - https://www.oracle.com/java/technologies/javase/tutorial/java/javaOO/enum.html
 ---
+# Enum Validation & State Machines — Beyond Simple Constants
 
 ## The Concept, From Zero
 

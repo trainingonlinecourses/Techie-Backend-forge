@@ -28,8 +28,8 @@ The org rule of thumb:
 
 ## The production patterns teams keep
 
-```java
 **Pattern 1 — an audit aspect keyed by a custom annotation.** The annotation is the *contract*; the aspect is the *policy*:
+```java
 
 @Target(ElementType.METHOD) @Retention(RetentionPolicy.RUNTIME)
 public @interface Audited { String action(); }
@@ -57,8 +57,8 @@ public Order placeOrder(OrderRequest r) { ... }
 
 The annotation pattern is the sweet spot: **the *what* is declared on the method, the *how* lives in one aspect**, and adding auditing to a new method is a one-line annotation.
 
-```java
 **Pattern 2 — a retry aspect for transient failures.** Retrying only the *transient* exception types, with backoff and a cap — and importantly, sitting **outside** any transaction so each attempt gets a fresh unit of work:
+```java
 
 @Aspect @Component
 public class RetryAspect {

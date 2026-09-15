@@ -71,8 +71,8 @@ public List<Order> myOrders(CurrentUser user) {       // resolved by the custom 
 
 ## The patterns organizations actually use
 
-```java
 **Pattern 1 — the tenant-context argument.** Multi-tenant APIs inject the tenant for every controller:
+```java
 
 @Component
 public class TenantResolver implements HandlerMethodArgumentResolver {

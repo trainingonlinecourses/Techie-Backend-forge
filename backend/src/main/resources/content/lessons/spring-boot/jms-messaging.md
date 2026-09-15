@@ -8,14 +8,13 @@ docs:
   - https://docs.spring.io/spring-framework/reference/data-access/jms.html
   - https://activemq.apache.org/components/classic
 ---
+# JMS & Spring Messaging — Decoupling Services with Message Brokers
 
 ## The Concept, From Zero
 
-```java
 Synchronous REST calls have a hidden weakness: if service B is down, service A fails too — their fates are welded together. **Messaging** breaks that weld. Service A drops a message onto a **broker** (a durable post office) and moves on; service B picks it up whenever it can.
 
 **JMS (Java Message Service)** is the standard Java API for talking to such brokers (ActiveMQ, Artemis, IBM MQ, Amazon SQS-compatible...). Two delivery models:
-```
 
 | Model | Analogy | Who receives |
 |---|---|---|
@@ -112,13 +111,11 @@ Acknowledge modes, from naive to robust:
 
 ## Real Organizational Scenarios
 
-```java
 **Scenario 1 — Surviving downstream outages.** An e-commerce platform publishes "order placed" events to a queue consumed by the email service. During an SMTP outage, emails pile up in the queue instead of failing checkouts; when SMTP recovers, the backlog drains automatically. Revenue path never touches the fragile path.
 
 **Scenario 2 — Load smoothing / spikes.** Flash-sale traffic produces 50k orders/minute but inventory can process 8k/min. The queue absorbs the difference — producers never block, consumers work at their own pace, nothing is dropped.
 
 **Scenario 3 — Fan-out with topics.** One "payment-captured" event fans out to fraud-check, analytics, loyalty-points, and notification services via a topic. Adding a fifth subscriber requires zero changes to the payment service — that's architectural decoupling paying off.
-```
 
 ## Common Mistakes
 

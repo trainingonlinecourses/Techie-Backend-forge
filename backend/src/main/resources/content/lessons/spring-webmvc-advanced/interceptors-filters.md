@@ -228,14 +228,12 @@ class InterceptorTest {
     @Test
     void auditInterceptorLogsRequests() throws Exception {
         mockMvc.perform(get("/api/courses"))
-```java
             .andExpect(status().isOk());
         // assert the audit log contains the request (capture appender)
     }
 
     @Test
     void currentUserResolved() throws Exception {
-```
         mockMvc.perform(get("/api/me")
                 .requestAttr("authenticatedUserId", "u1"))
             .andExpect(status().isOk())

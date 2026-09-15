@@ -48,7 +48,6 @@ RestClient client = RestClient.create("https://api.example.com");
 User user = client.get()
     .uri("/users/1")
     .retrieve()
-```java
     .body(User.class);
 
 // POST with headers
@@ -58,7 +57,6 @@ User user = client.post()
     .contentType(MediaType.APPLICATION_JSON)
     .body(Map.of("name", "Alice"))
     .retrieve()
-```java
     .body(User.class);
 ```
 
@@ -76,7 +74,6 @@ RestClient client = RestClient.builder()
     .baseUrl("https://api.example.com")
     .defaultHeader("Authorization", "Bearer " + token)
     .defaultHeader("Accept", MediaType.APPLICATION_JSON_VALUE)
-```java
     .build();
 ```
 
@@ -88,17 +85,13 @@ RestClient client = RestClient.create("https://jsonplaceholder.typicode.com");
 String body = client.get()
     .uri("/posts/1")
     .retrieve()
-```java
     .body(String.class);
 
 // GET with path variables
 ```
 Post post = client.get()
-```java
     .uri("/posts/{id}", 1)
-```
     .retrieve()
-```java
     .body(Post.class);
 
 // GET with query parameters
@@ -124,7 +117,6 @@ Post newPost = client.post()
         "userId", 1
     ))
     .retrieve()
-```java
     .body(Post.class);
 
 // POST and get the full response (including status code, headers)
@@ -133,7 +125,6 @@ ResponseEntity<Post> response = client.post()
     .uri("/posts")
     .contentType(MediaType.APPLICATION_JSON)
     .body(Map.of("title", "Hello"))
-```java
     .toEntity(Post.class);
 
 int statusCode = response.getStatusCode().value();  // 201
@@ -148,7 +139,6 @@ client.put()
     .contentType(MediaType.APPLICATION_JSON)
     .body(Map.of("title", "Updated Title", "body", "Updated body", "userId", 1))
     .retrieve()
-```java
     .toBodilessEntity();  // No response body expected
 
 // PATCH — partial update
@@ -158,7 +148,6 @@ client.patch()
     .contentType(MediaType.APPLICATION_JSON)
     .body(Map.of("title", "Only Title Updated"))
     .retrieve()
-```java
     .toBodilessEntity();
 
 // DELETE
@@ -166,7 +155,6 @@ client.patch()
 client.delete()
     .uri("/posts/1")
     .retrieve()
-```java
     .toBodilessEntity();
 ```
 
@@ -183,9 +171,7 @@ public class Main {
 
         try {
             User user = client.get()
-```java
                 .uri("/users/{id}", 999)
-```
                 .retrieve()
                 .body(User.class);
         } catch (HttpClientErrorException.NotFound e) {
@@ -247,7 +233,6 @@ public class Main {
 RestClient client = RestClient.builder()
     .baseUrl("https://api.example.com")
     .requestInterceptor(new LoggingInterceptor())
-```java
     .build();
 
 // Custom interceptor
@@ -277,7 +262,6 @@ User user = client.get()
     .header("X-Request-Id", UUID.randomUUID().toString())
     .header("Accept-Language", "en-US")
     .retrieve()
-```java
     .body(User.class);
 ```
 
@@ -296,26 +280,22 @@ public class PaymentService {
         this.paymentClient = builder
             .baseUrl("https://api.stripe.com/v1")
             .defaultHeader("Authorization", "Bearer " + stripeApiKey)
-```java
             .build();
     }
 
     public PaymentIntent createPayment(BigDecimal amount, String currency) {
         return paymentClient.post()
-```
             .uri("/payment_intents")
             .contentType(MediaType.APPLICATION_FORM_URLENCODED)
             .body("amount=" + amount.multiply(BigDecimal.valueOf(100)).intValue()
                 + "&currency=" + currency)
             .retrieve()
-```java
             .body(PaymentIntent.class);
     }
 
     public PaymentIntent retrievePayment(String paymentIntentId) {
         return paymentClient.get()
             .uri("/payment_intents/{id}", paymentIntentId)
-```
             .retrieve()
             .body(PaymentIntent.class);
     }
@@ -338,9 +318,7 @@ public class OrderService {
     public OrderSummary createOrder(String userId, List<OrderItem> items) {
         // Validate user exists
         User user = userClient.get()
-```java
             .uri("/api/users/{id}", userId)
-```
             .retrieve()
             .body(User.class);
 

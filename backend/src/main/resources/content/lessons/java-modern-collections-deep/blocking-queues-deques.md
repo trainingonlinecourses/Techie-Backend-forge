@@ -10,6 +10,7 @@ docs:
   - https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Deque.html
   - https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/ConcurrentLinkedQueue.html
 ---
+# BlockingQueue, Deque, and the Concurrent Queue Implementations
 
 ## The Concept, From Zero
 

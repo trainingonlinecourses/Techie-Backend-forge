@@ -53,8 +53,8 @@ public class OrderService {
 
 ### Scenario 1: MDC for request tracing
 
-```java
 **MDC** (Mapped Diagnostic Context) lets you attach key-value pairs to the current thread's log output. Every log line within that request automatically includes the request ID:
+```java
 
 @Component
 public class RequestContextFilter implements Filter {

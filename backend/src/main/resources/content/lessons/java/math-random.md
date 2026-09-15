@@ -8,6 +8,7 @@ docs:
   - https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Math.html
   - https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/security/SecureRandom.html
 ---
+# Math Class & Random — Numbers Beyond Basic Arithmetic
 
 ## The Concept, From Zero
 

@@ -38,12 +38,11 @@ protoc generates:
 ManagedChannel channel = ManagedChannelBuilder
     .forAddress("course-service", 9090)
     .usePlaintext()                          // dev only — TLS in prod
-```java
     .build();
 ```
 
 CourseServiceGrpc.CourseServiceBlockingStub stub =
-```java
+```
     CourseServiceGrpc.newBlockingStub(channel);
 
 CourseReply reply = stub.getCourse(CourseRequest.newBuilder().setId(1L).build());
@@ -56,20 +55,18 @@ CourseReply reply = stub.getCourse(CourseRequest.newBuilder().setId(1L).build())
 // Per-call deadline
 CourseReply reply = stub
     .withDeadline(Deadline.after(3, TimeUnit.SECONDS))
-```java
     .getCourse(request);
 
 // Channel-level default
 ```
 ManagedChannel channel = ManagedChannelBuilder.forAddress(host, port)
     .keepAliveTime(30, TimeUnit.SECONDS)
-```java
     .build();
 ```
 
 Catch the timeout:
 
-```java
+```
 try {
     return stub.withDeadline(Deadline.after(2, TimeUnit.SECONDS))
         .getCourse(request);
@@ -115,7 +112,7 @@ A channel multiplexes many RPCs over one HTTP/2 connection — creating one per 
 ## Server Streaming Client
 
 Iterator<CourseReply> replies = stub.listCourses(
-```java
+```
     ListCoursesRequest.newBuilder().setLimit(100).build());
 
 while (replies.hasNext()) {
@@ -165,7 +162,7 @@ requestObserver.onNext(ChatMessage.newBuilder().setText("Explain AOP").build());
 
 ## Retry Configuration
 
-```java
+```
 // Per-call retry with the API (gRPC 1.46+)
 stub = stub.withWaitForReady();   // retry on UNAVAILABLE
 
@@ -182,7 +179,6 @@ ManagedChannel channel = ManagedChannelBuilder.forAddress(host, port)
                 "backoffMultiplier", 2.0,
                 "retryableStatusCodes", List.of("UNAVAILABLE"))))))
     .enableRetry()
-```java
     .build();
 
 **Retry only idempotent calls** — a retried non-idempotent RPC (like a payment charge) must be guarded by an idempotency key, exactly like HTTP.

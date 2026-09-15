@@ -7,6 +7,7 @@ topics: [react-integration, cors, proxy, api-first, full-stack, vite]
 docs:
   - https://spring.io/guides/tutorials/react-and-spring-data-rest/
 ---
+# Spring Boot + React Full Stack — API-First Development
 
 ## The Concept, From Zero
 

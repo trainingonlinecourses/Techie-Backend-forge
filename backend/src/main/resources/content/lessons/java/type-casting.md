@@ -61,10 +61,8 @@ int rounded = (int) Math.round(d);  // 4 — use Math.round for rounding
 
 **The bytes trap:** `byte` is signed (-128 to 127). Casting an `int` > 127 to `byte` wraps around:
 
-```java
 byte b = (byte) 200;       // -56 — binary representation is 11001000, which is -56 as signed byte
 byte b2 = (byte) 128;      // -128 — wraps to negative
-```
 // Always mask for unsigned interpretation: int unsigned = b & 0xFF;  → 200
 
 ## Autoboxing — convenience with a cost
@@ -98,8 +96,8 @@ Integer sum = a + b;
 <!-- why -->
 
 
-```java
 **Performance in loops:** Autoboxing inside a tight loop allocates thousands of objects:
+```java
 
 // BAD — allocates 10M Integer objects
 Long total = 0L;
@@ -229,8 +227,10 @@ BigDecimal amount = new BigDecimal(19.99);  // may be 19.9899999...
 // RIGHT: start from String or long
 BigDecimal amount = new BigDecimal("19.99");
 BigDecimal fromCents = BigDecimal.valueOf(1999L).movePointLeft(2);  // exact: 19.99
+```
 
 **Configuration parsing:** safe integer parsing with defaults:
+```java
 
 public static int safeInt(String value, int defaultValue) {
     try {
@@ -240,9 +240,9 @@ public static int safeInt(String value, int defaultValue) {
     }
 }
 // Usage: int port = safeInt(config.get("server.port"), 8080);
+```
 
 **Enum from int:** the reverse of ordinal:
-```
 
 <!-- why -->
 **What this code shows:**

@@ -7,6 +7,7 @@ topics: [sockets, tcp, server-socket, httpclient, url-parsing, networking]
 docs:
   - https://docs.oracle.com/en/java/javase/21/docs/api/java.net.http/java/net/http/HttpClient.html
 ---
+# Java Networking — Sockets, URLs, and HTTP Clients
 
 ## The Concept, From Zero
 
@@ -69,12 +70,11 @@ public class HttpExamples {
             .uri(URI.create(url))
             .header("Accept", "application/json")
             .GET()
-```java
             .build();
 ```
 
         HttpResponse<String> response = client.send(
-```java
+```
             request, HttpResponse.BodyHandlers.ofString());
 
         return response.body();
@@ -87,14 +87,12 @@ public class HttpExamples {
             .uri(URI.create(url))
             .header("Content-Type", "application/json")
             .POST(HttpRequest.BodyPublishers.ofString(json))
-```java
             .build();
 ```
 
         client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
             .thenApply(HttpResponse::body)
             .thenAccept(body -> System.out.println("Response: " + body))
-```java
             .exceptionally(ex -> {
                 System.err.println("Error: " + ex.getMessage());
                 return null;
@@ -111,7 +109,7 @@ public class HttpExamples {
 - Uses lambda expressions.
 
         String json = get("https://api.example.com/users");
-```java
+```
         System.out.println(json);
 
         // POST
@@ -142,7 +140,6 @@ public static boolean isServiceAlive(String url) {
             .uri(URI.create(url + "/actuator/health"))
             .timeout(Duration.ofSeconds(3))
             .GET()
-```java
             .build();
 ```
         HttpResponse<String> resp = client.send(request,
@@ -153,8 +150,10 @@ public static boolean isServiceAlive(String url) {
         return false;
     }
 }
+```
 
 **Scenario 2: File download with progress**
+```java
 public class Main {
 
     public static void main(String[] args) {

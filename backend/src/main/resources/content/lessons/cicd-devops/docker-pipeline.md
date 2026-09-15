@@ -45,9 +45,7 @@ The runtime image contains only the JRE + jar — the Maven toolchain, sources, 
 
 ## Layer Caching: The Order That Matters
 
-```java
 Docker caches layers; a layer only rebuilds when its inputs change. Order the instructions so *frequent changes come last*:
-```
 
 ```dockerfile
 COPY pom.xml .

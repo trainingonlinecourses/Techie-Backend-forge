@@ -148,14 +148,12 @@ public class WebConfig implements WebMvcConfigurer {
         // Order determines execution sequence (lower = first)
         registry.addInterceptor(new ResponseHeadersInterceptor())
             .addPathPatterns("/api/**")
-```java
             .order(1);
 ```
 
         registry.addInterceptor(authInterceptor)
             .addPathPatterns("/api/**")
             .excludePathPatterns("/api/auth/login", "/api/auth/register")
-```java
             .order(2);
 ```
 

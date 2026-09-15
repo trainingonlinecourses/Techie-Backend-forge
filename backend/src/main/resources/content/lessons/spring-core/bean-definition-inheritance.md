@@ -41,8 +41,8 @@ Injecting `DocumentBuilder` anywhere gives you the factory-built instance. Injec
 
 ## How we use it in an organization: the scenarios
 
-```java
 **Scenario 1 — lazy-init for heavyweight beans.** A bean that allocates pools or connects to external systems on construction should not run during every test bootstrap:
+```java
 
 @Bean
 @Lazy
@@ -51,8 +51,8 @@ public KafkaAdmin kafkaAdmin() { return new KafkaAdmin(props); }  // only built 
 
 `@Lazy` on a *dependency* defers its creation until first injection; on a `@Bean` it defers until first lookup. JPA `@OneToMany` lazy loading is unrelated — this is bean-level laziness.
 
-```java
 **Scenario 2 — aliases for environment-specific names.** The same underlying bean under two names so legacy callers keep working:
+```java
 
 @Bean("orderStore")
 @Primary

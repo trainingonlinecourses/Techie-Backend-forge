@@ -8,6 +8,7 @@ docs:
   - https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html
   - https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/nio/charset/Charset.html
 ---
+# Byte Array ↔ Char Array Conversion — Text and Binary Are Not the Same
 
 ## The Concept, From Zero
 

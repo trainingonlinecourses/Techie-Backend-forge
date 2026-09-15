@@ -58,11 +58,15 @@ Boot 3 exposes both as groups automatically: `curl /actuator/health/readiness`. 
 ## The Code Walkthrough
 
 // ---- 1. Expose the endpoints you want (security-minded by default) ----
+
+```properties
 # application.properties
 management.endpoints.web.exposure.include=health,info,metrics
 management.endpoint.health.show-details=always
 management.endpoint.health.probes.enabled=true
+```
 
+```java
 // ---- 2. Custom health indicator — check your own dependency ----
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
@@ -90,6 +94,7 @@ public class CurriculumHealthIndicator implements HealthIndicator {
 info.app.name=BackendForge Academy
 info.app.description=Java & Spring end-to-end course platform
 
+```
 ```java
 // dynamic info via InfoContributor:
 @Component
@@ -147,10 +152,10 @@ Actuator endpoints expose internals (`/actuator/env` shows environment variables
 - **Protect the rest** with Spring Security or a network policy (internal-only).
 - With Spring Security present, actuator endpoints are **automatically protected** by default (403 without auth) — you must explicitly permit `/actuator/health` for your platform's health checks:
 
+```java
 http.securityMatcher("/actuator/**")
     .authorizeHttpRequests(auth -> auth
         .requestMatchers("/actuator/health/**").permitAll()   // platforms poll this
-```java
         .anyRequest().authenticated());
 ```
 

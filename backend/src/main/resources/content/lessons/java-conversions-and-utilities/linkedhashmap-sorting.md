@@ -8,6 +8,7 @@ docs:
   - https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/LinkedHashMap.html
   - https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Map.html
 ---
+# LinkedHashMap Sorting by Keys and Values — Predictable Order You Can Reorder
 
 ## The Concept, From Zero
 

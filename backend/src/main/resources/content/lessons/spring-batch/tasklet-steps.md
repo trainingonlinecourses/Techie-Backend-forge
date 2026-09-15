@@ -70,14 +70,12 @@ public class BatchConfig {
     public Step cleanupStep(JobRepository jobRepository, PlatformTransactionManager txManager) {
         return new StepBuilder("cleanupStep", jobRepository)
             .tasklet(cleanupTasklet, txManager)
-```java
             .build();
     }
 
     @Bean
     public Job cleanupJob(JobRepository jobRepository, Step cleanupStep) {
         return new JobBuilder("cleanupJob", jobRepository)
-```
             .start(cleanupStep)
             .build();
     }

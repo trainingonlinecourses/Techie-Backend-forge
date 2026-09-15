@@ -99,9 +99,7 @@ The paging links (`prev`/`next`) are the same idea as the OpenAPI pagination con
 | Clients you control but want navigation that can't rot | Internal BFFs with typed generated clients |
 | Admin tools / machine clients that benefit from discovery | Hypermedia as dogma — links no one follows are decoration |
 
-```java
 The test of good HATEOAS: **every link a client actually uses, and every action the state allows** — if the response carries a link the client never follows, it's JSON noise; if the state allows an action the response doesn't advertise, the API is lying.
-```
 
 ## Key takeaways
 

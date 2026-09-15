@@ -19,8 +19,8 @@ When you write `System.out.println("Hello")` and run it, three things happen:
 2. **Load**: The JVM reads the `.class` file and loads it into memory.
 3. **Execute**: The JVM interprets or JIT-compiles the bytecode to machine code.
 
-```java
 **Beginner mental model:** Think of Java like a universal translator. You write in English (Java source code), it translates to a neutral language (bytecode), and then any computer with a JVM can execute it. That's why Java is "write once, run anywhere."
+```java
 
 // You write this (HelloWorld.java):
 public class HelloWorld {

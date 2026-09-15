@@ -165,7 +165,6 @@ CompletableFuture<String> fastest = CompletableFuture.anyOf(source1, source2, so
 ## Exception Handling
 
 CompletableFuture<String> future = CompletableFuture
-```java
     .supplyAsync(() -> {
         if (Math.random() > 0.5) {
             throw new RuntimeException("API call failed!");
@@ -192,7 +191,6 @@ CompletableFuture<String> future = CompletableFuture
 
 CompletableFuture<String> future = CompletableFuture
     .supplyAsync(() -> riskyOperation())
-```java
     .exceptionally(ex -> {
         if (ex instanceof TimeoutException) {
             return "Timed out — using cached data";
@@ -214,7 +212,6 @@ CompletableFuture<String> future = CompletableFuture
 
 CompletableFuture<String> future = CompletableFuture
     .supplyAsync(() -> riskyOperation())
-```java
     .handle((result, ex) -> {
         if (ex != null) {
             log.error("Operation failed", ex);
@@ -238,7 +235,6 @@ CompletableFuture<String> future = CompletableFuture
 CompletableFuture<String> future = CompletableFuture
     .supplyAsync(() -> slowOperation())
     .orTimeout(5, TimeUnit.SECONDS)  // Fail after 5 seconds
-```java
     .exceptionally(ex -> {
         if (ex instanceof TimeoutException) {
             return "Operation timed out";

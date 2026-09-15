@@ -8,6 +8,7 @@ docs:
   - https://www.javaguides.net/2023/09/spring-boot-dto-tutorial-using-java.html
   - https://spring.io/guides/gs/producing-rest
 ---
+# DTO Pattern — Never Expose Your Entities to the Outside World
 
 ## The Concept, From Zero
 
@@ -314,8 +315,10 @@ public record TransactionRequest(
 ```java
 ) {}
 // ^ Client sends only what's needed — server adds timestamp, generates ID
+```
 
 **3. Social Media Post API**
+```java
 public record PostResponse(Long id, String content, String authorName,
     Instant createdAt, int likeCount, boolean isLikedByMe) {}
 // ^ Includes computed fields (likeCount, isLikedByMe) — not in database

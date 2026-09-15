@@ -59,8 +59,8 @@ long safeAvg = avg == null ? 0 : avg;
 <!-- why -->
 
 
-```java
 **The classic NPE in the wild:**
+```java
 
 // Long total = orderRepo.sumRevenue();  // NULL when no orders exist
 Long total = orderRepo.sumRevenue();

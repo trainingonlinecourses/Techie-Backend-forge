@@ -8,6 +8,7 @@ docs:
   - url: "https://spring.io/projects/spring-session"
     title: "Spring Session"
 ---
+# Spring Session — Distributed Session Management
 
 ## The Concept, From Zero
 
@@ -85,9 +86,9 @@ public class Application {
         SpringApplication.run(Application.class, args);
     }
 }
+```
 
 **That's it.** Your sessions are now stored in Redis. Every instance of your app reads/writes to the same Redis, so sessions are shared.
-```
 
 <!-- why -->
 **What this code shows:**

@@ -208,13 +208,11 @@ public class TestDatabaseConfig {
         return new EmbeddedDatabaseBuilder()
             .setType(EmbeddedDatabaseType.H2)
             .addScript("schema-test.sql")
-```java
             .build();
     }
 
     @Bean
     public FlywayMigrationStrategy flywayStrategy() {
-```
         return Flyway::migrate;  // run migrations on test DB
     }
 }

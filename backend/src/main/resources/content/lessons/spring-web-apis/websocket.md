@@ -19,9 +19,7 @@ docs:
 | Server-Sent Events (SSE) | server → client, one-way | live feeds (notifications, prices) |
 | **WebSocket** | **full-duplex** | chat, collaborative editing, live dashboards with client→server traffic |
 
-```java
 WebSocket is a **persistent, bidirectional TCP-ish connection** from the browser; STOMP is the simple messaging protocol layered on top (subscribe/ publish, destinations) — Spring's recommended way to use WebSocket, because it gives you topics, routing and a familiar publish/subscribe model.
-```
 
 ## Wiring STOMP
 

@@ -7,6 +7,7 @@ topics: [packages, imports, namespace, classpath, package-by-feature, fully-qual
 docs:
   - https://docs.oracle.com/javase/tutorial/java/package/index.html
 ---
+# Packages & Imports — Organizing a Codebase That Scales
 
 ## The Concept, From Zero
 

@@ -7,6 +7,7 @@ topics: [shell-testing, command-runner, integration-test, mock, availability]
 docs:
   - https://docs.spring.io/spring-shell/reference/
 ---
+# Shell Testing — Unit and Integration Tests for CLI
 
 ## The Concept, From Zero
 

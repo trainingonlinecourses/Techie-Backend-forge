@@ -40,9 +40,7 @@ public class SupportService {
         return chatClient.prompt()
                 .system("You are {company}'s support assistant. Be concise and friendly.")
                 .user(u -> u
-```java
                         .text("Customer {name} asks: {question}")
-```
                         .param("company", "Acme")
                         .param("name", customerName)
                         .param("question", question))
@@ -67,7 +65,6 @@ List<Message> history = List.of(
 String answer = chatClient.prompt()
         .messages(history)
         .call()
-```java
         .content();
 ```
 
@@ -77,7 +74,6 @@ String answer = chatClient.prompt()
 Flux<String> stream = chatClient.prompt()
         .user("Write a haiku about Spring Boot")
         .stream()
-```java
         .content();
 
 // Consume chunk by chunk (e.g. server-sent events to the frontend)

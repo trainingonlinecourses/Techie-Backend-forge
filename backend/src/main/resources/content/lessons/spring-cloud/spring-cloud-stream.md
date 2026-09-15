@@ -66,9 +66,7 @@ Spring Cloud Stream uses **content-type negotiation** (like HTTP headers) plus `
 
 ## Error handling: retries and DLQs
 
-```java
 Failures are retried by default (3 attempts); after that the message is sent to an **error destination** (the DLQ pattern):
-```
 
 ```yaml
 spring.cloud.stream.bindings.onOrderCreated-in-0.consumer:

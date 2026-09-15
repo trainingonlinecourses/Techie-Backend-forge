@@ -267,7 +267,6 @@ List<Integer> result = List.of(1, 2, 3, 4, 5).stream()
     .peek(n -> System.out.println("After filter: " + n))    // prints 3, 4, 5
     .map(n -> n * 10)
     .peek(n -> System.out.println("After map: " + n))       // prints 30, 40, 50
-```java
     .toList();
 // Result: [30, 40, 50]
 ```
@@ -300,7 +299,7 @@ These trigger the actual processing. After a terminal operation, the stream is c
 
 The same code, clean:
 
-```java
+```
 List<String> names = List.of("Alice", "Bob", "Charlie", "David");
 
 List<String> result = names.stream()
@@ -356,7 +355,7 @@ Map<Boolean, List<Integer>> partitioned = List.of(1, 2, 3, 4, 5, 6).stream()
 
 The same code, clean:
 
-```java
+```
 List<Integer> numbers = List.of(1, 2, 3, 4, 5);
 
 int sum = numbers.stream()
@@ -400,7 +399,7 @@ Optional<Integer> sum3 = numbers.stream()
 
 The same code, clean:
 
-```java
+```
 public class Main {
 
     public static void main(String[] args) {
@@ -450,7 +449,7 @@ public class Main {
 
 The same code, clean:
 
-```java
+```
 List<Integer> numbers = IntStream.rangeClosed(1, 10_000_000).boxed().toList();
 
 long seqTime = System.nanoTime();
@@ -483,7 +482,6 @@ IntStream.range(0, 1000).parallel()
 // SAFE: use collect (thread-safe terminal operation)
 List<Integer> safeList = IntStream.range(0, 1000).parallel()
     .boxed()
-```java
     .collect(Collectors.toList());  // thread-safe collection
 ```
 

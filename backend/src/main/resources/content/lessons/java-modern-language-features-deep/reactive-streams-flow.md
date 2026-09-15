@@ -8,6 +8,7 @@ docs:
   - https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/Flow.html
   - https://www.reactive-streams.org/
 ---
+# Reactive Streams in the JDK — java.util.concurrent.Flow
 
 ## The Concept, From Zero
 

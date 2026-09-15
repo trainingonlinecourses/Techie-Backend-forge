@@ -7,6 +7,7 @@ topics: [unnamed-variables, wildcard, pattern-matching, jep456, java25]
 docs:
   - https://openjdk.org/jeps/456
 ---
+# Unnamed Variables — When You Don't Care About the Name
 
 ## The Concept, From Zero
 
@@ -62,7 +63,17 @@ The same code, clean:
 ```java
 public class Main {
 
+    static void riskyOperation() throws Exception {
+        // ... some I/O that can fail ...
+    }
+
+    static void logError() {
+        System.out.println("Something failed — handled.");
+    }
+
     public static void main(String[] args) {
+        Object obj = "hello";
+        var list = java.util.List.of("x", "y");
         try {
             riskyOperation();
         } catch (Exception _) {
@@ -110,6 +121,10 @@ The same code, clean:
 public class Main {
 
     public static void main(String[] args) {
+        Object obj = 42;
+        var result = new Result("OK", "body", 200);
+        var input = "42";
+        int defaultValue = 0;
         try {
             parse(input);
         } catch (NumberFormatException _) {
@@ -129,6 +144,10 @@ public class Main {
              var reader = new BufferedReader(new InputStreamReader(new FileInputStream("b.txt")))) {
             String line = reader.readLine();
         }
+    }
+
+    static int parse(String s) throws NumberFormatException {
+        return Integer.parseInt(s.trim());
     }
 }
 ```

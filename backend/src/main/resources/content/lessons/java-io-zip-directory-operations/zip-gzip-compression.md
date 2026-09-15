@@ -10,6 +10,7 @@ docs:
   - https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/zip/GZIPOutputStream.html
   - https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/zip/Deflater.html
 ---
+# ZIP and GZIP Compression in Java
 
 ## The Concept, From Zero
 

@@ -17,9 +17,7 @@ Some workloads can't (or shouldn't) run in a request: nightly payroll runs, migr
 
 ## The mental model
 
-```java
 A **Job** is a sequence of **Steps**; each Step processes data through the classic pipeline:
-```
 
 ```
 ItemReader ──▶ ItemProcessor ──▶ ItemWriter

@@ -7,6 +7,7 @@ topics: [method-handles, reflection, lookup, invoke, performance, jmh, mh-invoke
 docs:
   - https://docs.oracle.com/javase/8/docs/api/java/lang/invoke/MethodHandles.html
 ---
+# Method Handles — The Modern Reflection Alternative
 
 ## The Concept, From Zero
 

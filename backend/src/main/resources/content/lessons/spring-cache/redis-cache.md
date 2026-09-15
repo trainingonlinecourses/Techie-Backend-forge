@@ -50,11 +50,9 @@ public class RedisCacheConfig {
                 .fromSerializer(new StringRedisSerializer()))
             .serializeValuesWith(RedisSerializationContext.SerializationPair
                 .fromSerializer(new GenericJackson2JsonRedisSerializer()))
-```java
             .disableCachingNullValues();
 
         return RedisCacheManager.builder(factory)
-```
             .cacheDefaults(config)
             .withCacheConfiguration("course-catalog",
                 RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofHours(1)))

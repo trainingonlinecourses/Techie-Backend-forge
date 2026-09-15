@@ -27,9 +27,9 @@ void auditOrder(OrderCreatedEvent event) { /* record audit */ }
 
 @EventListener
 void updateInventory(OrderCreatedEvent event) { /* deduct stock */ }
+```
 
 **Why events over direct method calls?**
-```
 - Adding a new consumer doesn't change the publisher
 - Listeners can run asynchronously (don't block the request)
 - Transactions can be synchronized (run after commit)
@@ -96,9 +96,9 @@ public class OrderNotificationListener {
         auditService.log("Order lifecycle complete: " + event.getOrderId());
     }
 }
+```
 
 **Phases:**
-```
 - `AFTER_COMMIT` — Runs only if the transaction commits successfully (most common)
 - `AFTER_ROLLBACK` — Runs only if the transaction rolls back
 - `AFTER_COMPLETION` — Runs after commit or rollback (always)

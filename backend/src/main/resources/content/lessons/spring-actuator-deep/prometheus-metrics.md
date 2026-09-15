@@ -9,6 +9,8 @@ docs:
     title: "Metrics with Micrometer"
 ---
 
+# Prometheus & Micrometer Metrics — Observability at Scale
+
 ## The Concept, From Zero
 
 When your application runs in production, you need answers to questions like: "How many requests per second?", "What's the 95th percentile response time?", "How many users hit a 500 error in the last hour?".
@@ -58,11 +60,9 @@ public class OrderService {
         this.orderCounter = Counter.builder("orders.created")
             .description("Total orders created")
             .tag("version", "v2")
-```java
             .register(registry);
 
         this.failedOrderCounter = Counter.builder("orders.failed")
-```
             .description("Total failed orders")
             .register(registry);
     }
@@ -84,7 +84,6 @@ public class OrderService {
 this.orderCounter = Counter.builder("orders.created")
     .description("Total orders created")
     .tag("version", "v2")
-```java
     .register(registry);
 ```
 - `Counter.builder("orders.created")` — Names the metric. In Prometheus this becomes `orders_created_total`
@@ -92,13 +91,13 @@ this.orderCounter = Counter.builder("orders.created")
 - `.tag("version", "v2")` — A dimension label. You can filter by this in Grafana. Every unique tag combination is a separate time series
 - `.register(registry)` — Connects the counter to the Micrometer registry (which talks to Prometheus)
 
-```java
+```
 orderCounter.increment();  // The counter goes up by 1
 orderCounter.increment(5); // The counter goes up by 5 (bulk increment)
 
 **Prometheus output:**
-```
-```
+
+```text
 # HELP orders_created_total Total orders created
 # TYPE orders_created_total counter
 orders_created_total{version="v2",} 142.0
@@ -119,7 +118,7 @@ orders_created_total{version="v2",} 142.0
 
 The same code, clean:
 
-```java
+```
 @Service
 public class QueueHealthService {
 
@@ -178,7 +177,6 @@ public class PaymentService {
             sample.stop(Timer.builder("payment.processing")
                 .tag("status", "success")
                 .tag("provider", request.getProvider())
-```java
                 .register(registry));
             return result;
         } catch (PaymentException e) {
@@ -222,6 +220,7 @@ A single Timer records **six** metrics automatically:
 ## Publishing to Prometheus
 
 Add the dependency:
+```
 ```xml
 <dependency>
     <groupId>io.micrometer</groupId>
@@ -266,6 +265,7 @@ payment_processing_seconds_bucket{provider="stripe",status="success",le="0.1",} 
 
 ## Real-World Scenario — Multi-Tenant SaaS Metrics
 
+```java
 @Component
 public class TenantMetrics {
 
@@ -281,37 +281,36 @@ public class TenantMetrics {
             .tag("endpoint", endpoint)
             .tag("status", String.valueOf(status))
             .register(registry)
-```java
             .increment();
     }
 
     public void recordLatency(String tenantId, String operation, Duration duration) {
-```
-
-<!-- why -->
-**What this code shows:**
-
-- Uses the java.time date-time API.
-
         Timer.builder("tenant.operation.latency")
             .tag("tenant", tenantId)
             .tag("operation", operation)
             .publishPercentiles(0.5, 0.95, 0.99)  // Publish percentiles
-            .register(registry)
-```java
+            .register(registry);
             .record(duration);
     }
 
     public void gaugeActiveUsers(String tenantId, AtomicInteger count) {
-```
         Gauge.builder("tenant.active.users", count, AtomicInteger::get)
             .tag("tenant", tenantId)
             .register(registry);
     }
 }
+```
+
+<!-- why -->
+**What this code shows:**
+
+- Defines `TenantMetrics` with methods `recordRequest()`, `recordLatency()`, `gaugeActiveUsers()`.
+- Registers a `Counter` per request (tenant + endpoint + status tags), a `Timer` with 0.5/0.95/0.99 percentiles, and a `Gauge` tracking active users via `AtomicInteger`.
+- All metrics carry the `tenant` tag, so dashboards can slice every series per tenant.
 
 **This creates metrics like:**
-```
+
+```text
 api_requests_total{tenant="acme-corp",endpoint="/api/orders",status="200"} 1234
 api_requests_total{tenant="acme-corp",endpoint="/api/orders",status="500"} 3
 tenant_operation_latency_seconds{tenant="acme-corp",operation="checkout",quantile="0.99"} 2.1

@@ -7,6 +7,7 @@ topics: [string, strip, isblank, lines, repeat, java11]
 docs:
   - https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/String.html
 ---
+# String New Methods — Everyday String Operations Made Easy
 
 ## The Concept, From Zero
 

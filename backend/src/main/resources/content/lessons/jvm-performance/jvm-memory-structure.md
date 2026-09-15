@@ -51,10 +51,10 @@ The heap is the most important region. Every object you create with `new` lives 
   New objects → Eden → Survive → S0/S1 → Old Gen → GC'd
 ```
 
-```java
 **Young Generation:** New objects are allocated here. Most objects die young (local variables, temporary strings). The GC runs frequently here (minor GC) and is very fast.
 
 **Old Generation:** Objects that survive multiple minor GCs are promoted here. Major GC runs less frequently but takes longer.
+```java
 
 // This string lives in Young Gen (Eden space):
 String temp = "Hello";          // Created, used briefly, eligible for GC quickly
@@ -73,9 +73,9 @@ class Order {                    // header (12-16 bytes) + fields
     String customer;             //   4 bytes (reference, compressed oops)
     BigDecimal total;            //   4 bytes (reference)
 }
+```
 
 **Memory layout explained:**
-```
 - **Object header**: 12 bytes with compressed oops (default for heaps < 32 GB), 16 bytes without. Contains mark word (hashcode, GC age, lock info) + class pointer.
 - **References**: 4 bytes with `-XX:+UseCompressedOops` (default), 8 bytes without.
 - **Alignment**: Objects are padded to 8-byte boundaries. A 20-byte object actually uses 24 bytes.

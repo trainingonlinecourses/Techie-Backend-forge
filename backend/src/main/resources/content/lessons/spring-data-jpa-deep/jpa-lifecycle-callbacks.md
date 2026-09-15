@@ -92,8 +92,8 @@ public abstract class Auditable { /* createdAt, updatedAt, setters */ }
 
 **Scenario 1 — normalize at the boundary.** Emails, phone numbers, and slugs normalized in `@PrePersist`/`@PreUpdate` — every insert path gets clean data, and code review stops checking "did the service normalize before save?".
 
-```java
 **Scenario 2 — hash sensitive fields before writing.** A token or secret that must never be stored raw:
+```java
 
 @PrePersist @PreUpdate
 void hashSecret() {

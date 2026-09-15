@@ -7,6 +7,7 @@ topics: [automatic-modules, classpath, module-path, migration, java9]
 docs:
   - https://docs.oracle.com/javase/9/language/java-module-system.htm
 ---
+# Automatic Modules — Legacy JARs in the Module System
 
 ## The Concept, From Zero
 

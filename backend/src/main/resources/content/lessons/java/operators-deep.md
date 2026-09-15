@@ -8,6 +8,7 @@ docs:
   - https://docs.oracle.com/javase/tutorial/java/nutsandbolts/operators.html
   - https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/instanceof.html
 ---
+# Java Operators — Beyond the Basics That Trip Up Production Code
 
 ## The Concept, From Zero
 
@@ -74,6 +75,7 @@ The same code, clean:
 public class Main {
 
     public static void main(String[] args) {
+        Object obj = "pattern matching";
         if (obj instanceof String) {
             String s = (String) obj;
             System.out.println(s.length());
@@ -84,7 +86,7 @@ public class Main {
         }
 
         if (obj instanceof String s && s.length() > 5) {
-            process(s);
+            System.out.println(s.toUpperCase());   // use s directly — guard + bind
         }
     }
 }

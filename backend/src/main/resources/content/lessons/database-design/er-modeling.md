@@ -56,9 +56,7 @@ A student can be in many enrollments; a course can be in many enrollments — ma
 
 5. **Derive the schema** — entities become tables, attributes become columns, relationships become FKs.
 
-```java
 **Requirements:** "A student can enroll in many courses. Each course has many lessons. Each lesson belongs to one course. A student can mark lessons complete. Courses have one instructor; instructors teach many courses."
-```
 
 <!-- why -->
 ## The Code Walkthrough — A Full Example

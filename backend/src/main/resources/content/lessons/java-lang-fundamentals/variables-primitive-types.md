@@ -8,6 +8,7 @@ docs:
   - https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html
   - https://docs.oracle.com/javase/specs/jls/se21/html/jls-4.html#jls-4.2
 ---
+# Variables and Primitive Types — The Building Blocks of State
 
 ## The Concept, From Zero
 
@@ -149,9 +150,7 @@ System.out.println(overflow);   // -2147483648
 
 The JVM does not throw on integer overflow by default. In safety-critical code, you can check for overflow explicitly or use `Math.addExact`, which throws an `ArithmeticException` on overflow:
 
-```java
 int safe = Math.addExact(max, 1);   // throws ArithmeticException — overflow
-```
 
 ### The Floating-Point Types — float, double
 

@@ -30,9 +30,7 @@ public Order processOrder(OrderRequest request) {
 
 If the assertion fails, an `AssertionError` is thrown — a **programming error**, not a recoverable exception.
 
-```java
 **Critical distinction:** assertions are for *programming errors* (bugs in your code), not for *user input validation* (bad data from the outside world). Validation catches bad input; assertions catch internal inconsistencies.
-```
 
 ## Assertions are disabled by default
 
@@ -51,8 +49,8 @@ java -ea:com.backendforge.academy -jar app.jar
 
 This means assertions have **zero cost in production** — the JVM skips them entirely. They are a development and testing tool, not a runtime guard.
 
-```java
 **The implication:** never put logic with side effects inside an assertion:
+```java
 
 // WRONG: the counter increment is skipped when assertions are off
 assert processCounter.increment() == 1 : "Should be first";

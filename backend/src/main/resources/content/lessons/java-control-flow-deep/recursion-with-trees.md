@@ -8,6 +8,7 @@ docs:
   - https://docs.oracle.com/javase/tutorial/essential/io/walk.html
 capstone: false
 ---
+# Recursion with Trees — Where Recursion Earns Its Keep
 
 ## The Concept, From Zero
 

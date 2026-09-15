@@ -7,6 +7,7 @@ topics: [scoped-values, threadlocal, context-propagation, jep503, java26]
 docs:
   - https://openjdk.org/jeps/503
 ---
+# Scoped Values — Thread-Local Without the Pain
 
 ## The Concept, From Zero
 
@@ -24,9 +25,9 @@ public void handleRequest() {
         currentUser.remove();     // MUST clean up or memory leak!
     }
 }
+```
 
 **Problems with ThreadLocal:**
-```
 1. **Memory leaks** — if you forget `remove()`, values persist
 2. **Virtual threads** — millions of virtual threads = millions of ThreadLocal copies
 3. **Inheritance** — child threads don't automatically inherit ThreadLocal values

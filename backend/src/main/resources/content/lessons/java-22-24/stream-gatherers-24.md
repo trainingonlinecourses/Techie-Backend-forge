@@ -9,6 +9,7 @@ docs:
     title: JEP 485 — Stream Gatherers (final)
 capstone: false
 ---
+# Java 24 — Stream Gatherers (JEP 485, finalized)
 
 ## The idea in one sentence
 

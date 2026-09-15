@@ -7,6 +7,7 @@ topics: [nested-properties, list-binding, map-binding, complex-config, groups]
 docs:
   - https://docs.spring.io/spring-boot/reference/features/external-config.html#features.external-config.typesafe-configuration-properties
 ---
+# Nested Configuration Properties — Complex Config Structures
 
 ## The Concept, From Zero
 

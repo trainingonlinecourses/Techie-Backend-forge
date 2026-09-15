@@ -8,6 +8,7 @@ docs:
   - url: "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/arrays.html"
     title: "Arrays (The Java Tutorials)"
 ---
+# Multi-Dimensional Arrays — Matrices, Jagged Arrays, and Real Data
 
 ## The Concept, From Zero
 

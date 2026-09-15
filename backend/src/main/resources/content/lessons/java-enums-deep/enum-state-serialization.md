@@ -7,6 +7,7 @@ topics: [enum-state-machine, enum-serialization, read-resolve, transition-table,
 docs:
   - https://docs.oracle.com/javase/tutorial/essential/enum/index.html
 ---
+# Enum State Machines & Serialization — Real Patterns
 
 ## The Concept, From Zero
 

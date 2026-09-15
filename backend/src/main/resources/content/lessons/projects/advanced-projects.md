@@ -8,6 +8,7 @@ docs:
   - https://microservices.io/patterns/
   - https://docs.spring.io/spring-cloud/reference/
 ---
+# Advanced Projects — CQRS, Event Sourcing, Saga, and Distributed Patterns
 
 ## Project 21: CQRS Order System
 
@@ -66,8 +67,10 @@ public class PlaceOrderCommand {
         public void setPrice(BigDecimal price) { this.price = price; }
     }
 }
+```
 
 **OrderAggregate.java**
+```java
 package com.backendforge.cqrs.command;
 
 import com.backendforge.cqrs.common.DomainEvent;
@@ -497,8 +500,8 @@ public class OrderSagaOrchestrator {
 
 ### Spring Cloud Config Server
 
-```java
 **ConfigServerApplication.java**
+```java
 package com.backendforge.configserver;
 
 import org.springframework.boot.SpringApplication;

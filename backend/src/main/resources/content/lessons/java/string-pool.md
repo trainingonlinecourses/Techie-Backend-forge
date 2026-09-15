@@ -121,9 +121,9 @@ for (int i = 0; i < 1_000_000; i++) {
     unique.intern();   // adds to pool — but pool has limited memory!
     // After ~500K unique strings, you get OutOfMemoryError: Metaspace
 }
+```
 
 **Why this happens:** The pool lives in Metaspace (native memory), which is limited. Each interned string stays forever (or until GC runs a Full GC). In a loop creating millions of unique strings, the pool explodes.
-```
 
 <!-- why -->
 **What this code shows:**

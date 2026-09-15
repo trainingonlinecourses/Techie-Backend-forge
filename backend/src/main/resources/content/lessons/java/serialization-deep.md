@@ -35,9 +35,9 @@ public class UserAccount implements Serializable {
 
     // Getters, setters, constructor...
 }
+```
 
 **What gets serialized:**
-```
 - All non-transient, non-static fields
 - The entire object graph (every object this object references, recursively)
 - Static fields are NOT serialized (they belong to the class, not the instance)
@@ -148,9 +148,9 @@ public class MarketDataPoint implements Externalizable {
         symbol = in.readUTF();
     }
 }
+```
 
 **Why Externalizable here?** In a financial system processing millions of market data points per second, the reflection overhead of standard serialization is unacceptable. Externalizable writes fields in a fixed order with no metadata — roughly 3x faster.
-```
 
 <!-- why -->
 **What this code shows:**

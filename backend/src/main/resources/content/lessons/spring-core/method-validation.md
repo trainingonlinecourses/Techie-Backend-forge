@@ -42,16 +42,18 @@ The value: **the service self-documents and self-defends** — a caller passing 
 
 ## How we use it in an organization: the scenarios
 
-```java
 **Scenario 1 — the multi-entry-point service.** The same service method is called by a controller, a message consumer, and a batch job. Field validation on the DTO only fires in the controller path; the consumer and batch callers bypass it. **Method validation enforces the contract at the service boundary for every caller:**
+```java
 
 @Service @Validated
 public class OrderService {
     public void placeOrder(@NotNull @Valid PlaceOrderCommand cmd) { ... }
     // controller POST /api/orders AND kafka listener AND batch import — all validated
 }
+```
 
 **Scenario 2 — validation groups for partial updates.** The same DTO validated differently by operation:
+```java
 
 public interface CreateGroup {}
 public interface UpdateGroup {}
@@ -71,8 +73,8 @@ public class CustomerService {
 
 // @NotNull(groups = CreateGroup.class) on email → required on create, optional on update
 
-```java
 **Scenario 3 — return-value contracts.** A repository or client wrapper guarantees non-null results:
+```java
 
 public interface ProductClient {
     @NotNull

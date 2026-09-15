@@ -134,14 +134,12 @@ public class DataStreamClient {
             .retrieve()
             .bodyToFlux(DataChunk.class)
             .timeout(Duration.ofSeconds(30))
-```java
             .retry(3);
     }
 
     public Mono<byte[]> downloadFile(String fileId) {
         return webClient.get()
             .uri("/api/files/{id}", fileId)
-```
             .accept(MediaType.APPLICATION_OCTET_STREAM)
             .retrieve()
             .bodyToMono(byte[].class);

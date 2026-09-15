@@ -47,9 +47,7 @@ Getting status codes right is a core API quality issue — teams maintain a tabl
 | Server bug | 500 Internal Server Error |
 | Dependency down / timeout | 502/503/504 gateway variants |
 
-```java
 **The 401 vs 403 distinction** is the most common review point: 401 = "identify yourself (or your credentials are wrong)"; 403 = "I know who you are, you're not allowed". Returning 403 for unauthenticated requests breaks clients that react to 401 by prompting for credentials.
-```
 
 ## How we use it in an organization: the scenarios
 

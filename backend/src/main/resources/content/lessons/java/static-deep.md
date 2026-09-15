@@ -27,8 +27,8 @@ There are five distinct uses of `static`:
 
 ## Static fields — the good, the bad, and the dangerous
 
-```java
 **Good: immutable constants**
+```java
 
 public class OrderConstants {
     public static final String STATUS_CREATED = "CREATED";
@@ -44,8 +44,8 @@ public class OrderConstants {
 
 Safe because `final` prevents reassignment, and `String`/`int` are immutable.
 
-```java
 **Dangerous: mutable static state**
+```java
 
 public class ConnectionPool {
     // DANGER: mutable static state
@@ -74,8 +74,8 @@ public class ConnectionPool {
 
 The `activeConnections++` is **not atomic** and is not protected by any lock. Two threads can read the same value, both increment, and store the same result — losing a count. This is a classic race condition.
 
-```java
 **The fix: avoid mutable statics entirely. Use dependency injection:**
+```java
 
 @Component
 public class ConnectionPool {
@@ -116,9 +116,9 @@ public class CacheConfig {
         return CACHE.getOrDefault(key, "10m");
     }
 }
+```
 
 **Initialization order rules:**
-```
 
 1. Static fields and static blocks execute in source order.
 2. Parent class statics run before child class statics.

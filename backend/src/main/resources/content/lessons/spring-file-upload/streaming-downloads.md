@@ -7,6 +7,7 @@ topics: [streaming, download, content-disposition, range-requests, large-files]
 docs:
   - https://docs.spring.io/spring-framework/reference/web/webmvc/mvc-ann-responseentity.html
 ---
+# Streaming Downloads — Serving Files Efficiently
 
 ## The Concept, From Zero
 

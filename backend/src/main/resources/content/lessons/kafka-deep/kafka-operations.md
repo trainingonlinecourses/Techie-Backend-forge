@@ -36,7 +36,6 @@ public class AdminDemo {
             // Create a topic: 3 partitions (parallelism), replication 3
             // (fault tolerance — 3 brokers), retention 7 days.
             NewTopic orders = new NewTopic("orders", 3, (short) 3)
-```java
                     .configs(Map.of("retention.ms", "604800000"));
             try {
                 admin.createTopics(List.of(orders)).all().get();
@@ -58,7 +57,6 @@ public class AdminDemo {
 - When run, it prints: “Topic 'orders' created”, “Topic already exists — fine”
 
             admin.describeCluster().nodes().get()
-```java
                  .forEach(n -> System.out.println("Broker: " + n.host() + ":" + n.port()));
 ```
 

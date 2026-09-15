@@ -51,10 +51,6 @@ B can't reach A. B must decide:
 | Use for | Money, locks, coordination | Feeds, caches, shopping carts |
 
 
-**What this code does — step by step:**
-
-1. A CP choice: the majority must agree before the write is durable. (etcd/ZooKeeper quorum writes). A write to the minority side → error, not silent acceptance
-2. An AP choice: any node accepts the write and replicates async. (Cassandra/DynamoDB hinted handoff). Reads may lag — eventual consistency
 
 
 ## Consistency Models: The Spectrum

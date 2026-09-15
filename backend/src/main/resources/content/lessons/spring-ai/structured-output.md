@@ -33,7 +33,6 @@ String response = chatClient.prompt()
                 .param("txn", txn.toString())
                 .param("format", converter.getFormat()))     // "Respond in JSON with this schema..."
         .call()
-```java
         .content();
 
 FraudDecision decision = converter.convert(response);         // parse + validate
@@ -43,7 +42,7 @@ The converter injects the JSON schema into the prompt and parses the model's ans
 
 ## MapOutputConverter: when you just need key/values
 
-```java
+```
 MapOutputConverter converter = new MapOutputConverter();
 Map<String, Object> summary = converter.convert(response);
 ```
@@ -67,7 +66,6 @@ public class OrderTools {
     public String orderStatus(String orderId) {
         return orders.findById(orderId)
                 .map(o -> "Order %s is %s, total %s".formatted(o.getId(), o.getStatus(), o.getTotal()))
-```java
                 .orElse("Order not found: " + orderId);
     }
 }

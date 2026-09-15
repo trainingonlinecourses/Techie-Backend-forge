@@ -8,6 +8,7 @@ docs:
   - url: "https://docs.spring.io/spring-security/reference/servlet/exploits/csrf.html"
     title: "CSRF Protection"
 ---
+# Session Security — CSRF, Fixation, and Session Management Best Practices
 
 ## The Concept, From Zero
 
@@ -82,9 +83,9 @@ http.sessionManagement(session -> session
     .expiredUrl("/login?expired=true")     // Where to redirect
 ```java
 );
+```
 
 **When user A logs in from Device 1, then logs in from Device 2:**
-```
 - `maxSessionsPreventsLogin(false)` → Device 1 is logged out, Device 2 succeeds
 - `maxSessionsPreventsLogin(true)` → Device 2 is rejected, Device 1 stays
 

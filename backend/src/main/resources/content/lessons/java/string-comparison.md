@@ -72,8 +72,8 @@ Objects.equals(a, b)
 
 ## How we use it in an organization: the scenarios
 
-```java
 **Scenario 1 — status/state matching.** The canonical org code:
+```java
 
 if ("PAID".equals(order.getStatus())) { ... }          // literal FIRST — null-safe!
 if (order.getStatus().equals("PAID")) { ... }           // NPE if status is null!
@@ -115,8 +115,8 @@ if (status == Status.PAID_NAME) { ... }   // only safe if both are interned/lite
 
 This is an optimization for ultra-hot loops; teams generally ban it in review because the guarantee is fragile. Use `equals`.
 
-```java
 **Scenario 4 — input normalization before comparison.** The robust pattern: normalize once at the boundary, then compare confidently:
+```java
 
 // In a request DTO setter / validator:
 String normalized = raw.trim().toLowerCase(Locale.ROOT);   // Locale.ROOT avoids Turkish-i surprises
