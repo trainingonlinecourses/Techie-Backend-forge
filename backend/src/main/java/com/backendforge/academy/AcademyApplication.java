@@ -2,6 +2,7 @@ package com.backendforge.academy;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
  * BackendForge Academy — a full-stack Spring learning platform.
@@ -10,6 +11,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * The web UI (frontend/) talks to this API on port 8080.
  * All 675 lessons with proper summaries loaded.
  */
+@EnableScheduling
 @SpringBootApplication
 public class AcademyApplication {
 
