@@ -48,3 +48,23 @@ jobs:
           echo "Keep-alive ping completed at $(date -u)"
           echo "Workflow: ${{ github.workflow }}"
           echo "Run: ${{ github.run_number }}"
+
+      # The scheduled crons are heavily throttled (one every ~4h in practice),
+      # so a failing ping could leave the backend unmonitored for hours — which
+      # is exactly how the 2026-09-16 outage went unnoticed for 5. If the
+      # health check just failed, re-trigger this workflow on a short delay:
+      # workflow_dispatch runs are not throttled, so recovery pings arrive
+      # every ~2 minutes until the backend answers again.
+      - name: Re-trigger on failure (self-recovery loop)
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for i in 1 2 3 4 5; do
+            sleep 60
+            if gh workflow run keepalive.yml --ref main; then
+              echo "✓ re-triggered keepalive (attempt $i)"
+              break
+            fi
+            echo "re-trigger attempt $i failed (cron dismissal or API hiccup), retrying..."
+          done

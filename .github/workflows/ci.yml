@@ -83,6 +83,42 @@ jobs:
           path: frontend/dist/
           retention-days: 7
 
+  smoke-prod:
+    name: Prod smoke (Vercel + Render live)
+    runs-on: ubuntu-latest
+    needs: [content, backend, frontend]
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Install Playwright chromium
+        run: npx playwright install chromium --with-deps
+
+      # Real browser against the DEPLOYED app. Render free-tier cold starts are
+      # expected: the spec warms the API first and retries once on failure.
+      - name: Run production smoke suite
+        run: npx playwright test --config=playwright.prod.config.js
+
+      - name: Upload production smoke report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-prod
+          path: frontend/playwright-report-prod/
+          retention-days: 7
+
   e2e:
     name: E2E (register → login → lesson → persistence)
     runs-on: ubuntu-latest
