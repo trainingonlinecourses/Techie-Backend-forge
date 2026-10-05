@@ -59,12 +59,17 @@ jobs:
         if: failure()
         env:
           GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
         run: |
-          for i in 1 2 3 4 5; do
+          # -R is REQUIRED: this job never checks out the repo, so there is no
+          # .git directory for gh to infer the repository from. Without it every
+          # call fails with "fatal: not a git repository" and the self-recovery
+          # loop silently does nothing (exactly what happened for weeks).
+          for i in 1 2 3; do
             sleep 60
-            if gh workflow run keepalive.yml --ref main; then
+            if gh workflow run keepalive.yml --ref main -R "$REPO"; then
               echo "✓ re-triggered keepalive (attempt $i)"
               break
             fi
-            echo "re-trigger attempt $i failed (cron dismissal or API hiccup), retrying..."
+            echo "re-trigger attempt $i failed (API hiccup), retrying..."
           done

@@ -22,24 +22,48 @@ function mkUsername(retry = 0) {
   return `psmoke_${Date.now().toString(36)}${retry}${Math.floor(Math.random() * 1e4).toString(36)}`;
 }
 
-// Render free tier sleeps after ~15 idle minutes; the first requests then
-// hang (not 503 — HANG) for minutes. Warm the API through Vercel's proxy
-// before any assertion, exactly like the keepalive workflow does.
-test.afterAll(async () => {
-  for (let i = 1; i <= 6; i++) {
+// Render free tier sleeps after ~15 idle minutes; the first request then HANGS
+// (not 503 — no response at all) while the instance boots. Warm the API through
+// Vercel's proxy before any assertion.
+//
+// This runs in beforeAll (not afterAll) and THROWS on failure, deliberately:
+// a dead backend must fail the job in ~2 minutes with one clear message. The
+// previous version warned and let all four tests run anyway, each burning its own
+// 150s timeout — a 29-minute CI job that said only "failed".
+test.beforeAll(async () => {
+  // Budget must stay well under the suite's 150s per-test timeout: beforeAll
+  // shares that timeout, so a budget >= it would be killed mid-loop and report
+  // a generic "hook timeout" instead of this diagnostic.
+  const DEADLINE = 90_000; // total warmup budget
+  const PER_ATTEMPT = 15_000;
+  const started = Date.now();
+  let last = 'no attempt completed';
+
+  while (Date.now() - started < DEADLINE) {
     try {
-      const res = await fetch(`${BASE}/api/content/stats`, { signal: AbortSignal.timeout(60_000) });
+      const res = await fetch(`${BASE}/api/content/stats`, {
+        signal: AbortSignal.timeout(PER_ATTEMPT),
+      });
       if (res.ok) {
-        console.log(`\n[smoke-prod] API warmed after ${i} attempt(s)`);
+        console.log(`\n[smoke-prod] API warmed in ${Math.round((Date.now() - started) / 1000)}s`);
         return;
       }
-      console.log(`[smoke-prod] warmup attempt ${i}: HTTP ${res.status}`);
+      last = `HTTP ${res.status}`;
     } catch (e) {
-      console.log(`[smoke-prod] warmup attempt ${i}: ${e.name}`);
+      // A hung Render instance rejects as a timeout/fetch error, not a status.
+      last = e.name === 'TimeoutError' ? 'timeout (no response)' : e.name;
     }
-    await new Promise((r) => setTimeout(r, 10_000));
+    await new Promise((r) => setTimeout(r, 5_000));
   }
-  console.log('\n[smoke-prod] WARNING: API still not answering after warmup — tests will run and fail');
+
+  throw new Error(
+    `PRODUCTION BACKEND IS DOWN — ${BASE}/api/content/stats never answered ` +
+      `(${last}) after ${Math.round(DEADLINE / 1000)}s.\n` +
+      `This is an outage, not a test bug. Recovery: Render dashboard -> the service -> ` +
+      `Manual Deploy -> "Clear build cache & deploy". If it still fails to boot, check ` +
+      `that the Supabase project behind DATABASE_URL is not paused ` +
+      `(Supabase dashboard -> the project -> Restore). See docs/ops-production-monitoring.md.`
+  );
 });
 
 /** Register a fresh account through the production UI and wait until signed in. */

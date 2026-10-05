@@ -59,27 +59,32 @@ public class AppConfig {
                         "allowCredentials=true a wildcard is rejected by browsers and is " +
                         "never correct for this API. Use explicit origins instead.");
             }
-        }
-        if (isProductionLike(env)) {
+        }if (isProductionLike(env)) {
             for (String o : origins) {
+                // Any HTTP origin is rejected, which covers localhost/127.0.0.1
+                // too — a single rule keeps this from drifting into dead branches.
                 if (o.startsWith("http://")) {
                     throw new IllegalStateException(
-                            "app.cors.allowed-origins contains an HTTP (non-TLS) origin '" + o +
-                            "' in a nonlocal environment. The API is served over HTTPS; " +
-                            "allowing an HTTP origin would let a network attacker impersonate " +
-                            "the SPA. Use HTTPS origins only.");
-                }
-                if (o.startsWith("http://localhost") || o.startsWith("http://127.0.0.1")) {
-                    throw new IllegalStateException(
-                            "app.cors.allowed-origins contains a localhost/127.0.0.1 origin '" + o +
-                            "' in a nonlocal environment. Dev origins must not be reachable " +
-                            "from production browsers.");
+                            "app.cors.allowed-origins contains a non-TLS origin '" + o
+                            + "' in a deployed environment. The API is served over HTTPS; "
+                            + "allowing an HTTP origin would let a network attacker impersonate "
+                            + "the SPA. Use HTTPS origins only (a localhost origin counts as "
+                            + "HTTP and must not be deployed).");
                 }
             }
         }
         System.out.println("[AppConfig] CORS allowed origins: " + origins);
     }
 
+    /**
+     * Deployed vs. local.
+     *
+     * <p>Render (and most PaaS providers) inject {@code PORT} to tell the app which
+     * port to bind. Some environments — Git Bash on Windows in particular — also
+     * export {@code PORT=0}, meaning "pick any free port". Treating that as
+     * "deployed" made the CORS guard reject the default localhost dev origins and
+     * crashed startup with a misleading security error, so require a real port.
+     */
     private boolean isProductionLike(Environment env) {
         String active = env.getProperty("spring.profiles.active");
         // "test" is a test slice, not a production environment — do not reject
@@ -87,6 +92,16 @@ public class AppConfig {
         if (active != null && (active.contains("test") || active.contains("local"))) {
             return false;
         }
-        return env.getProperty("PORT") != null;
+        String port = env.getProperty("PORT");
+        if (port == null || port.isBlank()) {
+            return false;
+        }
+        try {
+            return Integer.parseInt(port.trim()) > 0;
+        } catch (NumberFormatException e) {
+            // A non-numeric PORT is not a provider binding hint; stay permissive
+            // so a weird local environment cannot lock the app out of booting.
+            return false;
+        }
     }
 }
