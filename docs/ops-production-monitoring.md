@@ -14,7 +14,9 @@
 1. **Keepalive** (`.github/workflows/keepalive.yml`) — pings health + content every
    ~15 minutes. On failure it **re-triggers itself every ~2 minutes** until the API
    answers again (scheduled crons are heavily throttled by GitHub; dispatch runs are
-   not). This is the "it stopped responding" alarm AND the retry heartbeat.
+   not). This is the "it stopped responding" alarm AND the retry heartbeat. The
+   re-trigger passes `-R ${{ github.repository }}` — that job has no checkout, so
+   without it `gh` cannot infer the repo and the loop silently does nothing.
 2. **CI smoke-prod** (`.github/workflows/ci.yml` → `smoke-prod` job) — after every
    push, real-browser checks against production: lesson load, signup, login,
    completion persistence, prereq gate. A functional break in prod fails the push's
@@ -57,8 +59,13 @@ workflow still alerts via the re-trigger loop, and recovery is manual per above.
 - GitHub-scheduled workflows on free repos are heavily throttled — expect one run
   every ~2–4 hours, not every 5 minutes. That's why the failure loop uses
   `workflow_dispatch`, which is never throttled.
-- The production smoke suite warms the API itself (`test.afterAll` retry loop in
-  `frontend/e2e-prod/smoke.spec.js`) and tolerates one cold start per test via
-  Playwright `retries`.
+- The production smoke suite warms the API in `test.beforeAll` and tolerates a
+  Render cold start (90s budget). If the API never answers it aborts the whole
+  job in ~90 seconds with the recovery steps above, rather than letting every
+  test burn its own timeout — that variant turned a dead backend into a
+  30-minute CI run that reported only "failed".
+- A `PORT` env var is what marks the app as deployed (Render injects it). It must
+  be a real port: shells such as Git Bash export `PORT=0`, and treating that as
+  production makes the CORS guard reject the local dev origins and crash startup.
 - CI minutes: the smoke-prod job adds ~3–5 minutes per push. If that becomes a
   problem, gate it to `workflow_dispatch` + a `schedule` cron instead of every push.

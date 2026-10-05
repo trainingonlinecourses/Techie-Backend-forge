@@ -4,7 +4,22 @@ export const TOKEN_KEY = 'backendforge_token';
 
 // In dev, Vite proxies /api to the backend. In production, point VITE_API_URL at
 // the deployed backend (e.g. https://your-backend-host.com/api) during the build.
-export const api = axios.create({ baseURL: import.meta.env.VITE_API_URL || '/api' });
+//
+// The timeout is NOT optional. When the deployed backend is wedged it accepts the
+// TCP connection and then never answers, so the request stays pending forever
+// instead of rejecting — which meant every .catch() fallback (the bundled
+// curriculum, error banners) silently never ran and the UI sat on
+// "Loading curriculum…" indefinitely. Axios has no default timeout, so without
+// this a hung backend is indistinguishable from a slow one.
+// Kept above Render's cold-start (30-60s) window? No — deliberately below it:
+// the cold-start retry below re-issues the request, which is itself the wake
+// trigger, so the total budget still covers a full wake.
+const REQUEST_TIMEOUT_MS = 20_000;
+
+export const api = axios.create({
+  baseURL: import.meta.env.VITE_API_URL || '/api',
+  timeout: REQUEST_TIMEOUT_MS,
+});
 
 // ---- Render cold-start resilience -----------------------------------------
 // The free-tier backend sleeps after ~15 idle minutes and takes 30-60s to wake.
@@ -22,13 +37,14 @@ api.interceptors.response.use(
   undefined,
   (error) => {
     const config = error.config || {};
+    const retriesSoFar = config.__wakeRetries || 0;
     const retryable =
-      config.__wakeRetried === undefined && // retry only once per request chain
+      retriesSoFar < WAKE_RETRIES && // bounded: then the caller's fallback runs
       isColdStartError(error) &&
       (config.method || 'get').toLowerCase() === 'get' &&
       !config.url?.includes('/auth/'); // never blind-retry auth endpoints
     if (retryable) {
-      config.__wakeRetried = true;
+      config.__wakeRetries = retriesSoFar + 1;
       return new Promise((resolve, reject) => {
         setTimeout(() => {
           api.request(config).then(resolve, reject);
