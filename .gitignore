@@ -32,3 +32,11 @@ Thumbs.db
 
 .vercel
 .env*.local
+
+# Any plain .env holds real credentials — `supabase link` writes the database
+# password there, and DATABASE_URL / DATABASE_PASSWORD are production secrets.
+# Only the explicit *.example templates are allowed to be tracked.
+.env
+.env.*
+!.env.example
+!.env.*.example
