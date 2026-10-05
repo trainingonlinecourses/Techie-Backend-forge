@@ -166,7 +166,16 @@ function auditLesson(rel, text) {
       // explaining this block, so stop there.
       const window = body.slice(f.close + 1, f.close + 9);
       const firstMeaningful = window.find(
-        (l) => l.trim() && !/^\s*#{1,6}\s/.test(l) && !/^\s*<!--/.test(l) && !/^\s*```/.test(l)
+        (l) =>
+          l.trim() &&
+          !/^\s*#{1,6}\s/.test(l) &&
+          !/^\s*<!--/.test(l) &&
+          !/^\s*```/.test(l) &&
+          // A bolded file label introduces the NEXT file in a multi-file
+          // listing (e.g. "**TaskService.java**"). That names the code just
+          // shown as clearly as a heading would, so it is not a missing
+          // explanation.
+          !/^\s*\*\*[^*]+\*\*:?\s*$/.test(l)
       );
       const after = window.join('\n');
       if (EXPLAINED.test(after) || WHY_MARKER.test(after) || BULLET_OR_NUM.test(after)) return;
