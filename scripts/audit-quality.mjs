@@ -26,6 +26,11 @@ const base = path.join(root, 'backend/src/main/resources/content/lessons');
 
 const REPORT = [];
 const fail = (lesson, kind, msg) => REPORT.push({ lesson, kind, msg });
+// Advisory, not a defect: real content quality notes that must NOT be counted
+// as failures (and must never gate CI). Used for style-consistency signals such
+// as an explanation written in prose rather than the "<!-- why -->" shape.
+const NOTES = [];
+const note = (lesson, kind, msg) => NOTES.push({ lesson, kind, msg });
 
 // ---------- fence helpers ----------
 
@@ -129,15 +134,55 @@ function auditLesson(rel, text) {
         if (usesP && !definesP) fail(rel, 'code', `possible non-compiling program at line ${bodyStart + f.open + 1}: uses obj/process without defining them`);
       }
     }
-    // generated-explanation coverage (any explanation voice counts)
-    const withExpl = fences.filter((f) => {
-      const after = body.slice(f.close + 1, f.close + 8).join('\n');
-      return /What this code (shows|does)|Line-by-line|step[- ]by[- ]step|walkthrough|How (this|it) works|\*\*Output|breakdown/i.test(after)
-        || /^\s*\d+[.)]\s|^\s*[-*+]\s/m.test(after);
-    }).length;
-    const bare = fences.length - withExpl;
+    // Explanation coverage.
+    //
+    // This previously counted only a narrow marker vocabulary ("What this code
+    // shows", "step-by-step", a bullet list) and so reported ~94 lessons as
+    // unexplained when most of them DO explain the code in ordinary prose —
+    // e.g. java-keywords.md answers every block with "In this example, ..."
+    // That produced false positives that invited pointless rewriting of good
+    // content, so the two cases are now separated:
+    //
+    //   bare     — NOTHING but whitespace/heading follows the fence. A real
+    //              defect: the reader gets code with no explanation at all.
+    //   offVoice — real prose, but not in the "<!-- why --> / What this code
+    //              does" shape the UI renders as a Show/Hide explanation.
+    //              A style inconsistency, reported separately and at lower
+    //              severity, never conflated with a missing explanation.
+    const EXPLAINED = /What this code (shows|does)|Line-by-line|step[- ]by[- ]step|walkthrough|How (this|it) works|\*\*Output|breakdown/i;
+    const WHY_MARKER = /^\s*<!--\s*why\s*-->/i;
+    const BULLET_OR_NUM = /^\s*([-*+]\s|\d+[.)]\s)/m;
+
+    let bare = 0;
+    let offVoice = 0;
+    fences.forEach((f, idx) => {
+      // A fence immediately followed by another fence is a before/after or
+      // wrong/right comparison pair. The pair is explained once, after the
+      // SECOND block, so the first block needs no explanation of its own.
+      const nextIsFence = idx + 1 < fences.length && fences[idx + 1].open <= f.close + 2;
+      if (nextIsFence) return;
+
+      // Look past a heading: a "## Next topic" section heading is not prose
+      // explaining this block, so stop there.
+      const window = body.slice(f.close + 1, f.close + 9);
+      const firstMeaningful = window.find(
+        (l) => l.trim() && !/^\s*#{1,6}\s/.test(l) && !/^\s*<!--/.test(l) && !/^\s*```/.test(l)
+      );
+      const after = window.join('\n');
+      if (EXPLAINED.test(after) || WHY_MARKER.test(after) || BULLET_OR_NUM.test(after)) return;
+      if (!firstMeaningful) {
+        bare++; // nothing at all follows — genuine missing explanation
+      } else if (firstMeaningful.trim().length > 40) {
+        offVoice++; // prose explanation, just not in the Show/Hide shape
+      } else {
+        bare++;
+      }
+    });
     if (bare > Math.max(2, fences.length * 0.25)) {
-      fail(rel, 'code', `${bare}/${fences.length} code blocks have no explanation below`);
+      fail(rel, 'code', `${bare}/${fences.length} code blocks have NO explanation below`);
+    }
+    if (offVoice > Math.max(2, fences.length * 0.25)) {
+      note(rel, 'code', `${offVoice}/${fences.length} explanations are prose but lack a "<!-- why -->" marker`);
     }
   }
 
@@ -190,7 +235,7 @@ for (const modId of moduleIds) {
 }
 for (const r of REPORT) byKind[r.kind] = (byKind[r.kind] || 0) + 1;
 
-console.log(`Audited ${lessons} lesson(s) in ${moduleIds.length} module(s) — ${REPORT.length} finding(s)\n`);
+console.log(`Audited ${lessons} lesson(s) in ${moduleIds.length} module(s) — ${REPORT.length} finding(s), ${NOTES.length} advisory note(s)\n`);
 for (const [kind, n] of Object.entries(byKind).sort((a, b) => b[1] - a[1])) {
   console.log(`  ${kind}: ${n}`);
 }
@@ -201,5 +246,13 @@ for (const kind of KINDS) {
   if (!rows.length) continue;
   console.log(`== ${kind.toUpperCase()} (${rows.length}) ==`);
   for (const r of rows) console.log(`  ${r.lesson}: ${r.msg}`);
+  console.log('');
+}
+// Advisory notes are style consistency, never defects: listed separately so
+// they are visible but can never be mistaken for a failure or gate a build.
+if (NOTES.length) {
+  console.log(`== ADVISORY (${NOTES.length}, not defects) ==`);
+  for (const n of NOTES.slice(0, 40)) console.log(`  ${n.lesson}: ${n.msg}`);
+  if (NOTES.length > 40) console.log(`  ... and ${NOTES.length - 40} more`);
   console.log('');
 }
