@@ -18,7 +18,6 @@ name: Keep Render backend awake
 #
 # This repo is public, so scheduled GitHub Actions runs are free.
 on:
-on:
   schedule:
     # GitHub throttles scheduled workflows under load — a single */5 cron ran
     # hours apart in practice (19:10 → 13:58 → 07:06), letting Render sleep and

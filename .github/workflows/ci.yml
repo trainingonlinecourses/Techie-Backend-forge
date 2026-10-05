@@ -26,6 +26,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      # A duplicate key makes GitHub reject the ENTIRE workflow file, which
+      # silently disables the uptime guard — the same silent-monitor-failure
+      # mode it exists to prevent. This shipped once already (`on:` twice).
+      - name: Validate workflow YAML
+        run: node scripts/verify-workflows.mjs
+
       - name: Verify curriculum integrity
         run: node scripts/verify-content.mjs
 
