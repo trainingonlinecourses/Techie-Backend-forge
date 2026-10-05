@@ -4,19 +4,22 @@
 
 | Surface | URL | Checked by |
 |---|---|---|
-| Frontend (Vercel) | https://techie-backend-forge.vercel.app | keepalive (every ~15 min) + CI smoke-prod |
-| API health (Render) | https://backendforge-academy-api-bef2.onrender.com/actuator/health | keepalive (every ~15 min) + CI smoke-prod |
-| API content | .../api/content/stats | keepalive + smoke-prod |
-| Vercel → Render proxy | https://techie-backend-forge.vercel.app/api/content/stats | smoke-prod |
+| Frontend (Vercel) | https://techie-backend-forge.vercel.app | uptime guard + CI smoke-prod |
+| API health (Render) | https://backendforge-academy-api-bef2.onrender.com/actuator/health | uptime guard + CI smoke-prod |
+| API content | .../api/content/stats | uptime guard + smoke-prod |
+| Vercel → Render proxy | https://techie-backend-forge.vercel.app/api/content/stats | uptime guard + smoke-prod |
 
 ## Layers
 
-1. **Keepalive** (`.github/workflows/keepalive.yml`) — pings health + content every
-   ~15 minutes. On failure it **re-triggers itself every ~2 minutes** until the API
-   answers again (scheduled crons are heavily throttled by GitHub; dispatch runs are
-   not). This is the "it stopped responding" alarm AND the retry heartbeat. The
-   re-trigger passes `-R ${{ github.repository }}` — that job has no checkout, so
-   without it `gh` cannot infer the repo and the loop silently does nothing.
+1. **Uptime guard** (`.github/workflows/keepalive.yml` → `scripts/uptime-guard.mjs`) —
+   checks the API, the frontend and the Vercel→API proxy, then auto-redeploys the
+   cases a redeploy genuinely fixes (see the table above). On failure it
+   re-triggers itself every ~90s so recovery isn't stuck behind GitHub's
+   heavily-throttled cron. This single job is both the alarm and the repair.
+2. **CI smoke-prod** (`.github/workflows/ci.yml` → `smoke-prod` job) — after every
+   push, real-browser checks against production: lesson load, signup, login,
+   completion persistence, prereq gate. A functional break in prod fails the push's
+   CI, so it cannot go unnoticed.
 2. **CI smoke-prod** (`.github/workflows/ci.yml` → `smoke-prod` job) — after every
    push, real-browser checks against production: lesson load, signup, login,
    completion persistence, prereq gate. A functional break in prod fails the push's
@@ -44,15 +47,54 @@ pipeline itself is healthy — it does NOT fix a wedged boot or a paused databas
 
 ## Auto-recovery (needs one secret)
 
-Create a Render **Deploy Hook** (Service → Settings → Deploy Hooks), then:
+`scripts/uptime-guard.mjs` is the recovery brain: it diagnoses the failure mode
+and redeploys **only what a redeploy can actually fix**.
+
+| Diagnosis | Auto-recover? | Why |
+|---|---|---|
+| API hangs (TCP connects, 0 bytes) | ✅ Render redeploy + cache clear | a wedged container is exactly what a redeploy fixes |
+| Frontend unreachable | ✅ `vercel redeploy` | Vercel-side failure, Render's API can't help |
+| API unreachable (DNS/conn refused) | ❌ manual | the service is gone; redeploy can't resurrect it |
+| API answers with an error (404/500) | ❌ manual | the app is UP — a redeploy would mask the real cause |
+| Healthy | — | no action |
+
+A paused Supabase project lands in the last two rows: the app boots, can't reach
+the database, and dies again. Redeploying in a loop cannot fix that, so the
+guard reports it and stops. A 30-minute cooldown also prevents every throttled
+cron tick from queueing another build during a real outage.
+
+### 1. Get a Render API key (required for auto-recovery)
+
+Render dashboard → your account → **API Keys** → *Create API Key* → copy it.
 
 ```bash
-gh secret set RENDER_DEPLOY_HOOK_URL   # paste the hook URL
+gh secret set RENDER_API_KEY        # paste the key
 ```
 
-The keepalive workflow will then call it automatically when the API has been
-unresponsive for 10+ minutes. If the secret is absent (current state), the
-workflow still alerts via the re-trigger loop, and recovery is manual per above.
+The guard resolves your service **by name** (`backendforge-academy-api-bef2`),
+so no service id is needed. Override with `RENDER_SERVICE_NAME` if you rename it.
+
+### 2. Get a Vercel token (optional, frontend only)
+
+Vercel dashboard → Account Settings → Tokens → Create Token.
+
+```bash
+gh secret set VERCEL_TOKEN          # paste the token
+```
+
+Without it the guard still checks the frontend and just reports it instead of
+redeploying. The API key/secret are only ever read from the Actions environment —
+never committed, never written to disk by the script.
+
+### Verify the automation end to end
+
+```bash
+node scripts/uptime-guard.mjs --check   # check only, never redeploys
+node scripts/uptime-guard.mjs           # check + recover if needed
+```
+
+Exit codes: `0` healthy or recovered, `1` still down (manual steps printed),
+`2` bad configuration.
 
 ## Notes
 

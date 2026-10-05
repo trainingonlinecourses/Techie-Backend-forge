@@ -1,11 +1,23 @@
 name: Keep Render backend awake
 
-# Render free web services sleep after ~15 minutes of inbound-idle traffic and
-# take ~30-60s to wake, which makes the first request after a quiet period slow
-# (or fail the browser's initial calls). Pinging every 5 minutes keeps the
-# instance warm. This repo is public, so GitHub Actions scheduled runs are free.
-# For extra safety you can add a second pinger on cron-job.org pointing at
-# the same URL — see README "Render keep-alive" section.
+# This workflow is the production uptime guard. It does two jobs:
+#
+#  1. KEEPS WARM — Render free web services sleep after ~15 minutes of idle
+#     traffic and take ~30-60s to wake, so a periodic check keeps the instance
+#     hot and the first visitor's request fast.
+#
+#  2. SELF-HEALS — if the API stops answering, scripts/uptime-guard.mjs
+#     diagnoses the failure and automatically redeploys ONLY the cases a
+#     redeploy genuinely fixes (a wedged Render container, a dead Vercel
+#     frontend). Cases it cannot fix — a paused Supabase project, an app that
+#     is up but erroring — are reported with exact manual steps instead of
+#     being retried forever.
+#
+# Auto-recovery needs one secret: RENDER_API_KEY (see docs/ops-production-monitoring.md).
+# VERCEL_TOKEN is optional and only used to redeploy the frontend.
+#
+# This repo is public, so scheduled GitHub Actions runs are free.
+on:
 on:
   schedule:
     # GitHub throttles scheduled workflows under load — a single */5 cron ran
@@ -23,52 +35,57 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  ping:
-    name: Wake Render
+  guard:
+    name: Uptime guard (check + auto-recover)
     runs-on: ubuntu-latest
     steps:
-      - name: Hit health endpoint
-        run: |
-          echo "Pinging Render backend at $(date -u)..."
-          # --fail-with-body: non-2xx fails the step but still prints the response,
-          # so the Actions log shows WHAT the health endpoint returned, not just the code.
-          curl -sS --fail-with-body --retry 3 --retry-delay 5 --max-time 60 \
-            https://backendforge-academy-api-bef2.onrender.com/actuator/health \
-            && echo "✓ health OK"
+      # Checkout is required now: the guard script lives in the repo. (This is
+      # also what the old `gh workflow run -R` step was missing a repo for.)
+      - name: Check out repo
+        uses: actions/checkout@v4
 
-      - name: Warm the content cache
-        run: |
-          curl -fsS --retry 2 --retry-delay 3 --max-time 30 \
-            https://backendforge-academy-api-bef2.onrender.com/api/content/stats \
-            && echo "✓ content cache warm"
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # Diagnose, and redeploy ONLY what a redeploy can fix (a wedged boot).
+      # A wedged container or a dead frontend is recovered automatically; a
+      # paused database or an erroring app is reported with manual steps,
+      # because retrying those just burns builds and hides the real cause.
+      - name: Check production and recover if possible
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          # Cooldown lives in the Actions cache: without it, every throttled
+          # cron tick would queue another Render build during a real outage.
+          GUARD_STATE_DIR: ${{ runner.temp }}/guard
+        run: node scripts/uptime-guard.mjs
 
       - name: Log result
         if: always()
         run: |
-          echo "Keep-alive ping completed at $(date -u)"
+          echo "Uptime guard completed at $(date -u)"
           echo "Workflow: ${{ github.workflow }}"
           echo "Run: ${{ github.run_number }}"
 
-      # The scheduled crons are heavily throttled (one every ~4h in practice),
-      # so a failing ping could leave the backend unmonitored for hours — which
-      # is exactly how the 2026-09-16 outage went unnoticed for 5. If the
-      # health check just failed, re-trigger this workflow on a short delay:
-      # workflow_dispatch runs are not throttled, so recovery pings arrive
-      # every ~2 minutes until the backend answers again.
-      - name: Re-trigger on failure (self-recovery loop)
+      # A failing guard re-checks shortly rather than waiting for the next cron
+      # slot (which GitHub throttles to ~every 2-4h in practice). That is what
+      # let the backend sit dark for weeks: failures were recorded but nobody
+      # re-checked. workflow_dispatch runs are never throttled.
+      - name: Re-check shortly after a failure
         if: failure()
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
         run: |
-          # -R is REQUIRED: this job never checks out the repo, so there is no
-          # .git directory for gh to infer the repository from. Without it every
-          # call fails with "fatal: not a git repository" and the self-recovery
-          # loop silently does nothing (exactly what happened for weeks).
-          for i in 1 2 3; do
-            sleep 60
+          # -R is REQUIRED: gh infers the repository from the local git
+          # checkout, and without it every call fails with
+          # "fatal: not a git repository" — the loop silently did nothing.
+          for i in 1 2; do
+            sleep 90
             if gh workflow run keepalive.yml --ref main -R "$REPO"; then
-              echo "✓ re-triggered keepalive (attempt $i)"
+              echo "✓ re-triggered uptime guard (attempt $i)"
               break
             fi
             echo "re-trigger attempt $i failed (API hiccup), retrying..."
